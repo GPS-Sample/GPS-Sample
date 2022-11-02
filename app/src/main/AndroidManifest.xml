@@ -13,6 +13,14 @@
         android:theme="@style/Theme.GPSSample"
         tools:targetApi="31">
         <activity
+            android:name=".activity.manager.network.NetworkActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+ 
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
