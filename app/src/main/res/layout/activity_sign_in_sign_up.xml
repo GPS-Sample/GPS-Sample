@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.SignInSignUpActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.GPSSample.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/Theme.GPSSample.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <Button
+            android:id="@+id/admin_sign_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_above="@+id/admin_sign_up_button"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Admin Sign In" />
+
+        <TextView
+            android:id="@+id/admin_sign_up_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_above="@+id/supervisor_sign_in_button"
+            android:gravity="center"
+            android:textColor="#0000ff"
+            android:text="Not Registered? Sign Up!" />
+
+        <Button
+            android:id="@+id/supervisor_sign_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Supervisor Sign In" />
+
+        <TextView
+            android:id="@+id/supervisor_sign_up_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/supervisor_sign_in_button"
+            android:gravity="center"
+            android:textColor="#0000ff"
+            android:text="Not Registered? Sign Up!" />
+
+        <Button
+            android:id="@+id/enumerator_sign_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/supervisor_sign_up_button"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Enumerator Sign In" />
+
+        <TextView
+            android:id="@+id/enumerator_sign_up_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/enumerator_sign_in_button"
+            android:gravity="center"
+            android:textColor="#0000ff"
+            android:text="Not Registered? Sign Up!" />
+
+    </RelativeLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

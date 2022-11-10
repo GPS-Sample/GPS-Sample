@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GPSSample</string>
+    <string name="app_name"></string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -11,4 +11,11 @@
     <string name="gps_sample">GPS Sample</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string-array name="forgot_pin_questions">
+        <item>"Father's middle name"</item>
+        <item>"Mother's maiden name"</item>
+        <item>"Childhood best friend"</item>
+        <item>"Favorite Pet's name"</item>
+    </string-array>
 </resources>

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.activity.manager.network.NetworkActivity
 import edu.gtri.gpssample.databinding.FragmentFirstBinding
 
@@ -35,15 +36,15 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonManager.setOnClickListener {
-            val intent = Intent(activity, NetworkActivity::class.java)
-            try {
-                startActivity(intent)
-            }catch( ex : Exception)
-            {
-                ex.printStackTrace()
-            }
+//            val intent = Intent(activity, NetworkActivity::class.java)
+//            try {
+//                startActivity(intent)
+//            }catch( ex : Exception)
+//            {
+//                ex.printStackTrace()
+//            }
 
-//            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
     }
 
