@@ -1,4 +1,4 @@
-package edu.gtri.innc.gpssample
+package edu.gtri.gpssample
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import edu.gtri.innc.gpssample.databinding.FragmentSecondBinding
+import edu.gtri.gpssample.databinding.FragmentSecondBinding
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.

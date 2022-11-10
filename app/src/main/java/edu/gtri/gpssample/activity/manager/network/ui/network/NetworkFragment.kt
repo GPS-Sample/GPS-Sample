@@ -1,4 +1,4 @@
-package edu.gtri.innc.gpssample.activity.manager.network.ui.network
+package edu.gtri.gpssample.activity.manager.network.ui.network
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import edu.gtri.innc.gpssample.R
+import edu.gtri.gpssample.R
 
 class NetworkFragment : Fragment() {
 

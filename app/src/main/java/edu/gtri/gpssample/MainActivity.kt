@@ -1,4 +1,4 @@
-package edu.gtri.innc.gpssample
+package edu.gtri.gpssample
 
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
@@ -9,7 +9,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
-import edu.gtri.innc.gpssample.databinding.ActivityMainBinding
+import edu.gtri.gpssample.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

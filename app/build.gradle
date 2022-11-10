@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'edu.gtri.innc.gpssample'
+    namespace 'edu.gtri.gpssample'
     compileSdk 32
 
     defaultConfig {
-        applicationId "edu.gtri.innc.gpssample"
+        applicationId "edu.gtri.gpssample"
         minSdk 29
         targetSdk 32
         versionCode 1
