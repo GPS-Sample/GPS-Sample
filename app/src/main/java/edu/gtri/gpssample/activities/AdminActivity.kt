@@ -2,6 +2,8 @@ package edu.gtri.gpssample.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.ActivityAdminBinding
@@ -15,13 +17,18 @@ class AdminActivity : AppCompatActivity() {
 
         binding = ActivityAdminBinding.inflate(layoutInflater)
         setContentView(binding.root)
+    }
 
-        binding.signOutButton.setOnClickListener {
-            finish()
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
 
-            val intent = Intent(this, SignInSignUpActivity::class.java)
-            startActivity( intent )
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        finish()
+        val intent = Intent(this, SignInSignUpActivity::class.java)
+        startActivity( intent )
+        return true
     }
 
     override fun onBackPressed() {

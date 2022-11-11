@@ -61,6 +61,10 @@
             android:name=".activities.EnumeratorActivity"
             android:screenOrientation="portrait">
         </activity>
-    </application>
 
+        <activity
+            android:name=".activities.BarcodeScanActivity"
+            android:screenOrientation="portrait">
+        </activity>
+    </application>
 </manifest>

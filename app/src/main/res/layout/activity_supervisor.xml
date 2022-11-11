@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.SupervisorActivity">
+    tools:context=".activities.AdminActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -15,15 +15,5 @@
         android:textColor="@color/primary"
         android:textSize="20dp"
         android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/sign_out_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
-        android:layout_gravity="bottom"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="Sign Out" />
 
 </FrameLayout>

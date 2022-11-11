@@ -37,12 +37,15 @@ class SignInActivity : AppCompatActivity() {
 
                 when (role) {
                     Role.Admin -> intent = Intent(this, AdminActivity::class.java)
-                    Role.Supervisor -> intent = Intent(this, SupervisorActivity::class.java)
-                    Role.Enumerator -> intent = Intent(this, EnumeratorActivity::class.java)
+                    Role.Supervisor -> intent = Intent(this, BarcodeScanActivity::class.java)
+                    Role.Enumerator -> intent = Intent(this, BarcodeScanActivity::class.java)
                     else -> {}
                 }
 
+                intent.putExtra( "role", roleVal )
+
                 startActivity( intent )
+
                 overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
 
                 // clear the back stack of all previous activities

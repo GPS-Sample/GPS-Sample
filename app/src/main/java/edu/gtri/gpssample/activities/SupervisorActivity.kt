@@ -2,9 +2,17 @@ package edu.gtri.gpssample.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.google.mlkit.common.MlKitException
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.ActivitySupervisorBinding
+import java.util.*
 
 class SupervisorActivity : AppCompatActivity() {
 
@@ -15,13 +23,18 @@ class SupervisorActivity : AppCompatActivity() {
 
         binding = ActivitySupervisorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+    }
 
-        binding.signOutButton.setOnClickListener {
-            finish()
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
 
-            val intent = Intent(this, SignInSignUpActivity::class.java)
-            startActivity( intent )
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        finish()
+        val intent = Intent(this, SignInSignUpActivity::class.java)
+        startActivity( intent )
+        return true
     }
 
     override fun onBackPressed() {
