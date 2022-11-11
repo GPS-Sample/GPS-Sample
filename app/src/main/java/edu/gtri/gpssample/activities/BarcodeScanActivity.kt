@@ -28,6 +28,13 @@ class BarcodeScanActivity : AppCompatActivity() {
         binding = ActivityBarcodeScanBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        when (role) {
+            Role.Admin -> binding.titleTextView.text = "Admin"
+            Role.Supervisor -> binding.titleTextView.text = "Supervisor"
+            Role.Enumerator -> binding.titleTextView.text = "Enumerator"
+            else -> {}
+        }
+
         binding.scanButton.setOnClickListener {
 
             val optionsBuilder = GmsBarcodeScannerOptions.Builder()
