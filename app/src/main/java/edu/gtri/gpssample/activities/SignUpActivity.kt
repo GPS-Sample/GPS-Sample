@@ -1,11 +1,10 @@
 package edu.gtri.gpssample.activities
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignUpBinding
 
 class SignUpActivity : AppCompatActivity() {
@@ -18,10 +17,9 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val roleVal = intent.getStringExtra("role" );
-        val role = Role.valueOf( roleVal!!.toString() );
+        val role = intent.getStringExtra("role" )
 
-        binding.titleTextView.text = roleVal + " Sign Up";
+        binding.titleTextView.text = role + " Sign Up"
 
         ArrayAdapter.createFromResource(
             this,
@@ -33,8 +31,17 @@ class SignUpActivity : AppCompatActivity() {
             binding.questionSpinner.adapter = adapter
         }
 
+        binding.nextButton.setOnClickListener {
+
+            val intent = Intent(this, SignInActivity::class.java)
+            intent.putExtra( "role", role )
+            startActivity( intent )
+            this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+        }
+
         binding.backButton.setOnClickListener {
-            onBackPressed();
+            this.setResult(RESULT_CANCELED )
+            onBackPressed()
         }
     }
 

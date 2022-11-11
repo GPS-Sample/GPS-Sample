@@ -7,14 +7,14 @@
     tools:context=".activities.SignUpActivity">
 
     <ScrollView
-        android:layout_marginBottom="90dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="90dp">
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/title_text_view"
@@ -28,100 +28,117 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:gravity="center_vertical"
                 android:text="Name"
-                android:layout_marginLeft="20dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/black"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"/>
+                android:textColor="@color/black" />
 
             <EditText
-                android:hint="Enter your name"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:hint="Enter your name" />
 
             <TextView
-                android:text="PIN"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginLeft="20dp"
                 android:gravity="center_vertical"
-                android:textColor="@color/black"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"/>
-
-            <EditText
-                android:hint="Enter your PIN"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"/>
-
-            <TextView
                 android:text="PIN"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="20dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/black"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"/>
+                android:textColor="@color/black" />
 
             <EditText
-                android:hint="Re-Enter your PIN"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:hint="Enter your PIN" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:text="PIN"
+                android:textColor="@color/black" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Re-Enter your PIN" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
                 android:text="Fogot PIN Question"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="20dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/black"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"/>
+                android:textColor="@color/black" />
 
             <FrameLayout
-                android:background="@drawable/spinner_frame"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp">
+                android:background="@drawable/spinner_frame">
 
                 <Spinner
                     android:id="@+id/question_spinner"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
             </FrameLayout>
 
             <TextView
-                android:text="Forgot PIN Answer"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="20dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/black"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"/>
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:text="Forgot PIN Answer"
+                android:textColor="@color/black" />
 
             <EditText
-                android:hint="Enter your answer"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:hint="Enter your answer" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
 
-    <Button
-        android:id="@+id/back_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_gravity="bottom"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="Back" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/back_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Back" />
+
+        <Button
+            android:id="@+id/next_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Next" />
+    </LinearLayout>
 
 </FrameLayout>

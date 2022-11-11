@@ -46,6 +46,21 @@
             android:name=".activities.SignUpActivity"
             android:screenOrientation="portrait">
         </activity>
+
+        <activity
+            android:name=".activities.AdminActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity
+            android:name=".activities.SupervisorActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity
+            android:name=".activities.EnumeratorActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

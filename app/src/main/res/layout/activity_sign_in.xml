@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.SignUpActivity">
+    tools:context=".activities.SignInActivity">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:orientation="vertical"
@@ -23,6 +23,7 @@
             android:textStyle="bold" />
 
         <EditText
+            android:id="@+id/pin_edit_text"
             android:hint="Enter your PIN"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"

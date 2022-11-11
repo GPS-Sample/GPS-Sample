@@ -2,10 +2,10 @@ package edu.gtri.gpssample.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
+import android.text.InputType
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignInBinding
@@ -20,30 +20,37 @@ class SignInActivity : AppCompatActivity() {
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val roleVal = intent.getStringExtra("role" );
-        val role = Role.valueOf( roleVal!!.toString() );
+        val roleVal = intent.getStringExtra("role")
+        val role = Role.valueOf(roleVal!!.toString())
 
-        binding.titleTextView.text = roleVal + " Sign In";
+        binding.pinEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
+
+        binding.titleTextView.text = roleVal + " Sign In"
 
         binding.backButton.setOnClickListener {
-            onBackPressed();
+            onBackPressed()
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
+        binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
+            if (binding.pinEditText.getText().toString().length >= 4) {
+                lateinit var intent: Intent
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
+                when (role) {
+                    Role.Admin -> intent = Intent(this, AdminActivity::class.java)
+                    Role.Supervisor -> intent = Intent(this, SupervisorActivity::class.java)
+                    Role.Enumerator -> intent = Intent(this, EnumeratorActivity::class.java)
+                    else -> {}
+                }
+
+                startActivity( intent )
+                overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+
+                // clear the back stack of all previous activities
+                ActivityCompat.finishAffinity(this)
+            }
+
+            false
+        })
     }
 
     override fun onBackPressed() {
