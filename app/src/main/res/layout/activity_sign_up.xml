@@ -22,17 +22,17 @@
                 android:layout_height="30dp"
                 android:layout_margin="20dp"
                 android:gravity="center_vertical"
-                android:text="Sign Up"
+                android:text="@string/sign_up"
                 android:textColor="@color/primary"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
-                android:text="Name"
+                android:text="@string/name"
                 android:textColor="@color/black" />
 
             <EditText
@@ -40,15 +40,15 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="Enter your name" />
+                android:hint="@string/enter_your_name" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
-                android:text="PIN"
+                android:text="@string/pin"
                 android:textColor="@color/black" />
 
             <EditText
@@ -56,15 +56,15 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="Enter your PIN" />
+                android:hint="@string/enter_your_pin" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
-                android:text="PIN"
+                android:text="@string/pin"
                 android:textColor="@color/black" />
 
             <EditText
@@ -72,15 +72,15 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="Re-Enter your PIN" />
+                android:hint="@string/reenter_your_pin" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
-                android:text="Fogot PIN Question"
+                android:text="@string/forgot_pin_question"
                 android:textColor="@color/black" />
 
             <FrameLayout
@@ -99,10 +99,10 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
-                android:text="Forgot PIN Answer"
+                android:text="@string/forgot_pin_answer"
                 android:textColor="@color/black" />
 
             <EditText
@@ -110,7 +110,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="Enter your answer" />
+                android:hint="@string/enter_your_answer" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
 
@@ -128,7 +128,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Back" />
+            android:text="@string/back" />
 
         <Button
             android:id="@+id/next_button"
@@ -138,7 +138,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Next" />
+            android:text="@string/next" />
     </LinearLayout>
 
 </FrameLayout>

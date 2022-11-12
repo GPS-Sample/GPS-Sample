@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignUpBinding
 
 class SignUpActivity : AppCompatActivity() {
@@ -17,24 +18,24 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val role = intent.getStringExtra("role" )
+        val role = Role.valueOf(intent.getStringExtra("role")!!)
 
-        binding.titleTextView.text = role + " Sign Up"
-
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.forgot_pin_questions,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            binding.questionSpinner.adapter = adapter
+        when (role) {
+            Role.Admin -> binding.titleTextView.text = resources.getString( R.string.admin_sign_up )
+            Role.Supervisor -> binding.titleTextView.text = resources.getString( R.string.supervisor_sign_up )
+            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.enumerator_sign_up )
         }
+
+        ArrayAdapter.createFromResource(this, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
+            .also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.questionSpinner.adapter = adapter
+            }
 
         binding.nextButton.setOnClickListener {
 
             val intent = Intent(this, SignInActivity::class.java)
-            intent.putExtra( "role", role )
+            intent.putExtra( "role", role.toString())
             startActivity( intent )
             this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
         }

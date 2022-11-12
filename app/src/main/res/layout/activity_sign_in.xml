@@ -17,14 +17,14 @@
             android:layout_height="30dp"
             android:layout_margin="20dp"
             android:gravity="center_vertical"
-            android:text="Welcome Back"
+            android:text="@string/admin_sign_in"
             android:textColor="@color/primary"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/pin_edit_text"
-            android:hint="Enter your PIN"
+            android:hint="@string/enter_your_pin"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_width="match_parent"
@@ -39,6 +39,6 @@
         android:layout_gravity="bottom"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="Back" />
+        android:text="@string/back" />
 
 </FrameLayout>

@@ -1,13 +1,11 @@
 package edu.gtri.gpssample
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.activity.manager.network.NetworkActivity
 import edu.gtri.gpssample.databinding.FragmentFirstBinding
 
 

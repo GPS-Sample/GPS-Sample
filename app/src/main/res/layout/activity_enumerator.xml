@@ -11,9 +11,9 @@
         android:layout_height="30dp"
         android:layout_margin="20dp"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Enumerator"
+        android:text="@string/enumerator"
         android:textColor="@color/primary"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
 </FrameLayout>

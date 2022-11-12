@@ -27,30 +27,44 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <Button
-            android:id="@+id/admin_sign_in_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_above="@+id/admin_sign_up_button"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="Admin Sign In" />
-
         <TextView
-            android:id="@+id/admin_sign_up_button"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_above="@+id/supervisor_sign_in_button"
+            android:layout_height="30dp"
+            android:layout_above="@+id/radio_group"
             android:gravity="center"
-            android:textColor="#0000ff"
-            android:text="Not Registered? Sign Up!" />
+            android:textColor="@color/primary"
+            android:textSize="17sp"
+            android:text="@string/select_role" />
+
+        <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/sign_in_button"
+            android:orientation="vertical">
+
+            <RadioButton android:id="@+id/admin_button"
+                android:text="@string/admin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <RadioButton android:id="@+id/supervisor_button"
+                android:text="@string/supervisor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <RadioButton android:id="@+id/enumerator_button"
+                android:text="@string/enumerator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RadioGroup>
 
         <Button
-            android:id="@+id/supervisor_sign_in_button"
+            android:id="@+id/sign_in_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_centerInParent="true"
@@ -60,39 +74,15 @@
             android:layout_marginBottom="0dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Supervisor Sign In" />
+            android:text="@string/sign_in" />
 
         <TextView
-            android:id="@+id/supervisor_sign_up_button"
+            android:id="@+id/sign_up_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_below="@+id/supervisor_sign_in_button"
+            android:layout_below="@+id/sign_in_button"
             android:gravity="center"
-            android:textColor="#0000ff"
-            android:text="Not Registered? Sign Up!" />
-
-        <Button
-            android:id="@+id/enumerator_sign_in_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_below="@+id/supervisor_sign_up_button"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="Enumerator Sign In" />
-
-        <TextView
-            android:id="@+id/enumerator_sign_up_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_below="@+id/enumerator_sign_in_button"
-            android:gravity="center"
-            android:textColor="#0000ff"
-            android:text="Not Registered? Sign Up!" />
-
+            android:text="@string/not_registered" />
     </RelativeLayout>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

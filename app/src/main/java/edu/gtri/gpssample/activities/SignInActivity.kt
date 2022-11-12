@@ -20,12 +20,15 @@ class SignInActivity : AppCompatActivity() {
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val roleVal = intent.getStringExtra("role")
-        val role = Role.valueOf(roleVal!!.toString())
-
         binding.pinEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.titleTextView.text = roleVal + " Sign In"
+        val role = Role.valueOf(intent.getStringExtra("role")!!)
+
+        when (role) {
+            Role.Admin -> binding.titleTextView.text = resources.getString( R.string.admin_sign_in )
+            Role.Supervisor -> binding.titleTextView.text = resources.getString( R.string.supervisor_sign_in )
+            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.enumerator_sign_in )
+        }
 
         binding.backButton.setOnClickListener {
             onBackPressed()
@@ -39,10 +42,9 @@ class SignInActivity : AppCompatActivity() {
                     Role.Admin -> intent = Intent(this, AdminActivity::class.java)
                     Role.Supervisor -> intent = Intent(this, BarcodeScanActivity::class.java)
                     Role.Enumerator -> intent = Intent(this, BarcodeScanActivity::class.java)
-                    else -> {}
                 }
 
-                intent.putExtra( "role", roleVal )
+                intent.putExtra( "role", role.toString())
 
                 startActivity( intent )
 

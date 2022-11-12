@@ -2,8 +2,6 @@ package edu.gtri.gpssample.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
@@ -21,45 +19,61 @@ class SignInSignUpActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        binding.adminSignInButton.setOnClickListener {
+        binding.signInButton.isEnabled = false
+        binding.signUpButton.isEnabled = false
+        binding.signUpButton.setTextColor( resources.getColor( R.color.light_gray, null))
+
+        binding.adminButton.setOnClickListener {
+            binding.signInButton.isEnabled = true
+            binding.signUpButton.isEnabled = true
+            binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
+        }
+        binding.supervisorButton.setOnClickListener {
+            binding.signInButton.isEnabled = true
+            binding.signUpButton.isEnabled = true
+            binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
+        }
+        binding.enumeratorButton.setOnClickListener {
+            binding.signInButton.isEnabled = true
+            binding.signUpButton.isEnabled = true
+            binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
+        }
+
+        binding.signInButton.setOnClickListener {
+
             val intent = Intent(this, SignInActivity::class.java)
-            intent.putExtra( "role", Role.Admin.toString())
+
+            if (binding.adminButton.isChecked) {
+                intent.putExtra( "role", Role.Admin.toString())
+            }
+            else if (binding.supervisorButton.isChecked) {
+                intent.putExtra( "role", Role.Supervisor.toString())
+            }
+            else if (binding.enumeratorButton.isChecked) {
+                intent.putExtra( "role", Role.Enumerator.toString())
+            }
+
             startActivity( intent )
+
             this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
         }
 
-        binding.adminSignUpButton.setOnClickListener {
+        binding.signUpButton.setOnClickListener {
+
             val intent = Intent(this, SignUpActivity::class.java)
-            intent.putExtra( "role", Role.Admin.toString())
-            startActivity( intent )
-            this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-        }
 
-        binding.supervisorSignInButton.setOnClickListener {
-            val intent = Intent(this, SignInActivity::class.java)
-            intent.putExtra( "role", Role.Supervisor.toString())
-            startActivity( intent )
-            this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-        }
+            if (binding.adminButton.isChecked) {
+                intent.putExtra( "role", Role.Admin.toString())
+            }
+            else if (binding.supervisorButton.isChecked) {
+                intent.putExtra( "role", Role.Supervisor.toString())
+            }
+            else if (binding.enumeratorButton.isChecked) {
+                intent.putExtra( "role", Role.Enumerator.toString())
+            }
 
-        binding.supervisorSignUpButton.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            intent.putExtra( "role", Role.Supervisor.toString())
             startActivity( intent )
-            this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-        }
 
-        binding.enumeratorSignInButton.setOnClickListener {
-            val intent = Intent(this, SignInActivity::class.java)
-            intent.putExtra( "role", Role.Enumerator.toString())
-            startActivity( intent )
-            this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-        }
-
-        binding.enumeratorSignUpButton.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            intent.putExtra( "role", Role.Enumerator.toString())
-            startActivity( intent )
             this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
         }
     }

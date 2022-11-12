@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"></string>
+    <string name="app_name">GPS Sample</string>
     <string name="action_settings">Settings</string>
     <string name="action_sign_out">Sign Out</string>
 
@@ -20,6 +20,34 @@
         <item>"Childhood best friend"</item>
         <item>"Favorite Pet's name"</item>
     </string-array>
+
+    <string name="admin">Admin</string>
+    <string name="supervisor">Supervisor</string>
+    <string name="enumerator">Enumerator</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="or">or</string>
+    <string name="continue_with_existing_study">Continue with existing Study</string>
+    <string name="admin_sign_in">Admin Sign In</string>
+    <string name="supervisor_sign_in">Supervisor Sign In</string>
+    <string name="enumerator_sign_in">Enumerator Sign In</string>
+    <string name="admin_sign_up">Admin Sign Up</string>
+    <string name="supervisor_sign_up">Supervisor Sign Up</string>
+    <string name="enumerator_sign_up">Enumerator Sign Up</string>
+    <string name="enter_your_pin">Enter your PIN</string>
+    <string name="reenter_your_pin">Re-enter your PIN</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="select_role">Select Role</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="not_registered">Not registered?  Sign Up!</string>
+    <string name="name">Name</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="pin">PIN</string>
+    <string name="forgot_pin_question">Forgot PIN question</string>
+    <string name="forgot_pin_answer">Forgot PIN answer</string>
+    <string name="enter_your_answer">Enter your answer</string>
 
     <string name="barcode_result" translatable="false">Barcode detected.\n%1$s</string>
     <string name="error_scanner_cancelled" translatable="false">Code scanner is cancelled.</string>

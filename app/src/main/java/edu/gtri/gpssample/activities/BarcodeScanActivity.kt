@@ -18,21 +18,20 @@ import java.util.*
 class BarcodeScanActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBarcodeScanBinding
-    private lateinit var role: Role;
+    private lateinit var role: Role
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        role = Role.valueOf(intent.getStringExtra("role")!!)
-
         binding = ActivityBarcodeScanBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        role = Role.valueOf(intent.getStringExtra("role")!!)
+
         when (role) {
-            Role.Admin -> binding.titleTextView.text = "Admin"
-            Role.Supervisor -> binding.titleTextView.text = "Supervisor"
-            Role.Enumerator -> binding.titleTextView.text = "Enumerator"
-            else -> {}
+            Role.Admin -> binding.titleTextView.text = resources.getString( R.string.admin )
+            Role.Supervisor -> binding.titleTextView.text = resources.getString( R.string.supervisor )
+            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.enumerator )
         }
 
         binding.scanButton.setOnClickListener {
@@ -42,11 +41,11 @@ class BarcodeScanActivity : AppCompatActivity() {
             gmsBarcodeScanner
                 .startScan()
                 .addOnSuccessListener { barcode: Barcode ->
-                    Log.d( "xxx", getSuccessfulMessage(barcode)!!)
+                    Log.d( "xxx", getSuccessfulMessage(barcode))
                 }
                 .addOnFailureListener { e: Exception -> Log.d( "xxx", getErrorMessage(e)!!) }
                 .addOnCanceledListener {
-                    Log.d( "xxx", getString(R.string.error_scanner_cancelled) );
+                    Log.d( "xxx", getString(R.string.error_scanner_cancelled) )
                     startNextActivity()
                 }
         }

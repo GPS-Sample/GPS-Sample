@@ -13,9 +13,9 @@
         android:layout_margin="20dp"
         android:layout_gravity="top"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Admin"
+        android:text="@string/admin"
         android:textColor="@color/primary"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <Button
@@ -28,7 +28,7 @@
         android:layout_gravity="center"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="Scan QR Code" />
+        android:text="@string/scan_qr_code" />
 
     <TextView
         android:layout_width="match_parent"
@@ -36,9 +36,9 @@
         android:layout_margin="20dp"
         android:layout_gravity="center"
         android:gravity="center_vertical|center_horizontal"
-        android:text="- OR -"
+        android:text="@string/or"
         android:textColor="@color/primary"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <Button
@@ -51,6 +51,6 @@
         android:layout_gravity="center"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="Continue with existing Study" />
+        android:text="@string/continue_with_existing_study" />
 
 </FrameLayout>
