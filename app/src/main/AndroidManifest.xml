@@ -66,5 +66,21 @@
             android:name=".activities.BarcodeScanActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".activities.AddConfigurationActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.DefineEnumerationAreaActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.DefineEnumerationFieldsActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.DefineSamplingMethodActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 </manifest>

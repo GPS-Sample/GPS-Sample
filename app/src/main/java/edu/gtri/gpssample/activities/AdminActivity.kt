@@ -25,9 +25,20 @@ class AdminActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        finish()
-        val intent = Intent(this, SignInSignUpActivity::class.java)
-        startActivity( intent )
+
+        when (item.itemId) {
+            R.id.action_add_configuration -> {
+                val intent = Intent(this, AddConfigurationActivity::class.java)
+                startActivity( intent )
+                overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+            }
+            R.id.action_signout -> {
+                finish()
+                val intent = Intent(this, SignInSignUpActivity::class.java)
+                startActivity( intent )
+            }
+        }
+
         return true
     }
 
