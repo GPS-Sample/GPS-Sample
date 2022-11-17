@@ -17,9 +17,6 @@
 package edu.gtri.gpssample.barcode
 
 import android.Manifest
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -41,29 +38,13 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.common.annotation.KeepName
 import com.google.mlkit.common.MlKitException
-import com.google.mlkit.common.model.LocalModel
 import com.google.mlkit.vision.barcode.common.Barcode
-import edu.gtri.gpssample.barcode.CameraXViewModel
-import edu.gtri.gpssample.barcode.GraphicOverlay
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.barcode.VisionImageProcessor
-import edu.gtri.gpssample.barcode.BarcodeScannerProcessor
-//import com.google.mlkit.vision.demo.preference.PreferenceUtils
-//import com.google.mlkit.vision.demo.preference.SettingsActivity
-//import com.google.mlkit.vision.demo.preference.SettingsActivity.LaunchSource
-//import com.google.mlkit.vision.label.custom.CustomImageLabelerOptions
-//import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
-//import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
-//import com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions
-//import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
-//import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
-//import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.ArrayList
 
 /** Live preview demo app for ML Kit APIs using CameraX. */
@@ -98,7 +79,7 @@ class CameraXLivePreviewActivity :
     }
     val spinner = findViewById<Spinner>(R.id.spinner)
     val options: MutableList<String> = ArrayList()
-    options.add(OBJECT_DETECTION)
+//    options.add(OBJECT_DETECTION)
     options.add(BARCODE_SCANNING)
 
     // Creating adapter for spinner
@@ -128,55 +109,11 @@ class CameraXLivePreviewActivity :
 //      intent.putExtra(SettingsActivity.EXTRA_LAUNCH_SOURCE, LaunchSource.CAMERAX_LIVE_PREVIEW)
 //      startActivity(intent)
     }
-
-    if (!allRuntimePermissionsGranted()) {
-      getRuntimePermissions()
-    }
   }
 
   override fun onSaveInstanceState(bundle: Bundle) {
     super.onSaveInstanceState(bundle)
     bundle.putString(STATE_SELECTED_MODEL, selectedModel)
-  }
-
-  private fun allRuntimePermissionsGranted(): Boolean {
-    for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
-      permission?.let {
-        if (!isPermissionGranted(this, it)) {
-          return false
-        }
-      }
-    }
-    return true
-  }
-
-  private fun getRuntimePermissions() {
-    val permissionsToRequest = ArrayList<String>()
-    for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
-      permission?.let {
-        if (!isPermissionGranted(this, it)) {
-          permissionsToRequest.add(permission)
-        }
-      }
-    }
-
-    if (permissionsToRequest.isNotEmpty()) {
-      ActivityCompat.requestPermissions(
-        this,
-        permissionsToRequest.toTypedArray(),
-        PERMISSION_REQUESTS
-      )
-    }
-  }
-
-  private fun isPermissionGranted(context: Context, permission: String): Boolean {
-    if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-    ) {
-      Log.i(TAG, "Permission granted: $permission")
-      return true
-    }
-    Log.i(TAG, "Permission NOT granted: $permission")
-    return false
   }
 
   @Synchronized
@@ -333,17 +270,8 @@ class CameraXLivePreviewActivity :
 
   companion object {
     private const val TAG = "CameraXLivePreview"
-    private const val OBJECT_DETECTION = "Object Detection"
+//    private const val OBJECT_DETECTION = "Object Detection"
     private const val BARCODE_SCANNING = "Barcode Scanning"
-
     private const val STATE_SELECTED_MODEL = "selected_model"
-    private const val PERMISSION_REQUESTS = 1
-
-    private val REQUIRED_RUNTIME_PERMISSIONS =
-      arrayOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.READ_EXTERNAL_STORAGE
-      )
   }
 }
