@@ -16,7 +16,6 @@
 
 package edu.gtri.gpssample.barcode
 
-import android.Manifest
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -68,7 +67,7 @@ class CameraXLivePreviewActivity :
     super.onCreate(savedInstanceState)
     Log.d(TAG, "onCreate")
     cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-    setContentView(R.layout.activity_vision_camerax_live_preview)
+    setContentView(R.layout.activity_camerax_live_preview)
     previewView = findViewById(R.id.preview_view)
     if (previewView == null) {
       Log.d(TAG, "previewView is null")

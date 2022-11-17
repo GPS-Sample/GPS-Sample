@@ -6,22 +6,28 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.barcode.CameraXLivePreviewActivity
-import edu.gtri.gpssample.databinding.ActivityAdminBinding
+import edu.gtri.gpssample.databinding.ActivityManageConfigurationsBinding
 
-class AdminActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAdminBinding
+class ManageStudiesActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityManageConfigurationsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityAdminBinding.inflate(layoutInflater)
+        binding = ActivityManageConfigurationsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.backButton.setOnClickListener {
+
+            finish()
+            overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
+        menuInflater.inflate(R.menu.menu_supervisor, menu)
         return true
     }
 
@@ -32,14 +38,6 @@ class AdminActivity : AppCompatActivity() {
                 val intent = Intent(this, AddConfigurationActivity::class.java)
                 startActivity( intent )
                 overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-            }
-            R.id.action_signout -> {
-                val intent = Intent(this, CameraXLivePreviewActivity::class.java)
-                startActivity( intent )
-                overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-//                finish()
-//                val intent = Intent(this, SignInSignUpActivity::class.java)
-//                startActivity( intent )
             }
         }
 

@@ -26,7 +26,7 @@ class DefineSamplingMethodActivity : AppCompatActivity() {
         }
 
         binding.nextButton.setOnClickListener {
-            val intent = Intent(this, AdminActivity::class.java)
+            val intent = Intent(this, AdminSelectRoleActivity::class.java)
             startActivity( intent )
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
 

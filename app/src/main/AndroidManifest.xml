@@ -55,7 +55,7 @@
         </activity>
 
         <activity
-            android:name=".activities.AdminActivity"
+            android:name=".activities.AdminSelectRoleActivity"
             android:screenOrientation="portrait">
         </activity>
 
@@ -91,6 +91,14 @@
         </activity>
         <activity
             android:name=".barcode.CameraXLivePreviewActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.ManageConfigurationsActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.SupervisorSelectRoleActivity"
             android:screenOrientation="portrait">
         </activity>
     </application>

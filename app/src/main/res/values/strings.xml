@@ -24,6 +24,7 @@
     <string name="admin">Admin</string>
     <string name="supervisor">Supervisor</string>
     <string name="enumerator">Enumerator</string>
+    <string name="data_collector">Data Collector</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="or">or</string>
     <string name="continue_with_existing_study">Continue with existing Study</string>
@@ -39,8 +40,11 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="select_role">Select Role</string>
+    <string name="admin_select_role">Admin Select Role</string>
+    <string name="supervisor_select_role">Supervisor Select Role</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
     <string name="not_registered">Not registered?  Sign Up!</string>
     <string name="name">Name</string>
     <string name="enter_your_name">Enter your name</string>

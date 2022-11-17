@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="edu.gtri.gpssample.MainActivity">
     <item
-        android:id="@+id/action_add_configuration"
+        android:id="@+id/action_add_study"
         android:orderInCategory="100"
-        android:title="Add Configuration"
+        android:title="Add Study"
         app:showAsAction="never" />
 </menu>

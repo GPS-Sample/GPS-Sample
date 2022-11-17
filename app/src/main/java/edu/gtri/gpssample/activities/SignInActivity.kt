@@ -1,12 +1,17 @@
 package edu.gtri.gpssample.activities
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.View
+import androidmads.library.qrgenearator.QRGContents
+import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.barcode.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignInBinding
 
@@ -39,7 +44,7 @@ class SignInActivity : AppCompatActivity() {
                 lateinit var intent: Intent
 
                 when (role) {
-                    Role.Admin -> intent = Intent(this, AdminActivity::class.java)
+                    Role.Admin -> intent = Intent(this, AdminSelectRoleActivity::class.java)
                     Role.Supervisor -> intent = Intent(this, BarcodeScanActivity::class.java)
                     Role.Enumerator -> intent = Intent(this, BarcodeScanActivity::class.java)
                 }
@@ -48,14 +53,37 @@ class SignInActivity : AppCompatActivity() {
 
                 startActivity( intent )
 
+                finish()
+
                 overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
 
-                // clear the back stack of all previous activities
-                ActivityCompat.finishAffinity(this)
+//                // clear the back stack of all previous activities
+//                ActivityCompat.finishAffinity(this)
             }
 
             false
         })
+
+        binding.generateButton.setOnClickListener {
+
+            val qrgEncoder = QRGEncoder("whoo Hoo Hoo", null, QRGContents.Type.TEXT, binding.imageView.width )
+            qrgEncoder.setColorBlack(Color.WHITE);
+            qrgEncoder.setColorWhite(Color.BLACK);
+
+            try {
+                val bitmap = qrgEncoder.bitmap
+                binding.imageView.setImageBitmap(bitmap)
+            } catch (e: Exception) {
+                Log.d("xxx", e.toString())
+            }
+        }
+
+        binding.scanButton.setOnClickListener {
+
+            val intent = Intent(this, CameraXLivePreviewActivity::class.java)
+            startActivity( intent )
+            overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+        }
     }
 
     override fun onBackPressed() {

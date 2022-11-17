@@ -56,8 +56,11 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.1.0"
     implementation "androidx.camera:camera-view:1.1.0"
 
-    // Barcode model
+    // Barcode scanning
     implementation 'com.google.mlkit:barcode-scanning:17.0.2'
+
+    // Barcode generation
+    implementation 'com.github.androidmads:QRGenerator:1.0.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
