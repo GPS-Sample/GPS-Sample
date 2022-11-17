@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.barcode.CameraXLivePreviewActivity
 import edu.gtri.gpssample.databinding.ActivityAdminBinding
 
 class AdminActivity : AppCompatActivity() {
@@ -33,9 +34,12 @@ class AdminActivity : AppCompatActivity() {
                 overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
             }
             R.id.action_signout -> {
-                finish()
-                val intent = Intent(this, SignInSignUpActivity::class.java)
+                val intent = Intent(this, CameraXLivePreviewActivity::class.java)
                 startActivity( intent )
+                overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+//                finish()
+//                val intent = Intent(this, SignInSignUpActivity::class.java)
+//                startActivity( intent )
             }
         }
 
