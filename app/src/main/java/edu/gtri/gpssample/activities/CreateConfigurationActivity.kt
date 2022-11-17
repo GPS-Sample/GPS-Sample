@@ -53,7 +53,7 @@ class CreateConfigurationActivity : AppCompatActivity() {
 
                 val configurationModel = ConfigurationModel()
 
-                configurationModel.name =binding.configNameEditText.text.toString()
+                configurationModel.name = binding.configNameEditText.text.toString()
 
                 mainApplication.configurations.add( configurationModel )
 
