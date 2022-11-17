@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.gtri.gpssample.barcode;
+package edu.gtri.gpssample.barcode_scanner;
 
 /** Describing a frame info. */
 public class FrameMetadata {

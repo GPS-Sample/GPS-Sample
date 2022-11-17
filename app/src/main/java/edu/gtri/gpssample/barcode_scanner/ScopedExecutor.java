@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.gtri.gpssample.barcode;
+package edu.gtri.gpssample.barcode_scanner;
 
 import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;

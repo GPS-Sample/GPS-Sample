@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.gtri.gpssample.barcode
+package edu.gtri.gpssample.barcode_scanner
 
 import android.app.ActivityManager
 import android.content.Context
@@ -38,13 +38,6 @@ import com.google.android.odml.image.MediaMlImageBuilder
 import com.google.android.odml.image.MlImage
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.common.InputImage
-import edu.gtri.gpssample.barcode.BitmapUtils
-import edu.gtri.gpssample.barcode.CameraImageGraphic
-import edu.gtri.gpssample.barcode.FrameMetadata
-import edu.gtri.gpssample.barcode.GraphicOverlay
-import edu.gtri.gpssample.barcode.InferenceInfoGraphic
-import edu.gtri.gpssample.barcode.ScopedExecutor
-import edu.gtri.gpssample.barcode.VisionImageProcessor
 //import com.google.mlkit.vision.demo.preference.PreferenceUtils
 import java.lang.Math.max
 import java.lang.Math.min

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.gtri.gpssample.barcode;
+package edu.gtri.gpssample.barcode_scanner;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;

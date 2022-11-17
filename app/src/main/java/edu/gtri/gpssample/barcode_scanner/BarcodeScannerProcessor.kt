@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.gtri.gpssample.barcode
+package edu.gtri.gpssample.barcode_scanner
 
 import android.content.Context
 import android.util.Log
@@ -25,7 +25,6 @@ import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import edu.gtri.gpssample.barcode.VisionProcessorBase
 
 /** Barcode Detector Demo.  */
 class BarcodeScannerProcessor(context: Context) : VisionProcessorBase<List<Barcode>>(context) {

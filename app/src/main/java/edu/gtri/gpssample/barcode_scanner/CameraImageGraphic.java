@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package edu.gtri.gpssample.barcode;
+package edu.gtri.gpssample.barcode_scanner;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import edu.gtri.gpssample.barcode.GraphicOverlay.Graphic;
+import edu.gtri.gpssample.barcode_scanner.GraphicOverlay.Graphic;
 
 /** Draw camera image to background. */
 public class CameraImageGraphic extends Graphic {

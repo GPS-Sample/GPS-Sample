@@ -9,9 +9,8 @@ import android.view.View
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.barcode.CameraXLivePreviewActivity
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignInBinding
 
@@ -63,6 +62,11 @@ class SignInActivity : AppCompatActivity() {
 
             false
         })
+
+//      HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
+//
+//      the generate and scan buttons are here for test purposes only!
+//      and will be moved to the appropriate place in the future
 
         binding.generateButton.setOnClickListener {
 

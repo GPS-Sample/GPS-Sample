@@ -91,7 +91,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".barcode.CameraXLivePreviewActivity"
+            android:name=".barcode_scanner.CameraXLivePreviewActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
