@@ -34,8 +34,8 @@ class ManageConfigurationsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            R.id.action_add_configuration -> {
-                val intent = Intent(this, AddConfigurationActivity::class.java)
+            R.id.action_create_configuration -> {
+                val intent = Intent(this, CreateConfigurationActivity::class.java)
                 startActivity( intent )
                 overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
             }

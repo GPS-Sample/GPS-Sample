@@ -21,6 +21,21 @@
         <item>"Favorite Pet's name"</item>
     </string-array>
 
+    <string-array name="preferred_units">
+        <item>"Feet / Miles"</item>
+        <item>"Meters / KiloMeters"</item>
+    </string-array>
+
+    <string-array name="date_format">
+        <item>"mm/dd/yyyy"</item>
+        <item>"dd/mm/yyyy"</item>
+    </string-array>
+
+    <string-array name="time_format">
+        <item>"12 hour (AM/PM)"</item>
+        <item>"24 hour"</item>
+    </string-array>
+
     <string name="admin">Admin</string>
     <string name="supervisor">Supervisor</string>
     <string name="enumerator">Enumerator</string>
@@ -52,6 +67,13 @@
     <string name="forgot_pin_question">Forgot PIN question</string>
     <string name="forgot_pin_answer">Forgot PIN answer</string>
     <string name="enter_your_answer">Enter your answer</string>
+    <string name="create_config">Create Configuration</string>
+    <string name="config_name">Configuration Name</string>
+    <string name="enter_config_name">Enter Configuration Name</string>
+    <string name="preferred_units">Preferred Units</string>
+    <string name="date_format">Date Format</string>
+    <string name="time_format">Time Format</string>
+    <string name="min_gps_precision">Minimum GPS Precision</string>
 
     <string name="barcode_result" translatable="false">Barcode detected.\n%1$s</string>
     <string name="error_scanner_cancelled" translatable="false">Code scanner is cancelled.</string>
