@@ -86,6 +86,9 @@
     <string name="date_format">Date Format</string>
     <string name="time_format">Time Format</string>
     <string name="min_gps_precision">Minimum GPS Precision</string>
+    <string name="enter_min_gps_precision">Enter Minimum GPS Precision</string>
+    <string name="define_enumeration_fields">Define Enumeration Fields</string>
+    <string name="define_sampling_method">Define Sampling Method</string>
 
     <string name="barcode_result" translatable="false">Barcode detected.\n%1$s</string>
     <string name="error_scanner_cancelled" translatable="false">Code scanner is cancelled.</string>

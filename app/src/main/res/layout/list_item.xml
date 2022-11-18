@@ -20,7 +20,6 @@
         android:includeFontPadding="true"
         android:letterSpacing="-0.02"
         android:lineSpacingExtra="1sp"
-        android:text="306 Conner Cir, Santa Rosa Beach, FL 32459"
         android:textAlignment="gravity"
         android:textSize="15sp"
         android:background="@drawable/list_item_primary_blue"

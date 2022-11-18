@@ -115,7 +115,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
-                android:text="@string/config_name"
+                android:text="@string/min_gps_precision"
                 android:textColor="@color/black" />
 
             <EditText
@@ -124,7 +124,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="@string/enter_config_name" />
+                android:hint="@string/enter_min_gps_precision" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
 
