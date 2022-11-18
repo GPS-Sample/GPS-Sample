@@ -39,6 +39,7 @@
     <string name="admin">Admin</string>
     <string name="supervisor">Supervisor</string>
     <string name="enumerator">Enumerator</string>
+    <string name="surveyor">Surveyor</string>
     <string name="data_collector">Data Collector</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="or">or</string>

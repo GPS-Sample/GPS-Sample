@@ -44,6 +44,7 @@ import com.google.android.gms.common.annotation.KeepName
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.barcode.common.Barcode
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.ResultCode
 import java.util.ArrayList
 
 /** Live preview demo app for ML Kit APIs using CameraX. */
@@ -222,8 +223,9 @@ class CameraXLivePreviewActivity :
         this,
         Observer { barcode: Barcode? ->
           if (barcode != null) {
-            Log.d( "xxx", "yooHoo! " + barcode.displayValue!! )
+            setResult( ResultCode.BarcodeScanned.value )
             finish()
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
           }
         }
     )

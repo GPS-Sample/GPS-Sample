@@ -69,32 +69,6 @@ class SignInActivity : AppCompatActivity() {
 
             false
         })
-
-//      HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
-//
-//      the generate and scan buttons are here for test purposes only!
-//      and will be moved to the appropriate place in the future
-
-        binding.generateButton.setOnClickListener {
-
-            val qrgEncoder = QRGEncoder("whoo Hoo Hoo", null, QRGContents.Type.TEXT, binding.imageView.width )
-            qrgEncoder.setColorBlack(Color.WHITE);
-            qrgEncoder.setColorWhite(Color.BLACK);
-
-            try {
-                val bitmap = qrgEncoder.bitmap
-                binding.imageView.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                Log.d("xxx", e.toString())
-            }
-        }
-
-        binding.scanButton.setOnClickListener {
-
-            val intent = Intent(this, CameraXLivePreviewActivity::class.java)
-            startActivity( intent )
-            overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-        }
     }
 
     override fun onBackPressed() {

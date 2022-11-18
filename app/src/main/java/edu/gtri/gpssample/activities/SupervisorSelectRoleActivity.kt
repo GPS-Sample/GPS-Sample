@@ -2,12 +2,10 @@ package edu.gtri.gpssample.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.databinding.ActivitySupervisorSelectRoleBinding
-
 
 class SupervisorSelectRoleActivity : AppCompatActivity() {
 
@@ -20,9 +18,12 @@ class SupervisorSelectRoleActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.supervisorButton.setOnClickListener {
+            val intent = Intent(this, SupervisorActivity::class.java)
+            startActivity( intent )
+            overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
         }
 
-        binding.backButton.setOnClickListener {
+        binding.signOutButton.setOnClickListener {
             finish()
             overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
         }

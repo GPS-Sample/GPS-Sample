@@ -2,10 +2,13 @@ package edu.gtri.gpssample.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
+import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivityBarcodeScanBinding
 
@@ -29,19 +32,40 @@ class BarcodeScanActivity : AppCompatActivity() {
         }
 
         binding.scanButton.setOnClickListener {
+            val intent = Intent(this, CameraXLivePreviewActivity::class.java)
+            startActivityForResult( intent, 0 )
+            overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
         }
 
         binding.continueButton.setOnClickListener {
-            startNextActivity()
+            startNextActivityForRole( role )
+        }
+
+        binding.signOutButton.setOnClickListener {
+
+            finish()
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
         }
     }
 
-    private fun startNextActivity()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == ResultCode.BarcodeScanned.value)
+        {
+            startNextActivityForRole( role )
+        }
+    }
+
+    private fun startNextActivityForRole( role: Role )
+    {
+        finish()
+
         lateinit var intent: Intent
 
         when (role) {
-            Role.Supervisor -> intent = Intent(this, SupervisorActivity::class.java)
+            Role.Supervisor -> intent = Intent(this, SupervisorSelectRoleActivity::class.java)
             Role.Enumerator -> intent = Intent(this, EnumeratorActivity::class.java)
             else -> {}
         }
@@ -51,8 +75,6 @@ class BarcodeScanActivity : AppCompatActivity() {
         startActivity( intent )
 
         overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-
-        finish()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

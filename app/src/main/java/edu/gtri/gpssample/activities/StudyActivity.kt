@@ -35,7 +35,6 @@ class StudyActivity : AppCompatActivity() {
         binding.backButton.setOnClickListener {
 
             finish()
-
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
         }
     }

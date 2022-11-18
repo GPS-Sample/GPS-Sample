@@ -17,18 +17,12 @@ class SupervisorActivity : AppCompatActivity() {
 
         binding = ActivitySupervisorBinding.inflate(layoutInflater)
         setContentView(binding.root)
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
+        binding.backButton.setOnClickListener {
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        finish()
-        val intent = Intent(this, SignInSignUpActivity::class.java)
-        startActivity( intent )
-        return true
+            finish()
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+        }
     }
 
     override fun onBackPressed() {
