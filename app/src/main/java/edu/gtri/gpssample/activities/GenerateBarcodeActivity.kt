@@ -25,21 +25,6 @@ class GenerateBarcodeActivity : AppCompatActivity() {
 
         val studyName = intent.getStringExtra( Key.StudyName.toString())
 
-        binding.saveButton.setOnClickListener {
-
-            val studyModel = StudyModel()
-
-            studyModel.name = studyName
-
-            (application as MainApplication).studies.add( studyModel )
-
-            setResult( ResultCode.GenerateBarcode.value )
-
-            finish()
-
-            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
-        }
-
         binding.generateButton.setOnClickListener {
 
             val qrgEncoder = QRGEncoder("whoo Hoo Hoo", null, QRGContents.Type.TEXT, binding.imageView.width )
@@ -54,6 +39,26 @@ class GenerateBarcodeActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.d("xxx", e.toString())
             }
+        }
+
+        binding.nextButton.setOnClickListener {
+
+            val studyModel = StudyModel()
+
+            studyModel.name = studyName
+
+            (application as MainApplication).studies.add( studyModel )
+
+            setResult( ResultCode.GenerateBarcode.value )
+
+            finish()
+
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+        }
+
+        binding.backButton.setOnClickListener {
+            finish()
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
         }
     }
 

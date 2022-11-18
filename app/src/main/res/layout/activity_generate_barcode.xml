@@ -53,14 +53,31 @@
         android:insetBottom="0dp"
         android:text="Generate Code" />
 
-    <Button
-        android:id="@+id/save_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_gravity="bottom"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="@string/save" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/back_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/back" />
+
+        <Button
+            android:id="@+id/next_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/next" />
+    </LinearLayout>
 
 </FrameLayout>
