@@ -118,5 +118,9 @@
             android:name=".activities.GenerateBarcodeActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".activities.StudyActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 </manifest>

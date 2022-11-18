@@ -69,9 +69,10 @@ class ManageStudiesActivity : AppCompatActivity() {
 
     fun onItemSelected(studyModel: StudyModel, shouldDismissKeyboard: Boolean )
     {
-//        val intent = Intent(this, ManageStudiesActivity::class.java)
-//        startActivity( intent )
-//        overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+        val intent = Intent(this, StudyActivity::class.java)
+        intent.putExtra( Key.StudyName.toString(), studyModel.name )
+        startActivity( intent )
+        overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

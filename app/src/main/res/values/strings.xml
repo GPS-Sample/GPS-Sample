@@ -68,7 +68,11 @@
     <string name="forgot_pin_answer">Forgot PIN answer</string>
     <string name="enter_your_answer">Enter your answer</string>
     <string name="create_config">Create Configuration</string>
+    <string name="delete_config">Delete Configuration</string>
+    <string name="edit_config">Edit Configuration</string>
     <string name="create_study">Create Study</string>
+    <string name="edit_study">Edit Study</string>
+    <string name="delete_study">Delete Study</string>
     <string name="create_field">Create Field</string>
     <string name="config_name">Configuration Name</string>
     <string name="study_name">Study Name</string>

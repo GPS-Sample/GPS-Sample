@@ -49,6 +49,8 @@ class GenerateBarcodeActivity : AppCompatActivity() {
             try {
                 val bitmap = qrgEncoder.bitmap
                 binding.imageView.setImageBitmap(bitmap)
+                (application as MainApplication).bitmap = bitmap
+
             } catch (e: Exception) {
                 Log.d("xxx", e.toString())
             }
