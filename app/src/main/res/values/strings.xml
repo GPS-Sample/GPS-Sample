@@ -68,8 +68,15 @@
     <string name="forgot_pin_answer">Forgot PIN answer</string>
     <string name="enter_your_answer">Enter your answer</string>
     <string name="create_config">Create Configuration</string>
+    <string name="create_study">Create Study</string>
+    <string name="create_field">Create Field</string>
     <string name="config_name">Configuration Name</string>
+    <string name="study_name">Study Name</string>
+    <string name="field_name">Field Name</string>
+    <string name="enumeration_fields">Enumeration Fields</string>
     <string name="enter_config_name">Enter Configuration Name</string>
+    <string name="enter_study_name">Enter Study Name</string>
+    <string name="enter_field_name">Enter Field Name</string>
     <string name="preferred_units">Preferred Units</string>
     <string name="date_format">Date Format</string>
     <string name="time_format">Time Format</string>

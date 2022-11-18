@@ -1,0 +1,5 @@
+package edu.gtri.gpssample.constants
+
+enum class ResultCode( val value: Int ) {
+    GenerateBarcode(1001 )
+}

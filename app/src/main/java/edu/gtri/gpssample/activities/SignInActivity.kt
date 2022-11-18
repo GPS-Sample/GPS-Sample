@@ -9,6 +9,7 @@ import android.view.View
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
+import edu.gtri.gpssample.MainApplication
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.Role
@@ -39,7 +40,13 @@ class SignInActivity : AppCompatActivity() {
         }
 
         binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
-            if (binding.pinEditText.getText().toString().length >= 4) {
+
+            if (binding.pinEditText.getText().toString().length >= 4)
+            {
+                (application as MainApplication).fields.clear()
+                (application as MainApplication).studies.clear()
+                (application as MainApplication).configurations.clear()
+
                 lateinit var intent: Intent
 
                 when (role) {

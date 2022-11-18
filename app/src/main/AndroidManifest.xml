@@ -102,5 +102,21 @@
             android:name=".activities.SupervisorSelectRoleActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".activities.ManageStudiesActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.CreateStudyActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.CreateFieldActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activities.GenerateBarcodeActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 </manifest>

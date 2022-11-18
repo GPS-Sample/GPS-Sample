@@ -68,18 +68,6 @@ class CreateConfigurationActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        finish()
-        val intent = Intent(this, SignInSignUpActivity::class.java)
-        startActivity( intent )
-        return true
-    }
-
     override fun onBackPressed() {
         super.onBackPressed()
 

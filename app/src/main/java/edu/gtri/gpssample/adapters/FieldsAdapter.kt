@@ -8,16 +8,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.ConfigurationModel
 import edu.gtri.gpssample.models.FieldModel
+import edu.gtri.gpssample.models.StudyModel
 
-class ConfigurationsAdapter(var configurations: List<ConfigurationModel>?) : RecyclerView.Adapter<ConfigurationsAdapter.ViewHolder>()
+class FieldsAdapter(var fields: List<FieldModel>?) : RecyclerView.Adapter<FieldsAdapter.ViewHolder>()
 {
-    override fun getItemCount() = configurations!!.size
+    override fun getItemCount() = fields!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var selectedItemCallback: ((fieldModel: FieldModel, shouldDismissKeyboard: Boolean) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -31,9 +31,9 @@ class ConfigurationsAdapter(var configurations: List<ConfigurationModel>?) : Rec
         return viewHolder
     }
 
-    fun updateConfigurations( configurations: List<ConfigurationModel> )
+    fun updateFields( studies: List<FieldModel> )
     {
-        this.configurations = configurations
+        this.fields = fields
         notifyDataSetChanged()
     }
 
@@ -41,12 +41,12 @@ class ConfigurationsAdapter(var configurations: List<ConfigurationModel>?) : Rec
     {
         holder.itemView.isSelected = false
 
-        val configurationModel = configurations!!.get(holder.adapterPosition)
+        val fieldModel = fields!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( configurationModel.name )
+        holder.nameTextView.setText( fieldModel.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(configurationModel, true)
+            selectedItemCallback.invoke(fieldModel, true)
         }
     }
 

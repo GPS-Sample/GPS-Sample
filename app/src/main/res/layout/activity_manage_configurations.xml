@@ -7,8 +7,37 @@
     android:layout_height="match_parent"
     tools:context=".activities.ManageConfigurationsActivity">
 
+    <RelativeLayout
+        android:layout_weight="1"
+        android:id="@+id/relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_margin="20dp"
+            android:layout_above="@+id/create_button"
+            android:gravity="center"
+            android:text="You don't have any configurations"
+            android:textColor="@color/primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/create_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_centerInParent="true"
+            android:text="Create Configuration" />
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
+        android:visibility="gone"
         android:layout_marginTop="20dp"
         android:layout_weight="1"
         android:layout_width="match_parent"

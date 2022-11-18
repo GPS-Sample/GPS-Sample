@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="edu.gtri.gpssample.MainActivity">
+    tools:context="edu.gtri.gpssample.activities.CreateConfigurationActivity">
     <item
-        android:id="@+id/action_add_study"
+        android:id="@+id/action_create_configuration"
         android:orderInCategory="100"
-        android:title="Add Study"
+        android:title="@string/create_config"
         app:showAsAction="never" />
 </menu>
