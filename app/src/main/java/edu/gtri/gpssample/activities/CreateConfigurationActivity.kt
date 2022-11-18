@@ -24,8 +24,8 @@ class CreateConfigurationActivity : AppCompatActivity() {
 
         binding.backButton.setOnClickListener {
 
-            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
             finish()
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
         }
 
         ArrayAdapter.createFromResource(this, R.array.preferred_units, android.R.layout.simple_spinner_item)

@@ -26,7 +26,8 @@ class ManageStudiesActivity : AppCompatActivity() {
         binding = ActivityManageStudiesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.configNameTextView.text = intent.getStringExtra( Key.ConfigurationName.toString())
+        val configName = intent.getStringExtra( Key.ConfigurationName.toString())
+        binding.configNameTextView.text = configName + " Configuration Studies"
 
         studiesAdapter = StudiesAdapter((application as MainApplication).studies)
         studiesAdapter.selectedItemCallback = this::onItemSelected

@@ -7,22 +7,22 @@
     android:layout_height="match_parent"
     tools:context=".activities.ManageConfigurationsActivity">
 
+    <TextView
+        android:id="@+id/config_name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="Configuration 1 Studies"
+        android:textColor="@color/primary"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
     <RelativeLayout
         android:layout_weight="1"
         android:id="@+id/relative_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp">
-
-        <TextView
-            android:id="@+id/config_name_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_margin="20dp"
-            android:gravity="center"
-            android:text="Configuration Name"
-            android:textColor="@color/primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
