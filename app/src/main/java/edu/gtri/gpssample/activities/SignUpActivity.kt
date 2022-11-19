@@ -23,7 +23,7 @@ class SignUpActivity : AppCompatActivity() {
         when (role) {
             Role.Admin -> binding.titleTextView.text = resources.getString( R.string.admin_sign_up )
             Role.Supervisor -> binding.titleTextView.text = resources.getString( R.string.supervisor_sign_up )
-            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.enumerator_sign_up )
+            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.data_collector_sign_up )
         }
 
         ArrayAdapter.createFromResource(this, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)

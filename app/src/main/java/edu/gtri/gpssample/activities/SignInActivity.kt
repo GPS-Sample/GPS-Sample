@@ -27,7 +27,7 @@ class SignInActivity : AppCompatActivity() {
         when (role) {
             Role.Admin -> binding.titleTextView.text = resources.getString( R.string.admin_sign_in )
             Role.Supervisor -> binding.titleTextView.text = resources.getString( R.string.supervisor_sign_in )
-            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.enumerator_sign_in )
+            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.data_collector_sign_in )
         }
 
         binding.backButton.setOnClickListener {

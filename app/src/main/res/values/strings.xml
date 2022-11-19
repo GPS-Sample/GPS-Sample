@@ -46,10 +46,10 @@
     <string name="continue_with_existing_study">Continue with existing Study</string>
     <string name="admin_sign_in">Admin Sign In</string>
     <string name="supervisor_sign_in">Supervisor Sign In</string>
-    <string name="enumerator_sign_in">Enumerator Sign In</string>
+    <string name="data_collector_sign_in">Data Collector Sign In</string>
     <string name="admin_sign_up">Admin Sign Up</string>
     <string name="supervisor_sign_up">Supervisor Sign Up</string>
-    <string name="enumerator_sign_up">Enumerator Sign Up</string>
+    <string name="data_collector_sign_up">Data Collector Sign Up</string>
     <string name="enter_your_pin">Enter your PIN</string>
     <string name="reenter_your_pin">Re-enter your PIN</string>
     <string name="back">Back</string>
