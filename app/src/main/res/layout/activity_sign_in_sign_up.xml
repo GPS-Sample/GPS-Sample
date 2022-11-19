@@ -32,9 +32,10 @@
             android:layout_height="30dp"
             android:layout_above="@+id/radio_group"
             android:gravity="center"
+            android:text="@string/select_role"
             android:textColor="@color/primary"
-            android:textSize="17sp"
-            android:text="@string/select_role" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <RadioGroup
             android:id="@+id/radio_group"

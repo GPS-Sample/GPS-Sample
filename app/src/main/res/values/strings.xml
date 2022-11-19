@@ -55,7 +55,7 @@
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
-    <string name="select_role">Select Role</string>
+    <string name="select_role">Select your Role</string>
     <string name="admin_select_role">Admin Select Role</string>
     <string name="supervisor_select_role">Supervisor Select Role</string>
     <string name="sign_in">Sign In</string>
