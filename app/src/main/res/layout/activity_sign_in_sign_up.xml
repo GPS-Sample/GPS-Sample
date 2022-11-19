@@ -81,6 +81,7 @@
             android:id="@+id/sign_up_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_marginTop="20dp"
             android:layout_below="@+id/sign_in_button"
             android:gravity="center"
             android:text="@string/not_registered" />
