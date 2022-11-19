@@ -9,7 +9,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import edu.gtri.gpssample.MainActivity
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignInSignUpBinding
@@ -41,7 +40,7 @@ class SignInSignUpActivity : AppCompatActivity() {
             binding.signUpButton.isEnabled = true
             binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
         }
-        binding.enumeratorButton.setOnClickListener {
+        binding.dataCollectorButton.setOnClickListener {
             binding.signInButton.isEnabled = true
             binding.signUpButton.isEnabled = true
             binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
@@ -57,7 +56,7 @@ class SignInSignUpActivity : AppCompatActivity() {
             else if (binding.supervisorButton.isChecked) {
                 intent.putExtra( "role", Role.Supervisor.toString())
             }
-            else if (binding.enumeratorButton.isChecked) {
+            else if (binding.dataCollectorButton.isChecked) {
                 intent.putExtra( "role", Role.Enumerator.toString())
             }
 
@@ -76,7 +75,7 @@ class SignInSignUpActivity : AppCompatActivity() {
             else if (binding.supervisorButton.isChecked) {
                 intent.putExtra( "role", Role.Supervisor.toString())
             }
-            else if (binding.enumeratorButton.isChecked) {
+            else if (binding.dataCollectorButton.isChecked) {
                 intent.putExtra( "role", Role.Enumerator.toString())
             }
 

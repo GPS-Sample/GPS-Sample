@@ -1,4 +1,4 @@
-package edu.gtri.gpssample
+package edu.gtri.gpssample.application
 
 import android.app.Application
 import android.graphics.Bitmap

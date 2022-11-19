@@ -1,20 +1,13 @@
 package edu.gtri.gpssample.activities
 
-import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidmads.library.qrgenearator.QRGContents
-import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
-import edu.gtri.gpssample.MainApplication
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityStudyBinding
-import edu.gtri.gpssample.models.StudyModel
 
 class StudyActivity : AppCompatActivity() {
 

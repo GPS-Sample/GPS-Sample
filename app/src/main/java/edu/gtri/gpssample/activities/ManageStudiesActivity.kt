@@ -8,7 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import edu.gtri.gpssample.MainApplication
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.adapters.StudiesAdapter
 import edu.gtri.gpssample.constants.Key

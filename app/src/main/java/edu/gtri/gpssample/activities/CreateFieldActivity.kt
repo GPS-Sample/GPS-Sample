@@ -2,7 +2,7 @@ package edu.gtri.gpssample.activities
 
 import android.os.Bundle
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.MainApplication
+import edu.gtri.gpssample.application.MainApplication
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.databinding.ActivityCreateFieldBinding
 import edu.gtri.gpssample.models.FieldModel

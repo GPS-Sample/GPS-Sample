@@ -1,17 +1,12 @@
 package edu.gtri.gpssample.activities
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.View
-import androidmads.library.qrgenearator.QRGContents
-import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
-import edu.gtri.gpssample.MainApplication
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignInBinding
 

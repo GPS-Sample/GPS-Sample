@@ -6,7 +6,7 @@ import android.util.Log
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
-import edu.gtri.gpssample.MainApplication
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode

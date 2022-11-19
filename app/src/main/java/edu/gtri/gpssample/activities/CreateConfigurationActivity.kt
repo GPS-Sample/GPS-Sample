@@ -1,13 +1,10 @@
 package edu.gtri.gpssample.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import edu.gtri.gpssample.MainApplication
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.ActivityCreateConfigurationBinding
 import edu.gtri.gpssample.models.ConfigurationModel
@@ -61,10 +58,6 @@ class CreateConfigurationActivity : AppCompatActivity() {
 
                 onBackPressed()
             }
-
-//            val intent = Intent(this, DefineEnumerationAreaActivity::class.java)
-//            startActivity( intent )
-//            this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
         }
     }
 
