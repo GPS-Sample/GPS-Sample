@@ -23,7 +23,7 @@ class StudyActivity : AppCompatActivity() {
 
         binding.studyNameTextView.text = studyName + " Study"
 
-        binding.imageView.setImageBitmap( (application as MainApplication).bitmap )
+        binding.imageView.setImageBitmap( (application as MainApplication).barcodeBitmap )
 
         binding.backButton.setOnClickListener {
 

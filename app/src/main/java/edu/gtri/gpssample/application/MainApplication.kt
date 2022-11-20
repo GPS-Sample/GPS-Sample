@@ -8,7 +8,7 @@ import edu.gtri.gpssample.models.ConfigurationModel
 
 class MainApplication : Application()
 {
-    var bitmap : Bitmap? = null
+    var barcodeBitmap : Bitmap? = null
 
     var fields = mutableListOf<FieldModel>()
     var studies = mutableListOf<StudyModel>()

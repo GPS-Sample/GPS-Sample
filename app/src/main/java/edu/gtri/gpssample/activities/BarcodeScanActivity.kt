@@ -54,7 +54,9 @@ class BarcodeScanActivity : AppCompatActivity() {
 
         if (resultCode == ResultCode.BarcodeScanned.value)
         {
-            startNextActivityForRole( role )
+            val payload = data!!.getStringExtra( "value" )
+            binding.payloadTextView.text = payload!!
+//            startNextActivityForRole( role )
         }
     }
 

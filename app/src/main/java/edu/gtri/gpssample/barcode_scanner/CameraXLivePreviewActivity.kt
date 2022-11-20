@@ -16,6 +16,7 @@
 
 package edu.gtri.gpssample.barcode_scanner
 
+import android.content.Intent
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -223,7 +224,9 @@ class CameraXLivePreviewActivity :
         this,
         Observer { barcode: Barcode? ->
           if (barcode != null) {
-            setResult( ResultCode.BarcodeScanned.value )
+            val data = Intent();
+            data.putExtra( "value", barcode.rawValue!! )
+            setResult( ResultCode.BarcodeScanned.value, data )
             finish()
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
           }

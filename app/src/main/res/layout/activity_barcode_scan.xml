@@ -22,7 +22,7 @@
         android:id="@+id/scan_button"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="50dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_gravity="center"
@@ -45,13 +45,26 @@
         android:id="@+id/continue_button"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_gravity="center"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/continue_with_existing_study" />
+
+    <TextView
+        android:id="@+id/payload_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_marginTop="180dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_gravity="center"
+        android:background="#dddddd"
+        android:textColor="@color/primary"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/sign_out_button"

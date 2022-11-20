@@ -12,6 +12,8 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityGenerateBarcodeBinding
 import edu.gtri.gpssample.models.StudyModel
+import org.json.JSONObject
+import java.util.UUID
 
 class GenerateBarcodeActivity : AppCompatActivity() {
 
@@ -27,14 +29,21 @@ class GenerateBarcodeActivity : AppCompatActivity() {
 
         binding.generateButton.setOnClickListener {
 
-            val qrgEncoder = QRGEncoder("whoo Hoo Hoo", null, QRGContents.Type.TEXT, binding.imageView.width )
+            val jsonObject = JSONObject()
+
+            jsonObject.put( "wifi_ssid", "GPS Sample App" )
+            jsonObject.put( "wifi_password", "Pa\$\$W0rd")
+            jsonObject.put( "configuration_id", "1be2a0fe")
+            jsonObject.put( "study_id", "6e70e86f")
+
+            val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
             qrgEncoder.setColorBlack(Color.WHITE);
             qrgEncoder.setColorWhite(Color.BLACK);
 
             try {
                 val bitmap = qrgEncoder.bitmap
                 binding.imageView.setImageBitmap(bitmap)
-                (application as MainApplication).bitmap = bitmap
+                (application as MainApplication).barcodeBitmap = bitmap
 
             } catch (e: Exception) {
                 Log.d("xxx", e.toString())
