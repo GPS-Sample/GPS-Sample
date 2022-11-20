@@ -20,9 +20,8 @@ class DefineSamplingMethodActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.backButton.setOnClickListener {
-
-            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
             finish()
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
         }
 
         binding.nextButton.setOnClickListener {
