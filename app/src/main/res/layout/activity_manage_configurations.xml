@@ -12,7 +12,7 @@
         android:layout_height="30dp"
         android:layout_margin="20dp"
         android:gravity="center"
-        android:text="Configurations"
+        android:text="@string/configurations"
         android:textColor="@color/primary"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -30,7 +30,7 @@
             android:layout_margin="20dp"
             android:layout_above="@+id/create_button"
             android:gravity="center"
-            android:text="You don't have any configurations"
+            android:text="@string/no_configurations"
             android:textColor="@color/primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:layout_centerInParent="true"
-            android:text="Create Configuration" />
+            android:text="@string/create_config" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView

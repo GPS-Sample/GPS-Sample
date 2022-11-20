@@ -28,7 +28,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Manage Enumerators" />
+            android:text="@string/manage_enumerators" />
 
         <Button
             android:id="@+id/collect_enumerations_button"
@@ -37,7 +37,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Collect Enumerations" />
+            android:text="@string/collect_enumerations" />
 
         <Button
             android:id="@+id/generate_sample_button"
@@ -46,7 +46,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Generate Sample" />
+            android:text="@string/generate_sample" />
 
         <Button
             android:id="@+id/collect_samples_button"
@@ -55,7 +55,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Collect Samples" />
+            android:text="@string/collect_samples" />
     </LinearLayout>
 
     <Button

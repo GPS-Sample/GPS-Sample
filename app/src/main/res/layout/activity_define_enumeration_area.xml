@@ -17,7 +17,7 @@
         android:layout_height="30dp"
         android:layout_margin="20dp"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Define Enumeration Area"
+        android:text="@string/define_enumeration_area"
         android:textColor="@color/primary"
         android:textSize="20sp"
         android:textStyle="bold" />

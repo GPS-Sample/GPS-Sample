@@ -40,6 +40,9 @@
     <string name="supervisor">Supervisor</string>
     <string name="enumerator">Enumerator</string>
     <string name="surveyor">Surveyor</string>
+    <string name="configurations">Configurations</string>
+    <string name="no_configurations">"You don't have any configurations"</string>
+    <string name="no_studies">"You don't have any studies for this configuration"</string>
     <string name="data_collector">Data Collector</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="or">or</string>
@@ -54,6 +57,7 @@
     <string name="reenter_your_pin">Re-enter your PIN</string>
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>
+    <string name="finish">Finish</string>
     <string name="save">Save</string>
     <string name="select_role">Select your Role</string>
     <string name="admin_select_role">Admin Select Role</string>
@@ -85,9 +89,16 @@
     <string name="preferred_units">Preferred Units</string>
     <string name="date_format">Date Format</string>
     <string name="time_format">Time Format</string>
+
+    <string name="manage_enumerators">Manage Enumerators</string>
+    <string name="collect_enumerations">Collect Enumerations</string>
+    <string name="generate_sample">Generate Sample</string>
+    <string name="collect_samples">Collect Samples</string>
+
     <string name="min_gps_precision">Minimum GPS Precision</string>
     <string name="enter_min_gps_precision">Enter Minimum GPS Precision</string>
     <string name="define_enumeration_fields">Define Enumeration Fields</string>
+    <string name="define_enumeration_area">Define Enumeration Area</string>
     <string name="define_sampling_method">Define Sampling Method</string>
 
     <string name="barcode_result" translatable="false">Barcode detected.\n%1$s</string>

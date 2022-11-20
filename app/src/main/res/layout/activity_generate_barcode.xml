@@ -20,8 +20,10 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:gravity="center"
-            android:text="Study Name"
-            android:textColor="@color/black" />
+            android:text="@string/study_name"
+            android:textSize="20sp"
+            android:textStyle="bold"
+        android:textColor="@color/primary" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

@@ -30,7 +30,7 @@
             android:layout_margin="20dp"
             android:layout_above="@+id/create_button"
             android:gravity="center"
-            android:text="You don't have any studies for this configuration"
+            android:text="@string/no_studies"
             android:textColor="@color/primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:layout_centerInParent="true"
-            android:text="Create Study" />
+            android:text="@string/create_study" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
