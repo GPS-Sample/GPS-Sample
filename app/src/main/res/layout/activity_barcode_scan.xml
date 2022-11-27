@@ -61,10 +61,10 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_gravity="center"
+        android:paddingLeft="10dp"
         android:background="#dddddd"
         android:textColor="@color/primary"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textSize="17sp"/>
 
     <Button
         android:id="@+id/sign_out_button"

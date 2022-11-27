@@ -122,7 +122,6 @@ class CameraXLivePreviewActivity :
     // An item was selected. You can retrieve the selected item using
     // parent.getItemAtPosition(pos)
 //    selectedModel = parent?.getItemAtPosition(pos).toString()
-    Log.d("xxx", "Selected model: $selectedModel")
     bindAnalysisUseCase()
   }
 

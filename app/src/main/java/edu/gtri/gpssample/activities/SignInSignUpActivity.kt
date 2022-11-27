@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivitySignInSignUpBinding
-import java.util.ArrayList
+
 
 class SignInSignUpActivity : AppCompatActivity() {
 
@@ -140,8 +140,12 @@ class SignInSignUpActivity : AppCompatActivity() {
         private val REQUIRED_RUNTIME_PERMISSIONS =
             arrayOf(
                 Manifest.permission.CAMERA,
+                Manifest.permission.CHANGE_WIFI_STATE,
+                Manifest.permission.CHANGE_NETWORK_STATE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
     }
 }

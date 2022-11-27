@@ -1,8 +1,11 @@
 package edu.gtri.gpssample.activities
 
 import android.graphics.Color
+import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
@@ -13,7 +16,6 @@ import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityGenerateBarcodeBinding
 import edu.gtri.gpssample.models.StudyModel
 import org.json.JSONObject
-import java.util.UUID
 
 class GenerateBarcodeActivity : AppCompatActivity() {
 
@@ -29,25 +31,37 @@ class GenerateBarcodeActivity : AppCompatActivity() {
 
         binding.generateButton.setOnClickListener {
 
-            val jsonObject = JSONObject()
+            try
+            {
+                val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
 
-            jsonObject.put( "wifi_ssid", "GPS Sample App" )
-            jsonObject.put( "wifi_password", "Pa\$\$W0rd")
-            jsonObject.put( "configuration_id", "1be2a0fe")
-            jsonObject.put( "study_id", "6e70e86f")
+                wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
+                {
+                    override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
+                    {
+                        super.onStarted(reservation)
 
-            val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
-            qrgEncoder.setColorBlack(Color.WHITE);
-            qrgEncoder.setColorWhite(Color.BLACK);
+                        val ssid = reservation.softApConfiguration.ssid
+                        val pass = reservation.softApConfiguration.passphrase
+                        Toast.makeText(applicationContext, "ssid = " + ssid, Toast.LENGTH_SHORT).show()
 
-            try {
-                val bitmap = qrgEncoder.bitmap
-                binding.imageView.setImageBitmap(bitmap)
-                (application as MainApplication).barcodeBitmap = bitmap
+                        Log.d( "xxx", "ssid = " + ssid );
+                        Log.d( "xxx", "pass = " + pass );
 
-            } catch (e: Exception) {
-                Log.d("xxx", e.toString())
-            }
+                        val jsonObject = JSONObject()
+                        jsonObject.put( "ssid", ssid )
+                        jsonObject.put( "pass", pass )
+
+                        val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
+                        qrgEncoder.setColorBlack(Color.WHITE);
+                        qrgEncoder.setColorWhite(Color.BLACK);
+
+                        val bitmap = qrgEncoder.bitmap
+                        binding.imageView.setImageBitmap(bitmap)
+                        (application as MainApplication).barcodeBitmap = bitmap
+                    }
+                }, Handler())
+            } catch(e: Exception) {}
         }
 
         binding.nextButton.setOnClickListener {
