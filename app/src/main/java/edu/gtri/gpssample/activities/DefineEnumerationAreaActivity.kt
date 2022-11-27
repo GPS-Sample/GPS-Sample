@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -35,9 +36,14 @@ class DefineEnumerationAreaActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         binding.nextButton.setOnClickListener {
-            val intent = Intent(this, DefineEnumerationFieldsActivity::class.java)
+            finish()
+            
+            val intent = Intent(this, AdminSelectRoleActivity::class.java)
             startActivity( intent )
-            this.overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+
+            // clear the back stack of all previous activities
+            ActivityCompat.finishAffinity(this)
         }
     }
 
