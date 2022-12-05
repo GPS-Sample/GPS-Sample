@@ -41,6 +41,7 @@ class GenerateBarcodeActivity : AppCompatActivity() {
                     {
                         super.onStarted(reservation)
 
+                        Log.d( "xxx", reservation.toString())
                         val ssid = reservation.softApConfiguration.ssid
                         val pass = reservation.softApConfiguration.passphrase
                         Toast.makeText(applicationContext, "ssid = " + ssid, Toast.LENGTH_SHORT).show()

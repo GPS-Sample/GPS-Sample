@@ -7,17 +7,27 @@ import android.net.wifi.WifiNetworkSpecifier
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivityBarcodeScanBinding
+import edu.gtri.gpssample.network.HeartBeatTransmitter
+import edu.gtri.gpssample.network.UDPBroadcastTransmitter
 import org.json.JSONObject
+import java.net.InetAddress
 
 class BarcodeScanActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBarcodeScanBinding
     private lateinit var role: Role
+
+    private val message = "Hello, World."
+    private lateinit var myInetAddress: InetAddress
+    private lateinit var serverInetAddress: InetAddress
+    private val heartBeatTransmitter = HeartBeatTransmitter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +83,7 @@ class BarcodeScanActivity : AppCompatActivity() {
             networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
             networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
             networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
+
             val networkRequest = networkRequestBuilder.build()
 
             val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE)
@@ -92,10 +103,20 @@ class BarcodeScanActivity : AppCompatActivity() {
             super.onLinkPropertiesChanged(network, linkProperties)
 
             val serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
+            // linkProperties.linkAddresses[0] is the IPV6 address
             val myAddress = linkProperties.linkAddresses[1].toString().substring(0, linkProperties.linkAddresses[1].toString().length-3)
 
             Log.d( "xxx", "server addr: " + serverAddress)
             Log.d( "xxx", "my addr: " + myAddress )
+
+            myInetAddress = InetAddress.getByName( myAddress )
+            serverInetAddress = InetAddress.getByName( "192.168.217.255" )
+
+            lifecycleScope.launchWhenStarted {
+                whenStarted {
+                    heartBeatTransmitter.transmit( myInetAddress, serverInetAddress, message.toByteArray())
+                }
+            }
 
             binding.payloadTextView.text = binding.payloadTextView.text.toString() + "\n\nserver addr: " + serverAddress + "\nmy addr: " + myAddress
         }

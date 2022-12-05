@@ -1,23 +1,51 @@
 package edu.gtri.gpssample.activities
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
+import androidmads.library.qrgenearator.QRGContents
+import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import edu.gtri.gpssample.application.MainApplication
+import com.google.mlkit.vision.barcode.common.Barcode
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.adapters.OnlineStatusAdapter
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityStudyBinding
-import edu.gtri.gpssample.models.StudyModel
 import edu.gtri.gpssample.models.UserModel
+import edu.gtri.gpssample.network.UDPBroadcastReceiver
+import kotlinx.coroutines.CoroutineScope
+import org.json.JSONObject
+import java.net.DatagramPacket
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.net.SocketException
+import java.sql.Types.NULL
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.thread
+
 
 class StudyActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStudyBinding
     private lateinit var onlineStatusAdapter: OnlineStatusAdapter
+    private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,11 +77,115 @@ class StudyActivity : AppCompatActivity() {
         binding.recyclerView.adapter = onlineStatusAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this )
 
+        val oldWifiAdresses = getWifiApIpAddresses()
+
+        binding.generateBarcodeButton.setOnClickListener {
+
+            try
+            {
+                val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
+
+                wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
+                {
+                    override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
+                    {
+                        super.onStarted(reservation)
+
+                        val ssid = reservation.softApConfiguration.ssid
+                        val pass = reservation.softApConfiguration.passphrase
+                        Toast.makeText(applicationContext, "ssid = " + ssid, Toast.LENGTH_SHORT).show()
+
+                        Log.d( "xxx", "ssid = " + ssid );
+                        Log.d( "xxx", "pass = " + pass );
+
+                        val newWifiAddresses = getWifiApIpAddresses()
+
+                        var inetAddress: InetAddress? = null
+
+                        if (oldWifiAdresses.isEmpty())
+                        {
+                            if (!newWifiAddresses.isEmpty())
+                            {
+                                inetAddress = newWifiAddresses[0]
+                            }
+                        }
+                        else
+                        {
+                            for (oldAddr in oldWifiAdresses)
+                            {
+                                for (newAddr in newWifiAddresses)
+                                {
+                                    if (newAddr.hostAddress.equals( oldAddr.hostAddress ))
+                                    {
+                                        continue
+                                    }
+                                    else
+                                    {
+                                        inetAddress = newAddr
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (inetAddress != null)
+                        {
+                            Log.d( "xxx", "inetAddress = " + inetAddress!!.hostAddress )
+
+                            lifecycleScope.launchWhenStarted {
+                                whenStarted {
+                                    udpBroadcastReceiver.beginListening( inetAddress!! )
+                                }
+                            }
+                        }
+
+                        val jsonObject = JSONObject()
+                        jsonObject.put( "ssid", ssid )
+                        jsonObject.put( "pass", pass )
+
+                        val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
+                        qrgEncoder.setColorBlack(Color.WHITE);
+                        qrgEncoder.setColorWhite(Color.BLACK);
+
+                        val bitmap = qrgEncoder.bitmap
+                        binding.imageView.setImageBitmap(bitmap)
+                        (application as MainApplication).barcodeBitmap = bitmap
+                    }
+                }, Handler())
+            } catch(e: Exception) {}
+        }
+
         binding.backButton.setOnClickListener {
 
             finish()
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
         }
+    }
+
+    fun getWifiApIpAddresses(): ArrayList<InetAddress> {
+        val list = ArrayList<InetAddress>()
+        try {
+            val en: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
+            while (en.hasMoreElements()) {
+                val intf: NetworkInterface = en.nextElement()
+                if (intf.getName().contains("wlan")) {
+                    val enumIpAddr: Enumeration<InetAddress> = intf.getInetAddresses()
+                    while (enumIpAddr.hasMoreElements()) {
+                        val inetAddress: InetAddress = enumIpAddr.nextElement()
+                        if (!inetAddress.isLoopbackAddress()) {
+                            val inetAddr = inetAddress.hostAddress!!
+                            if (!inetAddr.contains(":")) {
+                                list.add( inetAddress)
+                                Log.d("xxx", inetAddress.getHostAddress())
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            Log.e("xxx", ex.toString())
+        }
+        return list
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -78,4 +210,8 @@ class StudyActivity : AppCompatActivity() {
 
         this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
     }
+}
+
+private fun <T> MutableLiveData<T>.observe(coroutineScope: CoroutineScope, observer: Observer) {
+
 }
