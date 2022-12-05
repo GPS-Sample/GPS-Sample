@@ -14,6 +14,7 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityCreateStudyBinding
 import edu.gtri.gpssample.models.FieldModel
+import edu.gtri.gpssample.models.StudyModel
 
 class CreateStudyActivity : AppCompatActivity()
 {
@@ -38,10 +39,17 @@ class CreateStudyActivity : AppCompatActivity()
 
             if (binding.studyNameEditText.text.toString().length > 0)
             {
-                val intent = Intent(this, GenerateBarcodeActivity::class.java)
-                intent.putExtra( Key.StudyName.toString(), binding.studyNameEditText.text.toString())
-                startActivityForResult( intent, 0 )
-                overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+//                val intent = Intent(this, GenerateBarcodeActivity::class.java)
+//                intent.putExtra( Key.StudyName.toString(), binding.studyNameEditText.text.toString())
+//                startActivityForResult( intent, 0 )
+//                overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+
+                val studyModel = StudyModel()
+                studyModel.name = binding.studyNameEditText.text.toString();
+                (application as MainApplication).studies.add( studyModel )
+
+                finish();
+                overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
             }
         }
 
@@ -58,16 +66,16 @@ class CreateStudyActivity : AppCompatActivity()
         fieldsAdapter.updateFields((application as MainApplication).fields)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-    {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == ResultCode.GenerateBarcode.value)
-        {
-            finish()
-            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+//    {
+//        super.onActivityResult(requestCode, resultCode, data)
+//
+//        if (resultCode == ResultCode.GenerateBarcode.value)
+//        {
+//            finish()
+//            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+//        }
+//    }
 
     fun onItemSelected(fieldModel: FieldModel, shouldDismissKeyboard: Boolean )
     {

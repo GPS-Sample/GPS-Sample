@@ -4,14 +4,20 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.adapters.OnlineStatusAdapter
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.databinding.ActivityStudyBinding
+import edu.gtri.gpssample.models.StudyModel
+import edu.gtri.gpssample.models.UserModel
 
 class StudyActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStudyBinding
+    private lateinit var onlineStatusAdapter: OnlineStatusAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +30,24 @@ class StudyActivity : AppCompatActivity() {
         binding.studyNameTextView.text = studyName + " Study"
 
         binding.imageView.setImageBitmap( (application as MainApplication).barcodeBitmap )
+
+        val user1 = UserModel()
+        user1.name = "x"
+        (application as MainApplication).users.add( user1 )
+
+        val user2 = UserModel()
+        user2.name = "y"
+        (application as MainApplication).users.add( user2 )
+
+        val user3 = UserModel()
+        user3.name = "z"
+        (application as MainApplication).users.add( user3 )
+
+        onlineStatusAdapter = OnlineStatusAdapter((application as MainApplication).users)
+
+        binding.recyclerView.itemAnimator = DefaultItemAnimator()
+        binding.recyclerView.adapter = onlineStatusAdapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(this )
 
         binding.backButton.setOnClickListener {
 
