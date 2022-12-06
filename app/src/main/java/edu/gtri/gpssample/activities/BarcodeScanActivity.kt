@@ -16,6 +16,7 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.ActivityBarcodeScanBinding
 import edu.gtri.gpssample.network.HeartBeatTransmitter
 import edu.gtri.gpssample.network.UDPBroadcastTransmitter
+import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.net.InetAddress
 
@@ -54,6 +55,8 @@ class BarcodeScanActivity : AppCompatActivity() {
         }
 
         binding.signOutButton.setOnClickListener {
+
+            heartBeatTransmitter.enabled = false
 
             finish()
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
@@ -102,15 +105,18 @@ class BarcodeScanActivity : AppCompatActivity() {
         {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            val serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
+            var serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
             // linkProperties.linkAddresses[0] is the IPV6 address
             val myAddress = linkProperties.linkAddresses[1].toString().substring(0, linkProperties.linkAddresses[1].toString().length-3)
 
             Log.d( "xxx", "server addr: " + serverAddress)
             Log.d( "xxx", "my addr: " + myAddress )
 
+            val components = serverAddress.split(".")
+            serverAddress = components[0] + "." + components[1] + "." + components[2] + ".255"
+
             myInetAddress = InetAddress.getByName( myAddress )
-            serverInetAddress = InetAddress.getByName( "192.168.217.255" )
+            serverInetAddress = InetAddress.getByName( serverAddress )
 
             lifecycleScope.launchWhenStarted {
                 whenStarted {
