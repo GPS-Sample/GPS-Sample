@@ -11,18 +11,36 @@ import java.net.InetAddress
 class HeartBeatTransmitter
 {
     var port = 61234
-    var enabled = true
+    var datagramSocket: DatagramSocket? = null;
 
-    suspend fun transmit( myInetAddress: InetAddress, serverInetAddress: InetAddress, bytes: ByteArray )
+    private var enabled = false
+
+    fun endTransmitting()
+    {
+        enabled = false
+    }
+
+    fun isEnabled() : Boolean
+    {
+        return enabled
+    }
+
+    suspend fun beginTransmitting( myInetAddress: InetAddress, serverInetAddress: InetAddress, bytes: ByteArray )
     {
         Log.d( "xxx", "begin transmitting heartbeat on " + myInetAddress + " to " + serverInetAddress )
 
         val backgroundResult = withContext(Dispatchers.Default)
         {
-            val datagramSocket = DatagramSocket(port,myInetAddress)
-            datagramSocket!!.broadcast = true
-            datagramSocket!!.reuseAddress = true
+            if (datagramSocket == null)
+            {
+                datagramSocket = DatagramSocket(port,myInetAddress)
+                datagramSocket!!.broadcast = true
+                datagramSocket!!.reuseAddress = true
+            }
+
             val datagramPacket = DatagramPacket(bytes, bytes.size, serverInetAddress, port)
+
+            enabled = true
 
             while (enabled)
             {

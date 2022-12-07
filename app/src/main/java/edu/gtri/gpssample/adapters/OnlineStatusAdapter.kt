@@ -38,9 +38,9 @@ class OnlineStatusAdapter(var users: List<UserModel>?) : RecyclerView.Adapter<On
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        holder.itemView.isSelected = false
-
         val user = users!!.get(holder.adapterPosition)
+
+        holder.itemView.isSelected = user.isOnline
 
         holder.checkBox.setText( user.name )
         holder.checkBox.isChecked = user.isOnline;

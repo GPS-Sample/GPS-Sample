@@ -51,12 +51,16 @@ class BarcodeScanActivity : AppCompatActivity() {
         }
 
         binding.continueButton.setOnClickListener {
+
             startNextActivityForRole( role )
         }
 
         binding.signOutButton.setOnClickListener {
 
-            heartBeatTransmitter.enabled = false
+            heartBeatTransmitter.endTransmitting()
+
+            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.unregisterNetworkCallback( networkCallback )
 
             finish()
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
@@ -89,11 +93,8 @@ class BarcodeScanActivity : AppCompatActivity() {
 
             val networkRequest = networkRequestBuilder.build()
 
-            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE)
-
-            if (connectivityManager is ConnectivityManager) {
-                connectivityManager.requestNetwork( networkRequest, networkCallback )
-            }
+            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            connectivityManager.requestNetwork( networkRequest, networkCallback )
 
 //            startNextActivityForRole( role )
         }
@@ -101,6 +102,20 @@ class BarcodeScanActivity : AppCompatActivity() {
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback()
     {
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities)
+        {
+            super.onCapabilitiesChanged(network, networkCapabilities)
+
+            if (networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED) && !heartBeatTransmitter.isEnabled())
+            {
+                lifecycleScope.launchWhenStarted {
+                    whenStarted {
+                        heartBeatTransmitter.beginTransmitting( myInetAddress, serverInetAddress, message.toByteArray())
+                    }
+                }
+            }
+        }
+
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties)
         {
             super.onLinkPropertiesChanged(network, linkProperties)
@@ -117,12 +132,6 @@ class BarcodeScanActivity : AppCompatActivity() {
 
             myInetAddress = InetAddress.getByName( myAddress )
             serverInetAddress = InetAddress.getByName( serverAddress )
-
-            lifecycleScope.launchWhenStarted {
-                whenStarted {
-                    heartBeatTransmitter.transmit( myInetAddress, serverInetAddress, message.toByteArray())
-                }
-            }
 
             binding.payloadTextView.text = binding.payloadTextView.text.toString() + "\n\nserver addr: " + serverAddress + "\nmy addr: " + myAddress
         }

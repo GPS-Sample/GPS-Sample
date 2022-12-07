@@ -1,12 +1,9 @@
 package edu.gtri.gpssample.activities
 
-import android.content.Context
-import android.content.Intent
 import android.graphics.Color
-import android.net.ConnectivityManager
-import android.net.LinkProperties
 import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
 import android.view.Menu
@@ -20,12 +17,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.mlkit.vision.barcode.common.Barcode
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.adapters.OnlineStatusAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityStudyBinding
 import edu.gtri.gpssample.models.UserModel
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
@@ -34,15 +29,15 @@ import org.json.JSONObject
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.NetworkInterface
-import java.net.SocketException
-import java.sql.Types.NULL
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.concurrent.thread
+import java.util.concurrent.TimeUnit
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 
-class StudyActivity : AppCompatActivity() {
-
+class StudyActivity : AppCompatActivity(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate
+{
     private lateinit var binding: ActivityStudyBinding
     private lateinit var onlineStatusAdapter: OnlineStatusAdapter
     private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
@@ -59,16 +54,16 @@ class StudyActivity : AppCompatActivity() {
 
         binding.imageView.setImageBitmap( (application as MainApplication).barcodeBitmap )
 
-        val user1 = UserModel()
-        user1.name = "x"
+        var user1 = UserModel()
+        user1.name = "Russell"
         (application as MainApplication).users.add( user1 )
 
-        val user2 = UserModel()
-        user2.name = "y"
+        var user2 = UserModel()
+        user2.name = "Brian"
         (application as MainApplication).users.add( user2 )
 
-        val user3 = UserModel()
-        user3.name = "z"
+        var user3 = UserModel()
+        user3.name = "Megan"
         (application as MainApplication).users.add( user3 )
 
         onlineStatusAdapter = OnlineStatusAdapter((application as MainApplication).users)
@@ -76,6 +71,13 @@ class StudyActivity : AppCompatActivity() {
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = onlineStatusAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this )
+
+//        udpBroadcastReceiver.datagramPacketLiveData.observe(
+//            this,
+//            androidx.lifecycle.Observer {
+//                Log.d( "xxx", "datagramPacket updated!")
+//            }
+//        )
 
         val oldWifiAdresses = getWifiApIpAddresses()
 
@@ -134,7 +136,7 @@ class StudyActivity : AppCompatActivity() {
 
                             lifecycleScope.launchWhenStarted {
                                 whenStarted {
-                                    udpBroadcastReceiver.beginListening( inetAddress!! )
+                                    udpBroadcastReceiver.beginListening( inetAddress!!, this@StudyActivity )
                                 }
                             }
                         }
@@ -159,6 +161,52 @@ class StudyActivity : AppCompatActivity() {
 
             finish()
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+        }
+
+        Observable
+            .interval(2000, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (dataIsFresh)
+                {
+                    dataIsFresh = false;
+                }
+                else if ((application as MainApplication).users[0].isOnline)
+                {
+                    (application as MainApplication).users[0].isOnline = false
+                    onlineStatusAdapter.updateUsers( (application as MainApplication).users )
+                }
+            }
+    }
+
+    private var dataIsFresh = false
+
+    override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
+    {
+        dataIsFresh = true
+
+        (application as MainApplication).users[0].isOnline = true
+
+        this.runOnUiThread{
+            onlineStatusAdapter.updateUsers( (application as MainApplication).users )
+        }
+
+        Log.d( "xxx", "received : " + datagramPacket.length )
+    }
+
+    var countDownTimer: CountDownTimer = object : CountDownTimer(0, 4000)
+    {
+        override fun onTick(millisUntilFinished: Long) {}
+
+        override fun onFinish()
+        {
+            Log.d( "xxx", "finish" )
+            (application as MainApplication).users[0].isOnline = false
+
+            this@StudyActivity.runOnUiThread{
+                onlineStatusAdapter.updateUsers( (application as MainApplication).users )
+            }
         }
     }
 
