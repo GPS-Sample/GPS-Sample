@@ -22,8 +22,8 @@
     </string-array>
 
     <string-array name="preferred_units">
-        <item>"Feet / Miles"</item>
         <item>"Meters / KiloMeters"</item>
+        <item>"Feet / Miles"</item>
     </string-array>
 
     <string-array name="date_format">

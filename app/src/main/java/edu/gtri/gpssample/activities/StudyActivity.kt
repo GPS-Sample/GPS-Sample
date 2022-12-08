@@ -50,34 +50,30 @@ class StudyActivity : AppCompatActivity(), UDPBroadcastReceiver.UDPBroadcastRece
 
         val studyName = intent.getStringExtra( Key.StudyName.toString())
 
-        binding.studyNameTextView.text = studyName + " Study"
+        binding.studyNameTextView.text = studyName
 
         binding.imageView.setImageBitmap( (application as MainApplication).barcodeBitmap )
 
-        var user1 = UserModel()
-        user1.name = "Russell"
-        (application as MainApplication).users.add( user1 )
+        if ((application as MainApplication).users.isEmpty())
+        {
+            var user1 = UserModel()
+            user1.name = "Russell"
+            (application as MainApplication).users.add( user1 )
 
-        var user2 = UserModel()
-        user2.name = "Brian"
-        (application as MainApplication).users.add( user2 )
+            var user2 = UserModel()
+            user2.name = "Brian"
+            (application as MainApplication).users.add( user2 )
 
-        var user3 = UserModel()
-        user3.name = "Megan"
-        (application as MainApplication).users.add( user3 )
+            var user3 = UserModel()
+            user3.name = "Megan"
+            (application as MainApplication).users.add( user3 )
+        }
 
         onlineStatusAdapter = OnlineStatusAdapter((application as MainApplication).users)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = onlineStatusAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this )
-
-//        udpBroadcastReceiver.datagramPacketLiveData.observe(
-//            this,
-//            androidx.lifecycle.Observer {
-//                Log.d( "xxx", "datagramPacket updated!")
-//            }
-//        )
 
         val oldWifiAdresses = getWifiApIpAddresses()
 

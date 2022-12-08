@@ -1,15 +1,23 @@
 package edu.gtri.gpssample.activities
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.wifi.WifiNetworkSpecifier
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityCreateConfigurationBinding
 import edu.gtri.gpssample.models.ConfigurationModel
+import org.json.JSONObject
 
 class CreateConfigurationActivity : AppCompatActivity() {
 
@@ -20,6 +28,8 @@ class CreateConfigurationActivity : AppCompatActivity() {
 
         binding = ActivityCreateConfigurationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.backButton.setOnClickListener {
 
@@ -49,17 +59,24 @@ class CreateConfigurationActivity : AppCompatActivity() {
 
             if (binding.configNameEditText.text.toString().length > 0) {
                 val mainApplication = application as MainApplication
-
                 val configurationModel = ConfigurationModel()
-
                 configurationModel.name = binding.configNameEditText.text.toString()
-
                 mainApplication.configurations.add( configurationModel )
 
                 val intent = Intent(this, DefineEnumerationAreaActivity::class.java)
-                startActivity( intent )
+                startActivityForResult( intent, 0 )
                 overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == ResultCode.ConfigurationCreated.value)
+        {
+            finish()
         }
     }
 

@@ -72,6 +72,6 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/next" />
+            android:text="@string/finish" />
     </LinearLayout>
 </LinearLayout>

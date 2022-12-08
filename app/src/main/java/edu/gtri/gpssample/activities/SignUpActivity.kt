@@ -34,6 +34,8 @@ class SignUpActivity : AppCompatActivity() {
 
         binding.nextButton.setOnClickListener {
 
+            finish()
+
             val intent = Intent(this, SignInActivity::class.java)
             intent.putExtra( "role", role.toString())
             startActivity( intent )

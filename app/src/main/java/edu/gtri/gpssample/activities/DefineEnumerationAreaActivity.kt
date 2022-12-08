@@ -13,6 +13,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.ActivityDefineEnumerationAreaBinding
 
 class DefineEnumerationAreaActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -36,14 +37,16 @@ class DefineEnumerationAreaActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         binding.nextButton.setOnClickListener {
+            setResult( ResultCode.ConfigurationCreated.value, null )
             finish()
-            
-            val intent = Intent(this, AdminSelectRoleActivity::class.java)
-            startActivity( intent )
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
 
-            // clear the back stack of all previous activities
-            ActivityCompat.finishAffinity(this)
+//            val intent = Intent(this, AdminSelectRoleActivity::class.java)
+//            startActivity( intent )
+//            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+//
+//            // clear the back stack of all previous activities
+//            ActivityCompat.finishAffinity(this)
         }
     }
 
