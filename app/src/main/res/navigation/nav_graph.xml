@@ -3,26 +3,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/SignInSignUpFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="edu.gtri.gpssample.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:id="@+id/SignInSignUpFragment"
+        android:name="edu.gtri.gpssample.fragments.SignInSignUpFragment"
+        tools:layout="@layout/fragment_sign_in_sign_up">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_navigate_to_SignInFragment"
+            app:destination="@id/SignInFragment" />
     </fragment>
+
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="edu.gtri.gpssample.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:id="@+id/SignInFragment"
+        android:name="edu.gtri.gpssample.fragments.SignInFragment"
+        tools:layout="@layout/fragment_sign_in">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_navigate_to_AdminSelectRoleFragment"
+            app:destination="@id/AdminSelectRoleFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/AdminSelectRoleFragment"
+        android:name="edu.gtri.gpssample.fragments.AdminSelectRoleFragment"
+        tools:layout="@layout/fragment_admin_select_role">
+
+        <action
+            android:id="@+id/action_navigate_to_SignInSignUpFragment"
+            app:popUpTo="@id/SignInSignUpFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:destination="@id/ManageConfigurationsFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/ManageConfigurationsFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageConfigurationsFragment"
+        tools:layout="@layout/fragment_manage_configurations">
+    </fragment>
+
 </navigation>
