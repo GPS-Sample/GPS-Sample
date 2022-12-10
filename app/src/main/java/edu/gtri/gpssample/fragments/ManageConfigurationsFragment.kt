@@ -42,15 +42,31 @@ class ManageConfigurationsFragment : Fragment()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.createButton.setOnClickListener {
-//            val intent = Intent(this, CreateConfigurationActivity::class.java)
-//            startActivity( intent )
-//            overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+            findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
 
         binding.backButton.setOnClickListener {
 
             findNavController().popBackStack()
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        if ((activity!!.application as MainApplication).configurations.isEmpty())
+        {
+            binding.recyclerView.visibility = View.GONE
+            binding.relativeLayout.visibility = View.VISIBLE
+        }
+        else
+        {
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.relativeLayout.visibility = View.GONE
+        }
+
+        configurationsAdapter.updateConfigurations((activity!!.application as MainApplication).configurations)
     }
 
     fun onItemSelected(configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean )

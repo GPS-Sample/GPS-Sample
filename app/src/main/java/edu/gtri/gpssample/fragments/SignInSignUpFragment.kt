@@ -17,8 +17,8 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentSignInSignUpBinding
 
-class SignInSignUpFragment : Fragment() {
-
+class SignInSignUpFragment : Fragment()
+{
     private var _binding: FragmentSignInSignUpBinding? = null
 
     private val binding get() = _binding!!

@@ -43,6 +43,30 @@
         android:id="@+id/ManageConfigurationsFragment"
         android:name="edu.gtri.gpssample.fragments.ManageConfigurationsFragment"
         tools:layout="@layout/fragment_manage_configurations">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateConfigurationFragment"
+            app:destination="@id/CreateConfigurationFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreateConfigurationFragment"
+        android:name="edu.gtri.gpssample.fragments.CreateConfigurationFragment"
+        tools:layout="@layout/fragment_create_configuration">
+
+        <action
+            android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
+            app:destination="@id/DefineEnumerationAreaFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/DefineEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.DefineEnumerationAreaFragment"
+        tools:layout="@layout/fragment_define_enumeration_area">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
 
 </navigation>
