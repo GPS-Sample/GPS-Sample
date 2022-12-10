@@ -1,6 +1,5 @@
 package edu.gtri.gpssample.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.activities.ManageConfigurationsActivity
-import edu.gtri.gpssample.activities.SupervisorSelectRoleActivity
 import edu.gtri.gpssample.databinding.FragmentAdminSelectRoleBinding
 
 class AdminSelectRoleFragment : Fragment()

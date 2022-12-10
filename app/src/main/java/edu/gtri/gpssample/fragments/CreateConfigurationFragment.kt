@@ -1,6 +1,5 @@
 package edu.gtri.gpssample.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.activities.DefineEnumerationAreaActivity
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.models.ConfigurationModel

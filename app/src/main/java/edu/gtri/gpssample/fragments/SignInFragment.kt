@@ -1,17 +1,13 @@
 package edu.gtri.gpssample.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.activities.AdminSelectRoleActivity
-import edu.gtri.gpssample.activities.BarcodeScanActivity
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
@@ -19,7 +15,6 @@ import edu.gtri.gpssample.databinding.FragmentSignInBinding
 class SignInFragment : Fragment()
 {
     private var _binding: FragmentSignInBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?

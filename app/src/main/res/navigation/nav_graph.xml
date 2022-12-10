@@ -47,6 +47,10 @@
         <action
             android:id="@+id/action_navigate_to_CreateConfigurationFragment"
             app:destination="@id/CreateConfigurationFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_ManageStudiesFragment"
+            app:destination="@id/ManageStudiesFragment"/>
     </fragment>
 
     <fragment
@@ -67,6 +71,32 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/ManageStudiesFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageStudiesFragment"
+        tools:layout="@layout/fragment_manage_studies">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateStudyFragment"
+            app:destination="@id/CreateStudyFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_StudyFragment"
+            app:destination="@id/StudyFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreateStudyFragment"
+        android:name="edu.gtri.gpssample.fragments.CreateStudyFragment"
+        tools:layout="@layout/fragment_create_study">
+    </fragment>
+
+    <fragment
+        android:id="@+id/StudyFragment"
+        android:name="edu.gtri.gpssample.fragments.StudyFragment"
+        tools:layout="@layout/fragment_study">
     </fragment>
 
 </navigation>

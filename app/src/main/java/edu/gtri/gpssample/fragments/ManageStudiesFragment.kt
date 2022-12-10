@@ -9,20 +9,20 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.adapters.ConfigurationsAdapter
+import edu.gtri.gpssample.adapters.StudiesAdapter
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.models.ConfigurationModel
+import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
+import edu.gtri.gpssample.models.StudyModel
 
-class ManageConfigurationsFragment : Fragment()
+class ManageStudiesFragment : Fragment()
 {
-    private var _binding: FragmentManageConfigurationsBinding? = null
+    private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
-    private lateinit var configurationsAdapter: ConfigurationsAdapter
+    private lateinit var studiesAdapter: StudiesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentManageConfigurationsBinding.inflate(inflater, container, false)
+        _binding = FragmentManageStudiesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -30,15 +30,15 @@ class ManageConfigurationsFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        configurationsAdapter = ConfigurationsAdapter((activity!!.application as MainApplication).configurations)
-        configurationsAdapter.selectedItemCallback = this::onItemSelected
+        studiesAdapter = StudiesAdapter((activity!!.application as MainApplication).studies)
+        studiesAdapter.selectedItemCallback = this::onItemSelected
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = configurationsAdapter
+        binding.recyclerView.adapter = studiesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.createButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
+            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
         }
 
         binding.backButton.setOnClickListener {
@@ -51,7 +51,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         super.onResume()
 
-        if ((activity!!.application as MainApplication).configurations.isEmpty())
+        if ((activity!!.application as MainApplication).studies.isEmpty())
         {
             binding.recyclerView.visibility = View.GONE
             binding.relativeLayout.visibility = View.VISIBLE
@@ -62,15 +62,15 @@ class ManageConfigurationsFragment : Fragment()
             binding.relativeLayout.visibility = View.GONE
         }
 
-        configurationsAdapter.updateConfigurations((activity!!.application as MainApplication).configurations)
+        studiesAdapter.updateStudies((activity!!.application as MainApplication).studies)
     }
 
-    fun onItemSelected(configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean )
+    fun onItemSelected(studyModel: StudyModel, shouldDismissKeyboard: Boolean )
     {
-        findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment)
-//        val intent = Intent(this, ManageStudiesActivity::class.java)
-//        intent.putExtra( Key.ConfigurationName.toString(), configurationModel.name )
+//        val intent = Intent(this, StudyActivity::class.java)
+//        intent.putExtra( Key.StudyName.toString(), studyModel.name )
 //        startActivity( intent )
 //        overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
     }
+
 }
