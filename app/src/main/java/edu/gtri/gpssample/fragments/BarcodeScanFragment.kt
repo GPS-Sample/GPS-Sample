@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.activities
+package edu.gtri.gpssample.fragments
 
 import android.content.Context
 import android.content.Intent
@@ -6,64 +6,52 @@ import android.net.*
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
+import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
+import edu.gtri.gpssample.activities.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.ResultCode
-import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.databinding.ActivityBarcodeScanBinding
+import edu.gtri.gpssample.databinding.FragmentBarcodeScanBinding
 import edu.gtri.gpssample.network.HeartBeatTransmitter
-import edu.gtri.gpssample.network.UDPBroadcastTransmitter
-import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.net.InetAddress
 
-class BarcodeScanActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityBarcodeScanBinding
-    private lateinit var role: Role
-
+class BarcodeScanFragment : Fragment()
+{
+    private var _binding: FragmentBarcodeScanBinding? = null
+    private val binding get() = _binding!!
     private val message = "Hello, World."
     private lateinit var myInetAddress: InetAddress
     private lateinit var serverInetAddress: InetAddress
     private val heartBeatTransmitter = HeartBeatTransmitter()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
+    {
+        _binding = FragmentBarcodeScanBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivityBarcodeScanBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        role = Role.valueOf(intent.getStringExtra("role")!!)
-
-        when (role) {
-            Role.Admin -> binding.titleTextView.text = resources.getString( R.string.admin )
-            Role.Supervisor -> binding.titleTextView.text = resources.getString( R.string.supervisor )
-            Role.Enumerator -> binding.titleTextView.text = resources.getString( R.string.enumerator )
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.scanButton.setOnClickListener {
-            val intent = Intent(this, CameraXLivePreviewActivity::class.java)
+            val intent = Intent(activity!!, CameraXLivePreviewActivity::class.java)
             startActivityForResult( intent, 0 )
-            overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-        }
-
-        binding.continueButton.setOnClickListener {
-
-            startNextActivityForRole( role )
         }
 
         binding.signOutButton.setOnClickListener {
 
             heartBeatTransmitter.endTransmitting()
 
-            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.unregisterNetworkCallback( networkCallback )
 
-            finish()
-            this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
+            findNavController().navigate(R.id.action_navigate_to_SignInSignUpFragment)
         }
     }
 
@@ -93,10 +81,8 @@ class BarcodeScanActivity : AppCompatActivity() {
 
             val networkRequest = networkRequestBuilder.build()
 
-            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.requestNetwork( networkRequest, networkCallback )
-
-//            startNextActivityForRole( role )
         }
     }
 
@@ -135,30 +121,5 @@ class BarcodeScanActivity : AppCompatActivity() {
 
             binding.payloadTextView.text = binding.payloadTextView.text.toString() + "\n\nserver addr: " + serverAddress + "\nmy addr: " + myAddress
         }
-    }
-
-    private fun startNextActivityForRole( role: Role )
-    {
-        finish()
-
-        lateinit var intent: Intent
-
-        when (role) {
-            Role.Supervisor -> intent = Intent(this, SupervisorSelectRoleActivity::class.java)
-            Role.Enumerator -> intent = Intent(this, EnumeratorActivity::class.java)
-            else -> {}
-        }
-
-        intent.putExtra( "role", role.toString() )
-
-        startActivity( intent )
-
-        overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-
-        this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)
     }
 }

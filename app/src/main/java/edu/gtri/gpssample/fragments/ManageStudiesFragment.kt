@@ -42,7 +42,6 @@ class ManageStudiesFragment : Fragment()
         }
 
         binding.backButton.setOnClickListener {
-
             findNavController().popBackStack()
         }
     }
@@ -67,10 +66,7 @@ class ManageStudiesFragment : Fragment()
 
     fun onItemSelected(studyModel: StudyModel, shouldDismissKeyboard: Boolean )
     {
-//        val intent = Intent(this, StudyActivity::class.java)
-//        intent.putExtra( Key.StudyName.toString(), studyModel.name )
-//        startActivity( intent )
-//        overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+        findNavController().navigate( R.id.action_navigate_to_StudyFragment )
     }
 
 }

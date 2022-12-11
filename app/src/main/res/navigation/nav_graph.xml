@@ -23,6 +23,10 @@
         <action
             android:id="@+id/action_navigate_to_AdminSelectRoleFragment"
             app:destination="@id/AdminSelectRoleFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_BarcodeScanFragment"
+            app:destination="@id/BarcodeScanFragment" />
     </fragment>
 
     <fragment
@@ -97,6 +101,16 @@
         android:id="@+id/StudyFragment"
         android:name="edu.gtri.gpssample.fragments.StudyFragment"
         tools:layout="@layout/fragment_study">
+    </fragment>
+
+    <fragment
+        android:id="@+id/BarcodeScanFragment"
+        android:name="edu.gtri.gpssample.fragments.BarcodeScanFragment"
+        tools:layout="@layout/fragment_barcode_scan">
+
+        <action
+            android:id="@+id/action_navigate_to_SignInSignUpFragment"
+            app:popUpTo="@id/SignInSignUpFragment"/>
     </fragment>
 
 </navigation>

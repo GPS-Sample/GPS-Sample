@@ -56,6 +56,10 @@ class SignInFragment : Fragment()
                 {
                     findNavController().navigate(R.id.action_navigate_to_AdminSelectRoleFragment, bundle)
                 }
+                else if (role == Role.Supervisor.value)
+                {
+                    findNavController().navigate(R.id.action_navigate_to_BarcodeScanFragment, bundle)
+                }
             }
 
             false
