@@ -15,7 +15,7 @@ class HeartBeatTransmitter
 
     private var enabled = false
 
-    fun endTransmitting()
+    fun stopTransmitting()
     {
         enabled = false
     }

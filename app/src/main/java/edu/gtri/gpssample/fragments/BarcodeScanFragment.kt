@@ -46,7 +46,7 @@ class BarcodeScanFragment : Fragment()
 
         binding.signOutButton.setOnClickListener {
 
-            heartBeatTransmitter.endTransmitting()
+            heartBeatTransmitter.stopTransmitting()
 
             val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.unregisterNetworkCallback( networkCallback )

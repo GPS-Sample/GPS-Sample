@@ -25,6 +25,8 @@ import edu.gtri.gpssample.models.UserModel
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import java.net.DatagramPacket
@@ -37,8 +39,10 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 {
     private var _binding: FragmentStudyBinding? = null
     private val binding get() = _binding!!
+    private val compositeDisposable = CompositeDisposable()
     private lateinit var onlineStatusAdapter: OnlineStatusAdapter
     private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
+    private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
@@ -83,6 +87,8 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
                     override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
                     {
                         super.onStarted(reservation)
+
+                        localOnlyHotspotReservation = reservation
 
                         val ssid = reservation.softApConfiguration.ssid
                         val pass = reservation.softApConfiguration.passphrase
@@ -151,6 +157,12 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
         }
 
         binding.backButton.setOnClickListener {
+            compositeDisposable.clear()
+
+            udpBroadcastReceiver.stopReceiving()
+
+            localOnlyHotspotReservation?.close()
+
             findNavController().popBackStack()
         }
 
@@ -169,6 +181,8 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
                     onlineStatusAdapter.updateUsers( (activity!!.application as MainApplication).users )
                 }
             }
+            .addTo( compositeDisposable )
+
     }
 
     private var dataIsFresh = false

@@ -17,16 +17,29 @@ class UDPBroadcastReceiver
         fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
     }
 
-    var port = 61234
-    var enabled = true
-    lateinit var delegate: UDPBroadcastReceiverDelegate
-//    var datagramPacketLiveData: MutableLiveData<DatagramPacket> = MutableLiveData<DatagramPacket>()
+    private var port = 61234
+    private var enabled = true
+    private lateinit var datagramSocket: DatagramSocket
+    private lateinit var delegate: UDPBroadcastReceiverDelegate
+
+    fun stopReceiving()
+    {
+        enabled = false
+        datagramSocket.close()
+    }
+
+    fun isEnabled() : Boolean
+    {
+        return enabled
+    }
 
     suspend fun beginListening( inetAddress: InetAddress, delegate: UDPBroadcastReceiverDelegate )
     {
+        this.delegate = delegate
+
         val backgroundResult = withContext(Dispatchers.Default)
         {
-            val datagramSocket = DatagramSocket(port)
+            datagramSocket = DatagramSocket(port)
             datagramSocket.broadcast = true
             datagramSocket.reuseAddress = true
 
@@ -34,21 +47,23 @@ class UDPBroadcastReceiver
 
             while (enabled)
             {
-                var bytes: ByteArray? = null
-                val buf = ByteArray(4096)
-                val datagramPacket = DatagramPacket(buf, buf.size)
+                try {
+                    val buf = ByteArray(4096)
+                    val datagramPacket = DatagramPacket(buf, buf.size)
+                    datagramSocket.receive(datagramPacket)
 
-                datagramSocket.receive(datagramPacket)
-
-                delegate.didReceiveDatagramPacket( datagramPacket )
-
-//                this.launch {
-//                    datagramPacketLiveData.value = datagramPacket
-//                }
+                    delegate.didReceiveDatagramPacket( datagramPacket )
+                }
+                catch (ex: Exception)
+                {
+                    ex.printStackTrace().toString()
+                    enabled = false
+                }
             }
+
+            Log.d( "xxx", "stopped waiting for data" )
         }
         withContext(Dispatchers.Main) {
-            Log.d( "xxx", "stopped waiting for data" )
         }
     }
 }
