@@ -18,6 +18,7 @@ class HeartBeatTransmitter
     fun stopTransmitting()
     {
         enabled = false
+        datagramSocket?.close()
     }
 
     fun isEnabled() : Boolean
@@ -44,11 +45,17 @@ class HeartBeatTransmitter
 
             while (enabled)
             {
-                datagramSocket!!.send( datagramPacket )
-                delay(1000)
+                try {
+                    datagramSocket!!.send( datagramPacket )
+                    delay(1000)
+                }
+                catch( ex: Exception )
+                {
+                    Log.d( "xxx", ex.printStackTrace().toString())
+                    stopTransmitting()
+                }
             }
-        }
-        withContext(Dispatchers.Main) {
+
             Log.d( "xxx", "finished transmitting data" )
         }
     }

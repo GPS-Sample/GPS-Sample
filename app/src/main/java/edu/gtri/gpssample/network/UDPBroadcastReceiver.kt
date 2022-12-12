@@ -56,14 +56,12 @@ class UDPBroadcastReceiver
                 }
                 catch (ex: Exception)
                 {
-                    ex.printStackTrace().toString()
-                    enabled = false
+                    Log.d( "xxx", ex.printStackTrace().toString())
+                    stopReceiving()
                 }
             }
 
             Log.d( "xxx", "stopped waiting for data" )
-        }
-        withContext(Dispatchers.Main) {
         }
     }
 }
