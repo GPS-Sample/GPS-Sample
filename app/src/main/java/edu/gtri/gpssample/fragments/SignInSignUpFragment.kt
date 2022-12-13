@@ -34,7 +34,6 @@ class SignInSignUpFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
 
         binding.adminButton.setOnClickListener {
-            Log.d( "xxx", binding.adminButton.isChecked.toString() )
             binding.signInButton.isEnabled = true
             binding.signUpButton.isEnabled = true
             binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))

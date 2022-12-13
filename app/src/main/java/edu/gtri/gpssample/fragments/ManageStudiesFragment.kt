@@ -33,6 +33,9 @@ class ManageStudiesFragment : Fragment()
         studiesAdapter = StudiesAdapter((activity!!.application as MainApplication).studies)
         studiesAdapter.selectedItemCallback = this::onItemSelected
 
+        val configName = getArguments()?.getString("config_name");
+
+        binding.configNameTextView.text = "Configuration " + configName + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = studiesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )

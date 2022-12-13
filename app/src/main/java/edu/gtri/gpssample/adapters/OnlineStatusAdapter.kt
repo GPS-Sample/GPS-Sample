@@ -45,9 +45,9 @@ class OnlineStatusAdapter(var users: List<UserModel>?) : RecyclerView.Adapter<On
         holder.checkBox.setText( user.name )
         holder.checkBox.isChecked = user.isOnline;
 
-        holder.itemView.setOnClickListener {
+//        holder.itemView.setOnClickListener {
 //            selectedItemCallback.invoke(user, true)
-        }
+//        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

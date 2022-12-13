@@ -67,7 +67,12 @@ class ManageConfigurationsFragment : Fragment()
 
     fun onItemSelected(configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean )
     {
-        findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment)
+        var bundle = Bundle()
+
+        bundle.putString( "config_name", configurationModel.name )
+
+        findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
+
 //        val intent = Intent(this, ManageStudiesActivity::class.java)
 //        intent.putExtra( Key.ConfigurationName.toString(), configurationModel.name )
 //        startActivity( intent )
