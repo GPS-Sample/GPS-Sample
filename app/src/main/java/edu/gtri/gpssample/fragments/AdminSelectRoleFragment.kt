@@ -1,11 +1,14 @@
 package edu.gtri.gpssample.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.FragmentAdminSelectRoleBinding
 
@@ -24,6 +27,10 @@ class AdminSelectRoleFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.fragmentRootLayout.setOnClickListener {
+            Toast.makeText(activity!!.applicationContext, "AdminSelectRoleFragment", Toast.LENGTH_SHORT).show()
+        }
 
         binding.adminButton.setOnClickListener {
             findNavController().navigate( R.id.action_navigate_to_ManageConfigurationsFragment )

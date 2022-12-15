@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -33,16 +34,22 @@ class SignInSignUpFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fragmentRootLayout.setOnClickListener {
+            Toast.makeText(activity!!.applicationContext, "SignInSignUpFragment", Toast.LENGTH_SHORT).show()
+        }
+
         binding.adminButton.setOnClickListener {
             binding.signInButton.isEnabled = true
             binding.signUpButton.isEnabled = true
             binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
         }
+
         binding.supervisorButton.setOnClickListener {
             binding.signInButton.isEnabled = true
             binding.signUpButton.isEnabled = true
             binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
         }
+
         binding.dataCollectorButton.setOnClickListener {
             binding.signInButton.isEnabled = true
             binding.signUpButton.isEnabled = true

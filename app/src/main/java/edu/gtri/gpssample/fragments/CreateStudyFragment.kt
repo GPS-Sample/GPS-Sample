@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.application.MainApplication
@@ -24,6 +25,10 @@ class CreateStudyFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.fragmentRootLayout.setOnClickListener {
+            Toast.makeText(activity!!.applicationContext, "CreateStudyFragment", Toast.LENGTH_SHORT).show()
+        }
 
         binding.backButton.setOnClickListener {
 

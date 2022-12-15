@@ -54,6 +54,10 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fragmentRootLayout.setOnClickListener {
+            Toast.makeText(activity!!.applicationContext, "StudyFragment", Toast.LENGTH_SHORT).show()
+        }
+
         if ((activity!!.application as MainApplication).users.isEmpty())
         {
             var user1 = UserModel()
