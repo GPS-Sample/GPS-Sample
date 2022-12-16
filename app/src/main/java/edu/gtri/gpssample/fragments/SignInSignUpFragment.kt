@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentSignInSignUpBinding
@@ -35,7 +36,9 @@ class SignInSignUpFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
 
         binding.fragmentRootLayout.setOnClickListener {
-            Toast.makeText(activity!!.applicationContext, "SignInSignUpFragment", Toast.LENGTH_SHORT).show()
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, "SignInSignUpFragment", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.adminButton.setOnClickListener {

@@ -13,6 +13,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
 
@@ -33,7 +34,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
         super.onViewCreated(view, savedInstanceState)
 
         binding.fragmentRootLayout.setOnClickListener {
-            Toast.makeText(activity!!.applicationContext, "DefineEnumerationAreaFragment", Toast.LENGTH_SHORT).show()
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, "DefineEnumerationAreaFragment", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?

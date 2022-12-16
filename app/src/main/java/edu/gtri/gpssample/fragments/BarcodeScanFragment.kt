@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.activities.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.ResultCode
@@ -41,7 +42,9 @@ class BarcodeScanFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
 
         binding.fragmentRootLayout.setOnClickListener {
-            Toast.makeText(activity!!.applicationContext, "BarcodeScanFragment", Toast.LENGTH_SHORT).show()
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, "BarcodeScanFragment", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.scanButton.setOnClickListener {

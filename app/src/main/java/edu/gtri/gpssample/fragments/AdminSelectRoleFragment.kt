@@ -29,7 +29,9 @@ class AdminSelectRoleFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
 
         binding.fragmentRootLayout.setOnClickListener {
-            Toast.makeText(activity!!.applicationContext, "AdminSelectRoleFragment", Toast.LENGTH_SHORT).show()
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, "AdminSelectRoleFragment", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.adminButton.setOnClickListener {

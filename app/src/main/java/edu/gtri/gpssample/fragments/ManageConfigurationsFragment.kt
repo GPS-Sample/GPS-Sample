@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.adapters.ConfigurationsAdapter
 import edu.gtri.gpssample.application.MainApplication
@@ -32,7 +33,9 @@ class ManageConfigurationsFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
 
         binding.fragmentRootLayout.setOnClickListener {
-            Toast.makeText(activity!!.applicationContext, "ManageConfigurationsFragment", Toast.LENGTH_SHORT).show()
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, "ManageConfigurationsFragment", Toast.LENGTH_SHORT).show()
+            }
         }
 
         configurationsAdapter = ConfigurationsAdapter((activity!!.application as MainApplication).configurations)
