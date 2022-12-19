@@ -11,6 +11,20 @@
         tools:layout="@layout/fragment_sign_in_sign_up">
 
         <action
+            android:id="@+id/action_navigate_to_SignUpFragment"
+            app:destination="@id/SignUpFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_SignInFragment"
+            app:destination="@id/SignInFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/SignUpFragment"
+        android:name="edu.gtri.gpssample.fragments.SignUpFragment"
+        tools:layout="@layout/fragment_sign_up">
+
+        <action
             android:id="@+id/action_navigate_to_SignInFragment"
             app:destination="@id/SignInFragment" />
     </fragment>

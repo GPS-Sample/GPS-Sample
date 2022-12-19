@@ -76,12 +76,37 @@ class SignInSignUpFragment : Fragment()
         }
 
         binding.signUpButton.setOnClickListener {
+            var bundle = Bundle()
+
+            if (binding.adminButton.isChecked) {
+                bundle.putInt( "role", Role.Admin.value)
+            }
+            else if (binding.supervisorButton.isChecked) {
+                bundle.putInt( "role", Role.Supervisor.value)
+            }
+            else if (binding.dataCollectorButton.isChecked) {
+                bundle.putInt( "role", Role.Enumerator.value)
+            }
+
+            findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundle)
         }
 
         if (!allRuntimePermissionsGranted())
         {
             getRuntimePermissions()
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        binding.signInButton.isEnabled = false
+        binding.signUpButton.isEnabled = false
+        binding.adminButton.isChecked = false
+        binding.supervisorButton.isChecked = false
+        binding.dataCollectorButton.isChecked = false
+        binding.signUpButton.setTextColor( resources.getColor( R.color.light_gray, null))
     }
 
     private fun allRuntimePermissionsGranted(): Boolean {
@@ -127,6 +152,9 @@ class SignInSignUpFragment : Fragment()
     override fun onDestroyView()
     {
         super.onDestroyView()
+
+        Log.d( "xxx", "onDestroyView" )
+
         _binding = null
     }
 

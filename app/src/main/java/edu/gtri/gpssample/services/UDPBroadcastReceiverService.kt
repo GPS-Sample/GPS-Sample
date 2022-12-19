@@ -60,17 +60,17 @@ class UDPBroadcastReceiverService : Service()
 
     suspend fun beginListening()
     {
-        Log.d( "xxx", "begin listening" )
-
-        Looper.prepare()
-
+//        Log.d( "xxx", "begin listening" )
+//
+//        Looper.prepare()
+//
 //        while (enabled)
 //        {
 //            Log.d( "xxx", "timer fired" )
 //            delay( 1000 )
 //        }
-
-        Log.d( "xxx", "endListening" )
+//
+//        Log.d( "xxx", "endListening" )
     }
 
     override fun onDestroy()
