@@ -19,13 +19,16 @@ class UDPBroadcastReceiver
 
     private var port = 61234
     private var enabled = true
-    private lateinit var datagramSocket: DatagramSocket
+    private var datagramSocket: DatagramSocket? = null
     private lateinit var delegate: UDPBroadcastReceiverDelegate
 
     fun stopReceiving()
     {
         enabled = false
-        datagramSocket.close()
+        if (datagramSocket != null)
+        {
+            datagramSocket!!.close()
+        }
     }
 
     fun isEnabled() : Boolean
@@ -40,8 +43,8 @@ class UDPBroadcastReceiver
         val backgroundResult = withContext(Dispatchers.Default)
         {
             datagramSocket = DatagramSocket(port)
-            datagramSocket.broadcast = true
-            datagramSocket.reuseAddress = true
+            datagramSocket!!.broadcast = true
+            datagramSocket!!.reuseAddress = true
 
             Log.d( "xxx", "waiting for data on " + inetAddress.hostAddress )
 
@@ -50,7 +53,7 @@ class UDPBroadcastReceiver
                 try {
                     val buf = ByteArray(4096)
                     val datagramPacket = DatagramPacket(buf, buf.size)
-                    datagramSocket.receive(datagramPacket)
+                    datagramSocket!!.receive(datagramPacket)
 
                     delegate.didReceiveDatagramPacket( datagramPacket )
                 }

@@ -109,6 +109,16 @@
         android:id="@+id/CreateStudyFragment"
         android:name="edu.gtri.gpssample.fragments.CreateStudyFragment"
         tools:layout="@layout/fragment_create_study">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFieldFragment"
+            app:destination="@id/CreateFieldFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreateFieldFragment"
+        android:name="edu.gtri.gpssample.fragments.CreateFieldFragment"
+        tools:layout="@layout/fragment_create_field">
     </fragment>
 
     <fragment

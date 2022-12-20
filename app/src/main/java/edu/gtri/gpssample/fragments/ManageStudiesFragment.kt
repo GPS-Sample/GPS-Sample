@@ -1,9 +1,7 @@
 package edu.gtri.gpssample.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -24,7 +22,10 @@ class ManageStudiesFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        setHasOptionsMenu( true )
+
         _binding = FragmentManageStudiesBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -80,4 +81,21 @@ class ManageStudiesFragment : Fragment()
         findNavController().navigate( R.id.action_navigate_to_StudyFragment )
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_create_study, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.action_create_study -> {
+                findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment )
+            }
+        }
+
+        return true
+    }
 }

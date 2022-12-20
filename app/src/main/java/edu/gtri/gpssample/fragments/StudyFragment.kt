@@ -5,9 +5,7 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
@@ -19,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.adapters.OnlineStatusAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
@@ -47,7 +46,10 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        setHasOptionsMenu( true )
+
         _binding = FragmentStudyBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -177,7 +179,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             .interval(2000, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
+            .subscribe( {
                 if (dataIsFresh)
                 {
                     dataIsFresh = false;
@@ -187,9 +189,10 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
                     (activity!!.application as MainApplication).users[0].isOnline = false
                     onlineStatusAdapter.updateUsers( (activity!!.application as MainApplication).users )
                 }
-            }
+            },{throwable->
+                Log.d( "xxx", throwable.stackTraceToString())
+            })
             .addTo( compositeDisposable )
-
     }
 
     private var dataIsFresh = false
@@ -231,5 +234,22 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             Log.e("xxx", ex.toString())
         }
         return list
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_edit_study, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.action_edit_study -> {
+            }
+        }
+
+        return true
     }
 }

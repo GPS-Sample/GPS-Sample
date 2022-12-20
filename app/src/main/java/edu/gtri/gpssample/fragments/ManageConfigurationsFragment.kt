@@ -1,9 +1,8 @@
 package edu.gtri.gpssample.fragments
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -24,7 +23,10 @@ class ManageConfigurationsFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        setHasOptionsMenu( true )
+
         _binding = FragmentManageConfigurationsBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 
@@ -80,10 +82,23 @@ class ManageConfigurationsFragment : Fragment()
         bundle.putString( "config_name", configurationModel.name )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
+    }
 
-//        val intent = Intent(this, ManageStudiesActivity::class.java)
-//        intent.putExtra( Key.ConfigurationName.toString(), configurationModel.name )
-//        startActivity( intent )
-//        overridePendingTransition(R.animator.slide_from_right, R.animator.slide_to_left)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_create_configuration, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.action_create_configuration -> {
+                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment )
+            }
+        }
+
+        return true
     }
 }
