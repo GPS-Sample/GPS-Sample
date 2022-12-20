@@ -41,22 +41,24 @@ class SignInSignUpFragment : Fragment()
             }
         }
 
+        binding.signInButton.isEnabled = false
+
         binding.adminButton.setOnClickListener {
             binding.signInButton.isEnabled = true
-            binding.signUpButton.isEnabled = true
-            binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
+            binding.signUpTextView.isEnabled = true
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.blue, null))
         }
 
         binding.supervisorButton.setOnClickListener {
             binding.signInButton.isEnabled = true
-            binding.signUpButton.isEnabled = true
-            binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
+            binding.signUpTextView.isEnabled = true
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.blue, null))
         }
 
         binding.dataCollectorButton.setOnClickListener {
             binding.signInButton.isEnabled = true
-            binding.signUpButton.isEnabled = true
-            binding.signUpButton.setTextColor( resources.getColor( R.color.blue, null))
+            binding.signUpTextView.isEnabled = true
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.blue, null))
         }
 
         binding.signInButton.setOnClickListener {
@@ -72,10 +74,19 @@ class SignInSignUpFragment : Fragment()
                 bundle.putInt( "role", Role.Enumerator.value)
             }
 
+            binding.adminButton.isChecked = false
+            binding.supervisorButton.isChecked = false
+            binding.dataCollectorButton.isChecked = false
+
+            binding.signInButton.isEnabled = false
+            binding.signUpTextView.isEnabled = false
+
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
+
             findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
         }
 
-        binding.signUpButton.setOnClickListener {
+        binding.signUpTextView.setOnClickListener {
             var bundle = Bundle()
 
             if (binding.adminButton.isChecked) {
@@ -88,6 +99,15 @@ class SignInSignUpFragment : Fragment()
                 bundle.putInt( "role", Role.Enumerator.value)
             }
 
+            binding.adminButton.isChecked = false
+            binding.supervisorButton.isChecked = false
+            binding.dataCollectorButton.isChecked = false
+
+            binding.signInButton.isEnabled = false
+            binding.signUpTextView.isEnabled = false
+
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
+
             findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundle)
         }
 
@@ -95,18 +115,6 @@ class SignInSignUpFragment : Fragment()
         {
             getRuntimePermissions()
         }
-    }
-
-    override fun onResume()
-    {
-        super.onResume()
-
-        binding.signInButton.isEnabled = false
-        binding.signUpButton.isEnabled = false
-        binding.adminButton.isChecked = false
-        binding.supervisorButton.isChecked = false
-        binding.dataCollectorButton.isChecked = false
-        binding.signUpButton.setTextColor( resources.getColor( R.color.light_gray, null))
     }
 
     private fun allRuntimePermissionsGranted(): Boolean {
@@ -152,8 +160,6 @@ class SignInSignUpFragment : Fragment()
     override fun onDestroyView()
     {
         super.onDestroyView()
-
-        Log.d( "xxx", "onDestroyView" )
 
         _binding = null
     }

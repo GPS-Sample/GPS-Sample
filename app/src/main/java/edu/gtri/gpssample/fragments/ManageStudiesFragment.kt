@@ -93,9 +93,10 @@ class ManageStudiesFragment : Fragment()
         when (item.itemId) {
             R.id.action_create_study -> {
                 findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment )
+                return true
             }
         }
 
-        return true
+        return false
     }
 }

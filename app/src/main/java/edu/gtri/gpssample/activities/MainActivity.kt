@@ -3,6 +3,7 @@ package edu.gtri.gpssample.activities
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -52,6 +53,10 @@ class MainActivity : AppCompatActivity()
         override fun onServiceDisconnected(name: ComponentName)
         {
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     override fun onSupportNavigateUp(): Boolean

@@ -73,14 +73,15 @@ class CreateStudyFragment : Fragment()
         inflater.inflate(R.menu.menu_create_field, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
         when (item.itemId) {
             R.id.action_create_field -> {
                 findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                return true
             }
         }
 
-        return true
+        return false
     }
 }

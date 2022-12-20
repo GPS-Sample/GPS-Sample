@@ -247,9 +247,10 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
         when (item.itemId) {
             R.id.action_edit_study -> {
+                return true
             }
         }
 
-        return true
+        return false
     }
 }

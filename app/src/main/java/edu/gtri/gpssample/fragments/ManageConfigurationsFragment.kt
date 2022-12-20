@@ -91,14 +91,15 @@ class ManageConfigurationsFragment : Fragment()
         inflater.inflate(R.menu.menu_create_configuration, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
         when (item.itemId) {
             R.id.action_create_configuration -> {
                 findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment )
+                return true
             }
         }
 
-        return true
+        return false
     }
 }

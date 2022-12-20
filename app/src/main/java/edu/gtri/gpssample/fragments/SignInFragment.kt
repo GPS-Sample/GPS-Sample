@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments
 
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,6 +54,8 @@ class SignInFragment : Fragment()
 
             if (binding.pinEditText.getText().toString().length >= 4)
             {
+                binding.pinEditText.setText("")
+
                 (activity!!.application as MainApplication).fields.clear()
                 (activity!!.application as MainApplication).studies.clear()
                 (activity!!.application as MainApplication).configurations.clear()
@@ -72,5 +75,12 @@ class SignInFragment : Fragment()
 
             false
         })
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }
