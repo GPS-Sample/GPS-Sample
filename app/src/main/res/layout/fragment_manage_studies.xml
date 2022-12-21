@@ -15,7 +15,7 @@
         android:layout_margin="20dp"
         android:gravity="center"
         android:text="Configuration 1 Studies"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -32,7 +32,7 @@
             android:layout_above="@+id/create_button"
             android:gravity="center"
             android:text="@string/no_studies"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_textcolor"
             android:textSize="20sp"
             android:textStyle="bold" />
 

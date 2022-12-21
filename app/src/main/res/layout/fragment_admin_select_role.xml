@@ -15,7 +15,7 @@
         android:layout_above="@+id/admin_button"
         android:gravity="center"
         android:text="@string/admin_select_role"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 

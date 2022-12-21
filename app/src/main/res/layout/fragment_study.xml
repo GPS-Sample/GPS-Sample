@@ -15,7 +15,7 @@
         android:layout_margin="20dp"
         android:gravity="center"
         android:text="@string/study_name"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -32,7 +32,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="Users Online"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 

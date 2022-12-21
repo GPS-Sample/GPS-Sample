@@ -15,7 +15,7 @@
         android:layout_margin="20dp"
         android:gravity="center_vertical"
         android:text="@string/create_study"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 

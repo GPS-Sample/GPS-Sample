@@ -52,19 +52,19 @@ class MainFragment : Fragment()
         binding.adminButton.setOnClickListener {
             binding.signInButton.isEnabled = true
             binding.signUpTextView.isEnabled = true
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.blue, null))
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
         }
 
         binding.supervisorButton.setOnClickListener {
             binding.signInButton.isEnabled = true
             binding.signUpTextView.isEnabled = true
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.blue, null))
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
         }
 
         binding.dataCollectorButton.setOnClickListener {
             binding.signInButton.isEnabled = true
-            binding.signUpTextView.isEnabled = true
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.blue, null))
+            binding.signUpTextView.isFocusable = false
+            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
         }
 
         binding.signInButton.setOnClickListener {
@@ -93,28 +93,34 @@ class MainFragment : Fragment()
         }
 
         binding.signUpTextView.setOnClickListener {
-            var bundle = Bundle()
+            var bundle: Bundle? = null
 
             if (binding.adminButton.isChecked) {
+                bundle = Bundle()
                 bundle.putInt( "role", Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
+                bundle = Bundle()
                 bundle.putInt( "role", Role.Supervisor.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
+                bundle = Bundle()
                 bundle.putInt( "role", Role.Enumerator.value)
             }
 
-            binding.adminButton.isChecked = false
-            binding.supervisorButton.isChecked = false
-            binding.dataCollectorButton.isChecked = false
+            if (bundle != null)
+            {
+                binding.adminButton.isChecked = false
+                binding.supervisorButton.isChecked = false
+                binding.dataCollectorButton.isChecked = false
 
-            binding.signInButton.isEnabled = false
-            binding.signUpTextView.isEnabled = false
+                binding.signInButton.isEnabled = false
+                binding.signUpTextView.isEnabled = false
 
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
+                binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
 
-            findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundle)
+                findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundle)
+            }
         }
 
         if (!allRuntimePermissionsGranted())

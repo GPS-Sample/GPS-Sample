@@ -19,7 +19,7 @@
             android:layout_above="@+id/radio_group"
             android:gravity="center"
             android:text="@string/select_role"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_textcolor"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -36,16 +36,19 @@
 
             <RadioButton android:id="@+id/admin_button"
                 android:text="@string/admin"
+                android:textSize="17sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <RadioButton android:id="@+id/supervisor_button"
                 android:text="@string/supervisor"
+                android:textSize="17sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <RadioButton android:id="@+id/data_collector_button"
                 android:text="@string/data_collector"
+                android:textSize="17sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </RadioGroup>
@@ -70,6 +73,7 @@
             android:layout_marginTop="20dp"
             android:layout_below="@+id/sign_in_button"
             android:gravity="center"
+            android:textSize="17sp"
             android:text="@string/not_registered" />
     </RelativeLayout>
 
