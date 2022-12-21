@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.AdminSelectRole
 
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
@@ -15,8 +16,14 @@ import edu.gtri.gpssample.databinding.FragmentAdminSelectRoleBinding
 class AdminSelectRoleFragment : Fragment()
 {
     private var _binding: FragmentAdminSelectRoleBinding? = null
-
     private val binding get() = _binding!!
+    private lateinit var viewModel: AdminSelectRoleViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(AdminSelectRoleViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {

@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.CreateConfiguration
 
 import android.os.Bundle
 import android.text.InputType
@@ -8,17 +8,26 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
+import edu.gtri.gpssample.fragments.BarcodeScan.BarcodeScanViewModel
 import edu.gtri.gpssample.models.ConfigurationModel
 
 class CreateConfigurationFragment : Fragment()
 {
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
+    private lateinit var viewModel: CreateConfigurationViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(CreateConfigurationViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
@@ -73,5 +82,12 @@ class CreateConfigurationFragment : Fragment()
                 findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
             }
         }
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }

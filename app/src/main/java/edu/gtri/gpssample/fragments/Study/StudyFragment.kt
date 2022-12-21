@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.Study
 
 import android.graphics.Color
 import android.net.wifi.WifiManager
@@ -11,6 +11,7 @@ import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import androidx.navigation.fragment.findNavController
@@ -21,6 +22,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.adapters.OnlineStatusAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
+import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.models.UserModel
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
@@ -43,6 +45,13 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     private lateinit var onlineStatusAdapter: OnlineStatusAdapter
     private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
+    private lateinit var viewModel: StudyViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(StudyViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
@@ -252,5 +261,12 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
         }
 
         return false
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }

@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.SignIn
 
 import android.os.Bundle
 import android.text.InputType
@@ -8,17 +8,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
+import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 
 class SignInFragment : Fragment()
 {
     private var _binding: FragmentSignInBinding? = null
     private val binding get() = _binding!!
+    private lateinit var viewModel: SignInViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(SignInViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {

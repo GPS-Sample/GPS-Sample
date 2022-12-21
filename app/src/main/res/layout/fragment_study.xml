@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.StudyFragment">
+    tools:context=".fragments.Study.StudyFragment">
 
     <TextView
         android:id="@+id/study_name_text_view"

@@ -1,9 +1,10 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.ManageStudies
 
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +13,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.adapters.StudiesAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
+import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.models.StudyModel
 
 class ManageStudiesFragment : Fragment()
@@ -19,6 +21,13 @@ class ManageStudiesFragment : Fragment()
     private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
     private lateinit var studiesAdapter: StudiesAdapter
+    private lateinit var viewModel: ManageStudiesViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(ManageStudiesViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
@@ -98,5 +107,12 @@ class ManageStudiesFragment : Fragment()
         }
 
         return false
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }

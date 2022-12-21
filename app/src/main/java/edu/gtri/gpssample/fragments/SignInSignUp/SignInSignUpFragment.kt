@@ -1,10 +1,9 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.SignInSignUp
 
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,17 +12,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentSignInSignUpBinding
+import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 
 class SignInSignUpFragment : Fragment()
 {
     private var _binding: FragmentSignInSignUpBinding? = null
-
     private val binding get() = _binding!!
+    private lateinit var viewModel: SignInSignUpViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(SignInSignUpViewModel::class.java)
+    }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
@@ -118,7 +125,7 @@ class SignInSignUpFragment : Fragment()
     }
 
     private fun allRuntimePermissionsGranted(): Boolean {
-        for (permission in SignInSignUpFragment.REQUIRED_RUNTIME_PERMISSIONS) {
+        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
             permission?.let {
                 if (!isPermissionGranted(activity as AppCompatActivity, it)) {
                     return false
@@ -130,7 +137,7 @@ class SignInSignUpFragment : Fragment()
 
     private fun getRuntimePermissions() {
         val permissionsToRequest = ArrayList<String>()
-        for (permission in SignInSignUpFragment.REQUIRED_RUNTIME_PERMISSIONS) {
+        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
             permission?.let {
                 if (!isPermissionGranted(activity as AppCompatActivity, it)) {
                     permissionsToRequest.add(permission)
@@ -142,7 +149,7 @@ class SignInSignUpFragment : Fragment()
             ActivityCompat.requestPermissions(
                 activity as AppCompatActivity,
                 permissionsToRequest.toTypedArray(),
-                SignInSignUpFragment.PERMISSION_REQUESTS
+                PERMISSION_REQUESTS
             )
         }
     }

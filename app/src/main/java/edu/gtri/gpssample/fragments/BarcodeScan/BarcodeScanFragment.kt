@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.BarcodeScan
 
 import android.content.Context
 import android.content.Intent
@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import androidx.navigation.fragment.findNavController
@@ -19,6 +20,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.activities.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.FragmentBarcodeScanBinding
+import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.network.HeartBeatTransmitter
 import org.json.JSONObject
 import java.net.InetAddress
@@ -27,10 +29,17 @@ class BarcodeScanFragment : Fragment()
 {
     private var _binding: FragmentBarcodeScanBinding? = null
     private val binding get() = _binding!!
+    private lateinit var viewModel: BarcodeScanViewModel
     private val message = "Hello, World."
     private lateinit var myInetAddress: InetAddress
     private lateinit var serverInetAddress: InetAddress
     private val heartBeatTransmitter = HeartBeatTransmitter()
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(BarcodeScanViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
@@ -129,5 +138,12 @@ class BarcodeScanFragment : Fragment()
 
             binding.payloadTextView.text = binding.payloadTextView.text.toString() + "\n\nserver addr: " + serverAddress + "\nmy addr: " + myAddress
         }
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }

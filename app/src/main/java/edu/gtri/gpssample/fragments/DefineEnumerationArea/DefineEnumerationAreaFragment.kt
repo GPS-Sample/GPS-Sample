@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments
+package edu.gtri.gpssample.fragments.DefineEnumerationArea
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -16,12 +17,20 @@ import com.google.android.gms.maps.model.MarkerOptions
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
+import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 
 class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 {
     private var _binding: FragmentDefineEnumerationAreaBinding? = null
     private val binding get() = _binding!!
     private lateinit var map: GoogleMap
+    private lateinit var viewModel: DefineEnumerationAreaViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(DefineEnumerationAreaViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
@@ -64,4 +73,10 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
         map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
     }
 
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
+    }
 }
