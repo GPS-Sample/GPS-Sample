@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.SignInSignUp
+package edu.gtri.gpssample.fragments.Main
 
 import android.Manifest
 import android.content.Context
@@ -17,24 +17,23 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.databinding.FragmentSignInSignUpBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
+import edu.gtri.gpssample.databinding.FragmentMainBinding
 
-class SignInSignUpFragment : Fragment()
+class MainFragment : Fragment()
 {
-    private var _binding: FragmentSignInSignUpBinding? = null
+    private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: SignInSignUpViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SignInSignUpViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentSignInSignUpBinding.inflate(inflater, container, false)
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -44,7 +43,7 @@ class SignInSignUpFragment : Fragment()
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, "SignInSignUpFragment", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "MainFragment", Toast.LENGTH_SHORT).show()
             }
         }
 

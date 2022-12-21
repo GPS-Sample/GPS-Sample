@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/SignInSignUpFragment">
+    app:startDestination="@id/MainFragment">
 
     <fragment
-        android:id="@+id/SignInSignUpFragment"
-        android:name="edu.gtri.gpssample.fragments.SignInSignUp.SignInSignUpFragment"
-        tools:layout="@layout/fragment_sign_in_sign_up">
+        android:id="@+id/MainFragment"
+        android:name="edu.gtri.gpssample.fragments.Main.MainFragment"
+        tools:layout="@layout/fragment_main">
 
         <action
             android:id="@+id/action_navigate_to_SignUpFragment"
@@ -49,8 +49,8 @@
         tools:layout="@layout/fragment_admin_select_role">
 
         <action
-            android:id="@+id/action_navigate_to_SignInSignUpFragment"
-            app:popUpTo="@id/SignInSignUpFragment"/>
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:popUpTo="@id/MainFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
@@ -133,8 +133,8 @@
         tools:layout="@layout/fragment_barcode_scan">
 
         <action
-            android:id="@+id/action_navigate_to_SignInSignUpFragment"
-            app:popUpTo="@id/SignInSignUpFragment"/>
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:popUpTo="@id/MainFragment"/>
     </fragment>
 
 </navigation>

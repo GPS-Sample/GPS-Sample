@@ -17,10 +17,9 @@ import androidx.lifecycle.whenStarted
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.activities.CameraXLivePreviewActivity
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.FragmentBarcodeScanBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.network.HeartBeatTransmitter
 import org.json.JSONObject
 import java.net.InetAddress
@@ -68,7 +67,7 @@ class BarcodeScanFragment : Fragment()
             val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.unregisterNetworkCallback( networkCallback )
 
-            findNavController().navigate(R.id.action_navigate_to_SignInSignUpFragment)
+            findNavController().navigate(R.id.action_navigate_to_MainFragment)
         }
     }
 

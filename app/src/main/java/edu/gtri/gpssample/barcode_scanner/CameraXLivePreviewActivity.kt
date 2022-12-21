@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.gtri.gpssample.activities
+package edu.gtri.gpssample.barcode_scanner
 
 import android.content.Intent
 import android.os.Build.VERSION_CODES
@@ -45,10 +45,6 @@ import com.google.android.gms.common.annotation.KeepName
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.barcode.common.Barcode
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.barcode_scanner.BarcodeScannerProcessor
-import edu.gtri.gpssample.barcode_scanner.CameraXViewModel
-import edu.gtri.gpssample.barcode_scanner.GraphicOverlay
-import edu.gtri.gpssample.barcode_scanner.VisionImageProcessor
 import edu.gtri.gpssample.constants.ResultCode
 import java.util.ArrayList
 

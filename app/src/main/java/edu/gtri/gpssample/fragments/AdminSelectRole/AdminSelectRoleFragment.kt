@@ -52,7 +52,7 @@ class AdminSelectRoleFragment : Fragment()
         }
 
         binding.signOutButton.setOnClickListener {
-            findNavController().navigate( R.id.action_navigate_to_SignInSignUpFragment )
+            findNavController().navigate( R.id.action_navigate_to_MainFragment )
         }
     }
 }
