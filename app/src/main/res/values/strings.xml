@@ -108,5 +108,6 @@
     <string name="error_default_message" translatable="false">Failed to scan code: %1$s</string>
 
     <string name="menu_item_settings" translatable="false">Settings</string>
+    <string name="change_role">Change Role</string>
 
 </resources>

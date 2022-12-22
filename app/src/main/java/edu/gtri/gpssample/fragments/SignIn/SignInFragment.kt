@@ -74,7 +74,7 @@ class SignInFragment : Fragment()
 
                 if (role == Role.Admin.value)
                 {
-                    findNavController().navigate(R.id.action_navigate_to_AdminSelectRoleFragment, bundle)
+                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                 }
                 else if (role == Role.Supervisor.value)
                 {
