@@ -59,11 +59,6 @@ class ManageConfigurationsFragment : Fragment()
         binding.createButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
-
-        binding.backButton.setOnClickListener {
-
-            findNavController().popBackStack()
-        }
     }
 
     override fun onResume()

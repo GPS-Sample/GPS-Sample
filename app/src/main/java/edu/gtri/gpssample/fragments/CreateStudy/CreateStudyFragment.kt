@@ -56,11 +56,6 @@ class CreateStudyFragment : Fragment()
         binding.recyclerView.adapter = fieldsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager( activity )
 
-        binding.backButton.setOnClickListener {
-
-            findNavController().popBackStack()
-        }
-
         binding.nextButton.setOnClickListener {
 
             val studyModel = StudyModel()

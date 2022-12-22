@@ -55,10 +55,6 @@ class SignInFragment : Fragment()
             Role.Enumerator.value -> binding.titleTextView.text = resources.getString( R.string.data_collector_sign_in )
         }
 
-        binding.backButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
         binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
 
             if (binding.pinEditText.getText().toString().length >= 4)

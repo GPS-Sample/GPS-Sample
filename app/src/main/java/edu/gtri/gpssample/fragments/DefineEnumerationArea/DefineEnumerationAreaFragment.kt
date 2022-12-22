@@ -52,11 +52,6 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
         mapFragment!!.getMapAsync(this)
 
-        binding.backButton.setOnClickListener {
-
-            findNavController().popBackStack()
-        }
-
         binding.nextButton.setOnClickListener {
 
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)

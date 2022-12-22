@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
-    android:id="@+id/fragment_root_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,6 +13,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment" />
 
     <TextView
+        android:id="@+id/fragment_root_layout"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_margin="20dp"
@@ -23,30 +23,13 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
+    <Button
+        android:id="@+id/next_button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/back_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/back" />
-
-        <Button
-            android:id="@+id/next_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/finish" />
-    </LinearLayout>
+        android:layout_gravity="bottom"
+        android:layout_height="50dp"
+        android:layout_margin="20dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/finish" />
 </FrameLayout>

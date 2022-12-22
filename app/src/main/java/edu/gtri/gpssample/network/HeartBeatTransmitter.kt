@@ -43,6 +43,8 @@ class HeartBeatTransmitter
 
             enabled = true
 
+            delay(1000)
+
             while (enabled)
             {
                 try {

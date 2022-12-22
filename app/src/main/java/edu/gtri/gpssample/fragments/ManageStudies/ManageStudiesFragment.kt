@@ -61,10 +61,6 @@ class ManageStudiesFragment : Fragment()
         binding.createButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
         }
-
-        binding.backButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
     }
 
     override fun onResume()

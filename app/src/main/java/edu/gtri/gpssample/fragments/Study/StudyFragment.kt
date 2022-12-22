@@ -176,16 +176,6 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             }
         }
 
-        binding.backButton.setOnClickListener {
-            compositeDisposable.clear()
-
-            udpBroadcastReceiver.stopReceiving()
-
-            localOnlyHotspotReservation?.close()
-
-            findNavController().popBackStack()
-        }
-
         Observable
             .interval(2000, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
@@ -268,6 +258,12 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     override fun onDestroyView()
     {
         super.onDestroyView()
+
+        compositeDisposable.clear()
+
+        udpBroadcastReceiver.stopReceiving()
+
+        localOnlyHotspotReservation?.close()
 
         _binding = null
     }

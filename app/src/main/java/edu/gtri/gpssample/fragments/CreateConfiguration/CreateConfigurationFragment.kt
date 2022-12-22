@@ -47,11 +47,6 @@ class CreateConfigurationFragment : Fragment()
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.backButton.setOnClickListener {
-
-            findNavController().popBackStack()
-        }
-
         ArrayAdapter.createFromResource(activity!!, R.array.preferred_units, android.R.layout.simple_spinner_item)
             .also { adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
