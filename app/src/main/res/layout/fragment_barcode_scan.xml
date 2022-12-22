@@ -15,7 +15,7 @@
         android:layout_gravity="top"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/admin"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -38,7 +38,7 @@
         android:layout_gravity="center"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/or"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 

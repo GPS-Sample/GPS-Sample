@@ -1,10 +1,15 @@
 package edu.gtri.gpssample.fragments.BarcodeScan
 
 import android.content.Context
+import android.content.Context.WIFI_SERVICE
 import android.content.Intent
 import android.net.*
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,8 +26,13 @@ import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.databinding.FragmentBarcodeScanBinding
 import edu.gtri.gpssample.network.HeartBeatTransmitter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.NetworkInterface
 
 class BarcodeScanFragment : Fragment()
 {
@@ -64,8 +74,14 @@ class BarcodeScanFragment : Fragment()
 
             heartBeatTransmitter.stopTransmitting()
 
-            val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectivityManager.unregisterNetworkCallback( networkCallback )
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            {
+            }
+            else
+            {
+                val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                connectivityManager.unregisterNetworkCallback( networkCallback )
+            }
 
             findNavController().navigate(R.id.action_navigate_to_MainFragment)
         }
@@ -84,22 +100,87 @@ class BarcodeScanFragment : Fragment()
             Log.d( "xxx", jsonObject.toString(2))
             binding.payloadTextView.text = jsonObject.toString(2)
 
-            val builder = WifiNetworkSpecifier.Builder()
-            builder.setSsid( jsonObject.getString("ssid" ));
-            builder.setWpa2Passphrase(jsonObject.getString("pass" ))
-            val wifiNetworkSpecifier = builder.build()
+            val ssid = jsonObject.getString("ssid" )
+            val pass = jsonObject.getString("pass" )
 
-            val networkRequestBuilder = NetworkRequest.Builder()
-            networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-            networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                try {
+                    val wifiConfig = WifiConfiguration()
+                    wifiConfig.SSID = "\"" + ssid + "\""
+                    wifiConfig.preSharedKey = "\"" + pass + "\""
 
-            val networkRequest = networkRequestBuilder.build()
+                    var wifiManager = activity!!.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager?
 
-            val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectivityManager.requestNetwork( networkRequest, networkCallback )
+                    val netId = wifiManager!!.addNetwork(wifiConfig)
+                    wifiManager.disconnect()
+                    wifiManager.enableNetwork(netId, true)
+                    wifiManager.reconnect()
+
+                    Handler().postDelayed({
+                        wifiManager = activity!!.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager?
+
+                        var serverAddress = intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString().substring(1 )
+                        val myAddress = intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString().substring(1 )
+
+                        Log.d( "xxx", "server addr: " + serverAddress)
+                        Log.d( "xxx", "my addr: " + myAddress )
+
+                        val components = serverAddress.split(".")
+                        serverAddress = components[0] + "." + components[1] + "." + components[2] + ".255"
+
+                        myInetAddress = InetAddress.getByName( myAddress )
+                        serverInetAddress = InetAddress.getByName( serverAddress )
+
+                        if (!heartBeatTransmitter.isEnabled())
+                        {
+                            lifecycleScope.launchWhenStarted {
+                                whenStarted {
+                                    heartBeatTransmitter.beginTransmitting( myInetAddress, serverInetAddress, message.toByteArray())
+                                }
+                            }
+                        }
+                    }, 1000)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            else
+            {
+                val builder = WifiNetworkSpecifier.Builder()
+                builder.setSsid( jsonObject.getString("ssid" ));
+                builder.setWpa2Passphrase(jsonObject.getString("pass" ))
+                val wifiNetworkSpecifier = builder.build()
+
+                val networkRequestBuilder = NetworkRequest.Builder()
+                networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
+
+                val networkRequest = networkRequestBuilder.build()
+
+                val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                connectivityManager.requestNetwork( networkRequest, networkCallback )
+            }
         }
+    }
+
+    fun intToInetAddress(address: Int): InetAddress?
+    {
+        val addressBytes = byteArrayOf(
+            (0xff and address).toByte(),
+            (0xff and (address shr 8)).toByte(),
+            (0xff and (address shr 16)).toByte(),
+            (0xff and (address shr 24)).toByte()
+        )
+
+        try
+        {
+            return InetAddress.getByAddress(addressBytes)
+        }
+        catch (e: Exception) {}
+
+        return null
     }
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback()
