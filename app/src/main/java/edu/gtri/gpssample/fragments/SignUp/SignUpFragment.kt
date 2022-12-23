@@ -5,6 +5,7 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -52,6 +53,12 @@ class SignUpFragment : Fragment()
             Role.Supervisor.value -> binding.titleTextView.text = resources.getString( R.string.supervisor_sign_up )
             Role.Enumerator.value -> binding.titleTextView.text = resources.getString( R.string.data_collector_sign_up )
         }
+
+        ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
+            .also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.questionSpinner.adapter = adapter
+            }
 
         binding.nextButton.setOnClickListener {
 
