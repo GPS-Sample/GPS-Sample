@@ -126,17 +126,16 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:hint="@string/enter_min_gps_precision" />
+
+            <Button
+                android:id="@+id/next_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:layout_gravity="bottom"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/next" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
-
-    <Button
-        android:id="@+id/next_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
-        android:layout_gravity="bottom"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="@string/next" />
-
 </FrameLayout>

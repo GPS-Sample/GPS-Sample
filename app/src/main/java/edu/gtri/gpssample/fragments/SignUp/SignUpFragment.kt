@@ -59,10 +59,6 @@ class SignUpFragment : Fragment()
             bundle.putInt( "role", role!! )
             findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
         }
-
-        binding.backButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
     }
 
     override fun onDestroyView()

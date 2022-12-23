@@ -24,7 +24,7 @@
                 android:layout_margin="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/sign_up"
-                android:textColor="@color/primary"
+                android:textColor="@color/primary_textcolor"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -112,34 +112,15 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:hint="@string/enter_your_answer" />
+
+            <Button
+                android:id="@+id/next_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/next" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/back_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/back" />
-
-        <Button
-            android:id="@+id/next_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/next" />
-    </LinearLayout>
-
 </FrameLayout>
