@@ -14,15 +14,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.adapters.OnlineStatusAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.models.UserModel
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
@@ -42,7 +39,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     private var _binding: FragmentStudyBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
-    private lateinit var onlineStatusAdapter: OnlineStatusAdapter
+    private lateinit var studyAdapter: StudyAdapter
     private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
     private lateinit var viewModel: StudyViewModel
@@ -87,10 +84,10 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             (activity!!.application as MainApplication).users.add( user3 )
         }
 
-        onlineStatusAdapter = OnlineStatusAdapter((activity!!.application as MainApplication).users)
+        studyAdapter = StudyAdapter((activity!!.application as MainApplication).users)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = onlineStatusAdapter
+        binding.recyclerView.adapter = studyAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity!!)
 
         val oldWifiAdresses = getWifiApIpAddresses()
@@ -188,7 +185,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
                 else if ((activity!!.application as MainApplication).users[0].isOnline)
                 {
                     (activity!!.application as MainApplication).users[0].isOnline = false
-                    onlineStatusAdapter.updateUsers( (activity!!.application as MainApplication).users )
+                    studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
                 }
             },{throwable->
                 Log.d( "xxx", throwable.stackTraceToString())
@@ -205,7 +202,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
         (activity!!.application as MainApplication).users[0].isOnline = true
 
         activity!!.runOnUiThread{
-            onlineStatusAdapter.updateUsers( (activity!!.application as MainApplication).users )
+            studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
         }
 
         Log.d( "xxx", "received : " + datagramPacket.length )

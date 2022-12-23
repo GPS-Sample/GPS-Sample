@@ -10,10 +10,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.adapters.FieldsAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.models.FieldModel
 import edu.gtri.gpssample.models.StudyModel
 
@@ -21,7 +19,7 @@ class CreateStudyFragment : Fragment()
 {
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
-    private lateinit var fieldsAdapter: FieldsAdapter
+    private lateinit var createStudyAdapter: CreateStudyAdapter
     private lateinit var viewModel: CreateStudyViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -49,11 +47,11 @@ class CreateStudyFragment : Fragment()
             }
         }
 
-        fieldsAdapter = FieldsAdapter((activity!!.application as MainApplication).fields)
-        fieldsAdapter.selectedItemCallback = this::onItemSelected
+        createStudyAdapter = CreateStudyAdapter((activity!!.application as MainApplication).fields)
+        createStudyAdapter.selectedItemCallback = this::onItemSelected
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = fieldsAdapter
+        binding.recyclerView.adapter = createStudyAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager( activity )
 
         binding.nextButton.setOnClickListener {

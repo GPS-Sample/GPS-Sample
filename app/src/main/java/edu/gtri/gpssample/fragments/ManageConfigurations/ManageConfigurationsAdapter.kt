@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.adapters
+package edu.gtri.gpssample.fragments.ManageConfigurations
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,16 +8,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.FieldModel
-import edu.gtri.gpssample.models.StudyModel
+import edu.gtri.gpssample.models.ConfigurationModel
 
-class FieldsAdapter(var fields: List<FieldModel>?) : RecyclerView.Adapter<FieldsAdapter.ViewHolder>()
+class ManageConfigurationsAdapter(var configurations: List<ConfigurationModel>?) : RecyclerView.Adapter<ManageConfigurationsAdapter.ViewHolder>()
 {
-    override fun getItemCount() = fields!!.size
+    override fun getItemCount() = configurations!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((fieldModel: FieldModel, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var selectedItemCallback: ((configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -31,9 +30,9 @@ class FieldsAdapter(var fields: List<FieldModel>?) : RecyclerView.Adapter<Fields
         return viewHolder
     }
 
-    fun updateFields( studies: List<FieldModel> )
+    fun updateConfigurations( configurations: List<ConfigurationModel> )
     {
-        this.fields = fields
+        this.configurations = configurations
         notifyDataSetChanged()
     }
 
@@ -41,12 +40,12 @@ class FieldsAdapter(var fields: List<FieldModel>?) : RecyclerView.Adapter<Fields
     {
         holder.itemView.isSelected = false
 
-        val fieldModel = fields!!.get(holder.adapterPosition)
+        val configurationModel = configurations!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( fieldModel.name )
+        holder.nameTextView.setText( configurationModel.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(fieldModel, true)
+            selectedItemCallback.invoke(configurationModel, true)
         }
     }
 

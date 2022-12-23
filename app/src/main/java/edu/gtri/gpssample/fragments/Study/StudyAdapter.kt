@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.adapters
+package edu.gtri.gpssample.fragments.Study
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.models.UserModel
 
-class OnlineStatusAdapter(var users: List<UserModel>?) : RecyclerView.Adapter<OnlineStatusAdapter.ViewHolder>()
+class StudyAdapter(var users: List<UserModel>?) : RecyclerView.Adapter<StudyAdapter.ViewHolder>()
 {
     override fun getItemCount() = users!!.size
 

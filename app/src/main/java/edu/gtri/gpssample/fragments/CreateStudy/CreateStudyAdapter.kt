@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.adapters
+package edu.gtri.gpssample.fragments.CreateStudy
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,15 +8,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.StudyModel
+import edu.gtri.gpssample.models.FieldModel
 
-class StudiesAdapter(var studies: List<StudyModel>?) : RecyclerView.Adapter<StudiesAdapter.ViewHolder>()
+class CreateStudyAdapter(var fields: List<FieldModel>?) : RecyclerView.Adapter<CreateStudyAdapter.ViewHolder>()
 {
-    override fun getItemCount() = studies!!.size
+    override fun getItemCount() = fields!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((studyModel: StudyModel, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var selectedItemCallback: ((fieldModel: FieldModel, shouldDismissKeyboard: Boolean) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -30,9 +30,9 @@ class StudiesAdapter(var studies: List<StudyModel>?) : RecyclerView.Adapter<Stud
         return viewHolder
     }
 
-    fun updateStudies( studies: List<StudyModel> )
+    fun updateFields( studies: List<FieldModel> )
     {
-        this.studies = studies
+        this.fields = fields
         notifyDataSetChanged()
     }
 
@@ -40,12 +40,12 @@ class StudiesAdapter(var studies: List<StudyModel>?) : RecyclerView.Adapter<Stud
     {
         holder.itemView.isSelected = false
 
-        val studyModel = studies!!.get(holder.adapterPosition)
+        val fieldModel = fields!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( studyModel.name )
+        holder.nameTextView.setText( fieldModel.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(studyModel, true)
+            selectedItemCallback.invoke(fieldModel, true)
         }
     }
 

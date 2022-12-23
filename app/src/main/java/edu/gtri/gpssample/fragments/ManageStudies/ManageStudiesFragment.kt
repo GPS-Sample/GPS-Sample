@@ -10,17 +10,15 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.adapters.StudiesAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.models.StudyModel
 
 class ManageStudiesFragment : Fragment()
 {
     private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
-    private lateinit var studiesAdapter: StudiesAdapter
+    private lateinit var manageStudiesAdapter: ManageStudiesAdapter
     private lateinit var viewModel: ManageStudiesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -48,14 +46,14 @@ class ManageStudiesFragment : Fragment()
             }
         }
 
-        studiesAdapter = StudiesAdapter((activity!!.application as MainApplication).studies)
-        studiesAdapter.selectedItemCallback = this::onItemSelected
+        manageStudiesAdapter = ManageStudiesAdapter((activity!!.application as MainApplication).studies)
+        manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
         val configName = getArguments()?.getString("config_name");
 
         binding.configNameTextView.text = "Configuration " + configName + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = studiesAdapter
+        binding.recyclerView.adapter = manageStudiesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.createButton.setOnClickListener {
@@ -78,7 +76,7 @@ class ManageStudiesFragment : Fragment()
             binding.relativeLayout.visibility = View.GONE
         }
 
-        studiesAdapter.updateStudies((activity!!.application as MainApplication).studies)
+        manageStudiesAdapter.updateStudies((activity!!.application as MainApplication).studies)
     }
 
     fun onItemSelected(studyModel: StudyModel, shouldDismissKeyboard: Boolean )

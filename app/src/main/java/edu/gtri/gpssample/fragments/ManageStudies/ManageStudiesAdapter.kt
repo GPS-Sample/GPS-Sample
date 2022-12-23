@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.adapters
+package edu.gtri.gpssample.fragments.ManageStudies
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,16 +8,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.ConfigurationModel
-import edu.gtri.gpssample.models.FieldModel
+import edu.gtri.gpssample.models.StudyModel
 
-class ConfigurationsAdapter(var configurations: List<ConfigurationModel>?) : RecyclerView.Adapter<ConfigurationsAdapter.ViewHolder>()
+class ManageStudiesAdapter(var studies: List<StudyModel>?) : RecyclerView.Adapter<ManageStudiesAdapter.ViewHolder>()
 {
-    override fun getItemCount() = configurations!!.size
+    override fun getItemCount() = studies!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var selectedItemCallback: ((studyModel: StudyModel, shouldDismissKeyboard: Boolean) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -31,9 +30,9 @@ class ConfigurationsAdapter(var configurations: List<ConfigurationModel>?) : Rec
         return viewHolder
     }
 
-    fun updateConfigurations( configurations: List<ConfigurationModel> )
+    fun updateStudies( studies: List<StudyModel> )
     {
-        this.configurations = configurations
+        this.studies = studies
         notifyDataSetChanged()
     }
 
@@ -41,12 +40,12 @@ class ConfigurationsAdapter(var configurations: List<ConfigurationModel>?) : Rec
     {
         holder.itemView.isSelected = false
 
-        val configurationModel = configurations!!.get(holder.adapterPosition)
+        val studyModel = studies!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( configurationModel.name )
+        holder.nameTextView.setText( studyModel.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(configurationModel, true)
+            selectedItemCallback.invoke(studyModel, true)
         }
     }
 

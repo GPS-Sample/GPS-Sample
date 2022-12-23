@@ -1,6 +1,5 @@
 package edu.gtri.gpssample.fragments.ManageConfigurations
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -11,17 +10,15 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.adapters.ConfigurationsAdapter
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.models.ConfigurationModel
 
 class ManageConfigurationsFragment : Fragment()
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
-    private lateinit var configurationsAdapter: ConfigurationsAdapter
+    private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var viewModel: ManageConfigurationsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -49,11 +46,11 @@ class ManageConfigurationsFragment : Fragment()
             }
         }
 
-        configurationsAdapter = ConfigurationsAdapter((activity!!.application as MainApplication).configurations)
-        configurationsAdapter.selectedItemCallback = this::onItemSelected
+        manageConfigurationsAdapter = ManageConfigurationsAdapter((activity!!.application as MainApplication).configurations)
+        manageConfigurationsAdapter.selectedItemCallback = this::onItemSelected
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = configurationsAdapter
+        binding.recyclerView.adapter = manageConfigurationsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.createButton.setOnClickListener {
@@ -76,7 +73,7 @@ class ManageConfigurationsFragment : Fragment()
             binding.relativeLayout.visibility = View.GONE
         }
 
-        configurationsAdapter.updateConfigurations((activity!!.application as MainApplication).configurations)
+        manageConfigurationsAdapter.updateConfigurations((activity!!.application as MainApplication).configurations)
     }
 
     fun onItemSelected(configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean )
