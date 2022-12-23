@@ -72,7 +72,7 @@ class SignInFragment : Fragment()
                 {
                     findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                 }
-                else if (role == Role.Supervisor.value)
+                else
                 {
                     findNavController().navigate(R.id.action_navigate_to_BarcodeScanFragment, bundle)
                 }
