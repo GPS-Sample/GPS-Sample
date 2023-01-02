@@ -41,6 +41,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:inputType="textCapWords"
                 android:hint="@string/enter_your_name" />
 
             <TextView
@@ -57,6 +58,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:inputType="number"
                 android:hint="@string/enter_your_pin" />
 
             <TextView
@@ -73,6 +75,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:inputType="number"
                 android:hint="@string/reenter_your_pin" />
 
             <TextView
@@ -111,6 +114,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:inputType="textCapWords"
                 android:hint="@string/enter_your_answer" />
 
             <Button
