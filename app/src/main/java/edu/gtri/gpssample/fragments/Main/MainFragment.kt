@@ -71,13 +71,13 @@ class MainFragment : Fragment()
             var bundle = Bundle()
 
             if (binding.adminButton.isChecked) {
-                bundle.putInt( "role", Role.Admin.value)
+                bundle.putString( "role", Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
-                bundle.putInt( "role", Role.Supervisor.value)
+                bundle.putString( "role", Role.Supervisor.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
-                bundle.putInt( "role", Role.Enumerator.value)
+                bundle.putString( "role", Role.DataCollector.value)
             }
 
             binding.adminButton.isChecked = false
@@ -97,15 +97,15 @@ class MainFragment : Fragment()
 
             if (binding.adminButton.isChecked) {
                 bundle = Bundle()
-                bundle.putInt( "role", Role.Admin.value)
+                bundle.putString( "role", Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putInt( "role", Role.Supervisor.value)
+                bundle.putString( "role", Role.Supervisor.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putInt( "role", Role.Enumerator.value)
+                bundle.putString( "role", Role.DataCollector.value)
             }
 
             if (bundle != null)

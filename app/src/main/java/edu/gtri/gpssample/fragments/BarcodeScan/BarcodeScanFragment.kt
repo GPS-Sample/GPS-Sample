@@ -23,6 +23,7 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentBarcodeScanBinding
@@ -60,13 +61,11 @@ class BarcodeScanFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val role = getArguments()?.getInt("role");
+        val role_arg = getArguments()?.getString(Key.kRole.value);
 
-        when (role) {
-            Role.Admin.value -> binding.titleTextView.text = resources.getString( R.string.admin )
-            Role.Supervisor.value -> binding.titleTextView.text = resources.getString( R.string.supervisor )
-            Role.Enumerator.value -> binding.titleTextView.text = resources.getString( R.string.data_collector )
-        }
+        val role = Role.valueOf(role_arg!!)
+
+        binding.titleTextView.text = role.value
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {

@@ -24,11 +24,33 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/pin_edit_text"
-            android:hint="@string/enter_your_pin"
+            android:id="@+id/name_edit_text"
+            android:hint="@string/enter_your_user_name"
+            android:inputType="textCapWords"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
+
+        <EditText
+            android:id="@+id/pin_edit_text"
+            android:hint="@string/enter_your_pin"
+            android:inputType="number"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:layout_gravity="bottom"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/next" />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </FrameLayout>

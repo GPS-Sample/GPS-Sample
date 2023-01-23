@@ -20,7 +20,7 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
-import edu.gtri.gpssample.models.UserModel
+import edu.gtri.gpssample.models.User
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -71,15 +71,15 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
         if ((activity!!.application as MainApplication).users.isEmpty())
         {
-            var user1 = UserModel()
+            var user1 = User()
             user1.name = "Russell"
             (activity!!.application as MainApplication).users.add( user1 )
 
-            var user2 = UserModel()
+            var user2 = User()
             user2.name = "Brian"
             (activity!!.application as MainApplication).users.add( user2 )
 
-            var user3 = UserModel()
+            var user3 = User()
             user3.name = "Megan"
             (activity!!.application as MainApplication).users.add( user3 )
         }

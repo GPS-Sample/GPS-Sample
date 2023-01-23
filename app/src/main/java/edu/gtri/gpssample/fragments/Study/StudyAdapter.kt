@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.UserModel
+import edu.gtri.gpssample.models.User
 
-class StudyAdapter(var users: List<UserModel>?) : RecyclerView.Adapter<StudyAdapter.ViewHolder>()
+class StudyAdapter(var users: List<User>?) : RecyclerView.Adapter<StudyAdapter.ViewHolder>()
 {
     override fun getItemCount() = users!!.size
 
@@ -30,7 +30,7 @@ class StudyAdapter(var users: List<UserModel>?) : RecyclerView.Adapter<StudyAdap
         return viewHolder
     }
 
-    fun updateUsers( users: List<UserModel> )
+    fun updateUsers( users: List<User> )
     {
         this.users = users
         notifyDataSetChanged()

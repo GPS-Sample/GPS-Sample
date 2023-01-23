@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.SignUp
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +11,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.databinding.FragmentSignInBinding
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 
 class SignUpFragment : Fragment()
 {
@@ -46,13 +44,11 @@ class SignUpFragment : Fragment()
             }
         }
 
-        val role = getArguments()?.getInt("role");
+        val role_arg = getArguments()?.getString(Key.kRole.value);
 
-        when (role) {
-            Role.Admin.value -> binding.titleTextView.text = resources.getString( R.string.admin_sign_up )
-            Role.Supervisor.value -> binding.titleTextView.text = resources.getString( R.string.supervisor_sign_up )
-            Role.Enumerator.value -> binding.titleTextView.text = resources.getString( R.string.data_collector_sign_up )
-        }
+        val role = Role.valueOf(role_arg!!)
+
+        binding.titleTextView.text = role.value + " Sign Up"
 
         ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
             .also { adapter ->
@@ -62,9 +58,32 @@ class SignUpFragment : Fragment()
 
         binding.nextButton.setOnClickListener {
 
-            var bundle = Bundle()
-            bundle.putInt( "role", role!! )
-            findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
+            val name = binding.nameEditText.text.toString()
+            val pin1 = binding.pin1EditText.text.toString().toInt()
+            val pin2 = binding.pin2EditText.text.toString().toInt()
+            val question = binding.questionSpinner.selectedItem as String
+            val answer = binding.answerEditText.text.toString()
+
+            if (pin1 != pin2)
+            {
+                Toast.makeText(activity!!.applicationContext, "The PIN's do not match", Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                val userId = GPSSampleDAO.sharedInstance().createUser( role.value, name, pin1, question, answer )
+
+                val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
+                val editor = sharedPreferences.edit()
+
+                editor.putInt( Key.kPin.value, pin1 )
+                editor.putInt( Key.kUserId.value, userId )
+                editor.putString( Key.kUserName.value, name )
+                editor.commit()
+
+                val bundle = Bundle()
+                bundle.putString( Key.kRole.value, role.value )
+                findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
+            }
         }
     }
 

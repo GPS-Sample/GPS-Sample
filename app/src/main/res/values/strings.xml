@@ -109,5 +109,6 @@
 
     <string name="menu_item_settings" translatable="false">Settings</string>
     <string name="change_role">Change Role</string>
+    <string name="enter_your_user_name">Enter your User Name</string>
 
 </resources>

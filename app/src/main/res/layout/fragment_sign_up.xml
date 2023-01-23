@@ -37,6 +37,7 @@
                 android:textColor="@color/black" />
 
             <EditText
+                android:id="@+id/name_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
@@ -54,6 +55,7 @@
                 android:textColor="@color/black" />
 
             <EditText
+                android:id="@+id/pin1_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
@@ -71,6 +73,7 @@
                 android:textColor="@color/black" />
 
             <EditText
+                android:id="@+id/pin2_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
@@ -110,6 +113,7 @@
                 android:textColor="@color/black" />
 
             <EditText
+                android:id="@+id/answer_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"

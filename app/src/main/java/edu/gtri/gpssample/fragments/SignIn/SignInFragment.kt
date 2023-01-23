@@ -13,9 +13,10 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 
 class SignInFragment : Fragment()
 {
@@ -45,41 +46,78 @@ class SignInFragment : Fragment()
             }
         }
 
-        val role = getArguments()?.getInt("role");
+        val role_arg = getArguments()?.getString(Key.kRole.value);
 
-        binding.pinEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
+        val role = Role.valueOf(role_arg!!)
 
-        when (role) {
-            Role.Admin.value -> binding.titleTextView.text = resources.getString( R.string.admin_sign_in )
-            Role.Supervisor.value -> binding.titleTextView.text = resources.getString( R.string.supervisor_sign_in )
-            Role.Enumerator.value -> binding.titleTextView.text = resources.getString( R.string.data_collector_sign_in )
-        }
+        binding.titleTextView.text = role.value + " Sign In"
 
-        binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
+        binding.nextButton.setOnClickListener {
 
-            if (binding.pinEditText.getText().toString().length >= 4)
+            val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
+            val expectedPin = sharedPreferences.getInt( Key.kPin.value, 0 )
+            val userId = sharedPreferences.getInt( Key.kUserId.value, 0 )
+            val expectedUserName = sharedPreferences.getString( Key.kUserName.value, null )
+            val pin = binding.pinEditText.text.toString()
+            val userName = binding.nameEditText.text.toString()
+
+            if (userName.isEmpty())
             {
-                binding.pinEditText.setText("")
+                Toast.makeText(activity!!.applicationContext, "Please enter your User Name", Toast.LENGTH_SHORT).show()
+            }
+            else if (userName != expectedUserName)
+            {
+                Toast.makeText(activity!!.applicationContext, "The User Name is incorrect", Toast.LENGTH_SHORT).show()
+            }
+            else if (pin.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter your PIN", Toast.LENGTH_SHORT).show()
+            }
+            else if (pin.toInt() != expectedPin)
+            {
+                Toast.makeText(activity!!.applicationContext, "The PIN is incorrect", Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                val user = GPSSampleDAO.sharedInstance().getUser( userId )
 
-                (activity!!.application as MainApplication).fields.clear()
-                (activity!!.application as MainApplication).studies.clear()
-                (activity!!.application as MainApplication).configurations.clear()
-
-                var bundle = Bundle()
-                bundle.putInt( "role", role!! )
-
-                if (role == Role.Admin.value)
+                if (user == null)
                 {
-                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                    Toast.makeText(activity!!.applicationContext, "Missing User Data", Toast.LENGTH_SHORT).show()
+                }
+                else if (user!!.role != role)
+                {
+                    Toast.makeText(activity!!.applicationContext, "The expected role for User " + userName + " is: " + user.role.value + ".  Please try again.", Toast.LENGTH_SHORT).show()
                 }
                 else
                 {
-                    findNavController().navigate(R.id.action_navigate_to_BarcodeScanFragment, bundle)
+                    Log.d( "xxx", user!!.id.toString() );
+                    Log.d( "xxx", user!!.role.value );
+                    Log.d( "xxx", user!!.name );
+                    Log.d( "xxx", user!!.pin.toString() );
+                    Log.d( "xxx", user!!.recoveryQuestion );
+                    Log.d( "xxx", user!!.recoveryAnswer );
+
+                    binding.pinEditText.setText("")
+
+                    (activity!!.application as MainApplication).fields.clear()
+                    (activity!!.application as MainApplication).studies.clear()
+                    (activity!!.application as MainApplication).configurations.clear()
+
+                    val bundle = Bundle()
+                    bundle.putString( Key.kRole.value, role.value )
+
+                    if (role == Role.Admin)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                    }
+                    else
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_BarcodeScanFragment, bundle)
+                    }
                 }
             }
-
-            false
-        })
+        }
     }
 
     override fun onDestroyView()

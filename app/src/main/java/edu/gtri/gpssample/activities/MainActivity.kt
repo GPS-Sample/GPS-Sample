@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.content.ContextCompat
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
@@ -27,6 +28,11 @@ class MainActivity : AppCompatActivity()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null)
+        {
+            GPSSampleDAO.createSharedInstance(applicationContext)
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

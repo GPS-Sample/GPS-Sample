@@ -1,7 +1,8 @@
 package edu.gtri.gpssample.constants
 
-enum class Role(val value: Int) {
-    Admin(0),
-    Supervisor(1),
-    Enumerator(2)
+enum class Role(val value: String) {
+    Undefined("Undefined" ),
+    Admin("Admin" ),
+    Supervisor( "Supervisor" ),
+    DataCollector("DataCollector" )
 }
