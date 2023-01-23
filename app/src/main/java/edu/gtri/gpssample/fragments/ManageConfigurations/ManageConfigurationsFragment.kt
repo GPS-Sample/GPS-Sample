@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.models.ConfigurationModel
 
@@ -80,7 +81,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         var bundle = Bundle()
 
-        bundle.putString( "config_name", configurationModel.name )
+        bundle.putString( Key.kConfigName.value, configurationModel.name )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }

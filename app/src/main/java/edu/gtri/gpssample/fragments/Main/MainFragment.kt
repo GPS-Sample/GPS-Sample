@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentMainBinding
 
@@ -71,13 +72,13 @@ class MainFragment : Fragment()
             var bundle = Bundle()
 
             if (binding.adminButton.isChecked) {
-                bundle.putString( "role", Role.Admin.value)
+                bundle.putString( Key.kRole.value, Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
-                bundle.putString( "role", Role.Supervisor.value)
+                bundle.putString( Key.kRole.value, Role.Supervisor.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
-                bundle.putString( "role", Role.DataCollector.value)
+                bundle.putString( Key.kRole.value, Role.DataCollector.value)
             }
 
             binding.adminButton.isChecked = false
@@ -97,15 +98,15 @@ class MainFragment : Fragment()
 
             if (binding.adminButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( "role", Role.Admin.value)
+                bundle.putString( Key.kRole.value, Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( "role", Role.Supervisor.value)
+                bundle.putString( Key.kRole.value, Role.Supervisor.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( "role", Role.DataCollector.value)
+                bundle.putString( Key.kRole.value, Role.DataCollector.value)
             }
 
             if (bundle != null)

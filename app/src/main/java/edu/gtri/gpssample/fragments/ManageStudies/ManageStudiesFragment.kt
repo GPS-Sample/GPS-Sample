@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
 import edu.gtri.gpssample.models.StudyModel
 
@@ -49,7 +50,7 @@ class ManageStudiesFragment : Fragment()
         manageStudiesAdapter = ManageStudiesAdapter((activity!!.application as MainApplication).studies)
         manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
-        val configName = getArguments()?.getString("config_name");
+        val configName = getArguments()?.getString( Key.kConfigName.value );
 
         binding.configNameTextView.text = "Configuration " + configName + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()

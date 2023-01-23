@@ -101,15 +101,15 @@ class BarcodeScanFragment : Fragment()
 
         if (resultCode == ResultCode.BarcodeScanned.value)
         {
-            val payload = data!!.getStringExtra( "value" )
+            val payload = data!!.getStringExtra( Key.kPayload.value )
 
             val jsonObject = JSONObject( payload );
 
             Log.d( "xxx", jsonObject.toString(2))
             binding.payloadTextView.text = jsonObject.toString(2)
 
-            val ssid = jsonObject.getString("ssid" )
-            val pass = jsonObject.getString("pass" )
+            val ssid = jsonObject.getString( Key.kSSID.value )
+            val pass = jsonObject.getString( Key.kPass.value )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {
