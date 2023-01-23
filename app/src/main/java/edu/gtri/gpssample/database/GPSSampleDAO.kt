@@ -12,7 +12,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 {
     override fun onCreate(db: SQLiteDatabase)
     {
-        val createIntendedLocationTable = ("CREATE TABLE " +
+        val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
                 COLUMN_USER_ROLE + " TEXT," +
@@ -21,7 +21,21 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
                 COLUMN_USER_RECOVERY_QUESTION + " TEXT," +
                 COLUMN_USER_RECOVERY_ANSWER + " TEXT" +
                 ")")
-        db.execSQL(createIntendedLocationTable)
+        db.execSQL(createTableUser)
+
+        val createTableConfig = ("CREATE TABLE " +
+                TABLE_CONFIG + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY," +
+                COLUMN_CONFIG_NAME + " TEXT," +
+                ")")
+        db.execSQL(createTableConfig)
+
+        val createTableStudy = ("CREATE TABLE " +
+                TABLE_STUDY + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY," +
+                COLUMN_STUDY_NAME + " TEXT," +
+                ")")
+        db.execSQL(createTableStudy)
     }
 
     override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
@@ -80,16 +94,27 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
     companion object
     {
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
         private const val DATABASE_NAME = "GPSSampleDB.db"
         private const val COLUMN_ID = "id"
 
+        // User Table
         private const val TABLE_USER = "user"
-        private const val COLUMN_USER_ROLE = "role"
-        private const val COLUMN_USER_NAME = "name"
-        private const val COLUMN_USER_PIN = "pin"
-        private const val COLUMN_USER_RECOVERY_QUESTION = "recover_question"
-        private const val COLUMN_USER_RECOVERY_ANSWER = "recovery_answer"
+        private const val COLUMN_USER_ROLE = "user_role"
+        private const val COLUMN_USER_NAME = "user_name"
+        private const val COLUMN_USER_PIN = "user_pin"
+        private const val COLUMN_USER_RECOVERY_QUESTION = "user_recover_question"
+        private const val COLUMN_USER_RECOVERY_ANSWER = "user_recovery_answer"
+
+        // Config Table
+        private const val TABLE_CONFIG = "config"
+        private const val COLUMN_CONFIG_NAME = "config_name"
+
+        // Study Table
+        private const val TABLE_STUDY = "study"
+        private const val COLUMN_STUDY_NAME = "study_name"
+
+        // creation/access methods
 
         private var instance: GPSSampleDAO? = null
 
