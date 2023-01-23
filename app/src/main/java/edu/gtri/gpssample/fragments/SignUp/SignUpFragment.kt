@@ -44,11 +44,11 @@ class SignUpFragment : Fragment()
             }
         }
 
-        val role_arg = getArguments()?.getString(Key.kRole.value);
+        val role_arg = getArguments()?.getString(Key.kRole.toString());
 
         val role = Role.valueOf(role_arg!!)
 
-        binding.titleTextView.text = role.value + " Sign Up"
+        binding.titleTextView.text = role.toString() + " Sign Up"
 
         ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
             .also { adapter ->
@@ -70,18 +70,18 @@ class SignUpFragment : Fragment()
             }
             else
             {
-                val userId = GPSSampleDAO.sharedInstance().createUser( role.value, name, pin1, question, answer )
+                val userId = GPSSampleDAO.sharedInstance().createUser( role.toString(), name, pin1, question, answer )
 
                 val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
                 val editor = sharedPreferences.edit()
 
-                editor.putInt( Key.kPin.value, pin1 )
-                editor.putInt( Key.kUserId.value, userId )
-                editor.putString( Key.kUserName.value, name )
+                editor.putInt( Key.kPin.toString(), pin1 )
+                editor.putInt( Key.kUserId.toString(), userId )
+                editor.putString( Key.kUserName.toString(), name )
                 editor.commit()
 
                 val bundle = Bundle()
-                bundle.putString( Key.kRole.value, role.value )
+                bundle.putString( Key.kRole.toString(), role.toString() )
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }
         }

@@ -61,11 +61,11 @@ class BarcodeScanFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val role_arg = getArguments()?.getString(Key.kRole.value);
+        val role_arg = getArguments()?.getString(Key.kRole.toString());
 
         val role = Role.valueOf(role_arg!!)
 
-        binding.titleTextView.text = role.value
+        binding.titleTextView.text = role.toString()
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
@@ -101,15 +101,15 @@ class BarcodeScanFragment : Fragment()
 
         if (resultCode == ResultCode.BarcodeScanned.value)
         {
-            val payload = data!!.getStringExtra( Key.kPayload.value )
+            val payload = data!!.getStringExtra( Key.kPayload.toString() )
 
             val jsonObject = JSONObject( payload );
 
             Log.d( "xxx", jsonObject.toString(2))
             binding.payloadTextView.text = jsonObject.toString(2)
 
-            val ssid = jsonObject.getString( Key.kSSID.value )
-            val pass = jsonObject.getString( Key.kPass.value )
+            val ssid = jsonObject.getString( Key.kSSID.toString() )
+            val pass = jsonObject.getString( Key.kPass.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {

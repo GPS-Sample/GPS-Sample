@@ -26,14 +26,14 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_CONFIG_NAME + " TEXT," +
+                COLUMN_CONFIG_NAME + " TEXT" +
                 ")")
         db.execSQL(createTableConfig)
 
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_STUDY_NAME + " TEXT," +
+                COLUMN_STUDY_NAME + " TEXT" +
                 ")")
         db.execSQL(createTableStudy)
     }
@@ -41,6 +41,8 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
     {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIG)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDY)
         onCreate(db)
     }
 
@@ -59,34 +61,27 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
     fun getUser( id: Int ): User?
     {
-        try {
-            val db = this.writableDatabase
-            val query = "SELECT * FROM $TABLE_USER WHERE ID = ${id}"
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_USER WHERE ID = ${id}"
 
-            val cursor = db.rawQuery(query, null)
+        val cursor = db.rawQuery(query, null)
 
-            if (cursor.count > 0)
-            {
-                cursor.moveToNext()
-                val user = User()
-
-                user.id = Integer.parseInt(cursor.getString(0))
-                user.role = Role.valueOf( cursor.getString(cursor.getColumnIndex(COLUMN_USER_ROLE)))
-                user.name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))
-                user.pin = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PIN))
-                user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
-                user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
-
-                cursor.close()
-                db.close()
-
-                return user
-            }
-        }
-        catch( ex: Exception )
+        if (cursor.count > 0)
         {
-            println( ex.localizedMessage )
-            ex.printStackTrace()
+            cursor.moveToNext()
+            val user = User()
+
+            user.id = Integer.parseInt(cursor.getString(0))
+            user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ROLE)))
+            user.name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))
+            user.pin = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PIN))
+            user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
+            user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
+
+            cursor.close()
+            db.close()
+
+            return user
         }
 
         return null
@@ -94,7 +89,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
     companion object
     {
-        private const val DATABASE_VERSION = 4
+        private const val DATABASE_VERSION = 9
         private const val DATABASE_NAME = "GPSSampleDB.db"
         private const val COLUMN_ID = "id"
 
@@ -118,11 +113,6 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
         private var instance: GPSSampleDAO? = null
 
-        fun sharedInstance(): GPSSampleDAO
-        {
-            return instance!!
-        }
-
         fun createSharedInstance( context: Context ): GPSSampleDAO
         {
             if (instance == null)
@@ -130,6 +120,11 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
                 instance = GPSSampleDAO( context, null, null, DATABASE_VERSION )
             }
 
+            return instance!!
+        }
+
+        fun sharedInstance(): GPSSampleDAO
+        {
             return instance!!
         }
     }

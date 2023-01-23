@@ -81,7 +81,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         var bundle = Bundle()
 
-        bundle.putString( Key.kConfigName.value, configurationModel.name )
+        bundle.putString( Key.kConfigName.toString(), configurationModel.name )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }

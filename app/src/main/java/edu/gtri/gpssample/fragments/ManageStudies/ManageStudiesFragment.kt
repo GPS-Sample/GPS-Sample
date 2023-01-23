@@ -50,7 +50,7 @@ class ManageStudiesFragment : Fragment()
         manageStudiesAdapter = ManageStudiesAdapter((activity!!.application as MainApplication).studies)
         manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
-        val configName = getArguments()?.getString( Key.kConfigName.value );
+        val configName = getArguments()?.getString( Key.kConfigName.toString() );
 
         binding.configNameTextView.text = "Configuration " + configName + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()

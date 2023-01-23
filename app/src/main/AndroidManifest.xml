@@ -32,14 +32,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
-        <activity
-            android:name=".activity.manager.network.NetworkActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-
         <service android:name=".services.UDPBroadcastReceiverService"/>
 
         <activity

@@ -72,13 +72,13 @@ class MainFragment : Fragment()
             var bundle = Bundle()
 
             if (binding.adminButton.isChecked) {
-                bundle.putString( Key.kRole.value, Role.Admin.value)
+                bundle.putString( Key.kRole.toString(), Role.Admin.toString())
             }
             else if (binding.supervisorButton.isChecked) {
-                bundle.putString( Key.kRole.value, Role.Supervisor.value)
+                bundle.putString( Key.kRole.toString(), Role.Supervisor.toString())
             }
             else if (binding.dataCollectorButton.isChecked) {
-                bundle.putString( Key.kRole.value, Role.DataCollector.value)
+                bundle.putString( Key.kRole.toString(), Role.DataCollector.toString())
             }
 
             binding.adminButton.isChecked = false
@@ -98,15 +98,15 @@ class MainFragment : Fragment()
 
             if (binding.adminButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Key.kRole.value, Role.Admin.value)
+                bundle.putString( Key.kRole.toString(), Role.Admin.toString())
             }
             else if (binding.supervisorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Key.kRole.value, Role.Supervisor.value)
+                bundle.putString( Key.kRole.toString(), Role.Supervisor.toString())
             }
             else if (binding.dataCollectorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Key.kRole.value, Role.DataCollector.value)
+                bundle.putString( Key.kRole.toString(), Role.DataCollector.toString())
             }
 
             if (bundle != null)

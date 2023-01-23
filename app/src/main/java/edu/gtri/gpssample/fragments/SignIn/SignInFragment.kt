@@ -46,18 +46,18 @@ class SignInFragment : Fragment()
             }
         }
 
-        val role_arg = getArguments()?.getString(Key.kRole.value);
+        val role_arg = getArguments()?.getString(Key.kRole.toString());
 
         val role = Role.valueOf(role_arg!!)
 
-        binding.titleTextView.text = role.value + " Sign In"
+        binding.titleTextView.text = role.toString() + " Sign In"
 
         binding.nextButton.setOnClickListener {
 
             val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
-            val expectedPin = sharedPreferences.getInt( Key.kPin.value, 0 )
-            val userId = sharedPreferences.getInt( Key.kUserId.value, 0 )
-            val expectedUserName = sharedPreferences.getString( Key.kUserName.value, null )
+            val expectedPin = sharedPreferences.getInt( Key.kPin.toString(), 0 )
+            val userId = sharedPreferences.getInt( Key.kUserId.toString(), 0 )
+            val expectedUserName = sharedPreferences.getString( Key.kUserName.toString(), null )
             val pin = binding.pinEditText.text.toString()
             val userName = binding.nameEditText.text.toString()
 
@@ -87,12 +87,12 @@ class SignInFragment : Fragment()
                 }
                 else if (user!!.role != role)
                 {
-                    Toast.makeText(activity!!.applicationContext, "The expected role for User " + userName + " is: " + user.role.value + ".  Please try again.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.", Toast.LENGTH_SHORT).show()
                 }
                 else
                 {
                     Log.d( "xxx", user!!.id.toString() );
-                    Log.d( "xxx", user!!.role.value );
+                    Log.d( "xxx", user!!.role.toString() );
                     Log.d( "xxx", user!!.name );
                     Log.d( "xxx", user!!.pin.toString() );
                     Log.d( "xxx", user!!.recoveryQuestion );
@@ -105,7 +105,7 @@ class SignInFragment : Fragment()
                     (activity!!.application as MainApplication).configurations.clear()
 
                     val bundle = Bundle()
-                    bundle.putString( Key.kRole.value, role.value )
+                    bundle.putString( Key.kRole.toString(), role.toString())
 
                     if (role == Role.Admin)
                     {
