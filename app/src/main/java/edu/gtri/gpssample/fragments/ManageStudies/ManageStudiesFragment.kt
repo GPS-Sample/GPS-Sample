@@ -143,6 +143,7 @@ class ManageStudiesFragment : Fragment()
             R.id.action_delete_configuration -> {
                 GPSSampleDAO.sharedInstance().deleteConfiguration( configuration!! )
                 findNavController().popBackStack()
+                return true
             }
         }
 

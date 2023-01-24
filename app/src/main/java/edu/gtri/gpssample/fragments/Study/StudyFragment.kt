@@ -271,6 +271,12 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
                 findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
                 return true
             }
+
+            R.id.action_delete_study -> {
+                GPSSampleDAO.sharedInstance().deleteStudy( study!! )
+                findNavController().popBackStack()
+                return true
+            }
         }
 
         return false
