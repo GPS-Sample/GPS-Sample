@@ -4,7 +4,11 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import edu.gtri.gpssample.constants.DateFormat
+import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.models.Configuration
 import edu.gtri.gpssample.models.User
 
 class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
@@ -26,14 +30,19 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_CONFIG_NAME + " TEXT" +
+                COLUMN_CONFIG_NAME + " TEXT," +
+                COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT," +
+                COLUMN_CONFIG_DATE_FORMAT + " TEXT," +
+                COLUMN_CONFIG_TIME_FORMAT + " TEXT," +
+                COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" +
                 ")")
         db.execSQL(createTableConfig)
 
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_STUDY_NAME + " TEXT" +
+                COLUMN_STUDY_NAME + " TEXT," +
+                COLUMN_STUDY_CONFIG_ID + " INTEGER" +
                 ")")
         db.execSQL(createTableStudy)
     }
@@ -46,21 +55,22 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         onCreate(db)
     }
 
-    fun createUser( role: String, name: String, pin: Int, recoveryQuestion: String, recoveryAnswer: String ) : Int
+    fun createUser( user: User ) : Int
     {
         val values = ContentValues()
 
-        values.put( COLUMN_USER_ROLE, role )
-        values.put( COLUMN_USER_NAME, name )
-        values.put( COLUMN_USER_PIN, pin )
-        values.put( COLUMN_USER_RECOVERY_QUESTION, recoveryQuestion )
-        values.put( COLUMN_USER_RECOVERY_ANSWER, recoveryAnswer )
+        values.put( COLUMN_USER_ROLE, user.role.toString() )
+        values.put( COLUMN_USER_NAME, user.name )
+        values.put( COLUMN_USER_PIN, user.pin )
+        values.put( COLUMN_USER_RECOVERY_QUESTION, user.recoveryQuestion )
+        values.put( COLUMN_USER_RECOVERY_ANSWER, user.recoveryAnswer )
 
         return this.writableDatabase.insert(TABLE_USER, null, values).toInt()
     }
 
     fun getUser( id: Int ): User?
     {
+        var user: User? = null
         val db = this.writableDatabase
         val query = "SELECT * FROM $TABLE_USER WHERE ID = ${id}"
 
@@ -69,6 +79,33 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         if (cursor.count > 0)
         {
             cursor.moveToNext()
+
+            user = User()
+
+            user.id = Integer.parseInt(cursor.getString(0))
+            user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ROLE)))
+            user.name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))
+            user.pin = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PIN))
+            user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
+            user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
+        }
+
+        cursor.close()
+        db.close()
+
+        return user
+    }
+
+    fun getUsers(): List<User>
+    {
+        val users = ArrayList<User>()
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_USER"
+
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
             val user = User()
 
             user.id = Integer.parseInt(cursor.getString(0))
@@ -78,18 +115,106 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
             user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
 
-            cursor.close()
-            db.close()
-
-            return user
+            users.add( user )
         }
 
-        return null
+        cursor.close()
+        db.close()
+
+        return users
+    }
+
+    fun createConfiguration( configuration: Configuration ) : Int
+    {
+        val values = ContentValues()
+
+        values.put( COLUMN_CONFIG_NAME, configuration.name )
+        values.put( COLUMN_CONFIG_DISTANCE_FORMAT, configuration.distanceFormat.toString() )
+        values.put( COLUMN_CONFIG_DATE_FORMAT, configuration.dateFormat.toString() )
+        values.put( COLUMN_CONFIG_TIME_FORMAT, configuration.timeFormat.toString() )
+        values.put( COLUMN_CONFIG_MIN_GPS_PRECISION, configuration.minGpsPrecision )
+
+        return this.writableDatabase.insert(TABLE_CONFIG, null, values).toInt()
+    }
+
+    fun getConfigurations(): List<Configuration>
+    {
+        val configurations = ArrayList<Configuration>()
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_CONFIG"
+
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val configuration = Configuration()
+
+            configuration.id = Integer.parseInt(cursor.getString(0))
+            configuration.name = cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_NAME))
+            configuration.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DISTANCE_FORMAT)))
+            configuration.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DATE_FORMAT)))
+            configuration.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_TIME_FORMAT)))
+            configuration.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(COLUMN_CONFIG_MIN_GPS_PRECISION))
+
+            configurations.add( configuration )
+        }
+
+        cursor.close()
+        db.close()
+
+        return configurations
+    }
+
+    fun getConfiguration( id: Int ): Configuration?
+    {
+        var configuration: Configuration? = null
+
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_CONFIG WHERE ID = ${id}"
+
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            configuration = Configuration()
+
+            configuration.id = Integer.parseInt(cursor.getString(0))
+            configuration.name = cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_NAME))
+            configuration.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DISTANCE_FORMAT)))
+            configuration.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DATE_FORMAT)))
+            configuration.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_TIME_FORMAT)))
+            configuration.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(COLUMN_CONFIG_MIN_GPS_PRECISION))
+        }
+
+        cursor.close()
+        db.close()
+
+        return configuration
+    }
+
+    fun updateConfiguration( configuration: Configuration )
+    {
+        val db = this.writableDatabase
+        val whereClause = "${COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(configuration.id.toString())
+
+        val values = ContentValues()
+
+        values.put( COLUMN_CONFIG_NAME, configuration.name )
+        values.put( COLUMN_CONFIG_DISTANCE_FORMAT, configuration.distanceFormat.toString())
+        values.put( COLUMN_CONFIG_DATE_FORMAT, configuration.dateFormat.toString())
+        values.put( COLUMN_CONFIG_TIME_FORMAT, configuration.timeFormat.toString())
+        values.put( COLUMN_CONFIG_MIN_GPS_PRECISION, configuration.minGpsPrecision )
+
+        db.update( TABLE_CONFIG, values, whereClause, args )
+        db.close()
     }
 
     companion object
     {
-        private const val DATABASE_VERSION = 9
+        private const val DATABASE_VERSION = 10
         private const val DATABASE_NAME = "GPSSampleDB.db"
         private const val COLUMN_ID = "id"
 
@@ -104,10 +229,19 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         // Config Table
         private const val TABLE_CONFIG = "config"
         private const val COLUMN_CONFIG_NAME = "config_name"
+        private const val COLUMN_CONFIG_DISTANCE_FORMAT = "config_distance_format"
+        private const val COLUMN_CONFIG_DATE_FORMAT = "config_date_format"
+        private const val COLUMN_CONFIG_TIME_FORMAT = "config_time_format"
+        private const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
+
+        var distanceFormat: String = "";
+        var timeFormat: String = "";
+        var minGpsPrecision: Int = 0;
 
         // Study Table
         private const val TABLE_STUDY = "study"
         private const val COLUMN_STUDY_NAME = "study_name"
+        private const val COLUMN_STUDY_CONFIG_ID = "study_config_id"
 
         // creation/access methods
 

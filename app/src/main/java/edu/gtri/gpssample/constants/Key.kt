@@ -8,6 +8,7 @@ enum class Key {
     kUserId,
     kPayload,
     kUserName,
+    kConfigId,
     kStudyName,
     kConfigName,
 }

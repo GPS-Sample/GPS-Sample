@@ -21,14 +21,15 @@
         <item>"Favorite Pet's name"</item>
     </string-array>
 
-    <string-array name="preferred_units">
+    <string-array name="distance_format">
         <item>"Meters / KiloMeters"</item>
         <item>"Feet / Miles"</item>
     </string-array>
 
     <string-array name="date_format">
-        <item>"mm/dd/yyyy"</item>
         <item>"dd/mm/yyyy"</item>
+        <item>"mm/dd/yyyy"</item>
+        <item>"yyyy/mm/dd"</item>
     </string-array>
 
     <string-array name="time_format">

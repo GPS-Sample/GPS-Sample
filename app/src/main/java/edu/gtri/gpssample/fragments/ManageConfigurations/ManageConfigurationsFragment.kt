@@ -12,8 +12,9 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.models.ConfigurationModel
+import edu.gtri.gpssample.models.Configuration
 
 class ManageConfigurationsFragment : Fragment()
 {
@@ -47,7 +48,9 @@ class ManageConfigurationsFragment : Fragment()
             }
         }
 
-        manageConfigurationsAdapter = ManageConfigurationsAdapter((activity!!.application as MainApplication).configurations)
+        val configurations = GPSSampleDAO.sharedInstance().getConfigurations()
+
+        manageConfigurationsAdapter = ManageConfigurationsAdapter(configurations)
         manageConfigurationsAdapter.selectedItemCallback = this::onItemSelected
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -63,7 +66,9 @@ class ManageConfigurationsFragment : Fragment()
     {
         super.onResume()
 
-        if ((activity!!.application as MainApplication).configurations.isEmpty())
+        val configurations = GPSSampleDAO.sharedInstance().getConfigurations()
+
+        if (configurations.isEmpty())
         {
             binding.recyclerView.visibility = View.GONE
             binding.relativeLayout.visibility = View.VISIBLE
@@ -74,14 +79,14 @@ class ManageConfigurationsFragment : Fragment()
             binding.relativeLayout.visibility = View.GONE
         }
 
-        manageConfigurationsAdapter.updateConfigurations((activity!!.application as MainApplication).configurations)
+        manageConfigurationsAdapter.updateConfigurations(configurations)
     }
 
-    fun onItemSelected(configurationModel: ConfigurationModel, shouldDismissKeyboard: Boolean )
+    fun onItemSelected(configuration: Configuration, shouldDismissKeyboard: Boolean )
     {
         var bundle = Bundle()
 
-        bundle.putString( Key.kConfigName.toString(), configurationModel.name )
+        bundle.putInt( Key.kConfigId.toString(), configuration.id )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }

@@ -12,11 +12,14 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
+import edu.gtri.gpssample.models.Configuration
 import edu.gtri.gpssample.models.StudyModel
 
 class ManageStudiesFragment : Fragment()
 {
+    private var configuration: Configuration? = null;
     private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
@@ -50,9 +53,23 @@ class ManageStudiesFragment : Fragment()
         manageStudiesAdapter = ManageStudiesAdapter((activity!!.application as MainApplication).studies)
         manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
-        val configName = getArguments()?.getString( Key.kConfigName.toString() );
+        val configId = getArguments()?.getInt( Key.kConfigId.toString());
 
-        binding.configNameTextView.text = "Configuration " + configName + " Studies"
+        if (configId == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Config ID is NULL", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        configuration = GPSSampleDAO.sharedInstance().getConfiguration( configId!! )
+
+        if (configuration == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Missing Configuration with ID: " + configId.toString(), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.configNameTextView.text = "Configuration " + configuration!!.name + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageStudiesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
@@ -95,6 +112,13 @@ class ManageStudiesFragment : Fragment()
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+            R.id.action_edit_configuration -> {
+                var bundle = Bundle()
+
+                bundle.putInt( Key.kConfigId.toString(), configuration!!.id )
+
+                findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
+            }
             R.id.action_create_study -> {
                 findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment )
                 return true

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
 import edu.gtri.gpssample.models.User
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
@@ -69,22 +70,24 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             }
         }
 
-        if ((activity!!.application as MainApplication).users.isEmpty())
-        {
-            var user1 = User()
-            user1.name = "Russell"
-            (activity!!.application as MainApplication).users.add( user1 )
+        val users = GPSSampleDAO.sharedInstance().getUsers()
 
-            var user2 = User()
-            user2.name = "Brian"
-            (activity!!.application as MainApplication).users.add( user2 )
+//        if ((activity!!.application as MainApplication).users.isEmpty())
+//        {
+//            var user1 = User()
+//            user1.name = "Russell"
+//            (activity!!.application as MainApplication).users.add( user1 )
+//
+//            var user2 = User()
+//            user2.name = "Brian"
+//            (activity!!.application as MainApplication).users.add( user2 )
+//
+//            var user3 = User()
+//            user3.name = "Megan"
+//            (activity!!.application as MainApplication).users.add( user3 )
+//        }
 
-            var user3 = User()
-            user3.name = "Megan"
-            (activity!!.application as MainApplication).users.add( user3 )
-        }
-
-        studyAdapter = StudyAdapter((activity!!.application as MainApplication).users)
+        studyAdapter = StudyAdapter(users)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = studyAdapter
@@ -182,11 +185,11 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
                 {
                     dataIsFresh = false;
                 }
-                else if ((activity!!.application as MainApplication).users[0].isOnline)
-                {
-                    (activity!!.application as MainApplication).users[0].isOnline = false
-                    studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
-                }
+//                else if ((activity!!.application as MainApplication).users[0].isOnline)
+//                {
+//                    (activity!!.application as MainApplication).users[0].isOnline = false
+//                    studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
+//                }
             },{throwable->
                 Log.d( "xxx", throwable.stackTraceToString())
             })
@@ -199,11 +202,11 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     {
         dataIsFresh = true
 
-        (activity!!.application as MainApplication).users[0].isOnline = true
-
-        activity!!.runOnUiThread{
-            studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
-        }
+//        (activity!!.application as MainApplication).users[0].isOnline = true
+//
+//        activity!!.runOnUiThread{
+//            studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
+//        }
 
         Log.d( "xxx", "received : " + datagramPacket.length )
     }

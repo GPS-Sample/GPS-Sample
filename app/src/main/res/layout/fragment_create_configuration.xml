@@ -62,7 +62,7 @@
                 android:background="@drawable/spinner_frame">
 
                 <Spinner
-                    android:id="@+id/preferred_units_spinner"
+                    android:id="@+id/distance_format_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </FrameLayout>
@@ -126,6 +126,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:text="20"
                 android:hint="@string/enter_min_gps_precision" />
 
             <Button

@@ -15,6 +15,7 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
+import edu.gtri.gpssample.models.User
 
 class SignUpFragment : Fragment()
 {
@@ -70,14 +71,21 @@ class SignUpFragment : Fragment()
             }
             else
             {
-                val userId = GPSSampleDAO.sharedInstance().createUser( role.toString(), name, pin1, question, answer )
+                val user = User()
+                user.name = name
+                user.pin = pin1
+                user.role = role
+                user.recoveryQuestion = question
+                user.recoveryAnswer = answer
+
+                user.id = GPSSampleDAO.sharedInstance().createUser( user )
 
                 val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
                 val editor = sharedPreferences.edit()
 
-                editor.putInt( Key.kPin.toString(), pin1 )
-                editor.putInt( Key.kUserId.toString(), userId )
-                editor.putString( Key.kUserName.toString(), name )
+                editor.putInt( Key.kPin.toString(), user.pin )
+                editor.putInt( Key.kUserId.toString(), user.id )
+                editor.putString( Key.kUserName.toString(), user.name )
                 editor.commit()
 
                 val bundle = Bundle()

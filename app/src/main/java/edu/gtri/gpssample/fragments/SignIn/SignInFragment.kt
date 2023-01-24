@@ -102,7 +102,6 @@ class SignInFragment : Fragment()
 
                     (activity!!.application as MainApplication).fields.clear()
                     (activity!!.application as MainApplication).studies.clear()
-                    (activity!!.application as MainApplication).configurations.clear()
 
                     val bundle = Bundle()
                     bundle.putString( Key.kRole.toString(), role.toString())

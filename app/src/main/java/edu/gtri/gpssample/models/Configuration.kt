@@ -1,0 +1,15 @@
+package edu.gtri.gpssample.models
+
+import edu.gtri.gpssample.constants.DateFormat
+import edu.gtri.gpssample.constants.DistanceFormat
+import edu.gtri.gpssample.constants.TimeFormat
+
+class Configuration
+{
+    var id: Int = -1;
+    var name: String = "";
+    var dateFormat: DateFormat = DateFormat.DayMonthYear;
+    var timeFormat: TimeFormat = TimeFormat.twelveHour;
+    var distanceFormat: DistanceFormat = DistanceFormat.Feet;
+    var minGpsPrecision: Int = 0;
+}

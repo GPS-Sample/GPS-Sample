@@ -97,6 +97,10 @@
         tools:layout="@layout/fragment_manage_studies">
 
         <action
+            android:id="@+id/action_navigate_to_CreateConfigurationFragment"
+            app:destination="@id/CreateConfigurationFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_CreateStudyFragment"
             app:destination="@id/CreateStudyFragment"/>
 
