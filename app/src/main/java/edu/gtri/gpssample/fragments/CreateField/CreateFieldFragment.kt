@@ -7,13 +7,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
-import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
-import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 import edu.gtri.gpssample.models.FieldModel
-import edu.gtri.gpssample.models.StudyModel
 
 class CreateFieldFragment : Fragment()
 {

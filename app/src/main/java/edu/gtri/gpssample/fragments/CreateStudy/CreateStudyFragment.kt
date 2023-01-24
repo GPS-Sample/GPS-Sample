@@ -11,12 +11,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
+import edu.gtri.gpssample.models.Configuration
 import edu.gtri.gpssample.models.FieldModel
-import edu.gtri.gpssample.models.StudyModel
+import edu.gtri.gpssample.models.Study
 
 class CreateStudyFragment : Fragment()
 {
+    private var study: Study? = null;
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
     private lateinit var createStudyAdapter: CreateStudyAdapter
@@ -41,6 +45,20 @@ class CreateStudyFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
+        val studyId = getArguments()?.getInt( Key.kStudyId.toString());
+        val configId = getArguments()?.getInt( Key.kConfigId.toString());
+
+        if (configId == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Missing required configId", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (studyId != null)
+        {
+            study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
+        }
+
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
                 Toast.makeText(activity!!.applicationContext, "CreateStudyFragment", Toast.LENGTH_SHORT).show()
@@ -54,11 +72,35 @@ class CreateStudyFragment : Fragment()
         binding.recyclerView.adapter = createStudyAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager( activity )
 
+        if (study != null)
+        {
+            binding.studyNameEditText.setText( study!!.name )
+        }
+
         binding.nextButton.setOnClickListener {
 
-            val studyModel = StudyModel()
-            studyModel.name = binding.studyNameEditText.text.toString();
-            (activity!!.application as MainApplication).studies.add( studyModel )
+            if (binding.studyNameEditText.text.toString().isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (study == null)
+            {
+                study = Study()
+                study!!.configId = configId!!
+            }
+
+            study!!.name = binding.studyNameEditText.text.toString();
+
+            if (study!!.id < 0)
+            {
+                study!!.id = GPSSampleDAO.sharedInstance().createStudy( study!! )
+            }
+            else
+            {
+                GPSSampleDAO.sharedInstance().updateStudy( study!! )
+            }
 
             findNavController().popBackStack()
         }

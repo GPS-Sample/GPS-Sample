@@ -14,13 +14,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
+import edu.gtri.gpssample.models.Study
 import edu.gtri.gpssample.models.User
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
@@ -37,6 +40,7 @@ import java.util.concurrent.TimeUnit
 
 class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate
 {
+    private var study: Study? = null
     private var _binding: FragmentStudyBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
@@ -63,6 +67,17 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        val studyId = getArguments()?.getInt( Key.kStudyId.toString());
+
+        study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
+
+        if (study == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Missing study.", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.studyNameTextView.setText( "Study " + study!!.name )
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
@@ -248,6 +263,12 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
         when (item.itemId) {
             R.id.action_edit_study -> {
+                var bundle = Bundle()
+
+                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+                bundle.putInt( Key.kConfigId.toString(), study!!.configId )
+
+                findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
                 return true
             }
         }

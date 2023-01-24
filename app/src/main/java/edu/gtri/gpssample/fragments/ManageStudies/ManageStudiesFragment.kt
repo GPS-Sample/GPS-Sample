@@ -15,7 +15,7 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
 import edu.gtri.gpssample.models.Configuration
-import edu.gtri.gpssample.models.StudyModel
+import edu.gtri.gpssample.models.Study
 
 class ManageStudiesFragment : Fragment()
 {
@@ -50,7 +50,9 @@ class ManageStudiesFragment : Fragment()
             }
         }
 
-        manageStudiesAdapter = ManageStudiesAdapter((activity!!.application as MainApplication).studies)
+        val studies = GPSSampleDAO.sharedInstance().getStudies()
+
+        manageStudiesAdapter = ManageStudiesAdapter(studies)
         manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
         val configId = getArguments()?.getInt( Key.kConfigId.toString());
@@ -75,7 +77,12 @@ class ManageStudiesFragment : Fragment()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.createButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
+
+            var bundle = Bundle()
+
+            bundle.putInt( Key.kConfigId.toString(), configuration!!.id )
+
+            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
     }
 
@@ -83,7 +90,9 @@ class ManageStudiesFragment : Fragment()
     {
         super.onResume()
 
-        if ((activity!!.application as MainApplication).studies.isEmpty())
+        val studies = GPSSampleDAO.sharedInstance().getStudies()
+
+        if (studies.isEmpty())
         {
             binding.recyclerView.visibility = View.GONE
             binding.relativeLayout.visibility = View.VISIBLE
@@ -94,12 +103,16 @@ class ManageStudiesFragment : Fragment()
             binding.relativeLayout.visibility = View.GONE
         }
 
-        manageStudiesAdapter.updateStudies((activity!!.application as MainApplication).studies)
+        manageStudiesAdapter.updateStudies(studies)
     }
 
-    fun onItemSelected(studyModel: StudyModel, shouldDismissKeyboard: Boolean )
+    fun onItemSelected(study: Study, shouldDismissKeyboard: Boolean )
     {
-        findNavController().navigate( R.id.action_navigate_to_StudyFragment )
+        var bundle = Bundle()
+
+        bundle.putInt( Key.kStudyId.toString(), study.id )
+
+        findNavController().navigate( R.id.action_navigate_to_StudyFragment, bundle )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
@@ -120,8 +133,16 @@ class ManageStudiesFragment : Fragment()
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
             }
             R.id.action_create_study -> {
-                findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment )
+                var bundle = Bundle()
+
+                bundle.putInt( Key.kConfigId.toString(), configuration!!.id )
+
+                findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
                 return true
+            }
+            R.id.action_delete_configuration -> {
+                GPSSampleDAO.sharedInstance().deleteConfiguration( configuration!! )
+                findNavController().popBackStack()
             }
         }
 

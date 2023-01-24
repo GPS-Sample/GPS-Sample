@@ -129,6 +129,10 @@
         android:id="@+id/StudyFragment"
         android:name="edu.gtri.gpssample.fragments.Study.StudyFragment"
         tools:layout="@layout/fragment_study">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateStudyFragment"
+            app:destination="@id/CreateStudyFragment"/>
     </fragment>
 
     <fragment

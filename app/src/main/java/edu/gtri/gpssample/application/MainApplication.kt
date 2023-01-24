@@ -5,9 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.graphics.Bitmap
 import edu.gtri.gpssample.models.FieldModel
-import edu.gtri.gpssample.models.StudyModel
-import edu.gtri.gpssample.models.Configuration
-import edu.gtri.gpssample.models.User
+import edu.gtri.gpssample.models.Study
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 
 class MainApplication : Application()
@@ -16,7 +14,7 @@ class MainApplication : Application()
 
 //    var users = mutableListOf<User>()
     var fields = mutableListOf<FieldModel>()
-    var studies = mutableListOf<StudyModel>()
+    var studies = mutableListOf<Study>()
 //    var configurations = mutableListOf<Configuration>()
 
     override fun onCreate()
