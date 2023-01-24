@@ -378,10 +378,6 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         private const val COLUMN_CONFIG_TIME_FORMAT = "config_time_format"
         private const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
 
-        var distanceFormat: String = "";
-        var timeFormat: String = "";
-        var minGpsPrecision: Int = 0;
-
         // Study Table
         private const val TABLE_STUDY = "study"
         private const val COLUMN_STUDY_NAME = "study_name"
