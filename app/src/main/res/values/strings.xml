@@ -37,6 +37,14 @@
         <item>"24 hour"</item>
     </string-array>
 
+    <string-array name="field_types">
+        <item>"Text"</item>
+        <item>"Number"</item>
+        <item>"Date"</item>
+        <item>"Checkbox"</item>
+        <item>"Dropdown"</item>
+    </string-array>
+
     <string name="admin">Admin</string>
     <string name="supervisor">Supervisor</string>
     <string name="enumerator">Enumerator</string>
@@ -111,5 +119,8 @@
     <string name="menu_item_settings" translatable="false">Settings</string>
     <string name="change_role">Change Role</string>
     <string name="enter_your_user_name">Enter your User Name</string>
+    <string name="field_type">Field Type</string>
+    <string name="enter_checkbox_text">Enter checkbox item text</string>
+    <string name="enter_dropdown_item_text">Enter dropdown item text</string>
 
 </resources>

@@ -15,7 +15,7 @@
         android:layout_margin="20dp"
         android:gravity="center_vertical"
         android:text="@string/create_field"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -44,6 +44,64 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:hint="@string/enter_field_name" />
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:gravity="center_vertical"
+                android:text="@string/field_type"
+                android:textColor="@color/black" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/spinner_frame">
+
+                <Spinner
+                    android:id="@+id/field_type_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+
+            <include
+                android:visibility="visible"
+                android:id="@+id/layout_field_text"
+                layout="@layout/layout_field_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <include
+                android:visibility="gone"
+                android:id="@+id/layout_field_number"
+                layout="@layout/layout_field_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <include
+                android:visibility="gone"
+                android:id="@+id/layout_field_date"
+                layout="@layout/layout_field_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <include
+                android:visibility="gone"
+                android:id="@+id/layout_field_checkbox"
+                layout="@layout/layout_field_checkbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <include
+                android:visibility="gone"
+                android:id="@+id/layout_field_dropdown"
+                layout="@layout/layout_field_dropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
 
