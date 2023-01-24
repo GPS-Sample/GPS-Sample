@@ -50,11 +50,6 @@ class ManageStudiesFragment : Fragment()
             }
         }
 
-        val studies = GPSSampleDAO.sharedInstance().getStudies()
-
-        manageStudiesAdapter = ManageStudiesAdapter(studies)
-        manageStudiesAdapter.selectedItemCallback = this::onItemSelected
-
         val configId = getArguments()?.getInt( Key.kConfigId.toString());
 
         if (configId == null)
@@ -70,6 +65,11 @@ class ManageStudiesFragment : Fragment()
             Toast.makeText(activity!!.applicationContext, "Oops! Missing Configuration with ID: " + configId.toString(), Toast.LENGTH_SHORT).show()
             return
         }
+
+        val studies = GPSSampleDAO.sharedInstance().getStudies( configuration!!.id )
+
+        manageStudiesAdapter = ManageStudiesAdapter(studies)
+        manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
         binding.configNameTextView.text = "Configuration " + configuration!!.name + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -90,7 +90,7 @@ class ManageStudiesFragment : Fragment()
     {
         super.onResume()
 
-        val studies = GPSSampleDAO.sharedInstance().getStudies()
+        val studies = GPSSampleDAO.sharedInstance().getStudies( configuration!!.id )
 
         if (studies.isEmpty())
         {
