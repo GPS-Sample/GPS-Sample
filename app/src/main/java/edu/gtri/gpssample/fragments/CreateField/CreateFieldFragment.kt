@@ -14,6 +14,14 @@ import edu.gtri.gpssample.models.Field
 
 class CreateFieldFragment : Fragment()
 {
+    private lateinit var checkbox1Layout: LinearLayout
+    private lateinit var checkbox2Layout: LinearLayout
+    private lateinit var checkbox3Layout: LinearLayout
+    private lateinit var checkbox4Layout: LinearLayout
+    private lateinit var dropdown1Layout: LinearLayout
+    private lateinit var dropdown2Layout: LinearLayout
+    private lateinit var dropdown3Layout: LinearLayout
+    private lateinit var dropdown4Layout: LinearLayout
     private lateinit var checkbox1EditText: EditText
     private lateinit var checkbox2EditText: EditText
     private lateinit var checkbox3EditText: EditText
@@ -56,10 +64,20 @@ class CreateFieldFragment : Fragment()
         checkboxLayout = view.findViewById<LinearLayout>(R.id.layout_field_checkbox)
         dropdownLayout = view.findViewById<LinearLayout>(R.id.layout_field_dropdown)
 
+        checkbox1Layout = checkboxLayout.findViewById( R.id.option_1_layout )
+        checkbox2Layout = checkboxLayout.findViewById( R.id.option_2_layout )
+        checkbox3Layout = checkboxLayout.findViewById( R.id.option_3_layout )
+        checkbox4Layout = checkboxLayout.findViewById( R.id.option_4_layout )
+
         checkbox1EditText = checkboxLayout.findViewById( R.id.option_1_edit_text )
         checkbox2EditText = checkboxLayout.findViewById( R.id.option_2_edit_text )
         checkbox3EditText = checkboxLayout.findViewById( R.id.option_3_edit_text )
         checkbox4EditText = checkboxLayout.findViewById( R.id.option_4_edit_text )
+
+        dropdown1Layout = dropdownLayout.findViewById( R.id.option_1_layout )
+        dropdown2Layout = dropdownLayout.findViewById( R.id.option_2_layout )
+        dropdown3Layout = dropdownLayout.findViewById( R.id.option_3_layout )
+        dropdown4Layout = dropdownLayout.findViewById( R.id.option_4_layout )
 
         dropdown1EditText = dropdownLayout.findViewById( R.id.option_1_edit_text )
         dropdown2EditText = dropdownLayout.findViewById( R.id.option_2_edit_text )
@@ -131,21 +149,21 @@ class CreateFieldFragment : Fragment()
 
         checkboxAddAnotherButton.setOnClickListener {
 
-            if (checkbox1EditText.visibility == View.GONE)
+            if (checkbox1Layout.visibility == View.GONE)
             {
-                checkbox1EditText.visibility = View.VISIBLE
+                checkbox1Layout.visibility = View.VISIBLE
             }
-            else if (checkbox2EditText.visibility == View.GONE)
+            else if (checkbox2Layout.visibility == View.GONE)
             {
-                checkbox2EditText.visibility = View.VISIBLE
+                checkbox2Layout.visibility = View.VISIBLE
             }
-            else if (checkbox3EditText.visibility == View.GONE)
+            else if (checkbox3Layout.visibility == View.GONE)
             {
-                checkbox3EditText.visibility = View.VISIBLE
+                checkbox3Layout.visibility = View.VISIBLE
             }
-            else if (checkbox4EditText.visibility == View.GONE)
+            else if (checkbox4Layout.visibility == View.GONE)
             {
-                checkbox4EditText.visibility = View.VISIBLE
+                checkbox4Layout.visibility = View.VISIBLE
             }
         }
 
@@ -153,22 +171,78 @@ class CreateFieldFragment : Fragment()
 
         dropdownAddAnotherButton.setOnClickListener {
 
-            if (dropdown1EditText.visibility == View.GONE)
+            if (dropdown1Layout.visibility == View.GONE)
             {
-                dropdown1EditText.visibility = View.VISIBLE
+                dropdown1Layout.visibility = View.VISIBLE
             }
-            else if (dropdown2EditText.visibility == View.GONE)
+            else if (dropdown2Layout.visibility == View.GONE)
             {
-                dropdown2EditText.visibility = View.VISIBLE
+                dropdown2Layout.visibility = View.VISIBLE
             }
-            else if (dropdown3EditText.visibility == View.GONE)
+            else if (dropdown3Layout.visibility == View.GONE)
             {
-                dropdown3EditText.visibility = View.VISIBLE
+                dropdown3Layout.visibility = View.VISIBLE
             }
-            else if (dropdown4EditText.visibility == View.GONE)
+            else if (dropdown4Layout.visibility == View.GONE)
             {
-                dropdown4EditText.visibility = View.VISIBLE
+                dropdown4Layout.visibility = View.VISIBLE
             }
+        }
+
+        val checkbox1Button = checkboxLayout.findViewById<Button>(R.id.option_1_button)
+        checkbox1Button.setOnClickListener {
+
+            checkbox1EditText.setText("")
+            checkbox1Layout.visibility = View.GONE
+        }
+
+        val checkbox2Button = checkboxLayout.findViewById<Button>(R.id.option_2_button)
+        checkbox2Button.setOnClickListener {
+
+            checkbox2EditText.setText("")
+            checkbox2Layout.visibility = View.GONE
+        }
+
+        val checkbox3Button = checkboxLayout.findViewById<Button>(R.id.option_3_button)
+        checkbox3Button.setOnClickListener {
+
+            checkbox3EditText.setText("")
+            checkbox3Layout.visibility = View.GONE
+        }
+
+        val checkbox4Button = checkboxLayout.findViewById<Button>(R.id.option_4_button)
+        checkbox4Button.setOnClickListener {
+
+            checkbox4EditText.setText("")
+            checkbox4Layout.visibility = View.GONE
+        }
+
+        val dropdown1Button = dropdownLayout.findViewById<Button>(R.id.option_1_button)
+        dropdown1Button.setOnClickListener {
+
+            dropdown1EditText.setText("")
+            dropdown1Layout.visibility = View.GONE
+        }
+
+        val dropdown2Button = dropdownLayout.findViewById<Button>(R.id.option_2_button)
+        dropdown2Button.setOnClickListener {
+
+            dropdown2EditText.setText("")
+            dropdown2Layout.visibility = View.GONE
+        }
+
+        val dropdown3Button = dropdownLayout.findViewById<Button>(R.id.option_3_button)
+        dropdown3Button.setOnClickListener {
+
+            dropdown3EditText.setText("")
+            dropdown3Layout.visibility = View.GONE
+        }
+
+        val dropdown4Button = dropdownLayout.findViewById<Button>(R.id.option_4_button)
+        dropdown4Button.setOnClickListener {
+
+            dropdown4EditText.setText("")
+            dropdown4Layout.visibility = View.GONE
         }
 
         binding.cancelButton.setOnClickListener {
