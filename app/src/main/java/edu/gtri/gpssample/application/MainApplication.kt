@@ -4,7 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.graphics.Bitmap
-import edu.gtri.gpssample.models.FieldModel
+import edu.gtri.gpssample.models.Field
 import edu.gtri.gpssample.models.Study
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 
@@ -13,7 +13,7 @@ class MainApplication : Application()
     var barcodeBitmap : Bitmap? = null
 
 //    var users = mutableListOf<User>()
-    var fields = mutableListOf<FieldModel>()
+    var fields = mutableListOf<Field>()
     var studies = mutableListOf<Study>()
 //    var configurations = mutableListOf<Configuration>()
 

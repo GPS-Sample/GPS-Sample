@@ -4,11 +4,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import edu.gtri.gpssample.constants.DateFormat
-import edu.gtri.gpssample.constants.DistanceFormat
-import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.models.Configuration
+import edu.gtri.gpssample.models.Field
 import edu.gtri.gpssample.models.Study
 import edu.gtri.gpssample.models.User
 
@@ -47,6 +45,25 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
                 COLUMN_STUDY_CONFIG_ID + " INTEGER" +
                 ")")
         db.execSQL(createTableStudy)
+
+        val createTableField = ("CREATE TABLE " +
+                TABLE_FIELD + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY," +
+                COLUMN_FIELD_NAME + " TEXT," +
+                COLUMN_FIELD_STUDY_ID + " INTEGER," +
+                COLUMN_FIELD_TYPE + " STRING," +
+                COLUMN_FIELD_PII + " INTEGER," +
+                COLUMN_FIELD_REQUIRED + " INTEGER," +
+                COLUMN_FIELD_OPTION_1 + " STRING," +
+                COLUMN_FIELD_OPTION_2 + " STRING," +
+                COLUMN_FIELD_OPTION_3 + " STRING," +
+                COLUMN_FIELD_OPTION_4 + " STRING," +
+                COLUMN_FIELD_OPTION_1_CHECKED + " INTEGER," +
+                COLUMN_FIELD_OPTION_2_CHECKED + " INTEGER," +
+                COLUMN_FIELD_OPTION_3_CHECKED + " INTEGER," +
+                COLUMN_FIELD_OPTION_4_CHECKED + " INTEGER" +
+                ")")
+        db.execSQL(createTableStudy)
     }
 
     //--------------------------------------------------------------------------
@@ -55,6 +72,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIG)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDY)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FIELD)
         onCreate(db)
     }
 
@@ -356,6 +374,65 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         db.close()
     }
 
+    //--------------------------------------------------------------------------
+    fun createField( field: Field ) : Int
+    {
+        val values = ContentValues()
+
+        values.put( COLUMN_FIELD_NAME, field.name )
+        values.put( COLUMN_FIELD_STUDY_ID, field.studyId )
+        values.put( COLUMN_FIELD_TYPE, field.type.toString() )
+        values.put( COLUMN_FIELD_PII, field.pii )
+        values.put( COLUMN_FIELD_REQUIRED, field.required )
+        values.put( COLUMN_FIELD_OPTION_1, field.option1 )
+        values.put( COLUMN_FIELD_OPTION_2, field.option2 )
+        values.put( COLUMN_FIELD_OPTION_3, field.option3 )
+        values.put( COLUMN_FIELD_OPTION_4, field.option4 )
+        values.put( COLUMN_FIELD_OPTION_1_CHECKED, field.option1Checked )
+        values.put( COLUMN_FIELD_OPTION_2_CHECKED, field.option2Checked )
+        values.put( COLUMN_FIELD_OPTION_3_CHECKED, field.option3Checked )
+        values.put( COLUMN_FIELD_OPTION_4_CHECKED, field.option4Checked )
+
+        return this.writableDatabase.insert(TABLE_FIELD, null, values).toInt()
+    }
+
+    //--------------------------------------------------------------------------
+    fun getFields( studyId: Int ): List<Field>
+    {
+        val fields = ArrayList<Field>()
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_FIELD WHERE $COLUMN_FIELD_STUDY_ID = $studyId"
+
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val field = Field()
+
+            field.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
+            field.name = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_NAME))
+            field.studyId = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_STUDY_ID))
+            field.type = FieldType.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_TYPE)))
+            field.pii = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_PII))
+            field.required = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_REQUIRED))
+            field.option1 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1))
+            field.option2 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2))
+            field.option3 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3))
+            field.option4 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_4))
+            field.option1Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1_CHECKED))
+            field.option2Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2_CHECKED))
+            field.option3Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3_CHECKED))
+            field.option4Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_4_CHECKED))
+
+            fields.add( field )
+        }
+
+        cursor.close()
+        db.close()
+
+        return fields
+    }
+
     companion object
     {
         private const val DATABASE_VERSION = 11
@@ -382,6 +459,22 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         private const val TABLE_STUDY = "study"
         private const val COLUMN_STUDY_NAME = "study_name"
         private const val COLUMN_STUDY_CONFIG_ID = "study_config_id"
+
+        // Field Table
+        private const val TABLE_FIELD = "field"
+        private const val COLUMN_FIELD_NAME = "field_name"
+        private const val COLUMN_FIELD_STUDY_ID = "field_study_id"
+        private const val COLUMN_FIELD_TYPE = "field_type"
+        private const val COLUMN_FIELD_PII = "field_pii"
+        private const val COLUMN_FIELD_REQUIRED = "field_required"
+        private const val COLUMN_FIELD_OPTION_1 = "field_option_1"
+        private const val COLUMN_FIELD_OPTION_2 = "field_option_2"
+        private const val COLUMN_FIELD_OPTION_3 = "field_option_3"
+        private const val COLUMN_FIELD_OPTION_4 = "field_option_4"
+        private const val COLUMN_FIELD_OPTION_1_CHECKED = "field_option_1_checked"
+        private const val COLUMN_FIELD_OPTION_2_CHECKED = "field_option_2_checked"
+        private const val COLUMN_FIELD_OPTION_3_CHECKED = "field_option_3_checked"
+        private const val COLUMN_FIELD_OPTION_4_CHECKED = "field_option_4_checked"
 
         // creation/access methods
 

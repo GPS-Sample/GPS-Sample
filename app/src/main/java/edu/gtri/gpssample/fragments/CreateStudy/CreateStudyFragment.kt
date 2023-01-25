@@ -14,8 +14,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
-import edu.gtri.gpssample.models.Configuration
-import edu.gtri.gpssample.models.FieldModel
+import edu.gtri.gpssample.models.Field
 import edu.gtri.gpssample.models.Study
 
 class CreateStudyFragment : Fragment()
@@ -106,7 +105,7 @@ class CreateStudyFragment : Fragment()
         }
     }
 
-    fun onItemSelected(fieldModel: FieldModel, shouldDismissKeyboard: Boolean )
+    fun onItemSelected(fieldModel: Field, shouldDismissKeyboard: Boolean )
     {
     }
 

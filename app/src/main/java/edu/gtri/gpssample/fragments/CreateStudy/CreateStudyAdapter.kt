@@ -8,15 +8,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.FieldModel
+import edu.gtri.gpssample.models.Field
 
-class CreateStudyAdapter(var fields: List<FieldModel>?) : RecyclerView.Adapter<CreateStudyAdapter.ViewHolder>()
+class CreateStudyAdapter(var fields: List<Field>?) : RecyclerView.Adapter<CreateStudyAdapter.ViewHolder>()
 {
     override fun getItemCount() = fields!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((fieldModel: FieldModel, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var selectedItemCallback: ((fieldModel: Field, shouldDismissKeyboard: Boolean) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -30,7 +30,7 @@ class CreateStudyAdapter(var fields: List<FieldModel>?) : RecyclerView.Adapter<C
         return viewHolder
     }
 
-    fun updateFields( studies: List<FieldModel> )
+    fun updateFields( studies: List<Field> )
     {
         this.fields = fields
         notifyDataSetChanged()

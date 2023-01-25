@@ -1,10 +1,8 @@
 package edu.gtri.gpssample.fragments.CreateField
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
-import android.widget.AdapterView.OnItemSelectedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -12,7 +10,7 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
-import edu.gtri.gpssample.models.FieldModel
+import edu.gtri.gpssample.models.Field
 
 class CreateFieldFragment : Fragment()
 {
@@ -182,7 +180,7 @@ class CreateFieldFragment : Fragment()
 
             if (binding.fieldNameEditText.text.toString().length > 0)
             {
-                val fieldModel = FieldModel()
+                val fieldModel = Field()
                 fieldModel.name = binding.fieldNameEditText.text.toString()
                 (activity!!.application as MainApplication).fields.add( fieldModel )
 
