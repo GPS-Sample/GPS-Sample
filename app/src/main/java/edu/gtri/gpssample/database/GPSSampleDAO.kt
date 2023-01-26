@@ -298,7 +298,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         var study: Study? = null
 
         val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_ID = $id AND $COLUMN_STUDY_IS_VALID = 1"
+        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_ID = $id"
 
         val cursor = db.rawQuery(query, null)
 
@@ -329,7 +329,47 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     }
 
     //--------------------------------------------------------------------------
+    fun getStudies(): List<Study>
+    {
+        val studies = ArrayList<Study>()
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_STUDY"
+
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            studies.add( createStudy( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return studies
+    }
+
+    //--------------------------------------------------------------------------
     fun getStudies( configId: Int ): List<Study>
+    {
+        val studies = ArrayList<Study>()
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_STUDY_CONFIG_ID = $configId"
+
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            studies.add( createStudy( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return studies
+    }
+
+    //--------------------------------------------------------------------------
+    fun getValidStudies( configId: Int ): List<Study>
     {
         val studies = ArrayList<Study>()
         val db = this.writableDatabase
@@ -351,6 +391,13 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     //--------------------------------------------------------------------------
     fun deleteStudy( study: Study )
     {
+        val fields = getFields( study.id )
+
+        for (field in fields)
+        {
+            deleteField( field )
+        }
+
         val db = this.writableDatabase
         val whereClause = "$COLUMN_ID = ?"
         val args = arrayOf(study.id.toString())
@@ -465,6 +512,26 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     }
 
     //--------------------------------------------------------------------------
+    fun getFields(): List<Field>
+    {
+        val fields = ArrayList<Field>()
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_FIELD"
+
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            fields.add( createField( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return fields
+    }
+
+    //--------------------------------------------------------------------------
     fun deleteField( field: Field )
     {
         val db = this.writableDatabase
@@ -477,7 +544,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     //--------------------------------------------------------------------------
     companion object
     {
-        private const val DATABASE_VERSION = 14
+        private const val DATABASE_VERSION = 15
         private const val DATABASE_NAME = "GPSSampleDB.db"
         private const val COLUMN_ID = "id"
 

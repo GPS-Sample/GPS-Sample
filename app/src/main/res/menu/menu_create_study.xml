@@ -1,23 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="edu.gtri.gpssample.activities.CreateStudyActivity">
-
+    tools:context="edu.gtri.gpssample.activities.CreateFieldActivity">
     <item
-        android:id="@+id/action_create_study"
+        android:id="@+id/action_create_field"
         android:orderInCategory="100"
-        android:title="@string/create_study"
+        android:title="@string/create_field"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_edit_configuration"
-        android:orderInCategory="100"
-        android:title="@string/edit_config"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_delete_configuration"
-        android:orderInCategory="100"
-        android:title="@string/delete_config"
+        android:id="@+id/action_delete_study"
+        android:orderInCategory="101"
+        android:title="@string/delete_study"
         app:showAsAction="never" />
 </menu>

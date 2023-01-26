@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.CreateField
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
@@ -9,13 +8,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.CreateStudy.CreateStudyFragment
 import edu.gtri.gpssample.models.Field
 import edu.gtri.gpssample.models.Study
 
@@ -483,7 +480,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_delete_field, menu)
+        inflater.inflate(R.menu.menu_create_field, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
@@ -491,7 +488,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         when (item.itemId) {
             R.id.action_delete_field ->
             {
-                val confirmationDialog = ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?", this)
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?", this)
                 return true
             }
         }

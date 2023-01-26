@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.CreateStudy
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -11,14 +10,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.models.Field
 import edu.gtri.gpssample.models.Study
 
-class CreateStudyFragment : Fragment()
+class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var study: Study? = null;
     private var _binding: FragmentCreateStudyBinding? = null
@@ -150,7 +149,7 @@ class CreateStudyFragment : Fragment()
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_create_field, menu)
+        inflater.inflate(R.menu.menu_create_study, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
@@ -166,9 +165,25 @@ class CreateStudyFragment : Fragment()
 
                 return true
             }
+            R.id.action_delete_study -> {
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", this)
+            }
         }
 
         return false
+    }
+
+    override fun didAnswerNo()
+    {
+    }
+
+    override fun didAnswerYes()
+    {
+        if (study != null)
+        {
+            GPSSampleDAO.sharedInstance().deleteStudy( study!! )
+            findNavController().popBackStack()
+        }
     }
 
     override fun onDestroyView()

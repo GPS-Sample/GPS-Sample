@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
@@ -93,7 +92,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_create_configuration, menu)
+        inflater.inflate(R.menu.menu_manage_configurations, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean

@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.models.Configuration
 import edu.gtri.gpssample.models.Study
 
-class ManageStudiesFragment : Fragment()
+class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var config: Configuration? = null;
     private var _binding: FragmentManageStudiesBinding? = null
@@ -93,7 +93,7 @@ class ManageStudiesFragment : Fragment()
     {
         super.onResume()
 
-        val studies = GPSSampleDAO.sharedInstance().getStudies( config!!.id )
+        val studies = GPSSampleDAO.sharedInstance().getValidStudies( config!!.id )
 
         if (studies.isEmpty())
         {
@@ -123,7 +123,7 @@ class ManageStudiesFragment : Fragment()
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_create_study, menu)
+        inflater.inflate(R.menu.menu_manage_studies, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -145,13 +145,25 @@ class ManageStudiesFragment : Fragment()
                 return true
             }
             R.id.action_delete_configuration -> {
-                GPSSampleDAO.sharedInstance().deleteConfiguration( config!! )
-                findNavController().popBackStack()
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", this)
                 return true
             }
         }
 
         return false
+    }
+
+    override fun didAnswerNo()
+    {
+    }
+
+    override fun didAnswerYes()
+    {
+        if (config != null)
+        {
+            GPSSampleDAO.sharedInstance().deleteConfiguration( config!! )
+            findNavController().popBackStack()
+        }
     }
 
     override fun onDestroyView()

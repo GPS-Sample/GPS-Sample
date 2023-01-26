@@ -32,6 +32,15 @@ class MainActivity : AppCompatActivity()
         if (savedInstanceState == null)
         {
             GPSSampleDAO.createSharedInstance(applicationContext)
+
+            val configurations = GPSSampleDAO.sharedInstance().getConfigurations()
+            Log.d( "xxx", "found ${configurations.size} configs" )
+
+            val studies = GPSSampleDAO.sharedInstance().getStudies()
+            Log.d( "xxx", "found ${studies.size} studies" )
+
+            val fields = GPSSampleDAO.sharedInstance().getFields()
+            Log.d( "xxx", "found ${fields.size} fields" )
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

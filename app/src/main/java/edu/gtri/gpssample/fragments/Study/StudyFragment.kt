@@ -24,7 +24,6 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
 import edu.gtri.gpssample.models.Study
-import edu.gtri.gpssample.models.User
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -269,7 +268,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_edit_study, menu)
+        inflater.inflate(R.menu.menu_study, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
