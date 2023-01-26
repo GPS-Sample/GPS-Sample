@@ -103,10 +103,6 @@
         <action
             android:id="@+id/action_navigate_to_CreateStudyFragment"
             app:destination="@id/CreateStudyFragment"/>
-
-        <action
-            android:id="@+id/action_navigate_to_StudyFragment"
-            app:destination="@id/StudyFragment"/>
     </fragment>
 
     <fragment
@@ -117,6 +113,10 @@
         <action
             android:id="@+id/action_navigate_to_CreateFieldFragment"
             app:destination="@id/CreateFieldFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_ManageStudyFragment"
+            app:destination="@id/ManageStudyFragment"/>
     </fragment>
 
     <fragment
@@ -126,13 +126,13 @@
     </fragment>
 
     <fragment
-        android:id="@+id/StudyFragment"
-        android:name="edu.gtri.gpssample.fragments.Study.StudyFragment"
-        tools:layout="@layout/fragment_study">
+        android:id="@+id/ManageStudyFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageStudy.ManageStudyFragment"
+        tools:layout="@layout/fragment_manage_study">
 
-        <action
-            android:id="@+id/action_navigate_to_CreateStudyFragment"
-            app:destination="@id/CreateStudyFragment"/>
+<!--        <action-->
+<!--            android:id="@+id/action_navigate_to_CreateStudyFragment"-->
+<!--            app:destination="@id/CreateStudyFragment"/>-->
     </fragment>
 
     <fragment

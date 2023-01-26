@@ -121,6 +121,18 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             findNavController().popBackStack()
         }
+
+        binding.manageButton.setOnClickListener {
+
+            if (study!!.isValid)
+            {
+                val bundle = Bundle()
+
+                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+
+                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
+            }
+        }
     }
 
     override fun onResume()
@@ -132,6 +144,15 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             val fields = DAO.fieldDAO.getFields(study!!.id)
 
             createStudyAdapter.updateFields( fields )
+
+            if (study!!.isValid)
+            {
+                binding.manageButton.visibility = View.VISIBLE
+            }
+            else
+            {
+                binding.manageButton.visibility = View.GONE
+            }
         }
     }
 

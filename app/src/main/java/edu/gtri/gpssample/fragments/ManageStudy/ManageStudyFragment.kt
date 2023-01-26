@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.Study
+package edu.gtri.gpssample.fragments.ManageStudy
 
 import android.graphics.Color
 import android.net.wifi.WifiManager
@@ -22,7 +22,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.databinding.FragmentStudyBinding
+import edu.gtri.gpssample.databinding.FragmentManageStudyBinding
 import edu.gtri.gpssample.models.Study
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
@@ -37,28 +37,28 @@ import java.net.NetworkInterface
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate
+class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate
 {
     private var study: Study? = null
-    private var _binding: FragmentStudyBinding? = null
+    private var _binding: FragmentManageStudyBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
-    private lateinit var studyAdapter: StudyAdapter
+    private lateinit var studyAdapter: ManageStudyAdapter
     private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
-    private lateinit var viewModel: StudyViewModel
+    private lateinit var viewModel: ManageStudyViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(StudyViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(ManageStudyViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         setHasOptionsMenu( true )
 
-        _binding = FragmentStudyBinding.inflate(inflater, container, false)
+        _binding = FragmentManageStudyBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -99,22 +99,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
         val users = DAO.userDAO.getUsers()
 
-//        if ((activity!!.application as MainApplication).users.isEmpty())
-//        {
-//            var user1 = User()
-//            user1.name = "Russell"
-//            (activity!!.application as MainApplication).users.add( user1 )
-//
-//            var user2 = User()
-//            user2.name = "Brian"
-//            (activity!!.application as MainApplication).users.add( user2 )
-//
-//            var user3 = User()
-//            user3.name = "Megan"
-//            (activity!!.application as MainApplication).users.add( user3 )
-//        }
-
-        studyAdapter = StudyAdapter(users)
+        studyAdapter = ManageStudyAdapter(users)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = studyAdapter
@@ -180,7 +165,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
                             lifecycleScope.launchWhenStarted {
                                 whenStarted {
-                                    udpBroadcastReceiver.beginListening( inetAddress!!, this@StudyFragment )
+                                    udpBroadcastReceiver.beginListening( inetAddress!!, this@ManageStudyFragment )
                                 }
                             }
                         }
