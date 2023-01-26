@@ -4,7 +4,7 @@ import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
 
-class Configuration
+class Config
 {
     var id: Int = -1
     var name: String = ""

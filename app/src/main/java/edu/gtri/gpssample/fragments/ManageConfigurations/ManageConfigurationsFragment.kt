@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.models.Configuration
+import edu.gtri.gpssample.models.Config
 
 class ManageConfigurationsFragment : Fragment()
 {
@@ -47,7 +47,7 @@ class ManageConfigurationsFragment : Fragment()
             }
         }
 
-        manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Configuration>())
+        manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Config>())
         manageConfigurationsAdapter.selectedItemCallback = this::onItemSelected
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -63,7 +63,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         super.onResume()
 
-        val configurations = GPSSampleDAO.configDAO.getConfigurations()
+        val configurations = DAO.configDAO.getConfigs()
 
         if (configurations.isEmpty())
         {
@@ -79,7 +79,7 @@ class ManageConfigurationsFragment : Fragment()
         manageConfigurationsAdapter.updateConfigurations(configurations)
     }
 
-    fun onItemSelected(configuration: Configuration, shouldDismissKeyboard: Boolean )
+    fun onItemSelected(configuration: Config, shouldDismissKeyboard: Boolean )
     {
         val bundle = Bundle()
 

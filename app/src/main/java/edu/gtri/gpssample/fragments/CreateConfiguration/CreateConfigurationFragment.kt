@@ -2,7 +2,6 @@ package edu.gtri.gpssample.fragments.CreateConfiguration
 
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,18 +12,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.TimeFormat
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
-import edu.gtri.gpssample.models.Configuration
+import edu.gtri.gpssample.models.Config
 
 class CreateConfigurationFragment : Fragment()
 {
-    private var config: Configuration? = null;
+    private var config: Config? = null;
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: CreateConfigurationViewModel
@@ -49,7 +47,7 @@ class CreateConfigurationFragment : Fragment()
 
         if (configId != null)
         {
-            config = GPSSampleDAO.configDAO.getConfig( configId!! )
+            config = DAO.configDAO.getConfig( configId!! )
         }
 
         binding.fragmentRootLayout.setOnClickListener {
@@ -125,7 +123,7 @@ class CreateConfigurationFragment : Fragment()
 
             if (config == null)
             {
-                config = Configuration()
+                config = Config()
             }
 
             config!!.name = binding.configNameEditText.text.toString()
@@ -158,12 +156,12 @@ class CreateConfigurationFragment : Fragment()
 
             if (config!!.id < 0)
             {
-                config!!.id = GPSSampleDAO.configDAO.createConfig( config!! )
+                config!!.id = DAO.configDAO.createConfig( config!! )
                 findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
             }
             else
             {
-                GPSSampleDAO.configDAO.updateConfig( config!! )
+                DAO.configDAO.updateConfig( config!! )
                 findNavController().popBackStack()
             }
         }

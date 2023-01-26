@@ -5,31 +5,31 @@ import android.database.Cursor
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
-import edu.gtri.gpssample.models.Configuration
+import edu.gtri.gpssample.models.Config
 
-class ConfigDAO(private var dao: GPSSampleDAO)
+class ConfigDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createConfig( configuration: Configuration) : Int
+    fun createConfig( config: Config ) : Int
     {
         val values = ContentValues()
 
-        values.put(GPSSampleDAO.COLUMN_CONFIG_NAME, configuration.name )
-        values.put(GPSSampleDAO.COLUMN_CONFIG_DISTANCE_FORMAT, configuration.distanceFormat.toString() )
-        values.put(GPSSampleDAO.COLUMN_CONFIG_DATE_FORMAT, configuration.dateFormat.toString() )
-        values.put(GPSSampleDAO.COLUMN_CONFIG_TIME_FORMAT, configuration.timeFormat.toString() )
-        values.put(GPSSampleDAO.COLUMN_CONFIG_MIN_GPS_PRECISION, configuration.minGpsPrecision )
+        values.put(DAO.COLUMN_CONFIG_NAME, config.name )
+        values.put(DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat.toString() )
+        values.put(DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat.toString() )
+        values.put(DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat.toString() )
+        values.put(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
 
-        return dao.writableDatabase.insert(GPSSampleDAO.TABLE_CONFIG, null, values).toInt()
+        return dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
     }
 
     //--------------------------------------------------------------------------
-    fun getConfig( id: Int ): Configuration?
+    fun getConfig( id: Int ): Config?
     {
-        var config: Configuration? = null
+        var config: Config? = null
 
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${GPSSampleDAO.TABLE_CONFIG} WHERE ${GPSSampleDAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_ID} = $id"
 
         val cursor = db.rawQuery(query, null)
 
@@ -47,76 +47,76 @@ class ConfigDAO(private var dao: GPSSampleDAO)
     }
 
     //--------------------------------------------------------------------------
-    fun createConfig( cursor: Cursor) : Configuration
+    fun createConfig( cursor: Cursor) : Config
     {
-        val config = Configuration()
+        val config = Config()
 
         config.id = Integer.parseInt(cursor.getString(0))
-        config.name = cursor.getString(cursor.getColumnIndex(GPSSampleDAO.COLUMN_CONFIG_NAME))
+        config.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
         config.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(
-            GPSSampleDAO.COLUMN_CONFIG_DISTANCE_FORMAT
+            DAO.COLUMN_CONFIG_DISTANCE_FORMAT
         )))
-        config.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(GPSSampleDAO.COLUMN_CONFIG_DATE_FORMAT)))
-        config.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(GPSSampleDAO.COLUMN_CONFIG_TIME_FORMAT)))
-        config.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(GPSSampleDAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
+        config.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT)))
+        config.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT)))
+        config.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
 
         return config
     }
 
     //--------------------------------------------------------------------------
-    fun getConfigurations(): List<Configuration>
+    fun getConfigs(): List<Config>
     {
-        val configurations = ArrayList<Configuration>()
+        val configs = ArrayList<Config>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${GPSSampleDAO.TABLE_CONFIG}"
+        val query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
 
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            configurations.add( createConfig( cursor ))
+            configs.add( createConfig( cursor ))
         }
 
         cursor.close()
         db.close()
 
-        return configurations
+        return configs
     }
 
     //--------------------------------------------------------------------------
-    fun updateConfig( configuration: Configuration)
+    fun updateConfig( config: Config)
     {
         val db = dao.writableDatabase
-        val whereClause = "${GPSSampleDAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(configuration.id.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(config.id.toString())
 
         val values = ContentValues()
 
-        values.put(GPSSampleDAO.COLUMN_CONFIG_NAME, configuration.name )
-        values.put(GPSSampleDAO.COLUMN_CONFIG_DISTANCE_FORMAT, configuration.distanceFormat.toString())
-        values.put(GPSSampleDAO.COLUMN_CONFIG_DATE_FORMAT, configuration.dateFormat.toString())
-        values.put(GPSSampleDAO.COLUMN_CONFIG_TIME_FORMAT, configuration.timeFormat.toString())
-        values.put(GPSSampleDAO.COLUMN_CONFIG_MIN_GPS_PRECISION, configuration.minGpsPrecision )
+        values.put(DAO.COLUMN_CONFIG_NAME, config.name )
+        values.put(DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat.toString())
+        values.put(DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat.toString())
+        values.put(DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat.toString())
+        values.put(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
 
-        db.update(GPSSampleDAO.TABLE_CONFIG, values, whereClause, args )
+        db.update(DAO.TABLE_CONFIG, values, whereClause, args )
         db.close()
     }
 
     //--------------------------------------------------------------------------
-    fun deleteConfig( configuration: Configuration)
+    fun deleteConfig( config: Config)
     {
-        val studies = GPSSampleDAO.studyDAO.getStudies( configuration.id )
+        val studies = DAO.studyDAO.getStudies( config.id )
 
         for (study in studies)
         {
-            GPSSampleDAO.studyDAO.deleteStudy( study )
+            DAO.studyDAO.deleteStudy( study )
         }
 
         val db = dao.writableDatabase
-        val whereClause = "${GPSSampleDAO.COLUMN_ID} = ?"
-        val args = arrayOf(configuration.id.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args = arrayOf(config.id.toString())
 
-        db.delete(GPSSampleDAO.TABLE_CONFIG, whereClause, args)
+        db.delete(DAO.TABLE_CONFIG, whereClause, args)
         db.close()
     }
 }

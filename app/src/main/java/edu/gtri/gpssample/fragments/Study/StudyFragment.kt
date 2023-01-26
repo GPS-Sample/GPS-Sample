@@ -21,7 +21,7 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentStudyBinding
 import edu.gtri.gpssample.models.Study
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
@@ -81,7 +81,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             return
         }
 
-        study = GPSSampleDAO.studyDAO.getStudy( studyId )
+        study = DAO.studyDAO.getStudy( studyId )
 
         if (study == null)
         {
@@ -97,7 +97,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             }
         }
 
-        val users = GPSSampleDAO.userDAO.getUsers()
+        val users = DAO.userDAO.getUsers()
 
 //        if ((activity!!.application as MainApplication).users.isEmpty())
 //        {
@@ -285,7 +285,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             }
 
             R.id.action_delete_study -> {
-                GPSSampleDAO.studyDAO.deleteStudy( study!! )
+                DAO.studyDAO.deleteStudy( study!! )
                 findNavController().popBackStack()
                 return true
             }

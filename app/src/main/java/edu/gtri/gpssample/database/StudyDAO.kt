@@ -5,7 +5,7 @@ import android.database.Cursor
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.models.Study
 
-class StudyDAO(private var dao: GPSSampleDAO)
+class StudyDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
     fun createStudy( study: Study) : Int
@@ -14,29 +14,29 @@ class StudyDAO(private var dao: GPSSampleDAO)
 
         putStudy( study, values )
 
-        return dao.writableDatabase.insert(GPSSampleDAO.TABLE_STUDY, null, values).toInt()
+        return dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
     }
 
     //--------------------------------------------------------------------------
     fun putStudy(study: Study, values: ContentValues)
     {
-        values.put(GPSSampleDAO.COLUMN_STUDY_NAME, study.name )
-        values.put(GPSSampleDAO.COLUMN_STUDY_CONFIG_ID, study.configId )
-        values.put(GPSSampleDAO.COLUMN_STUDY_IS_VALID, study.isValid )
+        values.put(DAO.COLUMN_STUDY_NAME, study.name )
+        values.put(DAO.COLUMN_STUDY_CONFIG_ID, study.configId )
+        values.put(DAO.COLUMN_STUDY_IS_VALID, study.isValid )
     }
 
     //--------------------------------------------------------------------------
     fun updateStudy( study: Study)
     {
         val db = dao.writableDatabase
-        val whereClause = "${GPSSampleDAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(study.id.toString())
 
         val values = ContentValues()
 
         putStudy( study, values )
 
-        db.update(GPSSampleDAO.TABLE_STUDY, values, whereClause, args )
+        db.update(DAO.TABLE_STUDY, values, whereClause, args )
         db.close()
     }
 
@@ -46,7 +46,7 @@ class StudyDAO(private var dao: GPSSampleDAO)
         var study: Study? = null
 
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${GPSSampleDAO.TABLE_STUDY} WHERE ${GPSSampleDAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_ID} = $id"
 
         val cursor = db.rawQuery(query, null)
 
@@ -69,9 +69,9 @@ class StudyDAO(private var dao: GPSSampleDAO)
         val study = Study()
 
         study.id = Integer.parseInt(cursor.getString(0))
-        study.name = cursor.getString(cursor.getColumnIndex(GPSSampleDAO.COLUMN_STUDY_NAME))
-        study.configId = cursor.getInt(cursor.getColumnIndex(GPSSampleDAO.COLUMN_STUDY_CONFIG_ID))
-        study.isValid = cursor.getInt(cursor.getColumnIndex(GPSSampleDAO.COLUMN_STUDY_IS_VALID)).toBoolean()
+        study.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
+        study.configId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_ID))
+        study.isValid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_IS_VALID)).toBoolean()
 
         return study
     }
@@ -81,7 +81,7 @@ class StudyDAO(private var dao: GPSSampleDAO)
     {
         val studies = ArrayList<Study>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${GPSSampleDAO.TABLE_STUDY}"
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY}"
 
         val cursor = db.rawQuery(query, null)
 
@@ -101,7 +101,7 @@ class StudyDAO(private var dao: GPSSampleDAO)
     {
         val studies = ArrayList<Study>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${GPSSampleDAO.TABLE_STUDY} WHERE ${GPSSampleDAO.COLUMN_STUDY_CONFIG_ID} = $configId"
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_STUDY_CONFIG_ID} = $configId"
 
         val cursor = db.rawQuery(query, null)
 
@@ -121,7 +121,7 @@ class StudyDAO(private var dao: GPSSampleDAO)
     {
         val studies = ArrayList<Study>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${GPSSampleDAO.TABLE_STUDY} WHERE ${GPSSampleDAO.COLUMN_STUDY_CONFIG_ID} = $configId AND ${GPSSampleDAO.COLUMN_STUDY_IS_VALID} = 1"
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_STUDY_CONFIG_ID} = $configId AND ${DAO.COLUMN_STUDY_IS_VALID} = 1"
 
         val cursor = db.rawQuery(query, null)
 
@@ -139,17 +139,17 @@ class StudyDAO(private var dao: GPSSampleDAO)
     //--------------------------------------------------------------------------
     fun deleteStudy( study: Study)
     {
-        val fields = GPSSampleDAO.fieldDAO.getFields( study.id )
+        val fields = DAO.fieldDAO.getFields( study.id )
 
         for (field in fields)
         {
-            GPSSampleDAO.fieldDAO.deleteField( field )
+            DAO.fieldDAO.deleteField( field )
         }
 
         val db = dao.writableDatabase
-        val whereClause = "${GPSSampleDAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(study.id.toString())
-        db.delete(GPSSampleDAO.TABLE_STUDY, whereClause, args)
+        db.delete(DAO.TABLE_STUDY, whereClause, args)
         db.close()
     }
 }

@@ -1,19 +1,10 @@
 package edu.gtri.gpssample.database
 
-import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import androidx.core.content.contentValuesOf
-import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.extensions.toBoolean
-import edu.gtri.gpssample.models.Configuration
-import edu.gtri.gpssample.models.Field
-import edu.gtri.gpssample.models.Study
-import edu.gtri.gpssample.models.User
 
-class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
+class DAO(context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
 {
     //--------------------------------------------------------------------------
@@ -130,13 +121,13 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
         // creation/access methods
 
-        private var instance: GPSSampleDAO? = null
+        private var instance: DAO? = null
 
-        fun createSharedInstance( context: Context ): GPSSampleDAO
+        fun createSharedInstance( context: Context ): DAO
         {
             if (instance == null)
             {
-                instance = GPSSampleDAO( context, null, null, DATABASE_VERSION )
+                instance = DAO( context, null, null, DATABASE_VERSION )
 
                 userDAO = UserDAO( instance!! )
                 configDAO = ConfigDAO( instance!! )
@@ -147,7 +138,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             return instance!!
         }
 
-        fun sharedInstance(): GPSSampleDAO
+        fun sharedInstance(): DAO
         {
             return instance!!
         }

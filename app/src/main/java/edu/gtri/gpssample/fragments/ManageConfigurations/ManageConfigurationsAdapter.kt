@@ -8,15 +8,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.Configuration
+import edu.gtri.gpssample.models.Config
 
-class ManageConfigurationsAdapter(var configurations: List<Configuration>?) : RecyclerView.Adapter<ManageConfigurationsAdapter.ViewHolder>()
+class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerView.Adapter<ManageConfigurationsAdapter.ViewHolder>()
 {
     override fun getItemCount() = configurations!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((configurationModel: Configuration, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var selectedItemCallback: ((configurationModel: Config, shouldDismissKeyboard: Boolean) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -30,7 +30,7 @@ class ManageConfigurationsAdapter(var configurations: List<Configuration>?) : Re
         return viewHolder
     }
 
-    fun updateConfigurations( configurations: List<Configuration> )
+    fun updateConfigurations( configurations: List<Config> )
     {
         this.configurations = configurations
         notifyDataSetChanged()

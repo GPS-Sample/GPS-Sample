@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.models.Field
@@ -64,7 +64,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (studyId > 0)
         {
-            study = GPSSampleDAO.studyDAO.getStudy( studyId!! )
+            study = DAO.studyDAO.getStudy( studyId!! )
             if (study == null)
             {
                 Toast.makeText(activity!!.applicationContext, "Fatal Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
@@ -77,7 +77,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             study = Study()
             study!!.isValid = false
             study!!.configId = configId!!
-            study!!.id = GPSSampleDAO.studyDAO.createStudy( study!! )
+            study!!.id = DAO.studyDAO.createStudy( study!! )
         }
         else
         {
@@ -112,11 +112,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             if (study!!.id < 0)
             {
-                study!!.id = GPSSampleDAO.studyDAO.createStudy( study!! )
+                study!!.id = DAO.studyDAO.createStudy( study!! )
             }
             else
             {
-                GPSSampleDAO.studyDAO.updateStudy( study!! )
+                DAO.studyDAO.updateStudy( study!! )
             }
 
             findNavController().popBackStack()
@@ -129,7 +129,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (study != null)
         {
-            val fields = GPSSampleDAO.fieldDAO.getFields(study!!.id)
+            val fields = DAO.fieldDAO.getFields(study!!.id)
 
             createStudyAdapter.updateFields( fields )
         }
@@ -181,7 +181,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         if (study != null)
         {
-            GPSSampleDAO.studyDAO.deleteStudy( study!! )
+            DAO.studyDAO.deleteStudy( study!! )
             findNavController().popBackStack()
         }
     }

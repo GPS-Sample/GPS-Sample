@@ -1,8 +1,6 @@
 package edu.gtri.gpssample.fragments.SignIn
 
 import android.os.Bundle
-import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +13,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
 
 class SignInFragment : Fragment()
@@ -79,7 +77,7 @@ class SignInFragment : Fragment()
             }
             else
             {
-                val user = GPSSampleDAO.userDAO.getUser( userId )
+                val user = DAO.userDAO.getUser( userId )
 
                 if (user == null)
                 {

@@ -11,15 +11,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.models.Configuration
+import edu.gtri.gpssample.models.Config
 import edu.gtri.gpssample.models.Study
 
 class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var config: Configuration? = null;
+    private var config: Config? = null;
     private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
@@ -64,7 +64,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             return
         }
 
-        config = GPSSampleDAO.configDAO.getConfig( configId )
+        config = DAO.configDAO.getConfig( configId )
         if (config == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Configuration with id: $configId not found.", Toast.LENGTH_SHORT).show()
@@ -93,7 +93,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         super.onResume()
 
-        val studies = GPSSampleDAO.studyDAO.getValidStudies( config!!.id )
+        val studies = DAO.studyDAO.getValidStudies( config!!.id )
 
         if (studies.isEmpty())
         {
@@ -161,7 +161,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         if (config != null)
         {
-            GPSSampleDAO.configDAO.deleteConfig( config!! )
+            DAO.configDAO.deleteConfig( config!! )
             findNavController().popBackStack()
         }
     }

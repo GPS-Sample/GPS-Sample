@@ -13,7 +13,7 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.models.User
 
@@ -78,7 +78,7 @@ class SignUpFragment : Fragment()
                 user.recoveryQuestion = question
                 user.recoveryAnswer = answer
 
-                user.id = GPSSampleDAO.userDAO.createUser( user )
+                user.id = DAO.userDAO.createUser( user )
 
                 val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
                 val editor = sharedPreferences.edit()

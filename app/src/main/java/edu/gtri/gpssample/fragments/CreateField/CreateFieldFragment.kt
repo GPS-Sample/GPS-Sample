@@ -10,7 +10,7 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.models.Field
@@ -77,7 +77,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        study = GPSSampleDAO.studyDAO.getStudy( studyId )
+        study = DAO.studyDAO.getStudy( studyId )
         if (study == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
@@ -88,7 +88,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (fieldId > 0)
         {
-            field = GPSSampleDAO.fieldDAO.getField( fieldId )
+            field = DAO.fieldDAO.getField( fieldId )
         }
 
         textLayout = view.findViewById<LinearLayout>(R.id.layout_field_text)
@@ -387,7 +387,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 if (field == null)
                 {
                     field = Field()
-                    field!!.id = GPSSampleDAO.fieldDAO.createField( field!! )
+                    field!!.id = DAO.fieldDAO.createField( field!! )
                     field!!.studyId = study!!.id
                 }
 
@@ -469,7 +469,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                     }
                 }
 
-                GPSSampleDAO.fieldDAO.updateField( field!! )
+                DAO.fieldDAO.updateField( field!! )
 
                 findNavController().popBackStack()
             }
@@ -502,7 +502,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     override fun didAnswerYes()
     {
-        GPSSampleDAO.fieldDAO.deleteField( field!! )
+        DAO.fieldDAO.deleteField( field!! )
 
         findNavController().popBackStack()
     }

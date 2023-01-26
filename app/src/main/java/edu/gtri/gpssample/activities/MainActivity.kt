@@ -4,19 +4,15 @@ import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
 import androidx.core.content.ContextCompat
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.GPSSampleDAO
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
-import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 
 class MainActivity : AppCompatActivity()
@@ -31,15 +27,15 @@ class MainActivity : AppCompatActivity()
 
         if (savedInstanceState == null)
         {
-            GPSSampleDAO.createSharedInstance(applicationContext)
+            DAO.createSharedInstance(applicationContext)
 
-            val configurations = GPSSampleDAO.configDAO.getConfigurations()
+            val configurations = DAO.configDAO.getConfigs()
             Log.d( "xxx", "found ${configurations.size} configurations" )
 
-            val studies = GPSSampleDAO.studyDAO.getStudies()
+            val studies = DAO.studyDAO.getStudies()
             Log.d( "xxx", "found ${studies.size} studies" )
 
-            val fields = GPSSampleDAO.fieldDAO.getFields()
+            val fields = DAO.fieldDAO.getFields()
             Log.d( "xxx", "found ${fields.size} fields" )
         }
 
