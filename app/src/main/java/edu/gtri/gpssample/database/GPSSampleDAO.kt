@@ -42,7 +42,8 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
                 TABLE_STUDY + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
                 COLUMN_STUDY_NAME + " TEXT," +
-                COLUMN_STUDY_CONFIG_ID + " INTEGER" +
+                COLUMN_STUDY_CONFIG_ID + " INTEGER," +
+                COLUMN_STUDY_IS_VALID + " INTEGER" +
                 ")")
         db.execSQL(createTableStudy)
 
@@ -54,16 +55,15 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
                 COLUMN_FIELD_TYPE + " STRING," +
                 COLUMN_FIELD_PII + " INTEGER," +
                 COLUMN_FIELD_REQUIRED + " INTEGER," +
+                COLUMN_FIELD_INTEGER_ONLY + " INTEGER," +
+                COLUMN_FIELD_DATE + " INTEGER," +
+                COLUMN_FIELD_TIME + " INTEGER," +
                 COLUMN_FIELD_OPTION_1 + " STRING," +
                 COLUMN_FIELD_OPTION_2 + " STRING," +
                 COLUMN_FIELD_OPTION_3 + " STRING," +
-                COLUMN_FIELD_OPTION_4 + " STRING," +
-                COLUMN_FIELD_OPTION_1_CHECKED + " INTEGER," +
-                COLUMN_FIELD_OPTION_2_CHECKED + " INTEGER," +
-                COLUMN_FIELD_OPTION_3_CHECKED + " INTEGER," +
-                COLUMN_FIELD_OPTION_4_CHECKED + " INTEGER" +
+                COLUMN_FIELD_OPTION_4 + " STRING" +
                 ")")
-        db.execSQL(createTableStudy)
+        db.execSQL(createTableField)
     }
 
     //--------------------------------------------------------------------------
@@ -95,7 +95,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     {
         var user: User? = null
         val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_USER WHERE ID = ${id}"
+        val query = "SELECT * FROM $TABLE_USER WHERE $COLUMN_ID = $id"
 
         val cursor = db.rawQuery(query, null)
 
@@ -168,7 +168,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         var configuration: Configuration? = null
 
         val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_CONFIG WHERE ID = ${id}"
+        val query = "SELECT * FROM $TABLE_CONFIG WHERE $COLUMN_ID = $id"
 
         val cursor = db.rawQuery(query, null)
 
@@ -225,7 +225,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     fun updateConfiguration( configuration: Configuration )
     {
         val db = this.writableDatabase
-        val whereClause = "${COLUMN_ID} = ?"
+        val whereClause = "$COLUMN_ID = ?"
         val args: Array<String> = arrayOf(configuration.id.toString())
 
         val values = ContentValues()
@@ -265,6 +265,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
         values.put( COLUMN_STUDY_NAME, study.name )
         values.put( COLUMN_STUDY_CONFIG_ID, study.configId )
+        values.put( COLUMN_STUDY_IS_VALID, study.isValid )
 
         return this.writableDatabase.insert(TABLE_STUDY, null, values).toInt()
     }
@@ -275,7 +276,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         var study: Study? = null
 
         val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY WHERE ID = ${id}"
+        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_ID = $id AND $COLUMN_STUDY_IS_VALID = 1"
 
         val cursor = db.rawQuery(query, null)
 
@@ -288,6 +289,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             study.id = Integer.parseInt(cursor.getString(0))
             study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
             study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
+            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID))
         }
 
         cursor.close()
@@ -301,7 +303,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     {
         val studies = ArrayList<Study>()
         val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY"
+        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_STUDY_IS_VALID = 1"
 
         val cursor = db.rawQuery(query, null)
 
@@ -312,6 +314,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             study.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
             study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
             study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
+            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID))
 
             studies.add( study )
         }
@@ -327,7 +330,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     {
         val studies = ArrayList<Study>()
         val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_STUDY_CONFIG_ID = $configId"
+        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_STUDY_CONFIG_ID = $configId AND $COLUMN_STUDY_IS_VALID = 1"
 
         val cursor = db.rawQuery(query, null)
 
@@ -338,6 +341,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             study.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
             study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
             study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
+            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID))
 
             studies.add( study )
         }
@@ -352,14 +356,14 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     fun updateStudy( study: Study )
     {
         val db = this.writableDatabase
-        val whereClause = "${COLUMN_ID} = ?"
+        val whereClause = "$COLUMN_ID = ?"
         val args: Array<String> = arrayOf(study.id.toString())
 
         val values = ContentValues()
 
         values.put( COLUMN_STUDY_NAME, study.name )
         values.put( COLUMN_STUDY_CONFIG_ID, study.configId )
-
+        values.put( COLUMN_STUDY_IS_VALID, study.isValid )
         db.update( TABLE_STUDY, values, whereClause, args )
         db.close()
     }
@@ -368,7 +372,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     fun deleteStudy( study: Study )
     {
         val db = this.writableDatabase
-        val whereClause = "${COLUMN_ID} = ?"
+        val whereClause = "$COLUMN_ID = ?"
         val args = arrayOf(study.id.toString())
         db.delete(TABLE_STUDY, whereClause, args)
         db.close()
@@ -384,14 +388,13 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         values.put( COLUMN_FIELD_TYPE, field.type.toString() )
         values.put( COLUMN_FIELD_PII, field.pii )
         values.put( COLUMN_FIELD_REQUIRED, field.required )
+        values.put( COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
+        values.put( COLUMN_FIELD_DATE, field.date )
+        values.put( COLUMN_FIELD_TIME, field.time )
         values.put( COLUMN_FIELD_OPTION_1, field.option1 )
         values.put( COLUMN_FIELD_OPTION_2, field.option2 )
         values.put( COLUMN_FIELD_OPTION_3, field.option3 )
         values.put( COLUMN_FIELD_OPTION_4, field.option4 )
-        values.put( COLUMN_FIELD_OPTION_1_CHECKED, field.option1Checked )
-        values.put( COLUMN_FIELD_OPTION_2_CHECKED, field.option2Checked )
-        values.put( COLUMN_FIELD_OPTION_3_CHECKED, field.option3Checked )
-        values.put( COLUMN_FIELD_OPTION_4_CHECKED, field.option4Checked )
 
         return this.writableDatabase.insert(TABLE_FIELD, null, values).toInt()
     }
@@ -415,14 +418,13 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             field.type = FieldType.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_TYPE)))
             field.pii = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_PII))
             field.required = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_REQUIRED))
+            field.integerOnly = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_INTEGER_ONLY))
+            field.date = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_DATE))
+            field.time = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_TIME))
             field.option1 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1))
             field.option2 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2))
             field.option3 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3))
             field.option4 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_4))
-            field.option1Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1_CHECKED))
-            field.option2Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2_CHECKED))
-            field.option3Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3_CHECKED))
-            field.option4Checked = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_OPTION_4_CHECKED))
 
             fields.add( field )
         }
@@ -435,7 +437,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
     companion object
     {
-        private const val DATABASE_VERSION = 11
+        private const val DATABASE_VERSION = 13
         private const val DATABASE_NAME = "GPSSampleDB.db"
         private const val COLUMN_ID = "id"
 
@@ -459,6 +461,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         private const val TABLE_STUDY = "study"
         private const val COLUMN_STUDY_NAME = "study_name"
         private const val COLUMN_STUDY_CONFIG_ID = "study_config_id"
+        private const val COLUMN_STUDY_IS_VALID = "study_is_valid"
 
         // Field Table
         private const val TABLE_FIELD = "field"
@@ -467,14 +470,13 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         private const val COLUMN_FIELD_TYPE = "field_type"
         private const val COLUMN_FIELD_PII = "field_pii"
         private const val COLUMN_FIELD_REQUIRED = "field_required"
+        private const val COLUMN_FIELD_INTEGER_ONLY = "field_integer_only"
+        private const val COLUMN_FIELD_DATE = "field_date"
+        private const val COLUMN_FIELD_TIME = "field_time"
         private const val COLUMN_FIELD_OPTION_1 = "field_option_1"
         private const val COLUMN_FIELD_OPTION_2 = "field_option_2"
         private const val COLUMN_FIELD_OPTION_3 = "field_option_3"
         private const val COLUMN_FIELD_OPTION_4 = "field_option_4"
-        private const val COLUMN_FIELD_OPTION_1_CHECKED = "field_option_1_checked"
-        private const val COLUMN_FIELD_OPTION_2_CHECKED = "field_option_2_checked"
-        private const val COLUMN_FIELD_OPTION_3_CHECKED = "field_option_3_checked"
-        private const val COLUMN_FIELD_OPTION_4_CHECKED = "field_option_4_checked"
 
         // creation/access methods
 

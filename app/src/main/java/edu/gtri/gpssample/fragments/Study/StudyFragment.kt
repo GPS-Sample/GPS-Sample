@@ -70,11 +70,18 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
         val studyId = getArguments()?.getInt( Key.kStudyId.toString());
 
+        if (studyId == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Missing studyId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
 
         if (study == null)
         {
             Toast.makeText(activity!!.applicationContext, "Oops! Missing study.", Toast.LENGTH_SHORT).show()
+            return
         }
 
         binding.studyNameTextView.setText( "Study " + study!!.name )
@@ -263,7 +270,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
 
         when (item.itemId) {
             R.id.action_edit_study -> {
-                var bundle = Bundle()
+                val bundle = Bundle()
 
                 bundle.putInt( Key.kStudyId.toString(), study!!.id )
                 bundle.putInt( Key.kConfigId.toString(), study!!.configId )

@@ -69,7 +69,7 @@ class MainFragment : Fragment()
         }
 
         binding.signInButton.setOnClickListener {
-            var bundle = Bundle()
+            val bundle = Bundle()
 
             if (binding.adminButton.isChecked) {
                 bundle.putString( Key.kRole.toString(), Role.Admin.toString())

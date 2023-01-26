@@ -9,11 +9,17 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FieldType
+import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.models.Field
+import edu.gtri.gpssample.models.Study
 
 class CreateFieldFragment : Fragment()
 {
+    private var study: Study? = null
+
     private lateinit var checkbox1Layout: LinearLayout
     private lateinit var checkbox2Layout: LinearLayout
     private lateinit var checkbox3Layout: LinearLayout
@@ -57,6 +63,22 @@ class CreateFieldFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        val studyId = getArguments()?.getInt( Key.kStudyId.toString());
+
+        if (studyId == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Missing studyId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
+
+        if (study == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Oops! Missing study.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         textLayout = view.findViewById<LinearLayout>(R.id.layout_field_text)
         numberLayout = view.findViewById<LinearLayout>(R.id.layout_field_number)
@@ -254,9 +276,89 @@ class CreateFieldFragment : Fragment()
 
             if (binding.fieldNameEditText.text.toString().length > 0)
             {
-                val fieldModel = Field()
-                fieldModel.name = binding.fieldNameEditText.text.toString()
-                (activity!!.application as MainApplication).fields.add( fieldModel )
+                val fieldType = FieldType.valueOf(binding.fieldTypeSpinner.selectedItem as String)
+
+                val field = Field()
+                field.studyId = study!!.id
+                field.name = binding.fieldNameEditText.text.toString()
+                field.type = fieldType
+
+                when (fieldType) {
+                    FieldType.Text -> {
+                        val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked.compareTo(false)
+                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                    }
+                    FieldType.Number -> {
+                        val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
+                        val requiredCheckbox = numberLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked.compareTo(false)
+                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                        field.integerOnly = integerOnlyCheckbox.isChecked.compareTo(false)
+                    }
+                    FieldType.Date -> {
+                        val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        val dateCheckbox = dateLayout.findViewById<CheckBox>( R.id.date_checkBox )
+                        val timeCheckbox = dateLayout.findViewById<CheckBox>( R.id.time_checkBox)
+                        field.pii = piiCheckbox.isChecked.compareTo(false)
+                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                        field.date = dateCheckbox.isChecked.compareTo(false)
+                        field.time = timeCheckbox.isChecked.compareTo(false)
+                    }
+                    FieldType.Checkbox -> {
+                        val editText1 = checkbox1EditText.text.toString()
+                        val editText2 = checkbox2EditText.text.toString()
+                        val editText3 = checkbox3EditText.text.toString()
+                        val editText4 = checkbox4EditText.text.toString()
+
+                        val length = editText1.length + editText2.length + editText3.length + editText4.length
+
+                        if (length == 0)
+                        {
+                            Toast.makeText(activity!!.applicationContext, "Oops! You must enter at least 1 option", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+
+                        field.option1 = editText1
+                        field.option2 = editText2
+                        field.option3 = editText3
+                        field.option4 = editText4
+
+                        val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked.compareTo(false)
+                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                    }
+                    FieldType.Dropdown -> {
+                        val editText1 = dropdown1EditText.text.toString()
+                        val editText2 = dropdown2EditText.text.toString()
+                        val editText3 = dropdown3EditText.text.toString()
+                        val editText4 = dropdown4EditText.text.toString()
+
+                        val length = editText1.length + editText2.length + editText3.length + editText4.length
+
+                        if (length == 0)
+                        {
+                            Toast.makeText(activity!!.applicationContext, "Oops! You must enter at least 1 option", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+
+                        field.option1 = editText1
+                        field.option2 = editText2
+                        field.option3 = editText3
+                        field.option4 = editText4
+
+                        val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked.compareTo(false)
+                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                    }
+                }
+
+                field.id = GPSSampleDAO.sharedInstance().createField( field )
 
                 findNavController().popBackStack()
             }

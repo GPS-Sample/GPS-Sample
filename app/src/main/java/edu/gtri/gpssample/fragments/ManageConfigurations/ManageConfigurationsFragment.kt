@@ -84,7 +84,7 @@ class ManageConfigurationsFragment : Fragment()
 
     fun onItemSelected(configuration: Configuration, shouldDismissKeyboard: Boolean )
     {
-        var bundle = Bundle()
+        val bundle = Bundle()
 
         bundle.putInt( Key.kConfigId.toString(), configuration.id )
 

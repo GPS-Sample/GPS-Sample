@@ -19,7 +19,7 @@ import edu.gtri.gpssample.models.Study
 
 class ManageStudiesFragment : Fragment()
 {
-    private var configuration: Configuration? = null;
+    private var config: Configuration? = null;
     private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
@@ -58,29 +58,28 @@ class ManageStudiesFragment : Fragment()
             return
         }
 
-        configuration = GPSSampleDAO.sharedInstance().getConfiguration( configId!! )
-
-        if (configuration == null)
+        config = GPSSampleDAO.sharedInstance().getConfiguration( configId!! )
+        if (config == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Missing Configuration with ID: " + configId.toString(), Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal Error! Missing Configuration with id: $configId", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val studies = GPSSampleDAO.sharedInstance().getStudies( configuration!!.id )
+        val studies = GPSSampleDAO.sharedInstance().getStudies( config!!.id )
 
         manageStudiesAdapter = ManageStudiesAdapter(studies)
         manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
-        binding.configNameTextView.text = "Configuration " + configuration!!.name + " Studies"
+        binding.configNameTextView.text = "Configuration " + config!!.name + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageStudiesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.createButton.setOnClickListener {
 
-            var bundle = Bundle()
+            val bundle = Bundle()
 
-            bundle.putInt( Key.kConfigId.toString(), configuration!!.id )
+            bundle.putInt( Key.kConfigId.toString(), config!!.id )
 
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
@@ -90,7 +89,7 @@ class ManageStudiesFragment : Fragment()
     {
         super.onResume()
 
-        val studies = GPSSampleDAO.sharedInstance().getStudies( configuration!!.id )
+        val studies = GPSSampleDAO.sharedInstance().getStudies( config!!.id )
 
         if (studies.isEmpty())
         {
@@ -108,11 +107,12 @@ class ManageStudiesFragment : Fragment()
 
     fun onItemSelected(study: Study, shouldDismissKeyboard: Boolean )
     {
-        var bundle = Bundle()
+        val bundle = Bundle()
 
+        bundle.putInt( Key.kConfigId.toString(), config!!.id )
         bundle.putInt( Key.kStudyId.toString(), study.id )
 
-        findNavController().navigate( R.id.action_navigate_to_StudyFragment, bundle )
+        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
@@ -126,22 +126,22 @@ class ManageStudiesFragment : Fragment()
 
         when (item.itemId) {
             R.id.action_edit_configuration -> {
-                var bundle = Bundle()
+                val bundle = Bundle()
 
-                bundle.putInt( Key.kConfigId.toString(), configuration!!.id )
+                bundle.putInt( Key.kConfigId.toString(), config!!.id )
 
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
             }
             R.id.action_create_study -> {
-                var bundle = Bundle()
+                val bundle = Bundle()
 
-                bundle.putInt( Key.kConfigId.toString(), configuration!!.id )
+                bundle.putInt( Key.kConfigId.toString(), config!!.id )
 
                 findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
                 return true
             }
             R.id.action_delete_configuration -> {
-                GPSSampleDAO.sharedInstance().deleteConfiguration( configuration!! )
+                GPSSampleDAO.sharedInstance().deleteConfiguration( config!! )
                 findNavController().popBackStack()
                 return true
             }

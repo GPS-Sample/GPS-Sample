@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.CreateStudy
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -56,7 +57,26 @@ class CreateStudyFragment : Fragment()
         if (studyId != null)
         {
             study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
+            if (study == null)
+            {
+                Toast.makeText(activity!!.applicationContext, "Oops! Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
+                return
+            }
         }
+
+        if (study == null)
+        {
+            study = Study()
+            study!!.isValid = 0
+            study!!.configId = configId!!
+        }
+
+        if (study!!.isValid == 1)
+        {
+            binding.titleTextView.setText( "Study ${study!!.name}")
+        }
+
+        binding.studyNameEditText.setText( study!!.name )
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
@@ -71,11 +91,6 @@ class CreateStudyFragment : Fragment()
         binding.recyclerView.adapter = createStudyAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager( activity )
 
-        if (study != null)
-        {
-            binding.studyNameEditText.setText( study!!.name )
-        }
-
         binding.nextButton.setOnClickListener {
 
             if (binding.studyNameEditText.text.toString().isEmpty())
@@ -84,13 +99,8 @@ class CreateStudyFragment : Fragment()
                 return@setOnClickListener
             }
 
-            if (study == null)
-            {
-                study = Study()
-                study!!.configId = configId!!
-            }
-
-            study!!.name = binding.studyNameEditText.text.toString();
+            study!!.isValid = 1
+            study!!.name = binding.studyNameEditText.text.toString()
 
             if (study!!.id < 0)
             {
@@ -102,6 +112,18 @@ class CreateStudyFragment : Fragment()
             }
 
             findNavController().popBackStack()
+        }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        val fields = GPSSampleDAO.sharedInstance().getFields(study!!.id)
+
+        for (field in fields)
+        {
+            Log.d( "xxx", field.name )
         }
     }
 
@@ -120,7 +142,19 @@ class CreateStudyFragment : Fragment()
     {
         when (item.itemId) {
             R.id.action_create_field -> {
-                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+
+                if (study == null)
+                {
+                    study = Study()
+                    study!!.isValid = 0
+                    study!!.id = GPSSampleDAO.sharedInstance().createStudy( study!! )
+                }
+
+                val bundle = Bundle()
+
+                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+
+                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
                 return true
             }
         }

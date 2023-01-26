@@ -17,7 +17,7 @@
         android:textSize="18sp" />
 
     <CheckBox
-        android:id="@+id/timecheckBox"
+        android:id="@+id/time_checkBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"

@@ -39,6 +39,7 @@
 
             <EditText
                 android:id="@+id/field_name_edit_text"
+                android:inputType="textCapWords"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"

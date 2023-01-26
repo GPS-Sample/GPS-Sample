@@ -10,12 +10,11 @@ class Field
     var type: FieldType = FieldType.Text
     var pii: Int = 0
     var required: Int = 0
+    var integerOnly: Int = 0
+    var date: Int = 0
+    var time: Int = 0
     var option1: String = ""
     var option2: String = ""
     var option3: String = ""
     var option4: String = ""
-    var option1Checked: Int = 0
-    var option2Checked: Int = 0
-    var option3Checked: Int = 0
-    var option4Checked: Int = 0
 }
