@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.CreateField
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
@@ -13,11 +14,14 @@ import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.GPSSampleDAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.fragments.CreateStudy.CreateStudyFragment
 import edu.gtri.gpssample.models.Field
 import edu.gtri.gpssample.models.Study
 
-class CreateFieldFragment : Fragment()
+class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
+    private var field: Field? = null
     private var study: Study? = null
 
     private lateinit var checkbox1Layout: LinearLayout
@@ -53,8 +57,6 @@ class CreateFieldFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        setHasOptionsMenu( true )
-
         _binding = FragmentCreateFieldBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -83,6 +85,13 @@ class CreateFieldFragment : Fragment()
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
             return
+        }
+
+        val fieldId = arguments!!.getInt( Key.kFieldId.toString(), -1);
+
+        if (fieldId > 0)
+        {
+            field = GPSSampleDAO.sharedInstance().getField( fieldId )
         }
 
         textLayout = view.findViewById<LinearLayout>(R.id.layout_field_text)
@@ -277,41 +286,141 @@ class CreateFieldFragment : Fragment()
             findNavController().popBackStack()
         }
 
+        if (field != null)
+        {
+            setHasOptionsMenu( true )
+
+            binding.titleTextView.text = "Field ${field!!.name}"
+            binding.fieldNameEditText.setText( field!!.name )
+
+            when( field!!.type )
+            {
+                FieldType.Text -> {
+                    binding.fieldTypeSpinner.setSelection(0)
+                    val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                    val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                    piiCheckbox.isChecked = field!!.pii
+                    requiredCheckbox.isChecked = field!!.required
+                }
+                FieldType.Number -> {
+                    binding.fieldTypeSpinner.setSelection(1)
+                    val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                    val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
+                    val requiredCheckbox = numberLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                    piiCheckbox.isChecked = field!!.pii
+                    requiredCheckbox.isChecked = field!!.required
+                    integerOnlyCheckbox.isChecked = field!!.integerOnly
+                }
+                FieldType.Date -> {
+                    binding.fieldTypeSpinner.setSelection(2)
+                    val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                    val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                    val dateCheckbox = dateLayout.findViewById<CheckBox>( R.id.date_checkBox )
+                    val timeCheckbox = dateLayout.findViewById<CheckBox>( R.id.time_checkBox)
+                    piiCheckbox.isChecked = field!!.pii
+                    requiredCheckbox.isChecked = field!!.required
+                    dateCheckbox.isChecked = field!!.date
+                    timeCheckbox.isChecked = field!!.time
+                }
+                FieldType.Checkbox -> {
+                    binding.fieldTypeSpinner.setSelection(3)
+                    val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                    val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                    piiCheckbox.isChecked = field!!.pii
+                    requiredCheckbox.isChecked = field!!.required
+
+                    if (field!!.option1.length > 0)
+                    {
+                        checkbox1Layout.visibility = View.VISIBLE
+                        checkbox1EditText.setText( field!!.option1 )
+                    }
+                    if (field!!.option2.length > 0)
+                    {
+                        checkbox2Layout.visibility = View.VISIBLE
+                        checkbox2EditText.setText( field!!.option2 )
+                    }
+                    if (field!!.option3.length > 0)
+                    {
+                        checkbox3Layout.visibility = View.VISIBLE
+                        checkbox3EditText.setText( field!!.option3 )
+                    }
+                    if (field!!.option4.length > 0)
+                    {
+                        checkbox4Layout.visibility = View.VISIBLE
+                        checkbox4EditText.setText( field!!.option4 )
+                    }
+                }
+                FieldType.Dropdown -> {
+                    binding.fieldTypeSpinner.setSelection(4)
+                    val piiCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                    val requiredCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                    piiCheckbox.isChecked = field!!.pii
+                    requiredCheckbox.isChecked = field!!.required
+
+                    if (field!!.option1.length > 0)
+                    {
+                        dropdown1Layout.visibility = View.VISIBLE
+                        dropdown1EditText.setText( field!!.option1 )
+                    }
+                    if (field!!.option2.length > 0)
+                    {
+                        dropdown2Layout.visibility = View.VISIBLE
+                        dropdown2EditText.setText( field!!.option2 )
+                    }
+                    if (field!!.option3.length > 0)
+                    {
+                        dropdown3Layout.visibility = View.VISIBLE
+                        dropdown3EditText.setText( field!!.option3 )
+                    }
+                    if (field!!.option4.length > 0)
+                    {
+                        dropdown4Layout.visibility = View.VISIBLE
+                        dropdown4EditText.setText( field!!.option4 )
+                    }
+                }
+            }
+        }
+
         binding.saveButton.setOnClickListener {
 
             if (binding.fieldNameEditText.text.toString().length > 0)
             {
                 val fieldType = FieldType.valueOf(binding.fieldTypeSpinner.selectedItem as String)
 
-                val field = Field()
-                field.studyId = study!!.id
-                field.name = binding.fieldNameEditText.text.toString()
-                field.type = fieldType
+                if (field == null)
+                {
+                    field = Field()
+                    field!!.id = GPSSampleDAO.sharedInstance().createField( field!! )
+                    field!!.studyId = study!!.id
+                }
+
+                field!!.name = binding.fieldNameEditText.text.toString()
+                field!!.type = fieldType
 
                 when (fieldType) {
                     FieldType.Text -> {
                         val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked
-                        field.required = requiredCheckbox.isChecked
+                        field!!.pii = piiCheckbox.isChecked
+                        field!!.required = requiredCheckbox.isChecked
                     }
                     FieldType.Number -> {
                         val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
                         val requiredCheckbox = numberLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked
-                        field.required = requiredCheckbox.isChecked
-                        field.integerOnly = integerOnlyCheckbox.isChecked
+                        field!!.pii = piiCheckbox.isChecked
+                        field!!.required = requiredCheckbox.isChecked
+                        field!!.integerOnly = integerOnlyCheckbox.isChecked
                     }
                     FieldType.Date -> {
                         val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
                         val dateCheckbox = dateLayout.findViewById<CheckBox>( R.id.date_checkBox )
                         val timeCheckbox = dateLayout.findViewById<CheckBox>( R.id.time_checkBox)
-                        field.pii = piiCheckbox.isChecked
-                        field.required = requiredCheckbox.isChecked
-                        field.date = dateCheckbox.isChecked
-                        field.time = timeCheckbox.isChecked
+                        field!!.pii = piiCheckbox.isChecked
+                        field!!.required = requiredCheckbox.isChecked
+                        field!!.date = dateCheckbox.isChecked
+                        field!!.time = timeCheckbox.isChecked
                     }
                     FieldType.Checkbox -> {
                         val editText1 = checkbox1EditText.text.toString()
@@ -327,15 +436,15 @@ class CreateFieldFragment : Fragment()
                             return@setOnClickListener
                         }
 
-                        field.option1 = editText1
-                        field.option2 = editText2
-                        field.option3 = editText3
-                        field.option4 = editText4
+                        field!!.option1 = editText1
+                        field!!.option2 = editText2
+                        field!!.option3 = editText3
+                        field!!.option4 = editText4
 
                         val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked
-                        field.required = requiredCheckbox.isChecked
+                        field!!.pii = piiCheckbox.isChecked
+                        field!!.required = requiredCheckbox.isChecked
                     }
                     FieldType.Dropdown -> {
                         val editText1 = dropdown1EditText.text.toString()
@@ -351,23 +460,54 @@ class CreateFieldFragment : Fragment()
                             return@setOnClickListener
                         }
 
-                        field.option1 = editText1
-                        field.option2 = editText2
-                        field.option3 = editText3
-                        field.option4 = editText4
+                        field!!.option1 = editText1
+                        field!!.option2 = editText2
+                        field!!.option3 = editText3
+                        field!!.option4 = editText4
 
-                        val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
-                        val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked
-                        field.required = requiredCheckbox.isChecked
+                        val piiCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field!!.pii = piiCheckbox.isChecked
+                        field!!.required = requiredCheckbox.isChecked
                     }
                 }
 
-                field.id = GPSSampleDAO.sharedInstance().createField( field )
+                GPSSampleDAO.sharedInstance().updateField( field!! )
 
                 findNavController().popBackStack()
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_delete_field, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId) {
+            R.id.action_delete_field ->
+            {
+                val confirmationDialog = ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?", this)
+                return true
+            }
+        }
+
+        return false
+    }
+
+    override fun didAnswerNo()
+    {
+    }
+
+    override fun didAnswerYes()
+    {
+        GPSSampleDAO.sharedInstance().deleteField( field!! )
+
+        findNavController().popBackStack()
     }
 
     override fun onDestroyView()

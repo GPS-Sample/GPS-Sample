@@ -58,5 +58,5 @@
         android:layout_gravity="bottom"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="@string/finish" />
+        android:text="@string/save" />
 </LinearLayout>

@@ -123,5 +123,6 @@
     <string name="enter_checkbox_text">Enter checkbox item text</string>
     <string name="enter_dropdown_item_text">Enter dropdown item text</string>
     <string name="add_another">ADD ANOTHER</string>
+    <string name="delete_field">Delete Field</string>
 
 </resources>

@@ -78,9 +78,9 @@ class CreateStudyFragment : Fragment()
             study = Study()
             study!!.isValid = false
             study!!.configId = configId!!
+            study!!.id = GPSSampleDAO.sharedInstance().createStudy( study!! )
         }
-
-        if (study!!.isValid)
+        else
         {
             binding.titleTextView.text = "Study ${study!!.name}"
         }
@@ -136,8 +136,14 @@ class CreateStudyFragment : Fragment()
         }
     }
 
-    fun onItemSelected(fieldModel: Field, shouldDismissKeyboard: Boolean )
+    fun onItemSelected(field: Field, shouldDismissKeyboard: Boolean )
     {
+        val bundle = Bundle()
+
+        bundle.putInt( Key.kFieldId.toString(), field.id )
+        bundle.putInt( Key.kStudyId.toString(), study!!.id )
+
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
@@ -150,20 +156,14 @@ class CreateStudyFragment : Fragment()
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId) {
-            R.id.action_create_field -> {
-
-                if (study == null)
-                {
-                    study = Study()
-                    study!!.isValid = false
-                    study!!.id = GPSSampleDAO.sharedInstance().createStudy( study!! )
-                }
-
+            R.id.action_create_field ->
+            {
                 val bundle = Bundle()
 
                 bundle.putInt( Key.kStudyId.toString(), study!!.id )
 
                 findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+
                 return true
             }
         }

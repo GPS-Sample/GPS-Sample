@@ -2,8 +2,10 @@ package edu.gtri.gpssample.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import androidx.core.content.contentValuesOf
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.models.Configuration
@@ -104,18 +106,26 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         {
             cursor.moveToNext()
 
-            user = User()
-
-            user.id = Integer.parseInt(cursor.getString(0))
-            user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ROLE)))
-            user.name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))
-            user.pin = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PIN))
-            user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
-            user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
+            user = createUser( cursor )
         }
 
         cursor.close()
         db.close()
+
+        return user
+    }
+
+    //--------------------------------------------------------------------------
+    fun createUser( cursor: Cursor ) : User
+    {
+        val user = User()
+
+        user.id = Integer.parseInt(cursor.getString(0))
+        user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ROLE)))
+        user.name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))
+        user.pin = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PIN))
+        user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
+        user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
 
         return user
     }
@@ -131,16 +141,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
         while (cursor.moveToNext())
         {
-            val user = User()
-
-            user.id = Integer.parseInt(cursor.getString(0))
-            user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ROLE)))
-            user.name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))
-            user.pin = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PIN))
-            user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
-            user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
-
-            users.add( user )
+            users.add( createUser( cursor ))
         }
 
         cursor.close()
@@ -166,7 +167,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     //--------------------------------------------------------------------------
     fun getConfiguration( id: Int ): Configuration?
     {
-        var configuration: Configuration? = null
+        var config: Configuration? = null
 
         val db = this.writableDatabase
         val query = "SELECT * FROM $TABLE_CONFIG WHERE $COLUMN_ID = $id"
@@ -177,20 +178,28 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         {
             cursor.moveToNext()
 
-            configuration = Configuration()
-
-            configuration.id = Integer.parseInt(cursor.getString(0))
-            configuration.name = cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_NAME))
-            configuration.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DISTANCE_FORMAT)))
-            configuration.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DATE_FORMAT)))
-            configuration.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_TIME_FORMAT)))
-            configuration.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(COLUMN_CONFIG_MIN_GPS_PRECISION))
+            config = createConfiguration( cursor )
         }
 
         cursor.close()
         db.close()
 
-        return configuration
+        return config
+    }
+
+    //--------------------------------------------------------------------------
+    fun createConfiguration( cursor: Cursor ) : Configuration
+    {
+        val config = Configuration()
+
+        config.id = Integer.parseInt(cursor.getString(0))
+        config.name = cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_NAME))
+        config.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DISTANCE_FORMAT)))
+        config.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DATE_FORMAT)))
+        config.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_TIME_FORMAT)))
+        config.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(COLUMN_CONFIG_MIN_GPS_PRECISION))
+
+        return config
     }
 
     //--------------------------------------------------------------------------
@@ -204,16 +213,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
         while (cursor.moveToNext())
         {
-            val configuration = Configuration()
-
-            configuration.id = Integer.parseInt(cursor.getString(0))
-            configuration.name = cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_NAME))
-            configuration.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DISTANCE_FORMAT)))
-            configuration.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DATE_FORMAT)))
-            configuration.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_TIME_FORMAT)))
-            configuration.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(COLUMN_CONFIG_MIN_GPS_PRECISION))
-
-            configurations.add( configuration )
+            configurations.add( createConfiguration( cursor ))
         }
 
         cursor.close()
@@ -264,11 +264,32 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     {
         val values = ContentValues()
 
+        putStudy( study, values )
+
+        return this.writableDatabase.insert(TABLE_STUDY, null, values).toInt()
+    }
+
+    //--------------------------------------------------------------------------
+    fun putStudy( study: Study, values: ContentValues )
+    {
         values.put( COLUMN_STUDY_NAME, study.name )
         values.put( COLUMN_STUDY_CONFIG_ID, study.configId )
         values.put( COLUMN_STUDY_IS_VALID, study.isValid )
+    }
 
-        return this.writableDatabase.insert(TABLE_STUDY, null, values).toInt()
+    //--------------------------------------------------------------------------
+    fun updateStudy( study: Study )
+    {
+        val db = this.writableDatabase
+        val whereClause = "$COLUMN_ID = ?"
+        val args: Array<String> = arrayOf(study.id.toString())
+
+        val values = ContentValues()
+
+        putStudy( study, values )
+
+        db.update( TABLE_STUDY, values, whereClause, args )
+        db.close()
     }
 
     //--------------------------------------------------------------------------
@@ -285,12 +306,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         {
             cursor.moveToNext()
 
-            study = Study()
-
-            study.id = Integer.parseInt(cursor.getString(0))
-            study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
-            study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
-            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
+            study = createStudy( cursor )
         }
 
         cursor.close()
@@ -300,30 +316,16 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     }
 
     //--------------------------------------------------------------------------
-    fun getStudies(): List<Study>
+    fun createStudy( cursor: Cursor ): Study
     {
-        val studies = ArrayList<Study>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_STUDY_IS_VALID = 1"
+        val study = Study()
 
-        val cursor = db.rawQuery(query, null)
+        study.id = Integer.parseInt(cursor.getString(0))
+        study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
+        study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
+        study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
 
-        while (cursor.moveToNext())
-        {
-            val study = Study()
-
-            study.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
-            study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
-            study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
-            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
-
-            studies.add( study )
-        }
-
-        cursor.close()
-        db.close()
-
-        return studies
+        return study
     }
 
     //--------------------------------------------------------------------------
@@ -337,36 +339,13 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
         while (cursor.moveToNext())
         {
-            val study = Study()
-
-            study.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
-            study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
-            study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
-            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
-
-            studies.add( study )
+            studies.add( createStudy( cursor ))
         }
 
         cursor.close()
         db.close()
 
         return studies
-    }
-
-    //--------------------------------------------------------------------------
-    fun updateStudy( study: Study )
-    {
-        val db = this.writableDatabase
-        val whereClause = "$COLUMN_ID = ?"
-        val args: Array<String> = arrayOf(study.id.toString())
-
-        val values = ContentValues()
-
-        values.put( COLUMN_STUDY_NAME, study.name )
-        values.put( COLUMN_STUDY_CONFIG_ID, study.configId )
-        values.put( COLUMN_STUDY_IS_VALID, study.isValid )
-        db.update( TABLE_STUDY, values, whereClause, args )
-        db.close()
     }
 
     //--------------------------------------------------------------------------
@@ -384,6 +363,14 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     {
         val values = ContentValues()
 
+        putField( field, values )
+
+        return this.writableDatabase.insert(TABLE_FIELD, null, values).toInt()
+    }
+
+    //--------------------------------------------------------------------------
+    fun putField( field: Field, values: ContentValues )
+    {
         values.put( COLUMN_FIELD_NAME, field.name )
         values.put( COLUMN_FIELD_STUDY_ID, field.studyId )
         values.put( COLUMN_FIELD_TYPE, field.type.toString() )
@@ -396,8 +383,65 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         values.put( COLUMN_FIELD_OPTION_2, field.option2 )
         values.put( COLUMN_FIELD_OPTION_3, field.option3 )
         values.put( COLUMN_FIELD_OPTION_4, field.option4 )
+    }
 
-        return this.writableDatabase.insert(TABLE_FIELD, null, values).toInt()
+    //--------------------------------------------------------------------------
+    fun updateField( field: Field )
+    {
+        val db = this.writableDatabase
+        val whereClause = "$COLUMN_ID = ?"
+        val args: Array<String> = arrayOf(field.id.toString())
+
+        val values = ContentValues()
+
+        putField( field, values )
+
+        db.update( TABLE_FIELD, values, whereClause, args )
+        db.close()
+    }
+
+    //--------------------------------------------------------------------------
+    fun getField( fieldId: Int ): Field?
+    {
+        var field: Field? = null
+        val db = this.writableDatabase
+        val query = "SELECT * FROM $TABLE_FIELD WHERE $COLUMN_ID = $fieldId"
+
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            field = createField( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return field
+    }
+
+    //--------------------------------------------------------------------------
+    fun  createField( cursor: Cursor): Field
+    {
+        val field = Field()
+
+        field.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
+        field.name = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_NAME))
+        field.studyId = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_STUDY_ID))
+        field.type = FieldType.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_TYPE)))
+        field.pii = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_PII)).toBoolean()
+        field.required = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_REQUIRED)).toBoolean()
+        field.integerOnly = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
+        field.date = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_DATE)).toBoolean()
+        field.time = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_TIME)).toBoolean()
+        field.option1 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1))
+        field.option2 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2))
+        field.option3 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3))
+        field.option4 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_4))
+
+        return field
     }
 
     //--------------------------------------------------------------------------
@@ -411,23 +455,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
         while (cursor.moveToNext())
         {
-            val field = Field()
-
-            field.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
-            field.name = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_NAME))
-            field.studyId = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_STUDY_ID))
-            field.type = FieldType.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_TYPE)))
-            field.pii = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_PII)).toBoolean()
-            field.required = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_REQUIRED)).toBoolean()
-            field.integerOnly = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
-            field.date = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_DATE)).toBoolean()
-            field.time = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_TIME)).toBoolean()
-            field.option1 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1))
-            field.option2 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2))
-            field.option3 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3))
-            field.option4 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_4))
-
-            fields.add( field )
+            fields.add( createField( cursor ))
         }
 
         cursor.close()
@@ -436,6 +464,17 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
         return fields
     }
 
+    //--------------------------------------------------------------------------
+    fun deleteField( field: Field )
+    {
+        val db = this.writableDatabase
+        val whereClause = "$COLUMN_ID = ?"
+        val args = arrayOf(field.id.toString())
+        db.delete(TABLE_FIELD, whereClause, args)
+        db.close()
+    }
+
+    //--------------------------------------------------------------------------
     companion object
     {
         private const val DATABASE_VERSION = 14

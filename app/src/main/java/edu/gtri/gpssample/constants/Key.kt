@@ -7,6 +7,7 @@ enum class Key {
     kPass,
     kUserId,
     kPayload,
+    kFieldId,
     kStudyId,
     kUserName,
     kConfigId,
