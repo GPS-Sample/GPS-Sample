@@ -17,7 +17,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
-import edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleViewModel
 
 class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 {
