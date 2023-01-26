@@ -81,7 +81,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             return
         }
 
-        study = GPSSampleDAO.sharedInstance().getStudy( studyId )
+        study = GPSSampleDAO.studyDAO.getStudy( studyId )
 
         if (study == null)
         {
@@ -97,7 +97,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             }
         }
 
-        val users = GPSSampleDAO.sharedInstance().getUsers()
+        val users = GPSSampleDAO.userDAO.getUsers()
 
 //        if ((activity!!.application as MainApplication).users.isEmpty())
 //        {
@@ -285,7 +285,7 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
             }
 
             R.id.action_delete_study -> {
-                GPSSampleDAO.sharedInstance().deleteStudy( study!! )
+                GPSSampleDAO.studyDAO.deleteStudy( study!! )
                 findNavController().popBackStack()
                 return true
             }

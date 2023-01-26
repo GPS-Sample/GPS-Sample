@@ -33,13 +33,13 @@ class MainActivity : AppCompatActivity()
         {
             GPSSampleDAO.createSharedInstance(applicationContext)
 
-            val configurations = GPSSampleDAO.sharedInstance().getConfigurations()
-            Log.d( "xxx", "found ${configurations.size} configs" )
+            val configurations = GPSSampleDAO.configDAO.getConfigurations()
+            Log.d( "xxx", "found ${configurations.size} configurations" )
 
-            val studies = GPSSampleDAO.sharedInstance().getStudies()
+            val studies = GPSSampleDAO.studyDAO.getStudies()
             Log.d( "xxx", "found ${studies.size} studies" )
 
-            val fields = GPSSampleDAO.sharedInstance().getFields()
+            val fields = GPSSampleDAO.fieldDAO.getFields()
             Log.d( "xxx", "found ${fields.size} fields" )
         }
 

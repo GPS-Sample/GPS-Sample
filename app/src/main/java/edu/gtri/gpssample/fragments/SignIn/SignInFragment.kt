@@ -79,7 +79,7 @@ class SignInFragment : Fragment()
             }
             else
             {
-                val user = GPSSampleDAO.sharedInstance().getUser( userId )
+                val user = GPSSampleDAO.userDAO.getUser( userId )
 
                 if (user == null)
                 {
@@ -91,13 +91,6 @@ class SignInFragment : Fragment()
                 }
                 else
                 {
-                    Log.d( "xxx", user!!.id.toString() );
-                    Log.d( "xxx", user!!.role.toString() );
-                    Log.d( "xxx", user!!.name );
-                    Log.d( "xxx", user!!.pin.toString() );
-                    Log.d( "xxx", user!!.recoveryQuestion );
-                    Log.d( "xxx", user!!.recoveryAnswer );
-
                     binding.pinEditText.setText("")
 
                     (activity!!.application as MainApplication).fields.clear()

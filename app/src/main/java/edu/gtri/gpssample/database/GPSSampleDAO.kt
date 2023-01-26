@@ -80,510 +80,53 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
     }
 
     //--------------------------------------------------------------------------
-    fun createUser( user: User ) : Int
-    {
-        val values = ContentValues()
-
-        values.put( COLUMN_USER_ROLE, user.role.toString() )
-        values.put( COLUMN_USER_NAME, user.name )
-        values.put( COLUMN_USER_PIN, user.pin )
-        values.put( COLUMN_USER_RECOVERY_QUESTION, user.recoveryQuestion )
-        values.put( COLUMN_USER_RECOVERY_ANSWER, user.recoveryAnswer )
-
-        return this.writableDatabase.insert(TABLE_USER, null, values).toInt()
-    }
-
-    //--------------------------------------------------------------------------
-    fun getUser( id: Int ): User?
-    {
-        var user: User? = null
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_USER WHERE $COLUMN_ID = $id"
-
-        val cursor = db.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            user = createUser( cursor )
-        }
-
-        cursor.close()
-        db.close()
-
-        return user
-    }
-
-    //--------------------------------------------------------------------------
-    fun createUser( cursor: Cursor ) : User
-    {
-        val user = User()
-
-        user.id = Integer.parseInt(cursor.getString(0))
-        user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ROLE)))
-        user.name = cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME))
-        user.pin = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PIN))
-        user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_QUESTION))
-        user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(COLUMN_USER_RECOVERY_ANSWER))
-
-        return user
-    }
-
-    //--------------------------------------------------------------------------
-    fun getUsers(): List<User>
-    {
-        val users = ArrayList<User>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_USER"
-
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            users.add( createUser( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return users
-    }
-
-    //--------------------------------------------------------------------------
-    fun createConfiguration( configuration: Configuration ) : Int
-    {
-        val values = ContentValues()
-
-        values.put( COLUMN_CONFIG_NAME, configuration.name )
-        values.put( COLUMN_CONFIG_DISTANCE_FORMAT, configuration.distanceFormat.toString() )
-        values.put( COLUMN_CONFIG_DATE_FORMAT, configuration.dateFormat.toString() )
-        values.put( COLUMN_CONFIG_TIME_FORMAT, configuration.timeFormat.toString() )
-        values.put( COLUMN_CONFIG_MIN_GPS_PRECISION, configuration.minGpsPrecision )
-
-        return this.writableDatabase.insert(TABLE_CONFIG, null, values).toInt()
-    }
-
-    //--------------------------------------------------------------------------
-    fun getConfiguration( id: Int ): Configuration?
-    {
-        var config: Configuration? = null
-
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_CONFIG WHERE $COLUMN_ID = $id"
-
-        val cursor = db.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            config = createConfiguration( cursor )
-        }
-
-        cursor.close()
-        db.close()
-
-        return config
-    }
-
-    //--------------------------------------------------------------------------
-    fun createConfiguration( cursor: Cursor ) : Configuration
-    {
-        val config = Configuration()
-
-        config.id = Integer.parseInt(cursor.getString(0))
-        config.name = cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_NAME))
-        config.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DISTANCE_FORMAT)))
-        config.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_DATE_FORMAT)))
-        config.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_CONFIG_TIME_FORMAT)))
-        config.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(COLUMN_CONFIG_MIN_GPS_PRECISION))
-
-        return config
-    }
-
-    //--------------------------------------------------------------------------
-    fun getConfigurations(): List<Configuration>
-    {
-        val configurations = ArrayList<Configuration>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_CONFIG"
-
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            configurations.add( createConfiguration( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return configurations
-    }
-
-    //--------------------------------------------------------------------------
-    fun updateConfiguration( configuration: Configuration )
-    {
-        val db = this.writableDatabase
-        val whereClause = "$COLUMN_ID = ?"
-        val args: Array<String> = arrayOf(configuration.id.toString())
-
-        val values = ContentValues()
-
-        values.put( COLUMN_CONFIG_NAME, configuration.name )
-        values.put( COLUMN_CONFIG_DISTANCE_FORMAT, configuration.distanceFormat.toString())
-        values.put( COLUMN_CONFIG_DATE_FORMAT, configuration.dateFormat.toString())
-        values.put( COLUMN_CONFIG_TIME_FORMAT, configuration.timeFormat.toString())
-        values.put( COLUMN_CONFIG_MIN_GPS_PRECISION, configuration.minGpsPrecision )
-
-        db.update( TABLE_CONFIG, values, whereClause, args )
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteConfiguration( configuration: Configuration )
-    {
-        val studies = getStudies( configuration.id )
-
-        for (study in studies)
-        {
-            deleteStudy( study )
-        }
-
-        val db = this.writableDatabase
-        val whereClause = "$COLUMN_ID = ?"
-        val args = arrayOf(configuration.id.toString())
-
-        db.delete(TABLE_CONFIG, whereClause, args)
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun createStudy( study: Study) : Int
-    {
-        val values = ContentValues()
-
-        putStudy( study, values )
-
-        return this.writableDatabase.insert(TABLE_STUDY, null, values).toInt()
-    }
-
-    //--------------------------------------------------------------------------
-    fun putStudy( study: Study, values: ContentValues )
-    {
-        values.put( COLUMN_STUDY_NAME, study.name )
-        values.put( COLUMN_STUDY_CONFIG_ID, study.configId )
-        values.put( COLUMN_STUDY_IS_VALID, study.isValid )
-    }
-
-    //--------------------------------------------------------------------------
-    fun updateStudy( study: Study )
-    {
-        val db = this.writableDatabase
-        val whereClause = "$COLUMN_ID = ?"
-        val args: Array<String> = arrayOf(study.id.toString())
-
-        val values = ContentValues()
-
-        putStudy( study, values )
-
-        db.update( TABLE_STUDY, values, whereClause, args )
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun getStudy( id: Int ): Study?
-    {
-        var study: Study? = null
-
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_ID = $id"
-
-        val cursor = db.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            study = createStudy( cursor )
-        }
-
-        cursor.close()
-        db.close()
-
-        return study
-    }
-
-    //--------------------------------------------------------------------------
-    fun createStudy( cursor: Cursor ): Study
-    {
-        val study = Study()
-
-        study.id = Integer.parseInt(cursor.getString(0))
-        study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
-        study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
-        study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
-
-        return study
-    }
-
-    //--------------------------------------------------------------------------
-    fun getStudies(): List<Study>
-    {
-        val studies = ArrayList<Study>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY"
-
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            studies.add( createStudy( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return studies
-    }
-
-    //--------------------------------------------------------------------------
-    fun getStudies( configId: Int ): List<Study>
-    {
-        val studies = ArrayList<Study>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_STUDY_CONFIG_ID = $configId"
-
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            studies.add( createStudy( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return studies
-    }
-
-    //--------------------------------------------------------------------------
-    fun getValidStudies( configId: Int ): List<Study>
-    {
-        val studies = ArrayList<Study>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_STUDY WHERE $COLUMN_STUDY_CONFIG_ID = $configId AND $COLUMN_STUDY_IS_VALID = 1"
-
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            studies.add( createStudy( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return studies
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteStudy( study: Study )
-    {
-        val fields = getFields( study.id )
-
-        for (field in fields)
-        {
-            deleteField( field )
-        }
-
-        val db = this.writableDatabase
-        val whereClause = "$COLUMN_ID = ?"
-        val args = arrayOf(study.id.toString())
-        db.delete(TABLE_STUDY, whereClause, args)
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun createField( field: Field ) : Int
-    {
-        val values = ContentValues()
-
-        putField( field, values )
-
-        return this.writableDatabase.insert(TABLE_FIELD, null, values).toInt()
-    }
-
-    //--------------------------------------------------------------------------
-    fun putField( field: Field, values: ContentValues )
-    {
-        values.put( COLUMN_FIELD_NAME, field.name )
-        values.put( COLUMN_FIELD_STUDY_ID, field.studyId )
-        values.put( COLUMN_FIELD_TYPE, field.type.toString() )
-        values.put( COLUMN_FIELD_PII, field.pii )
-        values.put( COLUMN_FIELD_REQUIRED, field.required )
-        values.put( COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
-        values.put( COLUMN_FIELD_DATE, field.date )
-        values.put( COLUMN_FIELD_TIME, field.time )
-        values.put( COLUMN_FIELD_OPTION_1, field.option1 )
-        values.put( COLUMN_FIELD_OPTION_2, field.option2 )
-        values.put( COLUMN_FIELD_OPTION_3, field.option3 )
-        values.put( COLUMN_FIELD_OPTION_4, field.option4 )
-    }
-
-    //--------------------------------------------------------------------------
-    fun updateField( field: Field )
-    {
-        val db = this.writableDatabase
-        val whereClause = "$COLUMN_ID = ?"
-        val args: Array<String> = arrayOf(field.id.toString())
-
-        val values = ContentValues()
-
-        putField( field, values )
-
-        db.update( TABLE_FIELD, values, whereClause, args )
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun getField( fieldId: Int ): Field?
-    {
-        var field: Field? = null
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_FIELD WHERE $COLUMN_ID = $fieldId"
-
-        val cursor = db.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            field = createField( cursor )
-        }
-
-        cursor.close()
-        db.close()
-
-        return field
-    }
-
-    //--------------------------------------------------------------------------
-    fun  createField( cursor: Cursor): Field
-    {
-        val field = Field()
-
-        field.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
-        field.name = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_NAME))
-        field.studyId = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_STUDY_ID))
-        field.type = FieldType.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_TYPE)))
-        field.pii = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_PII)).toBoolean()
-        field.required = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_REQUIRED)).toBoolean()
-        field.integerOnly = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
-        field.date = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_DATE)).toBoolean()
-        field.time = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_TIME)).toBoolean()
-        field.option1 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1))
-        field.option2 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2))
-        field.option3 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3))
-        field.option4 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_4))
-
-        return field
-    }
-
-    //--------------------------------------------------------------------------
-    fun getFields( studyId: Int ): List<Field>
-    {
-        val fields = ArrayList<Field>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_FIELD WHERE $COLUMN_FIELD_STUDY_ID = $studyId"
-
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            fields.add( createField( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return fields
-    }
-
-    //--------------------------------------------------------------------------
-    fun getFields(): List<Field>
-    {
-        val fields = ArrayList<Field>()
-        val db = this.writableDatabase
-        val query = "SELECT * FROM $TABLE_FIELD"
-
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            fields.add( createField( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return fields
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteField( field: Field )
-    {
-        val db = this.writableDatabase
-        val whereClause = "$COLUMN_ID = ?"
-        val args = arrayOf(field.id.toString())
-        db.delete(TABLE_FIELD, whereClause, args)
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
     companion object
     {
         private const val DATABASE_VERSION = 15
         private const val DATABASE_NAME = "GPSSampleDB.db"
-        private const val COLUMN_ID = "id"
+        const val COLUMN_ID = "id"
 
         // User Table
-        private const val TABLE_USER = "user"
-        private const val COLUMN_USER_ROLE = "user_role"
-        private const val COLUMN_USER_NAME = "user_name"
-        private const val COLUMN_USER_PIN = "user_pin"
-        private const val COLUMN_USER_RECOVERY_QUESTION = "user_recover_question"
-        private const val COLUMN_USER_RECOVERY_ANSWER = "user_recovery_answer"
+        const val TABLE_USER = "user"
+        const val COLUMN_USER_ROLE = "user_role"
+        const val COLUMN_USER_NAME = "user_name"
+        const val COLUMN_USER_PIN = "user_pin"
+        const val COLUMN_USER_RECOVERY_QUESTION = "user_recover_question"
+        const val COLUMN_USER_RECOVERY_ANSWER = "user_recovery_answer"
 
         // Config Table
-        private const val TABLE_CONFIG = "config"
-        private const val COLUMN_CONFIG_NAME = "config_name"
-        private const val COLUMN_CONFIG_DISTANCE_FORMAT = "config_distance_format"
-        private const val COLUMN_CONFIG_DATE_FORMAT = "config_date_format"
-        private const val COLUMN_CONFIG_TIME_FORMAT = "config_time_format"
-        private const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
+        const val TABLE_CONFIG = "config"
+        const val COLUMN_CONFIG_NAME = "config_name"
+        const val COLUMN_CONFIG_DISTANCE_FORMAT = "config_distance_format"
+        const val COLUMN_CONFIG_DATE_FORMAT = "config_date_format"
+        const val COLUMN_CONFIG_TIME_FORMAT = "config_time_format"
+        const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
 
         // Study Table
-        private const val TABLE_STUDY = "study"
-        private const val COLUMN_STUDY_NAME = "study_name"
-        private const val COLUMN_STUDY_CONFIG_ID = "study_config_id"
-        private const val COLUMN_STUDY_IS_VALID = "study_is_valid"
+        const val TABLE_STUDY = "study"
+        const val COLUMN_STUDY_NAME = "study_name"
+        const val COLUMN_STUDY_CONFIG_ID = "study_config_id"
+        const val COLUMN_STUDY_IS_VALID = "study_is_valid"
 
         // Field Table
-        private const val TABLE_FIELD = "field"
-        private const val COLUMN_FIELD_NAME = "field_name"
-        private const val COLUMN_FIELD_STUDY_ID = "field_study_id"
-        private const val COLUMN_FIELD_TYPE = "field_type"
-        private const val COLUMN_FIELD_PII = "field_pii"
-        private const val COLUMN_FIELD_REQUIRED = "field_required"
-        private const val COLUMN_FIELD_INTEGER_ONLY = "field_integer_only"
-        private const val COLUMN_FIELD_DATE = "field_date"
-        private const val COLUMN_FIELD_TIME = "field_time"
-        private const val COLUMN_FIELD_OPTION_1 = "field_option_1"
-        private const val COLUMN_FIELD_OPTION_2 = "field_option_2"
-        private const val COLUMN_FIELD_OPTION_3 = "field_option_3"
-        private const val COLUMN_FIELD_OPTION_4 = "field_option_4"
+        const val TABLE_FIELD = "field"
+        const val COLUMN_FIELD_NAME = "field_name"
+        const val COLUMN_FIELD_STUDY_ID = "field_study_id"
+        const val COLUMN_FIELD_TYPE = "field_type"
+        const val COLUMN_FIELD_PII = "field_pii"
+        const val COLUMN_FIELD_REQUIRED = "field_required"
+        const val COLUMN_FIELD_INTEGER_ONLY = "field_integer_only"
+        const val COLUMN_FIELD_DATE = "field_date"
+        const val COLUMN_FIELD_TIME = "field_time"
+        const val COLUMN_FIELD_OPTION_1 = "field_option_1"
+        const val COLUMN_FIELD_OPTION_2 = "field_option_2"
+        const val COLUMN_FIELD_OPTION_3 = "field_option_3"
+        const val COLUMN_FIELD_OPTION_4 = "field_option_4"
+
+        lateinit var userDAO: UserDAO
+        lateinit var configDAO: ConfigDAO
+        lateinit var studyDAO: StudyDAO
+        lateinit var fieldDAO: FieldDAO
 
         // creation/access methods
 
@@ -594,6 +137,11 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             if (instance == null)
             {
                 instance = GPSSampleDAO( context, null, null, DATABASE_VERSION )
+
+                userDAO = UserDAO( instance!! )
+                configDAO = ConfigDAO( instance!! )
+                studyDAO = StudyDAO(( instance!! ))
+                fieldDAO = FieldDAO(( instance!! ))
             }
 
             return instance!!

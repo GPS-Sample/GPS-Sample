@@ -49,7 +49,7 @@ class CreateConfigurationFragment : Fragment()
 
         if (configId != null)
         {
-            config = GPSSampleDAO.sharedInstance().getConfiguration( configId!! )
+            config = GPSSampleDAO.configDAO.getConfig( configId!! )
         }
 
         binding.fragmentRootLayout.setOnClickListener {
@@ -158,12 +158,12 @@ class CreateConfigurationFragment : Fragment()
 
             if (config!!.id < 0)
             {
-                config!!.id = GPSSampleDAO.sharedInstance().createConfiguration( config!! )
+                config!!.id = GPSSampleDAO.configDAO.createConfig( config!! )
                 findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
             }
             else
             {
-                GPSSampleDAO.sharedInstance().updateConfiguration( config!! )
+                GPSSampleDAO.configDAO.updateConfig( config!! )
                 findNavController().popBackStack()
             }
         }

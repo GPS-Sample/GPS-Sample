@@ -64,7 +64,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (studyId > 0)
         {
-            study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
+            study = GPSSampleDAO.studyDAO.getStudy( studyId!! )
             if (study == null)
             {
                 Toast.makeText(activity!!.applicationContext, "Fatal Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
@@ -77,7 +77,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             study = Study()
             study!!.isValid = false
             study!!.configId = configId!!
-            study!!.id = GPSSampleDAO.sharedInstance().createStudy( study!! )
+            study!!.id = GPSSampleDAO.studyDAO.createStudy( study!! )
         }
         else
         {
@@ -112,11 +112,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             if (study!!.id < 0)
             {
-                study!!.id = GPSSampleDAO.sharedInstance().createStudy( study!! )
+                study!!.id = GPSSampleDAO.studyDAO.createStudy( study!! )
             }
             else
             {
-                GPSSampleDAO.sharedInstance().updateStudy( study!! )
+                GPSSampleDAO.studyDAO.updateStudy( study!! )
             }
 
             findNavController().popBackStack()
@@ -129,7 +129,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (study != null)
         {
-            val fields = GPSSampleDAO.sharedInstance().getFields(study!!.id)
+            val fields = GPSSampleDAO.fieldDAO.getFields(study!!.id)
 
             createStudyAdapter.updateFields( fields )
         }
@@ -181,7 +181,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         if (study != null)
         {
-            GPSSampleDAO.sharedInstance().deleteStudy( study!! )
+            GPSSampleDAO.studyDAO.deleteStudy( study!! )
             findNavController().popBackStack()
         }
     }

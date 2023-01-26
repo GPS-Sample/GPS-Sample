@@ -63,7 +63,7 @@ class ManageConfigurationsFragment : Fragment()
     {
         super.onResume()
 
-        val configurations = GPSSampleDAO.sharedInstance().getConfigurations()
+        val configurations = GPSSampleDAO.configDAO.getConfigurations()
 
         if (configurations.isEmpty())
         {

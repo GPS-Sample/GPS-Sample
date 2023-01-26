@@ -78,7 +78,7 @@ class SignUpFragment : Fragment()
                 user.recoveryQuestion = question
                 user.recoveryAnswer = answer
 
-                user.id = GPSSampleDAO.sharedInstance().createUser( user )
+                user.id = GPSSampleDAO.userDAO.createUser( user )
 
                 val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
                 val editor = sharedPreferences.edit()

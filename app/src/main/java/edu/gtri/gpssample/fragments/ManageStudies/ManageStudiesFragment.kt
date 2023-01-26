@@ -64,7 +64,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             return
         }
 
-        config = GPSSampleDAO.sharedInstance().getConfiguration( configId )
+        config = GPSSampleDAO.configDAO.getConfig( configId )
         if (config == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Configuration with id: $configId not found.", Toast.LENGTH_SHORT).show()
@@ -93,7 +93,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         super.onResume()
 
-        val studies = GPSSampleDAO.sharedInstance().getValidStudies( config!!.id )
+        val studies = GPSSampleDAO.studyDAO.getValidStudies( config!!.id )
 
         if (studies.isEmpty())
         {
@@ -161,7 +161,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         if (config != null)
         {
-            GPSSampleDAO.sharedInstance().deleteConfiguration( config!! )
+            GPSSampleDAO.configDAO.deleteConfig( config!! )
             findNavController().popBackStack()
         }
     }

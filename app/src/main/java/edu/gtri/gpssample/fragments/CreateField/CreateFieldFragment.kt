@@ -77,7 +77,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        study = GPSSampleDAO.sharedInstance().getStudy( studyId )
+        study = GPSSampleDAO.studyDAO.getStudy( studyId )
         if (study == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
@@ -88,7 +88,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (fieldId > 0)
         {
-            field = GPSSampleDAO.sharedInstance().getField( fieldId )
+            field = GPSSampleDAO.fieldDAO.getField( fieldId )
         }
 
         textLayout = view.findViewById<LinearLayout>(R.id.layout_field_text)
@@ -387,7 +387,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 if (field == null)
                 {
                     field = Field()
-                    field!!.id = GPSSampleDAO.sharedInstance().createField( field!! )
+                    field!!.id = GPSSampleDAO.fieldDAO.createField( field!! )
                     field!!.studyId = study!!.id
                 }
 
@@ -469,7 +469,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                     }
                 }
 
-                GPSSampleDAO.sharedInstance().updateField( field!! )
+                GPSSampleDAO.fieldDAO.updateField( field!! )
 
                 findNavController().popBackStack()
             }
@@ -502,7 +502,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     override fun didAnswerYes()
     {
-        GPSSampleDAO.sharedInstance().deleteField( field!! )
+        GPSSampleDAO.fieldDAO.deleteField( field!! )
 
         findNavController().popBackStack()
     }
