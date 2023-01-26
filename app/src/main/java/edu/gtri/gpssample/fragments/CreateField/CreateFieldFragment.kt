@@ -64,19 +64,24 @@ class CreateFieldFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val studyId = getArguments()?.getInt( Key.kStudyId.toString());
-
-        if (studyId == null)
+        if (arguments == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Missing studyId.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
+        val studyId = arguments!!.getInt( Key.kStudyId.toString(), -1);
 
+        if (studyId < 0)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        study = GPSSampleDAO.sharedInstance().getStudy( studyId )
         if (study == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Missing study.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -287,26 +292,26 @@ class CreateFieldFragment : Fragment()
                     FieldType.Text -> {
                         val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked.compareTo(false)
-                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
                     }
                     FieldType.Number -> {
                         val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
                         val requiredCheckbox = numberLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked.compareTo(false)
-                        field.required = requiredCheckbox.isChecked.compareTo(false)
-                        field.integerOnly = integerOnlyCheckbox.isChecked.compareTo(false)
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
+                        field.integerOnly = integerOnlyCheckbox.isChecked
                     }
                     FieldType.Date -> {
                         val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
                         val dateCheckbox = dateLayout.findViewById<CheckBox>( R.id.date_checkBox )
                         val timeCheckbox = dateLayout.findViewById<CheckBox>( R.id.time_checkBox)
-                        field.pii = piiCheckbox.isChecked.compareTo(false)
-                        field.required = requiredCheckbox.isChecked.compareTo(false)
-                        field.date = dateCheckbox.isChecked.compareTo(false)
-                        field.time = timeCheckbox.isChecked.compareTo(false)
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
+                        field.date = dateCheckbox.isChecked
+                        field.time = timeCheckbox.isChecked
                     }
                     FieldType.Checkbox -> {
                         val editText1 = checkbox1EditText.text.toString()
@@ -329,8 +334,8 @@ class CreateFieldFragment : Fragment()
 
                         val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked.compareTo(false)
-                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
                     }
                     FieldType.Dropdown -> {
                         val editText1 = dropdown1EditText.text.toString()
@@ -353,8 +358,8 @@ class CreateFieldFragment : Fragment()
 
                         val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                        field.pii = piiCheckbox.isChecked.compareTo(false)
-                        field.required = requiredCheckbox.isChecked.compareTo(false)
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
                     }
                 }
 

@@ -50,24 +50,28 @@ class ManageStudiesFragment : Fragment()
             }
         }
 
-        val configId = getArguments()?.getInt( Key.kConfigId.toString());
-
-        if (configId == null)
+        if (arguments == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Config ID is NULL", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        config = GPSSampleDAO.sharedInstance().getConfiguration( configId!! )
+        val configId = arguments!!.getInt( Key.kConfigId.toString(), -1);
+
+        if (configId < 0)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        config = GPSSampleDAO.sharedInstance().getConfiguration( configId )
         if (config == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal Error! Missing Configuration with id: $configId", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Configuration with id: $configId not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val studies = GPSSampleDAO.sharedInstance().getStudies( config!!.id )
-
-        manageStudiesAdapter = ManageStudiesAdapter(studies)
+        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
         manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
         binding.configNameTextView.text = "Configuration " + config!!.name + " Studies"

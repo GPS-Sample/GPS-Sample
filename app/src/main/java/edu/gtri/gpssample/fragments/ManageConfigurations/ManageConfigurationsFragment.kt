@@ -48,9 +48,7 @@ class ManageConfigurationsFragment : Fragment()
             }
         }
 
-        val configurations = GPSSampleDAO.sharedInstance().getConfigurations()
-
-        manageConfigurationsAdapter = ManageConfigurationsAdapter(configurations)
+        manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Configuration>())
         manageConfigurationsAdapter.selectedItemCallback = this::onItemSelected
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()

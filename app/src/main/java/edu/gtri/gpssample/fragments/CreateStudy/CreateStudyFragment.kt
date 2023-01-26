@@ -45,21 +45,30 @@ class CreateStudyFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val studyId = getArguments()?.getInt( Key.kStudyId.toString());
-        val configId = getArguments()?.getInt( Key.kConfigId.toString());
-
-        if (configId == null)
+        // required: configId
+        if (arguments == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Missing required configId", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (studyId != null)
+        val configId = arguments!!.getInt( Key.kConfigId.toString(), -1);
+
+        if (configId < 0)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // optional: studyId
+        val studyId = arguments!!.getInt( Key.kStudyId.toString(), -1);
+
+        if (studyId > 0)
         {
             study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
             if (study == null)
             {
-                Toast.makeText(activity!!.applicationContext, "Oops! Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "Fatal Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
                 return
             }
         }
@@ -67,13 +76,13 @@ class CreateStudyFragment : Fragment()
         if (study == null)
         {
             study = Study()
-            study!!.isValid = 0
+            study!!.isValid = false
             study!!.configId = configId!!
         }
 
-        if (study!!.isValid == 1)
+        if (study!!.isValid)
         {
-            binding.titleTextView.setText( "Study ${study!!.name}")
+            binding.titleTextView.text = "Study ${study!!.name}"
         }
 
         binding.studyNameEditText.setText( study!!.name )
@@ -84,7 +93,7 @@ class CreateStudyFragment : Fragment()
             }
         }
 
-        createStudyAdapter = CreateStudyAdapter((activity!!.application as MainApplication).fields)
+        createStudyAdapter = CreateStudyAdapter(listOf<Field>())
         createStudyAdapter.selectedItemCallback = this::onItemSelected
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -99,7 +108,7 @@ class CreateStudyFragment : Fragment()
                 return@setOnClickListener
             }
 
-            study!!.isValid = 1
+            study!!.isValid = true
             study!!.name = binding.studyNameEditText.text.toString()
 
             if (study!!.id < 0)
@@ -119,11 +128,11 @@ class CreateStudyFragment : Fragment()
     {
         super.onResume()
 
-        val fields = GPSSampleDAO.sharedInstance().getFields(study!!.id)
-
-        for (field in fields)
+        if (study != null)
         {
-            Log.d( "xxx", field.name )
+            val fields = GPSSampleDAO.sharedInstance().getFields(study!!.id)
+
+            createStudyAdapter.updateFields( fields )
         }
     }
 
@@ -146,7 +155,7 @@ class CreateStudyFragment : Fragment()
                 if (study == null)
                 {
                     study = Study()
-                    study!!.isValid = 0
+                    study!!.isValid = false
                     study!!.id = GPSSampleDAO.sharedInstance().createStudy( study!! )
                 }
 

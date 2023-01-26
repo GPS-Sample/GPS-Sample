@@ -68,19 +68,25 @@ class StudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDeleg
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val studyId = getArguments()?.getInt( Key.kStudyId.toString());
-
-        if (studyId == null)
+        if (arguments == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Missing studyId.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        study = GPSSampleDAO.sharedInstance().getStudy( studyId!! )
+        val studyId = arguments!!.getInt( Key.kStudyId.toString(), -1);
+
+        if (studyId < 0)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        study = GPSSampleDAO.sharedInstance().getStudy( studyId )
 
         if (study == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Oops! Missing study.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
             return
         }
 

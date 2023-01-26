@@ -30,7 +30,7 @@ class CreateStudyAdapter(var fields: List<Field>?) : RecyclerView.Adapter<Create
         return viewHolder
     }
 
-    fun updateFields( studies: List<Field> )
+    fun updateFields( fields: List<Field> )
     {
         this.fields = fields
         notifyDataSetChanged()
@@ -40,12 +40,12 @@ class CreateStudyAdapter(var fields: List<Field>?) : RecyclerView.Adapter<Create
     {
         holder.itemView.isSelected = false
 
-        val fieldModel = fields!!.get(holder.adapterPosition)
+        val field = fields!![holder.adapterPosition]
 
-        holder.nameTextView.setText( fieldModel.name )
+        holder.nameTextView.text = field.name
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(fieldModel, true)
+            selectedItemCallback.invoke(field, true)
         }
     }
 

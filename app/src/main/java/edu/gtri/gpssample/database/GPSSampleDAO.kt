@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.models.Configuration
 import edu.gtri.gpssample.models.Field
 import edu.gtri.gpssample.models.Study
@@ -43,7 +44,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
                 COLUMN_STUDY_NAME + " TEXT," +
                 COLUMN_STUDY_CONFIG_ID + " INTEGER," +
-                COLUMN_STUDY_IS_VALID + " INTEGER" +
+                COLUMN_STUDY_IS_VALID + " BOOLEAN" +
                 ")")
         db.execSQL(createTableStudy)
 
@@ -53,11 +54,11 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
                 COLUMN_FIELD_NAME + " TEXT," +
                 COLUMN_FIELD_STUDY_ID + " INTEGER," +
                 COLUMN_FIELD_TYPE + " STRING," +
-                COLUMN_FIELD_PII + " INTEGER," +
-                COLUMN_FIELD_REQUIRED + " INTEGER," +
-                COLUMN_FIELD_INTEGER_ONLY + " INTEGER," +
-                COLUMN_FIELD_DATE + " INTEGER," +
-                COLUMN_FIELD_TIME + " INTEGER," +
+                COLUMN_FIELD_PII + " BOOLEAN," +
+                COLUMN_FIELD_REQUIRED + " BOOLEAN," +
+                COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN," +
+                COLUMN_FIELD_DATE + " BOOLEAN," +
+                COLUMN_FIELD_TIME + " BOOLEAN," +
                 COLUMN_FIELD_OPTION_1 + " STRING," +
                 COLUMN_FIELD_OPTION_2 + " STRING," +
                 COLUMN_FIELD_OPTION_3 + " STRING," +
@@ -289,7 +290,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             study.id = Integer.parseInt(cursor.getString(0))
             study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
             study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
-            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID))
+            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
         }
 
         cursor.close()
@@ -314,7 +315,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             study.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
             study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
             study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
-            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID))
+            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
 
             studies.add( study )
         }
@@ -341,7 +342,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             study.id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID))
             study.name = cursor.getString(cursor.getColumnIndex(COLUMN_STUDY_NAME))
             study.configId = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_CONFIG_ID))
-            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID))
+            study.isValid = cursor.getInt(cursor.getColumnIndex(COLUMN_STUDY_IS_VALID)).toBoolean()
 
             studies.add( study )
         }
@@ -416,11 +417,11 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
             field.name = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_NAME))
             field.studyId = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_STUDY_ID))
             field.type = FieldType.valueOf(cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_TYPE)))
-            field.pii = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_PII))
-            field.required = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_REQUIRED))
-            field.integerOnly = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_INTEGER_ONLY))
-            field.date = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_DATE))
-            field.time = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_TIME))
+            field.pii = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_PII)).toBoolean()
+            field.required = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_REQUIRED)).toBoolean()
+            field.integerOnly = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
+            field.date = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_DATE)).toBoolean()
+            field.time = cursor.getInt(cursor.getColumnIndex(COLUMN_FIELD_TIME)).toBoolean()
             field.option1 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_1))
             field.option2 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_2))
             field.option3 = cursor.getString(cursor.getColumnIndex(COLUMN_FIELD_OPTION_3))
@@ -437,7 +438,7 @@ class GPSSampleDAO( context: Context, name: String?, factory: SQLiteDatabase.Cur
 
     companion object
     {
-        private const val DATABASE_VERSION = 13
+        private const val DATABASE_VERSION = 14
         private const val DATABASE_NAME = "GPSSampleDB.db"
         private const val COLUMN_ID = "id"
 
