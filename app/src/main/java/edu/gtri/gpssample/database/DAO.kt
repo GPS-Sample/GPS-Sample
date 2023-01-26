@@ -3,8 +3,9 @@ package edu.gtri.gpssample.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import edu.gtri.gpssample.constants.Key
 
-class DAO(context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
+class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
 {
     //--------------------------------------------------------------------------
@@ -12,49 +13,49 @@ class DAO(context: Context, name: String?, factory: SQLiteDatabase.CursorFactory
     {
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_USER_ROLE + " TEXT," +
-                COLUMN_USER_NAME + " TEXT," +
-                COLUMN_USER_PIN + " INTEGER," +
-                COLUMN_USER_RECOVERY_QUESTION + " TEXT," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_USER_ROLE + " TEXT" +  "," +
+                COLUMN_USER_NAME + " TEXT" + "," +
+                COLUMN_USER_PIN + " INTEGER" + "," +
+                COLUMN_USER_RECOVERY_QUESTION + " TEXT" + "," +
                 COLUMN_USER_RECOVERY_ANSWER + " TEXT" +
                 ")")
         db.execSQL(createTableUser)
 
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_CONFIG_NAME + " TEXT," +
-                COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT," +
-                COLUMN_CONFIG_DATE_FORMAT + " TEXT," +
-                COLUMN_CONFIG_TIME_FORMAT + " TEXT," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_CONFIG_NAME + " TEXT" + "," +
+                COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT" + "," +
+                COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
+                COLUMN_CONFIG_TIME_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" +
                 ")")
         db.execSQL(createTableConfig)
 
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_STUDY_NAME + " TEXT," +
-                COLUMN_STUDY_CONFIG_ID + " INTEGER," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_STUDY_NAME + " TEXT" + "," +
+                COLUMN_STUDY_CONFIG_ID + " INTEGER" + "," +
                 COLUMN_STUDY_IS_VALID + " BOOLEAN" +
                 ")")
         db.execSQL(createTableStudy)
 
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY," +
-                COLUMN_FIELD_NAME + " TEXT," +
-                COLUMN_FIELD_STUDY_ID + " INTEGER," +
-                COLUMN_FIELD_TYPE + " STRING," +
-                COLUMN_FIELD_PII + " BOOLEAN," +
-                COLUMN_FIELD_REQUIRED + " BOOLEAN," +
-                COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN," +
-                COLUMN_FIELD_DATE + " BOOLEAN," +
-                COLUMN_FIELD_TIME + " BOOLEAN," +
-                COLUMN_FIELD_OPTION_1 + " STRING," +
-                COLUMN_FIELD_OPTION_2 + " STRING," +
-                COLUMN_FIELD_OPTION_3 + " STRING," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_FIELD_NAME + " TEXT" + "," +
+                COLUMN_FIELD_STUDY_ID + " INTEGER" + "," +
+                COLUMN_FIELD_TYPE + " STRING" + "," +
+                COLUMN_FIELD_PII + " BOOLEAN" + "," +
+                COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
+                COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN" + "," +
+                COLUMN_FIELD_DATE + " BOOLEAN" + "," +
+                COLUMN_FIELD_TIME + " BOOLEAN" + "," +
+                COLUMN_FIELD_OPTION_1 + " STRING" + "," +
+                COLUMN_FIELD_OPTION_2 + " STRING" + "," +
+                COLUMN_FIELD_OPTION_3 + " STRING" + "," +
                 COLUMN_FIELD_OPTION_4 + " STRING" +
                 ")")
         db.execSQL(createTableField)
@@ -63,6 +64,16 @@ class DAO(context: Context, name: String?, factory: SQLiteDatabase.CursorFactory
     //--------------------------------------------------------------------------
     override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
     {
+        // clear cached user info from preferences
+        val sharedPreferences = context.applicationContext.getSharedPreferences( "default", 0 )
+        val editor = sharedPreferences.edit()
+
+        editor.putInt( Key.kPin.toString(), -1 )
+        editor.putInt( Key.kUserId.toString(), -1 )
+        editor.putString( Key.kUserName.toString(), null )
+        editor.commit()
+
+        // clear all tables
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIG)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDY)
@@ -73,7 +84,6 @@ class DAO(context: Context, name: String?, factory: SQLiteDatabase.CursorFactory
     //--------------------------------------------------------------------------
     companion object
     {
-        private const val DATABASE_VERSION = 15
         private const val DATABASE_NAME = "GPSSampleDB.db"
         const val COLUMN_ID = "id"
 
@@ -142,5 +152,7 @@ class DAO(context: Context, name: String?, factory: SQLiteDatabase.CursorFactory
         {
             return instance!!
         }
+
+        private const val DATABASE_VERSION = 19
     }
 }

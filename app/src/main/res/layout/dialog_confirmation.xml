@@ -14,7 +14,7 @@
         android:layout_marginRight="20dp"
         android:focusable="false"
         android:gravity="center_vertical"
-        android:textColor="@color/black"
+        android:textColor="@color/primary_textcolor"
         android:textSize="16sp" />
 
     <LinearLayout

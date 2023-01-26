@@ -61,15 +61,15 @@ class SignInFragment : Fragment()
 
             if (userName.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter your User Name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "Please enter your User Name.", Toast.LENGTH_SHORT).show()
             }
             else if (userName != expectedUserName)
             {
-                Toast.makeText(activity!!.applicationContext, "The User Name is incorrect", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "User Name not found.", Toast.LENGTH_SHORT).show()
             }
             else if (pin.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter your PIN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "Please enter your PIN.", Toast.LENGTH_SHORT).show()
             }
             else if (pin.toInt() != expectedPin)
             {
