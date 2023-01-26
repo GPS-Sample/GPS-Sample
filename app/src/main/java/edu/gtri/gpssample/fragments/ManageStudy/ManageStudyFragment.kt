@@ -23,7 +23,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageStudyBinding
-import edu.gtri.gpssample.models.Study
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.models
+package edu.gtri.gpssample.database.models
 
 import edu.gtri.gpssample.constants.FieldType
 

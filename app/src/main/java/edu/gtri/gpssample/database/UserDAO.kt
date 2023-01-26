@@ -3,12 +3,12 @@ package edu.gtri.gpssample.database
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.models.User
+import edu.gtri.gpssample.database.models.User
 
 class UserDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createUser( user: User ) : Int
+    fun createUser( user: User) : Int
     {
         val values = ContentValues()
 

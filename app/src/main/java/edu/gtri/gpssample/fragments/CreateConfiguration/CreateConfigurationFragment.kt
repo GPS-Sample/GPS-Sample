@@ -18,7 +18,7 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
-import edu.gtri.gpssample.models.Config
+import edu.gtri.gpssample.database.models.Config
 
 class CreateConfigurationFragment : Fragment()
 {

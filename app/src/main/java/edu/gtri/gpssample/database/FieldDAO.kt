@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.extensions.toBoolean
-import edu.gtri.gpssample.models.Field
+import edu.gtri.gpssample.database.models.Field
 
 class FieldDAO(private var dao: DAO)
 {

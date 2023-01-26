@@ -4,8 +4,8 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.graphics.Bitmap
-import edu.gtri.gpssample.models.Field
-import edu.gtri.gpssample.models.Study
+import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 
 class MainApplication : Application()

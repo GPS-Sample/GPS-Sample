@@ -15,7 +15,7 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
-import edu.gtri.gpssample.models.User
+import edu.gtri.gpssample.database.models.User
 
 class SignUpFragment : Fragment()
 {

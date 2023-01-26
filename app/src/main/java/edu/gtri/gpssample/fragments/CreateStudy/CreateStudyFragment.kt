@@ -14,8 +14,8 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.models.Field
-import edu.gtri.gpssample.models.Study
+import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Study
 
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {

@@ -13,7 +13,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.models.Config
+import edu.gtri.gpssample.database.models.Config
 
 class ManageConfigurationsFragment : Fragment()
 {

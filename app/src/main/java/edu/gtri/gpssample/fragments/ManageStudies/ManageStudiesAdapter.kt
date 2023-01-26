@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.Study
+import edu.gtri.gpssample.database.models.Study
 
 class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<ManageStudiesAdapter.ViewHolder>()
 {

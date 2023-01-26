@@ -5,12 +5,12 @@ import android.database.Cursor
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
-import edu.gtri.gpssample.models.Config
+import edu.gtri.gpssample.database.models.Config
 
 class ConfigDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createConfig( config: Config ) : Int
+    fun createConfig( config: Config) : Int
     {
         val values = ContentValues()
 

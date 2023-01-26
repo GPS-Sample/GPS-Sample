@@ -3,7 +3,7 @@ package edu.gtri.gpssample.database
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.extensions.toBoolean
-import edu.gtri.gpssample.models.Study
+import edu.gtri.gpssample.database.models.Study
 
 class StudyDAO(private var dao: DAO)
 {

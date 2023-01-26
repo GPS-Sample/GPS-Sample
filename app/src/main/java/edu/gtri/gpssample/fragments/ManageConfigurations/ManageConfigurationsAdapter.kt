@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.models.Config
+import edu.gtri.gpssample.database.models.Config
 
 class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerView.Adapter<ManageConfigurationsAdapter.ViewHolder>()
 {
