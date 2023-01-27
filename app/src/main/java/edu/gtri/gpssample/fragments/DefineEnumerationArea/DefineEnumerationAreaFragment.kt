@@ -43,7 +43,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, "DefineEnumerationAreaFragment", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
             }
         }
 

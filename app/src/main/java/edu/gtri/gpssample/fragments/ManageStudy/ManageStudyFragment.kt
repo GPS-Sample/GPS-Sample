@@ -93,7 +93,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, "StudyFragment", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -119,7 +119,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, "CreateFieldFragment", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
             }
         }
 
