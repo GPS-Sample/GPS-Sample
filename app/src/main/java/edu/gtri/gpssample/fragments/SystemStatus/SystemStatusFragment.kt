@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.BarcodeScan
+package edu.gtri.gpssample.fragments.SystemStatus
 
 import android.content.Context
 import android.content.Context.WIFI_SERVICE
@@ -19,29 +19,27 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
-import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
-import edu.gtri.gpssample.R
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.databinding.FragmentBarcodeScanBinding
+import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
+import edu.gtri.gpssample.models.Command
+import edu.gtri.gpssample.models.NetworkCommand
+import edu.gtri.gpssample.models.NetworkUser
 import edu.gtri.gpssample.network.HeartBeatTransmitter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.json.JSONObject
-import java.net.Inet4Address
 import java.net.InetAddress
-import java.net.NetworkInterface
+import java.util.UUID
 
-class BarcodeScanFragment : Fragment()
+class SystemStatusFragment : Fragment()
 {
-    private var _binding: FragmentBarcodeScanBinding? = null
+    private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: BarcodeScanViewModel
-    private val message = "Hello, World."
+    private lateinit var viewModel: SystemStatusViewModel
     private lateinit var myInetAddress: InetAddress
     private lateinit var serverInetAddress: InetAddress
     private val heartBeatTransmitter = HeartBeatTransmitter()
@@ -49,12 +47,12 @@ class BarcodeScanFragment : Fragment()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(BarcodeScanViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(SystemStatusViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentBarcodeScanBinding.inflate(inflater, container, false)
+        _binding = FragmentSystemStatusBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -73,25 +71,9 @@ class BarcodeScanFragment : Fragment()
             }
         }
 
-        binding.scanButton.setOnClickListener {
+        binding.wifiImageButton.setOnClickListener {
             val intent = Intent(activity!!, CameraXLivePreviewActivity::class.java)
             startActivityForResult( intent, 0 )
-        }
-
-        binding.signOutButton.setOnClickListener {
-
-            heartBeatTransmitter.stopTransmitting()
-
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-            {
-            }
-            else
-            {
-                val connectivityManager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                connectivityManager.unregisterNetworkCallback( networkCallback )
-            }
-
-            findNavController().navigate(R.id.action_navigate_to_MainFragment)
         }
     }
 
@@ -101,12 +83,12 @@ class BarcodeScanFragment : Fragment()
 
         if (resultCode == ResultCode.BarcodeScanned.value)
         {
-            val payload = data!!.getStringExtra( Key.kPayload.toString() )
+            val payload = data!!.getStringExtra( Key.kPayload.toString())
 
             val jsonObject = JSONObject( payload );
 
             Log.d( "xxx", jsonObject.toString(2))
-            binding.payloadTextView.text = jsonObject.toString(2)
+//            binding.payloadTextView.text = jsonObject.toString(2)
 
             val ssid = jsonObject.getString( Key.kSSID.toString() )
             val pass = jsonObject.getString( Key.kPass.toString() )
@@ -141,11 +123,7 @@ class BarcodeScanFragment : Fragment()
 
                         if (!heartBeatTransmitter.isEnabled())
                         {
-                            lifecycleScope.launchWhenStarted {
-                                whenStarted {
-                                    heartBeatTransmitter.beginTransmitting( myInetAddress, serverInetAddress, message.toByteArray())
-                                }
-                            }
+                            beginTransmittingHeartbeat()
                         }
                     }, 1000)
                 } catch (e: Exception) {
@@ -155,8 +133,8 @@ class BarcodeScanFragment : Fragment()
             else
             {
                 val builder = WifiNetworkSpecifier.Builder()
-                builder.setSsid( jsonObject.getString("ssid" ));
-                builder.setWpa2Passphrase(jsonObject.getString("pass" ))
+                builder.setSsid( ssid );
+                builder.setWpa2Passphrase( pass )
                 val wifiNetworkSpecifier = builder.build()
 
                 val networkRequestBuilder = NetworkRequest.Builder()
@@ -191,6 +169,25 @@ class BarcodeScanFragment : Fragment()
         return null
     }
 
+    private fun beginTransmittingHeartbeat()
+    {
+        lifecycleScope.launchWhenStarted {
+            whenStarted {
+                binding.wifiCheckBox.isChecked = true
+
+                val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
+                val userName = sharedPreferences.getString( Key.kUserName.toString(), "" )
+
+                val networkUser = NetworkUser( userName!!, UUID.randomUUID().toString(), true )
+                val networkUserMessage = Json.encodeToString( networkUser )
+                val networkCommand = NetworkCommand( Command.User.value, networkUserMessage )
+                val networkCommandMessage = Json.encodeToString( networkCommand )
+
+                heartBeatTransmitter.beginTransmitting( myInetAddress, serverInetAddress, networkCommandMessage.toByteArray())
+            }
+        }
+    }
+
     private val networkCallback = object : ConnectivityManager.NetworkCallback()
     {
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities)
@@ -199,11 +196,7 @@ class BarcodeScanFragment : Fragment()
 
             if (networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED) && !heartBeatTransmitter.isEnabled())
             {
-                lifecycleScope.launchWhenStarted {
-                    whenStarted {
-                        heartBeatTransmitter.beginTransmitting( myInetAddress, serverInetAddress, message.toByteArray())
-                    }
-                }
+                beginTransmittingHeartbeat()
             }
         }
 
@@ -224,7 +217,7 @@ class BarcodeScanFragment : Fragment()
             myInetAddress = InetAddress.getByName( myAddress )
             serverInetAddress = InetAddress.getByName( serverAddress )
 
-            binding.payloadTextView.text = binding.payloadTextView.text.toString() + "\n\nserver addr: " + serverAddress + "\nmy addr: " + myAddress
+//            binding.payloadTextView.text = binding.payloadTextView.text.toString() + "\n\nserver addr: " + serverAddress + "\nmy addr: " + myAddress
         }
     }
 

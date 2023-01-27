@@ -24,18 +24,25 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageStudyBinding
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.models.Command
+import edu.gtri.gpssample.models.NetworkCommand
+import edu.gtri.gpssample.models.NetworkUser
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate
 {
@@ -47,7 +54,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
     private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
     private lateinit var viewModel: ManageStudyViewModel
-
+    private var networkUsers = ArrayList<NetworkUser>()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -97,9 +104,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
             }
         }
 
-        val users = DAO.userDAO.getUsers()
-
-        studyAdapter = ManageStudyAdapter(users)
+        studyAdapter = ManageStudyAdapter(networkUsers)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = studyAdapter
@@ -110,6 +115,8 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
         binding.generateBarcodeButton.setOnClickListener {
             try
             {
+                binding.generateBarcodeButton.isEnabled = false
+
                 val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
 
                 wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
@@ -117,6 +124,10 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
                     override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
                     {
                         super.onStarted(reservation)
+
+                        binding.generateBarcodeButton.visibility = View.GONE
+                        binding.imageView.visibility = View.VISIBLE
+                        binding.usersOnlineTextView.visibility = View.VISIBLE
 
                         localOnlyHotspotReservation = reservation
 
@@ -171,8 +182,8 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
                         }
 
                         val jsonObject = JSONObject()
-                        jsonObject.put( "ssid", ssid )
-                        jsonObject.put( "pass", pass )
+                        jsonObject.put( Key.kSSID.toString(), ssid )
+                        jsonObject.put( Key.kPass.toString(), pass )
 
                         val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
                         qrgEncoder.setColorBlack(Color.WHITE);
@@ -197,11 +208,11 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
                 {
                     dataIsFresh = false;
                 }
-//                else if ((activity!!.application as MainApplication).users[0].isOnline)
-//                {
-//                    (activity!!.application as MainApplication).users[0].isOnline = false
-//                    studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
-//                }
+                else
+                {
+                    networkUsers.clear()
+                    studyAdapter.updateUsers( networkUsers )
+                }
             },{throwable->
                 Log.d( "xxx", throwable.stackTraceToString())
             })
@@ -210,17 +221,29 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
     private var dataIsFresh = false
 
-    override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket)
+    override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
     {
         dataIsFresh = true
 
-//        (activity!!.application as MainApplication).users[0].isOnline = true
-//
-//        activity!!.runOnUiThread{
-//            studyAdapter.updateUsers( (activity!!.application as MainApplication).users )
-//        }
+        val message = String( datagramPacket.data, 0, datagramPacket.length )
 
-        Log.d( "xxx", "received : " + datagramPacket.length )
+        val networkCommand = Json.decodeFromString<NetworkCommand>( message )
+
+        when( networkCommand.command )
+        {
+            Command.User.value -> {
+                val networkUser = Json.decodeFromString<NetworkUser>( networkCommand.message )
+                val user = networkUsers.find { it.name == networkUser.name }
+                if (user == null)
+                {
+                    networkUsers.add( networkUser )
+
+                    activity!!.runOnUiThread{
+                        studyAdapter.updateUsers( networkUsers )
+                    }
+                }
+            }
+        }
     }
 
     fun getWifiApIpAddresses(): ArrayList<InetAddress> {

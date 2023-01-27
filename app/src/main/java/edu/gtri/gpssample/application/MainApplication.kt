@@ -12,18 +12,13 @@ class MainApplication : Application()
 {
     var barcodeBitmap : Bitmap? = null
 
-//    var users = mutableListOf<User>()
-    var fields = mutableListOf<Field>()
-    var studies = mutableListOf<Study>()
-//    var configurations = mutableListOf<Configuration>()
-
     override fun onCreate()
     {
         super.onCreate()
         val serviceChannel = NotificationChannel(
 
             UDPBroadcastReceiverService.SERVICE_CHANNEL_ID,
-            "Panic Button Service",
+            "UDP Broadcast Receiver Service",
             NotificationManager.IMPORTANCE_LOW
 
         )

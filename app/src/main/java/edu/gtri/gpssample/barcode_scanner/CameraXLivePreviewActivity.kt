@@ -45,6 +45,7 @@ import com.google.android.gms.common.annotation.KeepName
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.barcode.common.Barcode
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode
 import java.util.ArrayList
 
@@ -224,7 +225,7 @@ class CameraXLivePreviewActivity :
         Observer { barcode: Barcode? ->
           if (barcode != null) {
             val data = Intent();
-            data.putExtra( "value", barcode.rawValue!! )
+            data.putExtra( Key.kPayload.toString(), barcode.rawValue!! )
             setResult( ResultCode.BarcodeScanned.value, data )
             finish()
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)

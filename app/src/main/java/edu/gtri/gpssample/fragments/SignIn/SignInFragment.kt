@@ -91,9 +91,6 @@ class SignInFragment : Fragment()
                 {
                     binding.pinEditText.setText("")
 
-                    (activity!!.application as MainApplication).fields.clear()
-                    (activity!!.application as MainApplication).studies.clear()
-
                     val bundle = Bundle()
                     bundle.putString( Key.kRole.toString(), role.toString())
 

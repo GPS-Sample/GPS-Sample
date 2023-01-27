@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_root_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.SystemStatus.SystemStatusFragment">
+
+    <TextView
+        android:id="@+id/title_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_margin="20dp"
+        android:layout_gravity="top"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/admin"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <CheckBox
+            android:id="@+id/wifi_check_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="WiFi Connected" />
+
+        <ImageButton
+            android:id="@+id/wifi_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/background_rounded_primary_frame_clear_fill"
+            android:src="@drawable/wifi_blue" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <CheckBox
+            android:id="@+id/config_check_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Configuration Received" />
+
+        <ImageButton
+            android:id="@+id/config_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/background_rounded_primary_frame_clear_fill"
+            android:src="@drawable/download_blue" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <CheckBox
+            android:id="@+id/study_check_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Study Received" />
+
+        <ImageButton
+            android:id="@+id/study_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/background_rounded_primary_frame_clear_fill"
+            android:src="@drawable/download_blue" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <CheckBox
+            android:id="@+id/fields_check_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Study Fields Received" />
+
+        <ImageButton
+            android:id="@+id/fields_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/background_rounded_primary_frame_clear_fill"
+            android:src="@drawable/download_blue" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <CheckBox
+            android:id="@+id/shape_files_check_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Shape Files Received" />
+
+        <ImageButton
+            android:id="@+id/shape_files_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/background_rounded_primary_frame_clear_fill"
+            android:src="@drawable/download_blue" />
+    </LinearLayout>
+</LinearLayout>

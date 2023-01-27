@@ -137,8 +137,8 @@
 
     <fragment
         android:id="@+id/BarcodeScanFragment"
-        android:name="edu.gtri.gpssample.fragments.BarcodeScan.BarcodeScanFragment"
-        tools:layout="@layout/fragment_barcode_scan">
+        android:name="edu.gtri.gpssample.fragments.SystemStatus.SystemStatusFragment"
+        tools:layout="@layout/fragment_system_status">
 
         <action
             android:id="@+id/action_navigate_to_MainFragment"
