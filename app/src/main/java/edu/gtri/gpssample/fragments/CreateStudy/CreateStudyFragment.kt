@@ -121,18 +121,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             findNavController().popBackStack()
         }
-
-        binding.manageButton.setOnClickListener {
-
-            if (study!!.isValid)
-            {
-                val bundle = Bundle()
-
-                bundle.putInt( Key.kStudyId.toString(), study!!.id )
-
-                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
-            }
-        }
     }
 
     override fun onResume()
@@ -144,15 +132,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             val fields = DAO.fieldDAO.getFields(study!!.id)
 
             createStudyAdapter.updateFields( fields )
-
-            if (study!!.isValid)
-            {
-                binding.manageButton.visibility = View.VISIBLE
-            }
-            else
-            {
-                binding.manageButton.visibility = View.GONE
-            }
         }
     }
 
@@ -179,12 +158,15 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             R.id.action_create_field ->
             {
                 val bundle = Bundle()
-
                 bundle.putInt( Key.kStudyId.toString(), study!!.id )
-
                 findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
 
                 return true
+            }
+            R.id.action_manage_study -> {
+                val bundle = Bundle()
+                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
             }
             R.id.action_delete_study -> {
                 ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", this)

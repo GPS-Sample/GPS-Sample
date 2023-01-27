@@ -125,5 +125,6 @@
     <string name="add_another">ADD ANOTHER</string>
     <string name="delete_field">Delete Field</string>
     <string name="manage_this_study">Manage this Study</string>
+    <string name="manage_study">Manage Study</string>
 
 </resources>
