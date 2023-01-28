@@ -28,9 +28,9 @@ class HeartBeatTransmitter
 
     suspend fun beginTransmitting( myInetAddress: InetAddress, serverInetAddress: InetAddress, bytes: ByteArray )
     {
-        Log.d( "xxx", "begin transmitting heartbeat on " + myInetAddress + " to " + serverInetAddress )
+        Log.d( "xxx", "begin transmitting heartbeat on $myInetAddress:$port to ${serverInetAddress}:$port" )
 
-        val backgroundResult = withContext(Dispatchers.Default)
+        val backgroundResult = withContext(Dispatchers.IO)
         {
             if (datagramSocket == null)
             {
@@ -45,7 +45,7 @@ class HeartBeatTransmitter
 
             delay(1000)
 
-            while (enabled)
+            while( enabled )
             {
                 try {
                     datagramSocket!!.send( datagramPacket )
@@ -53,7 +53,7 @@ class HeartBeatTransmitter
                 }
                 catch( ex: Exception )
                 {
-                    Log.d( "xxx", ex.printStackTrace().toString())
+                    Log.d( "xxx", ex.stackTraceToString())
                     stopTransmitting()
                 }
             }

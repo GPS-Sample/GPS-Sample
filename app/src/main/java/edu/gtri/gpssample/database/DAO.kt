@@ -9,7 +9,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
 {
     //--------------------------------------------------------------------------
-    override fun onCreate(db: SQLiteDatabase)
+    override fun onCreate( db: SQLiteDatabase )
     {
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
@@ -62,7 +62,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     }
 
     //--------------------------------------------------------------------------
-    override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
+    override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int )
     {
         // clear cached user info from preferences
         val sharedPreferences = context.applicationContext.getSharedPreferences( "default", 0 )

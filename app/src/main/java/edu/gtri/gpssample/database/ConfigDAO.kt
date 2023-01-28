@@ -10,15 +10,11 @@ import edu.gtri.gpssample.database.models.Config
 class ConfigDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createConfig( config: Config) : Int
+    fun createConfig( config: Config ) : Int
     {
         val values = ContentValues()
 
-        values.put(DAO.COLUMN_CONFIG_NAME, config.name )
-        values.put(DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat.toString() )
-        values.put(DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat.toString() )
-        values.put(DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat.toString() )
-        values.put(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
+        putConfig( config, values )
 
         return dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
     }
@@ -36,8 +32,7 @@ class ConfigDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-
-            config = createConfig( cursor )
+            config = createConfigModel( cursor )
         }
 
         cursor.close()
@@ -47,15 +42,13 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun createConfig( cursor: Cursor) : Config
+    private fun createConfigModel( cursor: Cursor ) : Config
     {
         val config = Config()
 
         config.id = Integer.parseInt(cursor.getString(0))
         config.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
-        config.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(
-            DAO.COLUMN_CONFIG_DISTANCE_FORMAT
-        )))
+        config.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT)))
         config.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT)))
         config.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT)))
         config.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
@@ -74,7 +67,7 @@ class ConfigDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            configs.add( createConfig( cursor ))
+            configs.add( createConfigModel( cursor ))
         }
 
         cursor.close()
@@ -84,26 +77,31 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun updateConfig( config: Config)
+    fun putConfig( config: Config, values: ContentValues )
+    {
+        values.put( DAO.COLUMN_CONFIG_NAME, config.name )
+        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat.toString())
+        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat.toString())
+        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat.toString())
+        values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
+    }
+
+    //--------------------------------------------------------------------------
+    fun updateConfig( config: Config )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(config.id.toString())
-
         val values = ContentValues()
 
-        values.put(DAO.COLUMN_CONFIG_NAME, config.name )
-        values.put(DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat.toString())
-        values.put(DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat.toString())
-        values.put(DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat.toString())
-        values.put(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
+        putConfig( config, values )
 
         db.update(DAO.TABLE_CONFIG, values, whereClause, args )
         db.close()
     }
 
     //--------------------------------------------------------------------------
-    fun deleteConfig( config: Config)
+    fun deleteConfig( config: Config )
     {
         val studies = DAO.studyDAO.getStudies( config.id )
 

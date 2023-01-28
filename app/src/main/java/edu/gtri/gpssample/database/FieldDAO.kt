@@ -9,7 +9,7 @@ import edu.gtri.gpssample.database.models.Field
 class FieldDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createField( field: Field) : Int
+    fun createField( field: Field ) : Int
     {
         val values = ContentValues()
 
@@ -19,29 +19,28 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun putField(field: Field, values: ContentValues)
+    fun putField( field: Field, values: ContentValues )
     {
-        values.put(DAO.COLUMN_FIELD_NAME, field.name )
-        values.put(DAO.COLUMN_FIELD_STUDY_ID, field.studyId )
-        values.put(DAO.COLUMN_FIELD_TYPE, field.type.toString() )
-        values.put(DAO.COLUMN_FIELD_PII, field.pii )
-        values.put(DAO.COLUMN_FIELD_REQUIRED, field.required )
-        values.put(DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
-        values.put(DAO.COLUMN_FIELD_DATE, field.date )
-        values.put(DAO.COLUMN_FIELD_TIME, field.time )
-        values.put(DAO.COLUMN_FIELD_OPTION_1, field.option1 )
-        values.put(DAO.COLUMN_FIELD_OPTION_2, field.option2 )
-        values.put(DAO.COLUMN_FIELD_OPTION_3, field.option3 )
-        values.put(DAO.COLUMN_FIELD_OPTION_4, field.option4 )
+        values.put( DAO.COLUMN_FIELD_NAME, field.name )
+        values.put( DAO.COLUMN_FIELD_STUDY_ID, field.studyId )
+        values.put( DAO.COLUMN_FIELD_TYPE, field.type.toString() )
+        values.put( DAO.COLUMN_FIELD_PII, field.pii )
+        values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
+        values.put( DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
+        values.put( DAO.COLUMN_FIELD_DATE, field.date )
+        values.put( DAO.COLUMN_FIELD_TIME, field.time )
+        values.put( DAO.COLUMN_FIELD_OPTION_1, field.option1 )
+        values.put( DAO.COLUMN_FIELD_OPTION_2, field.option2 )
+        values.put( DAO.COLUMN_FIELD_OPTION_3, field.option3 )
+        values.put( DAO.COLUMN_FIELD_OPTION_4, field.option4 )
     }
 
     //--------------------------------------------------------------------------
-    fun updateField( field: Field)
+    fun updateField( field: Field )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(field.id.toString())
-
         val values = ContentValues()
 
         putField( field, values )
@@ -56,14 +55,13 @@ class FieldDAO(private var dao: DAO)
         var field: Field? = null
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_ID} = $fieldId"
-
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
             cursor.moveToNext()
 
-            field = createField( cursor )
+            field = createFieldModel( cursor )
         }
 
         cursor.close()
@@ -73,7 +71,7 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun  createField( cursor: Cursor): Field
+    private fun  createFieldModel( cursor: Cursor ): Field
     {
         val field = Field()
 
@@ -100,12 +98,11 @@ class FieldDAO(private var dao: DAO)
         val fields = ArrayList<Field>()
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_FIELD_STUDY_ID} = $studyId"
-
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            fields.add( createField( cursor ))
+            fields.add( createFieldModel( cursor ))
         }
 
         cursor.close()
@@ -120,12 +117,11 @@ class FieldDAO(private var dao: DAO)
         val fields = ArrayList<Field>()
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD}"
-
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            fields.add( createField( cursor ))
+            fields.add( createFieldModel( cursor ))
         }
 
         cursor.close()
@@ -135,11 +131,12 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun deleteField( field: Field)
+    fun deleteField( field: Field )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(field.id.toString())
+
         db.delete(DAO.TABLE_FIELD, whereClause, args)
         db.close()
     }

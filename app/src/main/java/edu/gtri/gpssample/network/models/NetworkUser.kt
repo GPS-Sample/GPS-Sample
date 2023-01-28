@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.models
+package edu.gtri.gpssample.network.models
 
 import kotlinx.serialization.Serializable
 

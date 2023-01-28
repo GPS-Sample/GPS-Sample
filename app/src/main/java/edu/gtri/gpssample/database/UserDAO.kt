@@ -27,14 +27,13 @@ class UserDAO(private var dao: DAO)
         var user: User? = null
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_ID} = $id"
-
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
             cursor.moveToNext()
 
-            user = createUser( cursor )
+            user = createUserModel( cursor )
         }
 
         cursor.close()
@@ -44,7 +43,7 @@ class UserDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun createUser( cursor: Cursor) : User
+    private fun createUserModel( cursor: Cursor) : User
     {
         val user = User()
 
@@ -64,12 +63,11 @@ class UserDAO(private var dao: DAO)
         val users = ArrayList<User>()
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_USER}"
-
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            users.add( createUser( cursor ))
+            users.add( createUserModel( cursor ))
         }
 
         cursor.close()
@@ -77,5 +75,4 @@ class UserDAO(private var dao: DAO)
 
         return users
     }
-
 }

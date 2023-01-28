@@ -8,8 +8,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.User
-import edu.gtri.gpssample.models.NetworkUser
+import edu.gtri.gpssample.network.models.NetworkUser
 
 class ManageStudyAdapter(var networkUsers: List<NetworkUser>?) : RecyclerView.Adapter<ManageStudyAdapter.ViewHolder>()
 {

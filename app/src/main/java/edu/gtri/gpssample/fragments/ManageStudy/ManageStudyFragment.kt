@@ -24,17 +24,19 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageStudyBinding
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.database.models.User
-import edu.gtri.gpssample.models.Command
-import edu.gtri.gpssample.models.NetworkCommand
-import edu.gtri.gpssample.models.NetworkUser
+import edu.gtri.gpssample.network.TCPClient
+import edu.gtri.gpssample.network.TCPServer
+import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.NetworkUser
 import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.net.DatagramPacket
@@ -44,13 +46,15 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate
+class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate, TCPServer.TCPServerDelegate
 {
     private var study: Study? = null
+    private var serverInetAddress: InetAddress? = null
     private var _binding: FragmentManageStudyBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
     private lateinit var studyAdapter: ManageStudyAdapter
+    private val tcpServer: TCPServer = TCPServer()
     private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
     private lateinit var viewModel: ManageStudyViewModel
@@ -112,6 +116,12 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         val oldWifiAdresses = getWifiApIpAddresses()
 
+        Log.d( "xxx", "searching for old WiFi addresses..." )
+        for (address in oldWifiAdresses)
+        {
+            Log.d( "xxx", address.hostAddress )
+        }
+
         binding.generateBarcodeButton.setOnClickListener {
             try
             {
@@ -142,13 +152,11 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
                         val newWifiAddresses = getWifiApIpAddresses()
 
-                        var inetAddress: InetAddress? = null
-
                         if (oldWifiAdresses.isEmpty())
                         {
                             if (!newWifiAddresses.isEmpty())
                             {
-                                inetAddress = newWifiAddresses[0]
+                                serverInetAddress = newWifiAddresses[0]
                             }
                         }
                         else
@@ -163,21 +171,21 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
                                     }
                                     else
                                     {
-                                        inetAddress = newAddr
+                                        serverInetAddress = newAddr
                                         break;
                                     }
                                 }
                             }
                         }
 
-                        if (inetAddress != null)
+                        if (serverInetAddress != null)
                         {
-                            Log.d( "xxx", "inetAddress = " + inetAddress!!.hostAddress )
+                            lifecycleScope.launch {
+                                tcpServer.beginListening( serverInetAddress!!, this@ManageStudyFragment )
+                            }
 
-                            lifecycleScope.launchWhenStarted {
-                                whenStarted {
-                                    udpBroadcastReceiver.beginListening( inetAddress!!, this@ManageStudyFragment )
-                                }
+                            lifecycleScope.launch {
+                                udpBroadcastReceiver.beginListening( serverInetAddress!!, this@ManageStudyFragment )
                             }
                         }
 
@@ -231,7 +239,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         when( networkCommand.command )
         {
-            Command.User.value -> {
+            NetworkCommand.NetworkUserCommand -> {
                 val networkUser = Json.decodeFromString<NetworkUser>( networkCommand.message )
                 val user = networkUsers.find { it.name == networkUser.name }
                 if (user == null)
@@ -242,6 +250,9 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
                         studyAdapter.updateUsers( networkUsers )
                     }
                 }
+            }
+            NetworkCommand.NetworkRequestConfigCommand -> {
+                Log.d( "xxx", "received: NetworkRequestConfigCommand" )
             }
         }
     }
@@ -260,7 +271,6 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
                             val inetAddr = inetAddress.hostAddress!!
                             if (!inetAddr.contains(":")) {
                                 list.add( inetAddress)
-                                Log.d("xxx", inetAddress.getHostAddress())
                             }
                         }
                     }
@@ -283,12 +293,12 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         when (item.itemId) {
             R.id.action_edit_study -> {
-                val bundle = Bundle()
 
-                bundle.putInt( Key.kStudyId.toString(), study!!.id )
-                bundle.putInt( Key.kConfigId.toString(), study!!.configId )
-
-                findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
+                val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, "" )
+                val networkCommandMessage = Json.encodeToString( networkCommand )
+                lifecycleScope.launch {
+                    TCPClient().write( serverInetAddress!!.hostAddress, networkCommandMessage )
+                }
                 return true
             }
 
@@ -302,12 +312,18 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
         return false
     }
 
+    override fun didReceiveMessage(message: String )
+    {
+        Log.d( "xxx", "didReceiveMessage: $message" )
+    }
+
     override fun onDestroyView()
     {
         super.onDestroyView()
 
         compositeDisposable.clear()
 
+        tcpServer.stopReceiving()
         udpBroadcastReceiver.stopReceiving()
 
         localOnlyHotspotReservation?.close()

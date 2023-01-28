@@ -25,6 +25,7 @@ class UDPBroadcastReceiver
     fun stopReceiving()
     {
         enabled = false
+
         if (datagramSocket != null)
         {
             datagramSocket!!.close()
@@ -46,7 +47,7 @@ class UDPBroadcastReceiver
             datagramSocket!!.broadcast = true
             datagramSocket!!.reuseAddress = true
 
-            Log.d( "xxx", "waiting for data on " + inetAddress.hostAddress )
+            Log.d( "xxx", "waiting for UDP messages on $inetAddress:$port..." )
 
             while (enabled)
             {

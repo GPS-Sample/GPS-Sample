@@ -25,10 +25,12 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
-import edu.gtri.gpssample.models.Command
-import edu.gtri.gpssample.models.NetworkCommand
-import edu.gtri.gpssample.models.NetworkUser
+import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.NetworkUser
 import edu.gtri.gpssample.network.HeartBeatTransmitter
+import edu.gtri.gpssample.network.TCPClient
+import edu.gtri.gpssample.network.UDPBroadcastTransmitter
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
@@ -37,12 +39,14 @@ import java.util.UUID
 
 class SystemStatusFragment : Fragment()
 {
+    private lateinit var serverTCPAddress: String
+    private lateinit var serverUDPInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: SystemStatusViewModel
     private lateinit var myInetAddress: InetAddress
-    private lateinit var serverInetAddress: InetAddress
     private val heartBeatTransmitter = HeartBeatTransmitter()
+    private val udpBroadcastTransmitter = UDPBroadcastTransmitter()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -74,6 +78,17 @@ class SystemStatusFragment : Fragment()
         binding.wifiImageButton.setOnClickListener {
             val intent = Intent(activity!!, CameraXLivePreviewActivity::class.java)
             startActivityForResult( intent, 0 )
+        }
+
+        binding.configImageButton.setOnClickListener {
+            if (::serverTCPAddress.isInitialized)
+            {
+                val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, "" )
+                val networkCommandMessage = Json.encodeToString( networkCommand )
+                lifecycleScope.launch {
+                    TCPClient().write( serverTCPAddress, networkCommandMessage )
+                }
+            }
         }
     }
 
@@ -109,17 +124,13 @@ class SystemStatusFragment : Fragment()
                     Handler().postDelayed({
                         wifiManager = activity!!.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager?
 
-                        var serverAddress = intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString().substring(1 )
+                        serverTCPAddress = intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString().substring(1 )
                         val myAddress = intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString().substring(1 )
-
-                        Log.d( "xxx", "server addr: " + serverAddress)
-                        Log.d( "xxx", "my addr: " + myAddress )
-
-                        val components = serverAddress.split(".")
-                        serverAddress = components[0] + "." + components[1] + "." + components[2] + ".255"
+                        val components = serverTCPAddress.split(".")
+                        val server_udp_address = components[0] + "." + components[1] + "." + components[2] + ".255"
 
                         myInetAddress = InetAddress.getByName( myAddress )
-                        serverInetAddress = InetAddress.getByName( serverAddress )
+                        serverUDPInetAddress = InetAddress.getByName( server_udp_address )
 
                         if (!heartBeatTransmitter.isEnabled())
                         {
@@ -180,10 +191,10 @@ class SystemStatusFragment : Fragment()
 
                 val networkUser = NetworkUser( userName!!, UUID.randomUUID().toString(), true )
                 val networkUserMessage = Json.encodeToString( networkUser )
-                val networkCommand = NetworkCommand( Command.User.value, networkUserMessage )
+                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, networkUserMessage )
                 val networkCommandMessage = Json.encodeToString( networkCommand )
 
-                heartBeatTransmitter.beginTransmitting( myInetAddress, serverInetAddress, networkCommandMessage.toByteArray())
+                heartBeatTransmitter.beginTransmitting( myInetAddress, serverUDPInetAddress, networkCommandMessage.toByteArray())
             }
         }
     }
@@ -204,20 +215,15 @@ class SystemStatusFragment : Fragment()
         {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            var serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
+            serverTCPAddress = linkProperties.dhcpServerAddress.toString().substring(1)
             // linkProperties.linkAddresses[0] is the IPV6 address
             val myAddress = linkProperties.linkAddresses[1].toString().substring(0, linkProperties.linkAddresses[1].toString().length-3)
 
-            Log.d( "xxx", "server addr: " + serverAddress)
-            Log.d( "xxx", "my addr: " + myAddress )
-
-            val components = serverAddress.split(".")
-            serverAddress = components[0] + "." + components[1] + "." + components[2] + ".255"
+            val components = serverTCPAddress.split(".")
+            val server_udp_address = components[0] + "." + components[1] + "." + components[2] + ".255"
 
             myInetAddress = InetAddress.getByName( myAddress )
-            serverInetAddress = InetAddress.getByName( serverAddress )
-
-//            binding.payloadTextView.text = binding.payloadTextView.text.toString() + "\n\nserver addr: " + serverAddress + "\nmy addr: " + myAddress
+            serverUDPInetAddress = InetAddress.getByName( server_udp_address )
         }
     }
 
