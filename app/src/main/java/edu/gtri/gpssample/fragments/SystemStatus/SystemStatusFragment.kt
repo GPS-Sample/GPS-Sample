@@ -11,19 +11,20 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.NetworkUser
@@ -56,6 +57,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        setHasOptionsMenu( true )
+
         _binding = FragmentSystemStatusBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -300,36 +303,57 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
     {
         val message = String( datagramPacket.data, 0, datagramPacket.length )
-
         val networkCommand = Json.decodeFromString<NetworkCommand>( message )
+        val user = (activity!!.application as? MainApplication)?.user
 
-        when( networkCommand.command )
+        if (networkCommand.uuid == user!!.uuid)
         {
-            NetworkCommand.NetworkRequestConfigResponse ->
+            when( networkCommand.command )
             {
-                activity!!.runOnUiThread {
-                    binding.configCheckBox.isChecked = true
+                NetworkCommand.NetworkRequestConfigResponse ->
+                {
+                    activity!!.runOnUiThread {
+                        binding.configCheckBox.isChecked = true
+                    }
                 }
-            }
-            NetworkCommand.NetworkRequestStudyResponse ->
-            {
-                activity!!.runOnUiThread{
-                    binding.studyCheckBox.isChecked = true
+                NetworkCommand.NetworkRequestStudyResponse ->
+                {
+                    activity!!.runOnUiThread {
+                        binding.studyCheckBox.isChecked = true
+                    }
                 }
-            }
-            NetworkCommand.NetworkRequestFieldResponse ->
-            {
-                activity!!.runOnUiThread{
-                    binding.fieldsCheckBox.isChecked = true
+                NetworkCommand.NetworkRequestFieldResponse ->
+                {
+                    activity!!.runOnUiThread {
+                        binding.fieldsCheckBox.isChecked = true
+                    }
                 }
-            }
-            NetworkCommand.NetworkRequestShapeFileResponse ->
-            {
-                activity!!.runOnUiThread{
-                    binding.shapeFilesCheckBox.isChecked = true
+                NetworkCommand.NetworkRequestShapeFileResponse ->
+                {
+                    activity!!.runOnUiThread {
+                        binding.shapeFilesCheckBox.isChecked = true
+                    }
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_system_status, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.action_manage_study ->
+            {
+            }
+        }
+
+        return false
     }
 
     override fun onDestroyView()

@@ -115,10 +115,6 @@
         android:id="@+id/ManageStudyFragment"
         android:name="edu.gtri.gpssample.fragments.ManageStudy.ManageStudyFragment"
         tools:layout="@layout/fragment_manage_study">
-
-<!--        <action-->
-<!--            android:id="@+id/action_navigate_to_CreateStudyFragment"-->
-<!--            app:destination="@id/CreateStudyFragment"/>-->
     </fragment>
 
     <fragment
@@ -127,8 +123,8 @@
         tools:layout="@layout/fragment_system_status">
 
         <action
-            android:id="@+id/action_navigate_to_MainFragment"
-            app:popUpTo="@id/MainFragment"/>
+            android:id="@+id/action_navigate_to_ManageStudiesFragment"
+            app:destination="@id/ManageStudiesFragment" />
     </fragment>
 
 </navigation>

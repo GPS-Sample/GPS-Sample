@@ -10,17 +10,19 @@ import java.net.InetAddress
 
 class UDPBroadcaster
 {
-    interface UDPBroadcasterDelegate
-    {
-        fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
-    }
-
     private var port = 61234
     private var receiverEnabled = false
     private var transmitterEnabled = false
     private var datagramSocket: DatagramSocket? = null
     private lateinit var delegate: UDPBroadcasterDelegate
 
+    //--------------------------------------------------------------------------
+    interface UDPBroadcasterDelegate
+    {
+        fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
+    }
+
+    //--------------------------------------------------------------------------
     fun stopTransmitting()
     {
         transmitterEnabled = false
@@ -30,6 +32,7 @@ class UDPBroadcaster
         }
     }
 
+    //--------------------------------------------------------------------------
     fun stopReceiving()
     {
         receiverEnabled = false
@@ -39,16 +42,19 @@ class UDPBroadcaster
         }
     }
 
+    //--------------------------------------------------------------------------
     fun transmitterIsEnabled() : Boolean
     {
         return transmitterEnabled
     }
 
+    //--------------------------------------------------------------------------
     fun receiverIsEnabled() : Boolean
     {
         return receiverEnabled
     }
 
+    //--------------------------------------------------------------------------
     suspend fun transmit( myInetAddress: InetAddress, broadcastInetAddress: InetAddress, message: String )
     {
         val backgroundResult = withContext(Dispatchers.Default)
@@ -66,6 +72,7 @@ class UDPBroadcaster
         }
     }
 
+    //--------------------------------------------------------------------------
     suspend fun beginReceiving( inetAddress: InetAddress, delegate: UDPBroadcasterDelegate )
     {
         this.delegate = delegate
@@ -103,6 +110,7 @@ class UDPBroadcaster
         }
     }
 
+    //--------------------------------------------------------------------------
     suspend fun beginTransmitting( myInetAddress: InetAddress, broadcastInetAddress: InetAddress, bytes: ByteArray )
     {
         Log.d( "xxx", "begin transmitting heartbeat on $myInetAddress:$port to ${broadcastInetAddress}:$port" )

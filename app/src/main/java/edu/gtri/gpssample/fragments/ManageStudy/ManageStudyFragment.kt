@@ -59,6 +59,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
     private lateinit var viewModel: ManageStudyViewModel
     private var networkUsers = ArrayList<NetworkUser>()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -296,8 +297,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestConfigCommand -> {
                 lifecycleScope.launch {
-                    val user = (activity!!.application as? MainApplication)?.user
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, user!!.uuid, "" )
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, networkCommand.uuid, "" )
                     val networkCommandMessage = Json.encodeToString( networkResponseCommand )
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
                 }
@@ -305,8 +305,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestStudyCommand -> {
                 lifecycleScope.launch {
-                    val user = (activity!!.application as? MainApplication)?.user
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, user!!.uuid, "" )
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, networkCommand.uuid, "" )
                     val networkCommandMessage = Json.encodeToString( networkResponseCommand )
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
                 }
@@ -314,8 +313,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestFieldCommand -> {
                 lifecycleScope.launch {
-                    val user = (activity!!.application as? MainApplication)?.user
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldResponse, user!!.uuid, "" )
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldResponse, networkCommand.uuid, "" )
                     val networkCommandMessage = Json.encodeToString( networkResponseCommand )
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
                 }
@@ -323,8 +321,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestShapeFileCommand -> {
                 lifecycleScope.launch {
-                    val user = (activity!!.application as? MainApplication)?.user
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileResponse, user!!.uuid, "" )
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileResponse, networkCommand.uuid, "" )
                     val networkCommandMessage = Json.encodeToString( networkResponseCommand )
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
                 }
