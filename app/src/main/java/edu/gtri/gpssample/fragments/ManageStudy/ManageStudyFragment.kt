@@ -48,6 +48,7 @@ import kotlin.collections.ArrayList
 
 class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate, TCPServer.TCPServerDelegate
 {
+    private var dataIsFresh = false
     private var study: Study? = null
     private var serverInetAddress: InetAddress? = null
     private var _binding: FragmentManageStudyBinding? = null
@@ -116,16 +117,27 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         val oldWifiAdresses = getWifiApIpAddresses()
 
-        Log.d( "xxx", "searching for old WiFi addresses..." )
-        for (address in oldWifiAdresses)
-        {
-            Log.d( "xxx", address.hostAddress )
-        }
-
         binding.generateBarcodeButton.setOnClickListener {
             try
             {
                 binding.generateBarcodeButton.isEnabled = false
+
+//                for (address in oldWifiAdresses)
+//                {
+//                    serverInetAddress = address
+//                }
+//
+//                Log.d( "xxx", serverInetAddress!!.hostAddress )
+//
+//                lifecycleScope.launch {
+//                    tcpServer.beginListening( serverInetAddress!!, this@ManageStudyFragment )
+//                }
+//
+//                lifecycleScope.launch {
+//                    udpBroadcastReceiver.beginListening( serverInetAddress!!, this@ManageStudyFragment )
+//                }
+//
+//                return@setOnClickListener
 
                 val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
 
@@ -227,36 +239,6 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
             .addTo( compositeDisposable )
     }
 
-    private var dataIsFresh = false
-
-    override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
-    {
-        dataIsFresh = true
-
-        val message = String( datagramPacket.data, 0, datagramPacket.length )
-
-        val networkCommand = Json.decodeFromString<NetworkCommand>( message )
-
-        when( networkCommand.command )
-        {
-            NetworkCommand.NetworkUserCommand -> {
-                val networkUser = Json.decodeFromString<NetworkUser>( networkCommand.message )
-                val user = networkUsers.find { it.name == networkUser.name }
-                if (user == null)
-                {
-                    networkUsers.add( networkUser )
-
-                    activity!!.runOnUiThread{
-                        studyAdapter.updateUsers( networkUsers )
-                    }
-                }
-            }
-            NetworkCommand.NetworkRequestConfigCommand -> {
-                Log.d( "xxx", "received: NetworkRequestConfigCommand" )
-            }
-        }
-    }
-
     fun getWifiApIpAddresses(): ArrayList<InetAddress> {
         val list = ArrayList<InetAddress>()
         try {
@@ -293,13 +275,12 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         when (item.itemId) {
             R.id.action_edit_study -> {
-
-                val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, "" )
-                val networkCommandMessage = Json.encodeToString( networkCommand )
-                lifecycleScope.launch {
-                    TCPClient().write( serverInetAddress!!.hostAddress, networkCommandMessage )
-                }
-                return true
+//                val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, "" )
+//                val networkCommandMessage = Json.encodeToString( networkCommand )
+//                lifecycleScope.launch {
+//                    TCPClient().write( serverInetAddress!!.hostAddress, networkCommandMessage )
+//                }
+//                return true
             }
 
             R.id.action_delete_study -> {
@@ -312,9 +293,39 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
         return false
     }
 
-    override fun didReceiveMessage(message: String )
+    override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
     {
-        Log.d( "xxx", "didReceiveMessage: $message" )
+        dataIsFresh = true
+
+        val message = String( datagramPacket.data, 0, datagramPacket.length )
+
+        Log.d( "xxx", "${datagramPacket.length}")
+
+        val networkCommand = Json.decodeFromString<NetworkCommand>( message )
+
+        when( networkCommand.command )
+        {
+            NetworkCommand.NetworkUserCommand -> {
+                val networkUser = Json.decodeFromString<NetworkUser>( networkCommand.message )
+                val user = networkUsers.find { it.name == networkUser.name }
+                if (user == null)
+                {
+                    networkUsers.add( networkUser )
+
+                    activity!!.runOnUiThread{
+                        studyAdapter.updateUsers( networkUsers )
+                    }
+                }
+            }
+            NetworkCommand.NetworkRequestConfigCommand -> {
+                Log.d( "xxx", "received: NetworkRequestConfigCommand" )
+            }
+        }
+    }
+
+    override fun didReceiveTCPMessage(message: String )
+    {
+        Log.d( "xxx", "didReceiveTCPMessage: $message" )
     }
 
     override fun onDestroyView()

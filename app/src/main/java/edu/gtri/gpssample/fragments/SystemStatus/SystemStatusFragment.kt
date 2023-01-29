@@ -35,7 +35,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.net.InetAddress
-import java.util.UUID
+import java.net.NetworkInterface
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SystemStatusFragment : Fragment()
 {
@@ -75,7 +77,20 @@ class SystemStatusFragment : Fragment()
             }
         }
 
+        val oldWifiAdresses = getWifiApIpAddresses()
+
+        Log.d( "xxx", "searching for old WiFi addresses..." )
+        for (address in oldWifiAdresses)
+        {
+            myInetAddress = address
+            Log.d( "xxx", myInetAddress!!.hostAddress )
+        }
+
         binding.wifiImageButton.setOnClickListener {
+//            serverTCPAddress = "172.20.10.13"
+//            serverUDPInetAddress = InetAddress.getByName("172.20.10.13")
+//            beginTransmittingHeartbeat()
+
             val intent = Intent(activity!!, CameraXLivePreviewActivity::class.java)
             startActivityForResult( intent, 0 )
         }
@@ -92,6 +107,31 @@ class SystemStatusFragment : Fragment()
         }
     }
 
+    fun getWifiApIpAddresses(): ArrayList<InetAddress> {
+        val list = ArrayList<InetAddress>()
+        try {
+            val en: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
+            while (en.hasMoreElements()) {
+                val intf: NetworkInterface = en.nextElement()
+                if (intf.getName().contains("wlan")) {
+                    val enumIpAddr: Enumeration<InetAddress> = intf.getInetAddresses()
+                    while (enumIpAddr.hasMoreElements()) {
+                        val inetAddress: InetAddress = enumIpAddr.nextElement()
+                        if (!inetAddress.isLoopbackAddress()) {
+                            val inetAddr = inetAddress.hostAddress!!
+                            if (!inetAddr.contains(":")) {
+                                list.add( inetAddress)
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            Log.e("xxx", ex.toString())
+        }
+        return list
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         super.onActivityResult(requestCode, resultCode, data)
@@ -103,7 +143,6 @@ class SystemStatusFragment : Fragment()
             val jsonObject = JSONObject( payload );
 
             Log.d( "xxx", jsonObject.toString(2))
-//            binding.payloadTextView.text = jsonObject.toString(2)
 
             val ssid = jsonObject.getString( Key.kSSID.toString() )
             val pass = jsonObject.getString( Key.kPass.toString() )

@@ -14,7 +14,7 @@ class TCPServer
 {
     interface TCPServerDelegate
     {
-        fun didReceiveMessage( message: String )
+        fun didReceiveTCPMessage( message: String )
     }
 
     var port = 51234
@@ -70,7 +70,7 @@ class TCPServer
 
             Log.d( "xxx", "handleClient.received: ${message}")
 
-            delegate.didReceiveMessage( message )
+            delegate.didReceiveTCPMessage( message )
         }
         catch( ex: Exception )
         {
