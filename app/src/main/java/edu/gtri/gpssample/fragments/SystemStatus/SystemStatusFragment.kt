@@ -82,9 +82,46 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.configImageButton.setOnClickListener {
             val user = (activity!!.application as? MainApplication)?.user
-
             val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user!!.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.configCheckBox.isChecked = false
+
+            lifecycleScope.launch {
+                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+
+        binding.studyImageButton.setOnClickListener {
+            val user = (activity!!.application as? MainApplication)?.user
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyCommand, user!!.uuid, "" )
+            val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.studyCheckBox.isChecked = false
+
+            lifecycleScope.launch {
+                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+
+        binding.fieldsImageButton.setOnClickListener {
+            val user = (activity!!.application as? MainApplication)?.user
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldCommand, user!!.uuid, "" )
+            val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.fieldsCheckBox.isChecked = false
+
+            lifecycleScope.launch {
+                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+
+        binding.shapeFilesImageButton.setOnClickListener {
+            val user = (activity!!.application as? MainApplication)?.user
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileCommand, user!!.uuid, "" )
+            val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.shapeFilesCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
@@ -160,7 +197,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                         beginTransmittingHeartbeat()
                     }, 1000)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.d( "xxx", e.stackTraceToString())
                 }
             }
             else
@@ -268,10 +305,29 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         when( networkCommand.command )
         {
-            NetworkCommand.NetworkConfigResponseCommand ->
+            NetworkCommand.NetworkRequestConfigResponse ->
             {
-                binding.configCheckBox.isChecked = true
-                Log.d( "xxx", "received: NetworkConfigResponseCommand" )
+                activity!!.runOnUiThread {
+                    binding.configCheckBox.isChecked = true
+                }
+            }
+            NetworkCommand.NetworkRequestStudyResponse ->
+            {
+                activity!!.runOnUiThread{
+                    binding.studyCheckBox.isChecked = true
+                }
+            }
+            NetworkCommand.NetworkRequestFieldResponse ->
+            {
+                activity!!.runOnUiThread{
+                    binding.fieldsCheckBox.isChecked = true
+                }
+            }
+            NetworkCommand.NetworkRequestShapeFileResponse ->
+            {
+                activity!!.runOnUiThread{
+                    binding.shapeFilesCheckBox.isChecked = true
+                }
             }
         }
     }

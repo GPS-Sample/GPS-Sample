@@ -199,7 +199,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }, Handler())
             } catch(e: Exception) {
-                Log.d( "xxx", e.printStackTrace().toString())
+                Log.d( "xxx", e.stackTraceToString())
             }
         }
 
@@ -297,9 +297,35 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             NetworkCommand.NetworkRequestConfigCommand -> {
                 lifecycleScope.launch {
                     val user = (activity!!.application as? MainApplication)?.user
-                    val networkCommand = NetworkCommand( NetworkCommand.NetworkConfigResponseCommand, user!!.uuid, "" )
-                    val networkCommandMessage = Json.encodeToString( networkCommand )
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, user!!.uuid, "" )
+                    val networkCommandMessage = Json.encodeToString( networkResponseCommand )
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
+                }
+            }
 
+            NetworkCommand.NetworkRequestStudyCommand -> {
+                lifecycleScope.launch {
+                    val user = (activity!!.application as? MainApplication)?.user
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, user!!.uuid, "" )
+                    val networkCommandMessage = Json.encodeToString( networkResponseCommand )
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
+                }
+            }
+
+            NetworkCommand.NetworkRequestFieldCommand -> {
+                lifecycleScope.launch {
+                    val user = (activity!!.application as? MainApplication)?.user
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldResponse, user!!.uuid, "" )
+                    val networkCommandMessage = Json.encodeToString( networkResponseCommand )
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
+                }
+            }
+
+            NetworkCommand.NetworkRequestShapeFileCommand -> {
+                lifecycleScope.launch {
+                    val user = (activity!!.application as? MainApplication)?.user
+                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileResponse, user!!.uuid, "" )
+                    val networkCommandMessage = Json.encodeToString( networkResponseCommand )
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
                 }
             }

@@ -94,7 +94,7 @@ class UDPBroadcaster
                 }
                 catch (ex: Exception)
                 {
-                    Log.d( "xxx", ex.printStackTrace().toString())
+                    Log.d( "xxx", ex.stackTraceToString())
                     stopReceiving()
                 }
             }
