@@ -14,6 +14,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_USER_UUID + " TEXT" +  "," +
                 COLUMN_USER_ROLE + " TEXT" +  "," +
                 COLUMN_USER_NAME + " TEXT" + "," +
                 COLUMN_USER_PIN + " INTEGER" + "," +
@@ -89,6 +90,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // User Table
         const val TABLE_USER = "user"
+        const val COLUMN_USER_UUID = "user_uuid"
         const val COLUMN_USER_ROLE = "user_role"
         const val COLUMN_USER_NAME = "user_name"
         const val COLUMN_USER_PIN = "user_pin"
@@ -153,6 +155,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 19
+        private const val DATABASE_VERSION = 20
     }
 }

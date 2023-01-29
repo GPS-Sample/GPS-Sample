@@ -5,6 +5,7 @@ enum class Key {
     kRole,
     kSSID,
     kPass,
+    kUUID,
     kUserId,
     kPayload,
     kFieldId,

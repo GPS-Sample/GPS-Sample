@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.fragments.ManageStudy
 
+import android.content.Context
 import android.graphics.Color
 import android.net.wifi.WifiManager
 import android.os.Bundle
@@ -13,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenStarted
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,11 +24,10 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageStudyBinding
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.network.TCPClient
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.NetworkUser
-import edu.gtri.gpssample.network.UDPBroadcastReceiver
+import edu.gtri.gpssample.network.UDPBroadcaster
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -46,17 +45,17 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceiverDelegate, TCPServer.TCPServerDelegate
+class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
     private var dataIsFresh = false
     private var study: Study? = null
     private var serverInetAddress: InetAddress? = null
+    private var broadcastInetAddress: InetAddress? = null
     private var _binding: FragmentManageStudyBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
     private lateinit var studyAdapter: ManageStudyAdapter
-    private val tcpServer: TCPServer = TCPServer()
-    private val udpBroadcastReceiver: UDPBroadcastReceiver = UDPBroadcastReceiver()
+    private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
     private lateinit var viewModel: ManageStudyViewModel
     private var networkUsers = ArrayList<NetworkUser>()
@@ -122,23 +121,6 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
             {
                 binding.generateBarcodeButton.isEnabled = false
 
-//                for (address in oldWifiAdresses)
-//                {
-//                    serverInetAddress = address
-//                }
-//
-//                Log.d( "xxx", serverInetAddress!!.hostAddress )
-//
-//                lifecycleScope.launch {
-//                    tcpServer.beginListening( serverInetAddress!!, this@ManageStudyFragment )
-//                }
-//
-//                lifecycleScope.launch {
-//                    udpBroadcastReceiver.beginListening( serverInetAddress!!, this@ManageStudyFragment )
-//                }
-//
-//                return@setOnClickListener
-
                 val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
 
                 wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
@@ -192,12 +174,14 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
                         if (serverInetAddress != null)
                         {
-                            lifecycleScope.launch {
-                                tcpServer.beginListening( serverInetAddress!!, this@ManageStudyFragment )
-                            }
+                            val components = serverInetAddress!!.hostAddress.split(".")
+                            val broadcast_address = components[0] + "." + components[1] + "." + components[2] + ".255"
+                            broadcastInetAddress = InetAddress.getByName( broadcast_address )
+
+                            Log.d( "xxx", broadcast_address )
 
                             lifecycleScope.launch {
-                                udpBroadcastReceiver.beginListening( serverInetAddress!!, this@ManageStudyFragment )
+                                udpBroadcaster.beginReceiving( serverInetAddress!!, this@ManageStudyFragment )
                             }
                         }
 
@@ -275,12 +259,6 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         when (item.itemId) {
             R.id.action_edit_study -> {
-//                val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, "" )
-//                val networkCommandMessage = Json.encodeToString( networkCommand )
-//                lifecycleScope.launch {
-//                    TCPClient().write( serverInetAddress!!.hostAddress, networkCommandMessage )
-//                }
-//                return true
             }
 
             R.id.action_delete_study -> {
@@ -299,8 +277,6 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         val message = String( datagramPacket.data, 0, datagramPacket.length )
 
-        Log.d( "xxx", "${datagramPacket.length}")
-
         val networkCommand = Json.decodeFromString<NetworkCommand>( message )
 
         when( networkCommand.command )
@@ -317,15 +293,17 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
                     }
                 }
             }
+
             NetworkCommand.NetworkRequestConfigCommand -> {
-                Log.d( "xxx", "received: NetworkRequestConfigCommand" )
+                lifecycleScope.launch {
+                    val user = (activity!!.application as? MainApplication)?.user
+                    val networkCommand = NetworkCommand( NetworkCommand.NetworkConfigResponseCommand, user!!.uuid, "" )
+                    val networkCommandMessage = Json.encodeToString( networkCommand )
+
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
+                }
             }
         }
-    }
-
-    override fun didReceiveTCPMessage(message: String )
-    {
-        Log.d( "xxx", "didReceiveTCPMessage: $message" )
     }
 
     override fun onDestroyView()
@@ -334,8 +312,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcastReceiver.UDPBroadcastReceive
 
         compositeDisposable.clear()
 
-        tcpServer.stopReceiving()
-        udpBroadcastReceiver.stopReceiving()
+        udpBroadcaster.stopTransmitting()
 
         localOnlyHotspotReservation?.close()
 

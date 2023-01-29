@@ -12,6 +12,7 @@ class UserDAO(private var dao: DAO)
     {
         val values = ContentValues()
 
+        values.put( DAO.COLUMN_USER_UUID, user.uuid )
         values.put( DAO.COLUMN_USER_ROLE, user.role.toString() )
         values.put( DAO.COLUMN_USER_NAME, user.name )
         values.put( DAO.COLUMN_USER_PIN, user.pin )
@@ -48,6 +49,7 @@ class UserDAO(private var dao: DAO)
         val user = User()
 
         user.id = Integer.parseInt(cursor.getString(0))
+        user.uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_UUID))
         user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_ROLE)))
         user.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
         user.pin = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_PIN))

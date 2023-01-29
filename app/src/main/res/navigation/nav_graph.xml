@@ -39,22 +39,8 @@
             app:destination="@id/ManageConfigurationsFragment" />
 
         <action
-            android:id="@+id/action_navigate_to_BarcodeScanFragment"
-            app:destination="@id/BarcodeScanFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/AdminSelectRoleFragment"
-        android:name="edu.gtri.gpssample.fragments.AdminSelectRole.AdminSelectRoleFragment"
-        tools:layout="@layout/fragment_admin_select_role">
-
-        <action
-            android:id="@+id/action_navigate_to_MainFragment"
-            app:popUpTo="@id/MainFragment"/>
-
-        <action
-            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
-            app:destination="@id/ManageConfigurationsFragment"/>
+            android:id="@+id/action_navigate_to_SystemStatusFragment"
+            app:destination="@id/SystemStatusFragment" />
     </fragment>
 
     <fragment
@@ -136,7 +122,7 @@
     </fragment>
 
     <fragment
-        android:id="@+id/BarcodeScanFragment"
+        android:id="@+id/SystemStatusFragment"
         android:name="edu.gtri.gpssample.fragments.SystemStatus.SystemStatusFragment"
         tools:layout="@layout/fragment_system_status">
 

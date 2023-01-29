@@ -16,6 +16,7 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
+import java.util.*
 
 class SignUpFragment : Fragment()
 {
@@ -72,11 +73,13 @@ class SignUpFragment : Fragment()
             else
             {
                 val user = User()
-                user.name = name
+
                 user.pin = pin1
                 user.role = role
-                user.recoveryQuestion = question
+                user.name = name
                 user.recoveryAnswer = answer
+                user.recoveryQuestion = question
+                user.uuid = UUID.randomUUID().toString()
 
                 user.id = DAO.userDAO.createUser( user )
 
@@ -90,6 +93,7 @@ class SignUpFragment : Fragment()
 
                 val bundle = Bundle()
                 bundle.putString( Key.kRole.toString(), role.toString() )
+
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }
         }

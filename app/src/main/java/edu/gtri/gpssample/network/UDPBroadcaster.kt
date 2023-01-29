@@ -1,0 +1,141 @@
+package edu.gtri.gpssample.network
+
+import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+
+class UDPBroadcaster
+{
+    interface UDPBroadcasterDelegate
+    {
+        fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
+    }
+
+    private var port = 61234
+    private var receiverEnabled = false
+    private var transmitterEnabled = false
+    private var datagramSocket: DatagramSocket? = null
+    private lateinit var delegate: UDPBroadcasterDelegate
+
+    fun stopTransmitting()
+    {
+        transmitterEnabled = false
+        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
+        {
+            datagramSocket!!.close()
+        }
+    }
+
+    fun stopReceiving()
+    {
+        receiverEnabled = false
+        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
+        {
+            datagramSocket!!.close()
+        }
+    }
+
+    fun transmitterIsEnabled() : Boolean
+    {
+        return transmitterEnabled
+    }
+
+    fun receiverIsEnabled() : Boolean
+    {
+        return receiverEnabled
+    }
+
+    suspend fun transmit( myInetAddress: InetAddress, broadcastInetAddress: InetAddress, message: String )
+    {
+        val backgroundResult = withContext(Dispatchers.Default)
+        {
+            if (datagramSocket == null)
+            {
+                datagramSocket = DatagramSocket(port,myInetAddress)
+                datagramSocket!!.broadcast = true
+                datagramSocket!!.reuseAddress = true
+            }
+
+            Log.d( "xxx", "transmitting command on $myInetAddress:$port to ${broadcastInetAddress}:$port" )
+
+            datagramSocket!!.send( DatagramPacket( message.toByteArray(), message.length, broadcastInetAddress, port ))
+        }
+    }
+
+    suspend fun beginReceiving( inetAddress: InetAddress, delegate: UDPBroadcasterDelegate )
+    {
+        this.delegate = delegate
+
+        val backgroundResult = withContext(Dispatchers.Default)
+        {
+            if (datagramSocket == null)
+            {
+                datagramSocket = DatagramSocket(port)
+                datagramSocket!!.broadcast = true
+                datagramSocket!!.reuseAddress = true
+            }
+
+            Log.d( "xxx", "waiting for UDP messages on $inetAddress:$port..." )
+
+            receiverEnabled = true
+
+            while (receiverEnabled)
+            {
+                try {
+                    val buf = ByteArray(4096)
+                    val datagramPacket = DatagramPacket(buf, buf.size)
+                    datagramSocket!!.receive(datagramPacket)
+
+                    delegate.didReceiveDatagramPacket( datagramPacket )
+                }
+                catch (ex: Exception)
+                {
+                    Log.d( "xxx", ex.printStackTrace().toString())
+                    stopReceiving()
+                }
+            }
+
+            Log.d( "xxx", "stopped waiting for data" )
+        }
+    }
+
+    suspend fun beginTransmitting( myInetAddress: InetAddress, broadcastInetAddress: InetAddress, bytes: ByteArray )
+    {
+        Log.d( "xxx", "begin transmitting heartbeat on $myInetAddress:$port to ${broadcastInetAddress}:$port" )
+
+        val backgroundResult = withContext(Dispatchers.IO)
+        {
+            if (datagramSocket == null)
+            {
+                datagramSocket = DatagramSocket(port,myInetAddress)
+                datagramSocket!!.broadcast = true
+                datagramSocket!!.reuseAddress = true
+            }
+
+            val datagramPacket = DatagramPacket(bytes, bytes.size, broadcastInetAddress, port)
+
+            delay(1000)
+
+            transmitterEnabled = true
+
+            while( transmitterEnabled )
+            {
+                try {
+                    datagramSocket!!.send( datagramPacket )
+                    delay(1000)
+                }
+                catch( ex: Exception )
+                {
+                    Log.d( "xxx", ex.stackTraceToString())
+                    stopTransmitting()
+                }
+            }
+
+            Log.d( "xxx", "finished transmitting data" )
+        }
+    }
+}

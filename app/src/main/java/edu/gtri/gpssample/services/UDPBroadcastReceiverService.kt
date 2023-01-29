@@ -9,9 +9,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.activities.MainActivity
-import edu.gtri.gpssample.network.UDPBroadcastReceiver
 import kotlinx.coroutines.*
-import java.net.InetAddress
 
 class UDPBroadcastReceiverService : Service()
 {

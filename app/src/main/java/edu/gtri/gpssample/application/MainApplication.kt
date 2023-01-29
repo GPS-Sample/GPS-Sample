@@ -6,10 +6,13 @@ import android.app.NotificationManager
 import android.graphics.Bitmap
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 
 class MainApplication : Application()
 {
+    var user: User? = null
+
     var barcodeBitmap : Bitmap? = null
 
     override fun onCreate()

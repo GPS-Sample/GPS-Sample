@@ -89,6 +89,8 @@ class SignInFragment : Fragment()
                 }
                 else
                 {
+                    (activity!!.application as? MainApplication)?.user = user
+
                     binding.pinEditText.setText("")
 
                     val bundle = Bundle()
@@ -100,7 +102,7 @@ class SignInFragment : Fragment()
                     }
                     else
                     {
-                        findNavController().navigate(R.id.action_navigate_to_BarcodeScanFragment, bundle)
+                        findNavController().navigate(R.id.action_navigate_to_SystemStatusFragment, bundle)
                     }
                 }
             }
