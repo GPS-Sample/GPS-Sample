@@ -52,10 +52,6 @@ class SignInFragment : Fragment()
 
         binding.nextButton.setOnClickListener {
 
-            val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
-            val expectedPin = sharedPreferences.getInt( Key.kPin.toString(), 0 )
-            val userId = sharedPreferences.getInt( Key.kUserId.toString(), 0 )
-            val expectedUserName = sharedPreferences.getString( Key.kUserName.toString(), null )
             val pin = binding.pinEditText.text.toString()
             val userName = binding.nameEditText.text.toString()
 
@@ -63,25 +59,17 @@ class SignInFragment : Fragment()
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter your User Name.", Toast.LENGTH_SHORT).show()
             }
-            else if (userName != expectedUserName)
-            {
-                Toast.makeText(activity!!.applicationContext, "User Name not found.", Toast.LENGTH_SHORT).show()
-            }
             else if (pin.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter your PIN.", Toast.LENGTH_SHORT).show()
             }
-            else if (pin.toInt() != expectedPin)
-            {
-                Toast.makeText(activity!!.applicationContext, "The PIN is incorrect", Toast.LENGTH_SHORT).show()
-            }
             else
             {
-                val user = DAO.userDAO.getUser( userId )
+                val user = DAO.userDAO.getUser( userName, pin )
 
                 if (user == null)
                 {
-                    Toast.makeText(activity!!.applicationContext, "Missing User Data", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, "Invalid Username or PIN", Toast.LENGTH_SHORT).show()
                 }
                 else if (user!!.role != role)
                 {

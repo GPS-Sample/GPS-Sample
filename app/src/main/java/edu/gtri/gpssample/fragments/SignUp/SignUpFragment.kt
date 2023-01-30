@@ -83,14 +83,6 @@ class SignUpFragment : Fragment()
 
                 user.id = DAO.userDAO.createUser( user )
 
-                val sharedPreferences = activity!!.application.getSharedPreferences( "default", 0 )
-                val editor = sharedPreferences.edit()
-
-                editor.putInt( Key.kPin.toString(), user.pin )
-                editor.putInt( Key.kUserId.toString(), user.id )
-                editor.putString( Key.kUserName.toString(), user.name )
-                editor.commit()
-
                 val bundle = Bundle()
                 bundle.putString( Key.kRole.toString(), role.toString() )
 

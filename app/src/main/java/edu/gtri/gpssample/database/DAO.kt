@@ -65,15 +65,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     //--------------------------------------------------------------------------
     override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int )
     {
-        // clear cached user info from preferences
-        val sharedPreferences = context.applicationContext.getSharedPreferences( "default", 0 )
-        val editor = sharedPreferences.edit()
-
-        editor.putInt( Key.kPin.toString(), -1 )
-        editor.putInt( Key.kUserId.toString(), -1 )
-        editor.putString( Key.kUserName.toString(), null )
-        editor.commit()
-
         // clear all tables
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIG)

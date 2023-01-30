@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.database.DAO.Companion.COLUMN_USER_PIN
 import edu.gtri.gpssample.database.models.User
 
 class UserDAO(private var dao: DAO)
@@ -28,6 +29,27 @@ class UserDAO(private var dao: DAO)
         var user: User? = null
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_ID} = $id"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            user = createUserModel( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return user
+    }
+
+    //--------------------------------------------------------------------------
+    fun getUser( name: String, pin: String ): User?
+    {
+        var user: User? = null
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_USER_NAME} = '$name' AND ${COLUMN_USER_PIN} = $pin"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
