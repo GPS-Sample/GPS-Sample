@@ -12,14 +12,14 @@ class ConfirmationDialog
     interface ConfirmationDialogDelegate
     {
         fun didAnswerNo()
-        fun didAnswerYes()
+        fun didAnswerYes( tag: Int )
     }
 
     constructor()
     {
     }
 
-    constructor( context: Context?, title: String?, message: String?, delegate: ConfirmationDialogDelegate )
+    constructor( context: Context?, title: String?, message: String?, tag: Int, delegate: ConfirmationDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -46,7 +46,7 @@ class ConfirmationDialog
         val yesButton = view!!.findViewById<Button>(R.id.yes_button)
 
         yesButton.setOnClickListener {
-            delegate.didAnswerYes()
+            delegate.didAnswerYes(tag)
             alertDialog.dismiss()
         }
     }

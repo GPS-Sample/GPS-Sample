@@ -488,7 +488,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         when (item.itemId) {
             R.id.action_delete_field ->
             {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?", this)
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?", 0, this)
                 return true
             }
         }
@@ -500,7 +500,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
     }
 
-    override fun didAnswerYes()
+    override fun didAnswerYes( tag: Int )
     {
         DAO.fieldDAO.deleteField( field!! )
 

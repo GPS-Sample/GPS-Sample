@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.CreateStudy
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -99,11 +100,17 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         binding.recyclerView.adapter = createStudyAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager( activity )
 
-        binding.nextButton.setOnClickListener {
+        binding.addButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putInt( Key.kStudyId.toString(), study!!.id )
+            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+        }
+
+        binding.generateBarcodeButton.setOnClickListener {
 
             if (binding.studyNameEditText.text.toString().isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -119,7 +126,9 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 DAO.studyDAO.updateStudy( study!! )
             }
 
-            findNavController().popBackStack()
+            val bundle = Bundle()
+            bundle.putInt( Key.kStudyId.toString(), study!!.id )
+            findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
         }
     }
 
@@ -152,40 +161,68 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         inflater.inflate(R.menu.menu_create_study, menu)
     }
 
+    val deleteTag = 1
+    val saveTag = 2
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
+        Log.d( "xxx", item.toString())
         when (item.itemId) {
-            R.id.action_create_field ->
+            android.R.id.home ->
             {
-                val bundle = Bundle()
-                bundle.putInt( Key.kStudyId.toString(), study!!.id )
-                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
-
-                return true
+                if (!study!!.isValid)
+                {
+                    if (binding.studyNameEditText.text.toString().isNotEmpty())
+                    {
+                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", saveTag, this)
+                        return true
+                    }
+                }
+                return false
             }
-            R.id.action_manage_study -> {
-                val bundle = Bundle()
-                bundle.putInt( Key.kStudyId.toString(), study!!.id )
-                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
-            }
+//            R.id.action_create_field ->
+//            {
+//                val bundle = Bundle()
+//                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+//                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+//
+//                return true
+//            }
+//            R.id.action_manage_study -> {
+//                val bundle = Bundle()
+//                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+//                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
+//            }
             R.id.action_delete_study -> {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", this)
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", deleteTag, this)
             }
         }
 
         return false
     }
 
+
     override fun didAnswerNo()
     {
     }
 
-    override fun didAnswerYes()
+    override fun didAnswerYes( tag: Int )
     {
-        if (study != null)
+        when( tag )
         {
-            DAO.studyDAO.deleteStudy( study!! )
-            findNavController().popBackStack()
+            deleteTag -> {
+                if (study != null)
+                {
+                    DAO.studyDAO.deleteStudy( study!! )
+                    findNavController().popBackStack()
+                }
+            }
+            saveTag -> {
+                study!!.isValid = true
+                study!!.name = binding.studyNameEditText.text.toString()
+                study!!.id = DAO.studyDAO.createStudy( study!! )
+                findNavController().popBackStack()
+            }
         }
     }
 

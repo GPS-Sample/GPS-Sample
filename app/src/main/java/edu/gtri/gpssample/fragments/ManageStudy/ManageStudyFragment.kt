@@ -112,96 +112,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         binding.recyclerView.adapter = studyAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity!!)
 
-        val oldWifiAdresses = getWifiApIpAddresses()
-
-        binding.generateBarcodeButton.setOnClickListener {
-            try
-            {
-                binding.generateBarcodeButton.isEnabled = false
-
-                val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
-
-                wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
-                {
-                    override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
-                    {
-                        super.onStarted(reservation)
-
-                        binding.generateBarcodeButton.visibility = View.GONE
-                        binding.imageView.visibility = View.VISIBLE
-                        binding.usersOnlineTextView.visibility = View.VISIBLE
-
-                        localOnlyHotspotReservation = reservation
-
-                        val wifiConfiguration = reservation.wifiConfiguration
-
-                        val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
-                        val pass = wifiConfiguration!!.preSharedKey //reservation.softApConfiguration.passphrase
-                        Toast.makeText(activity!!.applicationContext, "ssid = " + ssid, Toast.LENGTH_SHORT).show()
-
-                        Log.d( "xxx", "ssid = " + ssid );
-                        Log.d( "xxx", "pass = " + pass );
-
-                        val newWifiAddresses = getWifiApIpAddresses()
-
-                        if (oldWifiAdresses.isEmpty())
-                        {
-                            if (!newWifiAddresses.isEmpty())
-                            {
-                                serverInetAddress = newWifiAddresses[0]
-                            }
-                        }
-                        else
-                        {
-                            for (oldAddr in oldWifiAdresses)
-                            {
-                                for (newAddr in newWifiAddresses)
-                                {
-                                    if (newAddr.hostAddress.equals( oldAddr.hostAddress ))
-                                    {
-                                        continue
-                                    }
-                                    else
-                                    {
-                                        serverInetAddress = newAddr
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (serverInetAddress != null)
-                        {
-                            val components = serverInetAddress!!.hostAddress.split(".")
-                            val broadcast_address = components[0] + "." + components[1] + "." + components[2] + ".255"
-                            broadcastInetAddress = InetAddress.getByName( broadcast_address )
-
-                            Log.d( "xxx", broadcast_address )
-
-                            lifecycleScope.launch {
-                                udpBroadcaster.beginReceiving( serverInetAddress!!, this@ManageStudyFragment )
-                            }
-                        }
-
-                        val jsonObject = JSONObject()
-                        jsonObject.put( Key.kSSID.toString(), ssid )
-                        jsonObject.put( Key.kPass.toString(), pass )
-                        jsonObject.put( Key.kStudyId.toString(), study!!.id )
-                        jsonObject.put( Key.kConfigId.toString(), study!!.configId )
-
-                        val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
-                        qrgEncoder.setColorBlack(Color.WHITE);
-                        qrgEncoder.setColorWhite(Color.BLACK);
-
-                        val bitmap = qrgEncoder.bitmap
-                        binding.imageView.setImageBitmap(bitmap)
-                        (activity!!.application as MainApplication).barcodeBitmap = bitmap
-                    }
-                }, Handler())
-            } catch(e: Exception) {
-                Log.d( "xxx", e.stackTraceToString())
-            }
-        }
+        generateBarcode()
 
         Observable
             .interval(2000, TimeUnit.MILLISECONDS)
@@ -221,6 +132,95 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 Log.d( "xxx", throwable.stackTraceToString())
             })
             .addTo( compositeDisposable )
+    }
+
+    fun generateBarcode()
+    {
+        try
+        {
+            val oldWifiAdresses = getWifiApIpAddresses()
+
+            val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
+
+            wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
+            {
+                override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
+                {
+                    super.onStarted(reservation)
+
+                    binding.imageView.visibility = View.VISIBLE
+                    binding.usersOnlineTextView.visibility = View.VISIBLE
+
+                    localOnlyHotspotReservation = reservation
+
+                    val wifiConfiguration = reservation.wifiConfiguration
+
+                    val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
+                    val pass = wifiConfiguration!!.preSharedKey //reservation.softApConfiguration.passphrase
+                    Toast.makeText(activity!!.applicationContext, "ssid = " + ssid, Toast.LENGTH_SHORT).show()
+
+                    Log.d( "xxx", "ssid = " + ssid );
+                    Log.d( "xxx", "pass = " + pass );
+
+                    val newWifiAddresses = getWifiApIpAddresses()
+
+                    if (oldWifiAdresses.isEmpty())
+                    {
+                        if (!newWifiAddresses.isEmpty())
+                        {
+                            serverInetAddress = newWifiAddresses[0]
+                        }
+                    }
+                    else
+                    {
+                        for (oldAddr in oldWifiAdresses)
+                        {
+                            for (newAddr in newWifiAddresses)
+                            {
+                                if (newAddr.hostAddress.equals( oldAddr.hostAddress ))
+                                {
+                                    continue
+                                }
+                                else
+                                {
+                                    serverInetAddress = newAddr
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (serverInetAddress != null)
+                    {
+                        val components = serverInetAddress!!.hostAddress.split(".")
+                        val broadcast_address = components[0] + "." + components[1] + "." + components[2] + ".255"
+                        broadcastInetAddress = InetAddress.getByName( broadcast_address )
+
+                        Log.d( "xxx", broadcast_address )
+
+                        lifecycleScope.launch {
+                            udpBroadcaster.beginReceiving( serverInetAddress!!, this@ManageStudyFragment )
+                        }
+                    }
+
+                    val jsonObject = JSONObject()
+                    jsonObject.put( Key.kSSID.toString(), ssid )
+                    jsonObject.put( Key.kPass.toString(), pass )
+                    jsonObject.put( Key.kStudyId.toString(), study!!.id )
+                    jsonObject.put( Key.kConfigId.toString(), study!!.configId )
+
+                    val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
+                    qrgEncoder.setColorBlack(Color.WHITE);
+                    qrgEncoder.setColorWhite(Color.BLACK);
+
+                    val bitmap = qrgEncoder.bitmap
+                    binding.imageView.setImageBitmap(bitmap)
+                    (activity!!.application as MainApplication).barcodeBitmap = bitmap
+                }
+            }, Handler())
+        } catch(e: Exception) {
+            Log.d( "xxx", e.stackTraceToString())
+        }
     }
 
     fun getWifiApIpAddresses(): ArrayList<InetAddress> {

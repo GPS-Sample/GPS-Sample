@@ -145,7 +145,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
                 return true
             }
             R.id.action_delete_configuration -> {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", this)
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
                 return true
             }
         }
@@ -157,7 +157,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
     }
 
-    override fun didAnswerYes()
+    override fun didAnswerYes( tag: Int )
     {
         if (config != null)
         {
