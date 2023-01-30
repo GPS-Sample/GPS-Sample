@@ -2,8 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_manage_study"
+        android:id="@+id/action_manage_configurations"
         android:orderInCategory="100"
-        android:title="@string/manage_study"
+        android:title="@string/manage_configurations"
         app:showAsAction="never" />
 </menu>

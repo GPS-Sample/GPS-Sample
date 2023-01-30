@@ -348,8 +348,11 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            R.id.action_manage_study ->
+            R.id.action_manage_configurations ->
             {
+                val bundle = Bundle()
+                bundle.putString( Key.kRole.toString(), Role.Admin.toString())
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
             }
         }
 

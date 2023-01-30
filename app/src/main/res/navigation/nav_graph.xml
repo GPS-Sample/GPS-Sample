@@ -123,8 +123,8 @@
         tools:layout="@layout/fragment_system_status">
 
         <action
-            android:id="@+id/action_navigate_to_ManageStudiesFragment"
-            app:destination="@id/ManageStudiesFragment" />
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:destination="@id/ManageConfigurationsFragment" />
     </fragment>
 
 </navigation>
