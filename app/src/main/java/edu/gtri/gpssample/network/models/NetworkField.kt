@@ -1,6 +1,5 @@
 package edu.gtri.gpssample.network.models
 
-import edu.gtri.gpssample.constants.FieldType
 import kotlinx.serialization.Serializable
 
 @Serializable
