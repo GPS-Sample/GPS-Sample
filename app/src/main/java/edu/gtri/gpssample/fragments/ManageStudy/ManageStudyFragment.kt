@@ -365,7 +365,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         compositeDisposable.clear()
 
-        udpBroadcaster.stopTransmitting()
+        udpBroadcaster.stopReceiving()
 
         localOnlyHotspotReservation?.close()
 
