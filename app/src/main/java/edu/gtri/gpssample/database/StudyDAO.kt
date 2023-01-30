@@ -147,4 +147,5 @@ class StudyDAO(private var dao: DAO)
         db.delete(DAO.TABLE_STUDY, whereClause, args)
         db.close()
     }
+
 }

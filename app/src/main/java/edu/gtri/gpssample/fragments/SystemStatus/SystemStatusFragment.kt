@@ -21,14 +21,14 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
-import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.constants.ResultCode
-import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
-import edu.gtri.gpssample.network.models.NetworkCommand
-import edu.gtri.gpssample.network.models.NetworkUser
 import edu.gtri.gpssample.network.UDPBroadcaster
+import edu.gtri.gpssample.network.models.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -42,6 +42,8 @@ import kotlin.collections.ArrayList
 
 class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
+    private var studyId = 0
+    private var configId = 0
     private lateinit var broadcastInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
@@ -72,6 +74,24 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.titleTextView.text = role.toString()
 
+        val configs = DAO.configDAO.getConfigs()
+        if (configs.isNotEmpty())
+        {
+            binding.configCheckBox.isChecked = true
+
+            val studies = DAO.studyDAO.getStudies()
+            if (studies.isNotEmpty())
+            {
+                binding.studyCheckBox.isChecked = true
+
+                val fields = DAO.fieldDAO.getFields(studies[0].id)
+                if (fields.isNotEmpty())
+                {
+                    binding.fieldsCheckBox.isChecked = true
+                }
+            }
+        }
+
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
                 Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
@@ -88,7 +108,12 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user!!.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
+            DAO.configDAO.deleteAllConfigs()
+
             binding.configCheckBox.isChecked = false
+            binding.studyCheckBox.isChecked = false
+            binding.fieldsCheckBox.isChecked = false
+            binding.shapeFilesCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
@@ -109,7 +134,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.fieldsImageButton.setOnClickListener {
             val user = (activity!!.application as? MainApplication)?.user
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldCommand, user!!.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsCommand, user!!.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.fieldsCheckBox.isChecked = false
@@ -171,6 +196,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             val ssid = jsonObject.getString( Key.kSSID.toString() )
             val pass = jsonObject.getString( Key.kPass.toString() )
+            studyId = jsonObject.getInt( Key.kStudyId.toString() )
+            configId = jsonObject.getInt( Key.kConfigId.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {
@@ -266,7 +293,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, user!!.uuid, networkUserMessage )
                 val networkCommandMessage = Json.encodeToString( networkCommand )
 
-                udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommandMessage.toByteArray())
+                udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommandMessage)
             }
         }
     }
@@ -312,22 +339,63 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             {
                 NetworkCommand.NetworkRequestConfigResponse ->
                 {
+                    val networkConfig = Json.decodeFromString<NetworkConfig>(networkCommand.message)
+
+                    val config = Config()
+                    config.name = networkConfig.name
+                    config.dateFormat = DateFormat.valueOf( networkConfig.dateFormat )
+                    config.timeFormat = TimeFormat.valueOf( networkConfig.timeFormat )
+                    config.distanceFormat = DistanceFormat.valueOf( networkConfig.distanceFormat )
+                    config.minGpsPrecision = networkConfig.minGspPrecision
+                    config.id = DAO.configDAO.createConfig( config )
+
                     activity!!.runOnUiThread {
                         binding.configCheckBox.isChecked = true
                     }
                 }
+
                 NetworkCommand.NetworkRequestStudyResponse ->
                 {
+                    val networkStudy = Json.decodeFromString<NetworkStudy>(networkCommand.message)
+
+                    val study = Study()
+                    study.name = networkStudy.name
+                    study.isValid = networkStudy.isValid
+                    study.configId = networkStudy.configId
+                    study.id = DAO.studyDAO.createStudy( study )
+
                     activity!!.runOnUiThread {
                         binding.studyCheckBox.isChecked = true
                     }
                 }
-                NetworkCommand.NetworkRequestFieldResponse ->
+
+                NetworkCommand.NetworkRequestFieldsResponse ->
                 {
+                    val networkFields = Json.decodeFromString<NetworkFields>(networkCommand.message)
+
+                    for (networkField in networkFields.fields)
+                    {
+                        val field = Field()
+                        field.studyId = networkField.studyId
+                        field.name = networkField.name
+                        field.type = FieldType.valueOf( networkField.type )
+                        field.pii = networkField.pii
+                        field.required = networkField.required
+                        field.integerOnly = networkField.integerOnly
+                        field.date = networkField.date
+                        field.time = networkField.time
+                        field.option1 = networkField.option1
+                        field.option2 = networkField.option2
+                        field.option3 = networkField.option3
+                        field.option4 = networkField.option4
+                        field.id = DAO.fieldDAO.createField( field )
+                    }
+
                     activity!!.runOnUiThread {
                         binding.fieldsCheckBox.isChecked = true
                     }
                 }
+
                 NetworkCommand.NetworkRequestShapeFileResponse ->
                 {
                     activity!!.runOnUiThread {

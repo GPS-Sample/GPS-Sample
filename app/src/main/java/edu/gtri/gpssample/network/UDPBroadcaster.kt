@@ -23,26 +23,6 @@ class UDPBroadcaster
     }
 
     //--------------------------------------------------------------------------
-    fun stopTransmitting()
-    {
-        transmitterEnabled = false
-        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
-        {
-            datagramSocket!!.close()
-        }
-    }
-
-    //--------------------------------------------------------------------------
-    fun stopReceiving()
-    {
-        receiverEnabled = false
-        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
-        {
-            datagramSocket!!.close()
-        }
-    }
-
-    //--------------------------------------------------------------------------
     fun transmitterIsEnabled() : Boolean
     {
         return transmitterEnabled
@@ -111,9 +91,9 @@ class UDPBroadcaster
     }
 
     //--------------------------------------------------------------------------
-    suspend fun beginTransmitting( myInetAddress: InetAddress, broadcastInetAddress: InetAddress, bytes: ByteArray )
+    suspend fun beginTransmitting( myInetAddress: InetAddress, broadcastInetAddress: InetAddress, message: String )
     {
-        Log.d( "xxx", "begin transmitting heartbeat on $myInetAddress:$port to ${broadcastInetAddress}:$port" )
+        Log.d( "xxx", "begin transmitting on $myInetAddress:$port to ${broadcastInetAddress}:$port" )
 
         val backgroundResult = withContext(Dispatchers.IO)
         {
@@ -124,7 +104,7 @@ class UDPBroadcaster
                 datagramSocket!!.reuseAddress = true
             }
 
-            val datagramPacket = DatagramPacket(bytes, bytes.size, broadcastInetAddress, port)
+            val datagramPacket = DatagramPacket( message.toByteArray(), message.length, broadcastInetAddress, port)
 
             delay(1000)
 
@@ -144,6 +124,26 @@ class UDPBroadcaster
             }
 
             Log.d( "xxx", "finished transmitting data" )
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    fun stopTransmitting()
+    {
+        transmitterEnabled = false
+        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
+        {
+            datagramSocket!!.close()
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    fun stopReceiving()
+    {
+        receiverEnabled = false
+        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
+        {
+            datagramSocket!!.close()
         }
     }
 }

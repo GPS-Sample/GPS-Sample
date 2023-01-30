@@ -117,4 +117,22 @@ class ConfigDAO(private var dao: DAO)
         db.delete(DAO.TABLE_CONFIG, whereClause, args)
         db.close()
     }
+
+    //--------------------------------------------------------------------------
+    fun deleteAllConfigs()
+    {
+        val studies = DAO.studyDAO.getStudies()
+
+        for (study in studies)
+        {
+            DAO.studyDAO.deleteStudy( study )
+        }
+
+        val configs = DAO.configDAO.getConfigs()
+
+        for (config in configs)
+        {
+            DAO.configDAO.deleteConfig( config )
+        }
+    }
 }
