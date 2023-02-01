@@ -47,15 +47,15 @@ class SignUpFragment : Fragment()
             }
         }
 
-        val roleArg = arguments?.getString(Key.kRole.toString());
+        arguments?.getString(Key.kRole.toString())?.let { role ->
+            this.role = role
+        }
 
-        if (roleArg == null)
+        if (!this::role.isInitialized)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: role.", Toast.LENGTH_SHORT).show()
             return
         }
-
-        role = roleArg
 
         binding.titleTextView.text = role.toString() + " Sign Up"
 

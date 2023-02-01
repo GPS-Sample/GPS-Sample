@@ -48,7 +48,7 @@ import kotlin.collections.ArrayList
 class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
     private var dataIsFresh = false
-    private var study: Study? = null
+    private lateinit var study: Study
     private var serverInetAddress: InetAddress? = null
     private var broadcastInetAddress: InetAddress? = null
     private var _binding: FragmentManageStudyBinding? = null
@@ -93,15 +93,17 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             return
         }
 
-        study = DAO.studyDAO.getStudy( studyId )
+        DAO.studyDAO.getStudy( studyId )?.let { study ->
+            this.study = study
+        }
 
-        if (study == null)
+        if (!this::study.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        binding.studyNameTextView.setText( "Study " + study!!.name )
+        binding.studyNameTextView.setText( "Study " + study.name )
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
@@ -209,8 +211,8 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     val jsonObject = JSONObject()
                     jsonObject.put( Key.kSSID.toString(), ssid )
                     jsonObject.put( Key.kPass.toString(), pass )
-                    jsonObject.put( Key.kStudyId.toString(), study!!.id )
-                    jsonObject.put( Key.kConfigId.toString(), study!!.configId )
+                    jsonObject.put( Key.kStudyId.toString(), study.id )
+                    jsonObject.put( Key.kConfigId.toString(), study.configId )
 
                     val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
                     qrgEncoder.setColorBlack(Color.WHITE);
@@ -265,7 +267,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
 
             R.id.action_delete_study -> {
-                DAO.studyDAO.deleteStudy( study!! )
+                DAO.studyDAO.deleteStudy( study )
                 findNavController().popBackStack()
                 return true
             }
@@ -299,7 +301,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestConfigCommand -> {
                 lifecycleScope.launch {
-                    val config = DAO.configDAO.getConfig( study!!.configId )
+                    val config = DAO.configDAO.getConfig( study.configId )
                     val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, networkCommand.uuid, config!!.pack() )
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                 }
@@ -307,14 +309,14 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestStudyCommand -> {
                 lifecycleScope.launch {
-                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, networkCommand.uuid, study!!.pack())
+                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, networkCommand.uuid, study.pack())
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                 }
             }
 
             NetworkCommand.NetworkRequestFieldsCommand -> {
                 lifecycleScope.launch {
-                    val fields = DAO.fieldDAO.getFields( study!!.id )
+                    val fields = DAO.fieldDAO.getFields( study.id )
                     val networkFields = NetworkFields( fields )
 
                     val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkFields.pack())

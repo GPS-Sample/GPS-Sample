@@ -44,6 +44,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
     private var studyId = -1
     private var configId = -1
+    private lateinit var role: String
     private lateinit var broadcastInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
@@ -106,9 +107,15 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val role_arg = getArguments()?.getString(Key.kRole.toString());
+        arguments?.getString(Key.kRole.toString())?.let { role ->
+            this.role = role
+        }
 
-        val role = Role.valueOf(role_arg!!)
+        if (!this::role.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: role.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         binding.titleTextView.text = role.toString()
 

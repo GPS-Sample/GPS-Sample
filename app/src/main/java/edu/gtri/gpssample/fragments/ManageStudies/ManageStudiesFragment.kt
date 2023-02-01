@@ -19,7 +19,7 @@ import edu.gtri.gpssample.database.models.Study
 
 class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var config: Config? = null;
+    private lateinit var config: Config
     private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
@@ -64,8 +64,11 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             return
         }
 
-        config = DAO.configDAO.getConfig( configId )
-        if (config == null)
+        DAO.configDAO.getConfig( configId )?.let {
+            config = it
+        }
+
+        if (!this::config.isInitialized)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Configuration with id: $configId not found.", Toast.LENGTH_SHORT).show()
             return
@@ -74,7 +77,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
         manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
         manageStudiesAdapter.selectedItemCallback = this::onItemSelected
 
-        binding.configNameTextView.text = "Configuration " + config!!.name + " Studies"
+        binding.configNameTextView.text = "Configuration " + config.name + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageStudiesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
@@ -83,7 +86,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
             val bundle = Bundle()
 
-            bundle.putInt( Key.kConfigId.toString(), config!!.id )
+            bundle.putInt( Key.kConfigId.toString(), config.id )
 
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
@@ -93,7 +96,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         super.onResume()
 
-        val studies = DAO.studyDAO.getValidStudies( config!!.id )
+        val studies = DAO.studyDAO.getValidStudies( config.id )
 
         if (studies.isEmpty())
         {
@@ -113,7 +116,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         val bundle = Bundle()
 
-        bundle.putInt( Key.kConfigId.toString(), config!!.id )
+        bundle.putInt( Key.kConfigId.toString(), config.id )
         bundle.putInt( Key.kStudyId.toString(), study.id )
 
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
@@ -132,14 +135,14 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             R.id.action_edit_configuration -> {
                 val bundle = Bundle()
 
-                bundle.putInt( Key.kConfigId.toString(), config!!.id )
+                bundle.putInt( Key.kConfigId.toString(), config.id )
 
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
             }
             R.id.action_create_study -> {
                 val bundle = Bundle()
 
-                bundle.putInt( Key.kConfigId.toString(), config!!.id )
+                bundle.putInt( Key.kConfigId.toString(), config.id )
 
                 findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
                 return true
@@ -159,11 +162,8 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
     override fun didAnswerYes( tag: Int )
     {
-        if (config != null)
-        {
-            DAO.configDAO.deleteConfig( config!! )
-            findNavController().popBackStack()
-        }
+        DAO.configDAO.deleteConfig( config )
+        findNavController().popBackStack()
     }
 
     override fun onDestroyView()

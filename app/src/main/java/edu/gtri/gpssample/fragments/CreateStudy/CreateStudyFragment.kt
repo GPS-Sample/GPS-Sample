@@ -20,7 +20,7 @@ import edu.gtri.gpssample.database.models.Study
 
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var study: Study? = null;
+    private lateinit var study: Study
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
     private lateinit var createStudyAdapter: CreateStudyAdapter
@@ -65,25 +65,28 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (studyId > 0)
         {
-            study = DAO.studyDAO.getStudy( studyId!! )
-            if (study == null)
+            DAO.studyDAO.getStudy( studyId )?.let { study ->
+                this.study = study
+            }
+
+            if (!this::study.isInitialized)
             {
-                Toast.makeText(activity!!.applicationContext, "Fatal Study with id: $studyId not found.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
                 return
             }
         }
 
-        if (study == null)
+        if (!this::study.isInitialized)
         {
             study = Study( -1, configId, "", false )
-            study!!.id = DAO.studyDAO.createStudy( study!! )
+            study.id = DAO.studyDAO.createStudy( study )
         }
         else
         {
-            binding.titleTextView.text = "Study ${study!!.name}"
+            binding.titleTextView.text = "Study ${study.name}"
         }
 
-        binding.studyNameEditText.setText( study!!.name )
+        binding.studyNameEditText.setText( study.name )
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
@@ -100,7 +103,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         binding.addButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putInt( Key.kStudyId.toString(), study!!.id )
+            bundle.putInt( Key.kStudyId.toString(), study.id )
             findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
         }
 
@@ -112,20 +115,20 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 return@setOnClickListener
             }
 
-            study!!.isValid = true
-            study!!.name = binding.studyNameEditText.text.toString()
+            study.isValid = true
+            study.name = binding.studyNameEditText.text.toString()
 
-            if (study!!.id < 0)
+            if (study.id < 0)
             {
-                study!!.id = DAO.studyDAO.createStudy( study!! )
+                study.id = DAO.studyDAO.createStudy( study )
             }
             else
             {
-                DAO.studyDAO.updateStudy( study!! )
+                DAO.studyDAO.updateStudy( study )
             }
 
             val bundle = Bundle()
-            bundle.putInt( Key.kStudyId.toString(), study!!.id )
+            bundle.putInt( Key.kStudyId.toString(), study.id )
             findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
         }
     }
@@ -134,9 +137,9 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onResume()
 
-        if (study != null)
+        if (this::study.isInitialized)
         {
-            val fields = DAO.fieldDAO.getFields(study!!.id)
+            val fields = DAO.fieldDAO.getFields(study.id)
 
             createStudyAdapter.updateFields( fields )
         }
@@ -147,7 +150,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         val bundle = Bundle()
 
         bundle.putInt( Key.kFieldId.toString(), field.id )
-        bundle.putInt( Key.kStudyId.toString(), study!!.id )
+        bundle.putInt( Key.kStudyId.toString(), study.id )
 
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
@@ -168,7 +171,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         when (item.itemId) {
             android.R.id.home ->
             {
-                if (!study!!.isValid)
+                if (!study.isValid)
                 {
                     if (binding.studyNameEditText.text.toString().isNotEmpty())
                     {
@@ -181,14 +184,14 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 //            R.id.action_create_field ->
 //            {
 //                val bundle = Bundle()
-//                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+//                bundle.putInt( Key.kStudyId.toString(), study.id )
 //                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
 //
 //                return true
 //            }
 //            R.id.action_manage_study -> {
 //                val bundle = Bundle()
-//                bundle.putInt( Key.kStudyId.toString(), study!!.id )
+//                bundle.putInt( Key.kStudyId.toString(), study.id )
 //                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
 //            }
             R.id.action_delete_study -> {
@@ -209,16 +212,13 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         when( tag )
         {
             deleteTag -> {
-                if (study != null)
-                {
-                    DAO.studyDAO.deleteStudy( study!! )
-                    findNavController().popBackStack()
-                }
+                DAO.studyDAO.deleteStudy( study )
+                findNavController().popBackStack()
             }
             saveTag -> {
-                study!!.isValid = true
-                study!!.name = binding.studyNameEditText.text.toString()
-                study!!.id = DAO.studyDAO.createStudy( study!! )
+                study.isValid = true
+                study.name = binding.studyNameEditText.text.toString()
+                study.id = DAO.studyDAO.createStudy( study )
                 findNavController().popBackStack()
             }
         }

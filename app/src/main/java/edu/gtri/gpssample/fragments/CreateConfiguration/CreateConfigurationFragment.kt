@@ -43,11 +43,10 @@ class CreateConfigurationFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val configId = getArguments()?.getInt( Key.kConfigId.toString());
+        val configId = arguments?.getInt( Key.kConfigId.toString());
 
-        if (configId != null)
-        {
-            config = DAO.configDAO.getConfig( configId!! )
+        configId?.let {
+            config = DAO.configDAO.getConfig( it )
         }
 
         binding.fragmentRootLayout.setOnClickListener {
@@ -76,27 +75,26 @@ class CreateConfigurationFragment : Fragment()
                 binding.timeFormatSpinner.adapter = adapter
             }
 
-        if (config != null)
-        {
+        config?.let { config ->
             binding.nextButton.text = "SAVE"
-            binding.titleTextView.setText( "Edit Configuration" )
-            binding.configNameEditText.setText( config!!.name )
-            binding.minGpsPrecisionEditText.setText( config!!.minGpsPrecision.toString())
+            binding.titleTextView.text = "Edit Configuration"
+            binding.configNameEditText.setText( config.name )
+            binding.minGpsPrecisionEditText.setText( config.minGpsPrecision.toString())
 
-            when (config!!.distanceFormat)
+            when (config.distanceFormat)
             {
                 DistanceFormat.Meters.toString() -> binding.distanceFormatSpinner.setSelection( 0 )
                 DistanceFormat.Feet.toString() -> binding.distanceFormatSpinner.setSelection( 1 )
             }
 
-            when (config!!.dateFormat)
+            when (config.dateFormat)
             {
                 DateFormat.DayMonthYear.toString() -> binding.dateFormatSpinner.setSelection( 0 )
                 DateFormat.MonthDayYear.toString() -> binding.dateFormatSpinner.setSelection( 1 )
                 DateFormat.YearMonthDay.toString() -> binding.dateFormatSpinner.setSelection( 2 )
             }
 
-            when (config!!.timeFormat)
+            when (config.timeFormat)
             {
                 TimeFormat.twelveHour.toString() -> binding.timeFormatSpinner.setSelection( 0 )
                 TimeFormat.twentyFourHour.toString() -> binding.timeFormatSpinner.setSelection( 1 )
@@ -126,43 +124,46 @@ class CreateConfigurationFragment : Fragment()
                 config = Config( -1, "", "", "", "", 0 )
             }
 
-            config!!.name = binding.configNameEditText.text.toString()
-            config!!.minGpsPrecision = binding.minGpsPrecisionEditText.text.toString().toInt()
+            config?.let { config ->
 
-            var selectedItem = binding.distanceFormatSpinner.selectedItem as String
+                config.name = binding.configNameEditText.text.toString()
+                config.minGpsPrecision = binding.minGpsPrecisionEditText.text.toString().toInt()
 
-            when (selectedItem)
-            {
-                distFormats[0] -> config!!.distanceFormat = DistanceFormat.Meters.toString();
-                distFormats[1] -> config!!.distanceFormat = DistanceFormat.Feet.toString();
-            }
+                var selectedItem = binding.distanceFormatSpinner.selectedItem as String
 
-            selectedItem = binding.dateFormatSpinner.selectedItem as String
+                when (selectedItem)
+                {
+                    distFormats[0] -> config.distanceFormat = DistanceFormat.Meters.toString();
+                    distFormats[1] -> config.distanceFormat = DistanceFormat.Feet.toString();
+                }
 
-            when (selectedItem)
-            {
-                dateFormats[0] -> config!!.dateFormat = DateFormat.DayMonthYear.toString();
-                dateFormats[1] -> config!!.dateFormat = DateFormat.MonthDayYear.toString();
-                dateFormats[2] -> config!!.dateFormat = DateFormat.YearMonthDay.toString();
-            }
+                selectedItem = binding.dateFormatSpinner.selectedItem as String
 
-            selectedItem = binding.timeFormatSpinner.selectedItem as String
+                when (selectedItem)
+                {
+                    dateFormats[0] -> config.dateFormat = DateFormat.DayMonthYear.toString();
+                    dateFormats[1] -> config.dateFormat = DateFormat.MonthDayYear.toString();
+                    dateFormats[2] -> config.dateFormat = DateFormat.YearMonthDay.toString();
+                }
 
-            when (selectedItem)
-            {
-                timeFormats[0] -> config!!.timeFormat = TimeFormat.twelveHour.toString();
-                timeFormats[1] -> config!!.timeFormat = TimeFormat.twentyFourHour.toString();
-            }
+                selectedItem = binding.timeFormatSpinner.selectedItem as String
 
-            if (config!!.id < 0)
-            {
-                config!!.id = DAO.configDAO.createConfig( config!! )
-                findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
-            }
-            else
-            {
-                DAO.configDAO.updateConfig( config!! )
-                findNavController().popBackStack()
+                when (selectedItem)
+                {
+                    timeFormats[0] -> config.timeFormat = TimeFormat.twelveHour.toString();
+                    timeFormats[1] -> config.timeFormat = TimeFormat.twentyFourHour.toString();
+                }
+
+                if (config.id < 0)
+                {
+                    config.id = DAO.configDAO.createConfig( config )
+                    findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
+                }
+                else
+                {
+                    DAO.configDAO.updateConfig( config )
+                    findNavController().popBackStack()
+                }
             }
         }
     }
