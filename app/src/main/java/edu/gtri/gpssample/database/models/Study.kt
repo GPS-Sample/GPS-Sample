@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.network.models.NetworkCommand
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -19,9 +20,9 @@ data class Study(
 
     companion object
     {
-        fun unpack( json: String ) : Study
+        fun unpack( message: String ) : Study
         {
-            return Json.decodeFromString<Study>( json )
+            return Json.decodeFromString<Study>( message )
         }
     }
 }

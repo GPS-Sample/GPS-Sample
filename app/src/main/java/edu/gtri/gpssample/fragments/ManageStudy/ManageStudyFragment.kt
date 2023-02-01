@@ -280,9 +280,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     {
         dataIsFresh = true
 
-        val message = String( datagramPacket.data, 0, datagramPacket.length )
-
-        val networkCommand = NetworkCommand.unpack( message )
+        val networkCommand = NetworkCommand.unpack( datagramPacket.data, datagramPacket.length )
 
         when( networkCommand.command )
         {

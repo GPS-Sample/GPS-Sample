@@ -25,9 +25,14 @@ data class NetworkCommand( var command: Int, var uuid: String, var message: Stri
         const val NetworkRequestShapeFileCommand    = 1008
         const val NetworkRequestShapeFileResponse   = 1009
 
-        fun unpack( json: String ) : NetworkCommand
+        fun unpack( message: String ) : NetworkCommand
         {
-            return Json.decodeFromString<NetworkCommand>( json )
+            return Json.decodeFromString<NetworkCommand>( message )
+        }
+
+        fun unpack( byteArray: ByteArray, length: Int ) : NetworkCommand
+        {
+            return unpack( String( byteArray, 0, length ))
         }
     }
 }

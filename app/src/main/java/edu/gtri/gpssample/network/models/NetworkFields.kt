@@ -16,9 +16,9 @@ data class NetworkFields( var fields: List<Field> )
 
     companion object
     {
-        fun unpack( json: String ) : NetworkFields
+        fun unpack( message: String ) : NetworkFields
         {
-            return Json.decodeFromString<NetworkFields>( json )
+            return Json.decodeFromString<NetworkFields>( message )
         }
     }
 }

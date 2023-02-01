@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database.models
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.network.models.NetworkCommand
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -24,9 +25,9 @@ data class Config(
 
     companion object
     {
-        fun unpack( json: String ) : Config
+        fun unpack( message: String ) : Config
         {
-            return Json.decodeFromString<Config>( json )
+            return Json.decodeFromString<Config>( message )
         }
     }
 }

@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.database.models
 
 import edu.gtri.gpssample.constants.FieldType
+import edu.gtri.gpssample.network.models.NetworkCommand
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -29,9 +30,9 @@ data class Field(
 
     companion object
     {
-        fun unpack( json: String ) : Field
+        fun unpack( message: String ) : Field
         {
-            return Json.decodeFromString<Field>( json )
+            return Json.decodeFromString<Field>( message )
         }
     }
 }

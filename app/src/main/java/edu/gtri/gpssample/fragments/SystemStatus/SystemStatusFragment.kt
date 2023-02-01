@@ -26,6 +26,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -42,6 +43,7 @@ import kotlin.collections.ArrayList
 
 class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
+    private lateinit var user: User
     private var studyId = -1
     private var configId = -1
     private lateinit var role: String
@@ -66,46 +68,19 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         return binding.root
     }
 
-    override fun onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        super.onResume()
-
-        binding.configCheckBox.isChecked = false
-        binding.studyCheckBox.isChecked = false
-        binding.fieldsCheckBox.isChecked = false
-
-        val configs = DAO.configDAO.getConfigs()
-
-        if (configs.isEmpty())
-        {
-            configId = -1
-            studyId = -1
-        }
-        else
-        {
-            binding.configCheckBox.isChecked = true
-
-            val studies = DAO.studyDAO.getStudies()
-
-            if (studies.isEmpty())
-            {
-                studyId = -1
-            }
-            else
-            {
-                binding.studyCheckBox.isChecked = true
-
-                val fields = DAO.fieldDAO.getFields(studies[0].id)
-                if (fields.isNotEmpty())
-                {
-                    binding.fieldsCheckBox.isChecked = true
-                }
-            }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (activity!!.application as? MainApplication)?.user?.let { user ->
+            this.user = user
+        }
+
+        if (!this::user.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "User is undefined", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         arguments?.getString(Key.kRole.toString())?.let { role ->
             this.role = role
@@ -142,8 +117,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val user = (activity!!.application as? MainApplication)?.user
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user!!.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             DAO.configDAO.deleteAllConfigs()
@@ -172,8 +146,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val user = (activity!!.application as? MainApplication)?.user
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyCommand, user!!.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyCommand, user.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.studyCheckBox.isChecked = false
@@ -203,8 +176,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val user = (activity!!.application as? MainApplication)?.user
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsCommand, user!!.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsCommand, user.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.fieldsCheckBox.isChecked = false
@@ -215,14 +187,51 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.shapeFilesImageButton.setOnClickListener {
-            val user = (activity!!.application as? MainApplication)?.user
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileCommand, user!!.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileCommand, user.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.shapeFilesCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        binding.configCheckBox.isChecked = false
+        binding.studyCheckBox.isChecked = false
+        binding.fieldsCheckBox.isChecked = false
+
+        val configs = DAO.configDAO.getConfigs()
+
+        if (configs.isEmpty())
+        {
+            configId = -1
+            studyId = -1
+        }
+        else
+        {
+            binding.configCheckBox.isChecked = true
+
+            val studies = DAO.studyDAO.getStudies()
+
+            if (studies.isEmpty())
+            {
+                studyId = -1
+            }
+            else
+            {
+                binding.studyCheckBox.isChecked = true
+
+                val fields = DAO.fieldDAO.getFields(studies[0].id)
+                if (fields.isNotEmpty())
+                {
+                    binding.fieldsCheckBox.isChecked = true
+                }
             }
         }
     }
@@ -361,8 +370,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             lifecycleScope.launch {
                 binding.wifiCheckBox.isChecked = true
 
-                val user = (activity!!.application as? MainApplication)?.user
-                user!!.isOnline = true
+                user.isOnline = true
                 val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, user.uuid, user.pack() )
 
                 udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
@@ -401,11 +409,9 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
     override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
     {
-        val message = String( datagramPacket.data, 0, datagramPacket.length )
-        val networkCommand = Json.decodeFromString<NetworkCommand>( message )
-        val user = (activity!!.application as? MainApplication)?.user
+        val networkCommand = NetworkCommand.unpack( datagramPacket.data, datagramPacket.length )
 
-        if (networkCommand.uuid == user!!.uuid)
+        if (networkCommand.uuid == user.uuid)
         {
             when( networkCommand.command )
             {
@@ -424,7 +430,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 {
                     val study = Study.unpack( networkCommand.message )
 
-                    study.configId = configId
+                    study.configId = configId // config ID may be different since this study came from a different DB
 
                     studyId = DAO.studyDAO.createStudy( study )
 
@@ -439,7 +445,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                     for (field in networkFields.fields)
                     {
-                        field.studyId = studyId
+                        field.studyId = studyId // study ID may be different since this field came from a different DB
                         DAO.fieldDAO.createField( field )
                     }
 
