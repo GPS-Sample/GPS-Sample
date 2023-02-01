@@ -20,6 +20,7 @@ import java.util.*
 
 class SignUpFragment : Fragment()
 {
+    private lateinit var role: String
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: SignUpViewModel
@@ -46,9 +47,15 @@ class SignUpFragment : Fragment()
             }
         }
 
-        val role_arg = getArguments()?.getString(Key.kRole.toString());
+        val roleArg = arguments?.getString(Key.kRole.toString());
 
-        val role = Role.valueOf(role_arg!!)
+        if (roleArg == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: role.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        role = roleArg
 
         binding.titleTextView.text = role.toString() + " Sign Up"
 
@@ -72,19 +79,11 @@ class SignUpFragment : Fragment()
             }
             else
             {
-                val user = User()
-
-                user.pin = pin1
-                user.role = role
-                user.name = name
-                user.recoveryAnswer = answer
-                user.recoveryQuestion = question
-                user.uuid = UUID.randomUUID().toString()
-
+                val user = User( -1, UUID.randomUUID().toString(), name, pin1, role, answer, question, false )
                 user.id = DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), role.toString() )
+                bundle.putString( Key.kRole.toString(), role )
 
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }

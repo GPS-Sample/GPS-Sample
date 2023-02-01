@@ -75,9 +75,15 @@ class UDPBroadcaster
                 try {
                     val buf = ByteArray(4096)
                     val datagramPacket = DatagramPacket(buf, buf.size)
+
                     datagramSocket!!.receive(datagramPacket)
 
-                    delegate.didReceiveDatagramPacket( datagramPacket )
+                    val fromAddress = datagramPacket.address
+
+                    if (fromAddress != inetAddress)
+                    {
+                        delegate.didReceiveDatagramPacket( datagramPacket )
+                    }
                 }
                 catch (ex: Exception)
                 {

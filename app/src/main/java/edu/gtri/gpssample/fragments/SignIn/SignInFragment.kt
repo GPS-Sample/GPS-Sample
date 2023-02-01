@@ -18,6 +18,7 @@ import edu.gtri.gpssample.databinding.FragmentSignInBinding
 
 class SignInFragment : Fragment()
 {
+    private lateinit var role: String
     private var _binding: FragmentSignInBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: SignInViewModel
@@ -44,9 +45,15 @@ class SignInFragment : Fragment()
             }
         }
 
-        val role_arg = getArguments()?.getString(Key.kRole.toString());
+        val roleArg = arguments?.getString(Key.kRole.toString());
 
-        val role = Role.valueOf(role_arg!!)
+        if (roleArg == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: role.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        role = roleArg
 
         binding.titleTextView.text = role.toString() + " Sign In"
 
@@ -84,7 +91,7 @@ class SignInFragment : Fragment()
                     val bundle = Bundle()
                     bundle.putString( Key.kRole.toString(), role.toString())
 
-                    if (role == Role.Admin)
+                    if (role == Role.Admin.toString())
                     {
                         findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                     }

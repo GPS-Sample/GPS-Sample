@@ -42,8 +42,8 @@ import kotlin.collections.ArrayList
 
 class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
-    private var studyId = 0
-    private var configId = 0
+    private var studyId = -1
+    private var configId = -1
     private lateinit var broadcastInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
@@ -65,22 +65,32 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onResume()
+    {
+        super.onResume()
 
-        val role_arg = getArguments()?.getString(Key.kRole.toString());
-
-        val role = Role.valueOf(role_arg!!)
-
-        binding.titleTextView.text = role.toString()
+        binding.configCheckBox.isChecked = false
+        binding.studyCheckBox.isChecked = false
+        binding.fieldsCheckBox.isChecked = false
 
         val configs = DAO.configDAO.getConfigs()
-        if (configs.isNotEmpty())
+
+        if (configs.isEmpty())
+        {
+            configId = -1
+            studyId = -1
+        }
+        else
         {
             binding.configCheckBox.isChecked = true
 
             val studies = DAO.studyDAO.getStudies()
-            if (studies.isNotEmpty())
+
+            if (studies.isEmpty())
+            {
+                studyId = -1
+            }
+            else
             {
                 binding.studyCheckBox.isChecked = true
 
@@ -91,6 +101,16 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 }
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val role_arg = getArguments()?.getString(Key.kRole.toString());
+
+        val role = Role.valueOf(role_arg!!)
+
+        binding.titleTextView.text = role.toString()
 
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
@@ -99,11 +119,22 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.wifiImageButton.setOnClickListener {
-            val intent = Intent(activity!!, CameraXLivePreviewActivity::class.java)
-            startActivityForResult( intent, 0 )
+
+            if (!connected())
+            {
+                val intent = Intent(activity!!, CameraXLivePreviewActivity::class.java)
+                startActivityForResult( intent, 0 )
+            }
         }
 
         binding.configImageButton.setOnClickListener {
+
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val user = (activity!!.application as? MainApplication)?.user
             val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user!!.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
@@ -121,6 +152,19 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.studyImageButton.setOnClickListener {
+
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (configId < 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val user = (activity!!.application as? MainApplication)?.user
             val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyCommand, user!!.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
@@ -133,6 +177,25 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.fieldsImageButton.setOnClickListener {
+
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (configId < 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (studyId < 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val user = (activity!!.application as? MainApplication)?.user
             val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsCommand, user!!.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
@@ -155,6 +218,11 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
+    }
+
+    private fun connected() : Boolean
+    {
+        return udpBroadcaster.transmitterIsEnabled()
     }
 
     fun getWifiApIpAddresses(): ArrayList<InetAddress> {
@@ -287,13 +355,10 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 binding.wifiCheckBox.isChecked = true
 
                 val user = (activity!!.application as? MainApplication)?.user
+                user!!.isOnline = true
+                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, user.uuid, user.pack() )
 
-                val networkUser = NetworkUser( user!!.name, user!!.uuid, true )
-                val networkUserMessage = Json.encodeToString( networkUser )
-                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, user!!.uuid, networkUserMessage )
-                val networkCommandMessage = Json.encodeToString( networkCommand )
-
-                udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommandMessage)
+                udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
             }
         }
     }
@@ -339,15 +404,9 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             {
                 NetworkCommand.NetworkRequestConfigResponse ->
                 {
-                    val networkConfig = Json.decodeFromString<NetworkConfig>(networkCommand.message)
+                    val config = Config.unpack( networkCommand.message )
 
-                    val config = Config()
-                    config.name = networkConfig.name
-                    config.dateFormat = DateFormat.valueOf( networkConfig.dateFormat )
-                    config.timeFormat = TimeFormat.valueOf( networkConfig.timeFormat )
-                    config.distanceFormat = DistanceFormat.valueOf( networkConfig.distanceFormat )
-                    config.minGpsPrecision = networkConfig.minGspPrecision
-                    config.id = DAO.configDAO.createConfig( config )
+                    configId = DAO.configDAO.createConfig( config )
 
                     activity!!.runOnUiThread {
                         binding.configCheckBox.isChecked = true
@@ -356,13 +415,11 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                 NetworkCommand.NetworkRequestStudyResponse ->
                 {
-                    val networkStudy = Json.decodeFromString<NetworkStudy>(networkCommand.message)
+                    val study = Study.unpack( networkCommand.message )
 
-                    val study = Study()
-                    study.name = networkStudy.name
-                    study.isValid = networkStudy.isValid
-                    study.configId = networkStudy.configId
-                    study.id = DAO.studyDAO.createStudy( study )
+                    study.configId = configId
+
+                    studyId = DAO.studyDAO.createStudy( study )
 
                     activity!!.runOnUiThread {
                         binding.studyCheckBox.isChecked = true
@@ -371,24 +428,12 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                 NetworkCommand.NetworkRequestFieldsResponse ->
                 {
-                    val networkFields = Json.decodeFromString<NetworkFields>(networkCommand.message)
+                    val networkFields = NetworkFields.unpack(networkCommand.message)
 
-                    for (networkField in networkFields.fields)
+                    for (field in networkFields.fields)
                     {
-                        val field = Field()
-                        field.studyId = networkField.studyId
-                        field.name = networkField.name
-                        field.type = FieldType.valueOf( networkField.type )
-                        field.pii = networkField.pii
-                        field.required = networkField.required
-                        field.integerOnly = networkField.integerOnly
-                        field.date = networkField.date
-                        field.time = networkField.time
-                        field.option1 = networkField.option1
-                        field.option2 = networkField.option2
-                        field.option3 = networkField.option3
-                        field.option4 = networkField.option4
-                        field.id = DAO.fieldDAO.createField( field )
+                        field.studyId = studyId
+                        DAO.fieldDAO.createField( field )
                     }
 
                     activity!!.runOnUiThread {

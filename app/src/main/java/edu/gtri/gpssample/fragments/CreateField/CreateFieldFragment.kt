@@ -292,14 +292,14 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             when( field!!.type )
             {
-                FieldType.Text -> {
+                FieldType.Text.toString() -> {
                     binding.fieldTypeSpinner.setSelection(0)
                     val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                     val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
                     piiCheckbox.isChecked = field!!.pii
                     requiredCheckbox.isChecked = field!!.required
                 }
-                FieldType.Number -> {
+                FieldType.Number.toString() -> {
                     binding.fieldTypeSpinner.setSelection(1)
                     val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                     val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
@@ -308,7 +308,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                     requiredCheckbox.isChecked = field!!.required
                     integerOnlyCheckbox.isChecked = field!!.integerOnly
                 }
-                FieldType.Date -> {
+                FieldType.Date.toString() -> {
                     binding.fieldTypeSpinner.setSelection(2)
                     val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                     val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
@@ -319,7 +319,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                     dateCheckbox.isChecked = field!!.date
                     timeCheckbox.isChecked = field!!.time
                 }
-                FieldType.Checkbox -> {
+                FieldType.Checkbox.toString() -> {
                     binding.fieldTypeSpinner.setSelection(3)
                     val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                     val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
@@ -347,7 +347,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         checkbox4EditText.setText( field!!.option4 )
                     }
                 }
-                FieldType.Dropdown -> {
+                FieldType.Dropdown.toString() -> {
                     binding.fieldTypeSpinner.setSelection(4)
                     val piiCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                     val requiredCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.required_checkBox )
@@ -382,26 +382,23 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             if (binding.fieldNameEditText.text.toString().length > 0)
             {
-                val fieldType = FieldType.valueOf(binding.fieldTypeSpinner.selectedItem as String)
-
                 if (field == null)
                 {
-                    field = Field()
+                    field = Field( -1, study!!.id, "", "", false, false, false, false, false, "", "", "", "" )
                     field!!.id = DAO.fieldDAO.createField( field!! )
-                    field!!.studyId = study!!.id
                 }
 
                 field!!.name = binding.fieldNameEditText.text.toString()
-                field!!.type = fieldType
+                field!!.type = binding.fieldTypeSpinner.selectedItem as String
 
-                when (fieldType) {
-                    FieldType.Text -> {
+                when (field!!.type) {
+                    FieldType.Text.toString() -> {
                         val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
                         field!!.pii = piiCheckbox.isChecked
                         field!!.required = requiredCheckbox.isChecked
                     }
-                    FieldType.Number -> {
+                    FieldType.Number.toString() -> {
                         val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
                         val requiredCheckbox = numberLayout.findViewById<CheckBox>( R.id.required_checkBox )
@@ -409,7 +406,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         field!!.required = requiredCheckbox.isChecked
                         field!!.integerOnly = integerOnlyCheckbox.isChecked
                     }
-                    FieldType.Date -> {
+                    FieldType.Date.toString() -> {
                         val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
                         val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
                         val dateCheckbox = dateLayout.findViewById<CheckBox>( R.id.date_checkBox )
@@ -419,7 +416,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         field!!.date = dateCheckbox.isChecked
                         field!!.time = timeCheckbox.isChecked
                     }
-                    FieldType.Checkbox -> {
+                    FieldType.Checkbox.toString() -> {
                         val editText1 = checkbox1EditText.text.toString()
                         val editText2 = checkbox2EditText.text.toString()
                         val editText3 = checkbox3EditText.text.toString()
@@ -443,7 +440,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         field!!.pii = piiCheckbox.isChecked
                         field!!.required = requiredCheckbox.isChecked
                     }
-                    FieldType.Dropdown -> {
+                    FieldType.Dropdown.toString() -> {
                         val editText1 = dropdown1EditText.text.toString()
                         val editText2 = dropdown2EditText.text.toString()
                         val editText3 = dropdown3EditText.text.toString()

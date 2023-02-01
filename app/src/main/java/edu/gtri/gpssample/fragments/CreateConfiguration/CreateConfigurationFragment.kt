@@ -85,21 +85,21 @@ class CreateConfigurationFragment : Fragment()
 
             when (config!!.distanceFormat)
             {
-                DistanceFormat.Meters -> binding.distanceFormatSpinner.setSelection( 0 )
-                DistanceFormat.Feet -> binding.distanceFormatSpinner.setSelection( 1 )
+                DistanceFormat.Meters.toString() -> binding.distanceFormatSpinner.setSelection( 0 )
+                DistanceFormat.Feet.toString() -> binding.distanceFormatSpinner.setSelection( 1 )
             }
 
             when (config!!.dateFormat)
             {
-                DateFormat.DayMonthYear -> binding.dateFormatSpinner.setSelection( 0 )
-                DateFormat.MonthDayYear -> binding.dateFormatSpinner.setSelection( 1 )
-                DateFormat.YearMonthDay -> binding.dateFormatSpinner.setSelection( 2 )
+                DateFormat.DayMonthYear.toString() -> binding.dateFormatSpinner.setSelection( 0 )
+                DateFormat.MonthDayYear.toString() -> binding.dateFormatSpinner.setSelection( 1 )
+                DateFormat.YearMonthDay.toString() -> binding.dateFormatSpinner.setSelection( 2 )
             }
 
             when (config!!.timeFormat)
             {
-                TimeFormat.twelveHour -> binding.timeFormatSpinner.setSelection( 0 )
-                TimeFormat.twentyFourHour -> binding.timeFormatSpinner.setSelection( 1 )
+                TimeFormat.twelveHour.toString() -> binding.timeFormatSpinner.setSelection( 0 )
+                TimeFormat.twentyFourHour.toString() -> binding.timeFormatSpinner.setSelection( 1 )
             }
         }
 
@@ -123,7 +123,7 @@ class CreateConfigurationFragment : Fragment()
 
             if (config == null)
             {
-                config = Config()
+                config = Config( -1, "", "", "", "", 0 )
             }
 
             config!!.name = binding.configNameEditText.text.toString()
@@ -133,25 +133,25 @@ class CreateConfigurationFragment : Fragment()
 
             when (selectedItem)
             {
-                distFormats[0] -> config!!.distanceFormat = DistanceFormat.Meters;
-                distFormats[1] -> config!!.distanceFormat = DistanceFormat.Feet;
+                distFormats[0] -> config!!.distanceFormat = DistanceFormat.Meters.toString();
+                distFormats[1] -> config!!.distanceFormat = DistanceFormat.Feet.toString();
             }
 
             selectedItem = binding.dateFormatSpinner.selectedItem as String
 
             when (selectedItem)
             {
-                dateFormats[0] -> config!!.dateFormat = DateFormat.DayMonthYear;
-                dateFormats[1] -> config!!.dateFormat = DateFormat.MonthDayYear;
-                dateFormats[2] -> config!!.dateFormat = DateFormat.YearMonthDay;
+                dateFormats[0] -> config!!.dateFormat = DateFormat.DayMonthYear.toString();
+                dateFormats[1] -> config!!.dateFormat = DateFormat.MonthDayYear.toString();
+                dateFormats[2] -> config!!.dateFormat = DateFormat.YearMonthDay.toString();
             }
 
             selectedItem = binding.timeFormatSpinner.selectedItem as String
 
             when (selectedItem)
             {
-                timeFormats[0] -> config!!.timeFormat = TimeFormat.twelveHour;
-                timeFormats[1] -> config!!.timeFormat = TimeFormat.twentyFourHour;
+                timeFormats[0] -> config!!.timeFormat = TimeFormat.twelveHour.toString();
+                timeFormats[1] -> config!!.timeFormat = TimeFormat.twentyFourHour.toString();
             }
 
             if (config!!.id < 0)

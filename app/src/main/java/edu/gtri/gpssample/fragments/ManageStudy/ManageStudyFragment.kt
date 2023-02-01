@@ -21,8 +21,11 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.databinding.FragmentManageStudyBinding
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
 import io.reactivex.Observable
@@ -55,7 +58,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
     private lateinit var viewModel: ManageStudyViewModel
-    private var networkUsers = ArrayList<NetworkUser>()
+    private var users = ArrayList<User>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -106,7 +109,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        studyAdapter = ManageStudyAdapter(networkUsers)
+        studyAdapter = ManageStudyAdapter(users)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = studyAdapter
@@ -125,8 +128,8 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 }
                 else
                 {
-                    networkUsers.clear()
-                    studyAdapter.updateUsers( networkUsers )
+                    users.clear()
+                    studyAdapter.updateUsers( users )
                 }
             },{throwable->
                 Log.d( "xxx", throwable.stackTraceToString())
@@ -277,19 +280,19 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         val message = String( datagramPacket.data, 0, datagramPacket.length )
 
-        val networkCommand = Json.decodeFromString<NetworkCommand>( message )
+        val networkCommand = NetworkCommand.unpack( message )
 
         when( networkCommand.command )
         {
             NetworkCommand.NetworkUserCommand -> {
-                val networkUser = Json.decodeFromString<NetworkUser>( networkCommand.message )
-                val user = networkUsers.find { it.name == networkUser.name }
-                if (user == null)
+                val user = User.unpack( networkCommand.message )
+
+                if (users.find { it.name == user.name } == null)
                 {
-                    networkUsers.add( networkUser )
+                    users.add( user )
 
                     activity!!.runOnUiThread{
-                        studyAdapter.updateUsers( networkUsers )
+                        studyAdapter.updateUsers( users )
                     }
                 }
             }
@@ -297,55 +300,25 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             NetworkCommand.NetworkRequestConfigCommand -> {
                 lifecycleScope.launch {
                     val config = DAO.configDAO.getConfig( study!!.configId )
-                    val networkConfig = NetworkConfig( config!!.name, config!!.dateFormat.toString(), config!!.timeFormat.toString(), config!!.distanceFormat.toString(), config!!.minGpsPrecision )
-                    val networkConfigMessage = Json.encodeToString( networkConfig )
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, networkCommand.uuid, networkConfigMessage )
-                    val networkResponseMessage = Json.encodeToString( networkResponseCommand )
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponseMessage )
+                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, networkCommand.uuid, config!!.pack() )
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                 }
             }
 
             NetworkCommand.NetworkRequestStudyCommand -> {
                 lifecycleScope.launch {
-                    val networkStudy = NetworkStudy( study!!.name, study!!.configId, study!!.isValid )
-                    val networkStudyMessage = Json.encodeToString( networkStudy )
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, networkCommand.uuid, networkStudyMessage )
-                    val networkResponseMessage = Json.encodeToString( networkResponseCommand )
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponseMessage )
+                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, networkCommand.uuid, study!!.pack())
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                 }
             }
 
             NetworkCommand.NetworkRequestFieldsCommand -> {
                 lifecycleScope.launch {
                     val fields = DAO.fieldDAO.getFields( study!!.id )
-                    val fieldList = mutableListOf<NetworkField>()
-                    for (field in fields)
-                    {
-                        val networkField = NetworkField(
-                            field.studyId,
-                            field.name,
-                            field.type.toString(),
-                            field.pii,
-                            field.required,
-                            field.integerOnly,
-                            field.date,
-                            field.time,
-                            field.option1,
-                            field.option2,
-                            field.option3,
-                            field.option4
-                        )
+                    val networkFields = NetworkFields( fields )
 
-                        fieldList.add( networkField )
-                    }
-                    val networkFields = NetworkFields( fieldList )
-                    val networkFieldsMessage = Json.encodeToString( networkFields )
-
-                    Log.d( "xxx", networkFieldsMessage )
-
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkFieldsMessage )
-                    val networkCommandMessage = Json.encodeToString( networkResponseCommand )
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
+                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkFields.pack())
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                 }
             }
 

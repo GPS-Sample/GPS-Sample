@@ -1,9 +1,27 @@
 package edu.gtri.gpssample.database.models
 
-class Study
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class Study(
+    var id: Int,
+    var configId: Int,
+    var name: String,
+    var isValid: Boolean )
 {
-    var id: Int = -1
-    var configId: Int = -1
-    var name: String = ""
-    var isValid: Boolean = false
+    fun pack() : String
+    {
+        return Json.encodeToString( this )
+    }
+
+    companion object
+    {
+        fun unpack( json: String ) : Study
+        {
+            return Json.decodeFromString<Study>( json )
+        }
+    }
 }

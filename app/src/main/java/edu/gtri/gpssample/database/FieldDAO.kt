@@ -23,7 +23,7 @@ class FieldDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_STUDY_ID, field.studyId )
-        values.put( DAO.COLUMN_FIELD_TYPE, field.type.toString() )
+        values.put( DAO.COLUMN_FIELD_TYPE, field.type )
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
         values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
         values.put( DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
@@ -73,23 +73,21 @@ class FieldDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun  createFieldModel( cursor: Cursor ): Field
     {
-        val field = Field()
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
+        val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_STUDY_ID))
+        val type = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE))
+        val pii = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_PII)).toBoolean()
+        val required = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_REQUIRED)).toBoolean()
+        val integerOnly = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
+        val date = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATE)).toBoolean()
+        val time = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TIME)).toBoolean()
+        val option1 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_1))
+        val option2 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_2))
+        val option3 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_3))
+        val option4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_4))
 
-        field.id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        field.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
-        field.studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_STUDY_ID))
-        field.type = FieldType.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE)))
-        field.pii = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_PII)).toBoolean()
-        field.required = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_REQUIRED)).toBoolean()
-        field.integerOnly = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
-        field.date = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATE)).toBoolean()
-        field.time = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TIME)).toBoolean()
-        field.option1 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_1))
-        field.option2 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_2))
-        field.option3 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_3))
-        field.option4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_4))
-
-        return field
+        return Field( id, studyId, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
     //--------------------------------------------------------------------------

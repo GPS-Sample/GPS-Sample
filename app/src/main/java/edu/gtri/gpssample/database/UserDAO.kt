@@ -5,6 +5,7 @@ import android.database.Cursor
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO.Companion.COLUMN_USER_PIN
 import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.extensions.toBoolean
 
 class UserDAO(private var dao: DAO)
 {
@@ -14,7 +15,7 @@ class UserDAO(private var dao: DAO)
         val values = ContentValues()
 
         values.put( DAO.COLUMN_USER_UUID, user.uuid )
-        values.put( DAO.COLUMN_USER_ROLE, user.role.toString() )
+        values.put( DAO.COLUMN_USER_ROLE, user.role )
         values.put( DAO.COLUMN_USER_NAME, user.name )
         values.put( DAO.COLUMN_USER_PIN, user.pin )
         values.put( DAO.COLUMN_USER_RECOVERY_QUESTION, user.recoveryQuestion )
@@ -68,17 +69,16 @@ class UserDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun createUserModel( cursor: Cursor) : User
     {
-        val user = User()
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_UUID))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
+        val pin = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_PIN))
+        val role = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_ROLE))
+        val recoveryQuestion = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_QUESTION))
+        val recoveryAnswer = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_ANSWER))
+        val isOnline = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_IS_ONLINE)).toBoolean()
 
-        user.id = Integer.parseInt(cursor.getString(0))
-        user.uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_UUID))
-        user.role = Role.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_ROLE)))
-        user.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
-        user.pin = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_PIN))
-        user.recoveryQuestion = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_QUESTION))
-        user.recoveryAnswer = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_ANSWER))
-
-        return user
+        return User( id, uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
     }
 
     //--------------------------------------------------------------------------

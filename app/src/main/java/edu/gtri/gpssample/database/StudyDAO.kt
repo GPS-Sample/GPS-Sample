@@ -63,14 +63,12 @@ class StudyDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun createStudy( cursor: Cursor ): Study
     {
-        val study = Study()
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val configId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_ID))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
+        val isValid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_IS_VALID)).toBoolean()
 
-        study.id = Integer.parseInt(cursor.getString(0))
-        study.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
-        study.configId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_ID))
-        study.isValid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_IS_VALID)).toBoolean()
-
-        return study
+        return Study( id, configId, name, isValid )
     }
 
     //--------------------------------------------------------------------------

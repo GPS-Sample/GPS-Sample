@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.network.models.NetworkUser
+import edu.gtri.gpssample.database.models.User
 
-class ManageStudyAdapter(var networkUsers: List<NetworkUser>?) : RecyclerView.Adapter<ManageStudyAdapter.ViewHolder>()
+class ManageStudyAdapter(var users: List<User>?) : RecyclerView.Adapter<ManageStudyAdapter.ViewHolder>()
 {
-    override fun getItemCount() = networkUsers!!.size
+    override fun getItemCount() = users!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
@@ -29,24 +29,20 @@ class ManageStudyAdapter(var networkUsers: List<NetworkUser>?) : RecyclerView.Ad
         return viewHolder
     }
 
-    fun updateUsers( networkUsers: List<NetworkUser> )
+    fun updateUsers( users: List<User> )
     {
-        this.networkUsers = networkUsers
+        this.users = users
         notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        val networkUser = networkUsers!!.get(holder.adapterPosition)
+        val user = users!!.get(holder.adapterPosition)
 
-        holder.itemView.isSelected = networkUser.isOnline
+//        holder.itemView.isSelected = user.isOnline
 
-        holder.checkBox.setText( networkUser.name )
-        holder.checkBox.isChecked = networkUser.isOnline;
-
-//        holder.itemView.setOnClickListener {
-//            selectedItemCallback.invoke(user, true)
-//        }
+        holder.checkBox.text = user.name
+        holder.checkBox.isChecked = user.isOnline;
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

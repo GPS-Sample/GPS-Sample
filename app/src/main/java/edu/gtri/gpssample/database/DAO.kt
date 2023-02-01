@@ -19,7 +19,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_USER_NAME + " TEXT" + "," +
                 COLUMN_USER_PIN + " INTEGER" + "," +
                 COLUMN_USER_RECOVERY_QUESTION + " TEXT" + "," +
-                COLUMN_USER_RECOVERY_ANSWER + " TEXT" +
+                COLUMN_USER_RECOVERY_ANSWER + " TEXT" + "," +
+                COLUMN_USER_IS_ONLINE + " BOOLEAN" +
                 ")")
         db.execSQL(createTableUser)
 
@@ -27,9 +28,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_CONFIG_NAME + " TEXT" + "," +
-                COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_TIME_FORMAT + " TEXT" + "," +
+                COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" +
                 ")")
         db.execSQL(createTableConfig)
@@ -87,6 +88,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_USER_PIN = "user_pin"
         const val COLUMN_USER_RECOVERY_QUESTION = "user_recover_question"
         const val COLUMN_USER_RECOVERY_ANSWER = "user_recovery_answer"
+        const val COLUMN_USER_IS_ONLINE = "user_is_online"
 
         // Config Table
         const val TABLE_CONFIG = "config"
@@ -146,6 +148,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 20
+        private const val DATABASE_VERSION = 25
     }
 }

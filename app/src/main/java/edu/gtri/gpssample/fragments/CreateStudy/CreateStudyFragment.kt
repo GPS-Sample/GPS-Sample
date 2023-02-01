@@ -75,9 +75,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (study == null)
         {
-            study = Study()
-            study!!.isValid = false
-            study!!.configId = configId!!
+            study = Study( -1, configId, "", false )
             study!!.id = DAO.studyDAO.createStudy( study!! )
         }
         else

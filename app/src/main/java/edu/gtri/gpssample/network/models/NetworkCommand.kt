@@ -1,10 +1,18 @@
 package edu.gtri.gpssample.network.models
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class NetworkCommand( var command: Int, var uuid: String, var message: String )
 {
+    fun pack() : String
+    {
+        return Json.encodeToString( this )
+    }
+
     companion object 
     {
         const val NetworkUserCommand                = 1001
@@ -16,5 +24,10 @@ data class NetworkCommand( var command: Int, var uuid: String, var message: Stri
         const val NetworkRequestFieldsResponse      = 1007
         const val NetworkRequestShapeFileCommand    = 1008
         const val NetworkRequestShapeFileResponse   = 1009
+
+        fun unpack( json: String ) : NetworkCommand
+        {
+            return Json.decodeFromString<NetworkCommand>( json )
+        }
     }
 }

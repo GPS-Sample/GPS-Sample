@@ -3,13 +3,30 @@ package edu.gtri.gpssample.database.models
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-class Config
+@Serializable
+data class Config(
+    var id: Int,
+    var name: String,
+    var dateFormat: String,
+    var timeFormat: String,
+    var distanceFormat: String,
+    var minGpsPrecision: Int )
 {
-    var id: Int = -1
-    var name: String = ""
-    var dateFormat: DateFormat = DateFormat.DayMonthYear
-    var timeFormat: TimeFormat = TimeFormat.twelveHour
-    var distanceFormat: DistanceFormat = DistanceFormat.Feet
-    var minGpsPrecision: Int = 0
+    fun pack() : String
+    {
+        return Json.encodeToString( this )
+    }
+
+    companion object
+    {
+        fun unpack( json: String ) : Config
+        {
+            return Json.decodeFromString<Config>( json )
+        }
+    }
 }

@@ -6,6 +6,7 @@ import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.database.models.Config
+import kotlin.math.min
 
 class ConfigDAO(private var dao: DAO)
 {
@@ -44,16 +45,14 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun createConfigModel( cursor: Cursor ) : Config
     {
-        val config = Config()
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
+        val distanceFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT))
+        val dateFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT))
+        val timeFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT))
+        val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
 
-        config.id = Integer.parseInt(cursor.getString(0))
-        config.name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
-        config.distanceFormat = DistanceFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT)))
-        config.dateFormat = DateFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT)))
-        config.timeFormat = TimeFormat.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT)))
-        config.minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
-
-        return config
+        return Config( id, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
     }
 
     //--------------------------------------------------------------------------
@@ -80,9 +79,9 @@ class ConfigDAO(private var dao: DAO)
     fun putConfig( config: Config, values: ContentValues )
     {
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
-        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat.toString())
-        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat.toString())
-        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat.toString())
+        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat)
+        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat)
+        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat)
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
     }
 

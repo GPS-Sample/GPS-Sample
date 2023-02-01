@@ -1,15 +1,31 @@
 package edu.gtri.gpssample.database.models
 
-import edu.gtri.gpssample.constants.Role
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-class User
+@Serializable
+data class User(
+    var id: Int,
+    var uuid: String,
+    var name: String,
+    var pin: Int,
+    var role: String,
+    var recoveryQuestion: String,
+    var recoveryAnswer: String,
+    var isOnline: Boolean )
 {
-    var id: Int = -1
-    var uuid: String = ""
-    var name: String = ""
-    var pin: Int = 0
-    var role: Role = Role.Undefined
-    var recoveryQuestion: String = ""
-    var recoveryAnswer: String = ""
-    var isOnline: Boolean = false
+    fun pack() : String
+    {
+        return Json.encodeToString( this )
+    }
+
+    companion object
+    {
+        fun unpack( json: String ) : User
+        {
+            return Json.decodeFromString<User>( json )
+        }
+    }
 }
