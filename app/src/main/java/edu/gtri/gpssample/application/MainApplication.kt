@@ -18,6 +18,7 @@ class MainApplication : Application()
     override fun onCreate()
     {
         super.onCreate()
+
         val serviceChannel = NotificationChannel(
 
             UDPBroadcastReceiverService.SERVICE_CHANNEL_ID,

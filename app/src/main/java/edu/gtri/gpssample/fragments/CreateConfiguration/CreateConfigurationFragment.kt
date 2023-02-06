@@ -76,7 +76,6 @@ class CreateConfigurationFragment : Fragment()
             }
 
         config?.let { config ->
-            binding.nextButton.text = "SAVE"
             binding.titleTextView.text = "Edit Configuration"
             binding.configNameEditText.setText( config.name )
             binding.minGpsPrecisionEditText.setText( config.minGpsPrecision.toString())
@@ -157,13 +156,13 @@ class CreateConfigurationFragment : Fragment()
                 if (config.id < 0)
                 {
                     config.id = DAO.configDAO.createConfig( config )
-                    findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
                 }
                 else
                 {
                     DAO.configDAO.updateConfig( config )
-                    findNavController().popBackStack()
                 }
+
+                findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
             }
         }
     }
