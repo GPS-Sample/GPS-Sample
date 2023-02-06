@@ -476,9 +476,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         when (item.itemId) {
             R.id.action_manage_configurations ->
             {
-                val bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), Role.Admin.toString())
-                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
             }
         }
 

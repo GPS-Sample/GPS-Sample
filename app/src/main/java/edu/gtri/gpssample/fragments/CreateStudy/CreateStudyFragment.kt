@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -107,29 +109,46 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
         }
 
+        val user = (activity!!.application as? MainApplication)!!.user
+
+        if (user!!.role == Role.Supervisor.toString())
+        {
+            binding.addButton.visibility = View.GONE
+            binding.generateBarcodeButton.text = "NEXT"
+        }
+
         binding.generateBarcodeButton.setOnClickListener {
 
-            if (binding.studyNameEditText.text.toString().isEmpty())
+            if (user!!.role == Role.Supervisor.toString())
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            study.isValid = true
-            study.name = binding.studyNameEditText.text.toString()
-
-            if (study.id < 0)
-            {
-                study.id = DAO.studyDAO.createStudy( study )
+                val bundle = Bundle()
+                bundle.putInt( Key.kStudyId.toString(), study.id )
+                findNavController().navigate( R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle )
             }
             else
             {
-                DAO.studyDAO.updateStudy( study )
-            }
+                if (binding.studyNameEditText.text.toString().isEmpty())
+                {
+                    Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
 
-            val bundle = Bundle()
-            bundle.putInt( Key.kStudyId.toString(), study.id )
-            findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
+                study.isValid = true
+                study.name = binding.studyNameEditText.text.toString()
+
+                if (study.id < 0)
+                {
+                    study.id = DAO.studyDAO.createStudy( study )
+                }
+                else
+                {
+                    DAO.studyDAO.updateStudy( study )
+                }
+
+                val bundle = Bundle()
+                bundle.putInt( Key.kStudyId.toString(), study.id )
+                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
+            }
         }
     }
 

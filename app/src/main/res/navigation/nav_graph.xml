@@ -103,6 +103,10 @@
         <action
             android:id="@+id/action_navigate_to_ManageStudyFragment"
             app:destination="@id/ManageStudyFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
+            app:destination="@id/DefineEnumerationAreaFragment"/>
     </fragment>
 
     <fragment
