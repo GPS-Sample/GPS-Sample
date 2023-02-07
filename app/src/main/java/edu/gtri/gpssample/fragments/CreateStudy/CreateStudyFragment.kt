@@ -18,6 +18,8 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Filter
+import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
@@ -96,26 +98,24 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }
         }
 
-        createStudyAdapter = CreateStudyAdapter(listOf<Field>())
+        createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
         createStudyAdapter.selectedItemCallback = this::onItemSelected
 
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = createStudyAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager( activity )
+        binding.expandableListView.setAdapter( createStudyAdapter )
 
-        binding.addButton.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putInt( Key.kStudyId.toString(), study.id )
-            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
-        }
+//        binding.addButton.setOnClickListener {
+//            val bundle = Bundle()
+//            bundle.putInt( Key.kStudyId.toString(), study.id )
+//            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+//        }
 
         val user = (activity!!.application as? MainApplication)!!.user
 
-        if (user!!.role == Role.Supervisor.toString())
-        {
-            binding.addButton.visibility = View.GONE
-            binding.generateBarcodeButton.text = "NEXT"
-        }
+//        if (user!!.role == Role.Supervisor.toString())
+//        {
+//            binding.addButton.visibility = View.GONE
+//            binding.generateBarcodeButton.text = "NEXT"
+//        }
 
         binding.generateBarcodeButton.setOnClickListener {
 

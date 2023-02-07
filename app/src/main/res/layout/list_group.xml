@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#e0e0e0"
+    android:layout_width="match_parent"
+    android:layout_height="51dp">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:background="#e0e0e0"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp">
+
+            <TextView
+                android:id="@+id/listGroupTitle"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:text="9999"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:paddingLeft="20dp"
+                android:fontFamily="sans-serif-thin"
+                android:gravity="center_vertical"/>
+
+            <ImageView
+                android:id="@+id/add_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/plus_blue" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_gravity="right"
+            android:layout_width="50dp"
+            android:layout_height="50dp">
+
+            <ImageView
+                android:id="@+id/arrow_up_image_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:visibility="gone"
+                app:srcCompat="@drawable/arrow_up_blue"/>
+
+            <ImageView
+                android:id="@+id/arrow_down_image_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                app:srcCompat="@drawable/arrow_down_blue"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <View
+        android:background="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+</LinearLayout>

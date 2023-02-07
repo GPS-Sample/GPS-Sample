@@ -8,7 +8,8 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Filter(
     var id: Int,
-    var studyId: Int )
+    var studyId: Int,
+    var name: String )
 {
     fun pack() : String
     {
