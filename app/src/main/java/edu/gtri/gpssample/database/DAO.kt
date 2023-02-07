@@ -49,18 +49,31 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_FIELD_NAME + " TEXT" + "," +
                 COLUMN_FIELD_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FIELD_TYPE + " STRING" + "," +
+                COLUMN_FIELD_TYPE + " TEXT" + "," +
                 COLUMN_FIELD_PII + " BOOLEAN" + "," +
                 COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
                 COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN" + "," +
                 COLUMN_FIELD_DATE + " BOOLEAN" + "," +
                 COLUMN_FIELD_TIME + " BOOLEAN" + "," +
-                COLUMN_FIELD_OPTION_1 + " STRING" + "," +
-                COLUMN_FIELD_OPTION_2 + " STRING" + "," +
-                COLUMN_FIELD_OPTION_3 + " STRING" + "," +
-                COLUMN_FIELD_OPTION_4 + " STRING" +
+                COLUMN_FIELD_OPTION_1 + " TEXT" + "," +
+                COLUMN_FIELD_OPTION_2 + " TEXT" + "," +
+                COLUMN_FIELD_OPTION_3 + " TEXT" + "," +
+                COLUMN_FIELD_OPTION_4 + " TEXT" +
                 ")")
         db.execSQL(createTableField)
+
+        val createTableRule = ("CREATE TABLE " +
+                TABLE_RULE + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_RULE_STUDY_ID + " INTEGER" + "," +
+                COLUMN_RULE_FIELD_ID + " INTEGER" + "," +
+                COLUMN_RULE_NAME + " TEXT" + "," +
+                COLUMN_RULE_OPERATOR + " TEXT" + "," +
+                COLUMN_RULE_INT_VAL + " INTEGER" + "," +
+                COLUMN_RULE_STRING_VAL + " TEXT" +
+                ")")
+        db.execSQL(createTableRule)
+
     }
 
     //--------------------------------------------------------------------------
@@ -71,6 +84,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIG)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDY)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FIELD)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RULE)
         onCreate(db)
     }
 
@@ -119,10 +133,21 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_OPTION_3 = "field_option_3"
         const val COLUMN_FIELD_OPTION_4 = "field_option_4"
 
+        // Rule Table
+        const val TABLE_RULE = "rule"
+        const val COLUMN_RULE_STUDY_ID = "rule_study_id"
+        const val COLUMN_RULE_FIELD_ID = "rule_field_id"
+        const val COLUMN_RULE_NAME = "rule_name"
+        const val COLUMN_RULE_OPERATOR = "rule_operator"
+        const val COLUMN_RULE_INT_VAL = "rule_int_val"
+        const val COLUMN_RULE_STRING_VAL = "rule_string_val"
+
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
         lateinit var studyDAO: StudyDAO
         lateinit var fieldDAO: FieldDAO
+        lateinit var ruleDAO: RuleDAO
+        lateinit var filterDAO: FilterDAO
 
         // creation/access methods
 
