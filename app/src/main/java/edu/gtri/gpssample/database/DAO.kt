@@ -73,6 +73,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 ")")
         db.execSQL(createTableRule)
 
+        val createTableFilter = ("CREATE TABLE " +
+                TABLE_FILTER + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_FILTER_STUDY_ID + " INTEGER" + "," +
+                COLUMN_FILTER_RULE_ID + " INTEGER" + "," +
+                COLUMN_FILTER_NAME + " TEXT" + "," +
+                COLUMN_FILTER_CONNECTOR + " TEXT" +
+                ")")
+        db.execSQL(createTableFilter)
     }
 
     //--------------------------------------------------------------------------
@@ -84,6 +93,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDY)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FIELD)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RULE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER)
         onCreate(db)
     }
 
@@ -140,6 +150,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RULE_OPERATOR = "rule_operator"
         const val COLUMN_RULE_VALUE = "rule_value"
 
+        // Filter Table
+        const val TABLE_FILTER = "filter"
+        const val COLUMN_FILTER_STUDY_ID = "filter_study_id"
+        const val COLUMN_FILTER_RULE_ID = "filter_rule_id"
+        const val COLUMN_FILTER_NAME = "filter_name"
+        const val COLUMN_FILTER_CONNECTOR = "filter_connector"
+
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
         lateinit var studyDAO: StudyDAO
@@ -162,6 +179,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 studyDAO = StudyDAO(( instance!! ))
                 fieldDAO = FieldDAO(( instance!! ))
                 ruleDAO = RuleDAO(( instance!! ))
+                filterDAO = FilterDAO(( instance!! ))
             }
 
             return instance!!

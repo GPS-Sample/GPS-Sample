@@ -1,6 +1,6 @@
 package edu.gtri.gpssample.constants
 
-enum class FilterConnector {
+enum class Connector {
     AND,
     OR,
     NOT,
