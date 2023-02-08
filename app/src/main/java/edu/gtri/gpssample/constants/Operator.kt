@@ -1,6 +1,6 @@
 package edu.gtri.gpssample.constants
 
-enum class FilterOperator {
+enum class Operator {
     Equal,
     NotEqual,
     LessThan,

@@ -45,6 +45,15 @@
         <item>"Dropdown"</item>
     </string-array>
 
+    <string-array name="operators">
+        <item>"Equal"</item>
+        <item>"NotEqual"</item>
+        <item>"LessThan"</item>
+        <item>"GreaterThan"</item>
+        <item>"LessThanOrEqual"</item>
+        <item>"GreaterThanOrEqual"</item>
+    </string-array>
+
     <string name="admin">Admin</string>
     <string name="supervisor">Supervisor</string>
     <string name="enumerator">Enumerator</string>
@@ -131,5 +140,10 @@
     <string name="generate_qr_code">Generate QR Code</string>
     <string name="create_filter">Create Filter</string>
     <string name="create_rule">Create Rule</string>
+    <string name="enter_rule_name">Enter Rule Name</string>
+    <string name="field">Field</string>
+    <string name="operator">Operator</string>
+    <string name="enter_value">Enter Value</string>
+    <string name="value">Value</string>
 
 </resources>

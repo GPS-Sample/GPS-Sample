@@ -158,8 +158,10 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         if (this::study.isInitialized)
         {
             val fields = DAO.fieldDAO.getFields(study.id)
+            val rules = DAO.ruleDAO.getRules(study.id)
+            val filters = listOf<Filter>()
 
-            createStudyAdapter.updateFields( fields )
+            createStudyAdapter.updateFieldsRulesFilters( fields, rules, filters )
         }
     }
 
@@ -172,9 +174,18 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     fun shouldAddRule()
     {
-        val bundle = Bundle()
-        bundle.putInt( Key.kStudyId.toString(), study.id )
-        findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
+        val fields = DAO.fieldDAO.getFields( study.id )
+
+        if (fields.isEmpty())
+        {
+            Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
+        }
+        else
+        {
+            val bundle = Bundle()
+            bundle.putInt( Key.kStudyId.toString(), study.id )
+            findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
+        }
     }
 
     fun shouldAddFilter()

@@ -37,6 +37,9 @@ class MainActivity : AppCompatActivity()
 
             val fields = DAO.fieldDAO.getFields()
             Log.d( "xxx", "found ${fields.size} fields" )
+
+            val rules = DAO.ruleDAO.getRules()
+            Log.d( "xxx", "found ${rules.size} rules" )
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

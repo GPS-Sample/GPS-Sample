@@ -22,21 +22,12 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
     lateinit var shouldAddRule: (() -> Unit)
     lateinit var shouldAddFilter: (() -> Unit)
 
-    fun updateFields( fields: List<Field> )
+    fun updateFieldsRulesFilters( fields: List<Field>, rules: List<Rule>, filters: List<Filter> )
     {
         this.fields = fields
-        notifyDataSetChanged()
-    }
-
-    fun updateRules( rules: List<Rule> )
-    {
         this.rules = rules
-        notifyDataSetChanged()
-    }
-
-    fun updateFilters( filters: List<Filter> )
-    {
         this.filters = filters
+
         notifyDataSetChanged()
     }
 

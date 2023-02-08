@@ -281,11 +281,6 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             dropdown4Layout.visibility = View.GONE
         }
 
-        binding.cancelButton.setOnClickListener {
-
-            findNavController().popBackStack()
-        }
-
         field?.let { field ->
 
             setHasOptionsMenu( true )
@@ -381,101 +376,107 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }
         }
 
+        binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         binding.saveButton.setOnClickListener {
 
-            if (binding.fieldNameEditText.text.toString().length > 0)
+            if (binding.fieldNameEditText.text.toString().length == 0)
             {
-                if (field == null)
-                {
-                    field = Field( -1, study.id, "", "", false, false, false, false, false, "", "", "", "" )
-                    field!!.id = DAO.fieldDAO.createField( field!! )
-                }
-
-                field?.let { field ->
-                    field.name = binding.fieldNameEditText.text.toString()
-                    field.type = binding.fieldTypeSpinner.selectedItem as String
-
-                    when (field.type) {
-                        FieldType.Text.toString() -> {
-                            val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
-                            val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                            field.pii = piiCheckbox.isChecked
-                            field.required = requiredCheckbox.isChecked
-                        }
-                        FieldType.Number.toString() -> {
-                            val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
-                            val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
-                            val requiredCheckbox = numberLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                            field.pii = piiCheckbox.isChecked
-                            field.required = requiredCheckbox.isChecked
-                            field.integerOnly = integerOnlyCheckbox.isChecked
-                        }
-                        FieldType.Date.toString() -> {
-                            val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
-                            val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                            val dateCheckbox = dateLayout.findViewById<CheckBox>( R.id.date_checkBox )
-                            val timeCheckbox = dateLayout.findViewById<CheckBox>( R.id.time_checkBox)
-                            field.pii = piiCheckbox.isChecked
-                            field.required = requiredCheckbox.isChecked
-                            field.date = dateCheckbox.isChecked
-                            field.time = timeCheckbox.isChecked
-                        }
-                        FieldType.Checkbox.toString() -> {
-                            val editText1 = checkbox1EditText.text.toString()
-                            val editText2 = checkbox2EditText.text.toString()
-                            val editText3 = checkbox3EditText.text.toString()
-                            val editText4 = checkbox4EditText.text.toString()
-
-                            val length = editText1.length + editText2.length + editText3.length + editText4.length
-
-                            if (length == 0)
-                            {
-                                Toast.makeText(activity!!.applicationContext, "Oops! You must enter at least 1 option", Toast.LENGTH_SHORT).show()
-                                return@setOnClickListener
-                            }
-
-                            field.option1 = editText1
-                            field.option2 = editText2
-                            field.option3 = editText3
-                            field.option4 = editText4
-
-                            val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
-                            val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                            field.pii = piiCheckbox.isChecked
-                            field.required = requiredCheckbox.isChecked
-                        }
-                        FieldType.Dropdown.toString() -> {
-                            val editText1 = dropdown1EditText.text.toString()
-                            val editText2 = dropdown2EditText.text.toString()
-                            val editText3 = dropdown3EditText.text.toString()
-                            val editText4 = dropdown4EditText.text.toString()
-
-                            val length = editText1.length + editText2.length + editText3.length + editText4.length
-
-                            if (length == 0)
-                            {
-                                Toast.makeText(activity!!.applicationContext, "Oops! You must enter at least 1 option", Toast.LENGTH_SHORT).show()
-                                return@setOnClickListener
-                            }
-
-                            field.option1 = editText1
-                            field.option2 = editText2
-                            field.option3 = editText3
-                            field.option4 = editText4
-
-                            val piiCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.pii_checkBox )
-                            val requiredCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.required_checkBox )
-                            field.pii = piiCheckbox.isChecked
-                            field.required = requiredCheckbox.isChecked
-                        }
-                    }
-
-                    DAO.fieldDAO.updateField( field )
-                }
-
-
-                findNavController().popBackStack()
+                Toast.makeText(activity!!.applicationContext, "Please enter a field name.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            if (field == null)
+            {
+                field = Field( -1, study.id, "", "", false, false, false, false, false, "", "", "", "" )
+                field!!.id = DAO.fieldDAO.createField( field!! )
+            }
+
+            field?.let { field ->
+                field.name = binding.fieldNameEditText.text.toString()
+                field.type = binding.fieldTypeSpinner.selectedItem as String
+
+                when (field.type) {
+                    FieldType.Text.toString() -> {
+                        val piiCheckbox = textLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = textLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
+                    }
+                    FieldType.Number.toString() -> {
+                        val piiCheckbox = numberLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val integerOnlyCheckbox = numberLayout.findViewById<CheckBox>( R.id.integer_only_checkBox )
+                        val requiredCheckbox = numberLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
+                        field.integerOnly = integerOnlyCheckbox.isChecked
+                    }
+                    FieldType.Date.toString() -> {
+                        val piiCheckbox = dateLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = dateLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        val dateCheckbox = dateLayout.findViewById<CheckBox>( R.id.date_checkBox )
+                        val timeCheckbox = dateLayout.findViewById<CheckBox>( R.id.time_checkBox)
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
+                        field.date = dateCheckbox.isChecked
+                        field.time = timeCheckbox.isChecked
+                    }
+                    FieldType.Checkbox.toString() -> {
+                        val editText1 = checkbox1EditText.text.toString()
+                        val editText2 = checkbox2EditText.text.toString()
+                        val editText3 = checkbox3EditText.text.toString()
+                        val editText4 = checkbox4EditText.text.toString()
+
+                        val length = editText1.length + editText2.length + editText3.length + editText4.length
+
+                        if (length == 0)
+                        {
+                            Toast.makeText(activity!!.applicationContext, "Oops! You must enter at least 1 option", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+
+                        field.option1 = editText1
+                        field.option2 = editText2
+                        field.option3 = editText3
+                        field.option4 = editText4
+
+                        val piiCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = checkboxLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
+                    }
+                    FieldType.Dropdown.toString() -> {
+                        val editText1 = dropdown1EditText.text.toString()
+                        val editText2 = dropdown2EditText.text.toString()
+                        val editText3 = dropdown3EditText.text.toString()
+                        val editText4 = dropdown4EditText.text.toString()
+
+                        val length = editText1.length + editText2.length + editText3.length + editText4.length
+
+                        if (length == 0)
+                        {
+                            Toast.makeText(activity!!.applicationContext, "Oops! You must enter at least 1 option", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+
+                        field.option1 = editText1
+                        field.option2 = editText2
+                        field.option3 = editText3
+                        field.option4 = editText4
+
+                        val piiCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.pii_checkBox )
+                        val requiredCheckbox = dropdownLayout.findViewById<CheckBox>( R.id.required_checkBox )
+                        field.pii = piiCheckbox.isChecked
+                        field.required = requiredCheckbox.isChecked
+                    }
+                }
+
+                DAO.fieldDAO.updateField( field )
+            }
+
+            findNavController().popBackStack()
         }
     }
 
@@ -483,7 +484,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_create_field, menu)
+        inflater.inflate(R.menu.menu_delete, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean

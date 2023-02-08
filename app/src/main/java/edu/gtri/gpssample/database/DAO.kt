@@ -161,6 +161,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 configDAO = ConfigDAO( instance!! )
                 studyDAO = StudyDAO(( instance!! ))
                 fieldDAO = FieldDAO(( instance!! ))
+                ruleDAO = RuleDAO(( instance!! ))
             }
 
             return instance!!

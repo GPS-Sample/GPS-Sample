@@ -34,17 +34,17 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
-                android:text="@string/field_name"
-                android:textColor="@color/black" />
+                android:text="@string/name"
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
-                android:id="@+id/field_name_edit_text"
+                android:id="@+id/name_edit_text"
                 android:inputType="textCapWords"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="@string/enter_field_name" />
+                android:hint="@string/enter_rule_name" />
 
             <TextView
                 android:layout_marginTop="20dp"
@@ -52,8 +52,8 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
-                android:text="@string/field_type"
-                android:textColor="@color/black" />
+                android:text="@string/field"
+                android:textColor="@color/primary_textcolor" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -63,45 +63,49 @@
                 android:background="@drawable/spinner_frame">
 
                 <Spinner
-                    android:id="@+id/field_type_spinner"
+                    android:id="@+id/field_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </FrameLayout>
 
-            <include
-                android:visibility="visible"
-                android:id="@+id/layout_field_text"
-                layout="@layout/layout_field_text"
+            <TextView
+                android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:gravity="center_vertical"
+                android:text="@string/operator"
+                android:textColor="@color/primary_textcolor" />
 
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_number"
-                layout="@layout/layout_field_number"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/spinner_frame">
 
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_date"
-                layout="@layout/layout_field_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                <Spinner
+                    android:id="@+id/operator_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
 
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_checkbox"
-                layout="@layout/layout_field_checkbox"
+            <TextView
+                android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:gravity="center_vertical"
+                android:text="@string/value"
+                android:textColor="@color/primary_textcolor" />
 
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_dropdown"
-                layout="@layout/layout_field_dropdown"
+            <EditText
+                android:id="@+id/value_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="@string/enter_value" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
     </ScrollView>
