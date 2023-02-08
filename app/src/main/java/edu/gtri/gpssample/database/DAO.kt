@@ -69,8 +69,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_RULE_FIELD_ID + " INTEGER" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
                 COLUMN_RULE_OPERATOR + " TEXT" + "," +
-                COLUMN_RULE_INT_VAL + " INTEGER" + "," +
-                COLUMN_RULE_STRING_VAL + " TEXT" +
+                COLUMN_RULE_VALUE + " TEXT" +
                 ")")
         db.execSQL(createTableRule)
 
@@ -139,8 +138,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RULE_FIELD_ID = "rule_field_id"
         const val COLUMN_RULE_NAME = "rule_name"
         const val COLUMN_RULE_OPERATOR = "rule_operator"
-        const val COLUMN_RULE_INT_VAL = "rule_int_val"
-        const val COLUMN_RULE_STRING_VAL = "rule_string_val"
+        const val COLUMN_RULE_VALUE = "rule_value"
 
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -173,6 +171,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 25
+        private const val DATABASE_VERSION = 26
     }
 }

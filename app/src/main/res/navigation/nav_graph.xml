@@ -101,6 +101,14 @@
             app:destination="@id/CreateFieldFragment"/>
 
         <action
+            android:id="@+id/action_navigate_to_CreateRuleFragment"
+            app:destination="@id/CreateRuleFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFilterFragment"
+            app:destination="@id/CreateFilterFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_ManageStudyFragment"
             app:destination="@id/ManageStudyFragment"/>
 
@@ -113,6 +121,18 @@
         android:id="@+id/CreateFieldFragment"
         android:name="edu.gtri.gpssample.fragments.CreateField.CreateFieldFragment"
         tools:layout="@layout/fragment_create_field">
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreateRuleFragment"
+        android:name="edu.gtri.gpssample.fragments.CreateRule.CreateRuleFragment"
+        tools:layout="@layout/fragment_create_rule">
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreateFilterFragment"
+        android:name="edu.gtri.gpssample.fragments.CreateFilter.CreateFilterFragment"
+        tools:layout="@layout/fragment_create_filter">
     </fragment>
 
     <fragment

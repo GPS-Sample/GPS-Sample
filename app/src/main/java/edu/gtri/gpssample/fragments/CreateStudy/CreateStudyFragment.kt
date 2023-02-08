@@ -110,11 +110,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         val user = (activity!!.application as? MainApplication)!!.user
 
-//        if (user!!.role == Role.Supervisor.toString())
-//        {
+        if (user!!.role == Role.Supervisor.toString())
+        {
 //            binding.addButton.visibility = View.GONE
-//            binding.generateBarcodeButton.text = "NEXT"
-//        }
+            binding.generateBarcodeButton.text = "NEXT"
+        }
 
         binding.generateBarcodeButton.setOnClickListener {
 
@@ -163,26 +163,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
     }
 
-    fun didSelectField( field: Field )
-    {
-        val bundle = Bundle()
-
-        bundle.putInt( Key.kFieldId.toString(), field.id )
-        bundle.putInt( Key.kStudyId.toString(), study.id )
-
-        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
-    }
-
-    fun didSelectRule( rule: Rule )
-    {
-        Log.d( "xxx", "didSelectRule" )
-    }
-
-    fun didSelectFilter( filter: Filter )
-    {
-        Log.d( "xxx", "didSelectFilter" )
-    }
-
     fun shouldAddField()
     {
         val bundle = Bundle()
@@ -192,12 +172,43 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     fun shouldAddRule()
     {
-        Log.d( "xxx", "shouldAddRule" )
+        val bundle = Bundle()
+        bundle.putInt( Key.kStudyId.toString(), study.id )
+        findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
     }
 
     fun shouldAddFilter()
     {
-        Log.d( "xxx", "shouldAddFilter" )
+        val bundle = Bundle()
+        bundle.putInt( Key.kStudyId.toString(), study.id )
+        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
+    }
+
+    fun didSelectField( field: Field )
+    {
+        val bundle = Bundle()
+        bundle.putInt( Key.kFieldId.toString(), field.id )
+        bundle.putInt( Key.kStudyId.toString(), study.id )
+
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+    }
+
+    fun didSelectRule( rule: Rule )
+    {
+        val bundle = Bundle()
+        bundle.putInt( Key.kRuleId.toString(), rule.id )
+        bundle.putInt( Key.kStudyId.toString(), study.id )
+
+        findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
+    }
+
+    fun didSelectFilter( filter: Filter )
+    {
+        val bundle = Bundle()
+        bundle.putInt( Key.kFilterId.toString(), filter.id )
+        bundle.putInt( Key.kStudyId.toString(), study.id )
+
+        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)

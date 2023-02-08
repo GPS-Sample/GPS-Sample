@@ -12,8 +12,7 @@ data class Rule(
     var fieldId: Int,
     var name: String,
     var operator: String,
-    var intVal: Int,
-    var stringVal: String )
+    var value: String)
 {
     fun pack() : String
     {

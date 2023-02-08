@@ -129,5 +129,7 @@
     <string name="manage_configuration">Manage Configuration</string>
     <string name="manage_configurations">Manage Configurations</string>
     <string name="generate_qr_code">Generate QR Code</string>
+    <string name="create_filter">Create Filter</string>
+    <string name="create_rule">Create Rule</string>
 
 </resources>

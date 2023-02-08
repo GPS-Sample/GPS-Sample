@@ -22,18 +22,6 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
     lateinit var shouldAddRule: (() -> Unit)
     lateinit var shouldAddFilter: (() -> Unit)
 
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
-//    {
-//        this.mContext = parent.context
-//
-//        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
-//
-//        viewHolder.itemView.isSelected = false
-//        allHolders.add(viewHolder)
-//
-//        return viewHolder
-//    }
-
     fun updateFields( fields: List<Field> )
     {
         this.fields = fields
@@ -51,24 +39,6 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
         this.filters = filters
         notifyDataSetChanged()
     }
-
-//    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
-//    {
-//        holder.itemView.isSelected = false
-//
-//        val field = fields!![holder.adapterPosition]
-//
-//        holder.nameTextView.text = field.name
-//
-//        holder.itemView.setOnClickListener {
-//            selectedItemCallback.invoke(field, true)
-//        }
-//    }
-
-//    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-//    {
-//        val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-//    }
 
     override fun getGroupCount(): Int
     {
