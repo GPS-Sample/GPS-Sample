@@ -15,7 +15,12 @@ import edu.gtri.gpssample.database.models.Rule
 
 class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rules: List<Rule>, var filters: List<Filter>) : BaseExpandableListAdapter()
 {
-    lateinit var selectedItemCallback: ((fieldModel: Field, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var didSelectField: ((field: Field) -> Unit)
+    lateinit var didSelectRule: ((rule: Rule) -> Unit)
+    lateinit var didSelectFilter: ((filter: Filter) -> Unit)
+    lateinit var shouldAddField: (() -> Unit)
+    lateinit var shouldAddRule: (() -> Unit)
+    lateinit var shouldAddFilter: (() -> Unit)
 
 //    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
 //    {
@@ -99,17 +104,35 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
         return p1.toLong()
     }
 
-    override fun getChildView(p0: Int, p1: Int, p2: Boolean, p3: View?, p4: ViewGroup?): View
+    override fun getChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean, childView: View?, viewGroup: ViewGroup?): View
     {
-        val view = LayoutInflater.from(context).inflate(R.layout.list_item, p4, false )
+        var view: View
 
-        val nameTextView = view.findViewById<View>(R.id.name_text_view) as TextView
-
-        when( p0 )
+        if (childView == null)
         {
-            0 -> nameTextView.text = fields[p1].name
-            1 -> nameTextView.text = rules[p1].name
-            2 -> nameTextView.text = filters[p1].name
+            view = LayoutInflater.from(context).inflate(R.layout.list_item, viewGroup, false )
+        }
+        else
+        {
+            view = childView
+        }
+
+        val nameTextView = view!!.findViewById<View>(R.id.name_text_view) as TextView
+
+        when( groupPosition )
+        {
+            0 -> nameTextView.text = fields[childPosition].name
+            1 -> nameTextView.text = rules[childPosition].name
+            2 -> nameTextView.text = filters[childPosition].name
+        }
+
+        view.setOnClickListener {
+            when( groupPosition )
+            {
+                0 -> didSelectField( fields[childPosition] )
+                1 -> didSelectRule( rules[childPosition] )
+                2 -> didSelectFilter( filters[childPosition] )
+            }
         }
 
         return view
@@ -137,37 +160,32 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
         return true
     }
 
-    override fun getGroupView(p0: Int, p1: Boolean, p2: View?, p3: ViewGroup?): View
+    override fun getGroupView( groupPosition: Int, isExpanded: Boolean, childView: View?, viewGroup: ViewGroup?): View
     {
         var view: View
 
-        if (p2 == null)
+        if (childView == null)
         {
-            view = LayoutInflater.from(context).inflate(R.layout.list_group, p3, false )
+            view = LayoutInflater.from(context).inflate(R.layout.list_group, viewGroup, false )
         }
         else
         {
-            view = p2!!
-        }
-
-        val addButton = view.findViewById<ImageView>(R.id.add_button)
-
-        addButton.setOnClickListener {
-            Log.d( "xxx", "addButton Pressed" )
+            view = childView!!
         }
 
         val listTitleTextView = view.findViewById<TextView>(R.id.listGroupTitle)
 
-        when( p0 )
+        when( groupPosition )
         {
             0 -> listTitleTextView.text = "Fields"
             1 -> listTitleTextView.text = "Rules"
             2 -> listTitleTextView.text = "Filters"
         }
+
         val downImageView = view.findViewById<View>(R.id.arrow_down_image_view) as ImageView
         val upImageView = view.findViewById<View>(R.id.arrow_up_image_view) as ImageView
 
-        if (p1)
+        if (isExpanded)
         {
             upImageView.visibility = View.VISIBLE
             downImageView.visibility = View.GONE
@@ -176,6 +194,17 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
         {
             upImageView.visibility = View.GONE
             downImageView.visibility = View.VISIBLE
+        }
+
+        val addButton = view.findViewById<ImageView>(R.id.add_button)
+
+        addButton.setOnClickListener {
+            when( groupPosition )
+            {
+                0 -> shouldAddField()
+                1 -> shouldAddRule()
+                2 -> shouldAddFilter()
+            }
         }
 
         return view

@@ -99,15 +99,14 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
 
         createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
-        createStudyAdapter.selectedItemCallback = this::onItemSelected
+        createStudyAdapter.didSelectField = this::didSelectField
+        createStudyAdapter.didSelectRule = this::didSelectRule
+        createStudyAdapter.didSelectFilter = this::didSelectFilter
+        createStudyAdapter.shouldAddField = this::shouldAddField
+        createStudyAdapter.shouldAddRule = this::shouldAddRule
+        createStudyAdapter.shouldAddFilter = this::shouldAddFilter
 
         binding.expandableListView.setAdapter( createStudyAdapter )
-
-//        binding.addButton.setOnClickListener {
-//            val bundle = Bundle()
-//            bundle.putInt( Key.kStudyId.toString(), study.id )
-//            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
-//        }
 
         val user = (activity!!.application as? MainApplication)!!.user
 
@@ -164,7 +163,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
     }
 
-    fun onItemSelected(field: Field, shouldDismissKeyboard: Boolean )
+    fun didSelectField( field: Field )
     {
         val bundle = Bundle()
 
@@ -172,6 +171,33 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         bundle.putInt( Key.kStudyId.toString(), study.id )
 
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+    }
+
+    fun didSelectRule( rule: Rule )
+    {
+        Log.d( "xxx", "didSelectRule" )
+    }
+
+    fun didSelectFilter( filter: Filter )
+    {
+        Log.d( "xxx", "didSelectFilter" )
+    }
+
+    fun shouldAddField()
+    {
+        val bundle = Bundle()
+        bundle.putInt( Key.kStudyId.toString(), study.id )
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+    }
+
+    fun shouldAddRule()
+    {
+        Log.d( "xxx", "shouldAddRule" )
+    }
+
+    fun shouldAddFilter()
+    {
+        Log.d( "xxx", "shouldAddFilter" )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
