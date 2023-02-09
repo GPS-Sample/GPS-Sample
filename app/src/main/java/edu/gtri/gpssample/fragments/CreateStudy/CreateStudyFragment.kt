@@ -135,14 +135,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 study.isValid = true
                 study.name = binding.studyNameEditText.text.toString()
 
-                if (study.id < 0)
-                {
-                    study.id = DAO.studyDAO.createStudy( study )
-                }
-                else
-                {
-                    DAO.studyDAO.updateStudy( study )
-                }
+                DAO.studyDAO.updateStudy( study )
 
                 val bundle = Bundle()
                 bundle.putInt( Key.kStudyId.toString(), study.id )
@@ -190,9 +183,18 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     fun shouldAddFilter()
     {
-        val bundle = Bundle()
-        bundle.putInt( Key.kStudyId.toString(), study.id )
-        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
+        val rules = DAO.ruleDAO.getRules( study.id )
+
+        if (rules.isEmpty())
+        {
+            Toast.makeText(activity!!.applicationContext, "You must create at least one rule before you can create a filter", Toast.LENGTH_SHORT).show()
+        }
+        else
+        {
+            val bundle = Bundle()
+            bundle.putInt( Key.kStudyId.toString(), study.id )
+            findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
+        }
     }
 
     fun didSelectField( field: Field )
@@ -285,7 +287,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             saveTag -> {
                 study.isValid = true
                 study.name = binding.studyNameEditText.text.toString()
-                study.id = DAO.studyDAO.createStudy( study )
+                DAO.studyDAO.updateStudy( study )
                 findNavController().popBackStack()
             }
         }

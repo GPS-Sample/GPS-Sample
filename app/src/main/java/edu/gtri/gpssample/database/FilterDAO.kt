@@ -20,9 +20,7 @@ class FilterDAO(private var dao: DAO)
     fun putFilter(filter: Filter, values: ContentValues)
     {
         values.put( DAO.COLUMN_FILTER_STUDY_ID, filter.studyId )
-        values.put( DAO.COLUMN_FILTER_RULE_ID, filter.ruleId )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
-        values.put( DAO.COLUMN_FILTER_CONNECTOR, filter.connector )
     }
 
     //--------------------------------------------------------------------------
@@ -65,11 +63,9 @@ class FilterDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_STUDY_ID))
-        val ruleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_RULE_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
-        val connector = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_CONNECTOR))
 
-        return Filter( id, studyId, ruleId, name, connector )
+        return Filter( id, studyId, name )
     }
 
     //--------------------------------------------------------------------------
@@ -119,4 +115,5 @@ class FilterDAO(private var dao: DAO)
 
         db.delete(DAO.TABLE_FILTER, whereClause, args)
         db.close()
-    }}
+    }
+}

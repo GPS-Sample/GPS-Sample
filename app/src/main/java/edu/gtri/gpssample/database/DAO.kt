@@ -77,11 +77,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_FILTER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_FILTER_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FILTER_RULE_ID + " INTEGER" + "," +
-                COLUMN_FILTER_NAME + " TEXT" + "," +
-                COLUMN_FILTER_CONNECTOR + " TEXT" +
+                COLUMN_FILTER_NAME + " TEXT" +
                 ")")
         db.execSQL(createTableFilter)
+
+        val createTableFilterRule = ("CREATE TABLE " +
+                TABLE_FILTERRULE + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_FILTERRULE_STUDY_ID + " INTEGER" + "," +
+                COLUMN_FILTERRULE_RULE_ID + " INTEGER" + "," +
+                COLUMN_FILTERRULE_CONNECTOR + " TEXT" +
+                ")")
+        db.execSQL(createTableFilterRule)
     }
 
     //--------------------------------------------------------------------------
@@ -94,6 +101,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FIELD)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RULE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERRULE)
         onCreate(db)
     }
 
@@ -153,16 +161,22 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Filter Table
         const val TABLE_FILTER = "filter"
         const val COLUMN_FILTER_STUDY_ID = "filter_study_id"
-        const val COLUMN_FILTER_RULE_ID = "filter_rule_id"
         const val COLUMN_FILTER_NAME = "filter_name"
-        const val COLUMN_FILTER_CONNECTOR = "filter_connector"
 
+        // FilterRule Table
+        const val TABLE_FILTERRULE = "filterrule"
+        const val COLUMN_FILTERRULE_STUDY_ID = "filterrule_study_id"
+        const val COLUMN_FILTERRULE_RULE_ID = "filterrule_rule_id"
+        const val COLUMN_FILTERRULE_CONNECTOR = "filterrule_connector"
+
+        // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
         lateinit var studyDAO: StudyDAO
         lateinit var fieldDAO: FieldDAO
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
+        lateinit var filterRuleDAO: FilterRuleDAO
 
         // creation/access methods
 
@@ -180,6 +194,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 fieldDAO = FieldDAO(( instance!! ))
                 ruleDAO = RuleDAO(( instance!! ))
                 filterDAO = FilterDAO(( instance!! ))
+                filterRuleDAO = FilterRuleDAO(( instance!! ))
             }
 
             return instance!!
@@ -190,6 +205,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 26
+        private const val DATABASE_VERSION = 30
     }
 }

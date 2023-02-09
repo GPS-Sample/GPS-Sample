@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/fragment_root_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="20dp"
+    android:background="@drawable/background_rounded_primary_frame_clear_fill"
+    tools:context=".fragments.CreateField.CreateFieldFragment">
+
+    <FrameLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/edit_button"
+            android:layout_gravity="start"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/edit_blue"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_gravity="end"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/delete_white"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+    </FrameLayout>
+
+    <View
+        android:background="@color/primary"
+        android:layout_width="match_parent"
+        android:layout_height="1dp">
+
+    </View>
+
+    <TextView
+        android:id="@+id/connector_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="AND"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/rule_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="At least 1 child less than 5"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

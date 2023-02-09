@@ -6,10 +6,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class Filter(
+data class FilterRule(
     var id: Int,
     var studyId: Int,
-    var name: String )
+    var ruleId: Int,
+    var connector: String)
 {
     fun pack() : String
     {
