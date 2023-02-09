@@ -11,6 +11,7 @@ data class Study(
     var id: Int,
     var configId: Int,
     var name: String,
+    var samplingMethod: String,
     var isValid: Boolean )
 {
     fun pack() : String

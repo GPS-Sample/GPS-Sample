@@ -40,6 +40,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
                 COLUMN_STUDY_CONFIG_ID + " INTEGER" + "," +
+                COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
                 COLUMN_STUDY_IS_VALID + " BOOLEAN" +
                 ")")
         db.execSQL(createTableStudy)
@@ -77,7 +78,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_FILTER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_FILTER_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FILTER_NAME + " TEXT" +
+                COLUMN_FILTER_NAME + " TEXT" + "," +
+                COLUMN_FILTER_IS_VALID + " BOOLEAN" +
                 ")")
         db.execSQL(createTableFilter)
 
@@ -85,6 +87,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_FILTERRULE + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_FILTERRULE_STUDY_ID + " INTEGER" + "," +
+                COLUMN_FILTERRULE_FILTER_ID + " INTEGER" + "," +
                 COLUMN_FILTERRULE_RULE_ID + " INTEGER" + "," +
                 COLUMN_FILTERRULE_CONNECTOR + " TEXT" +
                 ")")
@@ -133,6 +136,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
         const val COLUMN_STUDY_CONFIG_ID = "study_config_id"
+        const val COLUMN_STUDY_SAMPLING_METHOD = "study_sampling_method"
         const val COLUMN_STUDY_IS_VALID = "study_is_valid"
 
         // Field Table
@@ -162,10 +166,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_FILTER = "filter"
         const val COLUMN_FILTER_STUDY_ID = "filter_study_id"
         const val COLUMN_FILTER_NAME = "filter_name"
+        const val COLUMN_FILTER_IS_VALID = "filter_is_valid"
 
         // FilterRule Table
         const val TABLE_FILTERRULE = "filterrule"
         const val COLUMN_FILTERRULE_STUDY_ID = "filterrule_study_id"
+        const val COLUMN_FILTERRULE_FILTER_ID = "filterrule_filter_id"
         const val COLUMN_FILTERRULE_RULE_ID = "filterrule_rule_id"
         const val COLUMN_FILTERRULE_CONNECTOR = "filterrule_connector"
 
@@ -205,6 +211,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 30
+        private const val DATABASE_VERSION = 33
     }
 }

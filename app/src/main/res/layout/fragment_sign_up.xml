@@ -34,7 +34,7 @@
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/name"
-                android:textColor="@color/black" />
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
                 android:id="@+id/name_edit_text"
@@ -52,7 +52,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/pin"
-                android:textColor="@color/black" />
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
                 android:id="@+id/pin1_edit_text"
@@ -70,7 +70,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/pin"
-                android:textColor="@color/black" />
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
                 android:id="@+id/pin2_edit_text"
@@ -88,7 +88,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/forgot_pin_question"
-                android:textColor="@color/black" />
+                android:textColor="@color/primary_textcolor" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -110,7 +110,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/forgot_pin_answer"
-                android:textColor="@color/black" />
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
                 android:id="@+id/answer_edit_text"

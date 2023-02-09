@@ -22,6 +22,7 @@ class StudyDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_CONFIG_ID, study.configId )
+        values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD, study.samplingMethod )
         values.put( DAO.COLUMN_STUDY_IS_VALID, study.isValid )
     }
 
@@ -66,9 +67,10 @@ class StudyDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val configId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
+        val samplingMethod = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLING_METHOD))
         val isValid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_IS_VALID)).toBoolean()
 
-        return Study( id, configId, name, isValid )
+        return Study( id, configId, name, samplingMethod, isValid )
     }
 
     //--------------------------------------------------------------------------
@@ -145,5 +147,4 @@ class StudyDAO(private var dao: DAO)
         db.delete(DAO.TABLE_STUDY, whereClause, args)
         db.close()
     }
-
 }

@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 data class FilterRule(
     var id: Int,
     var studyId: Int,
+    var filterId: Int,
     var ruleId: Int,
     var connector: String)
 {

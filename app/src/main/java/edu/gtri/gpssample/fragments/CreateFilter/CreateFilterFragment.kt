@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
@@ -24,11 +25,13 @@ import edu.gtri.gpssample.fragments.ManageStudies.ManageStudiesAdapter
 
 class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
+
     private lateinit var viewModel: CreateRuleViewModel
     private var _binding: FragmentCreateFilterBinding? = null
     private val binding get() = _binding!!
     private lateinit var createFilterAdapter: CreateFilterAdapter
     private lateinit var study: Study
+    private lateinit var filter: Filter
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -71,6 +74,38 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
             return
         }
 
+        // clean up leftover filters & filterRules
+
+        val invalidFilters = DAO.filterDAO.getInvalidFilters( study!!.id )
+
+        for (invalidFilter in invalidFilters)
+        {
+            DAO.filterRuleDAO.deleteFilterRules( study!!.id, invalidFilter!!.id )
+            DAO.filterDAO.deleteFilter( invalidFilter )
+        }
+
+        // optional: filterId
+        val filterId = arguments!!.getInt( Key.kFilterId.toString(), -1);
+
+        if (filterId > 0)
+        {
+            DAO.filterDAO.getFilter( filterId )?.let { filter ->
+                this.filter = filter
+            }
+
+            if (!this::filter.isInitialized)
+            {
+                Toast.makeText(activity!!.applicationContext, "Fatal! Filter with id $filterId not found.", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+
+        if (!this::filter.isInitialized)
+        {
+            filter = Filter( -1, studyId, "", false )
+            filter.id = DAO.filterDAO.createFilter( filter )
+        }
+
         createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
         createFilterAdapter.shouldEditFilterRule = this::shouldEditFilterRule
         createFilterAdapter.shouldDeleteFilterRule = this::shouldDeleteFilterRule
@@ -80,10 +115,34 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
-            SelectRuleDialog( activity!!, studyId, null, this )
+            SelectRuleDialog( activity!!, study!!.id, filter!!.id, null, this )
         }
 
         binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.saveButton.setOnClickListener {
+
+            if (binding.nameEditText.text.toString().length == 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val filterRules = DAO.filterRuleDAO.getFilterRules( study.id, filter.id )
+
+            if (filterRules.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "You must add at least one rule", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            filter.name = binding.nameEditText.text.toString()
+            filter.isValid = true
+
+            DAO.filterDAO.updateFilter( filter )
+
             findNavController().popBackStack()
         }
     }
@@ -92,7 +151,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     {
         super.onResume()
 
-        val filterRules = DAO.filterRuleDAO.getFilterRules( study.id )
+        val filterRules = DAO.filterRuleDAO.getFilterRules( study.id, filter.id )
 
         createFilterAdapter.updateFilterRules(filterRules)
     }
@@ -101,7 +160,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
 
     fun shouldEditFilterRule( filterRule: FilterRule )
     {
-        SelectRuleDialog( activity!!, study!!.id, filterRule,this )
+        SelectRuleDialog( activity!!, study!!.id, filter!!.id, filterRule,this )
     }
 
     fun shouldDeleteFilterRule( filterRule: FilterRule )
@@ -118,14 +177,14 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     {
         selectedFilterRule?.let {
             DAO.filterRuleDAO.deleteFilterRule( it )
-            val filterRules = DAO.filterRuleDAO.getFilterRules( study.id )
+            val filterRules = DAO.filterRuleDAO.getFilterRules( study.id, filter.id )
             createFilterAdapter.updateFilterRules( filterRules )
         }
     }
 
     override fun didDismissSelectRuleDialog()
     {
-        val filterRules = DAO.filterRuleDAO.getFilterRules( study.id )
+        val filterRules = DAO.filterRuleDAO.getFilterRules( study.id, filter.id )
 
         createFilterAdapter.updateFilterRules( filterRules )
     }

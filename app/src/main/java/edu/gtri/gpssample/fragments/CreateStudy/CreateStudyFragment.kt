@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.CreateStudy
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -80,14 +81,30 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }
         }
 
+        ArrayAdapter.createFromResource(activity!!, R.array.samling_methods, android.R.layout.simple_spinner_item)
+            .also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.samplingMethodSpinner.adapter = adapter
+            }
+
+        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
+
         if (!this::study.isInitialized)
         {
-            study = Study( -1, configId, "", false )
+            study = Study( -1, configId, "", samplingMethods[0],false )
             study.id = DAO.studyDAO.createStudy( study )
         }
         else
         {
             binding.titleTextView.text = "Study ${study.name}"
+
+            for (i in samplingMethods.indices)
+            {
+                if (samplingMethods[i] == study.samplingMethod)
+                {
+                    binding.samplingMethodSpinner.setSelection(i)
+                }
+            }
         }
 
         binding.studyNameEditText.setText( study.name )
@@ -132,10 +149,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                     return@setOnClickListener
                 }
 
-                study.isValid = true
-                study.name = binding.studyNameEditText.text.toString()
-
-                DAO.studyDAO.updateStudy( study )
+                updateStudy()
 
                 val bundle = Bundle()
                 bundle.putInt( Key.kStudyId.toString(), study.id )
@@ -152,7 +166,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             val fields = DAO.fieldDAO.getFields(study.id)
             val rules = DAO.ruleDAO.getRules(study.id)
-            val filters = listOf<Filter>()
+            val filters = DAO.filterDAO.getValidFilters(study.id)
 
             createStudyAdapter.updateFieldsRulesFilters( fields, rules, filters )
         }
@@ -236,7 +250,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
-        Log.d( "xxx", item.toString())
         when (item.itemId) {
             android.R.id.home ->
             {
@@ -248,6 +261,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         return true
                     }
                 }
+                else
+                {
+                    updateStudy()
+                }
+
                 return false
             }
 //            R.id.action_create_field ->
@@ -271,6 +289,13 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         return false
     }
 
+    fun updateStudy()
+    {
+        study.isValid = true
+        study.name = binding.studyNameEditText.text.toString()
+        study.samplingMethod = binding.samplingMethodSpinner.selectedItem as String
+        DAO.studyDAO.updateStudy( study )
+    }
 
     override fun didAnswerNo()
     {
@@ -285,9 +310,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 findNavController().popBackStack()
             }
             saveTag -> {
-                study.isValid = true
-                study.name = binding.studyNameEditText.text.toString()
-                DAO.studyDAO.updateStudy( study )
+                updateStudy()
                 findNavController().popBackStack()
             }
         }
