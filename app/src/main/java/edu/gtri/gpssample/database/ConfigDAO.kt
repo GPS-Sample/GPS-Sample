@@ -21,12 +21,12 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getConfig( id: Int ): Config?
+    fun getConfig( uuid: String ): Config?
     {
         var config: Config? = null
 
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
 
         val cursor = db.rawQuery(query, null)
 
@@ -45,14 +45,14 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun createConfigModel( cursor: Cursor ) : Config
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
         val distanceFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT))
         val dateFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT))
         val timeFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT))
         val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
 
-        return Config( id, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
+        return Config( uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
     }
 
     //--------------------------------------------------------------------------
@@ -78,6 +78,7 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putConfig( config: Config, values: ContentValues )
     {
+        values.put( DAO.COLUMN_UUID, config.uuid )
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
         values.put( DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat)
         values.put( DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat)
@@ -89,8 +90,8 @@ class ConfigDAO(private var dao: DAO)
     fun updateConfig( config: Config )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(config.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(config.uuid)
         val values = ContentValues()
 
         putConfig( config, values )
@@ -102,7 +103,7 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteConfig( config: Config )
     {
-        val studies = DAO.studyDAO.getStudies( config.id )
+        val studies = DAO.studyDAO.getStudies( config.uuid )
 
         for (study in studies)
         {
@@ -110,8 +111,8 @@ class ConfigDAO(private var dao: DAO)
         }
 
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(config.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(config.uuid.toString())
 
         db.delete(DAO.TABLE_CONFIG, whereClause, args)
         db.close()

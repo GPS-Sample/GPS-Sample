@@ -7,10 +7,9 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Filter(
-    var id: Int,
-    var studyId: Int,
-    var name: String,
-    var isValid: Boolean )
+    var uuid: String,
+    var study_uuid: String,
+    var name: String )
 {
     fun pack() : String
     {

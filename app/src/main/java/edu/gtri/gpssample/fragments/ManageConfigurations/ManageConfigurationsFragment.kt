@@ -79,11 +79,11 @@ class ManageConfigurationsFragment : Fragment()
         manageConfigurationsAdapter.updateConfigurations(configurations)
     }
 
-    fun onItemSelected(configuration: Config, shouldDismissKeyboard: Boolean )
+    fun onItemSelected( config: Config, shouldDismissKeyboard: Boolean )
     {
         val bundle = Bundle()
 
-        bundle.putInt( Key.kConfigId.toString(), configuration.id )
+        bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }

@@ -44,8 +44,8 @@ import kotlin.collections.ArrayList
 class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
     private lateinit var user: User
-    private var studyId = -1
-    private var configId = -1
+    private var study_uuid = ""
+    private var config_uuid = ""
     private lateinit var role: String
     private lateinit var broadcastInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
@@ -140,7 +140,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            if (configId < 0)
+            if (config_uuid.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -164,13 +164,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            if (configId < 0)
+            if (config_uuid.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (studyId < 0)
+            if (study_uuid.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -210,8 +210,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         if (configs.isEmpty())
         {
-            configId = -1
-            studyId = -1
+            config_uuid = ""
+            study_uuid = ""
         }
         else
         {
@@ -221,13 +221,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             if (studies.isEmpty())
             {
-                studyId = -1
+                study_uuid = ""
             }
             else
             {
                 binding.studyCheckBox.isChecked = true
 
-                val fields = DAO.fieldDAO.getFields(studies[0].id)
+                val fields = DAO.fieldDAO.getFields(studies[0].uuid)
                 if (fields.isNotEmpty())
                 {
                     binding.fieldsCheckBox.isChecked = true
@@ -280,8 +280,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             val ssid = jsonObject.getString( Key.kSSID.toString() )
             val pass = jsonObject.getString( Key.kPass.toString() )
-            studyId = jsonObject.getInt( Key.kStudyId.toString() )
-            configId = jsonObject.getInt( Key.kConfigId.toString() )
+            study_uuid = jsonObject.getString( Key.kStudy_uuid.toString() )
+            config_uuid = jsonObject.getString( Key.kConfig_uuid.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {
@@ -419,7 +419,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 {
                     val config = Config.unpack( networkCommand.message )
 
-                    configId = DAO.configDAO.createConfig( config )
+                    DAO.configDAO.createConfig( config )
 
                     activity!!.runOnUiThread {
                         binding.configCheckBox.isChecked = true
@@ -430,9 +430,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 {
                     val study = Study.unpack( networkCommand.message )
 
-                    study.configId = configId // config ID may be different since this study came from a different DB
-
-                    studyId = DAO.studyDAO.createStudy( study )
+                    DAO.studyDAO.createStudy( study )
 
                     activity!!.runOnUiThread {
                         binding.studyCheckBox.isChecked = true
@@ -445,7 +443,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                     for (field in networkFields.fields)
                     {
-                        field.studyId = studyId // study ID may be different since this field came from a different DB
                         DAO.fieldDAO.createField( field )
                     }
 

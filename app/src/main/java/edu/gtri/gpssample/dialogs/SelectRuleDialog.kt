@@ -12,6 +12,8 @@ import android.widget.TextView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.FilterRule
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SelectRuleDialog
 {
@@ -24,7 +26,7 @@ class SelectRuleDialog
     {
     }
 
-    constructor(context: Context, studyId: Int, filterId: Int, filterRule: FilterRule?, delegate: SelectRuleDialogDelegate )
+    constructor(context: Context, study_uuid: String, filter_uuid: String, filterRule: FilterRule?, delegate: SelectRuleDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -38,7 +40,7 @@ class SelectRuleDialog
         alertDialog.setCancelable(false)
         alertDialog.show()
 
-        val rules = DAO.ruleDAO.getRules( studyId )
+        val rules = DAO.ruleDAO.getRules( study_uuid )
 
         val ruleNames = ArrayList<String>()
 
@@ -47,7 +49,7 @@ class SelectRuleDialog
             ruleNames.add( rule.name )
         }
 
-        val filterRules = DAO.filterRuleDAO.getFilterRules( studyId, filterId )
+        val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter_uuid )
 
         val connectorTextView = view!!.findViewById<TextView>(R.id.connector_text_view)
         val connectorFrameLayout = view!!.findViewById<FrameLayout>(R.id.connector_frame_layout)
@@ -71,7 +73,7 @@ class SelectRuleDialog
         filterRule?.let { filterRule ->
             for (i in rules.indices)
             {
-                if (filterRule.ruleId == rules[i].id)
+                if (filterRule.rule_uuid == rules[i].uuid)
                 {
                     ruleSpinner.setSelection( i )
                     break
@@ -103,14 +105,14 @@ class SelectRuleDialog
 
             if (filterRule != null)
             {
-                filterRule!!.ruleId = rule.id
+                filterRule!!.rule_uuid = rule.uuid
                 filterRule!!.connector = connector
                 DAO.filterRuleDAO.updateFilterRule( filterRule )
             }
             else
             {
-                val filterRule = FilterRule( -1, studyId, filterId, rule.id, connector )
-                filterRule.id = DAO.filterRuleDAO.createFilterRule( filterRule )
+                val filterRule = FilterRule( UUID.randomUUID().toString(), study_uuid, filter_uuid, rule.uuid, connector )
+                DAO.filterRuleDAO.createFilterRule( filterRule )
             }
 
             alertDialog.dismiss()

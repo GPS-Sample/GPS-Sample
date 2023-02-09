@@ -15,11 +15,12 @@ import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
+import java.util.*
 
 class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var field: Field? = null
-    private lateinit var study: Study
+    private lateinit var study_uuid: String
 
     private lateinit var checkbox1Layout: LinearLayout
     private lateinit var checkbox2Layout: LinearLayout
@@ -75,29 +76,29 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        val studyId = arguments!!.getInt( Key.kStudyId.toString(), -1);
+        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
 
-        if (studyId < 0)
+        if (study_uuid.isEmpty())
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.studyDAO.getStudy( studyId )?.let { study ->
-            this.study = study
-        }
+//        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
+//            this.study = study
+//        }
+//
+//        if (!this::study.isInitialized)
+//        {
+//            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
+//            return
+//        }
 
-        if (!this::study.isInitialized)
+        val field_uuid = arguments!!.getString( Key.kField_uuid.toString(), "" );
+
+        if (field_uuid.isNotEmpty())
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val fieldId = arguments!!.getInt( Key.kFieldId.toString(), -1);
-
-        if (fieldId > 0)
-        {
-            field = DAO.fieldDAO.getField( fieldId )
+            field = DAO.fieldDAO.getField( field_uuid )
         }
 
         textLayout = view.findViewById<LinearLayout>(R.id.layout_field_text)
@@ -390,8 +391,8 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             if (field == null)
             {
-                field = Field( -1, study.id, "", "", false, false, false, false, false, "", "", "", "" )
-                field!!.id = DAO.fieldDAO.createField( field!! )
+                field = Field( UUID.randomUUID().toString(), study_uuid, "", "", false, false, false, false, false, "", "", "", "" )
+                DAO.fieldDAO.createField( field!! )
             }
 
             field?.let { field ->

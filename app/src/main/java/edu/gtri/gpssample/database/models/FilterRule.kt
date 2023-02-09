@@ -7,10 +7,10 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class FilterRule(
-    var id: Int,
-    var studyId: Int,
-    var filterId: Int,
-    var ruleId: Int,
+    var uuid: String,
+    var study_uuid: String,
+    var filter_uuid: String,
+    var rule_uuid: String,
     var connector: String)
 {
     fun pack() : String

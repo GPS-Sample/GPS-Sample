@@ -20,18 +20,18 @@ class StudyDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putStudy( study: Study, values: ContentValues )
     {
+        values.put( DAO.COLUMN_UUID, study.uuid )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
-        values.put( DAO.COLUMN_STUDY_CONFIG_ID, study.configId )
+        values.put( DAO.COLUMN_STUDY_CONFIG_UUID, study.config_uuid )
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD, study.samplingMethod )
-        values.put( DAO.COLUMN_STUDY_IS_VALID, study.isValid )
     }
 
     //--------------------------------------------------------------------------
     fun updateStudy( study: Study )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(study.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(study.uuid)
         val values = ContentValues()
 
         putStudy( study, values )
@@ -41,11 +41,17 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getStudy( id: Int ): Study?
+    fun exists( uuid: String ) : Boolean
+    {
+        return getStudy( uuid ) != null
+    }
+
+    //--------------------------------------------------------------------------
+    fun getStudy( uuid: String ): Study?
     {
         var study: Study? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -64,13 +70,12 @@ class StudyDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun createStudy( cursor: Cursor ): Study
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val configId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val config_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
         val samplingMethod = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLING_METHOD))
-        val isValid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_IS_VALID)).toBoolean()
 
-        return Study( id, configId, name, samplingMethod, isValid )
+        return Study( uuid, config_uuid, name, samplingMethod )
     }
 
     //--------------------------------------------------------------------------
@@ -93,11 +98,11 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getStudies( configId: Int ): List<Study>
+    fun getStudies( config_uuid: String ): List<Study>
     {
         val studies = ArrayList<Study>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_STUDY_CONFIG_ID} = $configId"
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_STUDY_CONFIG_UUID} = '$config_uuid'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -112,11 +117,11 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getValidStudies( configId: Int ): List<Study>
+    fun getValidStudies( config_uuid: String ): List<Study>
     {
         val studies = ArrayList<Study>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_STUDY_CONFIG_ID} = $configId AND ${DAO.COLUMN_STUDY_IS_VALID} = 1"
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_STUDY_CONFIG_UUID} = '$config_uuid'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -133,7 +138,7 @@ class StudyDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteStudy( study: Study )
     {
-        val fields = DAO.fieldDAO.getFields( study.id )
+        val fields = DAO.fieldDAO.getFields( study.uuid )
 
         for (field in fields)
         {
@@ -141,8 +146,8 @@ class StudyDAO(private var dao: DAO)
         }
 
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(study.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(study.uuid.toString())
 
         db.delete(DAO.TABLE_STUDY, whereClause, args)
         db.close()

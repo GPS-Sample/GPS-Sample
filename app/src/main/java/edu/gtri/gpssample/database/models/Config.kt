@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Config(
-    var id: Int,
+    var uuid: String,
     var name: String,
     var dateFormat: String,
     var timeFormat: String,

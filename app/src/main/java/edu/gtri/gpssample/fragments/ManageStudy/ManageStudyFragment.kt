@@ -91,21 +91,21 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             return
         }
 
-        val studyId = arguments!!.getInt( Key.kStudyId.toString(), -1);
+        val study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
 
-        if (studyId < 0)
+        if (study_uuid.isEmpty())
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.studyDAO.getStudy( studyId )?.let { study ->
+        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
             this.study = study
         }
 
         if (!this::study.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -211,8 +211,8 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     val jsonObject = JSONObject()
                     jsonObject.put( Key.kSSID.toString(), ssid )
                     jsonObject.put( Key.kPass.toString(), pass )
-                    jsonObject.put( Key.kStudyId.toString(), study.id )
-                    jsonObject.put( Key.kConfigId.toString(), study.configId )
+                    jsonObject.put( Key.kStudy_uuid.toString(), study.uuid )
+                    jsonObject.put( Key.kConfig_uuid.toString(), study.config_uuid )
 
                     val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
                     qrgEncoder.setColorBlack(Color.WHITE);
@@ -299,7 +299,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestConfigCommand -> {
                 lifecycleScope.launch {
-                    val config = DAO.configDAO.getConfig( study.configId )
+                    val config = DAO.configDAO.getConfig( study.config_uuid )
                     val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, networkCommand.uuid, config!!.pack() )
                     udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                 }
@@ -314,7 +314,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestFieldsCommand -> {
                 lifecycleScope.launch {
-                    val fields = DAO.fieldDAO.getFields( study.id )
+                    val fields = DAO.fieldDAO.getFields( study.uuid )
                     val networkFields = NetworkFields( fields )
 
                     val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkFields.pack())

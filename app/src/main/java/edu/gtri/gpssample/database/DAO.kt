@@ -13,8 +13,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     {
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
-                COLUMN_USER_UUID + " TEXT" +  "," +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
                 COLUMN_USER_ROLE + " TEXT" +  "," +
                 COLUMN_USER_NAME + " TEXT" + "," +
                 COLUMN_USER_PIN + " INTEGER" + "," +
@@ -26,7 +25,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
                 COLUMN_CONFIG_NAME + " TEXT" + "," +
                 COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_TIME_FORMAT + " TEXT" + "," +
@@ -37,19 +36,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
-                COLUMN_STUDY_CONFIG_ID + " INTEGER" + "," +
-                COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
-                COLUMN_STUDY_IS_VALID + " BOOLEAN" +
+                COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
+                COLUMN_STUDY_SAMPLING_METHOD + " TEXT" +
                 ")")
         db.execSQL(createTableStudy)
 
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
                 COLUMN_FIELD_NAME + " TEXT" + "," +
-                COLUMN_FIELD_STUDY_ID + " INTEGER" + "," +
+                COLUMN_FIELD_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FIELD_TYPE + " TEXT" + "," +
                 COLUMN_FIELD_PII + " BOOLEAN" + "," +
                 COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
@@ -65,9 +63,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableRule = ("CREATE TABLE " +
                 TABLE_RULE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
-                COLUMN_RULE_STUDY_ID + " INTEGER" + "," +
-                COLUMN_RULE_FIELD_ID + " INTEGER" + "," +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_RULE_STUDY_UUID + " TEXT" + "," +
+                COLUMN_RULE_FIELD_UUID + " TEXT" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
                 COLUMN_RULE_OPERATOR + " TEXT" + "," +
                 COLUMN_RULE_VALUE + " TEXT" +
@@ -76,19 +74,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableFilter = ("CREATE TABLE " +
                 TABLE_FILTER + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
-                COLUMN_FILTER_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FILTER_NAME + " TEXT" + "," +
-                COLUMN_FILTER_IS_VALID + " BOOLEAN" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_FILTER_STUDY_UUID + " TEXT" + "," +
+                COLUMN_FILTER_NAME + " TEXT" +
                 ")")
         db.execSQL(createTableFilter)
 
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
-                COLUMN_FILTERRULE_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FILTERRULE_FILTER_ID + " INTEGER" + "," +
-                COLUMN_FILTERRULE_RULE_ID + " INTEGER" + "," +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_FILTERRULE_STUDY_UUID + " TEXT" + "," +
+                COLUMN_FILTERRULE_FILTER_UUID + " TEXT" + "," +
+                COLUMN_FILTERRULE_RULE_UUID + " TEXT" + "," +
                 COLUMN_FILTERRULE_CONNECTOR + " TEXT" +
                 ")")
         db.execSQL(createTableFilterRule)
@@ -112,11 +109,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     companion object
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
-        const val COLUMN_ID = "id"
+        const val COLUMN_UUID = "uuid"
 
         // User Table
         const val TABLE_USER = "user"
-        const val COLUMN_USER_UUID = "user_uuid"
         const val COLUMN_USER_ROLE = "user_role"
         const val COLUMN_USER_NAME = "user_name"
         const val COLUMN_USER_PIN = "user_pin"
@@ -135,14 +131,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Study Table
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
-        const val COLUMN_STUDY_CONFIG_ID = "study_config_id"
+        const val COLUMN_STUDY_CONFIG_UUID = "study_config_id"
         const val COLUMN_STUDY_SAMPLING_METHOD = "study_sampling_method"
-        const val COLUMN_STUDY_IS_VALID = "study_is_valid"
 
         // Field Table
         const val TABLE_FIELD = "field"
         const val COLUMN_FIELD_NAME = "field_name"
-        const val COLUMN_FIELD_STUDY_ID = "field_study_id"
+        const val COLUMN_FIELD_STUDY_UUID = "field_study_id"
         const val COLUMN_FIELD_TYPE = "field_type"
         const val COLUMN_FIELD_PII = "field_pii"
         const val COLUMN_FIELD_REQUIRED = "field_required"
@@ -156,23 +151,22 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // Rule Table
         const val TABLE_RULE = "rule"
-        const val COLUMN_RULE_STUDY_ID = "rule_study_id"
-        const val COLUMN_RULE_FIELD_ID = "rule_field_id"
+        const val COLUMN_RULE_STUDY_UUID = "rule_study_id"
+        const val COLUMN_RULE_FIELD_UUID = "rule_field_id"
         const val COLUMN_RULE_NAME = "rule_name"
         const val COLUMN_RULE_OPERATOR = "rule_operator"
         const val COLUMN_RULE_VALUE = "rule_value"
 
         // Filter Table
         const val TABLE_FILTER = "filter"
-        const val COLUMN_FILTER_STUDY_ID = "filter_study_id"
+        const val COLUMN_FILTER_STUDY_UUID = "filter_study_id"
         const val COLUMN_FILTER_NAME = "filter_name"
-        const val COLUMN_FILTER_IS_VALID = "filter_is_valid"
 
         // FilterRule Table
         const val TABLE_FILTERRULE = "filterrule"
-        const val COLUMN_FILTERRULE_STUDY_ID = "filterrule_study_id"
-        const val COLUMN_FILTERRULE_FILTER_ID = "filterrule_filter_id"
-        const val COLUMN_FILTERRULE_RULE_ID = "filterrule_rule_id"
+        const val COLUMN_FILTERRULE_STUDY_UUID = "filterrule_study_id"
+        const val COLUMN_FILTERRULE_FILTER_UUID = "filterrule_filter_id"
+        const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
         const val COLUMN_FILTERRULE_CONNECTOR = "filterrule_connector"
 
         // DAO's
@@ -211,6 +205,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 33
+        private const val DATABASE_VERSION = 36
     }
 }

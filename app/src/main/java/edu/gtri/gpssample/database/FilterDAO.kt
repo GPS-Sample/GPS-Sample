@@ -9,7 +9,7 @@ import edu.gtri.gpssample.extensions.toBoolean
 class FilterDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createFilter( filter: Filter) : Int
+    fun createFilter( filter: Filter ) : Int
     {
         val values = ContentValues()
 
@@ -19,19 +19,19 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun putFilter(filter: Filter, values: ContentValues)
+    fun putFilter( filter: Filter, values: ContentValues )
     {
-        values.put( DAO.COLUMN_FILTER_STUDY_ID, filter.studyId )
+        values.put( DAO.COLUMN_UUID, filter.study_uuid )
+        values.put( DAO.COLUMN_FILTER_STUDY_UUID, filter.study_uuid )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
-        values.put( DAO.COLUMN_FILTER_IS_VALID, filter.isValid )
     }
 
     //--------------------------------------------------------------------------
-    fun updateFilter( filter: Filter)
+    fun updateFilter( filter: Filter )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(filter.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(filter.uuid.toString())
         val values = ContentValues()
 
         putFilter( filter, values )
@@ -41,11 +41,11 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFilter( filterId: Int ) : Filter?
+    fun getFilter( filter_uuid: String ) : Filter?
     {
         var filter: Filter? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_ID} = $filterId"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '$filter_uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -62,41 +62,21 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createFilterModel( cursor: Cursor): Filter
+    private fun  createFilterModel( cursor: Cursor ): Filter
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_STUDY_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_STUDY_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
-        val isValid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_IS_VALID)).toBoolean()
 
-        return Filter( id, studyId, name, isValid )
+        return Filter( uuid, study_uuid, name )
     }
 
     //--------------------------------------------------------------------------
-    fun getValidFilters( studyId: Int ): List<Filter>
+    fun getFilters( study_uuid: String ): List<Filter>
     {
         val filters = ArrayList<Filter>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_FILTER_STUDY_ID} = $studyId AND ${DAO.COLUMN_FILTER_IS_VALID} = 1"
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            filters.add( createFilterModel( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return filters
-    }
-
-    //--------------------------------------------------------------------------
-    fun getInvalidFilters( studyId: Int ): List<Filter>
-    {
-        val filters = ArrayList<Filter>()
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_FILTER_STUDY_ID} = $studyId AND ${DAO.COLUMN_FILTER_IS_VALID} = 0"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_FILTER_STUDY_UUID} = '$study_uuid'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -130,13 +110,11 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun deleteFilter( filter: Filter)
+    fun deleteFilter( filter: Filter )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(filter.id.toString())
-
-        Log.d( "xxx", "Delete Filter with id: ${filter.id}")
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(filter.uuid)
 
         db.delete(DAO.TABLE_FILTER, whereClause, args)
         db.close()

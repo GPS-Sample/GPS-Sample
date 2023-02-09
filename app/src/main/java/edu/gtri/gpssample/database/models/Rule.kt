@@ -7,9 +7,9 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Rule(
-    var id: Int,
-    var studyId: Int,
-    var fieldId: Int,
+    var uuid: String,
+    var study_uuid: String,
+    var field_uuid: String,
     var name: String,
     var operator: String,
     var value: String)

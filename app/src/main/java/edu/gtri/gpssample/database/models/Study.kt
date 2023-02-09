@@ -8,11 +8,10 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Study(
-    var id: Int,
-    var configId: Int,
+    var uuid: String,
+    var config_uuid: String,
     var name: String,
-    var samplingMethod: String,
-    var isValid: Boolean )
+    var samplingMethod: String )
 {
     fun pack() : String
     {

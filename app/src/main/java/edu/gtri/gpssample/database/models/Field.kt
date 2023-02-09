@@ -9,8 +9,8 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Field(
-    var id: Int,
-    var studyId: Int,
+    var uuid: String,
+    var study_uuid: String,
     var name: String,
     var type: String,
     var pii: Boolean,

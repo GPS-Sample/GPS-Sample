@@ -14,7 +14,7 @@ class UserDAO(private var dao: DAO)
     {
         val values = ContentValues()
 
-        values.put( DAO.COLUMN_USER_UUID, user.uuid )
+        values.put( DAO.COLUMN_UUID, user.uuid )
         values.put( DAO.COLUMN_USER_ROLE, user.role )
         values.put( DAO.COLUMN_USER_NAME, user.name )
         values.put( DAO.COLUMN_USER_PIN, user.pin )
@@ -25,11 +25,11 @@ class UserDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getUser( id: Int ): User?
+    fun getUser( uuid: String ): User?
     {
         var user: User? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -69,8 +69,7 @@ class UserDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun createUserModel( cursor: Cursor) : User
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_UUID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
         val pin = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_PIN))
         val role = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_ROLE))
@@ -78,7 +77,7 @@ class UserDAO(private var dao: DAO)
         val recoveryAnswer = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_ANSWER))
         val isOnline = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_IS_ONLINE)).toBoolean()
 
-        return User( id, uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
+        return User( uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
     }
 
     //--------------------------------------------------------------------------

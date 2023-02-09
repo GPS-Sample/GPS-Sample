@@ -22,6 +22,7 @@ import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
+import java.util.*
 
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -63,26 +64,26 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        val configId = arguments!!.getInt( Key.kConfigId.toString(), -1);
+        val config_uuid = arguments!!.getString( Key.kConfig_uuid.toString(), "");
 
-        if (configId < 0)
+        if (config_uuid.isEmpty())
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
             return
         }
 
         // optional: studyId
-        val studyId = arguments!!.getInt( Key.kStudyId.toString(), -1);
+        val study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
 
-        if (studyId > 0)
+        if (!study_uuid.isEmpty())
         {
-            DAO.studyDAO.getStudy( studyId )?.let { study ->
+            DAO.studyDAO.getStudy( study_uuid )?.let { study ->
                 this.study = study
             }
 
             if (!this::study.isInitialized)
             {
-                Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
                 return
             }
         }
@@ -97,8 +98,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (!this::study.isInitialized)
         {
-            study = Study( -1, configId, "", samplingMethods[0],false )
-            study.id = DAO.studyDAO.createStudy( study )
+            study = Study( UUID.randomUUID().toString(), config_uuid, "", samplingMethods[0] )
         }
         else
         {
@@ -124,37 +124,9 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         createStudyAdapter.shouldAddFilter = this::shouldAddFilter
 
         binding.expandableListView.setAdapter( createStudyAdapter )
-
-        val user = (activity!!.application as? MainApplication)!!.user
-
-        if (user!!.role == Role.Supervisor.toString())
-        {
-//            binding.addButton.visibility = View.GONE
-            binding.generateBarcodeButton.text = "NEXT"
-        }
-
-        binding.generateBarcodeButton.setOnClickListener {
-
-            if (user!!.role == Role.Supervisor.toString())
-            {
-                val bundle = Bundle()
-                bundle.putInt( Key.kStudyId.toString(), study.id )
-                findNavController().navigate( R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle )
-            }
-            else
-            {
-                if (binding.studyNameEditText.text.toString().isEmpty())
-                {
-                    Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-
-                updateStudy()
-
-                val bundle = Bundle()
-                bundle.putInt( Key.kStudyId.toString(), study.id )
-                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
-            }
+        binding.saveButton.setOnClickListener {
+            updateStudy()
+            findNavController().popBackStack()
         }
     }
 
@@ -164,9 +136,9 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (this::study.isInitialized)
         {
-            val fields = DAO.fieldDAO.getFields(study.id)
-            val rules = DAO.ruleDAO.getRules(study.id)
-            val filters = DAO.filterDAO.getValidFilters(study.id)
+            val fields = DAO.fieldDAO.getFields(study.uuid)
+            val rules = DAO.ruleDAO.getRules(study.uuid)
+            val filters = DAO.filterDAO.getFilters(study.uuid)
 
             createStudyAdapter.updateFieldsRulesFilters( fields, rules, filters )
         }
@@ -175,13 +147,13 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun shouldAddField()
     {
         val bundle = Bundle()
-        bundle.putInt( Key.kStudyId.toString(), study.id )
+        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
     fun shouldAddRule()
     {
-        val fields = DAO.fieldDAO.getFields( study.id )
+        val fields = DAO.fieldDAO.getFields( study.uuid )
 
         if (fields.isEmpty())
         {
@@ -190,14 +162,14 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         else
         {
             val bundle = Bundle()
-            bundle.putInt( Key.kStudyId.toString(), study.id )
+            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
             findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
         }
     }
 
     fun shouldAddFilter()
     {
-        val rules = DAO.ruleDAO.getRules( study.id )
+        val rules = DAO.ruleDAO.getRules( study.uuid )
 
         if (rules.isEmpty())
         {
@@ -206,7 +178,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         else
         {
             val bundle = Bundle()
-            bundle.putInt( Key.kStudyId.toString(), study.id )
+            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
             findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
         }
     }
@@ -214,8 +186,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun didSelectField( field: Field )
     {
         val bundle = Bundle()
-        bundle.putInt( Key.kFieldId.toString(), field.id )
-        bundle.putInt( Key.kStudyId.toString(), study.id )
+        bundle.putString( Key.kField_uuid.toString(), field.uuid )
+        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
@@ -223,8 +195,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun didSelectRule( rule: Rule )
     {
         val bundle = Bundle()
-        bundle.putInt( Key.kRuleId.toString(), rule.id )
-        bundle.putInt( Key.kStudyId.toString(), study.id )
+        bundle.putString( Key.kRule_uuid.toString(), rule.uuid )
+        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
     }
@@ -232,8 +204,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun didSelectFilter( filter: Filter )
     {
         val bundle = Bundle()
-        bundle.putInt( Key.kFilterId.toString(), filter.id )
-        bundle.putInt( Key.kStudyId.toString(), study.id )
+        bundle.putString( Key.kFilter_uuid.toString(), filter.uuid )
+        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }
@@ -251,36 +223,28 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId) {
-            android.R.id.home ->
-            {
-                if (!study.isValid)
-                {
-                    if (binding.studyNameEditText.text.toString().isNotEmpty())
-                    {
-                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", saveTag, this)
-                        return true
-                    }
-                }
-                else
-                {
-                    updateStudy()
-                }
-
-                return false
-            }
-//            R.id.action_create_field ->
+//            android.R.id.home -> // intercept the back button press
 //            {
-//                val bundle = Bundle()
-//                bundle.putInt( Key.kStudyId.toString(), study.id )
-//                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+//                if (!study.isValid)
+//                {
+//                    if (binding.studyNameEditText.text.toString().isNotEmpty())
+//                    {
+//                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", saveTag, this)
+//                        return true
+//                    }
+//                }
+//                else
+//                {
+//                    updateStudy()
+//                }
 //
-//                return true
+//                return false
 //            }
-//            R.id.action_manage_study -> {
-//                val bundle = Bundle()
-//                bundle.putInt( Key.kStudyId.toString(), study.id )
-//                findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
-//            }
+
+            R.id.action_manage_study -> {
+                manageStudy()
+            }
+
             R.id.action_delete_study -> {
                 ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", deleteTag, this)
             }
@@ -289,12 +253,45 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         return false
     }
 
+    fun manageStudy()
+    {
+        val user = (activity!!.application as? MainApplication)!!.user
+
+        if (user!!.role == Role.Supervisor.toString())
+        {
+            val bundle = Bundle()
+            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+            findNavController().navigate( R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle )
+        }
+        else
+        {
+            if (binding.studyNameEditText.text.toString().isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            updateStudy()
+
+            val bundle = Bundle()
+            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+            findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
+        }
+    }
+
     fun updateStudy()
     {
-        study.isValid = true
         study.name = binding.studyNameEditText.text.toString()
         study.samplingMethod = binding.samplingMethodSpinner.selectedItem as String
-        DAO.studyDAO.updateStudy( study )
+
+        if (!DAO.studyDAO.exists( study.uuid ))
+        {
+            DAO.studyDAO.createStudy( study )
+        }
+        else
+        {
+            DAO.studyDAO.updateStudy( study )
+        }
     }
 
     override fun didAnswerNo()

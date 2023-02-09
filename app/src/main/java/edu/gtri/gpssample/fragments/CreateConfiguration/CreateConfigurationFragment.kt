@@ -19,6 +19,7 @@ import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.database.models.Config
+import java.util.*
 
 class CreateConfigurationFragment : Fragment()
 {
@@ -49,7 +50,7 @@ class CreateConfigurationFragment : Fragment()
             }
         }
 
-        val configId = arguments?.getInt( Key.kConfigId.toString());
+        val configId = arguments?.getString( Key.kConfig_uuid.toString());
 
         configId?.let {
             config = DAO.configDAO.getConfig( it )
@@ -120,7 +121,8 @@ class CreateConfigurationFragment : Fragment()
 
             if (config == null)
             {
-                config = Config( -1, "", "", "", "", 0 )
+                config = Config( UUID.randomUUID().toString(), "", "", "", "", 0 )
+                DAO.configDAO.createConfig( config!! )
             }
 
             config?.let { config ->
@@ -153,14 +155,7 @@ class CreateConfigurationFragment : Fragment()
                     timeFormats[1] -> config.timeFormat = TimeFormat.twentyFourHour.toString();
                 }
 
-                if (config.id < 0)
-                {
-                    config.id = DAO.configDAO.createConfig( config )
-                }
-                else
-                {
-                    DAO.configDAO.updateConfig( config )
-                }
+                DAO.configDAO.updateConfig( config )
 
                 findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
             }

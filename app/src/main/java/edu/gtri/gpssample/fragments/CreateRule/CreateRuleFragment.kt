@@ -19,11 +19,12 @@ import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import java.util.UUID
 
 class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var rule: Rule? = null
-    private lateinit var study: Study
+    private lateinit var study_uuid: String
     private lateinit var viewModel: CreateRuleViewModel
 
     private var firstLaunch = true
@@ -59,32 +60,34 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             return
         }
 
-        val studyId = arguments!!.getInt( Key.kStudyId.toString(), -1);
+        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
 
-        if (studyId < 0)
+        if (study_uuid.isEmpty())
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.studyDAO.getStudy( studyId )?.let { study ->
-            this.study = study
-        }
+//        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
+//            this.study = study
+//        }
+//
+//        if (!this::study.isInitialized)
+//        {
+//            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
+//            return
+//        }
 
-        if (!this::study.isInitialized)
+        val rule_uuid = arguments!!.getString( Key.kRule_uuid.toString(), "");
+
+        if (rule_uuid.isNotEmpty())
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $studyId not found.", Toast.LENGTH_SHORT).show()
-            return
+            rule = DAO.ruleDAO.getRule( rule_uuid )
+
+            // TODO: Null Check
         }
 
-        val ruleId = arguments!!.getInt( Key.kRuleId.toString(), -1);
-
-        if (ruleId > 0)
-        {
-            rule = DAO.ruleDAO.getRule( ruleId )
-        }
-
-        val fields = DAO.fieldDAO.getFields( studyId )
+        val fields = DAO.fieldDAO.getFields( study_uuid )
 
         val fieldNames = ArrayList<String>()
 
@@ -110,7 +113,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 
             for (i in fields.indices)
             {
-                if (rule!!.fieldId == fields[i].id)
+                if (rule!!.field_uuid == fields[i].uuid)
                 {
                     binding.fieldSpinner.setSelection(i)
                     break
@@ -177,12 +180,12 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 
             if (rule == null)
             {
-                rule = Rule( -1, studyId, field.id, name, operator, value )
-                rule!!.id = DAO.ruleDAO.createRule( rule!! )
+                rule = Rule( UUID.randomUUID().toString(), study_uuid, field.uuid, name, operator, value )
+                DAO.ruleDAO.createRule( rule!! )
             }
 
             rule!!.name = name
-            rule!!.fieldId = field.id
+            rule!!.field_uuid = field.uuid
             rule!!.operator = operator
             rule!!.value = value
 

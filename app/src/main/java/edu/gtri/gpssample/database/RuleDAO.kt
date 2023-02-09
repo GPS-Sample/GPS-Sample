@@ -20,8 +20,9 @@ class RuleDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putRule( rule: Rule, values: ContentValues )
     {
-        values.put( DAO.COLUMN_RULE_STUDY_ID, rule.studyId )
-        values.put( DAO.COLUMN_RULE_FIELD_ID, rule.fieldId )
+        values.put( DAO.COLUMN_UUID, rule.uuid )
+        values.put( DAO.COLUMN_RULE_STUDY_UUID, rule.study_uuid )
+        values.put( DAO.COLUMN_RULE_FIELD_UUID, rule.field_uuid )
         values.put( DAO.COLUMN_RULE_NAME, rule.name )
         values.put( DAO.COLUMN_RULE_OPERATOR, rule.operator )
         values.put( DAO.COLUMN_RULE_VALUE, rule.value )
@@ -31,8 +32,8 @@ class RuleDAO(private var dao: DAO)
     fun updateRule( rule: Rule )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(rule.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(rule.uuid.toString())
         val values = ContentValues()
 
         putRule( rule, values )
@@ -42,11 +43,11 @@ class RuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getRule( ruleId: Int ) : Rule?
+    fun getRule( rule_uuid: String ) : Rule?
     {
         var rule: Rule? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_ID} = $ruleId"
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = '$rule_uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -65,22 +66,22 @@ class RuleDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun  createRuleModel( cursor: Cursor): Rule
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_STUDY_ID))
-        val fieldId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_FIELD_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_STUDY_UUID))
+        val field_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
         val operator = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_OPERATOR))
         val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
 
-        return Rule( id, studyId, fieldId, name, operator, value )
+        return Rule( uuid, study_uuid, field_uuid, name, operator, value )
     }
 
     //--------------------------------------------------------------------------
-    fun getRules( studyId: Int ): List<Rule>
+    fun getRules( study_uuid: String ): List<Rule>
     {
         val rules = ArrayList<Rule>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_RULE_STUDY_ID} = $studyId"
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_RULE_STUDY_UUID} = '$study_uuid'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -117,8 +118,8 @@ class RuleDAO(private var dao: DAO)
     fun deleteRule( rule: Rule )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(rule.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(rule.uuid.toString())
 
         db.delete(DAO.TABLE_RULE, whereClause, args)
         db.close()

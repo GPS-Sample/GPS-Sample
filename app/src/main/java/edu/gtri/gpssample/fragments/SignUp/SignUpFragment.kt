@@ -79,8 +79,8 @@ class SignUpFragment : Fragment()
             }
             else
             {
-                val user = User( -1, UUID.randomUUID().toString(), name, pin1, role, answer, question, false )
-                user.id = DAO.userDAO.createUser( user )
+                val user = User( UUID.randomUUID().toString(), name, pin1, role, answer, question, false )
+                DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
                 bundle.putString( Key.kRole.toString(), role )

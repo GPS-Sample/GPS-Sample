@@ -56,21 +56,21 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             return
         }
 
-        val configId = arguments!!.getInt( Key.kConfigId.toString(), -1);
+        val config_uuid = arguments!!.getString( Key.kConfig_uuid.toString(), "");
 
-        if (configId < 0)
+        if (config_uuid.isEmpty())
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.configDAO.getConfig( configId )?.let {
+        DAO.configDAO.getConfig( config_uuid )?.let {
             config = it
         }
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Configuration with id: $configId not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Configuration with id: $config_uuid not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -86,7 +86,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
             val bundle = Bundle()
 
-            bundle.putInt( Key.kConfigId.toString(), config.id )
+            bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
 
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
@@ -96,7 +96,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         super.onResume()
 
-        val studies = DAO.studyDAO.getValidStudies( config.id )
+        val studies = DAO.studyDAO.getValidStudies( config.uuid )
 
         if (studies.isEmpty())
         {
@@ -116,8 +116,8 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         val bundle = Bundle()
 
-        bundle.putInt( Key.kConfigId.toString(), config.id )
-        bundle.putInt( Key.kStudyId.toString(), study.id )
+        bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
     }
@@ -135,14 +135,14 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             R.id.action_edit_configuration -> {
                 val bundle = Bundle()
 
-                bundle.putInt( Key.kConfigId.toString(), config.id )
+                bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
 
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
             }
             R.id.action_create_study -> {
                 val bundle = Bundle()
 
-                bundle.putInt( Key.kConfigId.toString(), config.id )
+                bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
 
                 findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
                 return true

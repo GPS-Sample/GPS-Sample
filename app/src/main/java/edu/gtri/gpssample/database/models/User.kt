@@ -8,7 +8,6 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class User(
-    var id: Int,
     var uuid: String,
     var name: String,
     var pin: Int,
