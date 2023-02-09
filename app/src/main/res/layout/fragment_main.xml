@@ -25,7 +25,7 @@
 
         <RadioGroup
             android:id="@+id/radio_group"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
@@ -34,23 +34,32 @@
             android:layout_above="@+id/sign_in_button"
             android:orientation="vertical">
 
-            <RadioButton android:id="@+id/admin_button"
+            <RadioButton
+                android:id="@+id/admin_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="40dp"
+                android:gravity="center"
                 android:text="@string/admin"
-                android:textSize="17sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:textSize="17sp" />
 
-            <RadioButton android:id="@+id/supervisor_button"
+            <RadioButton
+                android:id="@+id/supervisor_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="40dp"
+                android:gravity="center"
                 android:text="@string/supervisor"
-                android:textSize="17sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:textSize="17sp" />
 
-            <RadioButton android:id="@+id/data_collector_button"
+            <RadioButton
+                android:id="@+id/data_collector_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="40dp"
+                android:gravity="center"
                 android:text="@string/data_collector"
-                android:textSize="17sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:textSize="17sp" />
         </RadioGroup>
 
         <Button

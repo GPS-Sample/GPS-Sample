@@ -72,6 +72,12 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fragmentRootLayout.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
+            }
+        }
+
         (activity!!.application as? MainApplication)?.user?.let { user ->
             this.user = user
         }
@@ -93,12 +99,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.titleTextView.text = role.toString()
-
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         binding.wifiImageButton.setOnClickListener {
 

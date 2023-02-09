@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.Key
@@ -45,6 +46,12 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.fragmentRootLayout.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
+            }
+        }
 
         if (arguments == null)
         {

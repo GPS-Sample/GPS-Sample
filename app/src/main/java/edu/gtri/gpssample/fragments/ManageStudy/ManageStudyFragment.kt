@@ -79,6 +79,12 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fragmentRootLayout.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
+            }
+        }
+
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
@@ -104,12 +110,6 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.studyNameTextView.setText( "Study " + study.name )
-
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         studyAdapter = ManageStudyAdapter(users)
 

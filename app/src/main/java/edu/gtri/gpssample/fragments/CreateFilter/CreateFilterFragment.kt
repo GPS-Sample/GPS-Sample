@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
@@ -49,6 +50,12 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.fragmentRootLayout.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
+            }
+        }
 
         if (arguments == null)
         {
@@ -104,6 +111,10 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         {
             filter = Filter( -1, studyId, "", false )
             filter.id = DAO.filterDAO.createFilter( filter )
+        }
+        else
+        {
+            binding.nameEditText.setText( filter.name )
         }
 
         createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())

@@ -63,6 +63,12 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fragmentRootLayout.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
+            }
+        }
+
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
@@ -119,12 +125,6 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         dropdown2EditText = dropdownLayout.findViewById( R.id.option_2_edit_text )
         dropdown3EditText = dropdownLayout.findViewById( R.id.option_3_edit_text )
         dropdown4EditText = dropdownLayout.findViewById( R.id.option_4_edit_text )
-
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         ArrayAdapter.createFromResource(activity!!, R.array.field_types, android.R.layout.simple_spinner_item)
             .also { adapter ->

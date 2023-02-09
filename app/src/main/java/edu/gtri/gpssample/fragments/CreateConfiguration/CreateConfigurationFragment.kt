@@ -43,16 +43,16 @@ class CreateConfigurationFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val configId = arguments?.getInt( Key.kConfigId.toString());
-
-        configId?.let {
-            config = DAO.configDAO.getConfig( it )
-        }
-
         binding.fragmentRootLayout.setOnClickListener {
             if (BuildConfig.DEBUG) {
                 Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
             }
+        }
+
+        val configId = arguments?.getInt( Key.kConfigId.toString());
+
+        configId?.let {
+            config = DAO.configDAO.getConfig( it )
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)

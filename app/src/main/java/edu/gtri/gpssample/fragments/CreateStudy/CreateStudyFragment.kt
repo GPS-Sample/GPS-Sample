@@ -50,6 +50,12 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fragmentRootLayout.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
+            }
+        }
+
         // required: configId
         if (arguments == null)
         {
@@ -108,12 +114,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
 
         binding.studyNameEditText.setText( study.name )
-
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
         createStudyAdapter.didSelectField = this::didSelectField
