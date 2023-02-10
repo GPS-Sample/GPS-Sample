@@ -21,7 +21,7 @@ class FilterDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putFilter( filter: Filter, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, filter.study_uuid )
+        values.put( DAO.COLUMN_UUID, filter.uuid )
         values.put( DAO.COLUMN_FILTER_STUDY_UUID, filter.study_uuid )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
     }

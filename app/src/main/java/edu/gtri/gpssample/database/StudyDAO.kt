@@ -21,8 +21,8 @@ class StudyDAO(private var dao: DAO)
     fun putStudy( study: Study, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, study.uuid )
-        values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_CONFIG_UUID, study.config_uuid )
+        values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD, study.samplingMethod )
     }
 
