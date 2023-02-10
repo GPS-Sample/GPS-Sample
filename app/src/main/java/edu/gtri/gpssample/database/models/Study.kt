@@ -11,7 +11,9 @@ data class Study(
     var uuid: String,
     var config_uuid: String,
     var name: String,
-    var samplingMethod: String )
+    var samplingMethod: String,
+    var sampleSize: Int,
+    var sampleSizeIndex: Int )
 {
     fun pack() : String
     {

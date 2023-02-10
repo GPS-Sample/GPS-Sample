@@ -99,7 +99,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (!this::study.isInitialized)
         {
-            study = Study( UUID.randomUUID().toString(), config_uuid, "", samplingMethods[0] )
+            study = Study( UUID.randomUUID().toString(), config_uuid, "", samplingMethods[0], -1, 0 )
         }
         else
         {
@@ -126,8 +126,10 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         binding.samplingMethodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
+                Log.d( "xxx", "onItemSelected" )
+
                 when( position )
                 {
                     0 -> { // simple random sampling
@@ -154,6 +156,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             {
             }
         }
+
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -213,6 +216,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             val bundle = Bundle()
             bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+            bundle.putString( Key.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
             findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
         }
     }
@@ -240,6 +244,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         val bundle = Bundle()
         bundle.putString( Key.kFilter_uuid.toString(), filter.uuid )
         bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Key.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
 
         findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }

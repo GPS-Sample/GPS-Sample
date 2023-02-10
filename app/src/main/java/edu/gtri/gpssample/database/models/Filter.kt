@@ -9,7 +9,9 @@ import kotlinx.serialization.json.Json
 data class Filter(
     var uuid: String,
     var study_uuid: String,
-    var name: String )
+    var name: String,
+    var sampleSize: Int,
+    var sampleSizeIndex: Int )
 {
     fun pack() : String
     {

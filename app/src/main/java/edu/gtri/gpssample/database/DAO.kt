@@ -39,7 +39,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
                 COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
-                COLUMN_STUDY_SAMPLING_METHOD + " TEXT" +
+                COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
+                COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
+                COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" +
                 ")")
         db.execSQL(createTableStudy)
 
@@ -76,7 +78,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_FILTER + "(" +
                 COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
                 COLUMN_FILTER_STUDY_UUID + " TEXT" + "," +
-                COLUMN_FILTER_NAME + " TEXT" +
+                COLUMN_FILTER_NAME + " TEXT" + "," +
+                COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
+                COLUMN_FILTER_SAMPLE_SIZE_INDEX + " INTEGER" +
                 ")")
         db.execSQL(createTableFilter)
 
@@ -133,6 +137,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_STUDY_NAME = "study_name"
         const val COLUMN_STUDY_CONFIG_UUID = "study_config_id"
         const val COLUMN_STUDY_SAMPLING_METHOD = "study_sampling_method"
+        const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
+        const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
 
         // Field Table
         const val TABLE_FIELD = "field"
@@ -161,6 +167,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_FILTER = "filter"
         const val COLUMN_FILTER_STUDY_UUID = "filter_study_id"
         const val COLUMN_FILTER_NAME = "filter_name"
+        const val COLUMN_FILTER_SAMPLE_SIZE = "filter_sample_size"
+        const val COLUMN_FILTER_SAMPLE_SIZE_INDEX = "filter_sample_size_index"
 
         // FilterRule Table
         const val TABLE_FILTERRULE = "filterrule"
@@ -205,6 +213,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 38
+        private const val DATABASE_VERSION = 39
     }
 }

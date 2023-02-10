@@ -24,6 +24,8 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_CONFIG_UUID, study.config_uuid )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD, study.samplingMethod )
+        values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
+        values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX, study.sampleSizeIndex )
     }
 
     //--------------------------------------------------------------------------
@@ -80,8 +82,10 @@ class StudyDAO(private var dao: DAO)
         val config_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
         val samplingMethod = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLING_METHOD))
+        val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE))
+        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX))
 
-        return Study( uuid, config_uuid, name, samplingMethod )
+        return Study( uuid, config_uuid, name, samplingMethod, sampleSize, sampleSizeIndex )
     }
 
     //--------------------------------------------------------------------------

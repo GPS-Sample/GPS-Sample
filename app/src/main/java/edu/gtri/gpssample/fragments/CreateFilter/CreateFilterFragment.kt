@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
@@ -34,6 +35,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     private lateinit var createFilterAdapter: CreateFilterAdapter
     private lateinit var study_uuid: String
     private lateinit var filter: Filter
+    private lateinit var study: Study
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -64,12 +66,35 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
             return
         }
 
+        // required: Study_uuid
         study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
+        }
+
+        // required: SamplingMethod
+        val samplingMethod = arguments!!.getString( Key.kSamplingMethod.toString(), "");
+
+        if (samplingMethod.isEmpty())
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: samplingMethod.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        else
+        {
+            Log.d( "xxx", samplingMethod )
+
+            val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
+
+            if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
+            {
+                binding.sampleSize1Layout.visibility = View.GONE
+                binding.sampleSize2Layout.visibility = View.GONE
+                binding.sampleSize3Layout.visibility = View.GONE
+            }
         }
 
         // optional: filterId
@@ -90,7 +115,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
 
         if (!this::filter.isInitialized)
         {
-            filter = Filter( UUID.randomUUID().toString(), study_uuid, "" )
+            filter = Filter( UUID.randomUUID().toString(), study_uuid, "", -1, 0 )
         }
         else
         {
