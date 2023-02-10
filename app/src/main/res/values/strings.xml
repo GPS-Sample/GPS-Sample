@@ -163,5 +163,6 @@
     <string name="connector">Connector</string>
     <string name="sampling_method">Sampling Method</string>
     <string name="enter_filter_name">Enter Filter Name</string>
+    <string name="sample_size">Sample Size</string>
 
 </resources>

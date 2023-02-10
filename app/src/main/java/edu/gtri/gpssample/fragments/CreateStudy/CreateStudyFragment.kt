@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.CreateStudy
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -102,8 +103,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
         else
         {
-            binding.titleTextView.text = "Study ${study.name}"
-
             for (i in samplingMethods.indices)
             {
                 if (samplingMethods[i] == study.samplingMethod)
@@ -124,6 +123,41 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         createStudyAdapter.shouldAddFilter = this::shouldAddFilter
 
         binding.expandableListView.setAdapter( createStudyAdapter )
+
+        binding.samplingMethodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+            {
+                when( position )
+                {
+                    0 -> { // simple random sampling
+                        binding.sampleSize1Layout.visibility = View.VISIBLE
+                        binding.sampleSize2Layout.visibility = View.VISIBLE
+                        binding.sampleSize3Layout.visibility = View.VISIBLE
+                        binding.sampleSize1TextView.setText( "# of Households in all clusters")
+                    }
+                    1 -> { // cluster sampling
+                        binding.sampleSize1Layout.visibility = View.VISIBLE
+                        binding.sampleSize2Layout.visibility = View.GONE
+                        binding.sampleSize3Layout.visibility = View.GONE
+                        binding.sampleSize1TextView.setText( "# of Households per cluster")
+                    }
+                    else -> { // subset or strata sampling
+                        binding.sampleSize1Layout.visibility = View.GONE
+                        binding.sampleSize2Layout.visibility = View.GONE
+                        binding.sampleSize3Layout.visibility = View.GONE
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>)
+            {
+            }
+        }
+        binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         binding.saveButton.setOnClickListener {
             updateStudy()
             findNavController().popBackStack()
@@ -271,8 +305,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 return
             }
 
-            updateStudy()
-
             val bundle = Bundle()
             bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
             findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
@@ -304,10 +336,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             deleteTag -> {
                 DAO.studyDAO.deleteStudy( study )
-                findNavController().popBackStack()
-            }
-            saveTag -> {
-                updateStudy()
                 findNavController().popBackStack()
             }
         }
