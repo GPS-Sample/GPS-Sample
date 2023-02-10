@@ -29,6 +29,12 @@ class MainActivity : AppCompatActivity()
         {
             DAO.createSharedInstance(applicationContext)
 
+            DAO.studyDAO.deleteOrphans()
+            DAO.fieldDAO.deleteOrphans()
+            DAO.filterDAO.deleteOrphans()
+            DAO.ruleDAO.deleteOrphans()
+            DAO.filterRuleDAO.deleteOrphans()
+
             val configurations = DAO.configDAO.getConfigs()
             Log.d( "xxx", "found ${configurations.size} Configurations" )
 

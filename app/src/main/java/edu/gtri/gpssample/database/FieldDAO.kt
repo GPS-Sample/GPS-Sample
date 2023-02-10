@@ -51,11 +51,23 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getField( field_uuid: String ): Field?
+    fun exists( uuid: String ) : Boolean
+    {
+        return getField( uuid ) != null
+    }
+
+    //--------------------------------------------------------------------------
+    fun doesNotExist( uuid: String ) : Boolean
+    {
+        return !exists( uuid )
+    }
+
+    //--------------------------------------------------------------------------
+    fun getField( uuid: String ): Field?
     {
         var field: Field? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_UUID} = '$field_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -138,5 +150,19 @@ class FieldDAO(private var dao: DAO)
 
         db.delete(DAO.TABLE_FIELD, whereClause, args)
         db.close()
+    }
+
+    //--------------------------------------------------------------------------
+    fun deleteOrphans()
+    {
+        val fields = getFields()
+
+        for (field in fields)
+        {
+            if (DAO.studyDAO.doesNotExist( field.study_uuid ))
+            {
+                deleteField( field )
+            }
+        }
     }
 }

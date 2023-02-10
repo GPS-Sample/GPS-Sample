@@ -43,6 +43,18 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun exists( uuid: String ) : Boolean
+    {
+        return getConfig( uuid ) != null
+    }
+
+    //--------------------------------------------------------------------------
+    fun doesNotExist( uuid: String ) : Boolean
+    {
+        return !exists( uuid )
+    }
+
+    //--------------------------------------------------------------------------
     private fun createConfigModel( cursor: Cursor ) : Config
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))

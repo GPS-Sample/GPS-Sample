@@ -33,8 +33,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     private val binding get() = _binding!!
     private lateinit var createFilterAdapter: CreateFilterAdapter
     private lateinit var study_uuid: String
-    private lateinit var filter_uuid: String
-    private var filter: Filter? = null
+    private lateinit var filter: Filter
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -73,38 +72,29 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
             return
         }
 
-//        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
-//            this.study = study
-//        }
-//
-//        if (!this::study.isInitialized)
-//        {
-//            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
-//            return
-//        }
-
         // optional: filterId
-        filter_uuid = arguments!!.getString( Key.kFilter_uuid.toString(), "");
+        val filter_uuid = arguments!!.getString( Key.kFilter_uuid.toString(), "");
 
         if (filter_uuid.isNotEmpty())
         {
-            filter = DAO.filterDAO.getFilter( filter_uuid )
+            DAO.filterDAO.getFilter( filter_uuid )?.let {
+                this.filter = it
+            }
 
-            // TODO: Null Check
+            if (!this::filter.isInitialized)
+            {
+                Toast.makeText(activity!!.applicationContext, "Fatal! Filter with id $filter_uuid not found.", Toast.LENGTH_SHORT).show()
+                return
+            }
         }
 
-//        if (!this::filter.isInitialized)
-//        {
-//            filter = Filter( UUID.randomUUID().toString(), study_uuid, "" )
-//            DAO.filterDAO.createFilter( filter )
-//        }
-//        else
-//        {
-//            binding.nameEditText.setText( filter.name )
-//        }
-
-        filter?.let {
-            binding.nameEditText.setText( it.name )
+        if (!this::filter.isInitialized)
+        {
+            filter = Filter( UUID.randomUUID().toString(), study_uuid, "" )
+        }
+        else
+        {
+            binding.nameEditText.setText( filter.name )
         }
 
         createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
@@ -131,7 +121,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
                 return@setOnClickListener
             }
 
-            val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter_uuid )
+            val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
 
             if (filterRules.isEmpty())
             {
@@ -139,15 +129,16 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
                 return@setOnClickListener
             }
 
-            if (filter == null)
+            filter.name = binding.nameEditText.text.toString()
+
+            if (DAO.filterDAO.exists( filter.uuid ))
             {
-                filter = Filter( UUID.randomUUID().toString(), study_uuid, "" )
-                DAO.filterDAO.createFilter( filter!! )
+                DAO.filterDAO.updateFilter( filter )
             }
-
-            filter!!.name = binding.nameEditText.text.toString()
-
-            DAO.filterDAO.updateFilter( filter!! )
+            else
+            {
+                DAO.filterDAO.createFilter( filter )
+            }
 
             findNavController().popBackStack()
         }
@@ -157,18 +148,15 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     {
         super.onResume()
 
-        if (this::study_uuid.isInitialized && this::filter_uuid.isInitialized)
-        {
-            val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter_uuid )
-            createFilterAdapter.updateFilterRules(filterRules)
-        }
+        val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+        createFilterAdapter.updateFilterRules(filterRules)
     }
 
     private var selectedFilterRule: FilterRule? = null
 
     fun shouldEditFilterRule( filterRule: FilterRule )
     {
-        SelectRuleDialog( activity!!, study_uuid, filter_uuid, filterRule,this )
+        SelectRuleDialog( activity!!, study_uuid, filter.uuid, filterRule,this )
     }
 
     fun shouldDeleteFilterRule( filterRule: FilterRule )
@@ -185,14 +173,14 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     {
         selectedFilterRule?.let {
             DAO.filterRuleDAO.deleteFilterRule( it )
-            val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter_uuid )
+            val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
             createFilterAdapter.updateFilterRules( filterRules )
         }
     }
 
     override fun didDismissSelectRuleDialog()
     {
-        val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter_uuid )
+        val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
 
         createFilterAdapter.updateFilterRules( filterRules )
     }

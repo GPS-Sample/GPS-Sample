@@ -43,11 +43,23 @@ class RuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getRule( rule_uuid: String ) : Rule?
+    fun exists( uuid: String ) : Boolean
+    {
+        return getRule( uuid ) != null
+    }
+
+    //--------------------------------------------------------------------------
+    fun doesNotExist( uuid: String ) : Boolean
+    {
+        return !exists( uuid )
+    }
+
+    //--------------------------------------------------------------------------
+    fun getRule( uuid: String ) : Rule?
     {
         var rule: Rule? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = '$rule_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -123,5 +135,19 @@ class RuleDAO(private var dao: DAO)
 
         db.delete(DAO.TABLE_RULE, whereClause, args)
         db.close()
+    }
+
+    //--------------------------------------------------------------------------
+    fun deleteOrphans()
+    {
+        val rules = getRules()
+
+        for (rule in rules)
+        {
+            if (DAO.studyDAO.doesNotExist( rule.study_uuid ) or DAO.fieldDAO.doesNotExist( rule.field_uuid ))
+            {
+                deleteRule( rule )
+            }
+        }
     }
 }

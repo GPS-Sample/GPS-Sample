@@ -41,11 +41,23 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFilter( filter_uuid: String ) : Filter?
+    fun exists( uuid: String ) : Boolean
+    {
+        return getFilter( uuid ) != null
+    }
+
+    //--------------------------------------------------------------------------
+    fun doesNotExist( uuid: String ) : Boolean
+    {
+        return !exists( uuid )
+    }
+
+    //--------------------------------------------------------------------------
+    fun getFilter( uuid: String ) : Filter?
     {
         var filter: Filter? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '$filter_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -118,5 +130,19 @@ class FilterDAO(private var dao: DAO)
 
         db.delete(DAO.TABLE_FILTER, whereClause, args)
         db.close()
+    }
+
+    //--------------------------------------------------------------------------
+    fun deleteOrphans()
+    {
+        val filters = getFilters()
+
+        for (filter in filters)
+        {
+            if (DAO.studyDAO.doesNotExist( filter.study_uuid ))
+            {
+                deleteFilter( filter )
+            }
+        }
     }
 }

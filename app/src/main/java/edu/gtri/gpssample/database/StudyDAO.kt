@@ -47,6 +47,12 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun doesNotExist( uuid: String ) : Boolean
+    {
+        return !exists( uuid )
+    }
+
+    //--------------------------------------------------------------------------
     fun getStudy( uuid: String ): Study?
     {
         var study: Study? = null
@@ -117,25 +123,6 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getValidStudies( config_uuid: String ): List<Study>
-    {
-        val studies = ArrayList<Study>()
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_STUDY} WHERE ${DAO.COLUMN_STUDY_CONFIG_UUID} = '$config_uuid'"
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            studies.add( createStudy( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return studies
-    }
-
-    //--------------------------------------------------------------------------
     fun deleteStudy( study: Study )
     {
         val fields = DAO.fieldDAO.getFields( study.uuid )
@@ -151,5 +138,19 @@ class StudyDAO(private var dao: DAO)
 
         db.delete(DAO.TABLE_STUDY, whereClause, args)
         db.close()
+    }
+
+    //--------------------------------------------------------------------------
+    fun deleteOrphans()
+    {
+        val studies = getStudies()
+
+        for (study in studies)
+        {
+            if (DAO.configDAO.doesNotExist( study.config_uuid ))
+            {
+                deleteStudy( study )
+            }
+        }
     }
 }

@@ -39,7 +39,7 @@
             android:layout_height="50dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:hint="@string/enter_rule_name" />
+            android:hint="@string/enter_filter_name" />
 
         <TextView
             android:layout_marginTop="20dp"

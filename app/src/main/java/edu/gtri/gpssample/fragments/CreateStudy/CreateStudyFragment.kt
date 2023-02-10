@@ -75,7 +75,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         // optional: studyId
         val study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
 
-        if (!study_uuid.isEmpty())
+        if (study_uuid.isNotEmpty())
         {
             DAO.studyDAO.getStudy( study_uuid )?.let { study ->
                 this.study = study
@@ -284,13 +284,13 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         study.name = binding.studyNameEditText.text.toString()
         study.samplingMethod = binding.samplingMethodSpinner.selectedItem as String
 
-        if (!DAO.studyDAO.exists( study.uuid ))
+        if (DAO.studyDAO.exists( study.uuid ))
         {
-            DAO.studyDAO.createStudy( study )
+            DAO.studyDAO.updateStudy( study )
         }
         else
         {
-            DAO.studyDAO.updateStudy( study )
+            DAO.studyDAO.createStudy( study )
         }
     }
 

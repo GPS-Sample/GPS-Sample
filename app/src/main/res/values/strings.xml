@@ -162,5 +162,6 @@
     <string name="rule">Rule</string>
     <string name="connector">Connector</string>
     <string name="sampling_method">Sampling Method</string>
+    <string name="enter_filter_name">Enter Filter Name</string>
 
 </resources>

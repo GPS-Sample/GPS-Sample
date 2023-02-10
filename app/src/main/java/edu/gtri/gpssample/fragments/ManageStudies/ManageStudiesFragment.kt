@@ -96,7 +96,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         super.onResume()
 
-        val studies = DAO.studyDAO.getValidStudies( config.uuid )
+        val studies = DAO.studyDAO.getStudies( config.uuid )
 
         if (studies.isEmpty())
         {

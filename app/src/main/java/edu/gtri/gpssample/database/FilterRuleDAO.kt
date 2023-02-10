@@ -43,11 +43,23 @@ class FilterRuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFilterRule( filterRule_uuid: String ) : FilterRule?
+    fun exists( uuid: String ) : Boolean
+    {
+        return getFilterRule( uuid ) != null
+    }
+
+    //--------------------------------------------------------------------------
+    fun doesNotExist( uuid: String ) : Boolean
+    {
+        return !exists( uuid )
+    }
+
+    //--------------------------------------------------------------------------
+    fun getFilterRule( uuid: String ) : FilterRule?
     {
         var filterRule: FilterRule? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_UUID} = '$filterRule_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -127,18 +139,16 @@ class FilterRuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun deleteFilterRules( study_uuid: String, filter_uuid: String )
+    fun deleteOrphans()
     {
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_FILTERRULE_STUDY_UUID} = '$study_uuid' AND ${DAO.COLUMN_FILTERRULE_FILTER_UUID} = '$filter_uuid'"
-        val cursor = db.rawQuery(query, null)
+        val filterRules = getFilterRules()
 
-        while (cursor.moveToNext())
+        for (filterRule in filterRules)
         {
-            deleteFilterRule( createFilterRuleModel( cursor ))
+            if (DAO.studyDAO.doesNotExist( filterRule.study_uuid ) or DAO.filterDAO.doesNotExist( filterRule.filter_uuid ))
+            {
+                deleteFilterRule( filterRule )
+            }
         }
-
-        cursor.close()
-        db.close()
     }
 }
