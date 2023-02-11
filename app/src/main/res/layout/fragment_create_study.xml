@@ -53,6 +53,7 @@
     </FrameLayout>
 
     <TextView
+        android:id="@+id/sample_size_text_view"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_marginTop="20dp"

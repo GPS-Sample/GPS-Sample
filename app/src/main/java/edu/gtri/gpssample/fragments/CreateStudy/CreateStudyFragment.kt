@@ -156,6 +156,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         binding.sampleSize1Layout.visibility = View.GONE
                         binding.sampleSize2Layout.visibility = View.GONE
                         binding.sampleSize3Layout.visibility = View.GONE
+                        binding.sampleSizeTextView.visibility = View.GONE
                     }
                 }
             }
