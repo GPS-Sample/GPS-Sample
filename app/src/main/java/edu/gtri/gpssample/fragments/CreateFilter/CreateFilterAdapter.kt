@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
@@ -41,10 +42,9 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
-        val ruleTextView: TextView = itemView.findViewById(R.id.rule_text_view);
-        val connectorTextView: TextView = itemView.findViewById(R.id.connector_text_view);
-        val editButton: Button = itemView.findViewById(R.id.edit_button);
-        val deleteButton: Button = itemView.findViewById(R.id.delete_button);
+        val titleTextView: TextView = itemView.findViewById(R.id.title_text_view);
+        val editButton: ImageView = itemView.findViewById(R.id.edit_image_view);
+        val deleteButton: ImageView = itemView.findViewById(R.id.delete_image_view);
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
@@ -55,18 +55,13 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
 
         val rule = DAO.ruleDAO.getRule( filterRule.rule_uuid )
 
-        if (rule != null)
-        {
-            holder.ruleTextView.setText( rule.name )
-        }
-
         if (position == 0)
         {
-            holder.connectorTextView.visibility = View.GONE
+            holder.titleTextView.setText( rule!!.name )
         }
         else
         {
-            holder.connectorTextView.setText( filterRule.connector )
+            holder.titleTextView.setText( filterRule!!.connector + " " + rule!!.name )
         }
 
         holder.editButton.setOnClickListener {
