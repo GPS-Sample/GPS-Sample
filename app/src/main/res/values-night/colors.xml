@@ -10,5 +10,6 @@
     <color name="blue">#FF0000FF</color>
     <color name="primary">#FF0360A9</color>
     <color name="primary_textcolor">#FFFFFFFF</color>
+    <color name="secondary_textcolor">#FF0360A9</color>
     <color name="light_gray">#CCCCCC</color>
 </resources>

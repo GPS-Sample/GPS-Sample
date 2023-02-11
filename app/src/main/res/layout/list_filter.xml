@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="20dp"
-    android:background="@drawable/background_rounded_primary_frame_clear_fill"
+    android:background="@drawable/background_rounded_primary_frame_white_fill"
     tools:context=".fragments.CreateField.CreateFieldFragment">
 
     <FrameLayout
@@ -48,7 +48,7 @@
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="AND"
-        android:textColor="@color/primary_textcolor"
+        android:textColor="@color/secondary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:text="At least 1 child less than 5"
-        android:textColor="@color/primary_textcolor"
+        android:textColor="@color/secondary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
 
