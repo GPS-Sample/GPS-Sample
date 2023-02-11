@@ -71,10 +71,11 @@
 
         <EditText
             android:id="@+id/sample_size_1_edit_text"
-            android:inputType="number"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="20dp"
+            android:gravity="center"
+            android:inputType="number"/>
 
         <TextView
             android:id="@+id/sample_size_1_text_view"
@@ -84,7 +85,6 @@
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:lines="2"
             android:text="# of Households in all clusters"
             android:textColor="@color/primary_textcolor"
             android:textSize="15sp" />
@@ -98,6 +98,7 @@
 
         <EditText
             android:id="@+id/sample_size_2_edit_text"
+            android:gravity="center"
             android:inputType="number"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -111,7 +112,6 @@
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:lines="2"
             android:text="% of all Households in all clusters"
             android:textColor="@color/primary_textcolor"
             android:textSize="15sp" />
@@ -125,6 +125,7 @@
 
         <EditText
             android:id="@+id/sample_size_3_edit_text"
+            android:gravity="center"
             android:inputType="number"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -138,7 +139,6 @@
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:lines="2"
             android:text="% of total population in all clusters"
             android:textColor="@color/primary_textcolor"
             android:textSize="15sp" />

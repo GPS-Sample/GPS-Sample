@@ -35,7 +35,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     private lateinit var createFilterAdapter: CreateFilterAdapter
     private lateinit var study_uuid: String
     private lateinit var filter: Filter
-    private lateinit var study: Study
+    private var sampleSizeIsVisible = true
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -83,18 +83,15 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: samplingMethod.", Toast.LENGTH_SHORT).show()
             return
         }
-        else
+
+        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
+
+        if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
         {
-            Log.d( "xxx", samplingMethod )
-
-            val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
-
-            if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
-            {
-                binding.sampleSize1Layout.visibility = View.GONE
-                binding.sampleSize2Layout.visibility = View.GONE
-                binding.sampleSize3Layout.visibility = View.GONE
-            }
+            sampleSizeIsVisible = false
+            binding.sampleSize1Layout.visibility = View.GONE
+            binding.sampleSize2Layout.visibility = View.GONE
+            binding.sampleSize3Layout.visibility = View.GONE
         }
 
         // optional: filterId
@@ -120,6 +117,19 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         else
         {
             binding.nameEditText.setText( filter.name )
+
+            if (sampleSizeIsVisible)
+            {
+                if (filter.sampleSize > 0)
+                {
+                    when(filter.sampleSizeIndex)
+                    {
+                        0 -> binding.sampleSize1EditText.setText(filter.sampleSize.toString())
+                        1 -> binding.sampleSize2EditText.setText(filter.sampleSize.toString())
+                        2 -> binding.sampleSize3EditText.setText(filter.sampleSize.toString())
+                    }
+                }
+            }
         }
 
         createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
@@ -132,6 +142,21 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
 
         binding.addRuleButton.setOnClickListener {
             SelectRuleDialog( activity!!, study_uuid, filter!!.uuid, null, this )
+        }
+
+        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+            binding.sampleSize2EditText.setText("")
+            binding.sampleSize3EditText.setText("")
+        }
+
+        binding.sampleSize2EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+            binding.sampleSize1EditText.setText("")
+            binding.sampleSize3EditText.setText("")
+        }
+
+        binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+            binding.sampleSize1EditText.setText("")
+            binding.sampleSize2EditText.setText("")
         }
 
         binding.cancelButton.setOnClickListener {
@@ -152,6 +177,34 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
             {
                 Toast.makeText(activity!!.applicationContext, "You must add at least one rule", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
+            }
+
+            if (sampleSizeIsVisible)
+            {
+                val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
+                val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
+                val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
+
+                if (sample1Size == null && sample2Size == null && sample3Size == null)
+                {
+                    Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                sample1Size?.let { sampleSize ->
+                    filter.sampleSize = sampleSize
+                    filter.sampleSizeIndex = 0
+                }
+
+                sample2Size?.let { sampleSize ->
+                    filter.sampleSize = sampleSize
+                    filter.sampleSizeIndex = 1
+                }
+
+                sample3Size?.let { sampleSize ->
+                    filter.sampleSize = sampleSize
+                    filter.sampleSizeIndex = 2
+                }
             }
 
             filter.name = binding.nameEditText.text.toString()

@@ -112,6 +112,16 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }
         }
 
+        if (study.sampleSize > 0)
+        {
+            when(study.sampleSizeIndex)
+            {
+                0 -> binding.sampleSize1EditText.setText(study.sampleSize.toString())
+                1 -> binding.sampleSize2EditText.setText(study.sampleSize.toString())
+                2 -> binding.sampleSize3EditText.setText(study.sampleSize.toString())
+            }
+        }
+
         binding.studyNameEditText.setText( study.name )
 
         createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
@@ -128,8 +138,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
-                Log.d( "xxx", "onItemSelected" )
-
                 when( position )
                 {
                     0 -> { // simple random sampling
@@ -157,13 +165,27 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }
         }
 
+        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+            binding.sampleSize2EditText.setText("")
+            binding.sampleSize3EditText.setText("")
+        }
+
+        binding.sampleSize2EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+            binding.sampleSize1EditText.setText("")
+            binding.sampleSize3EditText.setText("")
+        }
+
+        binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+            binding.sampleSize1EditText.setText("")
+            binding.sampleSize2EditText.setText("")
+        }
+
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
             updateStudy()
-            findNavController().popBackStack()
         }
     }
 
@@ -318,7 +340,40 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     fun updateStudy()
     {
-        study.name = binding.studyNameEditText.text.toString()
+        val name = binding.studyNameEditText.text.toString()
+
+        if (name.length == 0)
+        {
+            Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
+        val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
+        val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
+
+        if (sample1Size == null && sample2Size == null && sample3Size == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        sample1Size?.let { sampleSize ->
+            study.sampleSize = sampleSize
+            study.sampleSizeIndex = 0
+        }
+
+        sample2Size?.let { sampleSize ->
+            study.sampleSize = sampleSize
+            study.sampleSizeIndex = 1
+        }
+
+        sample3Size?.let { sampleSize ->
+            study.sampleSize = sampleSize
+            study.sampleSizeIndex = 2
+        }
+
+        study.name = name
         study.samplingMethod = binding.samplingMethodSpinner.selectedItem as String
 
         if (DAO.studyDAO.exists( study.uuid ))
@@ -329,6 +384,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             DAO.studyDAO.createStudy( study )
         }
+
+        findNavController().popBackStack()
     }
 
     override fun didAnswerNo()
