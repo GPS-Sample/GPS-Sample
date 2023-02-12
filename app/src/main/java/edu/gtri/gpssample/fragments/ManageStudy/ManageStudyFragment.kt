@@ -85,6 +85,8 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
+        binding.progressBar.visibility = View.VISIBLE
+
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
@@ -152,6 +154,8 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
                 {
                     super.onStarted(reservation)
+
+                    binding.progressBar.visibility = View.GONE
 
                     binding.imageView.visibility = View.VISIBLE
                     binding.usersOnlineTextView.visibility = View.VISIBLE
