@@ -41,7 +41,7 @@
                 android:layout_marginEnd="40dp"
                 android:gravity="center"
                 android:text="@string/admin"
-                android:textSize="17sp" />
+                android:textSize="20sp" />
 
             <RadioButton
                 android:id="@+id/supervisor_button"
@@ -50,7 +50,7 @@
                 android:layout_marginEnd="40dp"
                 android:gravity="center"
                 android:text="@string/supervisor"
-                android:textSize="17sp" />
+                android:textSize="20sp" />
 
             <RadioButton
                 android:id="@+id/data_collector_button"
@@ -59,7 +59,7 @@
                 android:layout_marginEnd="40dp"
                 android:gravity="center"
                 android:text="@string/data_collector"
-                android:textSize="17sp" />
+                android:textSize="20sp" />
         </RadioGroup>
 
         <Button

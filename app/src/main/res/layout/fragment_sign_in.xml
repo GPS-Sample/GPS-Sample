@@ -20,7 +20,7 @@
             android:gravity="center_vertical"
             android:text="@string/admin_sign_in"
             android:textColor="@color/primary_textcolor"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
 
         <EditText

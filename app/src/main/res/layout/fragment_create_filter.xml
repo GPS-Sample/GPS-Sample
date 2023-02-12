@@ -20,7 +20,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/filter_name"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textColor="@color/primary_textcolor" />
 
         <EditText
@@ -39,7 +39,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/filters"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textColor="@color/primary_textcolor" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -68,7 +68,7 @@
             android:layout_marginEnd="20dp"
             android:gravity="center_vertical"
             android:text="@string/sample_size"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:textColor="@color/primary_textcolor" />
 
         <LinearLayout

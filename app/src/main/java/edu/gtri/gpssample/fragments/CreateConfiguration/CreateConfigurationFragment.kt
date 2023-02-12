@@ -77,7 +77,6 @@ class CreateConfigurationFragment : Fragment()
             }
 
         config?.let { config ->
-            binding.titleTextView.text = "Edit Configuration"
             binding.configNameEditText.setText( config.name )
             binding.minGpsPrecisionEditText.setText( config.minGpsPrecision.toString())
 

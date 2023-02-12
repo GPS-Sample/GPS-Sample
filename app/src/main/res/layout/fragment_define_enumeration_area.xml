@@ -20,7 +20,7 @@
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/define_enumeration_area"
         android:textColor="@color/primary"
-        android:textSize="20sp"
+        android:textSize="17sp"
         android:textStyle="bold" />
 
     <Button

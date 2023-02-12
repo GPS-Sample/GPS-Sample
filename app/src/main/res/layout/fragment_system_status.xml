@@ -17,7 +17,7 @@
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/admin"
         android:textColor="@color/primary_textcolor"
-        android:textSize="20sp"
+        android:textSize="17sp"
         android:textStyle="bold" />
 
     <LinearLayout

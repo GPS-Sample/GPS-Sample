@@ -16,7 +16,7 @@
         android:layout_marginEnd="20dp"
         android:gravity="center_vertical"
         android:text="@string/study_name"
-        android:textSize="20sp"
+        android:textSize="17sp"
         android:textColor="@color/primary_textcolor" />
 
     <EditText
@@ -35,7 +35,7 @@
         android:layout_marginStart="20dp"
         android:gravity="center_vertical"
         android:text="@string/sampling_method"
-        android:textSize="20sp"
+        android:textSize="17sp"
         android:textColor="@color/primary_textcolor" />
 
     <FrameLayout
@@ -61,7 +61,7 @@
         android:layout_marginEnd="20dp"
         android:gravity="center_vertical"
         android:text="@string/sample_size"
-        android:textSize="20sp"
+        android:textSize="17sp"
         android:textColor="@color/primary_textcolor" />
 
     <LinearLayout

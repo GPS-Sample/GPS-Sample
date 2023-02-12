@@ -25,7 +25,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/sign_up"
                 android:textColor="@color/primary_textcolor"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -34,6 +34,7 @@
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/name"
+                android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
 
             <EditText
@@ -52,6 +53,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/pin"
+                android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
 
             <EditText
@@ -70,6 +72,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/pin"
+                android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
 
             <EditText
@@ -88,6 +91,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/forgot_pin_question"
+                android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
 
             <FrameLayout
@@ -110,6 +114,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/forgot_pin_answer"
+                android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
 
             <EditText

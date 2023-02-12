@@ -18,23 +18,14 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/title_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:layout_margin="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/create_config"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/config_name"
-                android:textColor="@color/black" />
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
                 android:id="@+id/config_name_edit_text"
@@ -52,7 +43,8 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/preferred_units"
-                android:textColor="@color/black" />
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -74,7 +66,8 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/date_format"
-                android:textColor="@color/black" />
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -96,7 +89,8 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/time_format"
-                android:textColor="@color/black" />
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -118,7 +112,8 @@
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/min_gps_precision"
-                android:textColor="@color/black" />
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
                 android:id="@+id/min_gps_precision_edit_text"

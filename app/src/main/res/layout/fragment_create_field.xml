@@ -25,7 +25,7 @@
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/field_name"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
 
             <EditText
@@ -44,7 +44,7 @@
                 android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
                 android:text="@string/field_type"
-                android:textSize="20sp"
+                android:textSize="17sp"
                 android:textColor="@color/primary_textcolor" />
 
             <FrameLayout
