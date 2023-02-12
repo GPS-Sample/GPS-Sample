@@ -286,7 +286,6 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             setHasOptionsMenu( true )
 
-            binding.titleTextView.text = "Field ${field.name}"
             binding.fieldNameEditText.setText( field.name )
 
             when( field.type )

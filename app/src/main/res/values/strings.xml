@@ -164,5 +164,7 @@
     <string name="sampling_method">Sampling Method</string>
     <string name="enter_filter_name">Enter Filter Name</string>
     <string name="sample_size">Sample Size</string>
+    <string name="filter_name">Filter Name</string>
+    <string name="rule_name">Rule Name</string>
 
 </resources>

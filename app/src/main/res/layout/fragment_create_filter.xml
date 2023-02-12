@@ -8,17 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".fragments.CreateRule.CreateRuleFragment">
 
-    <TextView
-        android:id="@+id/title_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_margin="20dp"
-        android:gravity="center_vertical"
-        android:text="@string/create_filter"
-        android:textColor="@color/primary_textcolor"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,9 +16,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="30dp"
+            android:layout_marginTop="20dp"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="@string/name"
+            android:text="@string/filter_name"
+            android:textSize="20sp"
             android:textColor="@color/primary_textcolor" />
 
         <EditText
@@ -48,6 +39,7 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/filters"
+            android:textSize="20sp"
             android:textColor="@color/primary_textcolor" />
 
         <androidx.recyclerview.widget.RecyclerView
