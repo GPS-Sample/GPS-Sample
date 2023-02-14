@@ -5,8 +5,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+// uuid is either the source or destination, based on whether the command is a command or response
+
 @Serializable
-data class NetworkCommand( var command: Int, var uuid: String, var message: String )
+data class NetworkCommand( var command: Int, var uuid: String, val parm1: String, val parm2: String, var message: String )
 {
     fun pack() : String
     {
@@ -26,6 +28,8 @@ data class NetworkCommand( var command: Int, var uuid: String, var message: Stri
         const val NetworkRequestRulesResponse       = 1009
         const val NetworkRequestFiltersCommand      = 1010
         const val NetworkRequestFiltersResponse     = 1011
+        const val NetworkRequestFilterRulesCommand  = 1012
+        const val NetworkRequestFilterRulesResponse = 1013
 
         fun unpack( byteArray: ByteArray, length: Int ) : NetworkCommand
         {

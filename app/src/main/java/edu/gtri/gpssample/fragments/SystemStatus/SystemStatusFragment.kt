@@ -117,7 +117,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user.uuid, "" )
+            if (config_uuid.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user.uuid, config_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             DAO.configDAO.deleteAllConfigs()
@@ -147,7 +153,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyCommand, user.uuid, "" )
+            if (study_uuid.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyCommand, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.studyCheckBox.isChecked = false
@@ -177,7 +189,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsCommand, user.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsCommand, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.fieldsCheckBox.isChecked = false
@@ -207,7 +219,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestRulesCommand, user.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestRulesCommand, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.rulesCheckBox.isChecked = false
@@ -237,10 +249,10 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFiltersCommand, user.uuid, "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFiltersCommand, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
-            binding.rulesCheckBox.isChecked = false
+            binding.filtersCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
@@ -258,30 +270,26 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         val configs = DAO.configDAO.getConfigs()
 
-        if (configs.isEmpty())
-        {
-            config_uuid = ""
-            study_uuid = ""
-        }
-        else
+        if (configs.isNotEmpty())
         {
             binding.configCheckBox.isChecked = true
 
             val studies = DAO.studyDAO.getStudies()
 
-            if (studies.isEmpty())
-            {
-                study_uuid = ""
-            }
-            else
+            if (studies.isNotEmpty())
             {
                 binding.studyCheckBox.isChecked = true
 
-                val fields = DAO.fieldDAO.getFields(studies[0].uuid)
-                if (fields.isNotEmpty())
-                {
-                    binding.fieldsCheckBox.isChecked = true
-                }
+                val study = studies[0]
+
+                val fields = DAO.fieldDAO.getFields(study.uuid)
+                binding.fieldsCheckBox.isChecked = fields.isNotEmpty()
+
+                val rules = DAO.ruleDAO.getRules(study.uuid)
+                binding.rulesCheckBox.isChecked = rules.isNotEmpty()
+
+                val filters = DAO.filterDAO.getFilters(study.uuid)
+                binding.filtersCheckBox.isChecked = filters.isNotEmpty()
             }
         }
     }
@@ -421,7 +429,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 binding.wifiCheckBox.isChecked = true
 
                 user.isOnline = true
-                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, user.uuid, user.pack() )
+                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, user.uuid, "", "", user.pack() )
 
                 udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
             }
@@ -526,10 +534,27 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     for (filter in networkFilters.filters)
                     {
                         DAO.filterDAO.createFilter( filter )
+
+                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFilterRulesCommand, user.uuid, study_uuid, filter.uuid, "" )
+                        val networkCommandMessage = Json.encodeToString( networkCommand )
+
+                        lifecycleScope.launch {
+                            udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                        }
                     }
 
                     activity!!.runOnUiThread {
-                        binding.rulesCheckBox.isChecked = true
+                        binding.filtersCheckBox.isChecked = true
+                    }
+                }
+
+                NetworkCommand.NetworkRequestFilterRulesResponse ->
+                {
+                    val networkFilterRules = NetworkFilterRules.unpack(networkCommand.message)
+
+                    for (filterRule in networkFilterRules.filterRules)
+                    {
+                        DAO.filterRuleDAO.createFilterRule( filterRule )
                     }
                 }
             }

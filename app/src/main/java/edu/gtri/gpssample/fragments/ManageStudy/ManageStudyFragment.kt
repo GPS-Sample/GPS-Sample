@@ -303,46 +303,83 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestConfigCommand -> {
                 lifecycleScope.launch {
-                    val config = DAO.configDAO.getConfig( study.config_uuid )
-                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, networkCommand.uuid, config!!.pack() )
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    DAO.configDAO.getConfig( networkCommand.parm1 )?.let {
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestConfigResponse, networkCommand.uuid, "", "", it.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    } ?: Toast.makeText( activity!!.applicationContext, "config<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
                 }
             }
 
             NetworkCommand.NetworkRequestStudyCommand -> {
                 lifecycleScope.launch {
-                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, networkCommand.uuid, study.pack())
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    DAO.studyDAO.getStudy( networkCommand.parm1 )?.let {
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestStudyResponse, networkCommand.uuid, "", "", it.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    } ?: Toast.makeText( activity!!.applicationContext, "study<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
                 }
             }
 
             NetworkCommand.NetworkRequestFieldsCommand -> {
                 lifecycleScope.launch {
-                    val fields = DAO.fieldDAO.getFields( study.uuid )
-                    val networkFields = NetworkFields( fields )
-
-                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkFields.pack())
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    val fields = DAO.fieldDAO.getFields( networkCommand.parm1 )
+                    if (fields.isEmpty())
+                    {
+                        Toast.makeText( activity!!.applicationContext, "fields<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        val networkFields = NetworkFields( fields )
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, "", "", networkFields.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    }
                 }
             }
 
             NetworkCommand.NetworkRequestRulesCommand -> {
                 lifecycleScope.launch {
-                    val rules = DAO.ruleDAO.getRules( study.uuid )
-                    val networkRules = NetworkRules( rules )
-
-                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkRules.pack())
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    val rules = DAO.ruleDAO.getRules( networkCommand.parm1 )
+                    if (rules.isEmpty())
+                    {
+                        Toast.makeText( activity!!.applicationContext, "rules<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        val networkRules = NetworkRules( rules )
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestRulesResponse, networkCommand.uuid, "", "", networkRules.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    }
                 }
             }
 
             NetworkCommand.NetworkRequestFiltersCommand -> {
                 lifecycleScope.launch {
-                    val filters = DAO.filterDAO.getFilters( study.uuid )
-                    val networkFilters = NetworkFilters( filters )
+                    val filters = DAO.filterDAO.getFilters( networkCommand.parm1 )
+                    if (filters.isEmpty())
+                    {
+                        Toast.makeText( activity!!.applicationContext, "filters<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        val networkFilters = NetworkFilters( filters )
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFiltersResponse, networkCommand.uuid, "", "", networkFilters.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    }
+                }
+            }
 
-                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkFilters.pack())
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+            NetworkCommand.NetworkRequestFilterRulesCommand -> {
+                lifecycleScope.launch {
+                    val filterRules = DAO.filterRuleDAO.getFilterRules( networkCommand.parm1, networkCommand.parm2 )
+                    if (filterRules.isEmpty())
+                    {
+                        Toast.makeText( activity!!.applicationContext, "filterRule<${networkCommand.parm2} not found.>", Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        val networkFilterRules = NetworkFilterRules( filterRules )
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFilterRulesResponse, networkCommand.uuid, "", "", networkFilterRules.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    }
                 }
             }
         }
