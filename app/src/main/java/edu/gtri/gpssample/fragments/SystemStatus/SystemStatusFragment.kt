@@ -124,7 +124,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestConfigCommand, user.uuid, config_uuid, "", "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkConfigRequest, user.uuid, config_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             DAO.configDAO.deleteAllConfigs()
@@ -160,7 +160,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestStudyCommand, user.uuid, study_uuid, "", "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkStudyRequest, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.studyCheckBox.isChecked = false
@@ -190,7 +190,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFieldsCommand, user.uuid, study_uuid, "", "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkFieldsRequest, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.fieldsCheckBox.isChecked = false
@@ -220,7 +220,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestRulesCommand, user.uuid, study_uuid, "", "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRulesRequest, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             binding.rulesCheckBox.isChecked = false
@@ -250,7 +250,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFiltersCommand, user.uuid, study_uuid, "", "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkFiltersRequest, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
             numFilterRules = 0
@@ -433,7 +433,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 binding.wifiCheckBox.isChecked = true
 
                 user.isOnline = true
-                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserCommand, user.uuid, "", "", user.pack() )
+                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserRequest, user.uuid, "", "", user.pack() )
 
                 udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
             }
@@ -477,7 +477,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         {
             when( networkCommand.command )
             {
-                NetworkCommand.NetworkRequestConfigResponse ->
+                NetworkCommand.NetworkConfigResponse ->
                 {
                     val config = Config.unpack( networkCommand.message )
 
@@ -490,7 +490,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }
 
-                NetworkCommand.NetworkRequestStudyResponse ->
+                NetworkCommand.NetworkStudyResponse ->
                 {
                     val study = Study.unpack( networkCommand.message )
 
@@ -503,7 +503,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }
 
-                NetworkCommand.NetworkRequestFieldsResponse ->
+                NetworkCommand.NetworkFieldsResponse ->
                 {
                     val networkFields = NetworkFields.unpack(networkCommand.message)
 
@@ -517,7 +517,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }
 
-                NetworkCommand.NetworkRequestRulesResponse ->
+                NetworkCommand.NetworkRulesResponse ->
                 {
                     val networkRules = NetworkRules.unpack(networkCommand.message)
 
@@ -531,7 +531,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }
 
-                NetworkCommand.NetworkRequestFiltersResponse ->
+                NetworkCommand.NetworkFiltersResponse ->
                 {
                     val networkFilters = NetworkFilters.unpack(networkCommand.message)
 
@@ -542,7 +542,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                             DAO.filterDAO.createFilter( filter )
                         }
 
-                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFilterRulesCommand, user.uuid, study_uuid, "", "" )
+                        val networkCommand = NetworkCommand( NetworkCommand.NetworkFilterRulesRequest, user.uuid, study_uuid, "", "" )
                         val networkCommandMessage = Json.encodeToString( networkCommand )
 
                         lifecycleScope.launch {
@@ -551,7 +551,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }
 
-                NetworkCommand.NetworkRequestFilterRulesResponse ->
+                NetworkCommand.NetworkFilterRulesResponse ->
                 {
                     val networkFilterRules = NetworkFilterRules.unpack(networkCommand.message)
 
