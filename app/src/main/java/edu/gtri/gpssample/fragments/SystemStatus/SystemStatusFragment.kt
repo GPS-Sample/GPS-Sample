@@ -125,7 +125,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.configCheckBox.isChecked = false
             binding.studyCheckBox.isChecked = false
             binding.fieldsCheckBox.isChecked = false
-            binding.shapeFilesCheckBox.isChecked = false
+            binding.rulesCheckBox.isChecked = false
+            binding.fieldsCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
@@ -186,11 +187,60 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        binding.shapeFilesImageButton.setOnClickListener {
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileCommand, user.uuid, "" )
+        binding.rulesImageButton.setOnClickListener {
+
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (config_uuid.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (study_uuid.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestRulesCommand, user.uuid, "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
-            binding.shapeFilesCheckBox.isChecked = false
+            binding.rulesCheckBox.isChecked = false
+
+            lifecycleScope.launch {
+                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+
+        binding.filtersImageButton.setOnClickListener {
+
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (config_uuid.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (study_uuid.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFiltersCommand, user.uuid, "" )
+            val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.rulesCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
@@ -419,6 +469,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 {
                     val config = Config.unpack( networkCommand.message )
 
+                    config_uuid = config.uuid
+
                     DAO.configDAO.createConfig( config )
 
                     activity!!.runOnUiThread {
@@ -429,6 +481,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 NetworkCommand.NetworkRequestStudyResponse ->
                 {
                     val study = Study.unpack( networkCommand.message )
+
+                    study_uuid = study.uuid
 
                     DAO.studyDAO.createStudy( study )
 
@@ -451,10 +505,31 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }
 
-                NetworkCommand.NetworkRequestShapeFileResponse ->
+                NetworkCommand.NetworkRequestRulesResponse ->
                 {
+                    val networkRules = NetworkRules.unpack(networkCommand.message)
+
+                    for (rule in networkRules.rules)
+                    {
+                        DAO.ruleDAO.createRule( rule )
+                    }
+
                     activity!!.runOnUiThread {
-                        binding.shapeFilesCheckBox.isChecked = true
+                        binding.rulesCheckBox.isChecked = true
+                    }
+                }
+
+                NetworkCommand.NetworkRequestFiltersResponse ->
+                {
+                    val networkFilters = NetworkFilters.unpack(networkCommand.message)
+
+                    for (filter in networkFilters.filters)
+                    {
+                        DAO.filterDAO.createFilter( filter )
+                    }
+
+                    activity!!.runOnUiThread {
+                        binding.rulesCheckBox.isChecked = true
                     }
                 }
             }

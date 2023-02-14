@@ -22,17 +22,14 @@ data class NetworkCommand( var command: Int, var uuid: String, var message: Stri
         const val NetworkRequestStudyResponse       = 1005
         const val NetworkRequestFieldsCommand       = 1006
         const val NetworkRequestFieldsResponse      = 1007
-        const val NetworkRequestShapeFileCommand    = 1008
-        const val NetworkRequestShapeFileResponse   = 1009
-
-        fun unpack( message: String ) : NetworkCommand
-        {
-            return Json.decodeFromString<NetworkCommand>( message )
-        }
+        const val NetworkRequestRulesCommand        = 1008
+        const val NetworkRequestRulesResponse       = 1009
+        const val NetworkRequestFiltersCommand      = 1010
+        const val NetworkRequestFiltersResponse     = 1011
 
         fun unpack( byteArray: ByteArray, length: Int ) : NetworkCommand
         {
-            return unpack( String( byteArray, 0, length ))
+            return Json.decodeFromString<NetworkCommand>( String( byteArray, 0, length ) )
         }
     }
 }

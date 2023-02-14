@@ -121,14 +121,37 @@
         android:layout_height="50dp">
 
         <CheckBox
-            android:id="@+id/shape_files_check_box"
+            android:id="@+id/rules_check_box"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Shape Files Received" />
+            android:text="Study Rules Received" />
 
         <ImageButton
-            android:id="@+id/shape_files_image_button"
+            android:id="@+id/rules_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/background_rounded_primary_frame_clear_fill"
+            android:src="@drawable/download_blue" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <CheckBox
+            android:id="@+id/filters_check_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Study Filters Received" />
+
+        <ImageButton
+            android:id="@+id/filters_image_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/background_rounded_primary_frame_clear_fill"

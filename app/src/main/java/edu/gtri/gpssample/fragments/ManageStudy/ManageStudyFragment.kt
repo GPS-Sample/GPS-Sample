@@ -326,11 +326,23 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 }
             }
 
-            NetworkCommand.NetworkRequestShapeFileCommand -> {
+            NetworkCommand.NetworkRequestRulesCommand -> {
                 lifecycleScope.launch {
-                    val networkResponseCommand = NetworkCommand( NetworkCommand.NetworkRequestShapeFileResponse, networkCommand.uuid, "" )
-                    val networkCommandMessage = Json.encodeToString( networkResponseCommand )
-                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkCommandMessage )
+                    val rules = DAO.ruleDAO.getRules( study.uuid )
+                    val networkRules = NetworkRules( rules )
+
+                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkRules.pack())
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                }
+            }
+
+            NetworkCommand.NetworkRequestFiltersCommand -> {
+                lifecycleScope.launch {
+                    val filters = DAO.filterDAO.getFilters( study.uuid )
+                    val networkFilters = NetworkFilters( filters )
+
+                    val networkResponse = NetworkCommand( NetworkCommand.NetworkRequestFieldsResponse, networkCommand.uuid, networkFilters.pack())
+                    udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                 }
             }
         }
