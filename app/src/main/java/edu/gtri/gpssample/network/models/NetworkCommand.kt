@@ -17,19 +17,26 @@ data class NetworkCommand( var command: Int, var uuid: String, val parm1: String
 
     companion object 
     {
-        const val NetworkUserCommand                = 1001
-        const val NetworkRequestConfigCommand       = 1002
-        const val NetworkRequestConfigResponse      = 1003
-        const val NetworkRequestStudyCommand        = 1004
-        const val NetworkRequestStudyResponse       = 1005
-        const val NetworkRequestFieldsCommand       = 1006
-        const val NetworkRequestFieldsResponse      = 1007
-        const val NetworkRequestRulesCommand        = 1008
-        const val NetworkRequestRulesResponse       = 1009
-        const val NetworkRequestFiltersCommand      = 1010
-        const val NetworkRequestFiltersResponse     = 1011
-        const val NetworkRequestFilterRulesCommand  = 1012
-        const val NetworkRequestFilterRulesResponse = 1013
+        const val NetworkUserCommand                    = 1001
+        const val NetworkUserCommandResponse            = 2001
+
+        const val NetworkRequestConfigCommand           = 1002
+        const val NetworkRequestConfigResponse          = 2002
+
+        const val NetworkRequestStudyCommand            = 1003
+        const val NetworkRequestStudyResponse           = 2003
+
+        const val NetworkRequestFieldsCommand           = 1004
+        const val NetworkRequestFieldsResponse          = 2004
+
+        const val NetworkRequestRulesCommand            = 1005
+        const val NetworkRequestRulesResponse           = 2005
+
+        const val NetworkRequestFiltersCommand          = 1006
+        const val NetworkRequestFiltersResponse         = 2006
+
+        const val NetworkRequestFilterRulesCommand      = 1007
+        const val NetworkRequestFilterRulesResponse     = 2007
 
         fun unpack( byteArray: ByteArray, length: Int ) : NetworkCommand
         {

@@ -286,6 +286,11 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         val networkCommand = NetworkCommand.unpack( datagramPacket.data, datagramPacket.length )
 
+        if (networkCommand.command != NetworkCommand.NetworkUserCommand)
+        {
+            Log.d( "xxx", "Received network command: " + networkCommand.command )
+        }
+
         when( networkCommand.command )
         {
             NetworkCommand.NetworkUserCommand -> {
@@ -369,10 +374,10 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             NetworkCommand.NetworkRequestFilterRulesCommand -> {
                 lifecycleScope.launch {
-                    val filterRules = DAO.filterRuleDAO.getFilterRules( networkCommand.parm1, networkCommand.parm2 )
+                    val filterRules = DAO.filterRuleDAO.getFilterRules( networkCommand.parm1 )
                     if (filterRules.isEmpty())
                     {
-                        Toast.makeText( activity!!.applicationContext, "filterRule<${networkCommand.parm2} not found.>", Toast.LENGTH_SHORT).show()
+                        Toast.makeText( activity!!.applicationContext, "study<${networkCommand.parm1} does not contain any FilterRules.>", Toast.LENGTH_SHORT).show()
                     }
                     else
                     {

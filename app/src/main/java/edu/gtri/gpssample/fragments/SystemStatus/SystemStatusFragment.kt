@@ -53,6 +53,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private lateinit var viewModel: SystemStatusViewModel
     private lateinit var myInetAddress: InetAddress
     private val udpBroadcaster = UDPBroadcaster()
+    private var numFilterRules = 0
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -252,6 +253,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFiltersCommand, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
+            numFilterRules = 0
             binding.filtersCheckBox.isChecked = false
 
             lifecycleScope.launch {
@@ -267,6 +269,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         binding.configCheckBox.isChecked = false
         binding.studyCheckBox.isChecked = false
         binding.fieldsCheckBox.isChecked = false
+        binding.rulesCheckBox.isChecked = false
+        binding.filtersCheckBox.isChecked = false
 
         val configs = DAO.configDAO.getConfigs()
 
@@ -531,20 +535,19 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 {
                     val networkFilters = NetworkFilters.unpack(networkCommand.message)
 
-                    for (filter in networkFilters.filters)
+                    if (networkFilters.filters.isNotEmpty())
                     {
-                        DAO.filterDAO.createFilter( filter )
+                        for (filter in networkFilters.filters)
+                        {
+                            DAO.filterDAO.createFilter( filter )
+                        }
 
-                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFilterRulesCommand, user.uuid, study_uuid, filter.uuid, "" )
+                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRequestFilterRulesCommand, user.uuid, study_uuid, "", "" )
                         val networkCommandMessage = Json.encodeToString( networkCommand )
 
                         lifecycleScope.launch {
                             udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
                         }
-                    }
-
-                    activity!!.runOnUiThread {
-                        binding.filtersCheckBox.isChecked = true
                     }
                 }
 
@@ -555,6 +558,10 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     for (filterRule in networkFilterRules.filterRules)
                     {
                         DAO.filterRuleDAO.createFilterRule( filterRule )
+                    }
+
+                    activity!!.runOnUiThread {
+                        binding.filtersCheckBox.isChecked = true
                     }
                 }
             }

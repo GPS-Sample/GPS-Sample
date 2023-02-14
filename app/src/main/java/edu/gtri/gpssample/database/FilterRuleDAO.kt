@@ -88,6 +88,25 @@ class FilterRuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun getFilterRules( study_uuid: String ): List<FilterRule>
+    {
+        val filterRules = ArrayList<FilterRule>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_FILTERRULE_STUDY_UUID} = '$study_uuid'"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            filterRules.add( createFilterRuleModel( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return filterRules
+    }
+
+    //--------------------------------------------------------------------------
     fun getFilterRules( study_uuid: String, filter_uuid: String ): List<FilterRule>
     {
         val filterRules = ArrayList<FilterRule>()
