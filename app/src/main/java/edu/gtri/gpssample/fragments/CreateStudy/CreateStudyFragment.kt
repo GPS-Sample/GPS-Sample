@@ -145,12 +145,14 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         binding.sampleSize2Layout.visibility = View.VISIBLE
                         binding.sampleSize3Layout.visibility = View.VISIBLE
                         binding.sampleSize1TextView.setText( "# of Households in all clusters")
+                        binding.sampleSizeTextView.visibility = View.VISIBLE
                     }
                     1 -> { // cluster sampling
                         binding.sampleSize1Layout.visibility = View.VISIBLE
                         binding.sampleSize2Layout.visibility = View.GONE
                         binding.sampleSize3Layout.visibility = View.GONE
                         binding.sampleSize1TextView.setText( "# of Households per cluster")
+                        binding.sampleSizeTextView.visibility = View.VISIBLE
                     }
                     else -> { // subset or strata sampling
                         binding.sampleSize1Layout.visibility = View.GONE
@@ -349,29 +351,35 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
-        val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
-        val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
+        val samplingMethod = binding.samplingMethodSpinner.selectedItem as String
+        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
 
-        if (sample1Size == null && sample2Size == null && sample3Size == null)
+        if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
         {
-            Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
-            return
-        }
+            val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
+            val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
+            val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
 
-        sample1Size?.let { sampleSize ->
-            study.sampleSize = sampleSize
-            study.sampleSizeIndex = 0
-        }
+            if (sample1Size == null && sample2Size == null && sample3Size == null)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
+                return
+            }
 
-        sample2Size?.let { sampleSize ->
-            study.sampleSize = sampleSize
-            study.sampleSizeIndex = 1
-        }
+            sample1Size?.let { sampleSize ->
+                study.sampleSize = sample1Size
+                study.sampleSizeIndex = 0
+            }
 
-        sample3Size?.let { sampleSize ->
-            study.sampleSize = sampleSize
-            study.sampleSizeIndex = 2
+            sample2Size?.let { sampleSize ->
+                study.sampleSize = sampleSize
+                study.sampleSizeIndex = 1
+            }
+
+            sample3Size?.let { sampleSize ->
+                study.sampleSize = sampleSize
+                study.sampleSizeIndex = 2
+            }
         }
 
         study.name = name

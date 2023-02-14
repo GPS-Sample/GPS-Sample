@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:id="@+id/fragment_root_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
@@ -14,6 +13,7 @@
         android:layout_weight="1">
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/fragment_root_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -30,6 +30,7 @@
 
             <EditText
                 android:id="@+id/name_edit_text"
+                android:imeOptions="actionDone"
                 android:inputType="textCapWords"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

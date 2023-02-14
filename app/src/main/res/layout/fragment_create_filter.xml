@@ -26,6 +26,7 @@
         <EditText
             android:id="@+id/name_edit_text"
             android:inputType="textCapWords"
+            android:imeOptions="actionDone"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginLeft="20dp"
@@ -81,6 +82,7 @@
                 android:id="@+id/sample_size_1_edit_text"
                 android:gravity="center"
                 android:inputType="number"
+                android:imeOptions="actionDone"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"/>
@@ -109,6 +111,7 @@
                 android:id="@+id/sample_size_2_edit_text"
                 android:gravity="center"
                 android:inputType="number"
+                android:imeOptions="actionDone"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"/>
@@ -137,6 +140,7 @@
                 android:id="@+id/sample_size_3_edit_text"
                 android:gravity="center"
                 android:inputType="number"
+                android:imeOptions="actionDone"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"/>

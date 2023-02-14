@@ -166,5 +166,6 @@
     <string name="sample_size">Sample Size</string>
     <string name="filter_name">Filter Name</string>
     <string name="rule_name">Rule Name</string>
+    <string name="total_sample_size">Total Sample Size</string>
 
 </resources>
