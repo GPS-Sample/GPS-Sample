@@ -36,7 +36,7 @@
             android:text="WiFi Connected" />
 
         <ImageButton
-            android:id="@+id/wifi_image_button"
+            android:id="@+id/request_wifi_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/background_rounded_primary_frame_clear_fill"
@@ -59,7 +59,7 @@
             android:text="Configuration Received" />
 
         <ImageButton
-            android:id="@+id/config_image_button"
+            android:id="@+id/request_config_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/background_rounded_primary_frame_clear_fill"
@@ -82,7 +82,7 @@
             android:text="Study Received" />
 
         <ImageButton
-            android:id="@+id/study_image_button"
+            android:id="@+id/request_study_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/background_rounded_primary_frame_clear_fill"
@@ -105,7 +105,7 @@
             android:text="Study Fields Received" />
 
         <ImageButton
-            android:id="@+id/fields_image_button"
+            android:id="@+id/request_fields_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/background_rounded_primary_frame_clear_fill"
@@ -128,7 +128,7 @@
             android:text="Study Rules Received" />
 
         <ImageButton
-            android:id="@+id/rules_image_button"
+            android:id="@+id/request_rules_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/background_rounded_primary_frame_clear_fill"
@@ -151,7 +151,7 @@
             android:text="Study Filters Received" />
 
         <ImageButton
-            android:id="@+id/filters_image_button"
+            android:id="@+id/request_filters_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/background_rounded_primary_frame_clear_fill"

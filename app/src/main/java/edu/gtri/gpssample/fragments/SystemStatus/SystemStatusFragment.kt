@@ -101,7 +101,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.titleTextView.text = role.toString()
 
-        binding.wifiImageButton.setOnClickListener {
+        binding.requestWifiButton.setOnClickListener {
 
             if (!connected())
             {
@@ -110,7 +110,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        binding.configImageButton.setOnClickListener {
+        binding.requestConfigButton.setOnClickListener {
 
             if (!connected())
             {
@@ -140,7 +140,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        binding.studyImageButton.setOnClickListener {
+        binding.requestStudyButton.setOnClickListener {
 
             if (!connected())
             {
@@ -170,7 +170,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        binding.fieldsImageButton.setOnClickListener {
+        binding.requestFieldsButton.setOnClickListener {
 
             if (!connected())
             {
@@ -200,7 +200,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        binding.rulesImageButton.setOnClickListener {
+        binding.requestRulesButton.setOnClickListener {
 
             if (!connected())
             {
@@ -230,7 +230,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        binding.filtersImageButton.setOnClickListener {
+        binding.requestFiltersButton.setOnClickListener {
 
             if (!connected())
             {
