@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.fragments.SignUp
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -79,6 +80,11 @@ class SignUpFragment : Fragment()
             }
             else
             {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Key.kUserName.toString(), name )
+                editor.commit()
+
                 val user = User( UUID.randomUUID().toString(), name, pin1, role, answer, question, false )
                 DAO.userDAO.createUser( user )
 

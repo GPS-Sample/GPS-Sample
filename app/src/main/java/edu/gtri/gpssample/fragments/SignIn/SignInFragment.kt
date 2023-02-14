@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.fragments.SignIn
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -57,6 +58,13 @@ class SignInFragment : Fragment()
 
         binding.titleTextView.text = role.toString() + " Sign In"
 
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val userName = sharedPreferences.getString( Key.kUserName.toString(), null)
+
+        userName?.let {
+            binding.nameEditText.setText( userName )
+        }
+
         binding.nextButton.setOnClickListener {
 
             val pin = binding.pinEditText.text.toString()
@@ -84,6 +92,11 @@ class SignInFragment : Fragment()
                 }
                 else
                 {
+                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                    val editor = sharedPreferences.edit()
+                    editor.putString( Key.kUserName.toString(), userName )
+                    editor.commit()
+
                     (activity!!.application as? MainApplication)?.user = user
 
                     binding.pinEditText.setText("")

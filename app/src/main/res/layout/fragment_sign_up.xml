@@ -44,6 +44,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="textCapWords"
+                android:imeOptions="actionDone"
                 android:hint="@string/enter_your_name" />
 
             <TextView
@@ -63,6 +64,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="number"
+                android:imeOptions="actionDone"
                 android:hint="@string/enter_your_pin" />
 
             <TextView
@@ -82,6 +84,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="number"
+                android:imeOptions="actionDone"
                 android:hint="@string/reenter_your_pin" />
 
             <TextView
@@ -124,6 +127,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="textCapWords"
+                android:imeOptions="actionDone"
                 android:hint="@string/enter_your_answer" />
 
             <Button
