@@ -287,23 +287,23 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId) {
-//            android.R.id.home -> // intercept the back button press
-//            {
-//                if (!study.isValid)
-//                {
-//                    if (binding.studyNameEditText.text.toString().isNotEmpty())
-//                    {
-//                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", saveTag, this)
-//                        return true
-//                    }
-//                }
-//                else
-//                {
-//                    updateStudy()
-//                }
-//
-//                return false
-//            }
+            android.R.id.home -> // intercept the back button press
+            {
+                if (DAO.studyDAO.doesNotExist( study.uuid ))
+                {
+                    val fields = DAO.fieldDAO.getFields(study.uuid)
+                    val rules = DAO.ruleDAO.getRules(study.uuid)
+                    val filters = DAO.filterDAO.getFilters(study.uuid)
+
+                    if (binding.studyNameEditText.text.toString().isNotEmpty() || fields.size > 0 || rules.size > 0 || filters.size > 0)
+                    {
+                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", saveTag, this)
+                        return true
+                    }
+                }
+
+                return false
+            }
 
             R.id.action_manage_study -> {
                 manageStudy()
@@ -399,6 +399,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     override fun didAnswerNo()
     {
+        findNavController().popBackStack()
     }
 
     override fun didAnswerYes( tag: Int )
