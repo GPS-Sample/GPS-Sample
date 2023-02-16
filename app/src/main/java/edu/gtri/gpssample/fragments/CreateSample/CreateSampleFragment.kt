@@ -1,9 +1,14 @@
 package edu.gtri.gpssample.fragments.CreateSample
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -113,42 +118,46 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
         binding.recyclerView.adapter = createSampleAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.generateButton.setOnClickListener {
+        binding.numEnumsEditText.setOnEditorActionListener { v, actionId, event ->
+            when(actionId){
+                EditorInfo.IME_ACTION_DONE -> {
+                    val numEnumerators = binding.numEnumsEditText.text.toString().toIntOrNull()
 
-            if (binding.nameEditText.text.toString().length == 0)
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                    numEnumerators?.let { numEnumerators
+                        if (numEnumerators > study.sampleSize)
+                        {
+                            Toast.makeText(activity!!.applicationContext, "The number of enumerators specified exceeds the sample size for this study.", Toast.LENGTH_SHORT).show()
+                        }
+                        else
+                        {
+                            DAO.navPlanDAO.deleteNavPlans( sample.uuid )
+
+                            sample.numEnumerators = numEnumerators
+
+                            val navPlans = ArrayList<NavPlan>()
+
+                            for (i in 1..sample.numEnumerators)
+                            {
+                                val navPlan = NavPlan( UUID.randomUUID().toString(), sample.uuid, "Navigation Plan ${i}" )
+                                DAO.navPlanDAO.createNavPlan( navPlan )
+                                navPlans.add( navPlan )
+                            }
+
+                            createSampleAdapter.updateNavPlans( navPlans )
+                        }
+                    }
+
+                    false
+                }
+                else -> false
             }
-
-            if (binding.numEnumsEditText.text.toString().length == 0)
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter the number of enumerators.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            sample.numEnumerators = binding.numEnumsEditText.text.toString().toInt()
-
-            if (sample.numEnumerators > study.sampleSize)
-            {
-                Toast.makeText(activity!!.applicationContext, "The number of enumerators specified exceeds the sample size for this study.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val navPlans = ArrayList<NavPlan>()
-
-            for (i in 1..sample.numEnumerators)
-            {
-                val navPlan = NavPlan( UUID.randomUUID().toString(), sample.uuid, "Navigation Plan ${i}" )
-                DAO.navPlanDAO.createNavPlan( navPlan )
-                navPlans.add( navPlan )
-            }
-
-            createSampleAdapter.updateNavPlans( navPlans )
         }
 
         binding.cancelButton.setOnClickListener {
-            findNavController().popBackStack()
+            val inputMethodManager = activity!!.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0)
+
+//            findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {

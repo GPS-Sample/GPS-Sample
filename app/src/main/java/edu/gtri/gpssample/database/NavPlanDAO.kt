@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.NavPlan
 import edu.gtri.gpssample.database.models.Sample
+import edu.gtri.gpssample.database.models.Study
 
 class NavPlanDAO(private var dao: DAO)
 {
@@ -129,6 +130,17 @@ class NavPlanDAO(private var dao: DAO)
 
         db.delete(DAO.TABLE_NAV_PLAN, whereClause, args)
         db.close()
+    }
+
+    //--------------------------------------------------------------------------
+    fun deleteNavPlans( sample_uuid: String )
+    {
+        val navPlans = getNavPlans( sample_uuid )
+
+        for (navPlan in navPlans)
+        {
+            deleteNavPlan( navPlan )
+        }
     }
 
     //--------------------------------------------------------------------------
