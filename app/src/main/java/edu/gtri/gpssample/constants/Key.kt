@@ -16,5 +16,6 @@ enum class Key {
     kFilter_uuid,
     kConfig_uuid,
     kSample_uuid,
+    kNavPlan_uuid,
     kSamplingMethod,
 }

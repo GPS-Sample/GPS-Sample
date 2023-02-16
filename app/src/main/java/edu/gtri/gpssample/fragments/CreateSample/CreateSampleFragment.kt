@@ -179,7 +179,10 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
 
     fun didSelectNavPlan( navPlan: NavPlan )
     {
-        Log.d( "xxx", navPlan.name )
+        val bundle = Bundle()
+        bundle.putString( Key.kNavPlan_uuid.toString(), navPlan.uuid )
+
+        findNavController().navigate(R.id.action_navigate_to_NavigationPlanFragment, bundle)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)

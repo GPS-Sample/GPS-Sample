@@ -131,6 +131,16 @@
         android:id="@+id/CreateSampleFragment"
         android:name="edu.gtri.gpssample.fragments.CreateSample.CreateSampleFragment"
         tools:layout="@layout/fragment_create_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_NavigationPlanFragment"
+            app:destination="@id/NavigationPlanFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/NavigationPlanFragment"
+        android:name="edu.gtri.gpssample.fragments.NavigationPlan.NavigationPlanFragment"
+        tools:layout="@layout/fragment_navigation_plan">
     </fragment>
 
     <fragment
