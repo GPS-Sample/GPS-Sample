@@ -4,9 +4,9 @@
     tools:context="edu.gtri.gpssample.activities.CreateFieldActivity">
 
     <item
-        android:id="@+id/action_manage_study"
+        android:id="@+id/action_manage_samples"
         android:orderInCategory="101"
-        android:title="@string/manage_study"
+        android:title="@string/manage_samples"
         app:showAsAction="never" />
 
     <item

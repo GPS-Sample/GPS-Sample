@@ -66,7 +66,7 @@ class RuleDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            rule = createRuleModel( cursor )
+            rule = createRule( cursor )
         }
 
         cursor.close()
@@ -76,7 +76,7 @@ class RuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createRuleModel( cursor: Cursor): Rule
+    private fun  createRule( cursor: Cursor): Rule
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_STUDY_UUID))
@@ -98,7 +98,7 @@ class RuleDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            rules.add( createRuleModel( cursor ))
+            rules.add( createRule( cursor ))
         }
 
         cursor.close()
@@ -117,7 +117,7 @@ class RuleDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            rules.add( createRuleModel( cursor ))
+            rules.add( createRule( cursor ))
         }
 
         cursor.close()

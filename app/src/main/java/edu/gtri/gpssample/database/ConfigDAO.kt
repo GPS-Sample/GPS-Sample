@@ -33,7 +33,7 @@ class ConfigDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            config = createConfigModel( cursor )
+            config = createConfig( cursor )
         }
 
         cursor.close()
@@ -55,7 +55,7 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createConfigModel( cursor: Cursor ) : Config
+    private fun createConfig( cursor: Cursor ) : Config
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
@@ -78,7 +78,7 @@ class ConfigDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            configs.add( createConfigModel( cursor ))
+            configs.add( createConfig( cursor ))
         }
 
         cursor.close()

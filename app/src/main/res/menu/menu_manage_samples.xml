@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="edu.gtri.gpssample.activities.CreateFieldActivity">
+
+    <item
+        android:id="@+id/action_create_sample"
+        android:title="@string/create_sample"
+        app:showAsAction="never" />
+
+</menu>

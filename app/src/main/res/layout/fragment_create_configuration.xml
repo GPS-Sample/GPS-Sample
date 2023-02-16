@@ -34,6 +34,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:inputType="textCapWords"
+                android:imeOptions="actionDone"
                 android:hint="@string/enter_config_name" />
 
             <TextView

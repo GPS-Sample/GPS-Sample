@@ -112,7 +112,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
         manageStudiesAdapter.updateStudies(studies)
     }
 
-    fun onItemSelected(study: Study, shouldDismissKeyboard: Boolean )
+    fun onItemSelected(study: Study)
     {
         val bundle = Bundle()
 

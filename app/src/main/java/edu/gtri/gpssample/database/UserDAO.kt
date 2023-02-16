@@ -36,7 +36,7 @@ class UserDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            user = createUserModel( cursor )
+            user = createUser( cursor )
         }
 
         cursor.close()
@@ -57,7 +57,7 @@ class UserDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            user = createUserModel( cursor )
+            user = createUser( cursor )
         }
 
         cursor.close()
@@ -67,7 +67,7 @@ class UserDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createUserModel( cursor: Cursor) : User
+    private fun createUser( cursor: Cursor) : User
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
@@ -90,7 +90,7 @@ class UserDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            users.add( createUserModel( cursor ))
+            users.add( createUser( cursor ))
         }
 
         cursor.close()

@@ -109,12 +109,28 @@
             app:destination="@id/CreateFilterFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_ManageStudyFragment"
-            app:destination="@id/ManageStudyFragment"/>
+            android:id="@+id/action_navigate_to_ManageSamplesFragment"
+            app:destination="@id/ManageSamplesFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
             app:destination="@id/DefineEnumerationAreaFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/ManageSamplesFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesFragment"
+        tools:layout="@layout/fragment_create_field">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateSampleFragment"
+            app:destination="@id/CreateSampleFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreateSampleFragment"
+        android:name="edu.gtri.gpssample.fragments.CreateSample.CreateSampleFragment"
+        tools:layout="@layout/fragment_create_sample">
     </fragment>
 
     <fragment

@@ -93,6 +93,23 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_FILTERRULE_CONNECTOR + " TEXT" +
                 ")")
         db.execSQL(createTableFilterRule)
+
+        val createTableSample = ("CREATE TABLE " +
+                TABLE_SAMPLE + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_SAMPLE_STUDY_UUID + " TEXT" + "," +
+                COLUMN_SAMPLE_NAME + " TEXT" + "," +
+                COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" +
+                ")")
+        db.execSQL(createTableSample)
+
+        val createTableNavigationPlan = ("CREATE TABLE " +
+                TABLE_NAV_PLAN + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_NAV_PLAN_SAMPLE_UUID + " TEXT" + "," +
+                COLUMN_NAV_PLAN_NAME + " TEXT" +
+                ")")
+        db.execSQL(createTableNavigationPlan)
     }
 
     //--------------------------------------------------------------------------
@@ -106,6 +123,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RULE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERRULE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAMPLE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAV_PLAN)
+
         onCreate(db)
     }
 
@@ -177,6 +197,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
         const val COLUMN_FILTERRULE_CONNECTOR = "filterrule_connector"
 
+        // Sample Table
+        const val TABLE_SAMPLE = "sample"
+        const val COLUMN_SAMPLE_STUDY_UUID = "sample_study_id"
+        const val COLUMN_SAMPLE_NAME = "sample_name"
+        const val COLUMN_SAMPLE_NUM_ENUMERATORS = "sample_num_enumerators"
+
+        // NavigationPlan Table
+        const val TABLE_NAV_PLAN = "nav_plan"
+        const val COLUMN_NAV_PLAN_SAMPLE_UUID = "nav_plan_sample_id"
+        const val COLUMN_NAV_PLAN_NAME = "nav_plan_name"
+
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -185,6 +216,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
         lateinit var filterRuleDAO: FilterRuleDAO
+        lateinit var sampleDAO: SampleDAO
+        lateinit var navPlanDAO: NavPlanDAO
 
         // creation/access methods
 
@@ -203,16 +236,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 ruleDAO = RuleDAO(( instance!! ))
                 filterDAO = FilterDAO(( instance!! ))
                 filterRuleDAO = FilterRuleDAO(( instance!! ))
+                sampleDAO = SampleDAO(( instance!! ))
+                navPlanDAO = NavPlanDAO(( instance!! ))
             }
 
             return instance!!
         }
 
-        fun sharedInstance(): DAO
-        {
-            return instance!!
-        }
-
-        private const val DATABASE_VERSION = 40
+        private const val DATABASE_VERSION = 45
     }
 }

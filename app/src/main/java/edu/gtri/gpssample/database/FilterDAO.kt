@@ -66,7 +66,7 @@ class FilterDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            filter = createFilterModel( cursor )
+            filter = createFilter( cursor )
         }
 
         cursor.close()
@@ -76,7 +76,7 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createFilterModel( cursor: Cursor ): Filter
+    private fun  createFilter( cursor: Cursor ): Filter
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_STUDY_UUID))
@@ -97,7 +97,7 @@ class FilterDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            filters.add( createFilterModel( cursor ))
+            filters.add( createFilter( cursor ))
         }
 
         cursor.close()
@@ -116,7 +116,7 @@ class FilterDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            filters.add( createFilterModel( cursor ))
+            filters.add( createFilter( cursor ))
         }
 
         cursor.close()

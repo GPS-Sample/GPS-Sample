@@ -66,7 +66,7 @@ class FilterRuleDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            filterRule = createFilterRuleModel( cursor )
+            filterRule = createFilterRule( cursor )
         }
 
         cursor.close()
@@ -76,7 +76,7 @@ class FilterRuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createFilterRuleModel( cursor: Cursor ): FilterRule
+    private fun  createFilterRule( cursor: Cursor ): FilterRule
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_STUDY_UUID))
@@ -97,7 +97,7 @@ class FilterRuleDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            filterRules.add( createFilterRuleModel( cursor ))
+            filterRules.add( createFilterRule( cursor ))
         }
 
         cursor.close()
@@ -116,7 +116,7 @@ class FilterRuleDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            filterRules.add( createFilterRuleModel( cursor ))
+            filterRules.add( createFilterRule( cursor ))
         }
 
         cursor.close()
@@ -135,7 +135,7 @@ class FilterRuleDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            filterRules.add( createFilterRuleModel( cursor ))
+            filterRules.add( createFilterRule( cursor ))
         }
 
         cursor.close()

@@ -8,15 +8,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.models.Sample
 import edu.gtri.gpssample.database.models.Study
 
-class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<ManageStudiesAdapter.ViewHolder>()
+class ManageSamplesAdapter(var samples: List<Sample>?) : RecyclerView.Adapter<ManageSamplesAdapter.ViewHolder>()
 {
-    override fun getItemCount() = studies!!.size
+    override fun getItemCount() = samples!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((study: Study) -> Unit)
+    lateinit var selectedItemCallback: ((sample: Sample) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -30,9 +31,9 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
         return viewHolder
     }
 
-    fun updateStudies( studies: List<Study> )
+    fun updateSamples( samples: List<Sample> )
     {
-        this.studies = studies
+        this.samples = samples
         notifyDataSetChanged()
     }
 
@@ -40,12 +41,12 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
     {
         holder.itemView.isSelected = false
 
-        val study = studies!!.get(holder.adapterPosition)
+        val sample = samples!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( study.name )
+        holder.nameTextView.setText( sample.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(study)
+            selectedItemCallback.invoke(sample)
         }
     }
 

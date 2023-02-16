@@ -16,7 +16,7 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((configurationModel: Config, shouldDismissKeyboard: Boolean) -> Unit)
+    lateinit var selectedItemCallback: ((config: Config) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -40,12 +40,12 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
     {
         holder.itemView.isSelected = false
 
-        val configurationModel = configurations!!.get(holder.adapterPosition)
+        val config = configurations!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( configurationModel.name )
+        holder.nameTextView.setText( config.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(configurationModel, true)
+            selectedItemCallback.invoke(config)
         }
     }
 

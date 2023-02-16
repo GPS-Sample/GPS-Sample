@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity()
             DAO.filterDAO.deleteOrphans()
             DAO.ruleDAO.deleteOrphans()
             DAO.filterRuleDAO.deleteOrphans()
+            DAO.sampleDAO.deleteOrphans()
+            DAO.navPlanDAO.deleteOrphans()
 
             val configurations = DAO.configDAO.getConfigs()
             Log.d( "xxx", "found ${configurations.size} Configurations" )
@@ -52,6 +54,12 @@ class MainActivity : AppCompatActivity()
 
             val filterRules = DAO.filterRuleDAO.getFilterRules()
             Log.d( "xxx", "found ${filterRules.size} FilterRules" )
+
+            val samples = DAO.sampleDAO.getSamples()
+            Log.d( "xxx", "found ${samples.size} Samples" )
+
+            val navPlans = DAO.navPlanDAO.getNavPlans()
+            Log.d( "xxx", "found ${navPlans.size} NavPlans" )
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

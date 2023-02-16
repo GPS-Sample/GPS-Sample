@@ -167,5 +167,9 @@
     <string name="filter_name">Filter Name</string>
     <string name="rule_name">Rule Name</string>
     <string name="total_sample_size">Total Sample Size</string>
+    <string name="manage_studies">Manage Studies</string>
+    <string name="manage_samples">Manage Samples</string>
+    <string name="create_sample">Create Sample</string>
+    <string name="delete_sample">Delete Sample</string>
 
 </resources>

@@ -74,7 +74,7 @@ class FieldDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            field = createFieldModel( cursor )
+            field = createField( cursor )
         }
 
         cursor.close()
@@ -84,7 +84,7 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createFieldModel( cursor: Cursor ): Field
+    private fun  createField( cursor: Cursor ): Field
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
@@ -113,7 +113,7 @@ class FieldDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            fields.add( createFieldModel( cursor ))
+            fields.add( createField( cursor ))
         }
 
         cursor.close()
@@ -132,7 +132,7 @@ class FieldDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            fields.add( createFieldModel( cursor ))
+            fields.add( createField( cursor ))
         }
 
         cursor.close()

@@ -79,7 +79,7 @@ class ManageConfigurationsFragment : Fragment()
         manageConfigurationsAdapter.updateConfigurations(configurations)
     }
 
-    fun onItemSelected( config: Config, shouldDismissKeyboard: Boolean )
+    fun onItemSelected( config: Config )
     {
         val bundle = Bundle()
 

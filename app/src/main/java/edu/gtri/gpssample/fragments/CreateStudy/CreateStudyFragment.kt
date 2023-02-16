@@ -305,8 +305,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 return false
             }
 
-            R.id.action_manage_study -> {
-                manageStudy()
+            R.id.action_manage_samples -> {
+                manageSamples()
             }
 
             R.id.action_delete_study -> {
@@ -317,7 +317,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         return false
     }
 
-    fun manageStudy()
+    fun manageSamples()
     {
         val user = (activity!!.application as? MainApplication)!!.user
 
@@ -337,7 +337,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             val bundle = Bundle()
             bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
-            findNavController().navigate( R.id.action_navigate_to_ManageStudyFragment, bundle )
+            findNavController().navigate( R.id.action_navigate_to_ManageSamplesFragment, bundle )
         }
     }
 

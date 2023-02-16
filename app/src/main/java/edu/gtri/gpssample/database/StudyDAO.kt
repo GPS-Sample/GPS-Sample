@@ -76,7 +76,7 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun createStudy( cursor: Cursor ): Study
+    private fun createStudy( cursor: Cursor ): Study
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val config_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_UUID))
