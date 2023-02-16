@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.DefineEnumerationArea
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +17,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
 
 class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 {
+    private var quickStart = false
     private var _binding: FragmentDefineEnumerationAreaBinding? = null
     private val binding get() = _binding!!
     private lateinit var map: GoogleMap
@@ -47,13 +50,48 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
             }
         }
 
+        // required: configId
+        if (arguments == null)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val config_uuid = arguments!!.getString( Key.kConfig_uuid.toString(), "");
+
+        if (config_uuid.isEmpty())
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+
+        quick_start?.let {
+            quickStart = it
+        }
+
+        if (quickStart)
+        {
+            binding.nextButton.setText( "NEXT" )
+        }
+
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
 
         binding.nextButton.setOnClickListener {
-
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+            if (quickStart)
+            {
+                val bundle = Bundle()
+                bundle.putBoolean( Key.kQuickStart.toString(), quickStart )
+                bundle.putString( Key.kConfig_uuid.toString(), config_uuid )
+                findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+            }
+            else
+            {
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+            }
         }
     }
 

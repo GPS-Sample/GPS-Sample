@@ -13,6 +13,7 @@ enum class Key {
     kRule_uuid,
     kField_uuid,
     kStudy_uuid,
+    kQuickStart,
     kFilter_uuid,
     kConfig_uuid,
     kSample_uuid,

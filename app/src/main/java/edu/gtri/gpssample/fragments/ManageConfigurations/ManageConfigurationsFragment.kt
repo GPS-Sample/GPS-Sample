@@ -102,6 +102,12 @@ class ManageConfigurationsFragment : Fragment()
                 findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment )
                 return true
             }
+            R.id.action_quick_start -> {
+                val bundle = Bundle()
+                bundle.putBoolean( Key.kQuickStart.toString(), true )
+                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
+                return true
+            }
         }
 
         return false

@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.CreateConfiguration
 
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +24,8 @@ import java.util.*
 
 class CreateConfigurationFragment : Fragment()
 {
-    private var config: Config? = null;
+    private var quickStart = false
+    private var config: Config? = null
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: CreateConfigurationViewModel
@@ -48,6 +50,12 @@ class CreateConfigurationFragment : Fragment()
             if (BuildConfig.DEBUG) {
                 Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
             }
+        }
+
+        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+
+        quick_start?.let {
+            quickStart = it
         }
 
         val configId = arguments?.getString( Key.kConfig_uuid.toString());
@@ -156,7 +164,10 @@ class CreateConfigurationFragment : Fragment()
 
                 DAO.configDAO.updateConfig( config )
 
-                findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment)
+                val bundle = Bundle()
+                bundle.putBoolean( Key.kQuickStart.toString(), quickStart )
+                bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+                findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
             }
         }
     }

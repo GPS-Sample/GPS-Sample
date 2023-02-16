@@ -27,6 +27,7 @@ import java.util.*
 
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
+    private var quickStart = false
     private lateinit var study: Study
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
@@ -87,6 +88,18 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
                 return
             }
+        }
+
+        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+
+        quick_start?.let {
+            quickStart = it
+        }
+
+        if (quickStart)
+        {
+            binding.cancelButton.visibility = View.GONE
+            binding.saveButton.setText( "NEXT" )
         }
 
         ArrayAdapter.createFromResource(activity!!, R.array.samling_methods, android.R.layout.simple_spinner_item)
@@ -394,7 +407,17 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             DAO.studyDAO.createStudy( study )
         }
 
-        findNavController().popBackStack()
+        if (quickStart)
+        {
+            val bundle = Bundle()
+            bundle.putBoolean( Key.kQuickStart.toString(), quickStart )
+            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+            findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
+        }
+        else
+        {
+            findNavController().popBackStack()
+        }
     }
 
     override fun didAnswerNo()

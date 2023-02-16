@@ -73,6 +73,10 @@
         tools:layout="@layout/fragment_define_enumeration_area">
 
         <action
+            android:id="@+id/action_navigate_to_CreateStudyFragment"
+            app:destination="@id/CreateStudyFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
@@ -95,6 +99,10 @@
         android:id="@+id/CreateStudyFragment"
         android:name="edu.gtri.gpssample.fragments.CreateStudy.CreateStudyFragment"
         tools:layout="@layout/fragment_create_study">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateSampleFragment"
+            app:destination="@id/CreateSampleFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_CreateFieldFragment"
@@ -131,6 +139,10 @@
         android:id="@+id/CreateSampleFragment"
         android:name="edu.gtri.gpssample.fragments.CreateSample.CreateSampleFragment"
         tools:layout="@layout/fragment_create_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_NavigationPlanFragment"

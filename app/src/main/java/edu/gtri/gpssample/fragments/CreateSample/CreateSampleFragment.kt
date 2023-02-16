@@ -29,6 +29,7 @@ import kotlin.collections.ArrayList
 
 class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
+    private var quickStart = false
     private var _binding: FragmentCreateSampleBinding? = null
     private val binding get() = _binding!!
 
@@ -100,6 +101,18 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
             }
         }
 
+        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+
+        quick_start?.let {
+            quickStart = it
+        }
+
+        if (quickStart)
+        {
+            binding.cancelButton.visibility = View.GONE
+            binding.saveButton.setText( "FINISH" )
+        }
+
         if (!this::sample.isInitialized)
         {
             sample = Sample( UUID.randomUUID().toString(), study_uuid, "", 0 )
@@ -154,10 +167,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
         }
 
         binding.cancelButton.setOnClickListener {
-            val inputMethodManager = activity!!.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0)
-
-//            findNavController().popBackStack()
+            findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
@@ -172,7 +182,14 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
 
                 DAO.sampleDAO.updateSample( sample )
 
-                findNavController().popBackStack()
+                if (quickStart)
+                {
+                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+                }
+                else
+                {
+                    findNavController().popBackStack()
+                }
             }
         }
     }
