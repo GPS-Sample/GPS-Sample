@@ -147,6 +147,10 @@ class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 Log.d( "xxx", throwable.stackTraceToString())
             })
             .addTo( compositeDisposable )
+
+        binding.finishButton.setOnClickListener {
+            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+        }
     }
 
     fun generateBarcode()

@@ -181,6 +181,10 @@
         android:id="@+id/ManageSampleFragment"
         android:name="edu.gtri.gpssample.fragments.ManageSample.ManageSampleFragment"
         tools:layout="@layout/fragment_manage_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
 
     <fragment

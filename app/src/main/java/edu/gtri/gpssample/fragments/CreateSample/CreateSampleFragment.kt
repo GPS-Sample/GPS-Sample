@@ -110,7 +110,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
         if (quickStart)
         {
             binding.cancelButton.visibility = View.GONE
-            binding.saveButton.setText( "FINISH" )
+            binding.saveButton.setText( "NEXT" )
         }
 
         if (!this::sample.isInitialized)
@@ -184,7 +184,9 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
 
                 if (quickStart)
                 {
-                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+                    val bundle = Bundle()
+                    bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
+                    findNavController().navigate(R.id.action_navigate_to_ManageSampleFragment, bundle)
                 }
                 else
                 {

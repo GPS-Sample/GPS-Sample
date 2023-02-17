@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +16,10 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.NavPlan
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SignInFragment : Fragment()
 {
@@ -65,53 +69,67 @@ class SignInFragment : Fragment()
             binding.nameEditText.setText( userName )
         }
 
-        binding.nextButton.setOnClickListener {
-
-            val pin = binding.pinEditText.text.toString()
-            val userName = binding.nameEditText.text.toString()
-
-            if (userName.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter your User Name.", Toast.LENGTH_SHORT).show()
+        binding.pinEditText.setOnEditorActionListener { v, actionId, event ->
+            when(actionId){
+                EditorInfo.IME_ACTION_NEXT -> {
+                    handleNextButtonPress()
+                    false
+                }
+                else -> false
             }
-            else if (pin.isEmpty())
+        }
+
+        binding.nextButton.setOnClickListener {
+            handleNextButtonPress()
+        }
+    }
+
+    fun handleNextButtonPress()
+    {
+        val pin = binding.pinEditText.text.toString()
+        val userName = binding.nameEditText.text.toString()
+
+        if (userName.isEmpty())
+        {
+            Toast.makeText(activity!!.applicationContext, "Please enter your User Name.", Toast.LENGTH_SHORT).show()
+        }
+        else if (pin.isEmpty())
+        {
+            Toast.makeText(activity!!.applicationContext, "Please enter your PIN.", Toast.LENGTH_SHORT).show()
+        }
+        else
+        {
+            val user = DAO.userDAO.getUser( userName, pin )
+
+            if (user == null)
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter your PIN.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, "Invalid Username or PIN", Toast.LENGTH_SHORT).show()
+            }
+            else if (user!!.role != role)
+            {
+                Toast.makeText(activity!!.applicationContext, "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.", Toast.LENGTH_SHORT).show()
             }
             else
             {
-                val user = DAO.userDAO.getUser( userName, pin )
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Key.kUserName.toString(), userName )
+                editor.commit()
 
-                if (user == null)
+                (activity!!.application as? MainApplication)?.user = user
+
+                binding.pinEditText.setText("")
+
+                val bundle = Bundle()
+                bundle.putString( Key.kRole.toString(), role.toString())
+
+                if (role == Role.Admin.toString())
                 {
-                    Toast.makeText(activity!!.applicationContext, "Invalid Username or PIN", Toast.LENGTH_SHORT).show()
-                }
-                else if (user!!.role != role)
-                {
-                    Toast.makeText(activity!!.applicationContext, "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                 }
                 else
                 {
-                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                    val editor = sharedPreferences.edit()
-                    editor.putString( Key.kUserName.toString(), userName )
-                    editor.commit()
-
-                    (activity!!.application as? MainApplication)?.user = user
-
-                    binding.pinEditText.setText("")
-
-                    val bundle = Bundle()
-                    bundle.putString( Key.kRole.toString(), role.toString())
-
-                    if (role == Role.Admin.toString())
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-                    }
-                    else
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_SystemStatusFragment, bundle)
-                    }
+                    findNavController().navigate(R.id.action_navigate_to_SystemStatusFragment, bundle)
                 }
             }
         }
