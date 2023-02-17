@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
     android:id="@+id/intended_location_cell"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/list_item_primary_blue"
     android:padding="0dp">
 
     <TextView
         android:id="@+id/name_text_view"
         android:layout_marginBottom="1dp"
         android:layout_marginTop="1dp"
-        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
@@ -22,7 +24,14 @@
         android:lineSpacingExtra="1sp"
         android:textAlignment="gravity"
         android:textSize="15sp"
-        android:background="@drawable/list_item_primary_blue"
         android:textColor="@color/white"/>
+
+    <ImageView
+        android:id="@+id/delete_image_view"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:srcCompat="@drawable/delete_white"/>
 
 </LinearLayout>

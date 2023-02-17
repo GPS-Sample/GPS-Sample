@@ -21,7 +21,7 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.fragments.ManageStudies.ManageSamplesAdapter
 import edu.gtri.gpssample.fragments.ManageStudies.ManageStudiesAdapter
 
-class ManageSamplesFragment : Fragment()
+class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentManageSamplesBinding? = null
     private val binding get() = _binding!!
@@ -68,7 +68,8 @@ class ManageSamplesFragment : Fragment()
         }
 
         manageSamplesAdapter = ManageSamplesAdapter(listOf<Sample>())
-        manageSamplesAdapter.selectedItemCallback = this::onItemSelected
+        manageSamplesAdapter.didSelectSample = this::didSelectSample
+        manageSamplesAdapter.shouldDeleteSample = this::shouldDeleteSample
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageSamplesAdapter
@@ -107,12 +108,31 @@ class ManageSamplesFragment : Fragment()
         manageSamplesAdapter.updateSamples(samples)
     }
 
-    fun onItemSelected(sample: Sample)
+    fun didSelectSample(sample: Sample)
     {
         val bundle = Bundle()
         bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
         bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
 
         findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
+    }
+
+    private var selectedSample: Sample? = null
+
+    fun shouldDeleteSample(sample: Sample)
+    {
+        selectedSample = sample
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this sample?", 0, this)
+    }
+
+    override fun didAnswerNo() {
+    }
+
+    override fun didAnswerYes( tag: Int )
+    {
+        selectedSample?.let {
+            DAO.sampleDAO.deleteSample( it )
+            manageSamplesAdapter.updateSamples(DAO.sampleDAO.getSamples())
+        }
     }
 }

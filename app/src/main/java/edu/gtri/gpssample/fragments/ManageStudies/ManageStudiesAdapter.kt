@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
@@ -16,7 +17,8 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((study: Study) -> Unit)
+    lateinit var didSelectStudy: ((study: Study) -> Unit)
+    lateinit var shouldDeleteStudy: ((study: Study) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -45,12 +47,17 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
         holder.nameTextView.setText( study.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(study)
+            didSelectStudy(study)
+        }
+
+        holder.deleteImageView.setOnClickListener {
+            shouldDeleteStudy(study)
         }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
+        val deleteImageView: ImageView = itemView.findViewById<ImageView>(R.id.delete_image_view)
     }
 }

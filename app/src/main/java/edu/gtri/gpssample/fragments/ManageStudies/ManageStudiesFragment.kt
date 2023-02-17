@@ -75,7 +75,8 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
         }
 
         manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
-        manageStudiesAdapter.selectedItemCallback = this::onItemSelected
+        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
+        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
 
         binding.configNameTextView.text = "Configuration " + config.name + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -116,7 +117,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
         manageStudiesAdapter.updateStudies(studies)
     }
 
-    fun onItemSelected(study: Study)
+    fun didSelectStudy(study: Study)
     {
         val bundle = Bundle()
 
@@ -124,6 +125,25 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
         bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+    }
+
+    private var selectedStudy: Study? = null
+
+    fun shouldDeleteStudy(study: Study)
+    {
+        selectedStudy = study
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", 0, this)
+    }
+
+    override fun didAnswerNo() {
+    }
+
+    override fun didAnswerYes( tag: Int )
+    {
+        selectedStudy?.let {
+            DAO.studyDAO.deleteStudy( it )
+            manageStudiesAdapter.updateStudies(DAO.studyDAO.getStudies())
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
@@ -143,23 +163,9 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
             }
-            R.id.action_delete_configuration -> {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
-                return true
-            }
         }
 
         return false
-    }
-
-    override fun didAnswerNo()
-    {
-    }
-
-    override fun didAnswerYes( tag: Int )
-    {
-        DAO.configDAO.deleteConfig( config )
-        findNavController().popBackStack()
     }
 
     override fun onDestroyView()

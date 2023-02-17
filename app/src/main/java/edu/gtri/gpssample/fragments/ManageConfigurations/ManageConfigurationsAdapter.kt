@@ -2,9 +2,11 @@ package edu.gtri.gpssample.fragments.ManageConfigurations
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
@@ -16,7 +18,8 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var selectedItemCallback: ((config: Config) -> Unit)
+    lateinit var didSelectConfig: ((config: Config) -> Unit)
+    lateinit var shouldDeleteConfig: ((config: Config) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -45,12 +48,17 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
         holder.nameTextView.setText( config.name )
 
         holder.itemView.setOnClickListener {
-            selectedItemCallback.invoke(config)
+            didSelectConfig(config)
+        }
+
+        holder.deleteImageView.setOnClickListener {
+            shouldDeleteConfig(config)
         }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
+        val deleteImageView: ImageView = itemView.findViewById<ImageView>(R.id.delete_image_view)
     }
 }

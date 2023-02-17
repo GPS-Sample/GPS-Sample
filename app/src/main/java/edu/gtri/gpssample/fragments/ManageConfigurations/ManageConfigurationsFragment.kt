@@ -14,8 +14,9 @@ import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 
-class ManageConfigurationsFragment : Fragment()
+class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
@@ -48,7 +49,8 @@ class ManageConfigurationsFragment : Fragment()
         }
 
         manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Config>())
-        manageConfigurationsAdapter.selectedItemCallback = this::onItemSelected
+        manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
+        manageConfigurationsAdapter.shouldDeleteConfig = this::shouldDeleteConfig
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageConfigurationsAdapter
@@ -74,13 +76,33 @@ class ManageConfigurationsFragment : Fragment()
         manageConfigurationsAdapter.updateConfigurations(configurations)
     }
 
-    fun onItemSelected( config: Config )
+    fun didSelectConfig( config: Config )
     {
         val bundle = Bundle()
 
         bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
+    }
+
+    private var selectedConfig: Config? = null
+
+    fun shouldDeleteConfig( config: Config )
+    {
+        selectedConfig = config
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
+    }
+
+    override fun didAnswerNo()
+    {
+    }
+
+    override fun didAnswerYes( tag: Int )
+    {
+        selectedConfig?.let {
+            DAO.configDAO.deleteConfig( it )
+            manageConfigurationsAdapter.updateConfigurations(DAO.configDAO.getConfigs())
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
