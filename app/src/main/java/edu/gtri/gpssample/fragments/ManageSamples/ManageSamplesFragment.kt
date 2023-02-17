@@ -81,7 +81,6 @@ class ManageSamplesFragment : Fragment()
         }
 
         binding.createButton.setOnClickListener {
-
             val bundle = Bundle()
             bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
             findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)

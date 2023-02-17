@@ -193,6 +193,10 @@
         tools:layout="@layout/fragment_system_status">
 
         <action
+            android:id="@+id/action_navigate_to_CreateSampleFragment"
+            app:destination="@id/CreateSampleFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
     </fragment>

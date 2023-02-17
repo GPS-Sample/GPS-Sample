@@ -314,12 +314,18 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                         return true
                     }
                 }
-
-                return false
             }
 
             R.id.action_manage_samples -> {
-                manageSamples()
+                if (binding.studyNameEditText.text.toString().isEmpty())
+                {
+                    Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
+                    return true
+                }
+
+                val bundle = Bundle()
+                bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+                findNavController().navigate( R.id.action_navigate_to_ManageSamplesFragment, bundle )
             }
 
             R.id.action_delete_study -> {
@@ -332,26 +338,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     fun manageSamples()
     {
-        val user = (activity!!.application as? MainApplication)!!.user
-
-        if (user!!.role == Role.Supervisor.toString())
-        {
-            val bundle = Bundle()
-            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
-            findNavController().navigate( R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle )
-        }
-        else
-        {
-            if (binding.studyNameEditText.text.toString().isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
-                return
-            }
-
-            val bundle = Bundle()
-            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
-            findNavController().navigate( R.id.action_navigate_to_ManageSamplesFragment, bundle )
-        }
     }
 
     fun updateStudy()

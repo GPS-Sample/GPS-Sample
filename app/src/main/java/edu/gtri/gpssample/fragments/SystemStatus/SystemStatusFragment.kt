@@ -23,10 +23,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -46,6 +43,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private lateinit var user: User
     private var study_uuid = ""
     private var config_uuid = ""
+    private var sample_uuid = ""
     private lateinit var role: String
     private lateinit var broadcastInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
@@ -53,7 +51,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private lateinit var viewModel: SystemStatusViewModel
     private lateinit var myInetAddress: InetAddress
     private val udpBroadcaster = UDPBroadcaster()
-    private var numFilterRules = 0
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -101,6 +98,17 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.titleTextView.text = role.toString()
 
+        binding.nextButton.setOnClickListener {
+
+            if (study_uuid.isNotEmpty() && sample_uuid.isNotEmpty())
+            {
+                val bundle = Bundle()
+                bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
+                bundle.putString( Key.kSample_uuid.toString(), sample_uuid )
+                findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
+            }
+        }
+
         binding.requestWifiButton.setOnClickListener {
 
             if (!connected())
@@ -111,16 +119,9 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.requestConfigButton.setOnClickListener {
-
             if (!connected())
             {
                 Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (config_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -141,22 +142,9 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.requestStudyButton.setOnClickListener {
-
             if (!connected())
             {
                 Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (config_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (study_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -171,22 +159,9 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.requestFieldsButton.setOnClickListener {
-
             if (!connected())
             {
                 Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (config_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (study_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -201,22 +176,9 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.requestRulesButton.setOnClickListener {
-
             if (!connected())
             {
                 Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (config_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (study_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -231,30 +193,50 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.requestFiltersButton.setOnClickListener {
-
             if (!connected())
             {
                 Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (config_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the configuration.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (study_uuid.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please download the study.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             val networkCommand = NetworkCommand( NetworkCommand.NetworkFiltersRequest, user.uuid, study_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
-            numFilterRules = 0
             binding.filtersCheckBox.isChecked = false
+
+            lifecycleScope.launch {
+                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+
+        binding.requestSampleButton.setOnClickListener {
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkSampleRequest, user.uuid, sample_uuid, "", "" )
+            val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.sampleCheckBox.isChecked = false
+
+            lifecycleScope.launch {
+                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+
+        binding.requestNavPlansButton.setOnClickListener {
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkNavPlansRequest, user.uuid, sample_uuid, "", "" )
+            val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.navPlansCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
@@ -271,12 +253,17 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         binding.fieldsCheckBox.isChecked = false
         binding.rulesCheckBox.isChecked = false
         binding.filtersCheckBox.isChecked = false
+        binding.sampleCheckBox.isChecked = false
+        binding.navPlansCheckBox.isChecked = false
 
         val configs = DAO.configDAO.getConfigs()
 
         if (configs.isNotEmpty())
         {
             binding.configCheckBox.isChecked = true
+
+            val config = configs[0]
+            config_uuid = config.uuid
 
             val studies = DAO.studyDAO.getStudies()
 
@@ -285,6 +272,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 binding.studyCheckBox.isChecked = true
 
                 val study = studies[0]
+                study_uuid = study.uuid
 
                 val fields = DAO.fieldDAO.getFields(study.uuid)
                 binding.fieldsCheckBox.isChecked = fields.isNotEmpty()
@@ -294,6 +282,19 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                 val filters = DAO.filterDAO.getFilters(study.uuid)
                 binding.filtersCheckBox.isChecked = filters.isNotEmpty()
+
+                val samples = DAO.sampleDAO.getSamples(study.uuid)
+
+                if (samples.isNotEmpty())
+                {
+                    binding.sampleCheckBox.isChecked = true
+
+                    val sample = samples[0]
+                    sample_uuid = sample.uuid
+
+                    val navPlans = DAO.navPlanDAO.getNavPlans(sample.uuid)
+                    binding.navPlansCheckBox.isChecked = navPlans.isNotEmpty()
+                }
             }
         }
     }
@@ -344,6 +345,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             val pass = jsonObject.getString( Key.kPass.toString() )
             study_uuid = jsonObject.getString( Key.kStudy_uuid.toString() )
             config_uuid = jsonObject.getString( Key.kConfig_uuid.toString() )
+            sample_uuid = jsonObject.getString( Key.kSample_uuid.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {
@@ -562,6 +564,31 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                     activity!!.runOnUiThread {
                         binding.filtersCheckBox.isChecked = true
+                    }
+                }
+
+                NetworkCommand.NetworkSampleResponse ->
+                {
+                    val sample = Sample.unpack( networkCommand.message )
+
+                    DAO.sampleDAO.createSample( sample )
+
+                    activity!!.runOnUiThread {
+                        binding.sampleCheckBox.isChecked = true
+                    }
+                }
+
+                NetworkCommand.NetworkNavPlansResponse ->
+                {
+                    val networkNavPlans = NetworkNavPlans.unpack(networkCommand.message)
+
+                    for (navPlan in networkNavPlans.navPlans)
+                    {
+                        DAO.navPlanDAO.createNavPlan( navPlan )
+                    }
+
+                    activity!!.runOnUiThread {
+                        binding.navPlansCheckBox.isChecked = true
                     }
                 }
             }

@@ -178,6 +178,7 @@ class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                     val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
                     val pass = wifiConfiguration!!.preSharedKey //reservation.softApConfiguration.passphrase
+
                     Toast.makeText(activity!!.applicationContext, "ssid = " + ssid, Toast.LENGTH_SHORT).show()
 
                     Log.d( "xxx", "ssid = " + ssid );
@@ -228,6 +229,7 @@ class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     jsonObject.put( Key.kSSID.toString(), ssid )
                     jsonObject.put( Key.kPass.toString(), pass )
                     jsonObject.put( Key.kStudy_uuid.toString(), study.uuid )
+                    jsonObject.put( Key.kSample_uuid.toString(), sample.uuid )
                     jsonObject.put( Key.kConfig_uuid.toString(), study.config_uuid )
 
                     val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
@@ -395,6 +397,31 @@ class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     {
                         val networkFilterRules = NetworkFilterRules( filterRules )
                         val networkResponse = NetworkCommand( NetworkCommand.NetworkFilterRulesResponse, networkCommand.uuid, "", "", networkFilterRules.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    }
+                }
+            }
+
+            NetworkCommand.NetworkSampleRequest -> {
+                lifecycleScope.launch {
+                    DAO.sampleDAO.getSample( networkCommand.parm1 )?.let {
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkSampleResponse, networkCommand.uuid, "", "", it.pack())
+                        udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    } ?: Toast.makeText( activity!!.applicationContext, "sample<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            NetworkCommand.NetworkNavPlansRequest -> {
+                lifecycleScope.launch {
+                    val navPlans = DAO.navPlanDAO.getNavPlans( networkCommand.parm1 )
+                    if (navPlans.isEmpty())
+                    {
+                        Toast.makeText( activity!!.applicationContext, "navPlans<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        val networkNavPlans = NetworkNavPlans( navPlans )
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkNavPlansResponse, networkCommand.uuid, "", "", networkNavPlans.pack())
                         udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
                     }
                 }
