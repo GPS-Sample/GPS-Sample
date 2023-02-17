@@ -89,6 +89,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
         {
             sampleSizeIsVisible = false
+            binding.sampleSizeTextView.visibility = View.GONE
             binding.sampleSize1Layout.visibility = View.GONE
             binding.sampleSize2Layout.visibility = View.GONE
             binding.sampleSize3Layout.visibility = View.GONE
