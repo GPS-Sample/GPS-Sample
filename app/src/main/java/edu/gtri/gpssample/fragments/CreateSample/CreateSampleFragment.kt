@@ -225,10 +225,6 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
                     findNavController().navigate(R.id.action_navigate_to_ManageSampleFragment, bundle)
                 }
             }
-
-            R.id.action_delete_sample -> {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this sample?", 0, this)
-            }
         }
 
         return false

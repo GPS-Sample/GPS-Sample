@@ -322,10 +322,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
                 findNavController().navigate( R.id.action_navigate_to_ManageSamplesFragment, bundle )
             }
-
-            R.id.action_delete_study -> {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", deleteTag, this)
-            }
         }
 
         return false

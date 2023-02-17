@@ -7,10 +7,4 @@
         android:id="@+id/action_manage_sample"
         android:title="Manage Sample"
         app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_delete_sample"
-        android:title="@string/delete_sample"
-        app:showAsAction="never" />
-
 </menu>
