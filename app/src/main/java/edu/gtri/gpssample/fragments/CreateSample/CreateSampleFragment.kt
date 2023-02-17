@@ -109,7 +109,6 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
 
         if (quickStart)
         {
-            binding.cancelButton.visibility = View.GONE
             binding.saveButton.setText( "NEXT" )
         }
 
@@ -164,10 +163,6 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
                 }
                 else -> false
             }
-        }
-
-        binding.cancelButton.setOnClickListener {
-            findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {

@@ -73,14 +73,14 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
         if (quickStart)
         {
-            binding.nextButton.setText( "NEXT" )
+            binding.saveButton.setText( "NEXT" )
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
 
-        binding.nextButton.setOnClickListener {
+        binding.saveButton.setOnClickListener {
             if (quickStart)
             {
                 val bundle = Bundle()

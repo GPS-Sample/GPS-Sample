@@ -179,8 +179,6 @@ class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
                     val pass = wifiConfiguration!!.preSharedKey //reservation.softApConfiguration.passphrase
 
-                    Toast.makeText(activity!!.applicationContext, "ssid = " + ssid, Toast.LENGTH_SHORT).show()
-
                     Log.d( "xxx", "ssid = " + ssid );
                     Log.d( "xxx", "pass = " + pass );
 

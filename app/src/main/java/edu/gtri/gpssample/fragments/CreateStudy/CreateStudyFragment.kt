@@ -98,7 +98,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (quickStart)
         {
-            binding.cancelButton.visibility = View.GONE
             binding.saveButton.setText( "NEXT" )
         }
 
@@ -194,10 +193,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
             binding.sampleSize1EditText.setText("")
             binding.sampleSize2EditText.setText("")
-        }
-
-        binding.cancelButton.setOnClickListener {
-            findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
