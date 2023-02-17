@@ -78,10 +78,6 @@ class SignInFragment : Fragment()
                 else -> false
             }
         }
-
-        binding.nextButton.setOnClickListener {
-            handleNextButtonPress()
-        }
     }
 
     fun handleNextButtonPress()
