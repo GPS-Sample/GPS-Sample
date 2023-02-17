@@ -141,6 +141,10 @@
         tools:layout="@layout/fragment_create_sample">
 
         <action
+            android:id="@+id/action_navigate_to_ManageSampleFragment"
+            app:destination="@id/ManageSampleFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
 
@@ -174,9 +178,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/ManageStudyFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageStudy.ManageStudyFragment"
-        tools:layout="@layout/fragment_manage_study">
+        android:id="@+id/ManageSampleFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageSample.ManageSampleFragment"
+        tools:layout="@layout/fragment_manage_sample">
     </fragment>
 
     <fragment

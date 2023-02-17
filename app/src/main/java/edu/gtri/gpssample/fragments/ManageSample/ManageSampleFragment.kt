@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageStudy
+package edu.gtri.gpssample.fragments.ManageSample
 
 import android.graphics.Color
 import android.net.wifi.WifiManager
@@ -21,9 +21,8 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Key
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.databinding.FragmentManageStudyBinding
+import edu.gtri.gpssample.database.models.Sample
+import edu.gtri.gpssample.databinding.FragmentManageSampleBinding
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.network.UDPBroadcaster
@@ -34,9 +33,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.net.DatagramPacket
 import java.net.InetAddress
@@ -45,32 +41,33 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
+class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
     private var dataIsFresh = false
     private lateinit var study: Study
+    private lateinit var sample: Sample
     private var serverInetAddress: InetAddress? = null
     private var broadcastInetAddress: InetAddress? = null
-    private var _binding: FragmentManageStudyBinding? = null
+    private var _binding: FragmentManageSampleBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
-    private lateinit var studyAdapter: ManageStudyAdapter
+    private lateinit var studyAdapter: ManageSampleAdapter
     private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
-    private lateinit var viewModel: ManageStudyViewModel
+    private lateinit var viewModel: ManageSampleViewModel
     private var users = ArrayList<User>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ManageStudyViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(ManageSampleViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         setHasOptionsMenu( true )
 
-        _binding = FragmentManageStudyBinding.inflate(inflater, container, false)
+        _binding = FragmentManageSampleBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -87,33 +84,44 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.progressBar.visibility = View.VISIBLE
 
+        // required: sample_uuid
         if (arguments == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: sampleId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        val sample_uuid = arguments!!.getString( Key.kSample_uuid.toString(), "");
 
-        if (study_uuid.isEmpty())
+        if (sample_uuid.isEmpty())
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: sampleId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
+        DAO.sampleDAO.getSample( sample_uuid )?.let { sample ->
+            this.sample = sample
+        }
+
+        if (!this::sample.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Sample with id $sample_uuid not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        DAO.studyDAO.getStudy( sample.study_uuid )?.let { study ->
             this.study = study
         }
 
         if (!this::study.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id ${sample.study_uuid} not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
         binding.studyNameTextView.setText( "Study " + study.name )
 
-        studyAdapter = ManageStudyAdapter(users)
+        studyAdapter = ManageSampleAdapter(users)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = studyAdapter
@@ -208,7 +216,7 @@ class ManageStudyFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                         Log.d( "xxx", broadcast_address )
 
                         lifecycleScope.launch {
-                            udpBroadcaster.beginReceiving( serverInetAddress!!, this@ManageStudyFragment )
+                            udpBroadcaster.beginReceiving( serverInetAddress!!, this@ManageSampleFragment )
                         }
                     }
 

@@ -207,7 +207,6 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
     {
         val bundle = Bundle()
         bundle.putString( Key.kNavPlan_uuid.toString(), navPlan.uuid )
-
         findNavController().navigate(R.id.action_navigate_to_NavigationPlanFragment, bundle)
     }
 
@@ -221,6 +220,15 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
+            R.id.action_manage_sample -> {
+                if (this::sample.isInitialized)
+                {
+                    val bundle = Bundle()
+                    bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
+                    findNavController().navigate(R.id.action_navigate_to_ManageSampleFragment, bundle)
+                }
+            }
+
             R.id.action_delete_sample -> {
                 ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this sample?", 0, this)
             }
