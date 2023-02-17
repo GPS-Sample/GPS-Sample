@@ -4,12 +4,6 @@
     tools:context="edu.gtri.gpssample.activities.CreateStudyActivity">
 
     <item
-        android:id="@+id/action_create_study"
-        android:orderInCategory="100"
-        android:title="@string/create_study"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_edit_configuration"
         android:orderInCategory="100"
         android:title="@string/edit_config"

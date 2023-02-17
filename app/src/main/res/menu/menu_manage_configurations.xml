@@ -4,17 +4,7 @@
     tools:context="edu.gtri.gpssample.activities.CreateConfigurationActivity">
 
     <item
-        android:id="@+id/action_create_configuration"
-        android:title="@string/create_config"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_change_role"
         android:title="@string/change_role"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_quick_start"
-        android:title="Quick Start"
         app:showAsAction="never" />
 </menu>

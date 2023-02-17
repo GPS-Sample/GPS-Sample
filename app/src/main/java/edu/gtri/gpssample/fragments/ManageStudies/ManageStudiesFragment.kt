@@ -82,12 +82,16 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
         binding.recyclerView.adapter = manageStudiesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
+        binding.addButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+        }
+
         binding.createButton.setOnClickListener {
 
             val bundle = Bundle()
-
             bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
-
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
     }
@@ -138,14 +142,6 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
                 bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
 
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
-            }
-            R.id.action_create_study -> {
-                val bundle = Bundle()
-
-                bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
-
-                findNavController().navigate( R.id.action_navigate_to_CreateStudyFragment, bundle )
-                return true
             }
             R.id.action_delete_configuration -> {
                 ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)

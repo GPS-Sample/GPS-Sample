@@ -54,7 +54,13 @@ class ManageConfigurationsFragment : Fragment()
         binding.recyclerView.adapter = manageConfigurationsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.createButton.setOnClickListener {
+        binding.quickStartButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putBoolean( Key.kQuickStart.toString(), true )
+            findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
+        }
+
+        binding.addButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
     }
@@ -64,17 +70,6 @@ class ManageConfigurationsFragment : Fragment()
         super.onResume()
 
         val configurations = DAO.configDAO.getConfigs()
-
-        if (configurations.isEmpty())
-        {
-            binding.recyclerView.visibility = View.GONE
-            binding.relativeLayout.visibility = View.VISIBLE
-        }
-        else
-        {
-            binding.recyclerView.visibility = View.VISIBLE
-            binding.relativeLayout.visibility = View.GONE
-        }
 
         manageConfigurationsAdapter.updateConfigurations(configurations)
     }
@@ -97,18 +92,18 @@ class ManageConfigurationsFragment : Fragment()
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
-        when (item.itemId) {
-            R.id.action_create_configuration -> {
-                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment )
-                return true
-            }
-            R.id.action_quick_start -> {
-                val bundle = Bundle()
-                bundle.putBoolean( Key.kQuickStart.toString(), true )
-                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
-                return true
-            }
-        }
+//        when (item.itemId) {
+//            R.id.action_create_configuration -> {
+//                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment )
+//                return true
+//            }
+//            R.id.action_quick_start -> {
+//                val bundle = Bundle()
+//                bundle.putBoolean( Key.kQuickStart.toString(), true )
+//                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
+//                return true
+//            }
+//        }
 
         return false
     }

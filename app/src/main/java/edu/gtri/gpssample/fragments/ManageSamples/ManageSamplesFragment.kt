@@ -38,8 +38,6 @@ class ManageSamplesFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        setHasOptionsMenu( true )
-
         _binding = FragmentManageSamplesBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -76,12 +74,16 @@ class ManageSamplesFragment : Fragment()
         binding.recyclerView.adapter = manageSamplesAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
+        binding.addButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
+            findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
+        }
+
         binding.createButton.setOnClickListener {
 
             val bundle = Bundle()
-
             bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
-
             findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
         }
     }
@@ -113,26 +115,5 @@ class ManageSamplesFragment : Fragment()
         bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
 
         findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater.inflate(R.menu.menu_manage_samples, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        when (item.itemId) {
-            R.id.action_create_sample -> {
-                val bundle = Bundle()
-                bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
-
-                findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
-            }
-        }
-
-        return false
     }
 }
