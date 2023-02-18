@@ -38,6 +38,8 @@ class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        setHasOptionsMenu( true )
+
         _binding = FragmentManageSamplesBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -134,5 +136,30 @@ class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             DAO.sampleDAO.deleteSample( it )
             manageSamplesAdapter.updateSamples(DAO.sampleDAO.getSamples())
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_manage_samples, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.action_home -> {
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+            }
+        }
+
+        return false
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }

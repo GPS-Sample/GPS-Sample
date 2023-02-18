@@ -311,6 +311,10 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 }
             }
 
+            R.id.action_home -> {
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+            }
+
             R.id.action_manage_samples -> {
                 if (binding.studyNameEditText.text.toString().isEmpty())
                 {

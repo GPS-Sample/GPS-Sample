@@ -4,7 +4,6 @@
     tools:context="edu.gtri.gpssample.MainActivity">
     <item
         android:id="@+id/action_add_configuration"
-        android:orderInCategory="100"
         android:title="Add Configuration"
         app:showAsAction="never" />
 </menu>

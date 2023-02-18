@@ -4,8 +4,7 @@
     tools:context="edu.gtri.gpssample.activities.CreateFieldActivity">
 
     <item
-        android:id="@+id/action_create_sample"
-        android:title="@string/create_sample"
+        android:id="@+id/action_home"
+        android:title="Home"
         app:showAsAction="never" />
-
 </menu>

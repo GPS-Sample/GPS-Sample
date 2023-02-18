@@ -5,6 +5,8 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/MainFragment">
 
+<!--MainFragment-->
+
     <fragment
         android:id="@+id/MainFragment"
         android:name="edu.gtri.gpssample.fragments.Main.MainFragment"
@@ -19,6 +21,8 @@
             app:destination="@id/SignInFragment" />
     </fragment>
 
+    <!--SignUpFragment-->
+
     <fragment
         android:id="@+id/SignUpFragment"
         android:name="edu.gtri.gpssample.fragments.SignUp.SignUpFragment"
@@ -28,6 +32,8 @@
             android:id="@+id/action_navigate_to_SignInFragment"
             app:destination="@id/SignInFragment" />
     </fragment>
+
+    <!--SignInFragment-->
 
     <fragment
         android:id="@+id/SignInFragment"
@@ -43,6 +49,8 @@
             app:destination="@id/SystemStatusFragment" />
     </fragment>
 
+    <!--ManageConfigurationsFragment-->
+
     <fragment
         android:id="@+id/ManageConfigurationsFragment"
         android:name="edu.gtri.gpssample.fragments.ManageConfigurations.ManageConfigurationsFragment"
@@ -57,6 +65,8 @@
             app:destination="@id/ManageStudiesFragment"/>
     </fragment>
 
+    <!--CreateConfigurationFragment-->
+
     <fragment
         android:id="@+id/CreateConfigurationFragment"
         android:name="edu.gtri.gpssample.fragments.CreateConfiguration.CreateConfigurationFragment"
@@ -66,6 +76,8 @@
             android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
             app:destination="@id/DefineEnumerationAreaFragment"/>
     </fragment>
+
+    <!--DefineEnumerationAreaFragment-->
 
     <fragment
         android:id="@+id/DefineEnumerationAreaFragment"
@@ -81,10 +93,16 @@
             app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
 
+    <!--ManageStudiesFragment-->
+
     <fragment
         android:id="@+id/ManageStudiesFragment"
         android:name="edu.gtri.gpssample.fragments.ManageStudies.ManageStudiesFragment"
         tools:layout="@layout/fragment_manage_studies">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_CreateConfigurationFragment"
@@ -94,6 +112,8 @@
             android:id="@+id/action_navigate_to_CreateStudyFragment"
             app:destination="@id/CreateStudyFragment"/>
     </fragment>
+
+    <!--CreateStudyFragment-->
 
     <fragment
         android:id="@+id/CreateStudyFragment"
@@ -123,7 +143,13 @@
         <action
             android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
             app:destination="@id/DefineEnumerationAreaFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
+
+    <!--ManageSamplesFragment-->
 
     <fragment
         android:id="@+id/ManageSamplesFragment"
@@ -133,7 +159,13 @@
         <action
             android:id="@+id/action_navigate_to_CreateSampleFragment"
             app:destination="@id/CreateSampleFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
+
+    <!--CreateSampleFragment-->
 
     <fragment
         android:id="@+id/CreateSampleFragment"
@@ -153,11 +185,15 @@
             app:destination="@id/NavigationPlanFragment"/>
     </fragment>
 
+    <!--NavigationPlanFragment-->
+
     <fragment
         android:id="@+id/NavigationPlanFragment"
         android:name="edu.gtri.gpssample.fragments.NavigationPlan.NavigationPlanFragment"
         tools:layout="@layout/fragment_navigation_plan">
     </fragment>
+
+    <!--CreateFieldFragment-->
 
     <fragment
         android:id="@+id/CreateFieldFragment"
@@ -165,17 +201,23 @@
         tools:layout="@layout/fragment_create_field">
     </fragment>
 
+    <!--CreateRuleFragment-->
+
     <fragment
         android:id="@+id/CreateRuleFragment"
         android:name="edu.gtri.gpssample.fragments.CreateRule.CreateRuleFragment"
         tools:layout="@layout/fragment_create_rule">
     </fragment>
 
+    <!--CreateFilterFragment-->
+
     <fragment
         android:id="@+id/CreateFilterFragment"
         android:name="edu.gtri.gpssample.fragments.CreateFilter.CreateFilterFragment"
         tools:layout="@layout/fragment_create_filter">
     </fragment>
+
+    <!--ManageSampleFragment-->
 
     <fragment
         android:id="@+id/ManageSampleFragment"
@@ -186,6 +228,8 @@
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
+
+    <!--SystemStatusFragment-->
 
     <fragment
         android:id="@+id/SystemStatusFragment"

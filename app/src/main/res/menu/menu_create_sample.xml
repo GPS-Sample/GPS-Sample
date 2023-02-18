@@ -7,4 +7,9 @@
         android:id="@+id/action_manage_sample"
         android:title="Manage Sample"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_home"
+        android:title="Home"
+        app:showAsAction="never" />
 </menu>

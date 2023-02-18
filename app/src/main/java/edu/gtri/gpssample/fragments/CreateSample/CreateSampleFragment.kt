@@ -218,12 +218,17 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
 
         when (item.itemId) {
             R.id.action_manage_sample -> {
-                if (this::sample.isInitialized)
-                {
+                if (this::sample.isInitialized) {
                     val bundle = Bundle()
-                    bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
-                    findNavController().navigate(R.id.action_navigate_to_ManageSampleFragment, bundle)
+                    bundle.putString(Key.kSample_uuid.toString(), sample.uuid)
+                    findNavController().navigate(
+                        R.id.action_navigate_to_ManageSampleFragment,
+                        bundle
+                    )
                 }
+            }
+            R.id.action_home -> {
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
             }
         }
 

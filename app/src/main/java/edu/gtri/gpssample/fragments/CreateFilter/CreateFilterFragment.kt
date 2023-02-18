@@ -263,4 +263,11 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
 
         createFilterAdapter.updateFilterRules( filterRules )
     }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
+    }
 }

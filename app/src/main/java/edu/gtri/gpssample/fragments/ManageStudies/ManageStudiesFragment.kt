@@ -163,6 +163,10 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
             }
+
+            R.id.action_home -> {
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+            }
         }
 
         return false
