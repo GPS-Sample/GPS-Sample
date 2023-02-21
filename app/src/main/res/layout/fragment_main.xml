@@ -10,8 +10,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <TextView
             android:layout_width="match_parent"
@@ -84,6 +83,14 @@
             android:gravity="center"
             android:textSize="17sp"
             android:text="@string/not_registered" />
-    </RelativeLayout>
 
+        <TextView
+            android:id="@+id/version_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:text="xxx"
+            android:textSize="14sp" />
+    </RelativeLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>

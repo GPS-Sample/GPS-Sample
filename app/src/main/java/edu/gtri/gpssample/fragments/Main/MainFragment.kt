@@ -48,6 +48,8 @@ class MainFragment : Fragment()
             }
         }
 
+        binding.versionTextView.text = BuildConfig.VERSION_NAME
+
         binding.signInButton.isEnabled = false
 
         binding.adminButton.setOnClickListener {

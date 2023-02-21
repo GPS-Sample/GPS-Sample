@@ -32,12 +32,22 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/wifi_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="WiFi Connected" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/wifi_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="WiFi Connected" />
+
+                <View
+                    android:id="@+id/wifi_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
 
             <ImageButton
                 android:id="@+id/request_wifi_button"
@@ -55,12 +65,23 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/config_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="Configuration Received" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/config_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Configuration Received" />
+
+                <View
+                    android:id="@+id/config_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
 
             <ImageButton
                 android:id="@+id/request_config_button"
@@ -78,12 +99,23 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/study_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="Study Received" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/study_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Study Received" />
+
+                <View
+                    android:id="@+id/study_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
 
             <ImageButton
                 android:id="@+id/request_study_button"
@@ -101,12 +133,22 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/fields_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="Study Fields Received" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/fields_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Study Fields Received" />
+
+                <View
+                    android:id="@+id/fields_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
 
             <ImageButton
                 android:id="@+id/request_fields_button"
@@ -124,12 +166,22 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/rules_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="Study Rules Received" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/rules_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Study Rules Received" />
+
+                <View
+                    android:id="@+id/rules_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
 
             <ImageButton
                 android:id="@+id/request_rules_button"
@@ -147,12 +199,22 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/filters_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="Study Filters Received" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/filters_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Study Filters Received" />
+
+                <View
+                    android:id="@+id/filters_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
 
             <ImageButton
                 android:id="@+id/request_filters_button"
@@ -170,12 +232,23 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/sample_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="Sample Received" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/sample_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Sample Received" />
+
+                <View
+                    android:id="@+id/sample_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
 
             <ImageButton
                 android:id="@+id/request_sample_button"
@@ -193,12 +266,22 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <CheckBox
-                android:id="@+id/nav_plans_check_box"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_weight="1"
-                android:text="Nav Plans Received" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <CheckBox
+                    android:id="@+id/nav_plans_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Nav Plans Received" />
+
+                <View
+                    android:id="@+id/nav_plans_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
 
             <ImageButton
                 android:id="@+id/request_nav_plans_button"

@@ -76,6 +76,15 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
+        binding.wifiView.setOnClickListener {}
+        binding.configView.setOnClickListener {}
+        binding.studyView.setOnClickListener {}
+        binding.fieldsView.setOnClickListener {}
+        binding.rulesView.setOnClickListener {}
+        binding.filtersView.setOnClickListener {}
+        binding.sampleView.setOnClickListener {}
+        binding.navPlansView.setOnClickListener {}
+
         (activity!!.application as? MainApplication)?.user?.let { user ->
             this.user = user
         }
