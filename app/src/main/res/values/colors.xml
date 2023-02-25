@@ -13,4 +13,5 @@
     <color name="primary_textcolor">@color/primary</color>
     <color name="secondary_textcolor">@color/primary</color>
     <color name="light_gray">#CCCCCC</color>
+    <color name="background">#F4F2F2</color>
 </resources>

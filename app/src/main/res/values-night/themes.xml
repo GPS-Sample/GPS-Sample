@@ -20,7 +20,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-
+    <style name="MyActionBarStyle" parent="ThemeOverlay.AppCompat">
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
     <style name="Theme.GPSSample.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.GPSSample.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

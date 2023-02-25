@@ -22,4 +22,9 @@
     <style name="Theme.GPSSample.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.GPSSample.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MyActionBarStyle" parent="ThemeOverlay.AppCompat">
+        <item name="android:paddingStart">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+    </style>
 </resources>
