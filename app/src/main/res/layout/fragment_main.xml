@@ -9,110 +9,124 @@
     android:orientation="vertical"
     tools:context=".fragments.Main.MainFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/linearLayout"
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:theme="@style/Theme.GPSSample"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true">
+        android:orientation="vertical"
+        android:weightSum="4">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_alignParentTop="true"
+            android:layout_weight="3">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="start"
-            android:paddingHorizontal="10dp"
-            android:text="@string/select_role"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/admin_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/textView"
+
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="15dp"
+                android:paddingHorizontal="10dp"
+                android:text="@string/select_role"
+                android:textColor="@color/primary_low"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/radioGroupMode"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/textView">
+            <RadioButton
+                android:id="@+id/admin_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="22dp"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/admin"
+                android:textSize="20sp"/>
+
+            <RadioButton
+                android:id="@+id/supervisor_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="22dp"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/supervisor"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/data_collector_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="22dp"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/data_collector"
+                android:textSize="20sp" />
+            </RadioGroup>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/sign_in_button"
+                android:theme="@style/Theme.GPSSample.ActionButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="@color/white"
+                android:text="@string/sign_in" />
+
+            <TextView
+                android:id="@+id/sign_up_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="@string/not_registered"
+                android:textSize="17sp"
+                app:layout_constraintBottom_toTopOf="@+id/version_text_view"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
+
+            <TextView
+                android:id="@+id/version_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="357dp"
+                android:gravity="center"
+                android:text="xxx"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sign_up_text_view" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-        <RadioButton
-            android:id="@+id/admin_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="@string/admin"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/supervisor_button"
-            app:layout_constraintEnd_toEndOf="@+id/supervisor_button"
-            app:layout_constraintStart_toStartOf="@+id/supervisor_button"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-        <RadioButton
-            android:id="@+id/supervisor_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="@string/supervisor"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/data_collector_button"
-            app:layout_constraintEnd_toEndOf="@+id/data_collector_button"
-            app:layout_constraintStart_toStartOf="@+id/data_collector_button"
-            app:layout_constraintTop_toBottomOf="@+id/admin_button" />
-
-        <RadioButton
-            android:id="@+id/data_collector_button"
-            android:layout_width="329dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:layout_marginLeft="22dp"
-            android:layout_marginBottom="20dp"
-            android:gravity="start"
-            android:text="@string/data_collector"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/sign_in_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/supervisor_button" />
-
-
-        <Button
-            android:id="@+id/sign_in_button"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/sign_in"
-            app:layout_constraintBottom_toTopOf="@+id/sign_up_text_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/data_collector_button" />
-
-
-        <TextView
-            android:id="@+id/sign_up_text_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="@string/not_registered"
-            android:textSize="17sp"
-            app:layout_constraintBottom_toTopOf="@+id/version_text_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
-
-        <TextView
-            android:id="@+id/version_text_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="357dp"
-            android:gravity="center"
-            android:text="xxx"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_text_view" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>

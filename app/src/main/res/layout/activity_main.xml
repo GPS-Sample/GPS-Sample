@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/background"
-        android:theme="@style/MyActionBarStyle"
+        android:theme="@style/Theme.GPSSample.ActionBarStyle"
 
         app:elevation="0dp">
 
@@ -19,8 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/background"
-            app:popupTheme="@style/Theme.GPSSample.PopupOverlay"
-            app:contentInsetStart="16dp"/>
+            app:contentInsetStart="16dp"
+            app:popupTheme="@style/Theme.GPSSample.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_main" />

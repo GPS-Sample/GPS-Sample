@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/averia_serif_libre</item>
+        <item>@font/averia_serif_libre_bold</item>
+        <item>@font/averia_serif_libre_bold_italic</item>
+        <item>@font/averia_serif_libre_italic</item>
+        <item>@font/averia_serif_libre_light_italic</item>
+        <item>@font/work_sans_medium</item>
+    </array>
+</resources>

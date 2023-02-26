@@ -11,9 +11,9 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
+
         <item name="android:statusBarColor">?attr/colorPrimary</item>
-        <!-- Customize your theme here. -->
+        <item name="android:fontFamily">@font/work_sans_medium</item>
     </style>
 
     <style name="Theme.GPSSample.NoActionBar">
@@ -27,4 +27,8 @@
     <style name="Theme.GPSSample.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.GPSSample.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.GPSSample.ActionBarStyle" parent="ThemeOverlay.AppCompat">
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:paddingStart">0dp</item>
+    </style>
 </resources>
