@@ -9,13 +9,17 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.GPSSample.AppBarOverlay">
+        android:background="@color/background"
+        android:theme="@style/Theme.GPSSample.ActionBarStyle"
+
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/background"
+            app:contentInsetStart="16dp"
             app:popupTheme="@style/Theme.GPSSample.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 

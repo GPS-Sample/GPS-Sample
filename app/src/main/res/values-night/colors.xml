@@ -12,4 +12,5 @@
     <color name="primary_textcolor">#FFFFFFFF</color>
     <color name="secondary_textcolor">#FF0360A9</color>
     <color name="light_gray">#CCCCCC</color>
+    <color name="background">#2F2E2E</color>
 </resources>

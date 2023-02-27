@@ -13,4 +13,13 @@
     <color name="primary_textcolor">@color/primary</color>
     <color name="secondary_textcolor">@color/primary</color>
     <color name="light_gray">#CCCCCC</color>
+    <color name="background">#F4F2F2</color>
+
+    <color name="text_light">#D8D8D8</color>
+    <color name="primary_high">#2E67ED</color>
+    <color name="primary_low">#19367A</color>
+    <color name="secondary_high">#E0E1ED</color>
+    <color name="secondary_mid">#626269</color>
+    <color name="secondary_low">#212124</color>
+
 </resources>

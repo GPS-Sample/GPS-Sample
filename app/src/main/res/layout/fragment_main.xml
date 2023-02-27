@@ -1,53 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    android:id="@+id/fragment_root_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/fragment_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".fragments.Main.MainFragment">
 
-    <RelativeLayout
+    <Space
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="50dp" />
 
-        <TextView
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:theme="@style/Theme.GPSSample"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="4">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_above="@+id/radio_group"
-            android:gravity="center"
-            android:text="@string/select_role"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_height="0px"
+            android:layout_alignParentTop="true"
+            android:layout_weight="3">
 
-        <RadioGroup
-            android:id="@+id/radio_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@+id/sign_in_button"
-            android:orientation="vertical">
+            <TextView
+                android:id="@+id/textView"
 
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="15dp"
+                android:paddingHorizontal="10dp"
+                android:text="@string/select_role"
+                android:textColor="@color/primary_low"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/radioGroupMode"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/textView">
             <RadioButton
                 android:id="@+id/admin_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="40dp"
-                android:gravity="center"
+                android:layout_marginStart="22dp"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/admin"
-                android:textSize="20sp" />
+                android:textSize="20sp"/>
 
             <RadioButton
                 android:id="@+id/supervisor_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="40dp"
-                android:gravity="center"
+                android:layout_marginStart="22dp"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/supervisor"
                 android:textSize="20sp" />
 
@@ -55,42 +72,60 @@
                 android:id="@+id/data_collector_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="40dp"
-                android:gravity="center"
+                android:layout_marginStart="22dp"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/data_collector"
                 android:textSize="20sp" />
-        </RadioGroup>
+            </RadioGroup>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
-            android:id="@+id/sign_in_button"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_centerInParent="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/sign_in" />
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/sign_up_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/sign_in_button"
-            android:gravity="center"
-            android:textSize="17sp"
-            android:text="@string/not_registered" />
+            <Button
+                android:id="@+id/sign_in_button"
+                android:theme="@style/Theme.GPSSample.ActionButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="@color/white"
+                android:text="@string/sign_in" />
 
-        <TextView
-            android:id="@+id/version_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:text="xxx"
-            android:textSize="14sp" />
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/sign_up_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="@string/not_registered"
+                android:textSize="17sp"
+                app:layout_constraintBottom_toTopOf="@+id/version_text_view"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
+
+            <TextView
+                android:id="@+id/version_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="357dp"
+                android:gravity="center"
+                android:text="xxx"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sign_up_text_view" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
 </androidx.appcompat.widget.LinearLayoutCompat>

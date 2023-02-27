@@ -1,6 +1,8 @@
 package edu.gtri.gpssample.activities
 
+import android.app.Application
 import android.content.*
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -75,6 +77,16 @@ class MainActivity : AppCompatActivity()
         ContextCompat.startForegroundService(this, serviceIntent)
         val intent = Intent(this, UDPBroadcastReceiverService::class.java)
         this.bindService( intent, serviceConnection, Context.BIND_AUTO_CREATE)
+
+       // Maybe there's a way to configure this better?
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        when (currentNightMode) {
+            Configuration.UI_MODE_NIGHT_NO -> {supportActionBar?.setIcon(R.drawable.gps_sample_light)} // Night mode is not active, we're using the light theme.
+            Configuration.UI_MODE_NIGHT_YES -> {supportActionBar?.setIcon(R.drawable.gps_sample_dark)} // Night mode is active, we're using dark theme.
+        }
+
+
+
     }
 
     private val serviceConnection = object : ServiceConnection {
