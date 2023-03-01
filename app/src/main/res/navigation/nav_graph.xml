@@ -137,8 +137,8 @@
             app:destination="@id/CreateFilterFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_ManageSamplesFragment"
-            app:destination="@id/ManageSamplesFragment"/>
+            android:id="@+id/action_navigate_to_ManageSupervisorsFragment"
+            app:destination="@id/ManageSupervisorsFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
@@ -152,9 +152,9 @@
     <!--ManageSamplesFragment-->
 
     <fragment
-        android:id="@+id/ManageSamplesFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesFragment"
-        tools:layout="@layout/fragment_create_field">
+        android:id="@+id/ManageSupervisorsFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageSupervisors.ManageSupervisorsFragment"
+        tools:layout="@layout/fragment_manage_supervisors">
 
         <action
             android:id="@+id/action_navigate_to_CreateSampleFragment"

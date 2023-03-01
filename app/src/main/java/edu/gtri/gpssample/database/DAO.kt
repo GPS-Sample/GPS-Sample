@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.database.models.Coordinate
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
@@ -110,6 +111,26 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_NAV_PLAN_NAME + " TEXT" +
                 ")")
         db.execSQL(createTableNavigationPlan)
+
+        val createTableEnumArea = ("CREATE TABLE " +
+                TABLE_ENUM_AREA + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ENUM_AREA_CONFIG_UUID + " TEXT" + "," +
+                COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
+                COLUMN_ENUM_AREA_TOP_LEFT + " TEXT" + "," +
+                COLUMN_ENUM_AREA_TOP_RIGHT + " TEXT" + "," +
+                COLUMN_ENUM_AREA_BOT_RIGHT + " TEXT" + "," +
+                COLUMN_ENUM_AREA_BOT_LEFT + " TEXT" +
+                ")")
+        db.execSQL(createTableEnumArea)
+
+        val createTableCoordinate = ("CREATE TABLE " +
+                TABLE_COORDINATE + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_COORDINATE_LAT + " REAL" + "," +
+                COLUMN_COORDINATE_LON + " REAL" +
+                ")")
+        db.execSQL(createTableCoordinate)
     }
 
     //--------------------------------------------------------------------------
@@ -125,6 +146,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERRULE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAMPLE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAV_PLAN)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUM_AREA)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE)
 
         onCreate(db)
     }
@@ -208,6 +231,20 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_NAV_PLAN_SAMPLE_UUID = "nav_plan_sample_id"
         const val COLUMN_NAV_PLAN_NAME = "nav_plan_name"
 
+        // EnumArea Table
+        const val TABLE_ENUM_AREA = "enum_area"
+        const val COLUMN_ENUM_AREA_CONFIG_UUID = "enum_area_config_uuid"
+        const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
+        const val COLUMN_ENUM_AREA_TOP_LEFT = "top_left"
+        const val COLUMN_ENUM_AREA_TOP_RIGHT = "top_right"
+        const val COLUMN_ENUM_AREA_BOT_RIGHT = "bot_right"
+        const val COLUMN_ENUM_AREA_BOT_LEFT = "bot_left"
+
+        // Coordinate Table
+        const val TABLE_COORDINATE = "coordinate"
+        const val COLUMN_COORDINATE_LAT = "lat"
+        const val COLUMN_COORDINATE_LON = "lon"
+
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -218,6 +255,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var filterRuleDAO: FilterRuleDAO
         lateinit var sampleDAO: SampleDAO
         lateinit var navPlanDAO: NavPlanDAO
+        lateinit var enumAreaDAO: EnumAreaDAO
+        lateinit var coordinateDAO: CoordinateDAO
 
         // creation/access methods
 
@@ -231,18 +270,20 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
                 userDAO = UserDAO( instance!! )
                 configDAO = ConfigDAO( instance!! )
-                studyDAO = StudyDAO(( instance!! ))
-                fieldDAO = FieldDAO(( instance!! ))
-                ruleDAO = RuleDAO(( instance!! ))
-                filterDAO = FilterDAO(( instance!! ))
-                filterRuleDAO = FilterRuleDAO(( instance!! ))
-                sampleDAO = SampleDAO(( instance!! ))
-                navPlanDAO = NavPlanDAO(( instance!! ))
+                studyDAO = StudyDAO( instance!! )
+                fieldDAO = FieldDAO( instance!! )
+                ruleDAO = RuleDAO( instance!! )
+                filterDAO = FilterDAO( instance!! )
+                filterRuleDAO = FilterRuleDAO( instance!! )
+                sampleDAO = SampleDAO( instance!! )
+                navPlanDAO = NavPlanDAO( instance!! )
+                enumAreaDAO = EnumAreaDAO( instance!! )
+                coordinateDAO = CoordinateDAO( instance!! )
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 45
+        private const val DATABASE_VERSION = 48
     }
 }

@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity()
             DAO.filterRuleDAO.deleteOrphans()
             DAO.sampleDAO.deleteOrphans()
             DAO.navPlanDAO.deleteOrphans()
+            DAO.enumAreaDAO.deleteOrphans()
 
             val configurations = DAO.configDAO.getConfigs()
             Log.d( "xxx", "found ${configurations.size} Configurations" )
@@ -62,6 +63,9 @@ class MainActivity : AppCompatActivity()
 
             val navPlans = DAO.navPlanDAO.getNavPlans()
             Log.d( "xxx", "found ${navPlans.size} NavPlans" )
+
+            val enumAreas = DAO.enumAreaDAO.getEnumAreas()
+            Log.d( "xxx", "found ${enumAreas.size} EnumAreas" )
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

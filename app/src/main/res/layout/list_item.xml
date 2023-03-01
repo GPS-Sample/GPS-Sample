@@ -27,7 +27,7 @@
         android:textColor="@color/white"/>
 
     <ImageView
-        android:id="@+id/delete_image_view"
+        android:id="@+id/image_view"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
         android:layout_width="40dp"

@@ -33,7 +33,7 @@
                 android:layout_marginBottom="15dp"
                 android:paddingHorizontal="10dp"
                 android:text="@string/select_role"
-                android:textColor="@color/primary_low"
+                android:textColor="@color/primary_textcolor"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/radioGroupMode"

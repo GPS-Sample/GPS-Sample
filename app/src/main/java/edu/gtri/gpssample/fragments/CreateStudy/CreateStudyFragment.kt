@@ -315,7 +315,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
             }
 
-            R.id.action_manage_samples -> {
+            R.id.action_manage_supervisors -> {
                 if (binding.studyNameEditText.text.toString().isEmpty())
                 {
                     Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
@@ -323,8 +323,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 }
 
                 val bundle = Bundle()
-                bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
-                findNavController().navigate( R.id.action_navigate_to_ManageSamplesFragment, bundle )
+                bundle.putString( Key.kConfig_uuid.toString(), study.config_uuid )
+                findNavController().navigate( R.id.action_navigate_to_ManageSupervisorsFragment, bundle )
             }
         }
 
@@ -391,9 +391,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         if (quickStart)
         {
             val bundle = Bundle()
-            bundle.putBoolean( Key.kQuickStart.toString(), quickStart )
-            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
-            findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
+            bundle.putString( Key.kConfig_uuid.toString(), study.config_uuid )
+            findNavController().navigate( R.id.action_navigate_to_ManageSupervisorsFragment, bundle )
         }
         else
         {

@@ -4,12 +4,12 @@
     tools:context="edu.gtri.gpssample.activities.CreateFieldActivity">
 
     <item
-        android:id="@+id/action_manage_samples"
-        android:title="@string/manage_samples"
+        android:id="@+id/action_manage_supervisors"
+        android:title="@string/manage_supervisors"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_home"
-        android:title="Home"
+        android:title="@string/home"
         app:showAsAction="never" />
 </menu>

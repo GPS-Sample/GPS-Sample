@@ -45,7 +45,7 @@
             android:layout_height="50dp">
 
             <ImageView
-                android:id="@+id/delete_image_view"
+                android:id="@+id/image_view"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
