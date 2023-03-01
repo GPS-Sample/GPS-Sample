@@ -137,8 +137,8 @@
             app:destination="@id/CreateFilterFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_ManageSupervisorsFragment"
-            app:destination="@id/ManageSupervisorsFragment"/>
+            android:id="@+id/action_navigate_to_ManageEnumerationAreasFragment"
+            app:destination="@id/ManageEnumerationAreasFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
@@ -149,20 +149,28 @@
             app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
 
-    <!--ManageSamplesFragment-->
+    <!--ManageEnumerationAreasFragment-->
 
     <fragment
-        android:id="@+id/ManageSupervisorsFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageSupervisors.ManageSupervisorsFragment"
-        tools:layout="@layout/fragment_manage_supervisors">
+        android:id="@+id/ManageEnumerationAreasFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageEnumerationAreas.ManageEnumerationAreasFragment"
+        tools:layout="@layout/fragment_manage_enumeration_areas">
 
         <action
-            android:id="@+id/action_navigate_to_CreateSampleFragment"
-            app:destination="@id/CreateSampleFragment"/>
+            android:id="@+id/action_navigate_to_ManageEnumerationAreaFragment"
+            app:destination="@id/ManageEnumerationAreaFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
+    </fragment>
+
+    <!-- ManageEnumerationAreaFragment   -->
+
+    <fragment
+        android:id="@+id/ManageEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaFragment"
+        tools:layout="@layout/fragment_manage_enumeration_area">
     </fragment>
 
     <!--CreateSampleFragment-->
@@ -221,8 +229,8 @@
 
     <fragment
         android:id="@+id/ManageSampleFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageSample.ManageSampleFragment"
-        tools:layout="@layout/fragment_manage_sample">
+        android:name="edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaFragment"
+        tools:layout="@layout/fragment_manage_enumeration_area">
 
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"

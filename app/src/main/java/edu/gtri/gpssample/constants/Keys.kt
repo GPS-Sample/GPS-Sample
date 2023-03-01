@@ -1,6 +1,6 @@
 package edu.gtri.gpssample.constants
 
-enum class Key {
+enum class Keys {
     kPin,
     kRole,
     kSSID,
@@ -18,5 +18,6 @@ enum class Key {
     kConfig_uuid,
     kSample_uuid,
     kNavPlan_uuid,
+    kEnumArea_uuid,
     kSamplingMethod,
 }

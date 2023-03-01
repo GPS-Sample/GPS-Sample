@@ -1,7 +1,6 @@
-package edu.gtri.gpssample.fragments.ManageSupervisors
+package edu.gtri.gpssample.fragments.ManageEnumerationAreas
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,19 +12,21 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.databinding.FragmentManageSupervisorsBinding
+import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreasBinding
 import edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesViewModel
 
-class ManageSupervisorsFragment : Fragment()
+class ManageEnumerationAreasFragment : Fragment()
 {
-    private var _binding: FragmentManageSupervisorsBinding? = null
+    private var _binding: FragmentManageEnumerationAreasBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var study: Study
     private lateinit var viewModel: ManageSamplesViewModel
-    private lateinit var manageSupervisorsAdapter: ManageSupervisorsAdapter
+    private lateinit var manageSupervisorsAdapter: ManageEnumerationAreasAdapter
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -37,7 +38,7 @@ class ManageSupervisorsFragment : Fragment()
     {
         setHasOptionsMenu( true )
 
-        _binding = FragmentManageSupervisorsBinding.inflate(inflater, container, false)
+        _binding = FragmentManageEnumerationAreasBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -59,17 +60,26 @@ class ManageSupervisorsFragment : Fragment()
             return
         }
 
-        val config_uuid = arguments!!.getString(Key.kConfig_uuid.toString(), "");
+        val study_uuid = arguments!!.getString(Keys.kStudy_uuid.toString(), "");
 
-        if (config_uuid.isEmpty()) {
+        if (study_uuid.isEmpty()) {
             Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        Log.d( "xxx", config_uuid )
-        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config_uuid )
+        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
+            this.study = study
+        }
 
-        manageSupervisorsAdapter = ManageSupervisorsAdapter( enumAreas )
+        if (!this::study.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val enumAreas = DAO.enumAreaDAO.getEnumAreas( study.config_uuid )
+
+        manageSupervisorsAdapter = ManageEnumerationAreasAdapter( enumAreas )
         manageSupervisorsAdapter.didSelectEnumArea = this::didSelectEnumArea
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -83,10 +93,9 @@ class ManageSupervisorsFragment : Fragment()
 
     fun didSelectEnumArea(enumArea: EnumArea)
     {
-//        val bundle = Bundle()
-//        bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
-//        bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
-//
-//        findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
+        val bundle = Bundle()
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
     }
 }

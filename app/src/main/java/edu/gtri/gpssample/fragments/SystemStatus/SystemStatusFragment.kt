@@ -28,7 +28,6 @@ import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
@@ -95,7 +94,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             return
         }
 
-        arguments?.getString(Key.kRole.toString())?.let { role ->
+        arguments?.getString(Keys.kRole.toString())?.let { role ->
             this.role = role
         }
 
@@ -112,8 +111,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             if (study_uuid.isNotEmpty() && sample_uuid.isNotEmpty())
             {
                 val bundle = Bundle()
-                bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
-                bundle.putString( Key.kSample_uuid.toString(), sample_uuid )
+                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+                bundle.putString( Keys.kSample_uuid.toString(), sample_uuid )
                 findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
             }
         }
@@ -344,17 +343,17 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         if (resultCode == ResultCode.BarcodeScanned.value)
         {
-            val payload = data!!.getStringExtra( Key.kPayload.toString())
+            val payload = data!!.getStringExtra( Keys.kPayload.toString())
 
             val jsonObject = JSONObject( payload );
 
             Log.d( "xxx", jsonObject.toString(2))
 
-            val ssid = jsonObject.getString( Key.kSSID.toString() )
-            val pass = jsonObject.getString( Key.kPass.toString() )
-            study_uuid = jsonObject.getString( Key.kStudy_uuid.toString() )
-            config_uuid = jsonObject.getString( Key.kConfig_uuid.toString() )
-            sample_uuid = jsonObject.getString( Key.kSample_uuid.toString() )
+            val ssid = jsonObject.getString( Keys.kSSID.toString() )
+            val pass = jsonObject.getString( Keys.kPass.toString() )
+            study_uuid = jsonObject.getString( Keys.kStudy_uuid.toString() )
+            config_uuid = jsonObject.getString( Keys.kConfig_uuid.toString() )
+            sample_uuid = jsonObject.getString( Keys.kSample_uuid.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {

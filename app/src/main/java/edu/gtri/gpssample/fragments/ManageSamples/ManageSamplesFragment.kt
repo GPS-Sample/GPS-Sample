@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.ManageSamples
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -11,15 +10,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Sample
-import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentManageSamplesBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.fragments.ManageStudies.ManageSamplesAdapter
-import edu.gtri.gpssample.fragments.ManageStudies.ManageStudiesAdapter
 
 class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -61,7 +57,7 @@ class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             return
         }
 
-        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
@@ -79,13 +75,13 @@ class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
         binding.addButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
+            bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
             findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
         }
 
         binding.createButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
+            bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
             findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
         }
     }
@@ -113,8 +109,8 @@ class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     fun didSelectSample(sample: Sample)
     {
         val bundle = Bundle()
-        bundle.putString( Key.kStudy_uuid.toString(), study_uuid )
-        bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
+        bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+        bundle.putString( Keys.kSample_uuid.toString(), sample.uuid )
 
         findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
     }

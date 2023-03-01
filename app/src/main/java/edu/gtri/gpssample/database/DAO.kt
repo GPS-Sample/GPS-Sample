@@ -3,8 +3,6 @@ package edu.gtri.gpssample.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.database.models.Coordinate
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )

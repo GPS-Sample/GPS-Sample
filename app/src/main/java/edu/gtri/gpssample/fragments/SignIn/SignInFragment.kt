@@ -13,13 +13,10 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.NavPlan
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
-import java.util.*
-import kotlin.collections.ArrayList
 
 class SignInFragment : Fragment()
 {
@@ -50,7 +47,7 @@ class SignInFragment : Fragment()
             }
         }
 
-        arguments?.getString(Key.kRole.toString())?.let { role ->
+        arguments?.getString(Keys.kRole.toString())?.let { role ->
             this.role = role
         }
 
@@ -63,7 +60,7 @@ class SignInFragment : Fragment()
         binding.titleTextView.text = role.toString() + " Sign In"
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val userName = sharedPreferences.getString( Key.kUserName.toString(), null)
+        val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)
 
         userName?.let {
             binding.nameEditText.setText( userName )
@@ -109,7 +106,7 @@ class SignInFragment : Fragment()
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
-                editor.putString( Key.kUserName.toString(), userName )
+                editor.putString( Keys.kUserName.toString(), userName )
                 editor.commit()
 
                 (activity!!.application as? MainApplication)?.user = user
@@ -117,7 +114,7 @@ class SignInFragment : Fragment()
                 binding.pinEditText.setText("")
 
                 val bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), role.toString())
+                bundle.putString( Keys.kRole.toString(), role.toString())
 
                 if (role == Role.Admin.toString())
                 {

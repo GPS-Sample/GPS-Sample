@@ -12,11 +12,10 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
-import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import java.util.UUID
@@ -60,7 +59,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             return
         }
 
-        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
@@ -78,7 +77,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 //            return
 //        }
 
-        val rule_uuid = arguments!!.getString( Key.kRule_uuid.toString(), "");
+        val rule_uuid = arguments!!.getString( Keys.kRule_uuid.toString(), "");
 
         if (rule_uuid.isNotEmpty())
         {

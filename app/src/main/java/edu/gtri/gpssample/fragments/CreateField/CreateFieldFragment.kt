@@ -9,12 +9,11 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.Study
 import java.util.*
 
 class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
@@ -76,7 +75,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
@@ -94,7 +93,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 //            return
 //        }
 
-        val field_uuid = arguments!!.getString( Key.kField_uuid.toString(), "" );
+        val field_uuid = arguments!!.getString( Keys.kField_uuid.toString(), "" );
 
         if (field_uuid.isNotEmpty())
         {

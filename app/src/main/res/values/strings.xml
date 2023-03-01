@@ -173,5 +173,6 @@
     <string name="delete_sample">Delete Sample</string>
     <string name="manage_supervisors">Manage Supervisors</string>
     <string name="home">Home</string>
+    <string name="manage_enumeration_areas">Manage Enumeration Areas</string>
 
 </resources>

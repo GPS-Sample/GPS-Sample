@@ -1,8 +1,7 @@
-package edu.gtri.gpssample.fragments.ManageSupervisors
+package edu.gtri.gpssample.fragments.ManageEnumerationAreas
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.EnumArea
 
 
-class ManageSupervisorsAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ManageSupervisorsAdapter.ViewHolder>()
+class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ManageEnumerationAreasAdapter.ViewHolder>()
 {
     override fun getItemCount() = enumAreas!!.size
 

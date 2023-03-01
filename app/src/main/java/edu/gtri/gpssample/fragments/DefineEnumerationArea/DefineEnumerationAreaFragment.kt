@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.DefineEnumerationArea
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,13 +13,11 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.EnumAreaDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Coordinate
 import edu.gtri.gpssample.database.models.EnumArea
@@ -65,7 +62,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
             return
         }
 
-        val config_uuid = arguments!!.getString( Key.kConfig_uuid.toString(), "");
+        val config_uuid = arguments!!.getString( Keys.kConfig_uuid.toString(), "");
 
         if (config_uuid.isEmpty())
         {
@@ -83,7 +80,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
             return
         }
 
-        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
 
         quick_start?.let {
             quickStart = it
@@ -102,8 +99,8 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
             if (quickStart)
             {
                 val bundle = Bundle()
-                bundle.putBoolean( Key.kQuickStart.toString(), quickStart )
-                bundle.putString( Key.kConfig_uuid.toString(), config_uuid )
+                bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
+                bundle.putString( Keys.kConfig_uuid.toString(), config_uuid )
                 findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
             }
             else

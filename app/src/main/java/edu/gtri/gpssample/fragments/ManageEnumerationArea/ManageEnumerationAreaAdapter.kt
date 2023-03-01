@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageSample
+package edu.gtri.gpssample.fragments.ManageEnumerationArea
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.User
 
-class ManageSampleAdapter(var users: List<User>?) : RecyclerView.Adapter<ManageSampleAdapter.ViewHolder>()
+class ManageEnumerationAreaAdapter(var users: List<User>?) : RecyclerView.Adapter<ManageEnumerationAreaAdapter.ViewHolder>()
 {
     override fun getItemCount() = users!!.size
 

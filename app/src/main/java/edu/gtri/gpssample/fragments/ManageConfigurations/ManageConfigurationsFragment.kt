@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.database.models.Config
@@ -58,7 +58,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         binding.quickStartButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putBoolean( Key.kQuickStart.toString(), true )
+            bundle.putBoolean( Keys.kQuickStart.toString(), true )
             findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
         }
 
@@ -80,7 +80,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         val bundle = Bundle()
 
-        bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+        bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }

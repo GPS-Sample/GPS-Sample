@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.CreateStudy
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -9,13 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -66,7 +61,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        val config_uuid = arguments!!.getString( Key.kConfig_uuid.toString(), "");
+        val config_uuid = arguments!!.getString( Keys.kConfig_uuid.toString(), "");
 
         if (config_uuid.isEmpty())
         {
@@ -75,7 +70,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
 
         // optional: studyId
-        val study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        val study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isNotEmpty())
         {
@@ -90,7 +85,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }
         }
 
-        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
 
         quick_start?.let {
             quickStart = it
@@ -217,7 +212,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun shouldAddField()
     {
         val bundle = Bundle()
-        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
@@ -232,7 +227,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         else
         {
             val bundle = Bundle()
-            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
             findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
         }
     }
@@ -248,8 +243,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         else
         {
             val bundle = Bundle()
-            bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
-            bundle.putString( Key.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
+            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+            bundle.putString( Keys.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
             findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
         }
     }
@@ -257,8 +252,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun didSelectField( field: Field )
     {
         val bundle = Bundle()
-        bundle.putString( Key.kField_uuid.toString(), field.uuid )
-        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kField_uuid.toString(), field.uuid )
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
@@ -266,8 +261,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun didSelectRule( rule: Rule )
     {
         val bundle = Bundle()
-        bundle.putString( Key.kRule_uuid.toString(), rule.uuid )
-        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kRule_uuid.toString(), rule.uuid )
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
     }
@@ -275,9 +270,9 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     fun didSelectFilter( filter: Filter )
     {
         val bundle = Bundle()
-        bundle.putString( Key.kFilter_uuid.toString(), filter.uuid )
-        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
-        bundle.putString( Key.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
+        bundle.putString( Keys.kFilter_uuid.toString(), filter.uuid )
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
 
         findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }
@@ -315,7 +310,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
             }
 
-            R.id.action_manage_supervisors -> {
+            R.id.action_manage_enumeration_areas -> {
                 if (binding.studyNameEditText.text.toString().isEmpty())
                 {
                     Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
@@ -323,8 +318,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 }
 
                 val bundle = Bundle()
-                bundle.putString( Key.kConfig_uuid.toString(), study.config_uuid )
-                findNavController().navigate( R.id.action_navigate_to_ManageSupervisorsFragment, bundle )
+                bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+                findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreasFragment, bundle )
             }
         }
 
@@ -391,8 +386,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         if (quickStart)
         {
             val bundle = Bundle()
-            bundle.putString( Key.kConfig_uuid.toString(), study.config_uuid )
-            findNavController().navigate( R.id.action_navigate_to_ManageSupervisorsFragment, bundle )
+            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreasFragment, bundle )
         }
         else
         {

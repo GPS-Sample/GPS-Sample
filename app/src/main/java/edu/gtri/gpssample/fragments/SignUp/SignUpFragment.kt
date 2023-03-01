@@ -12,8 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
@@ -48,7 +47,7 @@ class SignUpFragment : Fragment()
             }
         }
 
-        arguments?.getString(Key.kRole.toString())?.let { role ->
+        arguments?.getString(Keys.kRole.toString())?.let { role ->
             this.role = role
         }
 
@@ -82,14 +81,14 @@ class SignUpFragment : Fragment()
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
-                editor.putString( Key.kUserName.toString(), name )
+                editor.putString( Keys.kUserName.toString(), name )
                 editor.commit()
 
                 val user = User( UUID.randomUUID().toString(), name, pin1, role, answer, question, false )
                 DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), role )
+                bundle.putString( Keys.kRole.toString(), role )
 
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }

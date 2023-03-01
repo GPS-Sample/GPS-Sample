@@ -4,8 +4,8 @@
     tools:context="edu.gtri.gpssample.activities.CreateFieldActivity">
 
     <item
-        android:id="@+id/action_manage_supervisors"
-        android:title="@string/manage_supervisors"
+        android:id="@+id/action_manage_enumeration_areas"
+        android:title="@string/manage_enumeration_areas"
         app:showAsAction="never" />
 
     <item

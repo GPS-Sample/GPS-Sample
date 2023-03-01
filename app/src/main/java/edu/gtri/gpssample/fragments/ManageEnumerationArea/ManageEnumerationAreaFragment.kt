@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageSample
+package edu.gtri.gpssample.fragments.ManageEnumerationArea
 
 import android.graphics.Color
 import android.net.wifi.WifiManager
@@ -19,12 +19,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Sample
-import edu.gtri.gpssample.databinding.FragmentManageSampleBinding
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
 import io.reactivex.Observable
@@ -41,33 +41,33 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
+class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
     private var dataIsFresh = false
     private lateinit var study: Study
-    private lateinit var sample: Sample
+    private lateinit var enumArea: EnumArea
     private var serverInetAddress: InetAddress? = null
     private var broadcastInetAddress: InetAddress? = null
-    private var _binding: FragmentManageSampleBinding? = null
+    private var _binding: FragmentManageEnumerationAreaBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
-    private lateinit var studyAdapter: ManageSampleAdapter
+    private lateinit var studyAdapter: ManageEnumerationAreaAdapter
     private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
-    private lateinit var viewModel: ManageSampleViewModel
+    private lateinit var viewModel: ManageEnumerationAreaViewModel
     private var users = ArrayList<User>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ManageSampleViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(ManageEnumerationAreaViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         setHasOptionsMenu( true )
 
-        _binding = FragmentManageSampleBinding.inflate(inflater, container, false)
+        _binding = FragmentManageEnumerationAreaBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -84,44 +84,51 @@ class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.progressBar.visibility = View.VISIBLE
 
-        // required: sample_uuid
+        // required: studyId
         if (arguments == null)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: sampleId.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.",Toast.LENGTH_SHORT).show()
             return
         }
 
-        val sample_uuid = arguments!!.getString( Key.kSample_uuid.toString(), "");
+        val study_uuid = arguments!!.getString(Keys.kStudy_uuid.toString(), "");
 
-        if (sample_uuid.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: sampleId.", Toast.LENGTH_SHORT).show()
+        if (study_uuid.isEmpty()) {
+            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.sampleDAO.getSample( sample_uuid )?.let { sample ->
-            this.sample = sample
-        }
-
-        if (!this::sample.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Sample with id $sample_uuid not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.studyDAO.getStudy( sample.study_uuid )?.let { study ->
+        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
             this.study = study
         }
 
         if (!this::study.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id ${sample.study_uuid} not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id ${study_uuid} not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        binding.studyNameTextView.setText( "Study " + study.name )
+        // required enumArea_uuid
+        val enumArea_uuid = arguments!!.getString(Keys.kEnumArea_uuid.toString(), "");
 
-        studyAdapter = ManageSampleAdapter(users)
+        if (enumArea_uuid.isEmpty()) {
+            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: enumArea_uuid.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        DAO.enumAreaDAO.getEnumArea( enumArea_uuid )?.let {
+            this.enumArea = it
+        }
+
+        if (!this::enumArea.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_uuid} not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.studyNameTextView.setText( enumArea.name )
+
+        studyAdapter = ManageEnumerationAreaAdapter(users)
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = studyAdapter
@@ -219,16 +226,15 @@ class ManageSampleFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                         Log.d( "xxx", broadcast_address )
 
                         lifecycleScope.launch {
-                            udpBroadcaster.beginReceiving( serverInetAddress!!, this@ManageSampleFragment )
+                            udpBroadcaster.beginReceiving( serverInetAddress!!, this@ManageEnumerationAreaFragment )
                         }
                     }
 
                     val jsonObject = JSONObject()
-                    jsonObject.put( Key.kSSID.toString(), ssid )
-                    jsonObject.put( Key.kPass.toString(), pass )
-                    jsonObject.put( Key.kStudy_uuid.toString(), study.uuid )
-                    jsonObject.put( Key.kSample_uuid.toString(), sample.uuid )
-                    jsonObject.put( Key.kConfig_uuid.toString(), study.config_uuid )
+                    jsonObject.put( Keys.kSSID.toString(), ssid )
+                    jsonObject.put( Keys.kPass.toString(), pass )
+                    jsonObject.put( Keys.kStudy_uuid.toString(), study.uuid )
+                    jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )
 
                     val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
                     qrgEncoder.setColorBlack(Color.WHITE);
