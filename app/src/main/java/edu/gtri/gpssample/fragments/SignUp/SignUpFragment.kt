@@ -68,10 +68,34 @@ class SignUpFragment : Fragment()
         binding.nextButton.setOnClickListener {
 
             val name = binding.nameEditText.text.toString()
-            val pin1 = binding.pin1EditText.text.toString().toInt()
-            val pin2 = binding.pin2EditText.text.toString().toInt()
+            val pin1 = binding.pin1EditText.text.toString().toIntOrNull()
+            val pin2 = binding.pin2EditText.text.toString().toIntOrNull()
             val question = binding.questionSpinner.selectedItem as String
             val answer = binding.answerEditText.text.toString()
+
+            if (name.length == 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (pin1 == null)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a PIN", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (pin2 == null)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please re-enter the PIN", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (answer.length == 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter an answer.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             if (pin1 != pin2)
             {

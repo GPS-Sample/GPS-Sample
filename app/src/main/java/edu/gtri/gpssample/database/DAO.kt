@@ -308,6 +308,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 51
+        private const val DATABASE_VERSION = 53
     }
 }
