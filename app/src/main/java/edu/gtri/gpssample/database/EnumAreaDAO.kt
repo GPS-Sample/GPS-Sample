@@ -22,10 +22,8 @@ class EnumAreaDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, enumArea.uuid )
         values.put( DAO.COLUMN_ENUM_AREA_CONFIG_UUID, enumArea.config_uuid )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
-        values.put( DAO.COLUMN_ENUM_AREA_TOP_LEFT, enumArea.topLeft_uuid )
-        values.put( DAO.COLUMN_ENUM_AREA_TOP_RIGHT, enumArea.topRight_uuid )
-        values.put( DAO.COLUMN_ENUM_AREA_BOT_RIGHT, enumArea.botRight_uuid )
-        values.put( DAO.COLUMN_ENUM_AREA_BOT_LEFT, enumArea.botLeft_uuid )
+        values.put( DAO.COLUMN_ENUM_AREA_SHAPE, enumArea.shape )
+        values.put( DAO.COLUMN_ENUM_AREA_SHAPE_UUID, enumArea.shape_uuid )
     }
 
     //--------------------------------------------------------------------------
@@ -34,12 +32,10 @@ class EnumAreaDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val config_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_CONFIG_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
-        val topLeft = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TOP_LEFT))
-        val topRight = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TOP_RIGHT))
-        val botRight = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BOT_RIGHT))
-        val botLeft = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BOT_LEFT))
+        val shape = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_SHAPE))
+        val shape_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_SHAPE_UUID))
 
-        return EnumArea( uuid, config_uuid, name, topLeft, topRight, botRight, botLeft )
+        return EnumArea( uuid, config_uuid, name, shape, shape_uuid )
     }
 
     //--------------------------------------------------------------------------

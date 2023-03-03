@@ -234,6 +234,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
                     jsonObject.put( Keys.kSSID.toString(), ssid )
                     jsonObject.put( Keys.kPass.toString(), pass )
                     jsonObject.put( Keys.kStudy_uuid.toString(), study.uuid )
+                    jsonObject.put( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
                     jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )
 
                     val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
@@ -406,28 +407,21 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
                 }
             }
 
-            NetworkCommand.NetworkSampleRequest -> {
+            NetworkCommand.NetworkEnumAreaRequest -> {
                 lifecycleScope.launch {
-                    DAO.sampleDAO.getSample( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkSampleResponse, networkCommand.uuid, "", "", it.pack())
+                    DAO.enumAreaDAO.getEnumArea( networkCommand.parm1 )?.let {
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkEnumAreaResponse, networkCommand.uuid, "", "", it.pack())
                         udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( activity!!.applicationContext, "sample<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+                    } ?: Toast.makeText( activity!!.applicationContext, "enum_area<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            NetworkCommand.NetworkNavPlansRequest -> {
+            NetworkCommand.NetworkRectangleRequest -> {
                 lifecycleScope.launch {
-                    val navPlans = DAO.navPlanDAO.getNavPlans( networkCommand.parm1 )
-                    if (navPlans.isEmpty())
-                    {
-                        Toast.makeText( activity!!.applicationContext, "navPlans<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        val networkNavPlans = NetworkNavPlans( navPlans )
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkNavPlansResponse, networkCommand.uuid, "", "", networkNavPlans.pack())
+                    DAO.rectangleDAO.getRectangle( networkCommand.parm1 )?.let {
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRectangleResponse, networkCommand.uuid, "", "", it.pack())
                         udpBroadcaster.transmit( serverInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    }
+                    } ?: Toast.makeText( activity!!.applicationContext, "rectangle<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
                 }
             }
         }

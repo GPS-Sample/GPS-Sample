@@ -171,6 +171,10 @@
         android:id="@+id/ManageEnumerationAreaFragment"
         android:name="edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaFragment"
         tools:layout="@layout/fragment_manage_enumeration_area">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
 
     <!--CreateSampleFragment-->

@@ -42,7 +42,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private lateinit var user: User
     private var study_uuid = ""
     private var config_uuid = ""
-    private var sample_uuid = ""
+    private var enum_area_uuid = ""
     private lateinit var role: String
     private lateinit var broadcastInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
@@ -81,8 +81,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         binding.fieldsView.setOnClickListener {}
         binding.rulesView.setOnClickListener {}
         binding.filtersView.setOnClickListener {}
-        binding.sampleView.setOnClickListener {}
-        binding.navPlansView.setOnClickListener {}
 
         (activity!!.application as? MainApplication)?.user?.let { user ->
             this.user = user
@@ -108,13 +106,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.nextButton.setOnClickListener {
 
-            if (study_uuid.isNotEmpty() && sample_uuid.isNotEmpty())
-            {
-                val bundle = Bundle()
-                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-                bundle.putString( Keys.kSample_uuid.toString(), sample_uuid )
-                findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
-            }
+//            if (study_uuid.isNotEmpty() && sample_uuid.isNotEmpty())
+//            {
+//                val bundle = Bundle()
+//                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+//                bundle.putString( Keys.kSample_uuid.toString(), sample_uuid )
+//                findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
+//            }
         }
 
         binding.requestWifiButton.setOnClickListener {
@@ -217,34 +215,17 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
-        binding.requestSampleButton.setOnClickListener {
+        binding.requestEnumAreaButton.setOnClickListener {
             if (!connected())
             {
                 Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkSampleRequest, user.uuid, sample_uuid, "", "" )
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkEnumAreaRequest, user.uuid, enum_area_uuid, "", "" )
             val networkCommandMessage = Json.encodeToString( networkCommand )
 
-            binding.sampleCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
-        }
-
-        binding.requestNavPlansButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkNavPlansRequest, user.uuid, sample_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            binding.navPlansCheckBox.isChecked = false
+            binding.enumAreaCheckBox.isChecked = false
 
             lifecycleScope.launch {
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
@@ -261,8 +242,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         binding.fieldsCheckBox.isChecked = false
         binding.rulesCheckBox.isChecked = false
         binding.filtersCheckBox.isChecked = false
-        binding.sampleCheckBox.isChecked = false
-        binding.navPlansCheckBox.isChecked = false
+        binding.enumAreaCheckBox.isChecked = false
 
         val configs = DAO.configDAO.getConfigs()
 
@@ -291,17 +271,14 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 val filters = DAO.filterDAO.getFilters(study.uuid)
                 binding.filtersCheckBox.isChecked = filters.isNotEmpty()
 
-                val samples = DAO.sampleDAO.getSamples(study.uuid)
+                val enumAreas = DAO.enumAreaDAO.getEnumAreas(config.uuid)
 
-                if (samples.isNotEmpty())
+                if (enumAreas.isNotEmpty())
                 {
-                    binding.sampleCheckBox.isChecked = true
+                    binding.enumAreaCheckBox.isChecked = true
 
-                    val sample = samples[0]
-                    sample_uuid = sample.uuid
-
-                    val navPlans = DAO.navPlanDAO.getNavPlans(sample.uuid)
-                    binding.navPlansCheckBox.isChecked = navPlans.isNotEmpty()
+                    val enumArea = enumAreas[0]
+                    enum_area_uuid = enumArea.uuid
                 }
             }
         }
@@ -353,7 +330,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             val pass = jsonObject.getString( Keys.kPass.toString() )
             study_uuid = jsonObject.getString( Keys.kStudy_uuid.toString() )
             config_uuid = jsonObject.getString( Keys.kConfig_uuid.toString() )
-            sample_uuid = jsonObject.getString( Keys.kSample_uuid.toString() )
+            enum_area_uuid = jsonObject.getString( Keys.kEnumArea_uuid.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {
@@ -575,28 +552,31 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                     }
                 }
 
-                NetworkCommand.NetworkSampleResponse ->
+                NetworkCommand.NetworkEnumAreaResponse ->
                 {
-                    val sample = Sample.unpack( networkCommand.message )
+                    val enumArea = EnumArea.unpack( networkCommand.message )
 
-                    DAO.sampleDAO.createSample( sample )
+                    DAO.enumAreaDAO.createEnumArea( enumArea )
 
-                    activity!!.runOnUiThread {
-                        binding.sampleCheckBox.isChecked = true
+                    if (enumArea.shape == Shape.Rectangle.toString())
+                    {
+                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRectangleRequest, user.uuid, enumArea.shape_uuid, "", "" )
+                        val networkCommandMessage = Json.encodeToString( networkCommand )
+
+                        lifecycleScope.launch {
+                            udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                        }
                     }
                 }
 
-                NetworkCommand.NetworkNavPlansResponse ->
+                NetworkCommand.NetworkRectangleResponse ->
                 {
-                    val networkNavPlans = NetworkNavPlans.unpack(networkCommand.message)
+                    val rectangle = Rectangle.unpack( networkCommand.message )
 
-                    for (navPlan in networkNavPlans.navPlans)
-                    {
-                        DAO.navPlanDAO.createNavPlan( navPlan )
-                    }
+                    DAO.rectangleDAO.createRectangle( rectangle )
 
                     activity!!.runOnUiThread {
-                        binding.navPlansCheckBox.isChecked = true
+                        binding.enumAreaCheckBox.isChecked = true
                     }
                 }
             }

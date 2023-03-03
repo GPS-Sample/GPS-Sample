@@ -115,20 +115,33 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
                 COLUMN_ENUM_AREA_CONFIG_UUID + " TEXT" + "," +
                 COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
-                COLUMN_ENUM_AREA_TOP_LEFT + " TEXT" + "," +
-                COLUMN_ENUM_AREA_TOP_RIGHT + " TEXT" + "," +
-                COLUMN_ENUM_AREA_BOT_RIGHT + " TEXT" + "," +
-                COLUMN_ENUM_AREA_BOT_LEFT + " TEXT" +
+                COLUMN_ENUM_AREA_SHAPE + " TEXT" + "," +
+                COLUMN_ENUM_AREA_SHAPE_UUID + " TEXT" +
                 ")")
         db.execSQL(createTableEnumArea)
 
-        val createTableCoordinate = ("CREATE TABLE " +
-                TABLE_COORDINATE + "(" +
+        val createTableCircle = ("CREATE TABLE " +
+                TABLE_CIRCLE + "(" +
                 COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_COORDINATE_LAT + " REAL" + "," +
-                COLUMN_COORDINATE_LON + " REAL" +
+                COLUMN_CIRCLE_LAT + " REAL" + "," +
+                COLUMN_CIRCLE_LON + " REAL" + "," +
+                COLUMN_CIRCLE_RADIUS + " REAL" +
                 ")")
-        db.execSQL(createTableCoordinate)
+        db.execSQL(createTableCircle)
+
+        val createTableRectangle = ("CREATE TABLE " +
+                TABLE_RECTANGLE + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_RECTANGLE_TL_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_TL_LON + " REAL" + "," +
+                COLUMN_RECTANGLE_TR_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_TR_LON + " REAL" + "," +
+                COLUMN_RECTANGLE_BR_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_BR_LON + " REAL" + "," +
+                COLUMN_RECTANGLE_BL_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_BL_LON + " REAL" +
+                ")")
+        db.execSQL(createTableRectangle)
     }
 
     //--------------------------------------------------------------------------
@@ -145,7 +158,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAMPLE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAV_PLAN)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUM_AREA)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COORDINATE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CIRCLE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECTANGLE)
 
         onCreate(db)
     }
@@ -233,15 +247,25 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_ENUM_AREA = "enum_area"
         const val COLUMN_ENUM_AREA_CONFIG_UUID = "enum_area_config_uuid"
         const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
-        const val COLUMN_ENUM_AREA_TOP_LEFT = "top_left"
-        const val COLUMN_ENUM_AREA_TOP_RIGHT = "top_right"
-        const val COLUMN_ENUM_AREA_BOT_RIGHT = "bot_right"
-        const val COLUMN_ENUM_AREA_BOT_LEFT = "bot_left"
+        const val COLUMN_ENUM_AREA_SHAPE = "enum_area_shape"
+        const val COLUMN_ENUM_AREA_SHAPE_UUID = "enum_area_shape_uuid"
 
-        // Coordinate Table
-        const val TABLE_COORDINATE = "coordinate"
-        const val COLUMN_COORDINATE_LAT = "lat"
-        const val COLUMN_COORDINATE_LON = "lon"
+        // Circle Table
+        const val TABLE_CIRCLE = "circle"
+        const val COLUMN_CIRCLE_LAT = "circle_lat"
+        const val COLUMN_CIRCLE_LON = "circle_lon"
+        const val COLUMN_CIRCLE_RADIUS = "circle_radius"
+
+        // Rectangle Table
+        const val TABLE_RECTANGLE = "rectangle"
+        const val COLUMN_RECTANGLE_TL_LAT = "rectangle_tl_lat"
+        const val COLUMN_RECTANGLE_TL_LON = "rectangle_tl_lon"
+        const val COLUMN_RECTANGLE_TR_LAT = "rectangle_tr_lat"
+        const val COLUMN_RECTANGLE_TR_LON = "rectangle_tr_lon"
+        const val COLUMN_RECTANGLE_BR_LAT = "rectangle_br_lat"
+        const val COLUMN_RECTANGLE_BR_LON = "rectangle_br_lon"
+        const val COLUMN_RECTANGLE_BL_LAT = "rectangle_bl_lat"
+        const val COLUMN_RECTANGLE_BL_LON = "rectangle_bl_lon"
 
         // DAO's
         lateinit var userDAO: UserDAO
@@ -254,7 +278,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var sampleDAO: SampleDAO
         lateinit var navPlanDAO: NavPlanDAO
         lateinit var enumAreaDAO: EnumAreaDAO
-        lateinit var coordinateDAO: CoordinateDAO
+        lateinit var rectangleDAO: RectangleDAO
+        lateinit var circleDAO: CircleDAO
 
         // creation/access methods
 
@@ -276,12 +301,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 sampleDAO = SampleDAO( instance!! )
                 navPlanDAO = NavPlanDAO( instance!! )
                 enumAreaDAO = EnumAreaDAO( instance!! )
-                coordinateDAO = CoordinateDAO( instance!! )
+                rectangleDAO = RectangleDAO( instance!! )
+                circleDAO = CircleDAO(( instance!! ))
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 48
+        private const val DATABASE_VERSION = 51
     }
 }

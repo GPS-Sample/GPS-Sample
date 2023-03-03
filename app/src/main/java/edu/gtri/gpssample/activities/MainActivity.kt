@@ -58,11 +58,11 @@ class MainActivity : AppCompatActivity()
             val filterRules = DAO.filterRuleDAO.getFilterRules()
             Log.d( "xxx", "found ${filterRules.size} FilterRules" )
 
-            val samples = DAO.sampleDAO.getSamples()
-            Log.d( "xxx", "found ${samples.size} Samples" )
-
-            val navPlans = DAO.navPlanDAO.getNavPlans()
-            Log.d( "xxx", "found ${navPlans.size} NavPlans" )
+//            val samples = DAO.sampleDAO.getSamples()
+//            Log.d( "xxx", "found ${samples.size} Samples" )
+//
+//            val navPlans = DAO.navPlanDAO.getNavPlans()
+//            Log.d( "xxx", "found ${navPlans.size} NavPlans" )
 
             val enumAreas = DAO.enumAreaDAO.getEnumAreas()
             Log.d( "xxx", "found ${enumAreas.size} EnumAreas" )

@@ -16,11 +16,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.constants.Shape
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.RectangleDAO
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.Coordinate
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Rectangle
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
 import java.util.*
 
@@ -115,7 +119,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
         var enumAreas = DAO.enumAreaDAO.getEnumAreas(config.uuid)
 
-        if (enumAreas.isEmpty())
+        val user = (activity!!.application as? MainApplication)?.user
+
+        if (user!!.role == Role.Admin.toString() && enumAreas.isEmpty())
         {
             createTestAreas()
         }
@@ -124,80 +130,109 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
         for (enumArea in enumAreas)
         {
-            val tl = DAO.coordinateDAO.getCoordinate( enumArea.topLeft_uuid )
-            val tr = DAO.coordinateDAO.getCoordinate( enumArea.topRight_uuid )
-            val br = DAO.coordinateDAO.getCoordinate( enumArea.botRight_uuid )
-            val bl = DAO.coordinateDAO.getCoordinate( enumArea.botLeft_uuid )
+            if (enumArea.shape == Shape.Rectangle.toString())
+            {
+                val rectangle = DAO.rectangleDAO.getRectangle( enumArea.shape_uuid )
 
-            googleMap.addPolyline(
-                PolylineOptions()
-                    .clickable(true)
-                    .add(
-                        LatLng( tl!!.lat, tl!!.lon ),
-                        LatLng( tr!!.lat, tr!!.lon ),
-                        LatLng( br!!.lat, br!!.lon ),
-                        LatLng( bl!!.lat, bl!!.lon ),
-                        LatLng( tl!!.lat, tl!!.lon ),
-                    ))
+                rectangle?.let { rectangle
+                    googleMap.addPolyline(
+                        PolylineOptions()
+                            .clickable(true)
+                            .add(
+                                LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
+                                LatLng( rectangle.topRight_lat, rectangle.topRight_lon ),
+                                LatLng( rectangle.botRight_lat, rectangle.botRight_lon ),
+                                LatLng( rectangle.botLeft_lat, rectangle.botLeft_lon ),
+                                LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
+                            ))
+                    if (user!!.role == Role.Supervisor.toString())
+                    {
+                        val latLng = getCenter( rectangle )
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
+                    }
+                }
+            }
         }
 
-        val srb = LatLng(30.330603,-86.165004 )
+        if (user!!.role == Role.Admin.toString())
+        {
+            val srb = LatLng(30.330603,-86.165004 )
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
+        }
+    }
 
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
+    fun getCenter( rectangle: Rectangle ) : LatLng
+    {
+        var sumLat = rectangle.topLeft_lat + rectangle.topRight_lat + rectangle.botRight_lat + rectangle.botLeft_lat
+        var sumLon = rectangle.topLeft_lon + rectangle.topRight_lon + rectangle.botRight_lon + rectangle.botLeft_lon
+
+        return LatLng( sumLat/4.0, sumLon/4.0 )
     }
 
     fun createTestAreas()
     {
-        var topLeft = Coordinate(UUID.randomUUID().toString(), 30.343716828800115, -86.16672319932157 )
-        var topRight = Coordinate(UUID.randomUUID().toString(), 30.343716828800115, -86.1627468263619 )
-        var botRight = Coordinate(UUID.randomUUID().toString(), 30.3389857458543, -86.1627468263619 )
-        var botLeft = Coordinate(UUID.randomUUID().toString(), 30.3389857458543, -86.16662109919962 )
+        var topLeft = doubleArrayOf( 30.343716828800115, -86.16672319932157 )
+        var topRight = doubleArrayOf( 30.343716828800115, -86.1627468263619 )
+        var botRight = doubleArrayOf( 30.3389857458543, -86.1627468263619 )
+        var botLeft = doubleArrayOf( 30.3389857458543, -86.16662109919962 )
 
-        DAO.coordinateDAO.createCoordinate( topLeft )
-        DAO.coordinateDAO.createCoordinate( topRight )
-        DAO.coordinateDAO.createCoordinate( botRight )
-        DAO.coordinateDAO.createCoordinate( botLeft )
+        var rectangle = Rectangle( UUID.randomUUID().toString(),
+            topLeft[0], topLeft[1],
+            topRight[0], topRight[1],
+            botRight[0], botRight[1],
+            botLeft[0], botLeft[1])
 
-        var enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA NORTH", topLeft.uuid, topRight.uuid, botRight.uuid, botLeft.uuid )
+        DAO.rectangleDAO.createRectangle( rectangle )
+
+        var enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA NORTH", Shape.Rectangle.toString(), rectangle.uuid )
         DAO.enumAreaDAO.createEnumArea( enumArea )
 
-        topLeft = Coordinate(UUID.randomUUID().toString(), 30.332241965564545, -86.16700455200723 )
-        topRight = Coordinate(UUID.randomUUID().toString(),  30.332241965564545, -86.16187525250082 )
-        botRight = Coordinate(UUID.randomUUID().toString(), 30.328614485534533, -86.16187525250082 )
-        botLeft = Coordinate(UUID.randomUUID().toString(), 30.328614485534533, -86.16700455200723 )
+        topLeft = doubleArrayOf( 30.332241965564545, -86.16700455200723 )
+        topRight = doubleArrayOf( 30.332241965564545, -86.16187525250082 )
+        botRight = doubleArrayOf( 30.328614485534533, -86.16187525250082 )
+        botLeft = doubleArrayOf( 30.328614485534533, -86.16700455200723 )
 
-        DAO.coordinateDAO.createCoordinate( topLeft )
-        DAO.coordinateDAO.createCoordinate( topRight )
-        DAO.coordinateDAO.createCoordinate( botRight )
-        DAO.coordinateDAO.createCoordinate( botLeft )
+        rectangle = Rectangle( UUID.randomUUID().toString(),
+            topLeft[0], topLeft[1],
+            topRight[0], topRight[1],
+            botRight[0], botRight[1],
+            botLeft[0], botLeft[1])
 
-        enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA SOUTH", topLeft.uuid, topRight.uuid, botRight.uuid, botLeft.uuid )
+        DAO.rectangleDAO.createRectangle( rectangle )
+
+        enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA SOUTH", Shape.Rectangle.toString(), rectangle.uuid )
         DAO.enumAreaDAO.createEnumArea( enumArea )
 
-        topLeft = Coordinate(UUID.randomUUID().toString(), 30.337854506153278, -86.1716915111437 )
-        topRight = Coordinate(UUID.randomUUID().toString(), 30.337854506153278, -86.16865136128406 )
-        botRight = Coordinate(UUID.randomUUID().toString(), 30.33380130566348, -86.16865136128406 )
-        botLeft = Coordinate(UUID.randomUUID().toString(), 30.33380130566348, -86.171641010582 )
+        topLeft = doubleArrayOf( 30.337854506153278, -86.1716915111437 )
+        topRight = doubleArrayOf( 30.337854506153278, -86.16865136128406 )
+        botRight = doubleArrayOf( 30.33380130566348, -86.16865136128406 )
+        botLeft = doubleArrayOf( 30.33380130566348, -86.171641010582 )
 
-        DAO.coordinateDAO.createCoordinate( topLeft )
-        DAO.coordinateDAO.createCoordinate( topRight )
-        DAO.coordinateDAO.createCoordinate( botRight )
-        DAO.coordinateDAO.createCoordinate( botLeft )
+        rectangle = Rectangle( UUID.randomUUID().toString(),
+            topLeft[0], topLeft[1],
+            topRight[0], topRight[1],
+            botRight[0], botRight[1],
+            botLeft[0], botLeft[1])
 
-        enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA WEST", topLeft.uuid, topRight.uuid, botRight.uuid, botLeft.uuid )
+        DAO.rectangleDAO.createRectangle( rectangle )
+
+        enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA WEST", Shape.Rectangle.toString(), rectangle.uuid )
         DAO.enumAreaDAO.createEnumArea( enumArea )
 
-        topLeft = Coordinate(UUID.randomUUID().toString(), 30.33747998467289, -86.16498340055223 )
-        topRight = Coordinate(UUID.randomUUID().toString(), 30.33747998467289, -86.16076498381355 )
-        botRight = Coordinate(UUID.randomUUID().toString(), 30.334410467082552, -86.16076498381355 )
-        botLeft = Coordinate(UUID.randomUUID().toString(), 30.334410467082552, -86.16498340055223 )
+        topLeft = doubleArrayOf( 30.33747998467289, -86.16498340055223 )
+        topRight = doubleArrayOf( 30.33747998467289, -86.16076498381355 )
+        botRight = doubleArrayOf( 30.334410467082552, -86.16076498381355 )
+        botLeft = doubleArrayOf( 30.334410467082552, -86.16498340055223 )
 
-        DAO.coordinateDAO.createCoordinate( topLeft )
-        DAO.coordinateDAO.createCoordinate( topRight )
-        DAO.coordinateDAO.createCoordinate( botRight )
-        DAO.coordinateDAO.createCoordinate( botLeft )
+        rectangle = Rectangle( UUID.randomUUID().toString(),
+            topLeft[0], topLeft[1],
+            topRight[0], topRight[1],
+            botRight[0], botRight[1],
+            botLeft[0], botLeft[1])
 
-        enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA EAST", topLeft.uuid, topRight.uuid, botRight.uuid, botLeft.uuid )
+        DAO.rectangleDAO.createRectangle( rectangle )
+
+        enumArea = EnumArea( UUID.randomUUID().toString(), config.uuid, "EA EAST", Shape.Rectangle.toString(), rectangle.uuid )
         DAO.enumAreaDAO.createEnumArea( enumArea )
     }
 

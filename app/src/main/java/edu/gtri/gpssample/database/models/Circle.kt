@@ -6,12 +6,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class EnumArea (
+data class Circle (
     var uuid: String,
-    var config_uuid: String,
-    var name: String,
-    var shape: String,
-    var shape_uuid: String)
+    var lat: Double,
+    var lon: Double,
+    var radius: Double)
 {
     fun pack() : String
     {
@@ -20,9 +19,9 @@ data class EnumArea (
 
     companion object
     {
-        fun unpack( message: String ) : EnumArea
+        fun unpack( message: String ) : Circle
         {
-            return Json.decodeFromString<EnumArea>( message )
+            return Json.decodeFromString<Circle>( message )
         }
     }
 }

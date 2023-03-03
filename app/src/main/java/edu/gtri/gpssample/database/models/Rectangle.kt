@@ -6,10 +6,16 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class Coordinate (
+data class Rectangle (
     var uuid: String,
-    var lat: Double,
-    var lon: Double)
+    var topLeft_lat: Double,
+    var topLeft_lon: Double,
+    var topRight_lat: Double,
+    var topRight_lon: Double,
+    var botRight_lat: Double,
+    var botRight_lon: Double,
+    var botLeft_lat: Double,
+    var botLeft_lon: Double)
 {
     fun pack() : String
     {
@@ -18,9 +24,9 @@ data class Coordinate (
 
     companion object
     {
-        fun unpack( message: String ) : Coordinate
+        fun unpack( message: String ) : Rectangle
         {
-            return Json.decodeFromString<Coordinate>( message )
+            return Json.decodeFromString<Rectangle>( message )
         }
     }
 }

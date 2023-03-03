@@ -238,53 +238,20 @@
                 android:layout_height="match_parent">
 
                 <CheckBox
-                    android:id="@+id/sample_check_box"
+                    android:id="@+id/enum_area_check_box"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Sample Received" />
+                    android:text="Enumeration Area Received" />
 
                 <View
-                    android:id="@+id/sample_view"
+                    android:id="@+id/enum_area_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </FrameLayout>
 
 
             <ImageButton
-                android:id="@+id/request_sample_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/background_rounded_primary_frame_clear_fill"
-                android:src="@drawable/download_blue" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <FrameLayout
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent">
-
-                <CheckBox
-                    android:id="@+id/nav_plans_check_box"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Nav Plans Received" />
-
-                <View
-                    android:id="@+id/nav_plans_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-            </FrameLayout>
-
-            <ImageButton
-                android:id="@+id/request_nav_plans_button"
+                android:id="@+id/request_enum_area_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@drawable/background_rounded_primary_frame_clear_fill"
