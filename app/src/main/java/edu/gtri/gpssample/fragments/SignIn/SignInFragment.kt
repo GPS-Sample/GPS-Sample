@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.SignIn
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ class SignInFragment : Fragment()
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(SignInViewModel::class.java)
+        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -40,12 +42,6 @@ class SignInFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         arguments?.getString(Keys.kRole.toString())?.let { role ->
             this.role = role

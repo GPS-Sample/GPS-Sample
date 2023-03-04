@@ -6,13 +6,16 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.core.content.ContextCompat
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
@@ -89,8 +92,13 @@ class MainActivity : AppCompatActivity()
             Configuration.UI_MODE_NIGHT_YES -> {supportActionBar?.setIcon(R.drawable.gps_sample_dark)} // Night mode is active, we're using dark theme.
         }
 
-
-
+        binding.toolbar.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                (this.application as? MainApplication)?.currentFragment?.let {
+                    Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private val serviceConnection = object : ServiceConnection {

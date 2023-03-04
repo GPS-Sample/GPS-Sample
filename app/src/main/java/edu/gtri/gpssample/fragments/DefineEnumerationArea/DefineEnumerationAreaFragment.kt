@@ -41,6 +41,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(DefineEnumerationAreaViewModel::class.java)
+        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -52,12 +53,6 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         // required: configId
         if (arguments == null)
