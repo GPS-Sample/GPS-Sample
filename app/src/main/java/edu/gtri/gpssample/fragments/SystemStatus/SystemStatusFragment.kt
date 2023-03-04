@@ -218,6 +218,23 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             }
         }
 
+        binding.requestTeamButton.setOnClickListener {
+            if (!connected())
+            {
+                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkTeamRequest, user.uuid, team_uuid, "", "" )
+            val networkCommandMessage = Json.encodeToString( networkCommand )
+
+            binding.teamCheckBox.isChecked = false
+
+            lifecycleScope.launch {
+                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+            }
+        }
+
         binding.nextButton.setOnClickListener {
 
             udpBroadcaster.stopReceiving()
@@ -568,6 +585,17 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                     activity!!.runOnUiThread {
                         binding.enumAreaCheckBox.isChecked = true
+                    }
+                }
+
+                NetworkCommand.NetworkTeamResponse ->
+                {
+                    val team = Team.unpack( networkCommand.message )
+
+                    DAO.teamDAO.createTeam( team )
+
+                    activity!!.runOnUiThread {
+                        binding.teamCheckBox.isChecked = true
                     }
                 }
             }

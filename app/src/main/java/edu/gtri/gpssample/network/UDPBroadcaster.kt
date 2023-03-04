@@ -218,6 +218,15 @@ class UDPBroadcaster
                     } ?: Toast.makeText( fragment.activity!!.applicationContext, "rectangle<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
                 }
             }
+
+            NetworkCommand.NetworkTeamRequest -> {
+                fragment.lifecycleScope.launch {
+                    DAO.teamDAO.getTeam( networkCommand.parm1 )?.let {
+                        val networkResponse = NetworkCommand( NetworkCommand.NetworkTeamResponse, networkCommand.uuid, "", "", it.pack())
+                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "team<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         delegate.didReceiveDatagramPacket( datagramPacket )

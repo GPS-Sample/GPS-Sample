@@ -129,4 +129,18 @@ class TeamDAO(private var dao: DAO)
         db.delete(DAO.TABLE_TEAM, whereClause, args)
         db.close()
     }
+
+    //--------------------------------------------------------------------------
+    fun deleteOrphans()
+    {
+        val teams = getTeams()
+
+        for (team in teams)
+        {
+            if (DAO.enumAreaDAO.doesNotExist( team.enumArea_uuid ))
+            {
+                deleteTeam( team )
+            }
+        }
+    }
 }

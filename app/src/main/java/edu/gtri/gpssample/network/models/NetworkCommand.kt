@@ -50,6 +50,9 @@ data class NetworkCommand( var command: Int, var uuid: String, val parm1: String
         const val NetworkRectangleRequest       = 1011
         const val NetworkRectangleResponse      = 2011
 
+        const val NetworkTeamRequest            = 1012
+        const val NetworkTeamResponse           = 2012
+
         fun unpack( byteArray: ByteArray, length: Int ) : NetworkCommand
         {
             return Json.decodeFromString<NetworkCommand>( String( byteArray, 0, length ) )

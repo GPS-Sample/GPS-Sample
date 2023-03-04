@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity()
             DAO.sampleDAO.deleteOrphans()
             DAO.navPlanDAO.deleteOrphans()
             DAO.enumAreaDAO.deleteOrphans()
+            DAO.teamDAO.deleteOrphans()
 
             val configurations = DAO.configDAO.getConfigs()
             Log.d( "xxx", "found ${configurations.size} Configurations" )
