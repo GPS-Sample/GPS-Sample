@@ -40,15 +40,17 @@ import kotlin.collections.ArrayList
 class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
     private lateinit var user: User
+    private lateinit var role: String
+    private lateinit var broadcastInetAddress: InetAddress
+    private lateinit var viewModel: SystemStatusViewModel
+    private lateinit var myInetAddress: InetAddress
+
+    private var team_uuid = ""
     private var study_uuid = ""
     private var config_uuid = ""
     private var enum_area_uuid = ""
-    private lateinit var role: String
-    private lateinit var broadcastInetAddress: InetAddress
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: SystemStatusViewModel
-    private lateinit var myInetAddress: InetAddress
     private val udpBroadcaster = UDPBroadcaster()
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -98,17 +100,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.titleTextView.text = role.toString()
-
-        binding.nextButton.setOnClickListener {
-
-            if (enum_area_uuid.isNotEmpty())
-            {
-                val bundle = Bundle()
-                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-                bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
-                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
-            }
-        }
 
         binding.requestWifiButton.setOnClickListener {
 
@@ -226,6 +217,29 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
+
+        binding.nextButton.setOnClickListener {
+
+            udpBroadcaster.stopReceiving()
+            udpBroadcaster.stopTransmitting()
+            binding.wifiCheckBox.isChecked = false
+
+            if (team_uuid.isNotEmpty())
+            {
+                val bundle = Bundle()
+                bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
+                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+                bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
+                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
+            }
+            else if (enum_area_uuid.isNotEmpty())
+            {
+                val bundle = Bundle()
+                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+                bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
+                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
+            }
+        }
     }
 
     override fun onResume()
@@ -284,31 +298,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         return udpBroadcaster.transmitterIsEnabled()
     }
 
-    fun getWifiApIpAddresses(): ArrayList<InetAddress> {
-        val list = ArrayList<InetAddress>()
-        try {
-            val en: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
-            while (en.hasMoreElements()) {
-                val intf: NetworkInterface = en.nextElement()
-                if (intf.getName().contains("wlan")) {
-                    val enumIpAddr: Enumeration<InetAddress> = intf.getInetAddresses()
-                    while (enumIpAddr.hasMoreElements()) {
-                        val inetAddress: InetAddress = enumIpAddr.nextElement()
-                        if (!inetAddress.isLoopbackAddress()) {
-                            val inetAddr = inetAddress.hostAddress!!
-                            if (!inetAddr.contains(":")) {
-                                list.add( inetAddress)
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (ex: Exception) {
-            Log.e("xxx", ex.toString())
-        }
-        return list
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         super.onActivityResult(requestCode, resultCode, data)
@@ -323,6 +312,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             val ssid = jsonObject.getString( Keys.kSSID.toString() )
             val pass = jsonObject.getString( Keys.kPass.toString() )
+
+            val team_uuid = jsonObject.opt( Keys.kTeam_uuid.toString())
+
+            team_uuid?.let {
+                this.team_uuid = it as String
+            }
+
             study_uuid = jsonObject.getString( Keys.kStudy_uuid.toString() )
             config_uuid = jsonObject.getString( Keys.kConfig_uuid.toString() )
             enum_area_uuid = jsonObject.getString( Keys.kEnumArea_uuid.toString() )

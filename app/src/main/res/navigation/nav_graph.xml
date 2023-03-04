@@ -259,6 +259,10 @@
         <action
             android:id="@+id/action_navigate_to_ManageEnumerationTeamsFragment"
             app:destination="@id/ManageEnumerationTeamsFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
+            app:destination="@id/PerformEnumerationFragment" />
     </fragment>
 
     <fragment
@@ -275,6 +279,12 @@
         android:id="@+id/ManageEnumerationTeamFragment"
         android:name="edu.gtri.gpssample.fragments.ManageEnumerationTeam.ManageEnumerationTeamFragment"
         tools:layout="@layout/fragment_manage_enumeration_team">
+    </fragment>
+
+    <fragment
+        android:id="@+id/PerformEnumerationFragment"
+        android:name="edu.gtri.gpssample.fragments.PerformEnumeration.PerformEnumerationFragment"
+        tools:layout="@layout/fragment_perform_enumeration">
     </fragment>
 
 </navigation>
