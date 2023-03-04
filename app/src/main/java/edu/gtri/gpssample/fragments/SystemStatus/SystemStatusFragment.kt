@@ -402,7 +402,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         if (!udpBroadcaster.receiverIsEnabled())
         {
             lifecycleScope.launch {
-                udpBroadcaster.beginReceiving( myInetAddress, this@SystemStatusFragment )
+                udpBroadcaster.beginReceiving( myInetAddress, broadcastInetAddress, this@SystemStatusFragment )
             }
         }
     }

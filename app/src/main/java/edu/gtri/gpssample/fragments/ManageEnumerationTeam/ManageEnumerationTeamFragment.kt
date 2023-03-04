@@ -1,4 +1,7 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationArea
+package edu.gtri.gpssample.fragments.ManageEnumerationTeam
+
+import edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaAdapter
+import edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaViewModel
 
 import android.graphics.Color
 import android.net.wifi.WifiManager
@@ -22,8 +25,10 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
+import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamBinding
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -41,8 +46,9 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate
+class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate
 {
+    private lateinit var team: Team
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
     private lateinit var gpsSamleWifiManager: GPSSampleWifiManager
@@ -50,7 +56,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     private lateinit var viewModel: ManageEnumerationAreaViewModel
 
     private var dataIsFresh = false
-    private var _binding: FragmentManageEnumerationAreaBinding? = null
+    private var _binding: FragmentManageEnumerationTeamBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
     private var users = ArrayList<User>()
@@ -66,7 +72,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         setHasOptionsMenu( true )
 
-        _binding = FragmentManageEnumerationAreaBinding.inflate(inflater, container, false)
+        _binding = FragmentManageEnumerationTeamBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -119,7 +125,25 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             return
         }
 
-        binding.studyNameTextView.setText( enumArea.name )
+        // required team_uuid
+        val team_uuid = arguments!!.getString(Keys.kTeam_uuid.toString(), "");
+
+        if (team_uuid.isEmpty()) {
+            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: team_uuid.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        DAO.teamDAO.getTeam( team_uuid )?.let {
+            this.team = it
+        }
+
+        if (!this::enumArea.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_uuid} not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.studyNameTextView.setText( team.name )
 
         studyAdapter = ManageEnumerationAreaAdapter(users)
 
@@ -166,6 +190,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         val jsonObject = JSONObject()
         jsonObject.put( Keys.kSSID.toString(), ssid )
         jsonObject.put( Keys.kPass.toString(), pass )
+        jsonObject.put( Keys.kTeam_uuid.toString(), team.uuid )
         jsonObject.put( Keys.kStudy_uuid.toString(), study.uuid )
         jsonObject.put( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
         jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )

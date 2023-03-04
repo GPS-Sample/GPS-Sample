@@ -13,7 +13,6 @@ class MainApplication : Application()
 {
     var user: User? = null
     var currentFragment = ""
-    var barcodeBitmap : Bitmap? = null
 
     override fun onCreate()
     {

@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.ManageEnumerationTeams
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,17 +16,21 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
+import edu.gtri.gpssample.dialogs.CreateTeamDialog
 import edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesViewModel
+import java.util.*
 
-class ManageEnumerationTeamsFragment : Fragment()
+class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDialogDelegate
 {
     private var _binding: FragmentManageEnumerationTeamsBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var study: Study
+    private lateinit var enumArea: EnumArea
     private lateinit var viewModel: ManageSamplesViewModel
     private lateinit var manageEnumerationTeamsAdapter: ManageEnumerationTeamsAdapter
 
@@ -79,6 +84,17 @@ class ManageEnumerationTeamsFragment : Fragment()
             return
         }
 
+        DAO.enumAreaDAO.getEnumArea( enumArea_uuid )?.let { enumArea ->
+            this.enumArea = enumArea
+        }
+
+        if (!this::enumArea.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $enumArea_uuid not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.titleTextView.setText( enumArea.name + " Teams")
         val teams = DAO.teamDAO.getTeams( enumArea_uuid )
 
         manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( teams )
@@ -88,13 +104,25 @@ class ManageEnumerationTeamsFragment : Fragment()
         binding.recyclerView.adapter = manageEnumerationTeamsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
+        binding.addButton.setOnClickListener {
+            CreateTeamDialog( activity!!, this )
+        }
+    }
+
+    override fun shouldCreateTeamNamed( name: String )
+    {
+        val team = Team( UUID.randomUUID().toString(), enumArea.uuid, name )
+        DAO.teamDAO.createTeam( team )
+        manageEnumerationTeamsAdapter.updateTeams( DAO.teamDAO.getTeams( enumArea.uuid ))
     }
 
     fun didSelectTeam( team: Team )
     {
-//        val bundle = Bundle()
-//        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-//        bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
-//        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
+        Log.d( "xxx", team.name )
+        val bundle = Bundle()
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+        bundle.putString( Keys.kTeam_uuid.toString(), team.uuid )
+        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamFragment, bundle )
     }
 }

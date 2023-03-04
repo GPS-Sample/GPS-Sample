@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Team
 
 class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<ManageEnumerationTeamsAdapter.ViewHolder>()
@@ -29,6 +30,12 @@ class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapt
         allHolders.add(viewHolder)
 
         return viewHolder
+    }
+
+    fun updateTeams( teams: List<Team> )
+    {
+        this.teams = teams
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
