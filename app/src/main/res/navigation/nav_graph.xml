@@ -255,6 +255,16 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_ManageEnumerationTeamsFragment"
+            app:destination="@id/ManageEnumerationTeamsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ManageEnumerationTeamsFragment"
+        android:name="edu.gtri.gpssample.fragments.ManageEnumerationTeams.ManageEnumerationTeamsFragment"
+        tools:layout="@layout/fragment_manage_enumeration_teams">
     </fragment>
 
 </navigation>

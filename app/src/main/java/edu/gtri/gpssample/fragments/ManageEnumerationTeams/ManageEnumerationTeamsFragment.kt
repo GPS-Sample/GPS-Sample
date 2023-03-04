@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationAreas
+package edu.gtri.gpssample.fragments.ManageEnumerationTeams
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,19 +14,19 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreasBinding
+import edu.gtri.gpssample.database.models.Team
+import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
 import edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesViewModel
 
-class ManageEnumerationAreasFragment : Fragment()
+class ManageEnumerationTeamsFragment : Fragment()
 {
-    private var _binding: FragmentManageEnumerationAreasBinding? = null
+    private var _binding: FragmentManageEnumerationTeamsBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var study: Study
     private lateinit var viewModel: ManageSamplesViewModel
-    private lateinit var manageEnumerationAreasAdapter: ManageEnumerationAreasAdapter
+    private lateinit var manageEnumerationTeamsAdapter: ManageEnumerationTeamsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -38,7 +38,7 @@ class ManageEnumerationAreasFragment : Fragment()
     {
         setHasOptionsMenu( true )
 
-        _binding = FragmentManageEnumerationAreasBinding.inflate(inflater, container, false)
+        _binding = FragmentManageEnumerationTeamsBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -77,25 +77,29 @@ class ManageEnumerationAreasFragment : Fragment()
             return
         }
 
-        val enumAreas = DAO.enumAreaDAO.getEnumAreas( study.config_uuid )
+        val enumArea_uuid = arguments!!.getString(Keys.kEnumArea_uuid.toString(), "");
 
-        manageEnumerationAreasAdapter = ManageEnumerationAreasAdapter( enumAreas )
-        manageEnumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
+        if (enumArea_uuid.isEmpty()) {
+            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: enum_area_uuid.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val teams = DAO.teamDAO.getTeams( enumArea_uuid )
+
+        manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( teams )
+        manageEnumerationTeamsAdapter.didSelectTeam = this::didSelectTeam
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = manageEnumerationAreasAdapter
+        binding.recyclerView.adapter = manageEnumerationTeamsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
-        binding.finishButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
-        }
     }
 
-    fun didSelectEnumArea(enumArea: EnumArea)
+    fun didSelectTeam( team: Team )
     {
-        val bundle = Bundle()
-        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-        bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
-        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
+//        val bundle = Bundle()
+//        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+//        bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
+//        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
     }
 }

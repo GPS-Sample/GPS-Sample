@@ -142,6 +142,22 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_RECTANGLE_BL_LON + " REAL" +
                 ")")
         db.execSQL(createTableRectangle)
+
+        val createTableTeam = ("CREATE TABLE " +
+                TABLE_TEAM + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_TEAM_ENUM_AREA_UUID + " TEXT" + "," +
+                COLUMN_TEAM_NAME + " TEXT" +
+                ")")
+        db.execSQL(createTableTeam)
+
+        val createTableTeamMember = ("CREATE TABLE " +
+                TABLE_TEAM_MEMBER + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_TEAM_MEMBER_TEAM_UUID + " TEXT" + "," +
+                COLUMN_TEAM_MEMBER_NAME + " TEXT" +
+                ")")
+        db.execSQL(createTableTeamMember)
     }
 
     //--------------------------------------------------------------------------
@@ -160,6 +176,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUM_AREA)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CIRCLE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECTANGLE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM_MEMBER)
 
         onCreate(db)
     }
@@ -267,6 +285,16 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RECTANGLE_BL_LAT = "rectangle_bl_lat"
         const val COLUMN_RECTANGLE_BL_LON = "rectangle_bl_lon"
 
+        // Team Table
+        const val TABLE_TEAM = "team"
+        const val COLUMN_TEAM_ENUM_AREA_UUID = "team_enum_area_uuid"
+        const val COLUMN_TEAM_NAME = "team_name"
+
+        // Team Member Table
+        const val TABLE_TEAM_MEMBER = "team_member"
+        const val COLUMN_TEAM_MEMBER_TEAM_UUID = "team_member_team_uuid"
+        const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
+
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -280,6 +308,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var enumAreaDAO: EnumAreaDAO
         lateinit var rectangleDAO: RectangleDAO
         lateinit var circleDAO: CircleDAO
+        lateinit var teamDAO: TeamDAO
+        lateinit var teamMemberDAO: TeamMemberDAO
 
         // creation/access methods
 
@@ -302,12 +332,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 navPlanDAO = NavPlanDAO( instance!! )
                 enumAreaDAO = EnumAreaDAO( instance!! )
                 rectangleDAO = RectangleDAO( instance!! )
-                circleDAO = CircleDAO(( instance!! ))
+                circleDAO = CircleDAO( instance!! )
+                teamDAO = TeamDAO( instance!! )
+                teamMemberDAO = TeamMemberDAO( instance!! )
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 53
+        private const val DATABASE_VERSION = 54
     }
 }

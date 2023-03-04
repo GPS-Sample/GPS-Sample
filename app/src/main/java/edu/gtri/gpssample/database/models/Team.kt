@@ -1,17 +1,14 @@
 package edu.gtri.gpssample.database.models
 
-import android.graphics.Point
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Serializable
-data class Circle (
+@kotlinx.serialization.Serializable
+data class Team(
     var uuid: String,
-    var lat: Double,
-    var lon: Double,
-    var radius: Double)
+    var enumArea_uuid: String,
+    var name: String)
 {
     fun pack() : String
     {
@@ -20,9 +17,9 @@ data class Circle (
 
     companion object
     {
-        fun unpack( message: String ) : Circle
+        fun unpack( message: String ) : Team
         {
-            return Json.decodeFromString<Circle>( message )
+            return Json.decodeFromString<Team>( message )
         }
     }
 }

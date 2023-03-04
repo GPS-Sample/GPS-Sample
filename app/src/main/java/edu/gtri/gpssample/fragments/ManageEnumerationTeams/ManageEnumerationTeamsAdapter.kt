@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationAreas
+package edu.gtri.gpssample.fragments.ManageEnumerationTeams
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,15 +9,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Team
 
-class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ManageEnumerationAreasAdapter.ViewHolder>()
+class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<ManageEnumerationTeamsAdapter.ViewHolder>()
 {
-    override fun getItemCount() = enumAreas!!.size
+    override fun getItemCount() = teams!!.size
 
     private lateinit var context: Context
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var didSelectEnumArea: ((enumArea: EnumArea) -> Unit)
+    lateinit var didSelectTeam: ((team: Team) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -35,13 +35,13 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
     {
         holder.itemView.isSelected = false
 
-        val enumArea = enumAreas!!.get(holder.adapterPosition)
+        val team = teams!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( enumArea.name )
+        holder.nameTextView.setText( team.name )
         holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.qr_code_white))
 
         holder.itemView.setOnClickListener {
-            didSelectEnumArea(enumArea)
+            didSelectTeam(team)
         }
     }
 

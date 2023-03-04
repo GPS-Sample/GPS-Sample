@@ -106,13 +106,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.nextButton.setOnClickListener {
 
-//            if (study_uuid.isNotEmpty() && sample_uuid.isNotEmpty())
-//            {
-//                val bundle = Bundle()
-//                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-//                bundle.putString( Keys.kSample_uuid.toString(), sample_uuid )
-//                findNavController().navigate(R.id.action_navigate_to_CreateSampleFragment, bundle)
-//            }
+            if (enum_area_uuid.isNotEmpty())
+            {
+                val bundle = Bundle()
+                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+                bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
+                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
+            }
         }
 
         binding.requestWifiButton.setOnClickListener {
