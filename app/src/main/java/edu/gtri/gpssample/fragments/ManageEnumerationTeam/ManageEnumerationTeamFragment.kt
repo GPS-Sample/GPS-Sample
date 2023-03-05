@@ -174,10 +174,6 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         gpsSamleWifiManager = GPSSampleWifiManager( this )
         gpsSamleWifiManager.startHotSpot()
-
-        binding.finishButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
-        }
     }
 
     override fun didStartHotspot( ssid: String, pass: String )

@@ -237,8 +237,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         binding.nextButton.setOnClickListener {
 
-            udpBroadcaster.stopReceiving()
-            udpBroadcaster.stopTransmitting()
+            udpBroadcaster.closeSocket()
             binding.wifiCheckBox.isChecked = false
 
             if (team_uuid.isNotEmpty())
@@ -441,8 +440,14 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         {
             super.onCapabilitiesChanged(network, networkCapabilities)
 
+            val not_suspended = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
+            val validated = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            val trusted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+            val not_restricted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+
             if (networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED))
             {
+                Log.d( "xxx", "onCapabilitiesChanged" )
                 beginReceiving()
                 beginTransmittingHeartbeat()
             }

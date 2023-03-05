@@ -96,7 +96,7 @@ class UDPBroadcaster
                 catch (ex: Exception)
                 {
                     Log.d( "xxx", ex.stackTraceToString())
-                    stopReceiving()
+                    closeSocket()
                 }
             }
 
@@ -261,7 +261,7 @@ class UDPBroadcaster
                 catch( ex: Exception )
                 {
                     Log.d( "xxx", ex.stackTraceToString())
-                    stopTransmitting()
+                    closeSocket()
                 }
             }
 
@@ -270,22 +270,15 @@ class UDPBroadcaster
     }
 
     //--------------------------------------------------------------------------
-    fun stopTransmitting()
-    {
-        transmitterEnabled = false
-        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
-        {
-            datagramSocket!!.close()
-        }
-    }
-
-    //--------------------------------------------------------------------------
-    fun stopReceiving()
+    fun closeSocket()
     {
         receiverEnabled = false
-        if (datagramSocket != null && !transmitterEnabled && !receiverEnabled)
+        transmitterEnabled = false
+
+        if (datagramSocket != null)
         {
             datagramSocket!!.close()
+            datagramSocket = null
         }
     }
 }

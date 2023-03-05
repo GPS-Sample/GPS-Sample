@@ -27,7 +27,7 @@ class GPSSampleWifiManager( val fragment: Fragment )
 
     fun stopHotSpot()
     {
-        udpBroadcaster.stopReceiving()
+        udpBroadcaster.closeSocket()
 
         localOnlyHotspotReservation?.close()
     }
