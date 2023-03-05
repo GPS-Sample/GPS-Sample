@@ -51,7 +51,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private var enum_area_uuid = ""
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
-    private val udpBroadcaster = UDPBroadcaster()
+    private var udpBroadcaster: UDPBroadcaster? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -129,7 +129,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.fieldsCheckBox.isChecked = false
 
             lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
 
@@ -146,7 +146,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.studyCheckBox.isChecked = false
 
             lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
 
@@ -163,7 +163,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.fieldsCheckBox.isChecked = false
 
             lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
 
@@ -180,7 +180,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.rulesCheckBox.isChecked = false
 
             lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
 
@@ -197,7 +197,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.filtersCheckBox.isChecked = false
 
             lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
 
@@ -214,7 +214,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.enumAreaCheckBox.isChecked = false
 
             lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
 
@@ -231,13 +231,13 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.teamCheckBox.isChecked = false
 
             lifecycleScope.launch {
-                udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
             }
         }
 
         binding.nextButton.setOnClickListener {
 
-            udpBroadcaster.closeSocket()
+            udpBroadcaster?.closeSocket()
             binding.wifiCheckBox.isChecked = false
 
             if (team_uuid.isNotEmpty())
@@ -261,6 +261,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     override fun onResume()
     {
         super.onResume()
+
+        udpBroadcaster = null
 
         binding.configCheckBox.isChecked = false
         binding.studyCheckBox.isChecked = false
@@ -311,7 +313,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
     private fun connected() : Boolean
     {
-        return udpBroadcaster.transmitterIsEnabled()
+        return udpBroadcaster != null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -411,26 +413,20 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
     private fun beginReceiving()
     {
-        if (!udpBroadcaster.receiverIsEnabled())
-        {
-            lifecycleScope.launch {
-                udpBroadcaster.beginReceiving( myInetAddress, broadcastInetAddress, this@SystemStatusFragment )
-            }
+        lifecycleScope.launch {
+            udpBroadcaster?.beginReceiving( myInetAddress, broadcastInetAddress, this@SystemStatusFragment )
         }
     }
 
     private fun beginTransmittingHeartbeat()
     {
-        if (!udpBroadcaster.transmitterIsEnabled())
-        {
-            lifecycleScope.launch {
-                binding.wifiCheckBox.isChecked = true
+        lifecycleScope.launch {
+            binding.wifiCheckBox.isChecked = true
 
-                user.isOnline = true
-                val networkCommand = NetworkCommand( NetworkCommand.NetworkUserRequest, user.uuid, "", "", user.pack() )
+            user.isOnline = true
+            val networkCommand = NetworkCommand( NetworkCommand.NetworkUserRequest, user.uuid, "", "", user.pack() )
 
-                udpBroadcaster.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
-            }
+            udpBroadcaster?.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
         }
     }
 
@@ -445,9 +441,10 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             val trusted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_TRUSTED)
             val not_restricted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
 
-            if (networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED))
+            if (udpBroadcaster == null && networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED))
             {
-                Log.d( "xxx", "onCapabilitiesChanged" )
+                Log.d( "xxx", "beginTransmittingHeartbeat" )
+                udpBroadcaster = UDPBroadcaster()
                 beginReceiving()
                 beginTransmittingHeartbeat()
             }
@@ -546,7 +543,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                         val networkCommandMessage = Json.encodeToString( networkCommand )
 
                         lifecycleScope.launch {
-                            udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                            udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
                         }
                     }
                 }
@@ -577,7 +574,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                         val networkCommandMessage = Json.encodeToString( networkCommand )
 
                         lifecycleScope.launch {
-                            udpBroadcaster.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+                            udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
                         }
                     }
                 }

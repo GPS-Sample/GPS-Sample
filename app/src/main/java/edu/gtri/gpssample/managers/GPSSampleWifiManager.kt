@@ -36,6 +36,8 @@ class GPSSampleWifiManager( val fragment: Fragment )
     {
         try
         {
+            Log.d( "xxx", "startLocalOnlyHotspot" )
+
             val oldWifiAdresses = getWifiApIpAddresses()
 
             val wifiManager = fragment.activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager

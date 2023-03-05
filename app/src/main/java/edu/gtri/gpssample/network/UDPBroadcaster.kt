@@ -19,8 +19,6 @@ import java.net.InetAddress
 class UDPBroadcaster
 {
     private var port = 61234
-    private var receiverEnabled = false
-    private var transmitterEnabled = false
     private var datagramSocket: DatagramSocket? = null
     private lateinit var delegate: UDPBroadcasterDelegate
 
@@ -28,18 +26,6 @@ class UDPBroadcaster
     interface UDPBroadcasterDelegate
     {
         fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
-    }
-
-    //--------------------------------------------------------------------------
-    fun transmitterIsEnabled() : Boolean
-    {
-        return transmitterEnabled
-    }
-
-    //--------------------------------------------------------------------------
-    fun receiverIsEnabled() : Boolean
-    {
-        return receiverEnabled
     }
 
     //--------------------------------------------------------------------------
@@ -76,9 +62,9 @@ class UDPBroadcaster
 
             Log.d( "xxx", "waiting for UDP messages on $myInetAddress:$port..." )
 
-            receiverEnabled = true
+            var enabled = true
 
-            while (receiverEnabled)
+            while (enabled)
             {
                 try {
                     val buf = ByteArray(4096)
@@ -96,6 +82,7 @@ class UDPBroadcaster
                 catch (ex: Exception)
                 {
                     Log.d( "xxx", ex.stackTraceToString())
+                    enabled = false
                     closeSocket()
                 }
             }
@@ -250,9 +237,9 @@ class UDPBroadcaster
 
             delay(1000)
 
-            transmitterEnabled = true
+            var enabled = true
 
-            while( transmitterEnabled )
+            while( enabled )
             {
                 try {
                     datagramSocket!!.send( datagramPacket )
@@ -261,6 +248,7 @@ class UDPBroadcaster
                 catch( ex: Exception )
                 {
                     Log.d( "xxx", ex.stackTraceToString())
+                    enabled = false
                     closeSocket()
                 }
             }
@@ -272,9 +260,6 @@ class UDPBroadcaster
     //--------------------------------------------------------------------------
     fun closeSocket()
     {
-        receiverEnabled = false
-        transmitterEnabled = false
-
         if (datagramSocket != null)
         {
             datagramSocket!!.close()
