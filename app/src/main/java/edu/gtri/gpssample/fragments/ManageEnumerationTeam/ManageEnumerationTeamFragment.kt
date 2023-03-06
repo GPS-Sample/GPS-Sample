@@ -51,7 +51,6 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     private lateinit var team: Team
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
-    private lateinit var gpsSamleWifiManager: GPSSampleWifiManager
     private lateinit var studyAdapter: ManageEnumerationAreaAdapter
     private lateinit var viewModel: ManageEnumerationAreaViewModel
 
@@ -60,6 +59,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
     private var users = ArrayList<User>()
+    private var gpsSamleWifiManager: GPSSampleWifiManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -80,8 +80,6 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.progressBar.visibility = View.VISIBLE
 
         // required: studyId
         if (arguments == null)
@@ -170,10 +168,23 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             })
             .addTo( compositeDisposable )
 
-        // START THE HOTSPOT !!!
+        binding.generateBarcodeButton.setOnClickListener {
+            binding.progressBar.visibility = View.VISIBLE
+            gpsSamleWifiManager = GPSSampleWifiManager( this )
+            gpsSamleWifiManager!!.startHotSpot()
+        }
 
-        gpsSamleWifiManager = GPSSampleWifiManager( this )
-        gpsSamleWifiManager.startHotSpot()
+        binding.performEnumerationButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
+            bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+            bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
+        }
+
+        binding.finishButton.setOnClickListener {
+            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+        }
     }
 
     override fun didStartHotspot( ssid: String, pass: String )
@@ -251,7 +262,9 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         compositeDisposable.clear()
 
-        gpsSamleWifiManager.stopHotSpot()
+        gpsSamleWifiManager?.let {
+            it.stopHotSpot()
+        }
 
         _binding = null
     }

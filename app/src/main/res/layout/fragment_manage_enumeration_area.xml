@@ -51,6 +51,24 @@
             android:layout_height="0dp"/>
 
         <Button
+            android:id="@+id/generate_barcode_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Generate Barcode" />
+
+        <Button
+            android:id="@+id/supervise_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Supervise Area" />
+
+        <Button
             android:id="@+id/finish_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"

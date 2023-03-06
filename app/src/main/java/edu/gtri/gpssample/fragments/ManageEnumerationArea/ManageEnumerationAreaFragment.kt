@@ -45,7 +45,6 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 {
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
-    private lateinit var gpsSamleWifiManager: GPSSampleWifiManager
     private lateinit var studyAdapter: ManageEnumerationAreaAdapter
     private lateinit var viewModel: ManageEnumerationAreaViewModel
 
@@ -54,6 +53,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
     private var users = ArrayList<User>()
+    private var gpsSamleWifiManager: GPSSampleWifiManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -74,8 +74,6 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.progressBar.visibility = View.VISIBLE
 
         // required: studyId
         if (arguments == null)
@@ -146,10 +144,18 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             })
             .addTo( compositeDisposable )
 
-        // START THE HOTSPOT !!!
+        binding.generateBarcodeButton.setOnClickListener {
+            binding.progressBar.visibility = View.VISIBLE
+            gpsSamleWifiManager = GPSSampleWifiManager( this )
+            gpsSamleWifiManager!!.startHotSpot()
+        }
 
-        gpsSamleWifiManager = GPSSampleWifiManager( this )
-        gpsSamleWifiManager.startHotSpot()
+        binding.superviseButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+            bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+            findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
+        }
 
         binding.finishButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
@@ -182,20 +188,21 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_study, menu)
+        inflater.inflate(R.menu.menu_manage_enumeration_area, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            R.id.action_edit_study -> {
-            }
+            R.id.action_supervise_area -> {
+                val bundle = Bundle()
+                bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+                bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
 
-            R.id.action_delete_study -> {
-                DAO.studyDAO.deleteStudy( study )
-                findNavController().popBackStack()
                 return true
             }
+
         }
 
         return false
@@ -230,7 +237,10 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         compositeDisposable.clear()
 
-        gpsSamleWifiManager.stopHotSpot()
+        if (gpsSamleWifiManager != null)
+        {
+            gpsSamleWifiManager!!.stopHotSpot()
+        }
 
         _binding = null
     }

@@ -23,13 +23,24 @@
         android:textSize="17sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/subtitle_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/define_enumeration_area"
+        android:textColor="@color/primary"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
     <Button
-        android:id="@+id/save_button"
+        android:id="@+id/finish_button"
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
         android:layout_height="50dp"
         android:layout_margin="20dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="@string/save" />
+        android:text="@string/finish" />
 </FrameLayout>

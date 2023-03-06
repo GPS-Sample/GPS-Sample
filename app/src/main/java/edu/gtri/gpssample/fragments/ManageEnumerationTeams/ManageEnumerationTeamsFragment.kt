@@ -107,6 +107,10 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
         binding.addButton.setOnClickListener {
             CreateTeamDialog( activity!!, this )
         }
+
+        binding.finishButton.setOnClickListener {
+            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+        }
     }
 
     override fun shouldCreateTeamNamed( name: String )

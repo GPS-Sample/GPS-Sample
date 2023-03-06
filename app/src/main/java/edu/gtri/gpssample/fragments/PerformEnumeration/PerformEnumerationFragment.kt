@@ -109,11 +109,15 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             return
         }
 
+        binding.titleTextView.text = enumArea.name
+        binding.subtitleTextView.text = team.name
+
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
 
-        binding.saveButton.setOnClickListener {
+        binding.finishButton.setOnClickListener {
+            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
         }
     }
 
