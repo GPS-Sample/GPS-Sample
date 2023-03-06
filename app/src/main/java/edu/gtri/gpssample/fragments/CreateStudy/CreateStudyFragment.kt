@@ -87,11 +87,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             quickStart = it
         }
 
-        if (quickStart)
-        {
-            binding.saveButton.setText( "NEXT" )
-        }
-
         ArrayAdapter.createFromResource(activity!!, R.array.samling_methods, android.R.layout.simple_spinner_item)
             .also { adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -186,7 +181,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             binding.sampleSize2EditText.setText("")
         }
 
-        binding.saveButton.setOnClickListener {
+        binding.nextButton.setOnClickListener {
             updateStudy()
         }
     }
@@ -381,16 +376,9 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             DAO.studyDAO.createStudy( study )
         }
 
-        if (quickStart)
-        {
-            val bundle = Bundle()
-            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreasFragment, bundle )
-        }
-        else
-        {
-            findNavController().popBackStack()
-        }
+        val bundle = Bundle()
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreasFragment, bundle )
     }
 
     override fun didAnswerNo()

@@ -109,8 +109,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             return
         }
 
-        binding.titleTextView.text = enumArea.name
-        binding.subtitleTextView.text = team.name
+        binding.titleTextView.text = enumArea.name + " (" + team.name + ")"
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
@@ -146,7 +145,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
                             LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
                         ))
                 val latLng = getCenter( rectangle )
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
             }
         }
     }
