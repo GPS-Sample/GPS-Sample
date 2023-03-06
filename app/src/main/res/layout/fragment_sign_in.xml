@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".fragments.SignIn.SignInFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -19,7 +20,7 @@
             android:layout_margin="20dp"
             android:gravity="center_vertical"
             android:text="@string/admin_sign_in"
-            android:textColor="@color/primary_textcolor"
+            android:textColor="?attr/colorPrimary"
             android:textSize="17sp"
             android:textStyle="bold" />
 
