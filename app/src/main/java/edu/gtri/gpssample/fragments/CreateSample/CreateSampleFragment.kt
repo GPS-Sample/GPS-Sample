@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.NavPlan
@@ -37,7 +38,6 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(CreateSampleViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -184,9 +184,8 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
     override fun onResume()
     {
         super.onResume()
-
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateSampleFragment.value.toString() + ": " + this.javaClass.simpleName
         val navPlans = DAO.navPlanDAO.getNavPlans( sample.uuid )
-
         createSampleAdapter.updateNavPlans(navPlans)
     }
 

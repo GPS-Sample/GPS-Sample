@@ -13,6 +13,7 @@ import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
@@ -35,7 +36,6 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(CreateRuleViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -188,6 +188,12 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 
             findNavController().popBackStack()
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateRuleFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun setKeyboardInputType( field: Field)

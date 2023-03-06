@@ -57,7 +57,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(SystemStatusViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -261,6 +260,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     override fun onResume()
     {
         super.onResume()
+
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SystemStatusFragment.value.toString() + ": " + this.javaClass.simpleName
 
         udpBroadcaster = null
 

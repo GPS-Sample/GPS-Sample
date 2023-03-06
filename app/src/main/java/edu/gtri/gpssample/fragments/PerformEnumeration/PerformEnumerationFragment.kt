@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.constants.Shape
@@ -43,7 +44,6 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(DefineEnumerationAreaViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -119,6 +119,12 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.finishButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

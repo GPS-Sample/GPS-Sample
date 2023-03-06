@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
@@ -33,7 +34,6 @@ class ManageEnumerationAreasFragment : Fragment()
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ManageSamplesViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -86,6 +86,12 @@ class ManageEnumerationAreasFragment : Fragment()
         }
     }
 
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationAreasFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
     fun didSelectEnumArea(enumArea: EnumArea)
     {
         val bundle = Bundle()
@@ -93,4 +99,10 @@ class ManageEnumerationAreasFragment : Fragment()
         bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
         findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
     }
-}
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
+    }}

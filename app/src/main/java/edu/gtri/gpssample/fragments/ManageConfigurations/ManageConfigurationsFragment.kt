@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
@@ -28,7 +29,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ManageConfigurationsViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -66,9 +66,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     override fun onResume()
     {
         super.onResume()
-
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
         val configurations = DAO.configDAO.getConfigs()
-
         manageConfigurationsAdapter.updateConfigurations(configurations)
     }
 

@@ -13,10 +13,7 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.DateFormat
-import edu.gtri.gpssample.constants.DistanceFormat
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.database.models.Config
@@ -34,7 +31,6 @@ class CreateConfigurationFragment : Fragment()
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(CreateConfigurationViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -165,6 +161,12 @@ class CreateConfigurationFragment : Fragment()
                 findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
             }
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

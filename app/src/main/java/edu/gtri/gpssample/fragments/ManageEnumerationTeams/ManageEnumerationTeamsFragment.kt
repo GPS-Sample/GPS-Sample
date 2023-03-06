@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
@@ -38,7 +39,6 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
     {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ManageSamplesViewModel::class.java)
-        (activity!!.application as? MainApplication)?.currentFragment = this.javaClass.simpleName
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -113,6 +113,12 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
         }
     }
 
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
     override fun shouldCreateTeamNamed( name: String )
     {
         val team = Team( UUID.randomUUID().toString(), enumArea.uuid, name )
@@ -129,4 +135,10 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
         bundle.putString( Keys.kTeam_uuid.toString(), team.uuid )
         findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamFragment, bundle )
     }
-}
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
+    }}
