@@ -12,8 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
@@ -42,13 +43,7 @@ class SignUpFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        arguments?.getString(Key.kRole.toString())?.let { role ->
+        arguments?.getString(Keys.kRole.toString())?.let { role ->
             this.role = role
         }
 
@@ -69,10 +64,34 @@ class SignUpFragment : Fragment()
         binding.nextButton.setOnClickListener {
 
             val name = binding.nameEditText.text.toString()
-            val pin1 = binding.pin1EditText.text.toString().toInt()
-            val pin2 = binding.pin2EditText.text.toString().toInt()
+            val pin1 = binding.pin1EditText.text.toString().toIntOrNull()
+            val pin2 = binding.pin2EditText.text.toString().toIntOrNull()
             val question = binding.questionSpinner.selectedItem as String
             val answer = binding.answerEditText.text.toString()
+
+            if (name.length == 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (pin1 == null)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter a PIN", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (pin2 == null)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please re-enter the PIN", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (answer.length == 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter an answer.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             if (pin1 != pin2)
             {
@@ -82,18 +101,24 @@ class SignUpFragment : Fragment()
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
-                editor.putString( Key.kUserName.toString(), name )
+                editor.putString( Keys.kUserName.toString(), name )
                 editor.commit()
 
                 val user = User( UUID.randomUUID().toString(), name, pin1, role, answer, question, false )
                 DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), role )
+                bundle.putString( Keys.kRole.toString(), role )
 
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SignUpFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

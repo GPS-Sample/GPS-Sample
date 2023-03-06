@@ -3,7 +3,6 @@ package edu.gtri.gpssample.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import edu.gtri.gpssample.constants.Key
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
@@ -110,6 +109,55 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_NAV_PLAN_NAME + " TEXT" +
                 ")")
         db.execSQL(createTableNavigationPlan)
+
+        val createTableEnumArea = ("CREATE TABLE " +
+                TABLE_ENUM_AREA + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ENUM_AREA_CONFIG_UUID + " TEXT" + "," +
+                COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
+                COLUMN_ENUM_AREA_SHAPE + " TEXT" + "," +
+                COLUMN_ENUM_AREA_SHAPE_UUID + " TEXT" +
+                ")")
+        db.execSQL(createTableEnumArea)
+
+        val createTableCircle = ("CREATE TABLE " +
+                TABLE_CIRCLE + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_CIRCLE_LAT + " REAL" + "," +
+                COLUMN_CIRCLE_LON + " REAL" + "," +
+                COLUMN_CIRCLE_RADIUS + " REAL" +
+                ")")
+        db.execSQL(createTableCircle)
+
+        val createTableRectangle = ("CREATE TABLE " +
+                TABLE_RECTANGLE + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_RECTANGLE_TL_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_TL_LON + " REAL" + "," +
+                COLUMN_RECTANGLE_TR_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_TR_LON + " REAL" + "," +
+                COLUMN_RECTANGLE_BR_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_BR_LON + " REAL" + "," +
+                COLUMN_RECTANGLE_BL_LAT + " REAL" + "," +
+                COLUMN_RECTANGLE_BL_LON + " REAL" +
+                ")")
+        db.execSQL(createTableRectangle)
+
+        val createTableTeam = ("CREATE TABLE " +
+                TABLE_TEAM + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_TEAM_ENUM_AREA_UUID + " TEXT" + "," +
+                COLUMN_TEAM_NAME + " TEXT" +
+                ")")
+        db.execSQL(createTableTeam)
+
+        val createTableTeamMember = ("CREATE TABLE " +
+                TABLE_TEAM_MEMBER + "(" +
+                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_TEAM_MEMBER_TEAM_UUID + " TEXT" + "," +
+                COLUMN_TEAM_MEMBER_NAME + " TEXT" +
+                ")")
+        db.execSQL(createTableTeamMember)
     }
 
     //--------------------------------------------------------------------------
@@ -125,6 +173,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERRULE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAMPLE)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAV_PLAN)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUM_AREA)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CIRCLE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECTANGLE)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM)
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM_MEMBER)
 
         onCreate(db)
     }
@@ -208,6 +261,40 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_NAV_PLAN_SAMPLE_UUID = "nav_plan_sample_id"
         const val COLUMN_NAV_PLAN_NAME = "nav_plan_name"
 
+        // EnumArea Table
+        const val TABLE_ENUM_AREA = "enum_area"
+        const val COLUMN_ENUM_AREA_CONFIG_UUID = "enum_area_config_uuid"
+        const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
+        const val COLUMN_ENUM_AREA_SHAPE = "enum_area_shape"
+        const val COLUMN_ENUM_AREA_SHAPE_UUID = "enum_area_shape_uuid"
+
+        // Circle Table
+        const val TABLE_CIRCLE = "circle"
+        const val COLUMN_CIRCLE_LAT = "circle_lat"
+        const val COLUMN_CIRCLE_LON = "circle_lon"
+        const val COLUMN_CIRCLE_RADIUS = "circle_radius"
+
+        // Rectangle Table
+        const val TABLE_RECTANGLE = "rectangle"
+        const val COLUMN_RECTANGLE_TL_LAT = "rectangle_tl_lat"
+        const val COLUMN_RECTANGLE_TL_LON = "rectangle_tl_lon"
+        const val COLUMN_RECTANGLE_TR_LAT = "rectangle_tr_lat"
+        const val COLUMN_RECTANGLE_TR_LON = "rectangle_tr_lon"
+        const val COLUMN_RECTANGLE_BR_LAT = "rectangle_br_lat"
+        const val COLUMN_RECTANGLE_BR_LON = "rectangle_br_lon"
+        const val COLUMN_RECTANGLE_BL_LAT = "rectangle_bl_lat"
+        const val COLUMN_RECTANGLE_BL_LON = "rectangle_bl_lon"
+
+        // Team Table
+        const val TABLE_TEAM = "team"
+        const val COLUMN_TEAM_ENUM_AREA_UUID = "team_enum_area_uuid"
+        const val COLUMN_TEAM_NAME = "team_name"
+
+        // Team Member Table
+        const val TABLE_TEAM_MEMBER = "team_member"
+        const val COLUMN_TEAM_MEMBER_TEAM_UUID = "team_member_team_uuid"
+        const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
+
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -218,6 +305,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var filterRuleDAO: FilterRuleDAO
         lateinit var sampleDAO: SampleDAO
         lateinit var navPlanDAO: NavPlanDAO
+        lateinit var enumAreaDAO: EnumAreaDAO
+        lateinit var rectangleDAO: RectangleDAO
+        lateinit var circleDAO: CircleDAO
+        lateinit var teamDAO: TeamDAO
+        lateinit var teamMemberDAO: TeamMemberDAO
 
         // creation/access methods
 
@@ -231,18 +323,23 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
                 userDAO = UserDAO( instance!! )
                 configDAO = ConfigDAO( instance!! )
-                studyDAO = StudyDAO(( instance!! ))
-                fieldDAO = FieldDAO(( instance!! ))
-                ruleDAO = RuleDAO(( instance!! ))
-                filterDAO = FilterDAO(( instance!! ))
-                filterRuleDAO = FilterRuleDAO(( instance!! ))
-                sampleDAO = SampleDAO(( instance!! ))
-                navPlanDAO = NavPlanDAO(( instance!! ))
+                studyDAO = StudyDAO( instance!! )
+                fieldDAO = FieldDAO( instance!! )
+                ruleDAO = RuleDAO( instance!! )
+                filterDAO = FilterDAO( instance!! )
+                filterRuleDAO = FilterRuleDAO( instance!! )
+                sampleDAO = SampleDAO( instance!! )
+                navPlanDAO = NavPlanDAO( instance!! )
+                enumAreaDAO = EnumAreaDAO( instance!! )
+                rectangleDAO = RectangleDAO( instance!! )
+                circleDAO = CircleDAO( instance!! )
+                teamDAO = TeamDAO( instance!! )
+                teamMemberDAO = TeamMemberDAO( instance!! )
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 45
+        private const val DATABASE_VERSION = 55
     }
 }

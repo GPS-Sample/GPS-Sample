@@ -11,12 +11,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
-import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import java.util.UUID
@@ -48,19 +49,13 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
@@ -78,7 +73,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 //            return
 //        }
 
-        val rule_uuid = arguments!!.getString( Key.kRule_uuid.toString(), "");
+        val rule_uuid = arguments!!.getString( Keys.kRule_uuid.toString(), "");
 
         if (rule_uuid.isNotEmpty())
         {
@@ -193,6 +188,12 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 
             findNavController().popBackStack()
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateRuleFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun setKeyboardInputType( field: Field)

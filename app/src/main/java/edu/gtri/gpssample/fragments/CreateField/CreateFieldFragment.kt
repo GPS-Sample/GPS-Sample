@@ -8,13 +8,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.Study
 import java.util.*
 
 class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
@@ -64,19 +65,13 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
@@ -94,7 +89,7 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 //            return
 //        }
 
-        val field_uuid = arguments!!.getString( Key.kField_uuid.toString(), "" );
+        val field_uuid = arguments!!.getString( Keys.kField_uuid.toString(), "" );
 
         if (field_uuid.isNotEmpty())
         {
@@ -478,6 +473,12 @@ class CreateFieldFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             findNavController().popBackStack()
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFieldFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)

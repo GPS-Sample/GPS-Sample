@@ -46,7 +46,7 @@ class CreateSampleAdapter(var navPlans: List<NavPlan>?) : RecyclerView.Adapter<C
     {
         val titleTextView: TextView = itemView.findViewById(R.id.title_text_view)
         val editButton: ImageView = itemView.findViewById(R.id.edit_image_view)
-        val deleteButton: ImageView = itemView.findViewById(R.id.delete_image_view)
+        val deleteButton: ImageView = itemView.findViewById(R.id.image_view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)

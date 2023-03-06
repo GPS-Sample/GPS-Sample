@@ -1,14 +1,9 @@
 package edu.gtri.gpssample.fragments.CreateSample
 
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -16,14 +11,15 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.NavPlan
 import edu.gtri.gpssample.database.models.Sample
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.ManageStudies.ManageSamplesAdapter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -54,12 +50,6 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
@@ -67,7 +57,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
         }
 
         // required: study_uuid
-        val study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        val study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
@@ -86,7 +76,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
         }
 
         // optional: sample_uuid
-        val sample_uuid = arguments!!.getString( Key.kSample_uuid.toString(), "");
+        val sample_uuid = arguments!!.getString( Keys.kSample_uuid.toString(), "");
 
         if (sample_uuid.isNotEmpty())
         {
@@ -101,7 +91,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
             }
         }
 
-        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
 
         quick_start?.let {
             quickStart = it
@@ -180,7 +170,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
                 if (quickStart)
                 {
                     val bundle = Bundle()
-                    bundle.putString( Key.kSample_uuid.toString(), sample.uuid )
+                    bundle.putString( Keys.kSample_uuid.toString(), sample.uuid )
                     findNavController().navigate(R.id.action_navigate_to_ManageSampleFragment, bundle)
                 }
                 else
@@ -194,16 +184,15 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
     override fun onResume()
     {
         super.onResume()
-
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateSampleFragment.value.toString() + ": " + this.javaClass.simpleName
         val navPlans = DAO.navPlanDAO.getNavPlans( sample.uuid )
-
         createSampleAdapter.updateNavPlans(navPlans)
     }
 
     fun didSelectNavPlan( navPlan: NavPlan )
     {
         val bundle = Bundle()
-        bundle.putString( Key.kNavPlan_uuid.toString(), navPlan.uuid )
+        bundle.putString( Keys.kNavPlan_uuid.toString(), navPlan.uuid )
         findNavController().navigate(R.id.action_navigate_to_NavigationPlanFragment, bundle)
     }
 
@@ -220,7 +209,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
             R.id.action_manage_sample -> {
                 if (this::sample.isInitialized) {
                     val bundle = Bundle()
-                    bundle.putString(Key.kSample_uuid.toString(), sample.uuid)
+                    bundle.putString(Keys.kSample_uuid.toString(), sample.uuid)
                     findNavController().navigate(
                         R.id.action_navigate_to_ManageSampleFragment,
                         bundle

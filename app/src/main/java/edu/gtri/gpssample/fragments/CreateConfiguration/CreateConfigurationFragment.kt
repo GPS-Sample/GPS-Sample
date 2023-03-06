@@ -2,7 +2,6 @@ package edu.gtri.gpssample.fragments.CreateConfiguration
 
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.DateFormat
-import edu.gtri.gpssample.constants.DistanceFormat
-import edu.gtri.gpssample.constants.Key
-import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.database.models.Config
@@ -46,19 +43,13 @@ class CreateConfigurationFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        val quick_start = arguments?.getBoolean( Key.kQuickStart.toString(), false )
+        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
 
         quick_start?.let {
             quickStart = it
         }
 
-        val configId = arguments?.getString( Key.kConfig_uuid.toString());
+        val configId = arguments?.getString( Keys.kConfig_uuid.toString());
 
         configId?.let {
             config = DAO.configDAO.getConfig( it )
@@ -165,11 +156,17 @@ class CreateConfigurationFragment : Fragment()
                 DAO.configDAO.updateConfig( config )
 
                 val bundle = Bundle()
-                bundle.putBoolean( Key.kQuickStart.toString(), quickStart )
-                bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+                bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
+                bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
                 findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
             }
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()

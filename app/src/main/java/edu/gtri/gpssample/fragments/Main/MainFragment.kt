@@ -16,7 +16,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentMainBinding
 
@@ -41,12 +43,6 @@ class MainFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         binding.versionTextView.text = BuildConfig.VERSION_NAME
 
@@ -74,13 +70,13 @@ class MainFragment : Fragment()
             val bundle = Bundle()
 
             if (binding.adminButton.isChecked) {
-                bundle.putString( Key.kRole.toString(), Role.Admin.toString())
+                bundle.putString( Keys.kRole.toString(), Role.Admin.toString())
             }
             else if (binding.supervisorButton.isChecked) {
-                bundle.putString( Key.kRole.toString(), Role.Supervisor.toString())
+                bundle.putString( Keys.kRole.toString(), Role.Supervisor.toString())
             }
             else if (binding.dataCollectorButton.isChecked) {
-                bundle.putString( Key.kRole.toString(), Role.DataCollector.toString())
+                bundle.putString( Keys.kRole.toString(), Role.DataCollector.toString())
             }
 
             binding.adminButton.isChecked = false
@@ -100,15 +96,15 @@ class MainFragment : Fragment()
 
             if (binding.adminButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), Role.Admin.toString())
+                bundle.putString( Keys.kRole.toString(), Role.Admin.toString())
             }
             else if (binding.supervisorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), Role.Supervisor.toString())
+                bundle.putString( Keys.kRole.toString(), Role.Supervisor.toString())
             }
             else if (binding.dataCollectorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Key.kRole.toString(), Role.DataCollector.toString())
+                bundle.putString( Keys.kRole.toString(), Role.DataCollector.toString())
             }
 
             if (bundle != null)
@@ -130,6 +126,12 @@ class MainFragment : Fragment()
         {
             getRuntimePermissions()
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MainFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun allRuntimePermissionsGranted(): Boolean {

@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -44,19 +46,13 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val config_uuid = arguments!!.getString( Key.kConfig_uuid.toString(), "");
+        val config_uuid = arguments!!.getString( Keys.kConfig_uuid.toString(), "");
 
         if (config_uuid.isEmpty())
         {
@@ -85,14 +81,14 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
         binding.addButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+            bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
 
         binding.createButton.setOnClickListener {
 
             val bundle = Bundle()
-            bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+            bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
     }
@@ -100,6 +96,8 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     override fun onResume()
     {
         super.onResume()
+
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageStudiesFragment.value.toString() + ": " + this.javaClass.simpleName
 
         val studies = DAO.studyDAO.getStudies( config.uuid )
 
@@ -121,8 +119,8 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         val bundle = Bundle()
 
-        bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
-        bundle.putString( Key.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
 
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
     }
@@ -159,7 +157,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             R.id.action_edit_configuration -> {
                 val bundle = Bundle()
 
-                bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+                bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
 
                 findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
             }

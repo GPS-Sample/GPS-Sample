@@ -12,8 +12,7 @@ import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 class MainApplication : Application()
 {
     var user: User? = null
-
-    var barcodeBitmap : Bitmap? = null
+    var currentFragment = ""
 
     override fun onCreate()
     {

@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.CreateFilter
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,17 +12,17 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
-import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.SelectRuleDialog
 import edu.gtri.gpssample.fragments.CreateRule.CreateRuleViewModel
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
-import edu.gtri.gpssample.fragments.ManageStudies.ManageStudiesAdapter
 import java.util.*
 
 class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
@@ -54,12 +53,6 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
@@ -67,7 +60,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         }
 
         // required: Study_uuid
-        study_uuid = arguments!!.getString( Key.kStudy_uuid.toString(), "");
+        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isEmpty())
         {
@@ -76,7 +69,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         }
 
         // required: SamplingMethod
-        val samplingMethod = arguments!!.getString( Key.kSamplingMethod.toString(), "");
+        val samplingMethod = arguments!!.getString( Keys.kSamplingMethod.toString(), "");
 
         if (samplingMethod.isEmpty())
         {
@@ -96,7 +89,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         }
 
         // optional: filterId
-        val filter_uuid = arguments!!.getString( Key.kFilter_uuid.toString(), "");
+        val filter_uuid = arguments!!.getString( Keys.kFilter_uuid.toString(), "");
 
         if (filter_uuid.isNotEmpty())
         {
@@ -226,7 +219,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     override fun onResume()
     {
         super.onResume()
-
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFilterFragment.value.toString() + ": " + this.javaClass.simpleName
         val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
         createFilterAdapter.updateFilterRules(filterRules)
     }

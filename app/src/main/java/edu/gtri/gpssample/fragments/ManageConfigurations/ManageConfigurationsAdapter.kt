@@ -59,6 +59,6 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val deleteImageView: ImageView = itemView.findViewById<ImageView>(R.id.delete_image_view)
+        val deleteImageView: ImageView = itemView.findViewById<ImageView>(R.id.image_view)
     }
 }

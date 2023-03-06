@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.Key
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.database.models.Config
@@ -42,12 +44,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fragmentRootLayout.setOnClickListener {
-            if (BuildConfig.DEBUG) {
-                Toast.makeText(activity!!.applicationContext, this.javaClass.simpleName, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Config>())
         manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
         manageConfigurationsAdapter.shouldDeleteConfig = this::shouldDeleteConfig
@@ -58,7 +54,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         binding.quickStartButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putBoolean( Key.kQuickStart.toString(), true )
+            bundle.putBoolean( Keys.kQuickStart.toString(), true )
             findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
         }
 
@@ -70,9 +66,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     override fun onResume()
     {
         super.onResume()
-
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
         val configurations = DAO.configDAO.getConfigs()
-
         manageConfigurationsAdapter.updateConfigurations(configurations)
     }
 
@@ -80,7 +75,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         val bundle = Bundle()
 
-        bundle.putString( Key.kConfig_uuid.toString(), config.uuid )
+        bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }
