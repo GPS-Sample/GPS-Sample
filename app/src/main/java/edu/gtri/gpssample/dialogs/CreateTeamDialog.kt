@@ -26,8 +26,7 @@ class CreateTeamDialog
         val view = inflater.inflate(R.layout.dialog_create_team, null)
 
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Select Rule").setView(view)
-
+        builder.setView(view)
         val editText = view.findViewById<EditText>(R.id.edit_text)
 
         team?.let {

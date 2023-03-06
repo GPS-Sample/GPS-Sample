@@ -13,7 +13,7 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
-<!--        <item name="android:fontFamily">@font/work_sans_medium</item>-->
+        <item name="android:fontFamily">@font/work_sans_medium</item>
 
         <!-- Customize your theme here. -->
     </style>
