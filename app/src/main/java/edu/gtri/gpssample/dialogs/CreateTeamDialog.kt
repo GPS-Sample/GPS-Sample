@@ -5,11 +5,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.*
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.models.Team
 
 class CreateTeamDialog
 {
     interface CreateTeamDialogDelegate
     {
+        fun shouldUpdateTeam( team: Team )
         fun shouldCreateTeamNamed( name: String )
     }
 
@@ -17,7 +19,7 @@ class CreateTeamDialog
     {
     }
 
-    constructor(context: Context, delegate: CreateTeamDialogDelegate )
+    constructor( context: Context, team: Team?, delegate: CreateTeamDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -25,6 +27,12 @@ class CreateTeamDialog
 
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Select Rule").setView(view)
+
+        val editText = view.findViewById<EditText>(R.id.edit_text)
+
+        team?.let {
+            editText.setText( it.name )
+        }
 
         val alertDialog = builder.create()
 
@@ -40,12 +48,14 @@ class CreateTeamDialog
 
         saveButton.setOnClickListener {
 
-            val editText = view.findViewById<EditText>(R.id.edit_text)
-
             if (editText.text.toString().length > 0)
             {
                 alertDialog.dismiss()
-                delegate.shouldCreateTeamNamed( editText.text.toString())
+
+                team?.let {
+                    it.name = editText.text.toString()
+                    delegate.shouldUpdateTeam( it )
+                } ?: delegate.shouldCreateTeamNamed( editText.text.toString())
             }
         }
     }

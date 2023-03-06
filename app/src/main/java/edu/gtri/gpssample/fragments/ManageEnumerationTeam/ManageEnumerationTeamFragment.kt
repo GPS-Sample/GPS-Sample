@@ -30,6 +30,7 @@ import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamBinding
+import edu.gtri.gpssample.dialogs.CreateTeamDialog
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -47,7 +48,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate
+class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate, CreateTeamDialog.CreateTeamDialogDelegate
 {
     private lateinit var team: Team
     private lateinit var study: Study
@@ -141,7 +142,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             return
         }
 
-        binding.studyNameTextView.setText( team.name )
+        binding.teamNameTextView.setText( team.name )
 
         studyAdapter = ManageEnumerationAreaAdapter(users)
 
@@ -220,23 +221,34 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_study, menu)
+        inflater.inflate(R.menu.menu_manage_enumeration_team, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            R.id.action_edit_study -> {
+            R.id.action_edit_team -> {
+                CreateTeamDialog( activity!!, team, this )
             }
 
-            R.id.action_delete_study -> {
-                DAO.studyDAO.deleteStudy( study )
+            R.id.action_delete_team -> {
+                DAO.teamDAO.deleteTeam( team )
                 findNavController().popBackStack()
                 return true
             }
         }
 
         return false
+    }
+
+    override fun shouldUpdateTeam( team: Team )
+    {
+        DAO.teamDAO.updateTeam( team )
+        binding.teamNameTextView.setText( team.name )
+    }
+
+    override fun shouldCreateTeamNamed( name: String )
+    {
     }
 
     override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )

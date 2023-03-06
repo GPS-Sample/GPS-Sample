@@ -13,12 +13,11 @@
         tools:context=".fragments.ManageEnumerationTeam.ManageEnumerationTeamFragment">
 
         <TextView
-            android:id="@+id/study_name_text_view"
+            android:id="@+id/team_name_text_view"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_margin="20dp"
             android:gravity="center"
-            android:text="@string/study_name"
             android:textColor="@color/primary_textcolor"
             android:textSize="20sp"
             android:textStyle="bold" />

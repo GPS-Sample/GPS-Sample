@@ -105,7 +105,7 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.addButton.setOnClickListener {
-            CreateTeamDialog( activity!!, this )
+            CreateTeamDialog( activity!!, null, this )
         }
 
         binding.finishButton.setOnClickListener {
@@ -119,6 +119,10 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
+    override fun shouldUpdateTeam( team: Team )
+    {
+    }
+
     override fun shouldCreateTeamNamed( name: String )
     {
         val team = Team( UUID.randomUUID().toString(), enumArea.uuid, name )
@@ -128,7 +132,6 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
 
     fun didSelectTeam( team: Team )
     {
-        Log.d( "xxx", team.name )
         val bundle = Bundle()
         bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
         bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
