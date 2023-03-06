@@ -52,6 +52,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FIELD_NAME + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_FIELD_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FIELD_TYPE + " TEXT" + "," +
                 COLUMN_FIELD_PII + " BOOLEAN" + "," +
@@ -70,7 +71,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_RULE + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_RULE_STUDY_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_RULE_FIELD_UUID + " TEXT" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
                 COLUMN_RULE_OPERATOR + " TEXT" + "," +
@@ -82,6 +85,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_FILTER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_FILTER_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FILTER_NAME + " TEXT" + "," +
                 COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
@@ -106,6 +110,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_SAMPLE + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_SAMPLE_STUDY_UUID + " TEXT" + "," +
                 COLUMN_SAMPLE_NAME + " TEXT" + "," +
                 COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" +
@@ -124,9 +129,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_ENUM_AREA + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_ENUM_AREA_CONFIG_UUID + " TEXT" + "," +
                 COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
                 COLUMN_ENUM_AREA_SHAPE + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_ENUM_AREA_SHAPE_UUID + " TEXT" +
                 ")")
         db.execSQL(createTableEnumArea)
@@ -160,6 +167,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_TEAM + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_TEAM_ENUM_AREA_UUID + " TEXT" + "," +
                 COLUMN_TEAM_NAME + " TEXT" +
                 ")")
@@ -169,6 +177,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_TEAM_MEMBER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_TEAM_MEMBER_TEAM_UUID + " TEXT" + "," +
                 COLUMN_TEAM_MEMBER_NAME + " TEXT" +
                 ")")
@@ -179,20 +188,20 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int )
     {
         // clear all tables
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIG)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDY)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FIELD)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RULE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERRULE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAMPLE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAV_PLAN)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUM_AREA)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CIRCLE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECTANGLE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM_MEMBER)
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTERRULE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NAV_PLAN")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CIRCLE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_RECTANGLE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_MEMBER")
 
         onCreate(db)
     }
