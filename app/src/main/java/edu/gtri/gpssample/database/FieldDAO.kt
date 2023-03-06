@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.constants.FieldType
@@ -84,8 +85,10 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createField( cursor: Cursor ): Field
+    @SuppressLint("Range")
+    private fun  createField(cursor: Cursor ): Field
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_STUDY_UUID))
@@ -100,7 +103,7 @@ class FieldDAO(private var dao: DAO)
         val option3 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_3))
         val option4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_4))
 
-        return Field( uuid, study_uuid, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, uuid, study_uuid, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
     //--------------------------------------------------------------------------

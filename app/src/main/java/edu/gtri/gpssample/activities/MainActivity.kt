@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity()
             DAO.ruleDAO.deleteOrphans()
             DAO.filterRuleDAO.deleteOrphans()
             DAO.sampleDAO.deleteOrphans()
-            DAO.navPlanDAO.deleteOrphans()
+            //DAO.navPlanDAO.deleteOrphans()
             DAO.enumAreaDAO.deleteOrphans()
             DAO.teamDAO.deleteOrphans()
 

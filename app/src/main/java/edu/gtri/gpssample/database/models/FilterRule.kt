@@ -7,12 +7,16 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class FilterRule(
+    var id : Int? = null,
     var uuid: String,
     var study_uuid: String,
     var filter_uuid: String,
     var rule_uuid: String,
     var connector: String)
 {
+    constructor(uuid: String, study_uuid: String, filter_uuid: String,
+                rule_uuid: String, connector: String) : this(null, uuid, study_uuid, filter_uuid,
+                rule_uuid, connector)
     fun pack() : String
     {
         return Json.encodeToString( this )

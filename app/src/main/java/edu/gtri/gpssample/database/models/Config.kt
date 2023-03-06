@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Config(
+    var id : Int? = null,
     var uuid: String,
     var name: String,
     var dateFormat: String,
@@ -18,6 +19,8 @@ data class Config(
     var distanceFormat: String,
     var minGpsPrecision: Int )
 {
+    constructor(uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
+        minGpsPrecision: Int) : this(null, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision)
     fun pack() : String
     {
         return Json.encodeToString( this )

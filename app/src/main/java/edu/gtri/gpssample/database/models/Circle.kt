@@ -8,11 +8,14 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Circle (
+    var id : Int? = null,
     var uuid: String,
     var lat: Double,
     var lon: Double,
     var radius: Double)
 {
+    constructor(uuid: String, lat: Double, lon: Double, radius: Double) :
+            this(null, uuid, lat, lon, radius)
     fun pack() : String
     {
         return Json.encodeToString( this )

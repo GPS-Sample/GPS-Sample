@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.Field
@@ -76,8 +77,10 @@ class RuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createRule( cursor: Cursor): Rule
+    @SuppressLint("Range")
+    private fun  createRule(cursor: Cursor): Rule
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_STUDY_UUID))
         val field_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_FIELD_UUID))
@@ -85,7 +88,7 @@ class RuleDAO(private var dao: DAO)
         val operator = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_OPERATOR))
         val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
 
-        return Rule( uuid, study_uuid, field_uuid, name, operator, value )
+        return Rule( id, uuid, study_uuid, field_uuid, name, operator, value )
     }
 
     //--------------------------------------------------------------------------

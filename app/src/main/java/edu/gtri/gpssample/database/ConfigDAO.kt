@@ -57,6 +57,7 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun createConfig( cursor: Cursor ) : Config
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
         val distanceFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT))
@@ -64,7 +65,7 @@ class ConfigDAO(private var dao: DAO)
         val timeFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT))
         val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
 
-        return Config( uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
+        return Config( id, uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
     }
 
     //--------------------------------------------------------------------------

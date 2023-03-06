@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Rectangle (
+    var id : Int? = null,
     var uuid: String,
     var topLeft_lat: Double,
     var topLeft_lon: Double,
@@ -17,6 +18,10 @@ data class Rectangle (
     var botLeft_lat: Double,
     var botLeft_lon: Double)
 {
+    constructor(uuid: String, topLeft_lat: Double, topLeft_lon: Double, topRight_lat: Double,
+                topRight_lon: Double, botRight_lat: Double, botRight_lon: Double, botLeft_lat: Double,
+                botLeft_lon: Double) : this(null, uuid, topLeft_lat, topLeft_lon, topRight_lat,
+                topRight_lon, botRight_lat, botRight_lon, botLeft_lat, botLeft_lon)
     fun pack() : String
     {
         return Json.encodeToString( this )

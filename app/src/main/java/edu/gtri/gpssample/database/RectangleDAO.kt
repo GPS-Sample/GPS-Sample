@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.*
@@ -31,8 +32,10 @@ class RectangleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createRectangle( cursor: Cursor): Rectangle
+    @SuppressLint("Range")
+    private fun createRectangle(cursor: Cursor): Rectangle
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val tl_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_RECTANGLE_TL_LAT))
         val tl_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_RECTANGLE_TL_LON))
@@ -43,7 +46,7 @@ class RectangleDAO(private var dao: DAO)
         val bl_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_RECTANGLE_BL_LAT))
         val bl_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_RECTANGLE_BL_LON))
 
-        return Rectangle( uuid, tl_lat, tl_lon, tr_lat, tr_lon, br_lat, br_lon, bl_lat, bl_lon )
+        return Rectangle( id, uuid, tl_lat, tl_lon, tr_lat, tr_lon, br_lat, br_lon, bl_lat, bl_lon )
     }
 
     //--------------------------------------------------------------------------

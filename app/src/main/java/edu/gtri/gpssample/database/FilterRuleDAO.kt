@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
@@ -76,15 +77,17 @@ class FilterRuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createFilterRule( cursor: Cursor ): FilterRule
+    @SuppressLint("Range")
+    private fun  createFilterRule(cursor: Cursor ): FilterRule
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_STUDY_UUID))
         val filter_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_FILTER_UUID))
         val rule_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_RULE_UUID))
         val connector = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR))
 
-        return FilterRule( uuid, study_uuid, filter_uuid, rule_uuid, connector )
+        return FilterRule( id, uuid, study_uuid, filter_uuid, rule_uuid, connector )
     }
 
     //--------------------------------------------------------------------------

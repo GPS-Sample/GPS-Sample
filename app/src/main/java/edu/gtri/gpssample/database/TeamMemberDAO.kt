@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.*
@@ -25,13 +26,15 @@ class TeamMemberDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createTeamMember( cursor: Cursor): TeamMember
+    @SuppressLint("Range")
+    private fun createTeamMember(cursor: Cursor): TeamMember
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val team_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_MEMBER_TEAM_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_MEMBER_NAME))
 
-        return TeamMember( uuid, team_uuid, name )
+        return TeamMember(id, uuid, team_uuid, name )
     }
 
     //--------------------------------------------------------------------------

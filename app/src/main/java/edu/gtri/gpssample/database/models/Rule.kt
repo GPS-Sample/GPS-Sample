@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Rule(
+    var id : Int? = null,
     var uuid: String,
     var study_uuid: String,
     var field_uuid: String,
@@ -14,6 +15,8 @@ data class Rule(
     var operator: String,
     var value: String)
 {
+    constructor(uuid: String, study_uuid: String, field_uuid: String, name: String, operator: String,
+                value: String) : this(null, uuid, study_uuid, field_uuid, name, operator, value)
     fun pack() : String
     {
         return Json.encodeToString( this )

@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.Field
@@ -29,14 +30,16 @@ class SampleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createSample( cursor: Cursor): Sample
+    @SuppressLint("Range")
+    private fun createSample(cursor: Cursor): Sample
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_SAMPLE_STUDY_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_SAMPLE_NAME))
         val numEnumerators = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SAMPLE_NUM_ENUMERATORS))
 
-        return Sample( uuid, study_uuid, name, numEnumerators )
+        return Sample(id, uuid, study_uuid, name, numEnumerators )
     }
 
     //--------------------------------------------------------------------------

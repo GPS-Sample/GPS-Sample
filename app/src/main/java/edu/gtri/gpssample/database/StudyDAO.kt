@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.extensions.toBoolean
@@ -76,8 +77,10 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createStudy( cursor: Cursor ): Study
+    @SuppressLint("Range")
+    private fun createStudy(cursor: Cursor ): Study
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val config_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_CONFIG_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
@@ -85,7 +88,7 @@ class StudyDAO(private var dao: DAO)
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX))
 
-        return Study( uuid, config_uuid, name, samplingMethod, sampleSize, sampleSizeIndex )
+        return Study( id, uuid, config_uuid, name, samplingMethod, sampleSize, sampleSizeIndex )
     }
 
     //--------------------------------------------------------------------------

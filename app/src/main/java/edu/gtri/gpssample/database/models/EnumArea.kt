@@ -7,12 +7,15 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class EnumArea (
+    var id : Int? = null,
     var uuid: String,
     var config_uuid: String,
     var name: String,
     var shape: String,
     var shape_uuid: String)
 {
+    constructor(uuid: String, config_uuid: String, name: String, shape: String, shape_uuid: String) :
+            this(null, uuid, config_uuid, name, shape, shape_uuid)
     fun pack() : String
     {
         return Json.encodeToString( this )

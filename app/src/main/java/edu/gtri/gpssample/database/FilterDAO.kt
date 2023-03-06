@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
@@ -76,15 +77,17 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun  createFilter( cursor: Cursor ): Filter
+    @SuppressLint("Range")
+    private fun  createFilter(cursor: Cursor ): Filter
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_STUDY_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE_INDEX))
 
-        return Filter( uuid, study_uuid, name, sampleSize, sampleSizeIndex )
+        return Filter( id, uuid, study_uuid, name, sampleSize, sampleSizeIndex )
     }
 
     //--------------------------------------------------------------------------

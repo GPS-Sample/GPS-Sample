@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.constants.Role
@@ -67,8 +68,10 @@ class UserDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createUser( cursor: Cursor) : User
+    @SuppressLint("Range")
+    private fun createUser(cursor: Cursor) : User
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
         val pin = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_PIN))
@@ -77,7 +80,7 @@ class UserDAO(private var dao: DAO)
         val recoveryAnswer = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_ANSWER))
         val isOnline = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_IS_ONLINE)).toBoolean()
 
-        return User( uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
+        return User(id, uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
     }
 
     //--------------------------------------------------------------------------

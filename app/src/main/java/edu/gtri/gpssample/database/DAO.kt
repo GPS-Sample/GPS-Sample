@@ -12,7 +12,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     {
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_USER_ROLE + " TEXT" +  "," +
                 COLUMN_USER_NAME + " TEXT" + "," +
                 COLUMN_USER_PIN + " INTEGER" + "," +
@@ -24,7 +25,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_CONFIG_NAME + " TEXT" + "," +
                 COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_TIME_FORMAT + " TEXT" + "," +
@@ -35,7 +37,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
                 COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
                 COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
@@ -46,7 +49,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FIELD_NAME + " TEXT" + "," +
                 COLUMN_FIELD_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FIELD_TYPE + " TEXT" + "," +
@@ -64,7 +68,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableRule = ("CREATE TABLE " +
                 TABLE_RULE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_RULE_STUDY_UUID + " TEXT" + "," +
                 COLUMN_RULE_FIELD_UUID + " TEXT" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
@@ -75,7 +80,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableFilter = ("CREATE TABLE " +
                 TABLE_FILTER + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FILTER_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FILTER_NAME + " TEXT" + "," +
                 COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
@@ -83,9 +89,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 ")")
         db.execSQL(createTableFilter)
 
+        // connector table
+        // this is a logic chain
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FILTERRULE_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FILTERRULE_FILTER_UUID + " TEXT" + "," +
                 COLUMN_FILTERRULE_RULE_UUID + " TEXT" + "," +
@@ -95,24 +104,26 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableSample = ("CREATE TABLE " +
                 TABLE_SAMPLE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_SAMPLE_STUDY_UUID + " TEXT" + "," +
                 COLUMN_SAMPLE_NAME + " TEXT" + "," +
                 COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" +
                 ")")
         db.execSQL(createTableSample)
 
-        val createTableNavigationPlan = ("CREATE TABLE " +
-                TABLE_NAV_PLAN + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_NAV_PLAN_SAMPLE_UUID + " TEXT" + "," +
-                COLUMN_NAV_PLAN_NAME + " TEXT" +
-                ")")
-        db.execSQL(createTableNavigationPlan)
+//        val createTableNavigationPlan = ("CREATE TABLE " +
+//                TABLE_NAV_PLAN + "(" +
+//                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+//                COLUMN_NAV_PLAN_SAMPLE_UUID + " TEXT" + "," +
+//                COLUMN_NAV_PLAN_NAME + " TEXT" +
+//                ")")
+//        db.execSQL(createTableNavigationPlan)
 
         val createTableEnumArea = ("CREATE TABLE " +
                 TABLE_ENUM_AREA + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_ENUM_AREA_CONFIG_UUID + " TEXT" + "," +
                 COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
                 COLUMN_ENUM_AREA_SHAPE + " TEXT" + "," +
@@ -122,7 +133,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableCircle = ("CREATE TABLE " +
                 TABLE_CIRCLE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_CIRCLE_LAT + " REAL" + "," +
                 COLUMN_CIRCLE_LON + " REAL" + "," +
                 COLUMN_CIRCLE_RADIUS + " REAL" +
@@ -131,7 +143,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableRectangle = ("CREATE TABLE " +
                 TABLE_RECTANGLE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_RECTANGLE_TL_LAT + " REAL" + "," +
                 COLUMN_RECTANGLE_TL_LON + " REAL" + "," +
                 COLUMN_RECTANGLE_TR_LAT + " REAL" + "," +
@@ -145,7 +158,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableTeam = ("CREATE TABLE " +
                 TABLE_TEAM + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_TEAM_ENUM_AREA_UUID + " TEXT" + "," +
                 COLUMN_TEAM_NAME + " TEXT" +
                 ")")
@@ -153,7 +167,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableTeamMember = ("CREATE TABLE " +
                 TABLE_TEAM_MEMBER + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_TEAM_MEMBER_TEAM_UUID + " TEXT" + "," +
                 COLUMN_TEAM_MEMBER_NAME + " TEXT" +
                 ")")
@@ -186,6 +201,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     companion object
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
+        const val COLUMN_ID = "id"
         const val COLUMN_UUID = "uuid"
 
         // User Table

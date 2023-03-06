@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.*
@@ -26,14 +27,16 @@ class CircleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createCircle( cursor: Cursor): Circle
+    @SuppressLint("Range")
+    private fun createCircle(cursor: Cursor): Circle
     {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_CIRCLE_LAT))
         val lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_CIRCLE_LON))
         val radius = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_CIRCLE_RADIUS))
 
-        return Circle( uuid, lat, lon, radius )
+        return Circle( id, uuid, lat, lon, radius )
     }
 
     //--------------------------------------------------------------------------

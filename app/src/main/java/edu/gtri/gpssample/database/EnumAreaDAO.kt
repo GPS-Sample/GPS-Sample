@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.EnumArea
@@ -27,15 +28,17 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createEnumArea( cursor: Cursor): EnumArea
+    @SuppressLint("Range")
+    private fun createEnumArea(cursor: Cursor): EnumArea
     {
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID) )
         val config_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_CONFIG_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
         val shape = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_SHAPE))
         val shape_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_SHAPE_UUID))
 
-        return EnumArea( uuid, config_uuid, name, shape, shape_uuid )
+        return EnumArea( id, uuid, config_uuid, name, shape, shape_uuid )
     }
 
     //--------------------------------------------------------------------------

@@ -111,7 +111,7 @@ class SelectRuleDialog
             }
             else
             {
-                val filterRule = FilterRule( UUID.randomUUID().toString(), study_uuid, filter_uuid, rule.uuid, connector )
+                val filterRule = FilterRule( null, UUID.randomUUID().toString(), study_uuid, filter_uuid, rule.uuid, connector )
                 DAO.filterRuleDAO.createFilterRule( filterRule )
             }
 
