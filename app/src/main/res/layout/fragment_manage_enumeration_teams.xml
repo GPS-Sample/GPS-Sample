@@ -10,7 +10,6 @@
 
     <FrameLayout
         android:layout_marginBottom="2dp"
-        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="50dp">
 
@@ -20,7 +19,7 @@
             android:layout_height="50dp"
             android:gravity="center"
             android:text="Teams"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_textcolor"
             android:textSize="20sp"
             android:textStyle="bold" />
 

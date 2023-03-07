@@ -305,6 +305,26 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddLocationFragment"
+            app:destination="@id/AddLocationFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/AddHouseholdFragment"
+        android:name="edu.gtri.gpssample.fragments.AddHousehold.AddHouseholdFragment"
+        tools:layout="@layout/fragment_add_household">
+    </fragment>
+
+    <fragment
+        android:id="@+id/AddLocationFragment"
+        android:name="edu.gtri.gpssample.fragments.AddLocation.AddLocationFragment"
+        tools:layout="@layout/fragment_add_location">
     </fragment>
 
 </navigation>

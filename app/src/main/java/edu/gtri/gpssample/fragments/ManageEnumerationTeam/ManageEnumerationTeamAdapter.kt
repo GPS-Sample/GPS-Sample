@@ -21,7 +21,7 @@ class ManageEnumerationTeamAdapter(var users: List<User>?) : RecyclerView.Adapte
     {
         this.mContext = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_online_status, parent, false))
+        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_online_status, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)

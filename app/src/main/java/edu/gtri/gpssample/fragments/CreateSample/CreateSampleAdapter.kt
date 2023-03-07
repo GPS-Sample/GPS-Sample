@@ -2,19 +2,14 @@ package edu.gtri.gpssample.fragments.CreateSample
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.database.models.NavPlan
-import edu.gtri.gpssample.database.models.Sample
 
 class CreateSampleAdapter(var navPlans: List<NavPlan>?) : RecyclerView.Adapter<CreateSampleAdapter.ViewHolder>()
 {
@@ -28,7 +23,7 @@ class CreateSampleAdapter(var navPlans: List<NavPlan>?) : RecyclerView.Adapter<C
     {
         this.context = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_filter, parent, false))
+        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_filter, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)

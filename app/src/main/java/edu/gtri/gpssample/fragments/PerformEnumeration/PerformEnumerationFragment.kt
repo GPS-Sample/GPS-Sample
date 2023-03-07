@@ -115,6 +115,18 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         mapFragment!!.getMapAsync(this)
 
+        binding.addHouseholdButton.setOnClickListener {
+
+            val bundle = Bundle()
+            bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+        }
+
+        binding.addLocationButton.setOnClickListener {
+
+            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+        }
+
         binding.finishButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
         }
