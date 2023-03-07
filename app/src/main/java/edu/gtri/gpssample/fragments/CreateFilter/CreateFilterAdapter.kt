@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +25,7 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
     {
         this.context = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_filter, parent, false))
+        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_filter, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)

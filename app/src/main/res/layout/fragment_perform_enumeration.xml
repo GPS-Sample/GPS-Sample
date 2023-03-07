@@ -14,7 +14,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/define_enumeration_area"
-        android:textColor="@color/primary"
+        android:textColor="@color/primary_textcolor"
         android:textSize="17sp"
         android:textStyle="bold" />
 
@@ -36,6 +36,7 @@
 
     <LinearLayout
         android:orientation="horizontal"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -44,13 +45,11 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="10dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Add Household" />
+            android:text="+ Household" />
 
         <Button
             android:id="@+id/add_location_button"
@@ -59,11 +58,9 @@
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Add Location" />
+            android:text="+ Location" />
     </LinearLayout>
 
     <Button

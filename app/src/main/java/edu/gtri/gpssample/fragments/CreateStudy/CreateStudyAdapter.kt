@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.CreateStudy
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -127,7 +126,7 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
 
         if (childView == null)
         {
-            view = LayoutInflater.from(context).inflate(R.layout.list_group, viewGroup, false )
+            view = LayoutInflater.from(context).inflate(R.layout.list_item_group, viewGroup, false )
         }
         else
         {
