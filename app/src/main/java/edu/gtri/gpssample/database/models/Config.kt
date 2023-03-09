@@ -27,6 +27,15 @@ data class Config(
     constructor(id: Int?, uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
                 minGpsPrecision: Int) : this(id, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
                 ArrayList<Study>())
+
+    var minimumGPSPrecision : String
+        get() = minGpsPrecision.toString()
+        set(value){
+            value.toIntOrNull()?.let {
+                minGpsPrecision = it
+            } ?: {minGpsPrecision = 0}
+
+        }
     fun pack() : String
     {
         return Json.encodeToString( this )
