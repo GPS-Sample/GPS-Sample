@@ -30,13 +30,13 @@
 
             <EditText
                 android:id="@+id/field_name_edit_text"
-                android:inputType="textCapWords"
-                android:imeOptions="actionDone"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="@string/enter_field_name" />
+                android:hint="@string/enter_field_name"
+                android:imeOptions="actionDone"
+                android:inputType="textCapWords" />
 
             <TextView
                 android:layout_marginTop="20dp"

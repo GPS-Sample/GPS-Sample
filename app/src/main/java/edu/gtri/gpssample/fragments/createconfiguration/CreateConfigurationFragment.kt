@@ -115,7 +115,6 @@ class CreateConfigurationFragment : Fragment()
 
         binding.nextButton.setOnClickListener {
 
-            sharedViewModel.Test()
             if (binding.configNameEditText.text.toString().isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()
