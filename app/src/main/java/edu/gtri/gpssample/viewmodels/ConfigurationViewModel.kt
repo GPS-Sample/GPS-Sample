@@ -3,6 +3,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import java.util.*
@@ -11,23 +12,40 @@ import kotlin.collections.ArrayList
 class ConfigurationViewModel : ViewModel()
 {
     private var configurations : ArrayList<Config> = ArrayList()
-
     private var _currentConfiguration : MutableLiveData<Config>? = null
+    private var _deviceposition : MutableLiveData<String> = MutableLiveData(String())
 
+    private var distanceFormats : Array<String>
+
+    val DistanceFormats : Array<String>
+        get() = distanceFormats
+//    private var dateFormats : Array<String>
+//    private var timeFormats : Array<String>
 
     val Configurations : ArrayList<Config>
         get() = configurations
 
     var currentConfiguration : LiveData<Config>? = _currentConfiguration
-    var test : Int = 0
 
-    var _test : MutableLiveData<String> = MutableLiveData("Test")
-    var testString : LiveData<String> = _test
+    var devicePosition : LiveData<String> = _deviceposition
+
     init
     {
+        distanceFormats = Array(2){i ->
+            when(i)
+            {
+                0 -> DistanceFormat.Meters.toString()
+                1 -> DistanceFormat.Feet.toString()
+                else -> String()
+            }
+        }
 
     }
 
+    fun Test()
+    {
+        Log.d("TEST", "this is ${devicePosition}")
+    }
     fun initializeConfigurations()
     {
         configurations.clear()
@@ -46,9 +64,6 @@ class ConfigurationViewModel : ViewModel()
 
     fun saveNewConfiguration()
     {
-        Log.d("SAVE", "We are saving the config ${test }")
-        Log.d("SAVE", "We are saving the config ${currentConfiguration?.value?.name }")
-        Log.d("SAVE", "We are saving the config ${_currentConfiguration?.value?.name }")
         _currentConfiguration?.value.let{configuration ->
             configurations.add(configuration!!)
             // write to database

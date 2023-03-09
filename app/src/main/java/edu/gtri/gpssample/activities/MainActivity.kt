@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity()
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
         configurationViewModel = viewModel
-        configurationViewModel.test = 5
         lifecycleScope.launch {
         //    repeatOnLifecycle(Lifecycle.State.STARTED) {
 //                viewModel.uiState.collect {

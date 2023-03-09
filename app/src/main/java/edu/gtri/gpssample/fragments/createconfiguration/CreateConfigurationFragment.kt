@@ -71,11 +71,11 @@ class CreateConfigurationFragment : Fragment()
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        ArrayAdapter.createFromResource(activity!!, R.array.distance_format, android.R.layout.simple_spinner_item)
-            .also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.distanceFormatSpinner.adapter = adapter
-            }
+//        ArrayAdapter.createFromResource(activity!!, R.array.distance_format, android.R.layout.simple_spinner_item)
+//            .also { adapter ->
+//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//                binding.distanceFormatSpinner.adapter = adapter
+//            }
 
         ArrayAdapter.createFromResource(activity!!, R.array.date_format, android.R.layout.simple_spinner_item)
             .also { adapter ->
@@ -115,6 +115,7 @@ class CreateConfigurationFragment : Fragment()
 
         binding.nextButton.setOnClickListener {
 
+            sharedViewModel.Test()
             if (binding.configNameEditText.text.toString().isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()

@@ -79,7 +79,10 @@
                     <Spinner
                         android:id="@+id/distance_format_spinner"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        android:entries="@{viewModel.DistanceFormats}"
+                        android:selection="@={viewModel.devicePosition}"
+                        />
                 </FrameLayout>
 
                 <TextView
