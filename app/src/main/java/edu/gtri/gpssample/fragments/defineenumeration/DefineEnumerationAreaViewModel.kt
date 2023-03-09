@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.DefineEnumerationArea
+package edu.gtri.gpssample.fragments.defineenumeration
 
 import androidx.lifecycle.ViewModel
 

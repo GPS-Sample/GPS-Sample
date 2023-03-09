@@ -14,11 +14,19 @@ data class Study(
     var name: String,
     var samplingMethod: String,
     var sampleSize: Int,
-    var sampleSizeIndex: Int )
+    var sampleSizeIndex: Int,
+    var fields : List<Field>,
+    var rules : List<Rule>,
+    var filters : List<Filter>)
 {
     constructor(uuid: String, config_uuid: String, name: String, samplingMethod: String,
                 sampleSize: Int, sampleSizeIndex: Int) : this(null, uuid, config_uuid,
-                name, samplingMethod, sampleSize, sampleSizeIndex)
+                name, samplingMethod, sampleSize, sampleSizeIndex,
+                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
+    constructor(id: Int, uuid: String, config_uuid: String, name: String, samplingMethod: String,
+                sampleSize: Int, sampleSizeIndex: Int) : this(id, uuid, config_uuid,
+                name, samplingMethod, sampleSize, sampleSizeIndex,
+                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
     fun pack() : String
     {
         return Json.encodeToString( this )

@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.constants.DateFormat
@@ -11,13 +12,18 @@ import kotlin.math.min
 class ConfigDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createConfig( config: Config ) : Int
+    fun createConfig( config: Config ) : Boolean
     {
         val values = ContentValues()
 
         putConfig( config, values )
-
-        return dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
+        val id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
+        if (id > -1)
+        {
+            config.id = id
+            return true
+        }
+        return false
     }
 
     //--------------------------------------------------------------------------
@@ -55,7 +61,8 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun createConfig( cursor: Cursor ) : Config
+    @SuppressLint("Range")
+    private fun createConfig(cursor: Cursor ) : Config
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))

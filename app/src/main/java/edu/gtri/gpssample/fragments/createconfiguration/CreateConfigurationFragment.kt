@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.CreateConfiguration
+package edu.gtri.gpssample.fragments.createconfiguration
 
 import android.os.Bundle
 import android.text.InputType
@@ -8,15 +8,16 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+
 import java.util.*
 
 class CreateConfigurationFragment : Fragment()
@@ -25,12 +26,14 @@ class CreateConfigurationFragment : Fragment()
     private var config: Config? = null
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: CreateConfigurationViewModel
+    private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CreateConfigurationViewModel::class.java)
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -42,6 +45,17 @@ class CreateConfigurationFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        binding?.apply {
+            // Specify the fragment as the lifecycle owner
+            lifecycleOwner = viewLifecycleOwner
+
+            // Assign the view model to a property in the binding class
+            viewModel = sharedViewModel
+
+            // Assign the fragment
+            createConfigurationFragment = this@CreateConfigurationFragment
+        }
 
         val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
 
@@ -101,6 +115,7 @@ class CreateConfigurationFragment : Fragment()
 
         binding.nextButton.setOnClickListener {
 
+            sharedViewModel.Test()
             if (binding.configNameEditText.text.toString().isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()
@@ -120,7 +135,7 @@ class CreateConfigurationFragment : Fragment()
             if (config == null)
             {
                 config = Config( UUID.randomUUID().toString(), "", "", "", "", 0 )
-                DAO.configDAO.createConfig( config!! )
+                //DAO.configDAO.createConfig( config!! )
             }
 
             config?.let { config ->
@@ -153,11 +168,11 @@ class CreateConfigurationFragment : Fragment()
                     timeFormats[1] -> config.timeFormat = TimeFormat.twentyFourHour.toString();
                 }
 
-                DAO.configDAO.updateConfig( config )
+               // DAO.configDAO.updateConfig( config )
 
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
-                bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
+                bundle.putString( Keys.kConfig_uuid.toString(), sharedViewModel.currentConfiguration!!.value!!.uuid )
                 findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
             }
         }

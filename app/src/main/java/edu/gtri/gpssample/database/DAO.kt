@@ -12,7 +12,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     {
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_USER_ROLE + " TEXT" +  "," +
                 COLUMN_USER_NAME + " TEXT" + "," +
@@ -25,7 +25,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_CONFIG_NAME + " TEXT" + "," +
                 COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
@@ -37,23 +37,32 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
+
+                COLUMN_CONFIG_ID + " INTEGER" + "," +
+                // REMOVE THIS
                 COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
+
                 COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
                 COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
-                COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" +
+                COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableStudy)
 
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FIELD_NAME + " TEXT" + "," +
+
+                COLUMN_STUDY_ID + " INTEGER" + "," +
                 // this needs to be a foreign key
                 COLUMN_FIELD_STUDY_UUID + " TEXT" + "," +
+
+                // should be look up table
                 COLUMN_FIELD_TYPE + " TEXT" + "," +
                 COLUMN_FIELD_PII + " BOOLEAN" + "," +
                 COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
@@ -63,16 +72,20 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_FIELD_OPTION_1 + " TEXT" + "," +
                 COLUMN_FIELD_OPTION_2 + " TEXT" + "," +
                 COLUMN_FIELD_OPTION_3 + " TEXT" + "," +
-                COLUMN_FIELD_OPTION_4 + " TEXT" +
+                COLUMN_FIELD_OPTION_4 + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableField)
 
         val createTableRule = ("CREATE TABLE " +
                 TABLE_RULE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 // this needs to be a foreign key
                 COLUMN_RULE_STUDY_UUID + " TEXT" + "," +
+
+                // i think we can just use one key here.  if a field is connected to a study and
+                // a rule is connected to a field
                 // this needs to be a foreign key
                 COLUMN_RULE_FIELD_UUID + " TEXT" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
@@ -83,7 +96,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableFilter = ("CREATE TABLE " +
                 TABLE_FILTER + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 // this needs to be a foreign key
                 COLUMN_FILTER_STUDY_UUID + " TEXT" + "," +
@@ -108,12 +121,16 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableSample = ("CREATE TABLE " +
                 TABLE_SAMPLE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+
+                COLUMN_STUDY_ID + " INTEGER" + "," +
                 // this needs to be a foreign key
                 COLUMN_SAMPLE_STUDY_UUID + " TEXT" + "," +
+
                 COLUMN_SAMPLE_NAME + " TEXT" + "," +
-                COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" +
+                COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableSample)
 
@@ -127,20 +144,24 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableEnumArea = ("CREATE TABLE " +
                 TABLE_ENUM_AREA + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+
+                COLUMN_CONFIG_ID + " INTEGER" + "," +
                 // this needs to be a foreign key
                 COLUMN_ENUM_AREA_CONFIG_UUID + " TEXT" + "," +
+
                 COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
                 COLUMN_ENUM_AREA_SHAPE + " TEXT" + "," +
                 // this needs to be a foreign key
-                COLUMN_ENUM_AREA_SHAPE_UUID + " TEXT" +
+                COLUMN_ENUM_AREA_SHAPE_UUID + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumArea)
 
         val createTableCircle = ("CREATE TABLE " +
                 TABLE_CIRCLE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_CIRCLE_LAT + " REAL" + "," +
                 COLUMN_CIRCLE_LON + " REAL" + "," +
@@ -150,7 +171,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableRectangle = ("CREATE TABLE " +
                 TABLE_RECTANGLE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_RECTANGLE_TL_LAT + " REAL" + "," +
                 COLUMN_RECTANGLE_TL_LON + " REAL" + "," +
@@ -165,11 +186,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableTeam = ("CREATE TABLE " +
                 TABLE_TEAM + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+
+                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 // this needs to be a foreign key
                 COLUMN_TEAM_ENUM_AREA_UUID + " TEXT" + "," +
-                COLUMN_TEAM_NAME + " TEXT" +
+
+                COLUMN_TEAM_NAME + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableTeam)
 
@@ -177,9 +202,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_TEAM_MEMBER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                 COLUMN_UUID + " TEXT" + "," +
+
+                COLUMN_TEAM_ID + " INTEGER" + "," +
                 // this needs to be a foreign key
                 COLUMN_TEAM_MEMBER_TEAM_UUID + " TEXT" + "," +
-                COLUMN_TEAM_MEMBER_NAME + " TEXT" +
+
+                COLUMN_TEAM_MEMBER_NAME + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableTeamMember)
     }
@@ -210,8 +239,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     companion object
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
+
         const val COLUMN_ID = "id"
         const val COLUMN_UUID = "uuid"
+
+        // foreign key columns
+        const val COLUMN_CONFIG_ID = "config_id"
+        const val COLUMN_STUDY_ID = "study_id"
+        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
+        const val COLUMN_TEAM_ID = "team_id"
 
         // User Table
         const val TABLE_USER = "user"
@@ -233,6 +269,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Study Table
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
+
         const val COLUMN_STUDY_CONFIG_UUID = "study_config_id"
         const val COLUMN_STUDY_SAMPLING_METHOD = "study_sampling_method"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
@@ -365,6 +402,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 55
+        private const val DATABASE_VERSION = 59
     }
 }

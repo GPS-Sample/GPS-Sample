@@ -53,7 +53,7 @@
 
     <fragment
         android:id="@+id/ManageConfigurationsFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageConfigurations.ManageConfigurationsFragment"
+        android:name="edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsFragment"
         tools:layout="@layout/fragment_manage_configurations">
 
         <action
@@ -69,7 +69,7 @@
 
     <fragment
         android:id="@+id/CreateConfigurationFragment"
-        android:name="edu.gtri.gpssample.fragments.CreateConfiguration.CreateConfigurationFragment"
+        android:name="edu.gtri.gpssample.fragments.createconfiguration.CreateConfigurationFragment"
         tools:layout="@layout/fragment_create_configuration">
 
         <action
@@ -81,7 +81,7 @@
 
     <fragment
         android:id="@+id/DefineEnumerationAreaFragment"
-        android:name="edu.gtri.gpssample.fragments.DefineEnumerationArea.DefineEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.defineenumeration.DefineEnumerationAreaFragment"
         tools:layout="@layout/fragment_define_enumeration_area">
 
         <action

@@ -7,33 +7,52 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity()
 {
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var udpBroadcastReceiverService: UDPBroadcastReceiverService
-
+    private lateinit var configurationViewModel : ConfigurationViewModel
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
+        // build view models
+        val viewModel: ConfigurationViewModel by viewModels()
+        configurationViewModel = viewModel
+        configurationViewModel.test = 5
+        lifecycleScope.launch {
+        //    repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.uiState.collect {
+//                    // Update UI elements
+//                }
+        //    }
+        }
+
         if (savedInstanceState == null)
         {
             DAO.createSharedInstance(applicationContext)
+            configurationViewModel.initializeConfigurations()
 
+            // These are hacks
             DAO.studyDAO.deleteOrphans()
             DAO.fieldDAO.deleteOrphans()
             DAO.filterDAO.deleteOrphans()

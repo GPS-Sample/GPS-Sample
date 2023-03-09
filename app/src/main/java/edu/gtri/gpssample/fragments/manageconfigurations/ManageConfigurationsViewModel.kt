@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageConfigurations
+package edu.gtri.gpssample.fragments.manageconfigurations
 
 import androidx.lifecycle.ViewModel
 

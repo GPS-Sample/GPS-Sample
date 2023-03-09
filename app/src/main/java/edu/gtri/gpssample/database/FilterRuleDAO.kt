@@ -80,14 +80,13 @@ class FilterRuleDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun  createFilterRule(cursor: Cursor ): FilterRule
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_STUDY_UUID))
         val filter_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_FILTER_UUID))
         val rule_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_RULE_UUID))
         val connector = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR))
 
-        return FilterRule( id, uuid, study_uuid, filter_uuid, rule_uuid, connector )
+        return FilterRule( uuid, study_uuid, filter_uuid, rule_uuid, connector )
     }
 
     //--------------------------------------------------------------------------

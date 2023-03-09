@@ -1,14 +1,12 @@
-package edu.gtri.gpssample.fragments.ManageConfigurations
+package edu.gtri.gpssample.fragments.manageconfigurations
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -17,18 +15,20 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
-    private lateinit var viewModel: ManageConfigurationsViewModel
+    private lateinit var sharedViewModel: ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ManageConfigurationsViewModel::class.java)
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -55,10 +55,12 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         binding.quickStartButton.setOnClickListener {
             val bundle = Bundle()
             bundle.putBoolean( Keys.kQuickStart.toString(), true )
+            sharedViewModel.createNewConfiguration()
             findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
         }
 
         binding.addButton.setOnClickListener {
+            sharedViewModel.createNewConfiguration()
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
     }
@@ -67,8 +69,10 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
-        val configurations = DAO.configDAO.getConfigs()
-        manageConfigurationsAdapter.updateConfigurations(configurations)
+
+        // get this from the view controller
+        //val configurations = DAO.configDAO.getConfigs()
+        manageConfigurationsAdapter.updateConfigurations(sharedViewModel.Configurations)
     }
 
     fun didSelectConfig( config: Config )

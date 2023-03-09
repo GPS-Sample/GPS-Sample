@@ -17,10 +17,16 @@ data class Config(
     var dateFormat: String,
     var timeFormat: String,
     var distanceFormat: String,
-    var minGpsPrecision: Int )
+    var minGpsPrecision: Int,
+    var studies : List<Study>
+    )
 {
     constructor(uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
-        minGpsPrecision: Int) : this(null, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision)
+        minGpsPrecision: Int) : this(null, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
+                                    ArrayList<Study>())
+    constructor(id: Int?, uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
+                minGpsPrecision: Int) : this(id, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
+                ArrayList<Study>())
     fun pack() : String
     {
         return Json.encodeToString( this )
