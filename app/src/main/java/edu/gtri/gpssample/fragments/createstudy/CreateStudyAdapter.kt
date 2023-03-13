@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.CreateStudy
+package edu.gtri.gpssample.fragments.createstudy
 
 import android.content.Context
 import android.view.LayoutInflater

@@ -122,19 +122,6 @@ class ConfigurationViewModel : ViewModel()
         }
 
     }
-    fun Test()
-    {
-        val index : Int = distanceFormatPosition.value!!
-        val dist : String = distanceFormats[index]
-
-
-        Log.d("TEST", "this is ${distanceFormatPosition.value}  ${dist}  ")
-
-        _currentConfiguration?.value?.let {
-            Log.d("THE BIG TEST "," distance format ${it.distanceFormat}  ${it.minGpsPrecision}")
-        }
-    }
-
 
     fun initializeConfigurations()
     {

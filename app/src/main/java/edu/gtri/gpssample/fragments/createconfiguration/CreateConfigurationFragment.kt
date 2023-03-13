@@ -23,7 +23,6 @@ import java.util.*
 class CreateConfigurationFragment : Fragment()
 {
     private var quickStart = false
-    private var config: Config? = null
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -63,11 +62,11 @@ class CreateConfigurationFragment : Fragment()
             quickStart = it
         }
 
-        val configId = arguments?.getString( Keys.kConfig_uuid.toString());
-
-        configId?.let {
-            config = DAO.configDAO.getConfig( it )
-        }
+//        val configId = arguments?.getString( Keys.kConfig_uuid.toString());
+//
+//        configId?.let {
+//            config = DAO.configDAO.getConfig( it )
+//        }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
@@ -89,9 +88,9 @@ class CreateConfigurationFragment : Fragment()
 //                binding.timeFormatSpinner.adapter = adapter
 //            }
 
-        config?.let { config ->
-            binding.configNameEditText.setText( config.name )
-            binding.minGpsPrecisionEditText.setText( config.minGpsPrecision.toString())
+//        config?.let { config ->
+//            binding.configNameEditText.setText( config.name )
+//            binding.minGpsPrecisionEditText.setText( config.minGpsPrecision.toString())
 
 //            when (config.distanceFormat)
 //            {
@@ -106,16 +105,15 @@ class CreateConfigurationFragment : Fragment()
 //                DateFormat.YearMonthDay.toString() -> binding.dateFormatSpinner.setSelection( 2 )
 //            }
 
-            when (config.timeFormat)
-            {
-                TimeFormat.twelveHour.toString() -> binding.timeFormatSpinner.setSelection( 0 )
-                TimeFormat.twentyFourHour.toString() -> binding.timeFormatSpinner.setSelection( 1 )
-            }
-        }
+//            when (config.timeFormat)
+//            {
+//                TimeFormat.twelveHour.toString() -> binding.timeFormatSpinner.setSelection( 0 )
+//                TimeFormat.twentyFourHour.toString() -> binding.timeFormatSpinner.setSelection( 1 )
+//            }
+//        }
 
         binding.nextButton.setOnClickListener {
 
-            sharedViewModel.Test()
             if (binding.configNameEditText.text.toString().isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()
@@ -128,16 +126,13 @@ class CreateConfigurationFragment : Fragment()
                 return@setOnClickListener
             }
 
-            if (config == null)
-            {
-                config = Config( UUID.randomUUID().toString(), "", "", "", "", 0 )
-                //DAO.configDAO.createConfig( config!! )
-            }
+//            if (config == null)
+//            {
+//                config = Config( UUID.randomUUID().toString(), "", "", "", "", 0 )
+//                //DAO.configDAO.createConfig( config!! )
+//            }
 
-            config?.let { config ->
-
-                config.minGpsPrecision = binding.minGpsPrecisionEditText.text.toString().toInt()
-
+            sharedViewModel.currentConfiguration?.let {
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
                 bundle.putString( Keys.kConfig_uuid.toString(), sharedViewModel.currentConfiguration!!.value!!.uuid )

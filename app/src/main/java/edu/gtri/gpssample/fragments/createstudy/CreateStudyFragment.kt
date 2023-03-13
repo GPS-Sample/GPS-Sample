@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.CreateStudy
+package edu.gtri.gpssample.fragments.createstudy
 
 import android.os.Bundle
 import android.view.*
@@ -6,9 +6,9 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -20,6 +20,7 @@ import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
@@ -29,12 +30,13 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
     private lateinit var createStudyAdapter: CreateStudyAdapter
-    private lateinit var viewModel: CreateStudyViewModel
+    private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CreateStudyViewModel::class.java)
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -49,6 +51,17 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        binding?.apply {
+            // Specify the fragment as the lifecycle owner
+            lifecycleOwner = viewLifecycleOwner
+
+            // Assign the view model to a property in the binding class
+            viewModel = sharedViewModel
+
+            // Assign the fragment
+            createConfigurationFragment = this@CreateStudyFragment
+        }
 
         // required: configId
         if (arguments == null)

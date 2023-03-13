@@ -18,15 +18,16 @@ data class Config(
     var timeFormat: String,
     var distanceFormat: String,
     var minGpsPrecision: Int,
+    var currentStudy : Study?,
     var studies : List<Study>
     )
 {
     constructor(uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
         minGpsPrecision: Int) : this(null, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
-                                    ArrayList<Study>())
+                                    null,ArrayList<Study>())
     constructor(id: Int?, uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
                 minGpsPrecision: Int) : this(id, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
-                ArrayList<Study>())
+                null,ArrayList<Study>())
 
     var minimumGPSPrecision : String
         get() = minGpsPrecision.toString()
