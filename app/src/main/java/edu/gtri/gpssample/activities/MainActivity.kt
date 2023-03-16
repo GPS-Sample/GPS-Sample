@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity()
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var udpBroadcastReceiverService: UDPBroadcastReceiverService
     private lateinit var configurationViewModel : ConfigurationViewModel
+
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)

@@ -25,16 +25,20 @@
 <!--        android:layout_height="match_parent"-->
 <!--        tools:context=".fragments.createconfiguration.CreateConfigurationFragment">-->
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginBottom="90dp">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/fragment_root_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="2048dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -82,7 +86,7 @@
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.DistanceFormats}"
                         android:selectedItemPosition="@={viewModel.distanceFormatPosition}"
-                        android:onItemSelected="@{viewModel.onDistanceFormatSelected}"
+                        android:onItemSelected="@{viewModel::onDistanceFormatSelected}"
                         />
                 </FrameLayout>
 
@@ -109,7 +113,7 @@
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.DateFormats}"
                         android:selectedItemPosition="@={viewModel.dateFormatPosition}"
-                        android:onItemSelected="@{viewModel.onDateFormatSelected}"
+                        android:onItemSelected="@{viewModel::onDateFormatSelected}"
                         />
                 </FrameLayout>
 
@@ -136,7 +140,7 @@
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.TimeFormats}"
                         android:selectedItemPosition="@={viewModel.timeFormatPosition}"
-                        android:onItemSelected="@{viewModel.onTimeFormatSelected}"/>
+                        android:onItemSelected="@{viewModel::onTimeFormatSelected}"/>
                 </FrameLayout>
 
                 <TextView
@@ -157,17 +161,58 @@
                     android:layout_marginRight="20dp"
                     android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
                     android:hint="@string/enter_min_gps_precision" />
-
-                <Button
-                    android:id="@+id/next_button"
+                <Space
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_margin="20dp"
-                    android:layout_gravity="bottom"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/next" />
+                    android:layout_height="10dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/enumeration_area"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp" >
+                <fragment
+                    android:id="@+id/map_fragment"
+                    android:layout_width="300dp"
+                    android:layout_height="200dp"
+                    android:layout_centerHorizontal="true"
+                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+                </RelativeLayout>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/studies"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/study_view"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"/>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:layout_gravity="bottom"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/next" />
+    </LinearLayout>
 <!--    </FrameLayout>-->
 </layout>
