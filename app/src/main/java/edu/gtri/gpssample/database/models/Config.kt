@@ -4,12 +4,22 @@ import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.network.models.NetworkCommand
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 
-@Serializable
+@Serializable (with = ConfigSerializer::class)
 data class Config(
     var id : Int? = null,
     var uuid: String,
@@ -20,8 +30,7 @@ data class Config(
     var minGpsPrecision: Int,
     var currentStudy : Study?,
     var studies : List<Study>
-    )
-{
+    ) : java.io.Serializable {
     constructor(uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
         minGpsPrecision: Int) : this(null, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
                                     null,ArrayList<Study>())
@@ -48,5 +57,36 @@ data class Config(
         {
             return Json.decodeFromString<Config>( message )
         }
+    }
+}
+
+object ConfigSerializer : KSerializer<Config> {
+    private val charset = Charsets.UTF_8
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Config", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: Config) {
+
+        encoder.encodeString(serializeToString(value))
+    }
+
+    override fun deserialize(decoder: Decoder): Config {
+
+        return deserializeFromString(decoder.decodeString())
+    }
+
+    private fun serializeToString( config: Config) : String
+    {
+        var baos = ByteArrayOutputStream()
+        var oos = ObjectOutputStream(baos)
+        oos.writeObject(config)
+        oos.close()
+        return baos.toByteArray().toString(charset)
+    }
+
+    private fun deserializeFromString(str : String) : Config
+    {
+        val byteArray = str.toByteArray(charset)
+        var bais = ByteArrayInputStream(byteArray)
+        var ois = ObjectInputStream(bais)
+        return ois.readObject() as Config
     }
 }

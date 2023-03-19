@@ -70,6 +70,8 @@ class ConfigurationViewModel : ViewModel()
     val timeFormatPosition : MutableLiveData<Int>
         get() = _timeFormatPosition
 
+
+    var test = 5
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < distanceFormats.size)
@@ -148,6 +150,15 @@ class ConfigurationViewModel : ViewModel()
             DAO.configDAO.createConfig(configuration)
         }
 
+    }
+
+    fun setCurrentConfig(config : Config)
+    {
+        _currentConfiguration = MutableLiveData(config)
+        currentConfiguration = _currentConfiguration
+
+        test = 50
+        Log.d("CURRENT CONFIG ", "THE CONFIG ${currentConfiguration!!.value!!.name}")
     }
 
 

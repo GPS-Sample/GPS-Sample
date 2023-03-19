@@ -32,8 +32,9 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
         return viewHolder
     }
 
-    fun updateStudies( studies: List<Study> )
+    fun updateStudies( studies: List<Study>? )
     {
+
         this.studies = studies
         notifyDataSetChanged()
     }

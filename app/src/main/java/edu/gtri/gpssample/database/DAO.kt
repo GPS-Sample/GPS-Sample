@@ -27,7 +27,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_UUID + " TEXT" + "," +
-                COLUMN_CONFIG_NAME + " TEXT" + "," +
+                COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
                 COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_TIME_FORMAT + " TEXT" + "," +
                 COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT" + "," +
@@ -45,14 +45,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 // REMOVE THIS
                 COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
 
+                // this needs to be a look up table
                 COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
                 COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
+
+                // this needs to be a look up table
                 COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableStudy)
 
-        val createTableConfigurationStudy = ("CREATE TABLE " +
+        val createTableConfigStudy = ("CREATE TABLE " +
                 TABLE_CONFIG_STUDY + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_CONFIG_ID + " INTEGER NOT NULL" + "," +
@@ -60,7 +63,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
-        db.execSQL(createTableConfigurationStudy)
+        db.execSQL(createTableConfigStudy)
 
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
@@ -260,7 +263,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_TEAM_ID = "team_id"
 
         // Connector Tables
-        const val TABLE_CONFIG_STUDY = "configuration_study"
+        const val TABLE_CONFIG_STUDY = "config_study_conn"
 
         // User Table
         const val TABLE_USER = "user"

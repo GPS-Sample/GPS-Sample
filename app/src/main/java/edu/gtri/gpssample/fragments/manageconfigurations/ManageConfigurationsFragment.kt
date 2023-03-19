@@ -78,8 +78,14 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     fun didSelectConfig( config: Config )
     {
         val bundle = Bundle()
+        sharedViewModel.test = 10
+
+        sharedViewModel.setCurrentConfig(config)
+
+        bundle.putSerializable("currentConfig", config)
 
         bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
+
 
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }
