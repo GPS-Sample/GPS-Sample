@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Study
 
@@ -26,7 +27,7 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD, study.samplingMethod )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
-        values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX, study.sampleSizeIndex )
+        values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX, study.sampleType as Int)
     }
 
     //--------------------------------------------------------------------------
@@ -88,7 +89,7 @@ class StudyDAO(private var dao: DAO)
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX))
 
-        return Study( id, uuid, config_uuid, name, samplingMethod, sampleSize, sampleSizeIndex )
+        return Study( id, uuid, config_uuid, name, samplingMethod, sampleSize, sampleSizeIndex as SampleType )
     }
 
     //--------------------------------------------------------------------------

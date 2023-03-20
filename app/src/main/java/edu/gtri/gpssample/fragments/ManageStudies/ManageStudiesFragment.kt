@@ -6,11 +6,9 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -20,6 +18,7 @@ import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.fragments.createconfiguration.ManageStudiesAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
@@ -37,7 +36,6 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
 
-        Log.d("TEST", "BIG TEST ${sharedViewModel.test} ")
         Log.d("BIG TEST ", "THE CONFIG ${sharedViewModel.currentConfiguration!!.value!!.name}")
 
         manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
@@ -69,7 +67,6 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             Log.d("TEST", "config name ${config.name}")
         }
 
-        Log.d("TEST", "the test ${sharedViewModel.test}")
         val config_uuid = arguments!!.getString( Keys.kConfig_uuid.toString(), "");
 
         sharedViewModel.currentConfiguration?.value?.let {

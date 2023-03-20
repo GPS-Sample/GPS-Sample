@@ -16,15 +16,6 @@
             name="createConfigurationFragment"
             type="edu.gtri.gpssample.fragments.createconfiguration.CreateConfigurationFragment" />
     </data>
-
-<!--    <FrameLayout-->
-<!--        xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--        xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--        xmlns:tools="http://schemas.android.com/tools"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        tools:context=".fragments.createconfiguration.CreateConfigurationFragment">-->
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -32,8 +23,9 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="90dp">
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:layout_marginBottom="0dp">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/fragment_root_layout"
@@ -178,7 +170,7 @@
                     android:layout_height="match_parent"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp" >
-                <fragment
+                <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/map_fragment"
                     android:layout_width="300dp"
                     android:layout_height="200dp"
@@ -188,6 +180,11 @@
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
+                <FrameLayout
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
@@ -197,8 +194,16 @@
                     android:text="@string/studies"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
+
+                    <ImageView
+                        android:id="@+id/add_study_button"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="end"
+                        android:src="@drawable/plus_blue" />
+                </FrameLayout>
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/study_view"
+                    android:id="@+id/studies_recycler"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"/>
@@ -212,7 +217,6 @@
             android:layout_gravity="bottom"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/next" />
+            android:text="@string/save" />
     </LinearLayout>
-<!--    </FrameLayout>-->
 </layout>

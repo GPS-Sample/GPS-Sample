@@ -75,6 +75,12 @@
         <action
             android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
             app:destination="@id/DefineEnumerationAreaFragment"/>
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:destination="@id/ManageConfigurationsFragment" />
+        <action
+            android:id="@+id/action_navigate_to_CreateStudyFragment"
+            app:destination="@id/CreateStudyFragment" />
     </fragment>
 
     <!--DefineEnumerationAreaFragment-->
@@ -91,6 +97,9 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
+        <action
+            android:id="@+id/action_navigate_to_CreateConfigurationFragment"
+            app:destination="@id/CreateConfigurationFragment" />
     </fragment>
 
     <!--ManageStudiesFragment-->

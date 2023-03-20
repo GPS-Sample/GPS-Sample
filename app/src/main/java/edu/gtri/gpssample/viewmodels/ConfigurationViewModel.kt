@@ -5,14 +5,14 @@ import android.widget.AdapterView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import edu.gtri.gpssample.constants.DateFormat
-import edu.gtri.gpssample.constants.DistanceFormat
-import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import java.util.*
 import kotlin.collections.ArrayList
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.models.Study
+
 class ConfigurationViewModel : ViewModel()
 {
     private var configurations : ArrayList<Config> = ArrayList()
@@ -20,6 +20,10 @@ class ConfigurationViewModel : ViewModel()
     private var _distanceFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _timeFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _dateFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
+    private var _samplingMethodPosition : MutableLiveData<Int> = MutableLiveData(0)
+    private var _samplingTypePosition : MutableLiveData<Int> = MutableLiveData(0)
+
+    private var _currentStudy : MutableLiveData<Study>? = null
 
     private var distanceFormats : Array<String> = Array(2){ i ->
         when(i)
@@ -49,6 +53,27 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
+    private var samplingMethods : Array<String> = Array(4){ i ->
+        when(i)
+        {
+            0 -> SamplingMethod.SimpleRandom.format
+            1 -> SamplingMethod.Cluster.format
+            2 -> SamplingMethod.Subsets.format
+            3 -> SamplingMethod.Strata.format
+            else -> String()
+        }
+    }
+
+    private var samplingTypes : Array<String> = Array(4){ i ->
+        when(i)
+        {
+            0 -> SampleType.NumberHouseholds.format
+            1 -> SampleType.PercentHouseholds.format
+            2 -> SampleType.PercentTotal.format
+            else -> String()
+        }
+    }
+
     val DistanceFormats : Array<String>
         get() = distanceFormats
 
@@ -61,7 +86,14 @@ class ConfigurationViewModel : ViewModel()
     val Configurations : ArrayList<Config>
         get() = configurations
 
+    val SamplingMethods : Array<String>
+        get() = samplingMethods
+
+    val SampleTypes : Array<String>
+        get() = samplingTypes
+
     var currentConfiguration : LiveData<Config>? = _currentConfiguration
+    var currentStudy : LiveData<Study>? = _currentStudy
 
     val distanceFormatPosition : MutableLiveData<Int>
         get() = _distanceFormatPosition
@@ -70,8 +102,12 @@ class ConfigurationViewModel : ViewModel()
     val timeFormatPosition : MutableLiveData<Int>
         get() = _timeFormatPosition
 
+    val samplingMethodPosition : MutableLiveData<Int>
+        get() = _samplingMethodPosition
 
-    var test = 5
+    val samplingTypePosition : MutableLiveData<Int>
+        get() = _samplingTypePosition
+
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < distanceFormats.size)
@@ -82,8 +118,6 @@ class ConfigurationViewModel : ViewModel()
                 DistanceFormat.Feet.format -> dist = DistanceFormat.Feet.toString()
                 DistanceFormat.Meters.format -> dist = DistanceFormat.Meters.toString()
             }
-
-            Log.d("test", "the distance ${dist}")
             _currentConfiguration?.value?.let {
                 it.distanceFormat = dist
             }
@@ -125,6 +159,46 @@ class ConfigurationViewModel : ViewModel()
 
     }
 
+    fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        if(position > samplingMethods.size)
+        {
+            val format : String = samplingMethods[position]
+            var samplingMethod = ""
+
+            when(format){
+                SamplingMethod.SimpleRandom.format -> samplingMethod = SamplingMethod.SimpleRandom.toString()
+                SamplingMethod.Cluster.format -> samplingMethod = SamplingMethod.Cluster.toString()
+                SamplingMethod.Subsets.format -> samplingMethod = SamplingMethod.Subsets.toString()
+                SamplingMethod.Strata.format -> samplingMethod = SamplingMethod.Strata.toString()
+            }
+            _currentStudy?.value?.let {
+                it.samplingMethod = samplingMethod
+            }
+        }
+
+    }
+
+    fun onSampleTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        if(position > samplingTypes.size)
+        {
+            val format : String = samplingTypes[position]
+            var sampleType = ""
+
+            when(format){
+                SampleType.NumberHouseholds.format -> sampleType = SampleType.NumberHouseholds.toString()
+                SampleType.PercentHouseholds.format -> sampleType = SampleType.PercentHouseholds.toString()
+                SampleType.PercentTotal.format -> sampleType = SampleType.PercentTotal.toString()
+
+            }
+            _currentStudy?.value?.let {
+                it.samplingMethod = sampleType
+            }
+        }
+
+    }
+
     fun initializeConfigurations()
     {
         configurations.clear()
@@ -149,17 +223,26 @@ class ConfigurationViewModel : ViewModel()
             // write to database
             DAO.configDAO.createConfig(configuration)
         }
-
     }
 
     fun setCurrentConfig(config : Config)
     {
         _currentConfiguration = MutableLiveData(config)
         currentConfiguration = _currentConfiguration
-
-        test = 50
-        Log.d("CURRENT CONFIG ", "THE CONFIG ${currentConfiguration!!.value!!.name}")
     }
 
+    fun deleteConfig(config : Config)
+    {
+        DAO.configDAO.deleteConfig( config )
+        configurations.remove(config)
+
+    }
+
+    fun createNewStudy()
+    {
+        val newStudy = Study(UUID.randomUUID().toString(),"","","",0, SampleType.None,)
+        _currentStudy = MutableLiveData(newStudy)
+        currentStudy = _currentStudy
+    }
 
 }

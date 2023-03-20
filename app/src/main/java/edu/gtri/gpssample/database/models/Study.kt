@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.network.models.NetworkCommand
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -14,18 +15,18 @@ data class Study(
     var name: String,
     var samplingMethod: String,
     var sampleSize: Int,
-    var sampleSizeIndex: Int,
+    var sampleType : SampleType,
     var fields : List<Field>,
     var rules : List<Rule>,
     var filters : List<Filter>)
 {
     constructor(uuid: String, config_uuid: String, name: String, samplingMethod: String,
-                sampleSize: Int, sampleSizeIndex: Int) : this(null, uuid, config_uuid,
-                name, samplingMethod, sampleSize, sampleSizeIndex,
+                sampleSize: Int, sampleType: SampleType) : this(null, uuid, config_uuid,
+                name, samplingMethod, sampleSize, sampleType,
                 ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
     constructor(id: Int, uuid: String, config_uuid: String, name: String, samplingMethod: String,
-                sampleSize: Int, sampleSizeIndex: Int) : this(id, uuid, config_uuid,
-                name, samplingMethod, sampleSize, sampleSizeIndex,
+                sampleSize: Int, sampleType: SampleType) : this(id, uuid, config_uuid,
+                name, samplingMethod, sampleSize, sampleType,
                 ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
     fun pack() : String
     {

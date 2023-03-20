@@ -7,12 +7,12 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -51,6 +51,15 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+        study = sharedViewModel.currentStudy!!.value!!
+        createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
+        createStudyAdapter.didSelectField = this::didSelectField
+        createStudyAdapter.didSelectRule = this::didSelectRule
+        createStudyAdapter.didSelectFilter = this::didSelectFilter
+        createStudyAdapter.shouldAddField = this::shouldAddField
+        createStudyAdapter.shouldAddRule = this::shouldAddRule
+        createStudyAdapter.shouldAddFilter = this::shouldAddFilter
+
 
         binding?.apply {
             // Specify the fragment as the lifecycle owner
@@ -63,35 +72,21 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             createConfigurationFragment = this@CreateStudyFragment
         }
 
-        // required: configId
-        if (arguments == null)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val config_uuid = arguments!!.getString( Keys.kConfig_uuid.toString(), "");
-
-        if (config_uuid.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
-            return
-        }
 
         // optional: studyId
         val study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
         if (study_uuid.isNotEmpty())
         {
-            DAO.studyDAO.getStudy( study_uuid )?.let { study ->
-                this.study = study
-            }
-
-            if (!this::study.isInitialized)
-            {
-                Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
-                return
-            }
+//            DAO.studyDAO.getStudy( study_uuid )?.let { study ->
+//                this.study = study
+//            }
+//
+//            if (!this::study.isInitialized)
+//            {
+//                Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
+//                return
+//            }
         }
 
         val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
@@ -108,40 +103,33 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
 
-        if (!this::study.isInitialized)
-        {
-            study = Study( UUID.randomUUID().toString(), config_uuid, "", samplingMethods[0], -1, 0 )
-        }
-        else
-        {
-            for (i in samplingMethods.indices)
-            {
-                if (samplingMethods[i] == study.samplingMethod)
-                {
-                    binding.samplingMethodSpinner.setSelection(i)
-                }
-            }
-        }
+//
+//        else
+//        {
+//            for (i in samplingMethods.indices)
+//            {
+//                if (samplingMethods[i] == study.samplingMethod)
+//                {
+//                    binding.samplingMethodSpinner.setSelection(i)
+//                }
+//            }
+//        }
 
         if (study.sampleSize > 0)
         {
-            when(study.sampleSizeIndex)
+            when(study.sampleType)
             {
-                0 -> binding.sampleSize1EditText.setText(study.sampleSize.toString())
-                1 -> binding.sampleSize2EditText.setText(study.sampleSize.toString())
-                2 -> binding.sampleSize3EditText.setText(study.sampleSize.toString())
+                //SampleType.NumberHouseholds -> binding.sampleSize1EditText.setText(study.sampleSize.toString())
+                SampleType.PercentHouseholds -> binding.sampleSize2EditText.setText(study.sampleSize.toString())
+               // SampleType.PercentTotal -> binding.sampleSize3EditText.setText(study.sampleSize.toString())
+
+                else -> {}
             }
         }
 
         binding.studyNameEditText.setText( study.name )
 
-        createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
-        createStudyAdapter.didSelectField = this::didSelectField
-        createStudyAdapter.didSelectRule = this::didSelectRule
-        createStudyAdapter.didSelectFilter = this::didSelectFilter
-        createStudyAdapter.shouldAddField = this::shouldAddField
-        createStudyAdapter.shouldAddRule = this::shouldAddRule
-        createStudyAdapter.shouldAddFilter = this::shouldAddFilter
+
 
         binding.expandableListView.setAdapter( createStudyAdapter )
 
@@ -152,23 +140,23 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 when( position )
                 {
                     0 -> { // simple random sampling
-                        binding.sampleSize1Layout.visibility = View.VISIBLE
+                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
                         binding.sampleSize2Layout.visibility = View.VISIBLE
-                        binding.sampleSize3Layout.visibility = View.VISIBLE
-                        binding.sampleSize1TextView.setText( "# of Households in all clusters")
+                       // binding.sampleSize3Layout.visibility = View.VISIBLE
+                       // binding.sampleSize1TextView.setText( "# of Households in all clusters")
                         binding.sampleSizeTextView.visibility = View.VISIBLE
                     }
                     1 -> { // cluster sampling
-                        binding.sampleSize1Layout.visibility = View.VISIBLE
+                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
                         binding.sampleSize2Layout.visibility = View.GONE
-                        binding.sampleSize3Layout.visibility = View.GONE
-                        binding.sampleSize1TextView.setText( "# of Households per cluster")
+                      //  binding.sampleSize3Layout.visibility = View.GONE
+                      //  binding.sampleSize1TextView.setText( "# of Households per cluster")
                         binding.sampleSizeTextView.visibility = View.VISIBLE
                     }
                     else -> { // subset or strata sampling
-                        binding.sampleSize1Layout.visibility = View.GONE
+                     //   binding.sampleSize1Layout.visibility = View.GONE
                         binding.sampleSize2Layout.visibility = View.GONE
-                        binding.sampleSize3Layout.visibility = View.GONE
+                     //   binding.sampleSize3Layout.visibility = View.GONE
                         binding.sampleSizeTextView.visibility = View.GONE
                     }
                 }
@@ -179,20 +167,20 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }
         }
 
-        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-            binding.sampleSize2EditText.setText("")
-            binding.sampleSize3EditText.setText("")
-        }
+//        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+//            binding.sampleSize2EditText.setText("")
+//            binding.sampleSize3EditText.setText("")
+//        }
 
         binding.sampleSize2EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-            binding.sampleSize1EditText.setText("")
-            binding.sampleSize3EditText.setText("")
+       //     binding.sampleSize1EditText.setText("")
+       //     binding.sampleSize3EditText.setText("")
         }
 
-        binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-            binding.sampleSize1EditText.setText("")
-            binding.sampleSize2EditText.setText("")
-        }
+//        binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+//            binding.sampleSize1EditText.setText("")
+//            binding.sampleSize2EditText.setText("")
+//        }
 
         binding.nextButton.setOnClickListener {
             updateStudy()
@@ -351,30 +339,30 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
         {
-            val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
+            //val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
             val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
-            val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
+            //val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
 
-            if (sample1Size == null && sample2Size == null && sample3Size == null)
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
-                return
-            }
+//            if (sample1Size == null && sample2Size == null && sample3Size == null)
+//            {
+//                Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
+//                return
+//            }
 
-            sample1Size?.let { sampleSize ->
-                study.sampleSize = sample1Size
-                study.sampleSizeIndex = 0
-            }
+//            sample1Size?.let { sampleSize ->
+//                study.sampleSize = sample1Size
+//                study.sampleType = SampleType.NumberHouseholds
+//            }
 
             sample2Size?.let { sampleSize ->
                 study.sampleSize = sampleSize
-                study.sampleSizeIndex = 1
+                study.sampleType = SampleType.PercentHouseholds
             }
 
-            sample3Size?.let { sampleSize ->
-                study.sampleSize = sampleSize
-                study.sampleSizeIndex = 2
-            }
+//            sample3Size?.let { sampleSize ->
+//                study.sampleSize = sampleSize
+//                study.sampleType = SampleType.PercentTotal
+//            }
         }
 
         study.name = name

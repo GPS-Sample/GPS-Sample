@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageStudies
+package edu.gtri.gpssample.fragments.createconfiguration
 
 import android.annotation.SuppressLint
 import android.content.Context

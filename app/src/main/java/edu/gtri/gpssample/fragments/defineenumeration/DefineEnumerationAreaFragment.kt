@@ -104,19 +104,22 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
         mapFragment!!.getMapAsync(this)
 
         binding.saveButton.setOnClickListener {
-            sharedViewModel.saveNewConfiguration()
-            if (quickStart)
-            {
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
-                bundle.putString( Keys.kConfig_uuid.toString(), config_uuid )
 
-                findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
-            }
-            else
-            {
-                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
-            }
+            // TODO: add enumeration area to current configuration
+            findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
+//            sharedViewModel.saveNewConfiguration()
+//            if (quickStart)
+//            {
+//                val bundle = Bundle()
+//                bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
+//                bundle.putString( Keys.kConfig_uuid.toString(), config_uuid )
+//
+//                findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+//            }
+//            else
+//            {
+//                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+//            }
         }
     }
 

@@ -11,7 +11,6 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -78,15 +77,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     fun didSelectConfig( config: Config )
     {
         val bundle = Bundle()
-        sharedViewModel.test = 10
-
         sharedViewModel.setCurrentConfig(config)
-
         bundle.putSerializable("currentConfig", config)
-
         bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
-
-
         findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }
 
@@ -105,8 +98,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     override fun didAnswerYes( tag: Int )
     {
         selectedConfig?.let {
-            DAO.configDAO.deleteConfig( it )
-            manageConfigurationsAdapter.updateConfigurations(DAO.configDAO.getConfigs())
+            sharedViewModel.deleteConfig(it)
+            manageConfigurationsAdapter.updateConfigurations( sharedViewModel.Configurations)//DAO.configDAO.getConfigs())
         }
     }
 

@@ -5,34 +5,42 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
-import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.fragments.createstudy.CreateStudyAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-import java.util.*
-
-class CreateConfigurationFragment : Fragment()
-{
+class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
     private var quickStart = false
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private var map : GoogleMap? = null
+    private lateinit var createStudyAdapter: CreateStudyAdapter
+    private lateinit var manageStudiesAdapter: ManageStudiesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-
+        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
+        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
+        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -44,7 +52,7 @@ class CreateConfigurationFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
+        val bundle = Bundle()
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -62,55 +70,7 @@ class CreateConfigurationFragment : Fragment()
             quickStart = it
         }
 
-//        val configId = arguments?.getString( Keys.kConfig_uuid.toString());
-//
-//        configId?.let {
-//            config = DAO.configDAO.getConfig( it )
-//        }
-
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
-
-//        ArrayAdapter.createFromResource(activity!!, R.array.distance_format, android.R.layout.simple_spinner_item)
-//            .also { adapter ->
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//                binding.distanceFormatSpinner.adapter = adapter
-//            }
-//
-//        ArrayAdapter.createFromResource(activity!!, R.array.date_format, android.R.layout.simple_spinner_item)
-//            .also { adapter ->
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//                binding.dateFormatSpinner.adapter = adapter
-//            }
-//
-//        ArrayAdapter.createFromResource(activity!!, R.array.time_format, android.R.layout.simple_spinner_item)
-//            .also { adapter ->
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//                binding.timeFormatSpinner.adapter = adapter
-//            }
-
-//        config?.let { config ->
-//            binding.configNameEditText.setText( config.name )
-//            binding.minGpsPrecisionEditText.setText( config.minGpsPrecision.toString())
-
-//            when (config.distanceFormat)
-//            {
-//                DistanceFormat.Meters.toString() -> binding.distanceFormatSpinner.setSelection( 0 )
-//                DistanceFormat.Feet.toString() -> binding.distanceFormatSpinner.setSelection( 1 )
-//            }
-//
-//            when (config.dateFormat)
-//            {
-//                DateFormat.DayMonthYear.toString() -> binding.dateFormatSpinner.setSelection( 0 )
-//                DateFormat.MonthDayYear.toString() -> binding.dateFormatSpinner.setSelection( 1 )
-//                DateFormat.YearMonthDay.toString() -> binding.dateFormatSpinner.setSelection( 2 )
-//            }
-
-//            when (config.timeFormat)
-//            {
-//                TimeFormat.twelveHour.toString() -> binding.timeFormatSpinner.setSelection( 0 )
-//                TimeFormat.twentyFourHour.toString() -> binding.timeFormatSpinner.setSelection( 1 )
-//            }
-//        }
 
         binding.nextButton.setOnClickListener {
 
@@ -126,19 +86,27 @@ class CreateConfigurationFragment : Fragment()
                 return@setOnClickListener
             }
 
-//            if (config == null)
-//            {
-//                config = Config( UUID.randomUUID().toString(), "", "", "", "", 0 )
-//                //DAO.configDAO.createConfig( config!! )
-//            }
 
             sharedViewModel.currentConfiguration?.let {
-                val bundle = Bundle()
+
                 bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
                 bundle.putString( Keys.kConfig_uuid.toString(), sharedViewModel.currentConfiguration!!.value!!.uuid )
-                findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
+
+                sharedViewModel.saveNewConfiguration()
+                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
             }
         }
+        val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        binding.addStudyButton.setOnClickListener{
+            sharedViewModel.createNewStudy()
+            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+        }
+
+        binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
+        binding.studiesRecycler.adapter = manageStudiesAdapter
+        binding.studiesRecycler.layoutManager = LinearLayoutManager(activity )
     }
 
     override fun onResume()
@@ -152,5 +120,35 @@ class CreateConfigurationFragment : Fragment()
         super.onDestroyView()
 
         _binding = null
+    }
+
+    private fun didSelectStudy(study: Study)
+    {
+        val bundle = Bundle()
+
+        //bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
+        //bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+
+        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+    }
+    private fun shouldDeleteStudy(study: Study)
+    {
+       // selectedStudy = study
+      //  ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", 0, this)
+    }
+
+    override fun onMapClick(p0: LatLng) {
+        // Your code here to make it look like the map is clicked on touch
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
+        bundle.putString( Keys.kConfig_uuid.toString(), sharedViewModel.currentConfiguration!!.value!!.uuid )
+        findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
+    }
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
+        map?.let{gmap ->
+            gmap.setOnMapClickListener(this)
+            gmap.uiSettings.isScrollGesturesEnabled = false
+        }
     }
 }
