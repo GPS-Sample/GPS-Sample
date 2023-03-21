@@ -233,6 +233,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG_STUDY")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
@@ -418,6 +419,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 61
+        private const val DATABASE_VERSION = 64
     }
 }

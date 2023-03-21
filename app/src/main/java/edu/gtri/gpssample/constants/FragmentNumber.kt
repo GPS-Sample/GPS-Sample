@@ -23,4 +23,5 @@ enum class FragmentNumber( val value: Int ) {
     SystemStatusFragment(1020 ),
     AddHouseholdFragment(1021 ),
     AddLocationFragment(1022 ),
+    ConfigurationFragment(1023),
 }

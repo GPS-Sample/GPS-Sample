@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.Main.MainFragment">
+    tools:context=".fragments.main.MainFragment">
 
     <Space
         android:layout_width="match_parent"

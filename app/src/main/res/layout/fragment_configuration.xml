@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
-    tools:context=".fragments.createconfiguration.CreateConfigurationFragment"
+    tools:context=".fragments.configuration.ConfigurationFragment"
     >
     <data>
         <variable
@@ -13,8 +13,8 @@
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
 
         <variable
-            name="createConfigurationFragment"
-            type="edu.gtri.gpssample.fragments.createconfiguration.CreateConfigurationFragment" />
+            name="configurationFragment"
+            type="edu.gtri.gpssample.fragments.configuration.ConfigurationFragment" />
     </data>
         <LinearLayout
             android:orientation="vertical"
@@ -43,44 +43,32 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                <EditText
+                <TextView
                     android:id="@+id/config_name_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:inputType="textCapWords"
-                    android:imeOptions="actionDone"
-                    android:text="@={viewModel.currentConfiguration.name}"
-
-                    android:hint="@string/enter_config_name" />
+                    android:textSize="17sp"
+                    android:text="@={viewModel.currentConfiguration.name}" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center_vertical"
                     android:text="@string/preferred_units"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
-
-                <FrameLayout
+                <TextView
+                    android:id="@+id/config_preferred_units_text"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/distance_format_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:entries="@{viewModel.DistanceFormats}"
-                        android:selectedItemPosition="@={viewModel.distanceFormatPosition}"
-                        android:onItemSelected="@{viewModel::onDistanceFormatSelected}"
-                        />
-                </FrameLayout>
+                    android:textSize="17sp"
+                    android:text="@{viewModel.currentConfigurationDistanceFormat}" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -92,22 +80,14 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                <FrameLayout
+                <TextView
+                    android:id="@+id/config_date_format_text"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/date_format_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:entries="@{viewModel.DateFormats}"
-                        android:selectedItemPosition="@={viewModel.dateFormatPosition}"
-                        android:onItemSelected="@{viewModel::onDateFormatSelected}"
-                        />
-                </FrameLayout>
+                    android:textSize="17sp"
+                    android:text="@{viewModel.currentConfigurationDistanceFormat}" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -119,21 +99,14 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                <FrameLayout
+                <TextView
+                    android:id="@+id/config_time_format_text"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:background="@drawable/spinner_frame">
-
-                    <Spinner
-                        android:id="@+id/time_format_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:entries="@{viewModel.TimeFormats}"
-                        android:selectedItemPosition="@={viewModel.timeFormatPosition}"
-                        android:onItemSelected="@{viewModel::onTimeFormatSelected}"/>
-                </FrameLayout>
+                    android:textSize="17sp"
+                    android:text="@{viewModel.currentConfigurationTimeFormat}" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -145,14 +118,15 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                <EditText
+                <TextView
                     android:id="@+id/min_gps_precision_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
+                    android:textSize="17sp"
                     android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
-                    android:hint="@string/enter_min_gps_precision" />
+                     />
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
@@ -180,6 +154,19 @@
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/enum_areas_recycler"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_height="0dp"
+                    />
+
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
                 <FrameLayout
                     android:layout_marginBottom="2dp"
                     android:layout_width="match_parent"
@@ -195,12 +182,6 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                    <ImageView
-                        android:id="@+id/add_study_button"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="end"
-                        android:src="@drawable/plus_blue" />
                 </FrameLayout>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/studies_recycler"
@@ -212,13 +193,13 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
         <Button
-            android:id="@+id/next_button"
+            android:id="@+id/done_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_margin="20dp"
             android:layout_gravity="bottom"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/save" />
+            android:text="@string/done" />
     </LinearLayout>
 </layout>

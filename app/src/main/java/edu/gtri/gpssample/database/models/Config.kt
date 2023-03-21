@@ -29,14 +29,15 @@ data class Config(
     var distanceFormat: String,
     var minGpsPrecision: Int,
     var currentStudy : Study?,
-    var studies : List<Study>
+    var studies : ArrayList<Study>,
+    var enumAreas : List<EnumArea>?
     ) : java.io.Serializable {
     constructor(uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
         minGpsPrecision: Int) : this(null, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
-                                    null,ArrayList<Study>())
+                                    null,ArrayList<Study>(), null)
     constructor(id: Int?, uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
                 minGpsPrecision: Int) : this(id, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
-                null,ArrayList<Study>())
+                null,ArrayList<Study>(), null)
 
     var minimumGPSPrecision : String
         get() = minGpsPrecision.toString()

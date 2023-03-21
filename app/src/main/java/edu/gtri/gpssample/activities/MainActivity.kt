@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity()
             configurationViewModel.initializeConfigurations()
 
             // These are hacks
-            DAO.studyDAO.deleteOrphans()
+
             DAO.fieldDAO.deleteOrphans()
             DAO.filterDAO.deleteOrphans()
             DAO.ruleDAO.deleteOrphans()
@@ -64,8 +64,8 @@ class MainActivity : AppCompatActivity()
             DAO.enumAreaDAO.deleteOrphans()
             DAO.teamDAO.deleteOrphans()
 
-            val configurations = DAO.configDAO.getConfigs()
-            Log.d( "xxx", "found ${configurations.size} Configurations" )
+//            val configurations = DAO.configDAO.getConfigs()
+//            Log.d( "xxx", "found ${configurations.size} Configurations" )
 
             val studies = DAO.studyDAO.getStudies()
             Log.d( "xxx", "found ${studies.size} Studies" )

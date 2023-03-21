@@ -9,7 +9,7 @@
 
     <fragment
         android:id="@+id/MainFragment"
-        android:name="edu.gtri.gpssample.fragments.Main.MainFragment"
+        android:name="edu.gtri.gpssample.fragments.main.MainFragment"
         tools:layout="@layout/fragment_main">
 
         <action
@@ -63,6 +63,27 @@
         <action
             android:id="@+id/action_navigate_to_ManageStudiesFragment"
             app:destination="@id/ManageStudiesFragment"/>
+        <action
+            android:id="@+id/action_navigate_to_ConfigurationFragment"
+            app:destination="@id/ConfigurationFragment" />
+    </fragment>
+
+    <!--CreateConfigurationFragment-->
+
+    <fragment
+        android:id="@+id/ConfigurationFragment"
+        android:name="edu.gtri.gpssample.fragments.configuration.ConfigurationFragment"
+        tools:layout="@layout/fragment_configuration">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:destination="@id/ManageConfigurationsFragment" />
+        <action
+            android:id="@+id/action_navigate_to_CreateStudyFragment"
+            app:destination="@id/CreateStudyFragment" />
+        <action
+            android:id="@+id/action_navigate_to_ManageEnumerationAreaFragment"
+            app:destination="@id/ManageEnumerationAreaFragment" />
     </fragment>
 
     <!--CreateConfigurationFragment-->
@@ -156,6 +177,9 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
+        <action
+            android:id="@+id/action_navigate_to_CreateConfigurationFragment"
+            app:destination="@id/CreateConfigurationFragment" />
     </fragment>
 
     <!--ManageEnumerationAreasFragment-->

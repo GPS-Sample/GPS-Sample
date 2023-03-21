@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -20,6 +19,7 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreasBinding
 import edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesViewModel
+import edu.gtri.gpssample.fragments.configuration.ManageEnumerationAreasAdapter
 
 class ManageEnumerationAreasFragment : Fragment()
 {

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
-    tools:context=".fragments.createconfiguration.CreateConfigurationFragment"
+    tools:context=".fragments.createstudy.CreateStudyFragment"
     >
     <data>
         <variable
@@ -12,7 +12,7 @@
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
 
         <variable
-            name="createConfigurationFragment"
+            name="createStudyFragment"
             type="edu.gtri.gpssample.fragments.createstudy.CreateStudyFragment" />
     </data>
     <LinearLayout
@@ -39,9 +39,9 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:hint="@string/enter_study_name"
-            android:text="@={viewModel.currentConfiguration.currentStudy.name}"
             android:imeOptions="actionDone"
-            android:inputType="textCapWords" />
+            android:inputType="textCapWords"
+            android:text="@={viewModel.currentStudy.name}" />
 
         <TextView
             android:layout_width="match_parent"
@@ -67,7 +67,8 @@
                 android:layout_height="match_parent"
                 android:entries="@{viewModel.SamplingMethods}"
                 android:selectedItemPosition="@={viewModel.samplingMethodPosition}"
-                android:onItemSelected="@{viewModel::onSamplingMethodSelected}"/>
+                android:onItemSelected="@{viewModel::onSamplingMethodSelected}"
+                android:contentDescription="Sampling Method"/>
         </FrameLayout>
 
         <TextView
@@ -83,26 +84,37 @@
             android:textColor="@color/primary_textcolor" />
 
         <LinearLayout
-            android:id="@+id/sample_size_2_layout"
+            android:id="@+id/sample_size_layout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
             <EditText
-                android:id="@+id/sample_size_2_edit_text"
+                android:id="@+id/sample_size_edit_text"
                 android:gravity="center"
                 android:inputType="number"
                 android:imeOptions="actionDone"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"/>
+                android:layout_marginLeft="20dp"
+                android:text="@={viewModel.currentSampleSize}"
+                />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/spinner_frame">
             <Spinner
                 android:id="@+id/sampling_type_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:entries="@{viewModel.SampleTypes}"
                 android:selectedItemPosition="@={viewModel.samplingTypePosition}"
-                android:onItemSelected="@{viewModel::onSampleTypeSelected}"/>
+                android:onItemSelected="@{viewModel::onSampleTypeSelected}"
+                android:contentDescription="Sampling Type"/>
+            </FrameLayout>
 
         </LinearLayout>
 
@@ -117,12 +129,12 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/next_button"
+            android:id="@+id/save_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/next" />
+            android:text="@string/save" />
     </LinearLayout>
 </layout>

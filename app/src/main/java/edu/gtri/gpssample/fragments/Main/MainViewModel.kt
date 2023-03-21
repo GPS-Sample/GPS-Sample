@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.Main
+package edu.gtri.gpssample.fragments.main
 
 import androidx.lifecycle.ViewModel
 

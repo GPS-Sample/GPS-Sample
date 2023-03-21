@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.createconfiguration
+package edu.gtri.gpssample.fragments.configuration
 
 import android.os.Bundle
 import android.text.InputType
@@ -21,36 +21,38 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Rectangle
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
+import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.createstudy.CreateStudyAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
-    ConfirmationDialog.ConfirmationDialogDelegate {
+class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
     private var quickStart = false
-    private var _binding: FragmentCreateConfigurationBinding? = null
+    private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
     private var map : GoogleMap? = null
-    private lateinit var createStudyAdapter: CreateStudyAdapter
-    private lateinit var manageStudiesAdapter: ManageStudiesAdapter
-    private var selectedStudy: Study? = null
+    private lateinit var studiesAdapter: StudiesAdapter
+    private lateinit var enumerationAreasAdapter: ManageEnumerationAreasAdapter
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
-        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
-        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
-    }
+        studiesAdapter = StudiesAdapter(listOf<Study>())
+        studiesAdapter.didSelectStudy = this::didSelectStudy
 
+
+
+        enumerationAreasAdapter = ManageEnumerationAreasAdapter( listOf<EnumArea>() )
+        enumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentCreateConfigurationBinding.inflate(inflater, container, false)
+        _binding = FragmentConfigurationBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -66,7 +68,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
             viewModel = sharedViewModel
 
             // Assign the fragment
-            createConfigurationFragment = this@CreateConfigurationFragment
+            configurationFragment = this@ConfigurationFragment
         }
 
         val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
@@ -77,55 +79,39 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.nextButton.setOnClickListener {
-
-            if (binding.configNameEditText.text.toString().isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (binding.minGpsPrecisionEditText.text.toString().isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter the minimum desired GPS precision", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-
-            sharedViewModel.currentConfiguration?.value?.let {config ->
-
-                bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
-                bundle.putString( Keys.kConfig_uuid.toString(), sharedViewModel.currentConfiguration!!.value!!.uuid )
-                if (config.id == null){
-                    sharedViewModel.saveNewConfiguration()
-
-                } else{
-                    sharedViewModel.updateConfiguration()
-                }
-
-                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-            }
+        binding.doneButton.setOnClickListener {
+            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
         }
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        binding.addStudyButton.setOnClickListener{
-            sharedViewModel.createNewStudy()
-            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
-        }
-
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
-        binding.studiesRecycler.adapter = manageStudiesAdapter
+        binding.studiesRecycler.adapter = studiesAdapter
         binding.studiesRecycler.layoutManager = LinearLayoutManager(activity )
+
+        binding.enumAreasRecycler.itemAnimator = DefaultItemAnimator()
+        binding.enumAreasRecycler.adapter = enumerationAreasAdapter
+        binding.enumAreasRecycler.layoutManager = LinearLayoutManager(activity )
     }
 
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
-        manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
-    }
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
+        studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
+        enumerationAreasAdapter.updateEnumAreas(sharedViewModel.currentConfiguration?.value?.enumAreas)
 
+        // set the first study as selected.  TODO: save the id of the selected study
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            if(config.studies.count() > 0)
+            {
+                config.currentStudy = config.studies[0]
+
+            }
+        }
+
+
+    }
     override fun onDestroyView()
     {
         super.onDestroyView()
@@ -137,29 +123,17 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     {
         val bundle = Bundle()
 
-        //bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
-        //bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-        sharedViewModel.setCurrentStudy(study)
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
     }
-    private fun shouldDeleteStudy(study: Study)
-    {
-        selectedStudy = study
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", 0, this)
-    }
-
     override fun onMapClick(p0: LatLng) {
         // Your code here to make it look like the map is clicked on touch
-        val bundle = Bundle()
-        bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
-        bundle.putString( Keys.kConfig_uuid.toString(), sharedViewModel.currentConfiguration!!.value!!.uuid )
-        findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
     }
     override fun onMapReady(p0: GoogleMap) {
         map = p0
         map?.let{googleMap ->
             googleMap.setOnMapClickListener(this)
             googleMap.uiSettings.isScrollGesturesEnabled = false
+
             // put the enums
             sharedViewModel.currentConfiguration?.value?.let {config ->
                 config.enumAreas?.let {enumAreas ->
@@ -194,12 +168,23 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
         }
     }
 
-    override fun didAnswerNo() {
+    private fun didSelectEnumArea(enumArea: EnumArea)
+    {
+        val bundle = Bundle()
+        sharedViewModel.currentConfiguration?.value?.currentStudy?.let{study ->
+
+            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+            bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
+        }
 
     }
+    // HACK
+    private fun getCenter( rectangle: Rectangle) : LatLng
+    {
+        var sumLat = rectangle.topLeft_lat + rectangle.topRight_lat + rectangle.botRight_lat + rectangle.botLeft_lat
+        var sumLon = rectangle.topLeft_lon + rectangle.topRight_lon + rectangle.botRight_lon + rectangle.botLeft_lon
 
-    override fun didAnswerYes(tag: Int) {
-        sharedViewModel.removeStudy(selectedStudy)
-        manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
+        return LatLng( sumLat/4.0, sumLon/4.0 )
     }
 }

@@ -26,21 +26,5 @@
         android:textSize="15sp"
         android:textColor="@color/white"/>
 
-    <ImageView
-        android:id="@+id/edit_view"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="10dp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:srcCompat="@drawable/arrow_down_white"/>
-
-
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="10dp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:srcCompat="@drawable/delete_white"/>
 
 </LinearLayout>

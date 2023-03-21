@@ -11,10 +11,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 
 class ConfigurationViewModel : ViewModel()
 {
+    private val unavailable = "Unavailable"
     private var configurations : ArrayList<Config> = ArrayList()
     private var _currentConfiguration : MutableLiveData<Config>? = null
     private var _distanceFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
@@ -108,12 +110,50 @@ class ConfigurationViewModel : ViewModel()
     val samplingTypePosition : MutableLiveData<Int>
         get() = _samplingTypePosition
 
+
+    val currentConfigurationTimeFormat : String
+        get(){
+            currentConfiguration?.value?.let {config ->
+                return lookupTimeFormatFromKey(config.timeFormat)
+            }
+            return unavailable
+        }
+    val currentConfigurationDistanceFormat : String
+        get(){
+            currentConfiguration?.value?.let {config ->
+                return lookupDistanceFormatFromKey(config.distanceFormat)
+            }
+            return unavailable
+        }
+    val currentConfigurationDateFormat : String
+        get(){
+            currentConfiguration?.value?.let {config ->
+                return lookupDateFormatFromKey(config.dateFormat)
+            }
+            return unavailable
+        }
+
+    var currentSampleSize : String
+        get(){
+            currentStudy?.value?.let{study ->
+                return study.sampleSize.toString()
+            }
+            return "0"
+        }
+        set(value){
+            currentStudy?.value?.let{study ->
+                value.toIntOrNull()?.let {size ->
+                    study.sampleSize = size
+                } ?: run{ study.sampleSize = 0
+                }
+            }
+        }
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < distanceFormats.size)
         {
             val format : String = distanceFormats[position]
-            var dist : String = ""
+            var dist  = ""
             when(format){
                 DistanceFormat.Feet.format -> dist = DistanceFormat.Feet.toString()
                 DistanceFormat.Meters.format -> dist = DistanceFormat.Meters.toString()
@@ -142,7 +182,7 @@ class ConfigurationViewModel : ViewModel()
     }
     fun onDateFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        if(position > dateFormats.size)
+        if(position < dateFormats.size)
         {
             val format : String = dateFormats[position]
             var date = ""
@@ -225,6 +265,14 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
+    fun updateConfiguration()
+    {
+        _currentConfiguration?.value?.let{configuration ->
+            // write to database
+            DAO.configDAO.updateConfig(configuration)
+        }
+    }
+
     fun setCurrentConfig(config : Config)
     {
         _currentConfiguration = MutableLiveData(config)
@@ -245,4 +293,65 @@ class ConfigurationViewModel : ViewModel()
         currentStudy = _currentStudy
     }
 
+    fun setCurrentStudy(study : Study)
+    {
+        _currentStudy = MutableLiveData(study)
+        currentStudy = _currentStudy
+    }
+
+    fun addStudy()
+    {
+        currentStudy?.value?.let{study ->
+            currentConfiguration?.value?.let { config ->
+                if(!config.studies.contains(study))
+                {
+                    config.studies.add(study)
+                }
+            }
+        }
+    }
+    fun removeStudy(study: Study?)
+    {
+        study?.let { study ->
+            currentConfiguration?.value?.let{config ->
+                config.studies.remove(study)
+            }
+        }
+    }
+
+    fun addEnumerationAreas(enumAreas : List<EnumArea>? )
+    {
+        currentConfiguration?.value?.let{config ->
+            config.enumAreas = enumAreas
+        }
+    }
+
+    // TODO: use the converters in the constant enums
+    private fun lookupTimeFormatFromKey(key : String) : String
+    {
+        return when(key) {
+            TimeFormat.twelveHour.toString() -> TimeFormat.twelveHour.format
+            TimeFormat.twentyFourHour.toString() -> TimeFormat.twentyFourHour.format
+            else -> unavailable
+        }
+    }
+
+    private fun lookupDateFormatFromKey(key : String) : String
+    {
+        return when(key) {
+            DateFormat.DayMonthYear.toString() -> DateFormat.DayMonthYear.format
+            DateFormat.MonthDayYear.toString() -> DateFormat.MonthDayYear.format
+            DateFormat.YearMonthDay.toString() -> DateFormat.YearMonthDay.format
+            else -> unavailable
+        }
+    }
+
+    private fun lookupDistanceFormatFromKey(key : String) : String
+    {
+        return when(key) {
+            DistanceFormat.Meters.toString() -> DistanceFormat.Meters.format
+            DistanceFormat.Feet.toString() -> DistanceFormat.Feet.format
+            else -> unavailable
+        }
+    }
 }

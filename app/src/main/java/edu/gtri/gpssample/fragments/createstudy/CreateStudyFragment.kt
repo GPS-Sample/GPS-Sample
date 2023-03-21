@@ -69,26 +69,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             viewModel = sharedViewModel
 
             // Assign the fragment
-            createConfigurationFragment = this@CreateStudyFragment
+            createStudyFragment = this@CreateStudyFragment
         }
-
-
-        // optional: studyId
-        val study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
-
-        if (study_uuid.isNotEmpty())
-        {
-//            DAO.studyDAO.getStudy( study_uuid )?.let { study ->
-//                this.study = study
-//            }
-//
-//            if (!this::study.isInitialized)
-//            {
-//                Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
-//                return
-//            }
-        }
-
         val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
 
         quick_start?.let {
@@ -101,7 +83,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 binding.samplingMethodSpinner.adapter = adapter
             }
 
-        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
+//        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
 
 //
 //        else
@@ -115,74 +97,73 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 //            }
 //        }
 
-        if (study.sampleSize > 0)
-        {
-            when(study.sampleType)
-            {
-                //SampleType.NumberHouseholds -> binding.sampleSize1EditText.setText(study.sampleSize.toString())
-                SampleType.PercentHouseholds -> binding.sampleSize2EditText.setText(study.sampleSize.toString())
-               // SampleType.PercentTotal -> binding.sampleSize3EditText.setText(study.sampleSize.toString())
+//        if (study.sampleSize > 0)
+//        {
+//            when(study.sampleType)
+//            {
+//                //SampleType.NumberHouseholds -> binding.sampleSize1EditText.setText(study.sampleSize.toString())
+//                SampleType.PercentHouseholds -> binding.sampleSizeEditText.setText(study.sampleSize.toString())
+//               // SampleType.PercentTotal -> binding.sampleSize3EditText.setText(study.sampleSize.toString())
+//
+//                else -> {}
+//            }
+//        }
 
-                else -> {}
-            }
-        }
-
-        binding.studyNameEditText.setText( study.name )
-
-
-
+//        binding.studyNameEditText.setText( study.name )
         binding.expandableListView.setAdapter( createStudyAdapter )
 
-        binding.samplingMethodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-        {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-            {
-                when( position )
-                {
-                    0 -> { // simple random sampling
-                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
-                        binding.sampleSize2Layout.visibility = View.VISIBLE
-                       // binding.sampleSize3Layout.visibility = View.VISIBLE
-                       // binding.sampleSize1TextView.setText( "# of Households in all clusters")
-                        binding.sampleSizeTextView.visibility = View.VISIBLE
-                    }
-                    1 -> { // cluster sampling
-                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
-                        binding.sampleSize2Layout.visibility = View.GONE
-                      //  binding.sampleSize3Layout.visibility = View.GONE
-                      //  binding.sampleSize1TextView.setText( "# of Households per cluster")
-                        binding.sampleSizeTextView.visibility = View.VISIBLE
-                    }
-                    else -> { // subset or strata sampling
-                     //   binding.sampleSize1Layout.visibility = View.GONE
-                        binding.sampleSize2Layout.visibility = View.GONE
-                     //   binding.sampleSize3Layout.visibility = View.GONE
-                        binding.sampleSizeTextView.visibility = View.GONE
-                    }
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>)
-            {
-            }
-        }
+//        binding.samplingMethodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+//        {
+//            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+//            {
+//                when( position )
+//                {
+//                    0 -> { // simple random sampling
+//                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
+//                        binding.sampleSizeLayout.visibility = View.VISIBLE
+//                       // binding.sampleSize3Layout.visibility = View.VISIBLE
+//                       // binding.sampleSize1TextView.setText( "# of Households in all clusters")
+//                        binding.sampleSizeTextView.visibility = View.VISIBLE
+//                    }
+//                    1 -> { // cluster sampling
+//                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
+//                        binding.sampleSizeLayout.visibility = View.GONE
+//                      //  binding.sampleSize3Layout.visibility = View.GONE
+//                      //  binding.sampleSize1TextView.setText( "# of Households per cluster")
+//                        binding.sampleSizeTextView.visibility = View.VISIBLE
+//                    }
+//                    else -> { // subset or strata sampling
+//                     //   binding.sampleSize1Layout.visibility = View.GONE
+//                        binding.sampleSizeLayout.visibility = View.GONE
+//                     //   binding.sampleSize3Layout.visibility = View.GONE
+//                        binding.sampleSizeTextView.visibility = View.GONE
+//                    }
+//                }
+//            }
+//
+//            override fun onNothingSelected(parent: AdapterView<*>)
+//            {
+//            }
+//        }
 
 //        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
 //            binding.sampleSize2EditText.setText("")
 //            binding.sampleSize3EditText.setText("")
 //        }
 
-        binding.sampleSize2EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-       //     binding.sampleSize1EditText.setText("")
-       //     binding.sampleSize3EditText.setText("")
-        }
+//        binding.sampleSizeEditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+//       //     binding.sampleSize1EditText.setText("")
+//       //     binding.sampleSize3EditText.setText("")
+//        }
 
 //        binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
 //            binding.sampleSize1EditText.setText("")
 //            binding.sampleSize2EditText.setText("")
 //        }
 
-        binding.nextButton.setOnClickListener {
+        binding.saveButton.setOnClickListener {
+
+
             updateStudy()
         }
     }
@@ -340,7 +321,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
         {
             //val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
-            val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
+            // val sample2Size = binding.sampleSizeEditText.text.toString().toIntOrNull()
             //val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
 
 //            if (sample1Size == null && sample2Size == null && sample3Size == null)
@@ -354,10 +335,10 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 //                study.sampleType = SampleType.NumberHouseholds
 //            }
 
-            sample2Size?.let { sampleSize ->
-                study.sampleSize = sampleSize
-                study.sampleType = SampleType.PercentHouseholds
-            }
+//            sample2Size?.let { sampleSize ->
+//                study.sampleSize = sampleSize
+//                study.sampleType = SampleType.PercentHouseholds
+//            }
 
 //            sample3Size?.let { sampleSize ->
 //                study.sampleSize = sampleSize
@@ -365,21 +346,21 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 //            }
         }
 
-        study.name = name
-        study.samplingMethod = binding.samplingMethodSpinner.selectedItem as String
-
-        if (DAO.studyDAO.exists( study.uuid ))
-        {
-            DAO.studyDAO.updateStudy( study )
-        }
-        else
-        {
-            DAO.studyDAO.createStudy( study )
-        }
-
+//        study.name = name
+//        study.samplingMethod = binding.samplingMethodSpinner.selectedItem as String
+//
+//        if (DAO.studyDAO.exists( study.uuid ))
+//        {
+//            DAO.studyDAO.updateStudy( study )
+//        }
+//        else
+//        {
+//            DAO.studyDAO.createStudy( study )
+//        }
+        sharedViewModel.addStudy()
         val bundle = Bundle()
         bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreasFragment, bundle )
+        findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
     }
 
     override fun didAnswerNo()

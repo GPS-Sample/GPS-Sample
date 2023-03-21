@@ -37,6 +37,8 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
     private val binding get() = _binding!!
     private lateinit var map: GoogleMap
     private lateinit var sharedViewModel : ConfigurationViewModel
+
+    private var enumAreas : List<EnumArea>? = null
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -106,6 +108,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
         binding.saveButton.setOnClickListener {
 
             // TODO: add enumeration area to current configuration
+            sharedViewModel.addEnumerationAreas(enumAreas  )
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
 //            sharedViewModel.saveNewConfiguration()
 //            if (quickStart)
@@ -132,48 +135,50 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        var enumAreas = DAO.enumAreaDAO.getEnumAreas(config.uuid)
+        enumAreas = DAO.enumAreaDAO.getEnumAreas(config.uuid)
 
         val user = (activity!!.application as? MainApplication)?.user
 
-        if (user!!.role == Role.Admin.toString() && enumAreas.isEmpty())
+        if (user!!.role == Role.Admin.toString() && enumAreas!!.isEmpty())
         {
             createTestAreas()
         }
 
         enumAreas = DAO.enumAreaDAO.getEnumAreas()
-
-        for (enumArea in enumAreas)
-        {
-            if (enumArea.shape == Shape.Rectangle.toString())
+        enumAreas?.let {enumAreas->
+            for (enumArea in enumAreas)
             {
-                val rectangle = DAO.rectangleDAO.getRectangle( enumArea.shape_uuid )
+                if (enumArea.shape == Shape.Rectangle.toString())
+                {
+                    val rectangle = DAO.rectangleDAO.getRectangle( enumArea.shape_uuid )
 
-                rectangle?.let { rectangle
-                    googleMap.addPolyline(
-                        PolylineOptions()
-                            .clickable(true)
-                            .add(
-                                LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                                LatLng( rectangle.topRight_lat, rectangle.topRight_lon ),
-                                LatLng( rectangle.botRight_lat, rectangle.botRight_lon ),
-                                LatLng( rectangle.botLeft_lat, rectangle.botLeft_lon ),
-                                LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                            ))
-                    if (user!!.role == Role.Supervisor.toString())
-                    {
-                        val latLng = getCenter( rectangle )
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
+                    rectangle?.let { rectangle
+                        googleMap.addPolyline(
+                            PolylineOptions()
+                                .clickable(true)
+                                .add(
+                                    LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
+                                    LatLng( rectangle.topRight_lat, rectangle.topRight_lon ),
+                                    LatLng( rectangle.botRight_lat, rectangle.botRight_lon ),
+                                    LatLng( rectangle.botLeft_lat, rectangle.botLeft_lon ),
+                                    LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
+                                ))
+                        if (user!!.role == Role.Supervisor.toString())
+                        {
+                            val latLng = getCenter( rectangle )
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
+                        }
                     }
                 }
             }
+
+            if (user!!.role == Role.Admin.toString())
+            {
+                val srb = LatLng(30.330603,-86.165004 )
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
+            }
         }
 
-        if (user!!.role == Role.Admin.toString())
-        {
-            val srb = LatLng(30.330603,-86.165004 )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
-        }
     }
 
     fun getCenter( rectangle: Rectangle ) : LatLng
