@@ -83,87 +83,9 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 binding.samplingMethodSpinner.adapter = adapter
             }
 
-//        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
-
-//
-//        else
-//        {
-//            for (i in samplingMethods.indices)
-//            {
-//                if (samplingMethods[i] == study.samplingMethod)
-//                {
-//                    binding.samplingMethodSpinner.setSelection(i)
-//                }
-//            }
-//        }
-
-//        if (study.sampleSize > 0)
-//        {
-//            when(study.sampleType)
-//            {
-//                //SampleType.NumberHouseholds -> binding.sampleSize1EditText.setText(study.sampleSize.toString())
-//                SampleType.PercentHouseholds -> binding.sampleSizeEditText.setText(study.sampleSize.toString())
-//               // SampleType.PercentTotal -> binding.sampleSize3EditText.setText(study.sampleSize.toString())
-//
-//                else -> {}
-//            }
-//        }
-
-//        binding.studyNameEditText.setText( study.name )
         binding.expandableListView.setAdapter( createStudyAdapter )
 
-//        binding.samplingMethodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-//        {
-//            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-//            {
-//                when( position )
-//                {
-//                    0 -> { // simple random sampling
-//                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
-//                        binding.sampleSizeLayout.visibility = View.VISIBLE
-//                       // binding.sampleSize3Layout.visibility = View.VISIBLE
-//                       // binding.sampleSize1TextView.setText( "# of Households in all clusters")
-//                        binding.sampleSizeTextView.visibility = View.VISIBLE
-//                    }
-//                    1 -> { // cluster sampling
-//                      //  binding.sampleSize1Layout.visibility = View.VISIBLE
-//                        binding.sampleSizeLayout.visibility = View.GONE
-//                      //  binding.sampleSize3Layout.visibility = View.GONE
-//                      //  binding.sampleSize1TextView.setText( "# of Households per cluster")
-//                        binding.sampleSizeTextView.visibility = View.VISIBLE
-//                    }
-//                    else -> { // subset or strata sampling
-//                     //   binding.sampleSize1Layout.visibility = View.GONE
-//                        binding.sampleSizeLayout.visibility = View.GONE
-//                     //   binding.sampleSize3Layout.visibility = View.GONE
-//                        binding.sampleSizeTextView.visibility = View.GONE
-//                    }
-//                }
-//            }
-//
-//            override fun onNothingSelected(parent: AdapterView<*>)
-//            {
-//            }
-//        }
-
-//        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-//            binding.sampleSize2EditText.setText("")
-//            binding.sampleSize3EditText.setText("")
-//        }
-
-//        binding.sampleSizeEditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-//       //     binding.sampleSize1EditText.setText("")
-//       //     binding.sampleSize3EditText.setText("")
-//        }
-
-//        binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-//            binding.sampleSize1EditText.setText("")
-//            binding.sampleSize2EditText.setText("")
-//        }
-
         binding.saveButton.setOnClickListener {
-
-
             updateStudy()
         }
     }
@@ -174,21 +96,15 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
 
-
-        sharedViewModel.currentStudy?.value?.id?.let{ id->
-
-            val fields = DAO.fieldDAO.getFields(id)
-            val rules = DAO.ruleDAO.getRules(id)
-            val filters = DAO.filterDAO.getFilters(id)
-
-            createStudyAdapter.updateFieldsRulesFilters( fields, rules, filters )
+        sharedViewModel.currentStudy?.value?.let{ study->
+            createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
         }
     }
 
-    fun shouldAddField()
+    private fun shouldAddField()
     {
         val bundle = Bundle()
-        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+        sharedViewModel.createNewField()
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
@@ -201,6 +117,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
             }else
             {
+                sharedViewModel.createNewRule()
                 findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
             }
 
@@ -219,20 +136,18 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             {
                 findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
             }
-
         }
     }
 
-    fun didSelectField( field: Field )
+    private fun didSelectField( field: Field )
     {
         val bundle = Bundle()
-        bundle.putString( Keys.kField_uuid.toString(), field.uuid )
-        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+        sharedViewModel.setSelectedField(field)
 
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
-    fun didSelectRule( rule: Rule )
+    private fun didSelectRule( rule: Rule )
     {
         val bundle = Bundle()
         bundle.putString( Keys.kRule_uuid.toString(), rule.uuid )
@@ -241,7 +156,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
     }
 
-    fun didSelectFilter( filter: Filter )
+    private fun didSelectFilter( filter: Filter )
     {
         val bundle = Bundle()
         bundle.putString( Keys.kFilter_uuid.toString(), filter.uuid )

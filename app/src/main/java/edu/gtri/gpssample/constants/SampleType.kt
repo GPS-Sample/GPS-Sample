@@ -10,9 +10,7 @@ enum class SampleType(val format : String) {
 
 object SampleTypeConverter
 {
-    fun toArray() : Array<String>
-    {
-        return  Array(4){ i ->
+    val array : Array<String> = Array(4){ i ->
             when(i)
             {
                 0 -> SampleType.NumberHouseholds.format
@@ -20,8 +18,8 @@ object SampleTypeConverter
                 2 -> SampleType.PercentTotal.format
                 else -> String()
             }
-        }
     }
+
     fun toIndex(sampleType : SampleType) : Int
     {
         return when(sampleType)
@@ -32,6 +30,7 @@ object SampleTypeConverter
             else -> 0
         }
     }
+
     fun fromIndex( index : Int) : SampleType
     {
         return when(index)
@@ -39,6 +38,16 @@ object SampleTypeConverter
             1 -> SampleType.NumberHouseholds
             2 -> SampleType.PercentHouseholds
             3 -> SampleType.PercentTotal
+            else -> SampleType.None
+        }
+    }
+    fun fromString( type : String) : SampleType
+    {
+        return when(type)
+        {
+            SampleType.NumberHouseholds.format -> SampleType.NumberHouseholds
+            SampleType.PercentHouseholds.format -> SampleType.PercentHouseholds
+            SampleType.PercentTotal.format -> SampleType.PercentTotal
             else -> SampleType.None
         }
     }

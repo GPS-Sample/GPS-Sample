@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
-import edu.gtri.gpssample.constants.DateFormat
-import edu.gtri.gpssample.constants.DistanceFormat
-import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
 import kotlin.math.min
@@ -75,10 +73,15 @@ class ConfigDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
-        val distanceFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT))
-        val dateFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT))
-        val timeFormat = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT))
+        val distanceFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX))
+        val dateFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT_INDEX))
+        val timeFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX))
         val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
+
+        // TODO: these should be lookup tables
+        val distanceFormat = DistanceFormatConverter.fromIndex(distanceFormatIndex)
+        val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
+        val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
         return Config( id, uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
     }
@@ -134,10 +137,16 @@ class ConfigDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, config.uuid )
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
-        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat)
-        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat)
-        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat)
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
+
+        // TODO: these should be from lookup tables
+        val dateFormatIndex = DateFormatConverter.toIndex(config.dateFormat)
+        val timeFormatIndex = TimeFormatConverter.toIndex(config.timeFormat)
+        val distanceFormatIndex = DistanceFormatConverter.toIndex(config.distanceFormat)
+
+        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT_INDEX, dateFormatIndex)
+        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX, timeFormatIndex)
+        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX, distanceFormatIndex)
     }
 
     fun putConfigStudy(config: Config, study: Study, values: ContentValues )
@@ -145,12 +154,6 @@ class ConfigDAO(private var dao: DAO)
 
         values.put(DAO.COLUMN_CONFIG_ID, config.id)
         values.put(DAO.COLUMN_STUDY_ID, study.id)
-//        values.put( DAO.COLUMN_UUID, config.uuid )
-//        values.put( DAO.COLUMN_CONFIG_NAME, config.name )
-//        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT, config.dateFormat)
-//        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT, config.timeFormat)
-//        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT, config.distanceFormat)
-//        values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
     }
     //--------------------------------------------------------------------------
     fun updateConfig( config: Config )

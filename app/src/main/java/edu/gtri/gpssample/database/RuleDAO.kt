@@ -19,11 +19,11 @@ class RuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun putRule( rule: Rule, values: ContentValues )
+    private fun putRule( rule: Rule, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, rule.uuid )
-        values.put( DAO.COLUMN_RULE_STUDY_UUID, rule.study_uuid )
-        values.put( DAO.COLUMN_RULE_FIELD_UUID, rule.field_uuid )
+        values.put( DAO.COLUMN_STUDY_ID, rule.study_id )
+        values.put( DAO.COLUMN_FIELD_ID, rule.field_id )
         values.put( DAO.COLUMN_RULE_NAME, rule.name )
         values.put( DAO.COLUMN_RULE_OPERATOR, rule.operator )
         values.put( DAO.COLUMN_RULE_VALUE, rule.value )
@@ -82,13 +82,13 @@ class RuleDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_STUDY_UUID))
-        val field_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_FIELD_UUID))
+        val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_STUDY_UUID))
+        val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
         val operator = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_OPERATOR))
         val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
 
-        return Rule( id, uuid, study_uuid, field_uuid, name, operator, value )
+        return Rule( id, uuid, study_id, field_id, name, operator, value )
     }
 
     //--------------------------------------------------------------------------
@@ -143,14 +143,14 @@ class RuleDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteOrphans()
     {
-        val rules = getRules()
-
-        for (rule in rules)
-        {
-            if (DAO.studyDAO.doesNotExist( rule.study_uuid ) or DAO.fieldDAO.doesNotExist( rule.field_uuid ))
-            {
-                deleteRule( rule )
-            }
-        }
+//        val rules = getRules()
+//
+//        for (rule in rules)
+//        {
+//            if (DAO.studyDAO.doesNotExist( rule.study_uuid ) or DAO.fieldDAO.doesNotExist( rule.field_uuid ))
+//            {
+//                deleteRule( rule )
+//            }
+//        }
     }
 }

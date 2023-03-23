@@ -56,4 +56,17 @@ object FieldTypeConverter
             else -> FieldType.None
         }
     }
+
+    fun fromString( type : String) : FieldType
+    {
+        return when(type)
+        {
+            FieldType.Text.format -> FieldType.Text
+            FieldType.Number.format -> FieldType.Number
+            FieldType.Date.format -> FieldType.Date
+            FieldType.Checkbox.format -> FieldType.Checkbox
+            FieldType.Dropdown.format -> FieldType.Dropdown
+            else -> FieldType.None
+        }
+    }
 }

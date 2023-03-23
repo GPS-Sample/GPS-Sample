@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.database.models
 
 import edu.gtri.gpssample.constants.SampleType
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.network.models.NetworkCommand
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -13,18 +14,18 @@ data class Study(
     var uuid: String,
     var config_uuid: String,
     var name: String,
-    var samplingMethod: String,
+    var samplingMethod: SamplingMethod,
     var sampleSize: Int,
     var sampleType : SampleType,
     var fields : ArrayList<Field>,
     var rules : ArrayList<Rule>,
     var filters : ArrayList<Filter>)
 {
-    constructor(uuid: String, config_uuid: String, name: String, samplingMethod: String,
+    constructor(uuid: String, config_uuid: String, name: String, samplingMethod: SamplingMethod,
                 sampleSize: Int, sampleType: SampleType) : this(null, uuid, config_uuid,
                 name, samplingMethod, sampleSize, sampleType,
                 ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
-    constructor(id: Int, uuid: String, config_uuid: String, name: String, samplingMethod: String,
+    constructor(id: Int, uuid: String, config_uuid: String, name: String, samplingMethod: SamplingMethod,
                 sampleSize: Int, sampleType: SampleType) : this(id, uuid, config_uuid,
                 name, samplingMethod, sampleSize, sampleType,
                 ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
@@ -33,6 +34,13 @@ data class Study(
         return Json.encodeToString( this )
     }
 
+    val test : Array<String> = Array(1){i ->
+        when(i)
+        {
+            0 -> "BIG TEST"
+            else -> "else"
+        }
+    }
     companion object
     {
         fun unpack( message: String ) : Study

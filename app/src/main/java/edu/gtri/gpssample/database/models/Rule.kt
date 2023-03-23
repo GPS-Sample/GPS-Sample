@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.constants.Operator
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -9,14 +10,17 @@ import kotlinx.serialization.json.Json
 data class Rule(
     var id : Int? = null,
     var uuid: String,
-    var study_uuid: String,
-    var field_uuid: String,
+
+    // TODO: these aren't really necessary
+    var study_id: Int?,
+    var field_id: Int?,
+
     var name: String,
-    var operator: String,
+    var operator: Operator,
     var value: String)
 {
-    constructor(uuid: String, study_uuid: String, field_uuid: String, name: String, operator: String,
-                value: String) : this(null, uuid, study_uuid, field_uuid, name, operator, value)
+    constructor(uuid: String, study_id: Int?, field_id: Int?, name: String, operator: Operator,
+                value: String) : this(null, uuid, study_id, field_id, name, operator, value)
     fun pack() : String
     {
         return Json.encodeToString( this )

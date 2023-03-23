@@ -64,8 +64,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
 
         // get this from the view controller
-        //val configurations = DAO.configDAO.getConfigs()
-      //  manageConfigurationsAdapter.updateConfigurations(sharedViewModel.Configurations)
+         manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
     }
 
     private fun didSelectConfig( config: Config )

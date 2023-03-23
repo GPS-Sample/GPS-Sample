@@ -254,7 +254,7 @@
 
     <fragment
         android:id="@+id/CreateRuleFragment"
-        android:name="edu.gtri.gpssample.fragments.CreateRule.CreateRuleFragment"
+        android:name="edu.gtri.gpssample.fragments.createrule.CreateRuleFragment"
         tools:layout="@layout/fragment_create_rule">
     </fragment>
 

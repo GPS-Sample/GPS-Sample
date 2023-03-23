@@ -11,9 +11,9 @@ import kotlinx.serialization.json.Json
 data class Field(
     var id : Int? = null,
     var uuid: String,
-    var study_id: String,
+    var study_id: Int? = null,
     var name: String,
-    var type: String,
+    var type: FieldType,
     var pii: Boolean,
     var required: Boolean,
     var integerOnly: Boolean,
@@ -24,7 +24,7 @@ data class Field(
     var option3: String,
     var option4: String )
 {
-    constructor(uuid: String, study_id: String, name: String, type: String, pii: Boolean, required: Boolean,
+    constructor(uuid: String, study_id: Int?, name: String, type: FieldType, pii: Boolean, required: Boolean,
                 integerOnly: Boolean, date: Boolean, time: Boolean, option1: String, option2: String,
                 option3: String, option4: String ) : this(null, uuid, study_id, name, type,
                 pii, required, integerOnly, date, time, option1, option2, option3, option4)
@@ -34,6 +34,9 @@ data class Field(
         return Json.encodeToString( this )
     }
 
+    override fun toString(): String {
+        return name
+    }
     companion object
     {
         fun unpack( message: String ) : Field

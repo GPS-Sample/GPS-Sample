@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -21,9 +20,8 @@ import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.SelectRuleDialog
-import edu.gtri.gpssample.fragments.CreateRule.CreateRuleViewModel
+import edu.gtri.gpssample.fragments.createrule.CreateRuleViewModel
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
-import java.util.*
 
 class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {

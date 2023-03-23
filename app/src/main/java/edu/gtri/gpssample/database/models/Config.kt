@@ -24,19 +24,19 @@ data class Config(
     var id : Int? = null,
     var uuid: String,
     var name: String,
-    var dateFormat: String,
-    var timeFormat: String,
-    var distanceFormat: String,
+    var dateFormat: DateFormat,
+    var timeFormat: TimeFormat,
+    var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
     var currentStudy : Study?,
     var studies : ArrayList<Study>,
     var enumAreas : List<EnumArea>?
     ) : java.io.Serializable {
-    constructor(uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
-        minGpsPrecision: Int) : this(null, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
+    constructor(uuid: String, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+        minGpsPrecision: Int) : this(null, uuid, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
                                     null,ArrayList<Study>(), null)
-    constructor(id: Int?, uuid: String, name: String, dateFormat: String, imeFormat: String, distanceFormat: String,
-                minGpsPrecision: Int) : this(id, uuid, name, dateFormat, imeFormat, distanceFormat, minGpsPrecision,
+    constructor(id: Int?, uuid: String, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+                minGpsPrecision: Int) : this(id, uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
                 null,ArrayList<Study>(), null)
 
     var minimumGPSPrecision : String

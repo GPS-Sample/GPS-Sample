@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.CreateRule
+package edu.gtri.gpssample.fragments.createrule
 
 import android.os.Bundle
 import android.text.InputType
@@ -7,9 +7,9 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
@@ -20,22 +20,23 @@ import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import java.util.UUID
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var rule: Rule? = null
     private lateinit var study_uuid: String
-    private lateinit var viewModel: CreateRuleViewModel
 
     private var firstLaunch = true
     private var _binding: FragmentCreateRuleBinding? = null
     private val binding get() = _binding!!
+    private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CreateRuleViewModel::class.java)
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -48,7 +49,17 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            // Specify the fragment as the lifecycle owner
+            lifecycleOwner = viewLifecycleOwner
 
+            // Assign the view model to a property in the binding class
+            viewModel = sharedViewModel
+
+            // Assign the fragment
+            createFieldFragment = this@CreateRuleFragment
+            this.executePendingBindings()
+        }
         if (arguments == null)
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
@@ -72,60 +83,56 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 //            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id $study_uuid not found.", Toast.LENGTH_SHORT).show()
 //            return
 //        }
-
-        val rule_uuid = arguments!!.getString( Keys.kRule_uuid.toString(), "");
-
-        if (rule_uuid.isNotEmpty())
-        {
-            rule = DAO.ruleDAO.getRule( rule_uuid )
-
-            // TODO: Null Check
-        }
+//
+//        val rule_uuid = arguments!!.getString( Keys.kRule_uuid.toString(), "");
+//
+//        if (rule_uuid.isNotEmpty())
+//        {
+//            rule = DAO.ruleDAO.getRule( rule_uuid )
+//
+//            // TODO: Null Check
+//        }
 
         //val fields = DAO.fieldDAO.getFields( study_uuid )
 
-        val fieldNames = ArrayList<String>()
+//        val fieldNames = ArrayList<String>()
 
 //        for (field in fields)
 //        {
 //            fieldNames.add( field.name )
 //        }
 
-        binding.fieldSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_list_item_1, fieldNames )
+       // binding.fieldSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_list_item_1, fieldNames )
 
-        ArrayAdapter.createFromResource(activity!!, R.array.operators, android.R.layout.simple_spinner_item)
-            .also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.operatorSpinner.adapter = adapter
-            }
 
-        if (rule != null)
-        {
-            setHasOptionsMenu( true )
 
-            binding.nameEditText.setText( rule!!.name )
-            binding.valueEditText.setText( rule!!.value )
-
-//            for (i in fields.indices)
-//            {
-//                if (rule!!.field_uuid == fields[i].uuid)
-//                {
-//                    binding.fieldSpinner.setSelection(i)
-//                    break
-//                }
-//            }
-
-            val operators = resources.getStringArray(R.array.operators)
-
-            for (i in operators.indices)
-            {
-                if (rule!!.operator == operators[i])
-                {
-                    binding.operatorSpinner.setSelection(i)
-                    break
-                }
-            }
-        }
+//        if (rule != null)
+//        {
+//            setHasOptionsMenu( true )
+//
+//            binding.nameEditText.setText( rule!!.name )
+//            binding.valueEditText.setText( rule!!.value )
+//
+////            for (i in fields.indices)
+////            {
+////                if (rule!!.field_uuid == fields[i].uuid)
+////                {
+////                    binding.fieldSpinner.setSelection(i)
+////                    break
+////                }
+////            }
+//
+////            val operators = resources.getStringArray(R.array.operators)
+////
+////            for (i in operators.indices)
+////            {
+////                if (rule!!.operator == operators[i])
+////                {
+////                    binding.operatorSpinner.setSelection(i)
+////                    break
+////                }
+////            }
+//        }
 
         binding.fieldSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
@@ -198,7 +205,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 
     fun setKeyboardInputType( field: Field)
     {
-        if (field.type == FieldType.Number.toString())
+        if (field.type == FieldType.Number)
         {
             if (field.integerOnly)
             {

@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.CreateRule
+package edu.gtri.gpssample.fragments.createrule
 
 import androidx.lifecycle.ViewModel
 

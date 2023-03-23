@@ -6,6 +6,9 @@ import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SampleTypeConverter
+import edu.gtri.gpssample.constants.SamplingMethod
+import edu.gtri.gpssample.constants.SamplingMethodConverter
+import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Study
 
@@ -17,8 +20,15 @@ class StudyDAO(private var dao: DAO)
         val values = ContentValues()
 
         putStudy( study, values )
+        val id = dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
+        for(field in study.fields)
+        {
+            // add the study id to the field
+            field.id = id
+            DAO.fieldDAO.createField(field)
+        }
 
-        return dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
+        return id
     }
 
     //--------------------------------------------------------------------------
@@ -27,12 +37,14 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, study.uuid )
         values.put( DAO.COLUMN_STUDY_CONFIG_UUID, study.config_uuid )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
-        values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD, study.samplingMethod )
+
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
 
         // convert enum to int.  Maybe not do this and have look up tables?
-        val index = SampleTypeConverter.toIndex(study.sampleType)
+        var index = SampleTypeConverter.toIndex(study.sampleType)
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX, index)
+        index = SamplingMethodConverter.toIndex(study.samplingMethod)
+        values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX, index )
     }
 
     //--------------------------------------------------------------------------
@@ -46,6 +58,14 @@ class StudyDAO(private var dao: DAO)
         putStudy( study, values )
 
         db.update(DAO.TABLE_STUDY, values, whereClause, args )
+
+        for(field in study.fields)
+        {
+            // add the study id to the field
+            field.id = study.id
+            DAO.fieldDAO.updateField(field)
+        }
+
         db.close()
     }
 
@@ -74,6 +94,9 @@ class StudyDAO(private var dao: DAO)
             cursor.moveToNext()
 
             study = createStudy( cursor )
+            // now get fields
+            study.fields = DAO.fieldDAO.getFields() as ArrayList<Field>
+            Log.d("xxxx ", "")
         }
 
         cursor.close()
@@ -90,12 +113,13 @@ class StudyDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_UUID}"))
         val config_uuid = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_CONFIG_UUID}"))
         val name = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_NAME}"))
-        val samplingMethod = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD}"))
+        val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX}"))
         val sampleSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE}"))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX}"))
 
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
+        val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
         return Study( id, uuid, config_uuid, name, samplingMethod, sampleSize, sampleType )
     }
 
@@ -127,12 +151,13 @@ class StudyDAO(private var dao: DAO)
                     "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_ID} = conn.${DAO.COLUMN_STUDY_ID} and "  +
                     "conn.${DAO.COLUMN_CONFIG_ID} = $config_id"
 
-
         var cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            studies.add( createStudy( cursor ))
+            val study = createStudy( cursor )
+            studies.add( study )
+            study.fields = DAO.fieldDAO.getFields() as ArrayList<Field>
         }
         cursor.close()
         db.close()

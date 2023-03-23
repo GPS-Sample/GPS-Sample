@@ -28,9 +28,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
-                COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
-                COLUMN_CONFIG_TIME_FORMAT + " TEXT" + "," +
-                COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT" + "," +
+
+                // this needs to be a look up table
+                COLUMN_CONFIG_DATE_FORMAT_INDEX + " INTEGER" + "," +
+                COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
+                COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
+
                 COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" +
                 ")")
         db.execSQL(createTableConfig)
@@ -46,7 +49,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
 
                 // this needs to be a look up table
-                COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
+                COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
                 COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
 
                 // this needs to be a look up table
@@ -72,11 +75,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_FIELD_NAME + " TEXT" + "," +
 
                 COLUMN_STUDY_ID + " INTEGER" + "," +
-                // this needs to be a foreign key
-                COLUMN_FIELD_STUDY_UUID + " TEXT" + "," +
 
                 // should be look up table
-                COLUMN_FIELD_TYPE + " TEXT" + "," +
+                COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
                 COLUMN_FIELD_PII + " BOOLEAN" + "," +
                 COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
                 COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN" + "," +
@@ -260,6 +261,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // foreign key columns
         const val COLUMN_CONFIG_ID = "config_id"
         const val COLUMN_STUDY_ID = "study_id"
+        const val COLUMN_FIELD_ID = "study_id"
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
         const val COLUMN_TEAM_ID = "team_id"
 
@@ -278,9 +280,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Config Table
         const val TABLE_CONFIG = "config"
         const val COLUMN_CONFIG_NAME = "config_name"
-        const val COLUMN_CONFIG_DISTANCE_FORMAT = "config_distance_format"
-        const val COLUMN_CONFIG_DATE_FORMAT = "config_date_format"
-        const val COLUMN_CONFIG_TIME_FORMAT = "config_time_format"
+        const val COLUMN_CONFIG_DISTANCE_FORMAT_INDEX = "config_distance_format_index"
+        const val COLUMN_CONFIG_DATE_FORMAT_INDEX = "config_date_format_index"
+        const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
         const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
 
         // Study Table
@@ -288,7 +290,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_STUDY_NAME = "study_name"
 
         const val COLUMN_STUDY_CONFIG_UUID = "study_config_id"
-        const val COLUMN_STUDY_SAMPLING_METHOD = "study_sampling_method"
+        const val COLUMN_STUDY_SAMPLING_METHOD_INDEX = "study_sampling_method_index"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
 
@@ -296,7 +298,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_FIELD = "field"
         const val COLUMN_FIELD_NAME = "field_name"
         const val COLUMN_FIELD_STUDY_UUID = "field_study_id"
-        const val COLUMN_FIELD_TYPE = "field_type"
+        const val COLUMN_FIELD_TYPE_INDEX = "field_type_index"
         const val COLUMN_FIELD_PII = "field_pii"
         const val COLUMN_FIELD_REQUIRED = "field_required"
         const val COLUMN_FIELD_INTEGER_ONLY = "field_integer_only"
@@ -419,6 +421,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 64
+        private const val DATABASE_VERSION = 67
     }
 }
