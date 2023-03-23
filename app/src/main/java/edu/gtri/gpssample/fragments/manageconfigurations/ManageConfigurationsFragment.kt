@@ -52,13 +52,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         binding.recyclerView.adapter = manageConfigurationsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.quickStartButton.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putBoolean( Keys.kQuickStart.toString(), true )
-            sharedViewModel.createNewConfiguration()
-            findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
-        }
-
         binding.addButton.setOnClickListener {
             sharedViewModel.createNewConfiguration()
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
@@ -72,26 +65,23 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         // get this from the view controller
         //val configurations = DAO.configDAO.getConfigs()
-        manageConfigurationsAdapter.updateConfigurations(sharedViewModel.Configurations)
+      //  manageConfigurationsAdapter.updateConfigurations(sharedViewModel.Configurations)
     }
 
-    fun didSelectConfig( config: Config )
+    private fun didSelectConfig( config: Config )
     {
         val bundle = Bundle()
         sharedViewModel.setCurrentConfig(config)
         findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
-//        bundle.putSerializable("currentConfig", config)
-//        bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
-//        findNavController().navigate( R.id.action_navigate_to_ManageStudiesFragment, bundle )
     }
 
-    fun shouldDeleteConfig( config: Config )
+    private fun shouldDeleteConfig( config: Config )
     {
         selectedConfig = config
         ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
     }
 
-    fun shouldEditConfig(config: Config)
+    private fun shouldEditConfig(config: Config)
     {
         val bundle = Bundle()
         sharedViewModel.setCurrentConfig(config)
@@ -106,7 +96,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         selectedConfig?.let {
             sharedViewModel.deleteConfig(it)
-            manageConfigurationsAdapter.updateConfigurations( sharedViewModel.Configurations)
+          //  manageConfigurationsAdapter.updateConfigurations( sharedViewModel.Configurations)
         }
     }
 

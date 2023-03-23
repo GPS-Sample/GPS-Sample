@@ -143,19 +143,22 @@ class StudyDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteStudy( study: Study )
     {
-        val fields = DAO.fieldDAO.getFields( study.uuid )
+        study.id?.let{ id ->
+            val fields = DAO.fieldDAO.getFields( id )
 
-        for (field in fields)
-        {
-            DAO.fieldDAO.deleteField( field )
+            for (field in fields)
+            {
+                DAO.fieldDAO.deleteField( field )
+            }
+
+            val db = dao.writableDatabase
+            val whereClause = "${DAO.COLUMN_UUID} = ?"
+            val args = arrayOf(study.uuid.toString())
+
+            db.delete(DAO.TABLE_STUDY, whereClause, args)
+            db.close()
         }
 
-        val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(study.uuid.toString())
-
-        db.delete(DAO.TABLE_STUDY, whereClause, args)
-        db.close()
     }
 
     //--------------------------------------------------------------------------

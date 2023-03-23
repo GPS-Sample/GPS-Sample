@@ -106,7 +106,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
 
         if (!this::filter.isInitialized)
         {
-            filter = Filter( UUID.randomUUID().toString(), study_uuid, "", -1, 0 )
+            //filter = Filter( UUID.randomUUID().toString(), study_uuid, "", -1, 0 )
         }
         else
         {
@@ -135,7 +135,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
-            SelectRuleDialog( activity!!, study_uuid, filter!!.uuid, null, this )
+           // SelectRuleDialog( activity!!, study_uuid, filter!!.uuid, null, this )
         }
 
         binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
@@ -165,13 +165,13 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
                 return@setOnClickListener
             }
 
-            val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+            //val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
 
-            if (filterRules.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "You must add at least one rule", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+//            if (filterRules.isEmpty())
+//            {
+//                Toast.makeText(activity!!.applicationContext, "You must add at least one rule", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
 
             if (sampleSizeIsVisible)
             {
@@ -220,15 +220,15 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFilterFragment.value.toString() + ": " + this.javaClass.simpleName
-        val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-        createFilterAdapter.updateFilterRules(filterRules)
+        //val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+       // createFilterAdapter.updateFilterRules(filterRules)
     }
 
     private var selectedFilterRule: FilterRule? = null
 
     fun shouldEditFilterRule( filterRule: FilterRule )
     {
-        SelectRuleDialog( activity!!, study_uuid, filter.uuid, filterRule,this )
+       // SelectRuleDialog( activity!!, study_uuid, filter.uuid, filterRule,this )
     }
 
     fun shouldDeleteFilterRule( filterRule: FilterRule )
@@ -245,16 +245,16 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     {
         selectedFilterRule?.let {
             DAO.filterRuleDAO.deleteFilterRule( it )
-            val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-            createFilterAdapter.updateFilterRules( filterRules )
+           // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+           // createFilterAdapter.updateFilterRules( filterRules )
         }
     }
 
     override fun didDismissSelectRuleDialog()
     {
-        val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+       // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
 
-        createFilterAdapter.updateFilterRules( filterRules )
+      //  createFilterAdapter.updateFilterRules( filterRules )
     }
 
     override fun onDestroyView()

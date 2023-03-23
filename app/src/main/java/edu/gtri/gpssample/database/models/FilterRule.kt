@@ -9,13 +9,13 @@ import kotlinx.serialization.json.Json
 data class FilterRule(
     var id : Int? = null,
     var uuid: String,
-    var study_uuid: String,
+    var study_id: Int,
     var filter_uuid: String,
     var rule_uuid: String,
     var connector: String)
 {
-    constructor(uuid: String, study_uuid: String, filter_uuid: String,
-                rule_uuid: String, connector: String) : this(null, uuid, study_uuid, filter_uuid,
+    constructor(uuid: String, study_id: Int, filter_uuid: String,
+                rule_uuid: String, connector: String) : this(null, uuid, study_id, filter_uuid,
                 rule_uuid, connector)
     fun pack() : String
     {

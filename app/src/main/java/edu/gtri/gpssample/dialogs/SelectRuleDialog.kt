@@ -26,7 +26,7 @@ class SelectRuleDialog
     {
     }
 
-    constructor(context: Context, study_uuid: String, filter_uuid: String, filterRule: FilterRule?, delegate: SelectRuleDialogDelegate )
+    constructor(context: Context, study_id: Int, filter_uuid: String, filterRule: FilterRule?, delegate: SelectRuleDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -40,7 +40,7 @@ class SelectRuleDialog
         alertDialog.setCancelable(false)
         alertDialog.show()
 
-        val rules = DAO.ruleDAO.getRules( study_uuid )
+        val rules = DAO.ruleDAO.getRules( study_id )
 
         val ruleNames = ArrayList<String>()
 
@@ -49,7 +49,7 @@ class SelectRuleDialog
             ruleNames.add( rule.name )
         }
 
-        val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter_uuid )
+        val filterRules = DAO.filterRuleDAO.getFilterRules( study_id, filter_uuid )
 
         val connectorTextView = view!!.findViewById<TextView>(R.id.connector_text_view)
         val connectorFrameLayout = view!!.findViewById<FrameLayout>(R.id.connector_frame_layout)
@@ -111,7 +111,7 @@ class SelectRuleDialog
             }
             else
             {
-                val filterRule = FilterRule( null, UUID.randomUUID().toString(), study_uuid, filter_uuid, rule.uuid, connector )
+                val filterRule = FilterRule( null, UUID.randomUUID().toString(), study_id, filter_uuid, rule.uuid, connector )
                 DAO.filterRuleDAO.createFilterRule( filterRule )
             }
 

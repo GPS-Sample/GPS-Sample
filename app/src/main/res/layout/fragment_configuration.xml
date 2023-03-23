@@ -87,7 +87,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:textSize="17sp"
-                    android:text="@{viewModel.currentConfigurationDistanceFormat}" />
+                    android:text="@{viewModel.currentConfigurationDateFormat}" />
 
                 <TextView
                     android:layout_width="match_parent"

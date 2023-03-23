@@ -290,14 +290,14 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 val study = studies[0]
                 study_uuid = study.uuid
 
-                val fields = DAO.fieldDAO.getFields(study.uuid)
-                binding.fieldsCheckBox.isChecked = fields.isNotEmpty()
+//                val fields = DAO.fieldDAO.getFields(study.uuid)
+//                binding.fieldsCheckBox.isChecked = fields.isNotEmpty()
+//
+//                val rules = DAO.ruleDAO.getRules(study.uuid)
+//                binding.rulesCheckBox.isChecked = rules.isNotEmpty()
 
-                val rules = DAO.ruleDAO.getRules(study.uuid)
-                binding.rulesCheckBox.isChecked = rules.isNotEmpty()
-
-                val filters = DAO.filterDAO.getFilters(study.uuid)
-                binding.filtersCheckBox.isChecked = filters.isNotEmpty()
+            //    val filters = DAO.filterDAO.getFilters(study.uuid)
+             //   binding.filtersCheckBox.isChecked = filters.isNotEmpty()
 
                 val enumAreas = DAO.enumAreaDAO.getEnumAreas(config.uuid)
 

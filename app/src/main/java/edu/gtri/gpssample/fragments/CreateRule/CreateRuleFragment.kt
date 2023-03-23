@@ -82,14 +82,14 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             // TODO: Null Check
         }
 
-        val fields = DAO.fieldDAO.getFields( study_uuid )
+        //val fields = DAO.fieldDAO.getFields( study_uuid )
 
         val fieldNames = ArrayList<String>()
 
-        for (field in fields)
-        {
-            fieldNames.add( field.name )
-        }
+//        for (field in fields)
+//        {
+//            fieldNames.add( field.name )
+//        }
 
         binding.fieldSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_list_item_1, fieldNames )
 
@@ -106,14 +106,14 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             binding.nameEditText.setText( rule!!.name )
             binding.valueEditText.setText( rule!!.value )
 
-            for (i in fields.indices)
-            {
-                if (rule!!.field_uuid == fields[i].uuid)
-                {
-                    binding.fieldSpinner.setSelection(i)
-                    break
-                }
-            }
+//            for (i in fields.indices)
+//            {
+//                if (rule!!.field_uuid == fields[i].uuid)
+//                {
+//                    binding.fieldSpinner.setSelection(i)
+//                    break
+//                }
+//            }
 
             val operators = resources.getStringArray(R.array.operators)
 
@@ -140,7 +140,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
                     binding.valueEditText.setText("")
                 }
 
-                setKeyboardInputType( fields[position] )
+                //setKeyboardInputType( fields[position] )
             }
 
             override fun onNothingSelected(parent: AdapterView<*>)
@@ -169,22 +169,22 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
                 return@setOnClickListener
             }
 
-            val field = fields[binding.fieldSpinner.selectedItemPosition]
+         //   val field = fields[binding.fieldSpinner.selectedItemPosition]
 
-            val operator = binding.operatorSpinner.selectedItem as String
-
-            if (rule == null)
-            {
-                rule = Rule( UUID.randomUUID().toString(), study_uuid, field.uuid, name, operator, value )
-                DAO.ruleDAO.createRule( rule!! )
-            }
-
-            rule!!.name = name
-            rule!!.field_uuid = field.uuid
-            rule!!.operator = operator
-            rule!!.value = value
-
-            DAO.ruleDAO.updateRule( rule!! )
+//            val operator = binding.operatorSpinner.selectedItem as String
+//
+//            if (rule == null)
+//            {
+//                rule = Rule( UUID.randomUUID().toString(), study_uuid, field.uuid, name, operator, value )
+//                DAO.ruleDAO.createRule( rule!! )
+//            }
+//
+//            rule!!.name = name
+//            rule!!.field_uuid = field.uuid
+//            rule!!.operator = operator
+//            rule!!.value = value
+//
+//            DAO.ruleDAO.updateRule( rule!! )
 
             findNavController().popBackStack()
         }

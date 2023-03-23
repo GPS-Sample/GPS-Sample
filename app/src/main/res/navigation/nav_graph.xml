@@ -246,7 +246,7 @@
 
     <fragment
         android:id="@+id/CreateFieldFragment"
-        android:name="edu.gtri.gpssample.fragments.CreateField.CreateFieldFragment"
+        android:name="edu.gtri.gpssample.fragments.createfield.CreateFieldFragment"
         tools:layout="@layout/fragment_create_field">
     </fragment>
 

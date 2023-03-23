@@ -76,7 +76,7 @@
                         android:id="@+id/distance_format_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:entries="@{viewModel.DistanceFormats}"
+                        android:entries="@{viewModel.distanceFormats}"
                         android:selectedItemPosition="@={viewModel.distanceFormatPosition}"
                         android:onItemSelected="@{viewModel::onDistanceFormatSelected}"
                         />
@@ -103,7 +103,7 @@
                         android:id="@+id/date_format_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:entries="@{viewModel.DateFormats}"
+                        android:entries="@{viewModel.dateFormats}"
                         android:selectedItemPosition="@={viewModel.dateFormatPosition}"
                         android:onItemSelected="@{viewModel::onDateFormatSelected}"
                         />
@@ -130,7 +130,7 @@
                         android:id="@+id/time_format_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:entries="@{viewModel.TimeFormats}"
+                        android:entries="@{viewModel.timeFormats}"
                         android:selectedItemPosition="@={viewModel.timeFormatPosition}"
                         android:onItemSelected="@{viewModel::onTimeFormatSelected}"/>
                 </FrameLayout>

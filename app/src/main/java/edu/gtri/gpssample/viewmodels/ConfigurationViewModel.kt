@@ -1,4 +1,5 @@
 package edu.gtri.gpssample.viewmodels
+
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -6,28 +7,40 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
+
 import java.util.*
 import kotlin.collections.ArrayList
 import edu.gtri.gpssample.R
+
 import edu.gtri.gpssample.constants.*
+
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.Filter
+import edu.gtri.gpssample.database.models.FilterRule
 
 class ConfigurationViewModel : ViewModel()
 {
     private val unavailable = "Unavailable"
-    private var configurations : ArrayList<Config> = ArrayList()
-    private var _currentConfiguration : MutableLiveData<Config>? = null
+    private var _configurations : ArrayList<Config> = ArrayList()
+
     private var _distanceFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _timeFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _dateFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _samplingMethodPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _samplingTypePosition : MutableLiveData<Int> = MutableLiveData(0)
+    private var _fieldTypePosition : MutableLiveData<Int> = MutableLiveData(0)
 
+    // live data for each screen being controlled by the view model
+    private var _currentConfiguration : MutableLiveData<Config>? = null
     private var _currentStudy : MutableLiveData<Study>? = null
+    private var _currentField : MutableLiveData<Field>? = null
+    private var _currentFilter : MutableLiveData<Filter>? = null
+    private var _currentFilterRule : MutableLiveData<FilterRule>? = null
 
-    private var distanceFormats : Array<String> = Array(2){ i ->
+    private var _distanceFormats : Array<String> = Array(2){ i ->
         when(i)
         {
             0 -> DistanceFormat.Meters.format
@@ -36,7 +49,7 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
-    private var dateFormats : Array<String> = Array(3){ i ->
+    private var _dateFormats : Array<String> = Array(3){ i ->
         when(i)
         {
             0 -> DateFormat.MonthDayYear.format
@@ -46,7 +59,7 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
-    private var timeFormats : Array<String> = Array(2){ i ->
+    private var _timeFormats : Array<String> = Array(2){ i ->
         when(i)
         {
             0 -> TimeFormat.twelveHour.format;
@@ -55,7 +68,7 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
-    private var samplingMethods : Array<String> = Array(4){ i ->
+    private var _samplingMethods : Array<String> = Array(4){ i ->
         when(i)
         {
             0 -> SamplingMethod.SimpleRandom.format
@@ -66,7 +79,7 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
-    private var samplingTypes : Array<String> = Array(4){ i ->
+    private var _samplingTypes : Array<String> = Array(4){ i ->
         when(i)
         {
             0 -> SampleType.NumberHouseholds.format
@@ -76,26 +89,33 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
-    val DistanceFormats : Array<String>
-        get() = distanceFormats
-
-    val TimeFormats : Array<String>
-        get() = timeFormats
-
-    val DateFormats : Array<String>
-        get() = dateFormats
-
-    val Configurations : ArrayList<Config>
-        get() = configurations
-
-    val SamplingMethods : Array<String>
-        get() = samplingMethods
-
-    val SampleTypes : Array<String>
-        get() = samplingTypes
-
-    var currentConfiguration : LiveData<Config>? = _currentConfiguration
+    // Exposed LiveData each screen being controlled by the view model
+    var currentConfiguration : LiveData<Config>? =_currentConfiguration
     var currentStudy : LiveData<Study>? = _currentStudy
+    var currentField : LiveData<Field>? = _currentField
+    var currentFilter : LiveData<Filter>? = _currentFilter
+    var currentFilterRule : LiveData<FilterRule>? = _currentFilterRule
+
+    val distanceFormats : Array<String>
+        get() = _distanceFormats
+
+    val timeFormats : Array<String>
+        get() = _timeFormats
+
+    val dateFormats : Array<String>
+        get() = _dateFormats
+
+    val configurations : ArrayList<Config>
+        get() = _configurations
+
+    val samplingMethods : Array<String>
+        get() = _samplingMethods
+
+    val sampleTypes : Array<String>
+        get() = SampleTypeConverter.toArray()
+
+    val fieldTypes : Array<String>
+        get() = FieldTypeConverter.array
 
     val distanceFormatPosition : MutableLiveData<Int>
         get() = _distanceFormatPosition
@@ -110,6 +130,8 @@ class ConfigurationViewModel : ViewModel()
     val samplingTypePosition : MutableLiveData<Int>
         get() = _samplingTypePosition
 
+    val fieldTypePosition : MutableLiveData<Int>
+        get() = _fieldTypePosition
 
     val currentConfigurationTimeFormat : String
         get(){
@@ -138,7 +160,7 @@ class ConfigurationViewModel : ViewModel()
             currentStudy?.value?.let{study ->
                 return study.sampleSize.toString()
             }
-            return "0"
+            return ""
         }
         set(value){
             currentStudy?.value?.let{study ->
@@ -221,9 +243,9 @@ class ConfigurationViewModel : ViewModel()
 
     fun onSampleTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        if(position > samplingTypes.size)
+        if(position > _samplingTypes.size)
         {
-            val format : String = samplingTypes[position]
+            val format : String = _samplingTypes[position]
             var sampleType = ""
 
             when(format){
@@ -239,6 +261,7 @@ class ConfigurationViewModel : ViewModel()
 
     }
 
+    // Configuration
     fun initializeConfigurations()
     {
         configurations.clear()
@@ -286,6 +309,7 @@ class ConfigurationViewModel : ViewModel()
 
     }
 
+    // Study
     fun createNewStudy()
     {
         val newStudy = Study(UUID.randomUUID().toString(),"","","",0, SampleType.None,)
@@ -319,10 +343,39 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
+    // Enumerations
     fun addEnumerationAreas(enumAreas : List<EnumArea>? )
     {
         currentConfiguration?.value?.let{config ->
             config.enumAreas = enumAreas
+        }
+    }
+
+    // Fields
+    fun createNewField()
+    {
+        val newField = Field( UUID.randomUUID().toString(), "", "", "", false, false, false, false, false, "", "", "", "" )
+        _currentField = MutableLiveData(newField)
+        currentField = _currentField
+    }
+
+    fun onFieldTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        if(position > FieldTypeConverter.array.size)
+        {
+            val format : String = FieldTypeConverter.array[position]
+            var fieldType = ""
+
+            when(format){
+                FieldType.Text.format -> fieldType = FieldType.Text.toString()
+                FieldType.Number.format -> fieldType = FieldType.Number.toString()
+                FieldType.Date.format -> fieldType = FieldType.Date.toString()
+                FieldType.Checkbox.format -> fieldType = FieldType.Date.toString()
+                FieldType.Dropdown.format -> fieldType = FieldType.Date.toString()
+            }
+            _currentField?.value?.let {
+                it.type = fieldType
+            }
         }
     }
 
@@ -354,4 +407,6 @@ class ConfigurationViewModel : ViewModel()
             else -> unavailable
         }
     }
+
+
 }

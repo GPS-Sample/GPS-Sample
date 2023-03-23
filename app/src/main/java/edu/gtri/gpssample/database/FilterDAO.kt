@@ -23,7 +23,7 @@ class FilterDAO(private var dao: DAO)
     fun putFilter( filter: Filter, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, filter.uuid )
-        values.put( DAO.COLUMN_FILTER_STUDY_UUID, filter.study_uuid )
+        values.put( DAO.COLUMN_FILTER_STUDY_UUID, filter.study_id )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE_INDEX, filter.sampleSizeIndex )
@@ -82,20 +82,20 @@ class FilterDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_STUDY_UUID))
+        val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE_INDEX))
 
-        return Filter( id, uuid, study_uuid, name, sampleSize, sampleSizeIndex )
+        return Filter( id, uuid, study_id, name, sampleSize, sampleSizeIndex )
     }
 
     //--------------------------------------------------------------------------
-    fun getFilters( study_uuid: String ): List<Filter>
+    fun getFilters( study_id: Int ): List<Filter>
     {
         val filters = ArrayList<Filter>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_FILTER_STUDY_UUID} = '$study_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_FILTER_STUDY_UUID} = '$study_id'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -142,14 +142,14 @@ class FilterDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteOrphans()
     {
-        val filters = getFilters()
-
-        for (filter in filters)
-        {
-            if (DAO.studyDAO.doesNotExist( filter.study_uuid ))
-            {
-                deleteFilter( filter )
-            }
-        }
+//        val filters = getFilters()
+//
+//        for (filter in filters)
+//        {
+//            if (DAO.studyDAO.doesNotExist( filter.study_uuid ))
+//            {
+//                deleteFilter( filter )
+//            }
+//        }
     }
 }

@@ -92,11 +92,11 @@ class RuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getRules( study_uuid: String ): List<Rule>
+    fun getRules( study_id: Int ): List<Rule>
     {
         val rules = ArrayList<Rule>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_RULE_STUDY_UUID} = '$study_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_STUDY_ID} = '$study_id'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())

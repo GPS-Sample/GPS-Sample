@@ -65,7 +65,7 @@
                 android:id="@+id/sampling_method_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:entries="@{viewModel.SamplingMethods}"
+                android:entries="@{viewModel.samplingMethods}"
                 android:selectedItemPosition="@={viewModel.samplingMethodPosition}"
                 android:onItemSelected="@{viewModel::onSamplingMethodSelected}"
                 android:contentDescription="Sampling Method"/>

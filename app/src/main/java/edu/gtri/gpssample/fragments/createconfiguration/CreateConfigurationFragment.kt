@@ -38,6 +38,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     private lateinit var createStudyAdapter: CreateStudyAdapter
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
     private var selectedStudy: Study? = null
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)

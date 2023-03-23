@@ -24,7 +24,7 @@ class FieldDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, field.uuid )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
-        values.put( DAO.COLUMN_FIELD_STUDY_UUID, field.study_uuid )
+        values.put( DAO.COLUMN_STUDY_ID, field.study_id )
         values.put( DAO.COLUMN_FIELD_TYPE, field.type )
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
         values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
@@ -107,11 +107,11 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFields( study_uuid: String ): List<Field>
+    fun getFields( study_id : Int ): List<Field>
     {
         val fields = ArrayList<Field>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_FIELD_STUDY_UUID} = '$study_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_STUDY_ID} = '$study_id'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -158,14 +158,14 @@ class FieldDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteOrphans()
     {
-        val fields = getFields()
-
-        for (field in fields)
-        {
-            if (DAO.studyDAO.doesNotExist( field.study_uuid ))
-            {
-                deleteField( field )
-            }
-        }
+//        val fields = getFields()
+//
+//        for (field in fields)
+//        {
+//            if (DAO.studyDAO.doesNotExist( field.study_uuid ))
+//            {
+//                deleteField( field )
+//            }
+//        }
     }
 }

@@ -16,9 +16,9 @@ data class Study(
     var samplingMethod: String,
     var sampleSize: Int,
     var sampleType : SampleType,
-    var fields : List<Field>,
-    var rules : List<Rule>,
-    var filters : List<Filter>)
+    var fields : ArrayList<Field>,
+    var rules : ArrayList<Rule>,
+    var filters : ArrayList<Filter>)
 {
     constructor(uuid: String, config_uuid: String, name: String, samplingMethod: String,
                 sampleSize: Int, sampleType: SampleType) : this(null, uuid, config_uuid,

@@ -174,11 +174,12 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        if (this::study.isInitialized)
-        {
-            val fields = DAO.fieldDAO.getFields(study.uuid)
-            val rules = DAO.ruleDAO.getRules(study.uuid)
-            val filters = DAO.filterDAO.getFilters(study.uuid)
+
+        sharedViewModel.currentStudy?.value?.id?.let{ id->
+
+            val fields = DAO.fieldDAO.getFields(id)
+            val rules = DAO.ruleDAO.getRules(id)
+            val filters = DAO.filterDAO.getFilters(id)
 
             createStudyAdapter.updateFieldsRulesFilters( fields, rules, filters )
         }
@@ -191,36 +192,34 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
-    fun shouldAddRule()
+    private fun shouldAddRule()
     {
-        val fields = DAO.fieldDAO.getFields( study.uuid )
+        val bundle = Bundle()
+        sharedViewModel.currentStudy?.value?.let{study ->
+            if(study.fields.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
+            }else
+            {
+                findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
+            }
 
-        if (fields.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
         }
-        else
-        {
-            val bundle = Bundle()
-            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-            findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
-        }
+
     }
 
-    fun shouldAddFilter()
+    private fun shouldAddFilter()
     {
-        val rules = DAO.ruleDAO.getRules( study.uuid )
+        val bundle = Bundle()
+        sharedViewModel.currentStudy?.value?.let{study ->
+            if(study.rules.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "You must create at least one rule before you can create a filter", Toast.LENGTH_SHORT).show()
+            }else
+            {
+                findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
+            }
 
-        if (rules.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "You must create at least one rule before you can create a filter", Toast.LENGTH_SHORT).show()
-        }
-        else
-        {
-            val bundle = Bundle()
-            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-            bundle.putString( Keys.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
-            findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
         }
     }
 
@@ -267,20 +266,17 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         when (item.itemId) {
             android.R.id.home -> // intercept the back button press
             {
-                if (DAO.studyDAO.doesNotExist( study.uuid ))
-                {
-                    val fields = DAO.fieldDAO.getFields(study.uuid)
-                    val rules = DAO.ruleDAO.getRules(study.uuid)
-                    val filters = DAO.filterDAO.getFilters(study.uuid)
+                sharedViewModel.currentStudy?.value?.let{study ->
 
-                    if (binding.studyNameEditText.text.toString().isNotEmpty() || fields.size > 0 || rules.size > 0 || filters.size > 0)
+                    if (study.name.isNotEmpty() || study.fields.size > 0 || study.rules.size > 0 || study.filters.size > 0)
                     {
                         ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", saveTag, this)
                         return true
                     }
-                }
-            }
 
+                }
+
+            }
             R.id.action_home -> {
                 findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
             }
@@ -297,7 +293,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreasFragment, bundle )
             }
         }
-
         return false
     }
 
