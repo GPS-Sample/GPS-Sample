@@ -82,7 +82,6 @@ class ConfigurationViewModel : ViewModel()
     val ruleFieldPosition : MutableLiveData<Int>
         get() = _ruleFieldPosition
 
-
     val currentConfigurationTimeFormat : String
         get(){
             currentConfiguration?.value?.let {config ->
@@ -355,6 +354,15 @@ class ConfigurationViewModel : ViewModel()
         return false
     }
 
+    fun addRule()
+    {
+        currentStudy?.value?.let{study ->
+            currentRule?.value?.let { rule ->
+                study.rules.add(rule)
+            }
+        }
+    }
+
     fun onRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         currentRule?.value?.let{rule ->
@@ -367,6 +375,13 @@ class ConfigurationViewModel : ViewModel()
     }
     fun onRuleOperatorSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
+        currentRule?.value?.let{rule ->
+            currentStudy?.value?.let{study ->
+                val operator = operators[position]
+                rule.operator = OperatorConverter.fromString(operator)
+            }
+
+        }
         Log.d("HERE", "HERE")
     }
     //endregion

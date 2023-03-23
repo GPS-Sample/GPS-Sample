@@ -118,7 +118,8 @@
                     android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:hint="@string/enter_value" />
+                    android:hint="@string/enter_value"
+                    android:text="@={viewModel.currentRule.value}"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
