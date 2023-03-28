@@ -257,7 +257,9 @@ class ConfigurationViewModel : ViewModel()
         study?.let { study ->
             currentConfiguration?.value?.let{config ->
                 config.studies.remove(study)
+
             }
+            DAO.studyDAO.deleteStudy(study)
         }
     }
 
@@ -273,7 +275,7 @@ class ConfigurationViewModel : ViewModel()
     //region Fields
     fun createNewField()
     {
-        val newField = Field( UUID.randomUUID().toString(), null, "", FieldType.None, false, false, false, false, false, "", "", "", "" )
+        val newField = Field( UUID.randomUUID().toString(), "", FieldType.None, false, false, false, false, false, "", "", "", "" )
         _currentField = MutableLiveData(newField)
         currentField = _currentField
     }
@@ -281,8 +283,10 @@ class ConfigurationViewModel : ViewModel()
     {
         currentStudy?.value?.let{study ->
             currentField?.value?.let { field ->
-                study.fields.add(field)
-
+                if(!study.fields.contains(field))
+                {
+                    study.fields.add(field)
+                }
             }
         }
     }
@@ -292,6 +296,51 @@ class ConfigurationViewModel : ViewModel()
         _currentField = MutableLiveData(field)
         currentField = _currentField
     }
+
+    fun setSelectedRule(rule : Rule)
+    {
+        _currentRule = MutableLiveData(rule)
+        currentRule = _currentRule
+    }
+
+    fun deleteCurrentStudy()
+    {
+        _currentStudy?.value?.let{study ->
+            DAO.studyDAO.deleteStudy(study)
+            _currentConfiguration?.value?.let { config->
+                config.studies.remove(study)
+            }
+
+        }
+        _currentStudy = null
+        _currentField = null
+        _currentRule = null
+        _currentFilter = null
+    }
+
+    fun deleteSelectedField()
+    {
+        _currentField?.value?.let{field ->
+            currentStudy?.value?.let { study ->
+                study.fields.remove(field)
+            }
+            DAO.fieldDAO.deleteField(field)
+
+        }
+        _currentField = null
+    }
+    fun deleteSelectedRule()
+    {
+        _currentRule?.value?.let{rule ->
+            currentStudy?.value?.let { study ->
+                study.rules.remove(rule)
+            }
+            DAO.ruleDAO.deleteRule(rule)
+
+        }
+        _currentField = null
+    }
+
     fun onFieldTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         Log.d("TEST","xxxxx")
@@ -346,7 +395,7 @@ class ConfigurationViewModel : ViewModel()
     fun createNewRule() : Boolean
     {
         currentStudy?.value?.let{study ->
-            val newRule = Rule( UUID.randomUUID().toString(), study.id, null, "", Operator.None, "" )
+            val newRule = Rule( UUID.randomUUID().toString(), null, "", Operator.None, "" )
             _currentRule = MutableLiveData(newRule)
             currentRule = _currentRule
             return true
@@ -367,7 +416,7 @@ class ConfigurationViewModel : ViewModel()
     {
         currentRule?.value?.let{rule ->
             currentStudy?.value?.let{study ->
-                rule.field_id = study.fields[position].id
+                rule.field = study.fields[position]
             }
 
         }

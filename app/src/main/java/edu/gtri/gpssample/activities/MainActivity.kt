@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity()
 
             DAO.fieldDAO.deleteOrphans()
             DAO.filterDAO.deleteOrphans()
-            DAO.ruleDAO.deleteOrphans()
+
             DAO.filterRuleDAO.deleteOrphans()
             DAO.sampleDAO.deleteOrphans()
             //DAO.navPlanDAO.deleteOrphans()
@@ -67,14 +67,14 @@ class MainActivity : AppCompatActivity()
 //            val configurations = DAO.configDAO.getConfigs()
 //            Log.d( "xxx", "found ${configurations.size} Configurations" )
 
-            val studies = DAO.studyDAO.getStudies()
-            Log.d( "xxx", "found ${studies.size} Studies" )
+//            val studies = DAO.studyDAO.getStudies()
+//            Log.d( "xxx", "found ${studies.size} Studies" )
 
-            val fields = DAO.fieldDAO.getFields()
-            Log.d( "xxx", "found ${fields.size} Fields" )
-
-            val rules = DAO.ruleDAO.getRules()
-            Log.d( "xxx", "found ${rules.size} Rules" )
+//            val fields = DAO.fieldDAO.getFields()
+//            Log.d( "xxx", "found ${fields.size} Fields" )
+//
+//            val rules = DAO.ruleDAO.getRules()
+//            Log.d( "xxx", "found ${rules.size} Rules" )
 
             val filters = DAO.filterDAO.getFilters()
             Log.d( "xxx", "found ${filters.size} Filters" )

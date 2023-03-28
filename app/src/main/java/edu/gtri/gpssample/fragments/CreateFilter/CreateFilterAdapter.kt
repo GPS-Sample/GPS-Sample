@@ -52,15 +52,15 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
 
         val filterRule = filterRules!!.get(holder.adapterPosition)
 
-        val rule = DAO.ruleDAO.getRule( filterRule.rule_uuid )
+       // val rule = DAO.ruleDAO.getRule( filterRule.rule_uuid )
 
         if (position == 0)
         {
-            holder.titleTextView.setText( rule!!.name )
+       //     holder.titleTextView.setText( rule!!.name )
         }
         else
         {
-            holder.titleTextView.setText( filterRule!!.connector + " " + rule!!.name )
+       //     holder.titleTextView.setText( filterRule!!.connector + " " + rule!!.name )
         }
 
         holder.editButton.setOnClickListener {

@@ -7,28 +7,35 @@ import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createField( field: Field ) : Int
+    fun createField( field: Field, study : Study ) : Int
     {
-        val values = ContentValues()
-        putField( field, values )
-        val id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
-        if(id > -1)
-        {
-            field.id = id
+        field.id?.let{id ->
+            updateField(field, study)
+            return id
+        }?: run {
+            val values = ContentValues()
+            putField( field, study, values )
+            val id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
+            if(id > -1)
+            {
+                field.id = id
+            }
+            return id
         }
-        return id
+
     }
 
     //--------------------------------------------------------------------------
-    fun putField( field: Field, values: ContentValues )
+    fun putField( field: Field, study : Study, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, field.uuid )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
-        values.put( DAO.COLUMN_STUDY_ID, field.study_id )
+        values.put( DAO.COLUMN_STUDY_ID, study.id )
 
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
         values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
@@ -46,7 +53,7 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun updateField( field: Field )
+    fun updateField( field: Field, study : Study )
     {
         val db = dao.writableDatabase
 
@@ -55,58 +62,58 @@ class FieldDAO(private var dao: DAO)
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
 
-            putField( field, values )
+            putField( field, study, values )
 
             db.update(DAO.TABLE_FIELD, values, whereClause, args )
         }?:run{
             // this means the field is new so we add it
-            createField(field)
+            createField(field, study)
         }
 
         db.close()
     }
 
     //--------------------------------------------------------------------------
-    fun exists( uuid: String ) : Boolean
-    {
-        return getField( uuid ) != null
-    }
+//    fun exists( uuid: String ) : Boolean
+//    {
+//        return getField( uuid ) != null
+//    }
 
     //--------------------------------------------------------------------------
-    fun doesNotExist( uuid: String ) : Boolean
-    {
-        return !exists( uuid )
-    }
+//    fun doesNotExist( uuid: String ) : Boolean
+//    {
+//        return !exists( uuid )
+//    }
 
     //--------------------------------------------------------------------------
-    private fun getField( uuid: String ): Field?
-    {
-        var field: Field? = null
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = db.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            field = createField( cursor )
-        }
-
-        cursor.close()
-        db.close()
-
-        return field
-    }
+//    private fun getField( uuid: String ): Field?
+//    {
+//        var field: Field? = null
+//        val db = dao.writableDatabase
+//        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+//        val cursor = db.rawQuery(query, null)
+//
+//        if (cursor.count > 0)
+//        {
+//            cursor.moveToNext()
+//
+//            field = createField( cursor )
+//        }
+//
+//        cursor.close()
+//        db.close()
+//
+//        return field
+//    }
 
     //--------------------------------------------------------------------------
     @SuppressLint("Range")
-    private fun  createField(cursor: Cursor ): Field
+    private fun  buildField(cursor: Cursor ): Field
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
-        val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
+
         val type_index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
         val pii = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_PII)).toBoolean()
         val required = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_REQUIRED)).toBoolean()
@@ -119,39 +126,21 @@ class FieldDAO(private var dao: DAO)
         val option4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_4))
 
         val type = FieldTypeConverter.fromIndex(type_index)
-        return Field(id, uuid, study_id, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, uuid,  name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
+
     //--------------------------------------------------------------------------
-    fun getFields( study_id : Int ): List<Field>
+    fun getFields(study : Study): List<Field>
     {
         val fields = ArrayList<Field>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_STUDY_ID} = '$study_id'"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where study_id=${study.id}"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            fields.add( createField( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return fields
-    }
-
-    //--------------------------------------------------------------------------
-    fun getFields(): List<Field>
-    {
-        val fields = ArrayList<Field>()
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD}"
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            fields.add( createField( cursor ))
+            fields.add( buildField( cursor ))
         }
 
         cursor.close()

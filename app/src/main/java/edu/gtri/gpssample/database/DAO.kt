@@ -95,16 +95,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_RULE + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_UUID + " TEXT" + "," +
-                // this needs to be a foreign key
-                COLUMN_RULE_STUDY_UUID + " TEXT" + "," +
 
                 // i think we can just use one key here.  if a field is connected to a study and
                 // a rule is connected to a field
                 // this needs to be a foreign key
-                COLUMN_RULE_FIELD_UUID + " TEXT" + "," +
+                COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
-                COLUMN_RULE_OPERATOR + " TEXT" + "," +
-                COLUMN_RULE_VALUE + " TEXT" +
+
+                // TODO:  this should be a look up table
+                COLUMN_OPERATOR_ID + " INTEGER" + "," +
+                COLUMN_RULE_VALUE + " TEXT, " +
+                "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableRule)
 
@@ -261,10 +262,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // foreign key columns
         const val COLUMN_CONFIG_ID = "config_id"
         const val COLUMN_STUDY_ID = "study_id"
-        const val COLUMN_FIELD_ID = "study_id"
+        const val COLUMN_FIELD_ID = "field_id"
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
         const val COLUMN_TEAM_ID = "team_id"
-
+        const val COLUMN_OPERATOR_ID = "operator_id"
         // Connector Tables
         const val TABLE_CONFIG_STUDY = "config_study_conn"
 
@@ -314,7 +315,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RULE_STUDY_UUID = "rule_study_id"
         const val COLUMN_RULE_FIELD_UUID = "rule_field_id"
         const val COLUMN_RULE_NAME = "rule_name"
-        const val COLUMN_RULE_OPERATOR = "rule_operator"
+
         const val COLUMN_RULE_VALUE = "rule_value"
 
         // Filter Table
@@ -421,6 +422,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 67
+        private const val DATABASE_VERSION = 74
     }
 }

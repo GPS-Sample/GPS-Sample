@@ -12,10 +12,12 @@ data class Filter(
     var study_id : Int,
     var name: String,
     var sampleSize: Int,
-    var sampleSizeIndex: Int )
+    var sampleSizeIndex: Int,
+    var filterRules : ArrayList<FilterRule>)
 {
     constructor(uuid: String, study_id: Int, name: String, sampleSize: Int,
-                sampleSizeIndex: Int) : this(null, uuid, study_id, name, sampleSize, sampleSizeIndex)
+                sampleSizeIndex: Int) : this(null, uuid, study_id, name, sampleSize, sampleSizeIndex,
+                ArrayList<FilterRule>())
     fun pack() : String
     {
         return Json.encodeToString( this )

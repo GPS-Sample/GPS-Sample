@@ -41,7 +41,7 @@ class ConfigDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            config = createConfig( cursor )
+            config = buildConfig( cursor )
 //            // find studies
 //            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
 //
@@ -68,7 +68,7 @@ class ConfigDAO(private var dao: DAO)
 
     //--------------------------------------------------------------------------
     @SuppressLint("Range")
-    private fun createConfig(cursor: Cursor ) : Config
+    private fun buildConfig(cursor: Cursor ) : Config
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
@@ -97,11 +97,11 @@ class ConfigDAO(private var dao: DAO)
         Log.d("xxx","Cursor count ${cursor.count}")
         while (cursor.moveToNext())
         {
-            val config = createConfig( cursor )
+            val config = buildConfig( cursor )
 
             // find studies
             config.id?.let{id ->
-                config.studies = DAO.studyDAO.getStudies(id)
+                config.studies = DAO.studyDAO.getStudies(config)
                 Log.d("DAO", "")
             }
 
@@ -195,19 +195,19 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteAllConfigs()
     {
-        val studies = DAO.studyDAO.getStudies()
-
-        for (study in studies)
-        {
-            DAO.studyDAO.deleteStudy( study )
-        }
-
-        val configs = DAO.configDAO.getConfigs()
-
-        for (config in configs)
-        {
-            DAO.configDAO.deleteConfig( config )
-        }
+//        val studies = DAO.studyDAO.getStudies()
+//
+//        for (study in studies)
+//        {
+//            DAO.studyDAO.deleteStudy( study )
+//        }
+//
+//        val configs = DAO.configDAO.getConfigs()
+//
+//        for (config in configs)
+//        {
+//            DAO.configDAO.deleteConfig( config )
+//        }
     }
 
     private fun updateStudies(config : Config)
@@ -227,16 +227,8 @@ class ConfigDAO(private var dao: DAO)
             for(study in config.studies)
             {
                 var study_id = -1
-                study.id?.let {id ->
-                    DAO.studyDAO.updateStudy(study)
-                    study.id?.let{id ->
-                        study_id = id
-                    }
-
-                }?: run{
-                    study_id = DAO.studyDAO.createStudy(study)
-
-                }
+                // study will either be created or updated
+                study_id = DAO.studyDAO.createStudy(study)
                 if(study_id > -1)
                 {
                     study.id = study_id

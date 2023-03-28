@@ -11,16 +11,14 @@ data class Rule(
     var id : Int? = null,
     var uuid: String,
 
-    // TODO: these aren't really necessary
-    var study_id: Int?,
-    var field_id: Int?,
+    var field: Field?,
 
     var name: String,
     var operator: Operator,
     var value: String)
 {
-    constructor(uuid: String, study_id: Int?, field_id: Int?, name: String, operator: Operator,
-                value: String) : this(null, uuid, study_id, field_id, name, operator, value)
+    constructor(uuid: String, field: Field?, name: String, operator: Operator,
+                value: String) : this(null, uuid, field, name, operator, value)
     fun pack() : String
     {
         return Json.encodeToString( this )

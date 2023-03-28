@@ -159,7 +159,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         selectedStudy?.let {
             DAO.studyDAO.deleteStudy( it )
-            manageStudiesAdapter.updateStudies(DAO.studyDAO.getStudies())
+            //manageStudiesAdapter.updateStudies(DAO.studyDAO.getStudies())
         }
     }
 

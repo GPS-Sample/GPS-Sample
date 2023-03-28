@@ -272,44 +272,44 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         binding.filtersCheckBox.isChecked = false
         binding.enumAreaCheckBox.isChecked = false
 
-        val configs = DAO.configDAO.getConfigs()
+        //val configs = DAO.configDAO.getConfigs()
 
-        if (configs.isNotEmpty())
-        {
-            binding.configCheckBox.isChecked = true
-
-            val config = configs[0]
-            config_uuid = config.uuid
-
-            val studies = DAO.studyDAO.getStudies()
-
-            if (studies.isNotEmpty())
-            {
-                binding.studyCheckBox.isChecked = true
-
-                val study = studies[0]
-                study_uuid = study.uuid
-
-//                val fields = DAO.fieldDAO.getFields(study.uuid)
-//                binding.fieldsCheckBox.isChecked = fields.isNotEmpty()
+//        if (configs.isNotEmpty())
+//        {
+//            binding.configCheckBox.isChecked = true
 //
-//                val rules = DAO.ruleDAO.getRules(study.uuid)
-//                binding.rulesCheckBox.isChecked = rules.isNotEmpty()
-
-            //    val filters = DAO.filterDAO.getFilters(study.uuid)
-             //   binding.filtersCheckBox.isChecked = filters.isNotEmpty()
-
-                val enumAreas = DAO.enumAreaDAO.getEnumAreas(config.uuid)
-
-                if (enumAreas.isNotEmpty())
-                {
-                    binding.enumAreaCheckBox.isChecked = true
-
-                    val enumArea = enumAreas[0]
-                    enum_area_uuid = enumArea.uuid
-                }
-            }
-        }
+//            val config = configs[0]
+//            config_uuid = config.uuid
+//
+//           // val studies = DAO.studyDAO.getStudies()
+//
+////            if (studies.isNotEmpty())
+////            {
+////                binding.studyCheckBox.isChecked = true
+////
+////                val study = studies[0]
+////                study_uuid = study.uuid
+////
+//////                val fields = DAO.fieldDAO.getFields(study.uuid)
+//////                binding.fieldsCheckBox.isChecked = fields.isNotEmpty()
+//////
+//////                val rules = DAO.ruleDAO.getRules(study.uuid)
+//////                binding.rulesCheckBox.isChecked = rules.isNotEmpty()
+////
+////            //    val filters = DAO.filterDAO.getFilters(study.uuid)
+////             //   binding.filtersCheckBox.isChecked = filters.isNotEmpty()
+////
+////                val enumAreas = DAO.enumAreaDAO.getEnumAreas(config.uuid)
+////
+////                if (enumAreas.isNotEmpty())
+////                {
+////                    binding.enumAreaCheckBox.isChecked = true
+////
+////                    val enumArea = enumAreas[0]
+////                    enum_area_uuid = enumArea.uuid
+////                }
+////            }
+//        }
     }
 
     private fun connected() : Boolean
@@ -490,25 +490,25 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                 NetworkCommand.NetworkStudyResponse ->
                 {
-                    val study = Study.unpack( networkCommand.message )
-
-                    study_uuid = study.uuid
-
-                    DAO.studyDAO.createStudy( study )
-
-                    activity!!.runOnUiThread {
-                        binding.studyCheckBox.isChecked = true
-                    }
+//                    val study = Study.unpack( networkCommand.message )
+//
+//                    study_uuid = study.uuid
+//
+//                    DAO.studyDAO.createStudy( study )
+//
+//                    activity!!.runOnUiThread {
+//                        binding.studyCheckBox.isChecked = true
+//                    }
                 }
 
                 NetworkCommand.NetworkFieldsResponse ->
                 {
                     val networkFields = NetworkFields.unpack(networkCommand.message)
 
-                    for (field in networkFields.fields)
-                    {
-                        DAO.fieldDAO.createField( field )
-                    }
+//                    for (field in networkFields.fields)
+//                    {
+//                        DAO.fieldDAO.createField( field )
+//                    }
 
                     activity!!.runOnUiThread {
                         binding.fieldsCheckBox.isChecked = true

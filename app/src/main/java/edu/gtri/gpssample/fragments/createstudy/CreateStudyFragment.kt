@@ -23,6 +23,16 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
+enum class DeleteMode(val value : Int)
+{
+    deleteStudyTag (1),
+    deleteFieldTag (2),
+    deleteRuleTag (3),
+    deleteFilterTag (4),
+    saveTag (4)
+
+}
+
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var quickStart = false
@@ -59,6 +69,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         createStudyAdapter.shouldAddField = this::shouldAddField
         createStudyAdapter.shouldAddRule = this::shouldAddRule
         createStudyAdapter.shouldAddFilter = this::shouldAddFilter
+
+        createStudyAdapter.didDeleteField = this::didDeleteField
+        createStudyAdapter.didDeleteRule = this::didDeleteRule
+        createStudyAdapter.didDeleteFilter = this::didDeleteFilter
+
 
 
         binding?.apply {
@@ -150,9 +165,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private fun didSelectRule( rule: Rule )
     {
         val bundle = Bundle()
-        bundle.putString( Keys.kRule_uuid.toString(), rule.uuid )
-        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-
+        sharedViewModel.setSelectedRule(rule)
         findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
     }
 
@@ -166,15 +179,38 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }
 
+
+    private fun didDeleteField( field: Field )
+    {
+        sharedViewModel.setSelectedField(field)
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?",
+            DeleteMode.deleteFieldTag.value, this)
+    }
+
+    private fun didDeleteRule( rule: Rule )
+    {
+        sharedViewModel.setSelectedRule(rule)
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?",
+            DeleteMode.deleteRuleTag.value, this)
+    }
+
+    private fun didDeleteFilter( filter: Filter )
+    {
+        val bundle = Bundle()
+        bundle.putString( Keys.kFilter_uuid.toString(), filter.uuid )
+        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
+        bundle.putString( Keys.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
+
+        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
+    }
+
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
     {
         super.onCreateOptionsMenu(menu, inflater)
 
         inflater.inflate(R.menu.menu_create_study, menu)
     }
-
-    val deleteTag = 1
-    val saveTag = 2
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
@@ -185,7 +221,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
                     if (study.name.isNotEmpty() || study.fields.size > 0 || study.rules.size > 0 || study.filters.size > 0)
                     {
-                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", saveTag, this)
+                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", DeleteMode.saveTag.value, this)
                         return true
                     }
 
@@ -225,48 +261,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        val samplingMethod = binding.samplingMethodSpinner.selectedItem as String
-        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
-
-        if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
-        {
-            //val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
-            // val sample2Size = binding.sampleSizeEditText.text.toString().toIntOrNull()
-            //val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
-
-//            if (sample1Size == null && sample2Size == null && sample3Size == null)
-//            {
-//                Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
-//                return
-//            }
-
-//            sample1Size?.let { sampleSize ->
-//                study.sampleSize = sample1Size
-//                study.sampleType = SampleType.NumberHouseholds
-//            }
-
-//            sample2Size?.let { sampleSize ->
-//                study.sampleSize = sampleSize
-//                study.sampleType = SampleType.PercentHouseholds
-//            }
-
-//            sample3Size?.let { sampleSize ->
-//                study.sampleSize = sampleSize
-//                study.sampleType = SampleType.PercentTotal
-//            }
-        }
-
-//        study.name = name
-//        study.samplingMethod = binding.samplingMethodSpinner.selectedItem as String
-//
-//        if (DAO.studyDAO.exists( study.uuid ))
-//        {
-//            DAO.studyDAO.updateStudy( study )
-//        }
-//        else
-//        {
-//            DAO.studyDAO.createStudy( study )
-//        }
         sharedViewModel.addStudy()
         val bundle = Bundle()
         bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
@@ -282,9 +276,25 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         when( tag )
         {
-            deleteTag -> {
-                DAO.studyDAO.deleteStudy( study )
+            DeleteMode.deleteStudyTag.value -> {
+                sharedViewModel.deleteCurrentStudy()
                 findNavController().popBackStack()
+            }
+            DeleteMode.deleteFieldTag.value -> {
+
+                sharedViewModel.deleteSelectedField()
+                sharedViewModel.currentStudy?.value?.let{ study->
+                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
+                }
+            }
+            DeleteMode.deleteRuleTag.value -> {
+                sharedViewModel.deleteSelectedRule()
+                sharedViewModel.currentStudy?.value?.let{ study->
+                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
+                }
+            }
+            DeleteMode.deleteFilterTag.value -> {
+
             }
         }
     }

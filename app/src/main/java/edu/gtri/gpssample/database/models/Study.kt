@@ -34,13 +34,20 @@ data class Study(
         return Json.encodeToString( this )
     }
 
-    val test : Array<String> = Array(1){i ->
-        when(i)
+    fun equals(compare : Study) : Boolean
+    {
+
+        // TODO: needs to check all fields, rules and filters
+        if(this.uuid != compare.uuid || this.name != compare.name ||
+            this.samplingMethod != compare.samplingMethod ||
+            this.sampleSize != compare.sampleSize || this.sampleType != compare.sampleType)
         {
-            0 -> "BIG TEST"
-            else -> "else"
+            return false
         }
+
+        return true
     }
+
     companion object
     {
         fun unpack( message: String ) : Study

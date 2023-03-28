@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.createstudy
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,12 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
     lateinit var didSelectField: ((field: Field) -> Unit)
     lateinit var didSelectRule: ((rule: Rule) -> Unit)
     lateinit var didSelectFilter: ((filter: Filter) -> Unit)
+
+    lateinit var didDeleteField: ((field: Field) -> Unit)
+    lateinit var didDeleteRule: ((rule: Rule) -> Unit)
+    lateinit var didDeleteFilter: ((filter: Filter) -> Unit)
+
+
     lateinit var shouldAddField: (() -> Unit)
     lateinit var shouldAddRule: (() -> Unit)
     lateinit var shouldAddFilter: (() -> Unit)
@@ -94,6 +101,17 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
                 2 -> didSelectFilter( filters[childPosition] )
             }
         }
+
+        val deleteView = view!!.findViewById<View>(R.id.image_view) as ImageView
+        deleteView.setOnClickListener{
+            when( groupPosition )
+            {
+                0 -> didDeleteField( fields[childPosition] )
+                1 -> didDeleteRule( rules[childPosition] )
+                2 -> didDeleteFilter( filters[childPosition] )
+            }
+        }
+
 
         return view
     }

@@ -8,6 +8,7 @@ import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingMethodConverter
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Study
@@ -17,15 +18,36 @@ class StudyDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun createStudy( study: Study ) : Int
     {
+        // if study exists and is untouched, use it.
+        // if study exists and is modified, created a new one.
+
+        study.id?.let{id ->
+            var testStudy = DAO.studyDAO.getStudy(id)
+            val test = study.equals( testStudy)
+            Log.d("TEST", "${test}")
+            if(study.equals( testStudy))
+            {
+                return id
+            }
+        }
+
         val values = ContentValues()
 
-        putStudy( study, values )
+        putStudy(study, values)
         val id = dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
-        for(field in study.fields)
-        {
+        study.id = id
+        for (field in study.fields) {
             // add the study id to the field
-            field.id = id
-            DAO.fieldDAO.createField(field)
+
+            val field_id = DAO.fieldDAO.createField(field, study)
+            field.id = field_id
+        }
+        for (rule in study.rules) {
+            // add rules
+            rule.field?.let { field ->
+                Log.d("RULE", "${field.id}")
+                DAO.ruleDAO.createRule(rule)
+            }
         }
 
         return id
@@ -45,28 +67,6 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX, index)
         index = SamplingMethodConverter.toIndex(study.samplingMethod)
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX, index )
-    }
-
-    //--------------------------------------------------------------------------
-    fun updateStudy( study: Study )
-    {
-        val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(study.id.toString())
-        val values = ContentValues()
-
-        putStudy( study, values )
-
-        db.update(DAO.TABLE_STUDY, values, whereClause, args )
-
-        for(field in study.fields)
-        {
-            // add the study id to the field
-            field.id = study.id
-            DAO.fieldDAO.updateField(field)
-        }
-
-        db.close()
     }
 
     //--------------------------------------------------------------------------
@@ -93,9 +93,36 @@ class StudyDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            study = createStudy( cursor )
+            study = buildStudy( cursor )
             // now get fields
-            study.fields = DAO.fieldDAO.getFields() as ArrayList<Field>
+            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+            Log.d("xxxx ", "")
+        }
+
+        cursor.close()
+        db.close()
+
+        return study
+    }
+
+    fun getStudy( id: Int ): Study?
+    {
+        var study: Study? = null
+        val db = dao.writableDatabase
+        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_ID} = '$id'"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            study = buildStudy( cursor )
+            // now get fields
+            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+
+            // now get rules
+
+            // now get filters
             Log.d("xxxx ", "")
         }
 
@@ -107,7 +134,7 @@ class StudyDAO(private var dao: DAO)
 
     //--------------------------------------------------------------------------
     @SuppressLint("Range")
-    private fun createStudy(cursor: Cursor ): Study
+    private fun buildStudy(cursor: Cursor ): Study
     {
         val id = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_ID}"))
         val uuid = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_UUID}"))
@@ -124,40 +151,28 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getStudies(): List<Study>
-    {
-        val studies = ArrayList<Study>()
-        val db = dao.writableDatabase
-        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study"
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            studies.add( createStudy( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return studies
-    }
-
-    //--------------------------------------------------------------------------
-    fun getStudies( config_id: Int ): ArrayList<Study>
+    fun getStudies( config: Config): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
         var db = dao.writableDatabase
         var query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
                     "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_ID} = conn.${DAO.COLUMN_STUDY_ID} and "  +
-                    "conn.${DAO.COLUMN_CONFIG_ID} = $config_id"
+                    "conn.${DAO.COLUMN_CONFIG_ID} = ${config.id}"
 
         var cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            val study = createStudy( cursor )
+            val study = buildStudy( cursor )
             studies.add( study )
-            study.fields = DAO.fieldDAO.getFields() as ArrayList<Field>
+            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+            for( field in study.fields)
+            {
+                val rules = DAO.ruleDAO.getRulesForField(field)
+                // Add rules to study
+                study.rules.addAll(rules)
+            }
+            //study.rules = DAO.ruleDAO.getRulesForField()
         }
         cursor.close()
         db.close()
@@ -169,7 +184,7 @@ class StudyDAO(private var dao: DAO)
     fun deleteStudy( study: Study )
     {
         study.id?.let{ id ->
-            val fields = DAO.fieldDAO.getFields( id )
+            val fields = DAO.fieldDAO.getFields( study )
 
             for (field in fields)
             {
