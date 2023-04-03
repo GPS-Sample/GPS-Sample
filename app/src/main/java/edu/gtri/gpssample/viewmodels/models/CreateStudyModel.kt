@@ -37,8 +37,8 @@ class CreateStudyModel {
     val samplingMethods : Array<String>
         get() = SamplingMethodConverter.array
 
-    val sampleTypes : ObservableArrayList<String>
-        get() = _samplingTypes//SampleTypeConverter.array
+    val sampleTypes : Array<String>
+        get() = SampleTypeConverter.array
 
     var currentStudy : LiveData<Study>? = _currentStudy
 
@@ -73,11 +73,9 @@ class CreateStudyModel {
                 when(samplingMethod)
                 {
                     SamplingMethod.SimpleRandom.format -> {
-                        _samplingTypes.addAll(SampleTypeConverter.array)
                         sampleTypesVisibility.set(true)
                     }
                     SamplingMethod.Cluster.format -> {
-                        _samplingTypes.addAll(SampleTypeConverter.array)
                         sampleTypesVisibility.set(true)
                     }
                     else -> {sampleTypesVisibility.set(false)}
@@ -90,7 +88,7 @@ class CreateStudyModel {
 
     fun onSampleTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        if(position > sampleTypes.size)
+        if(position < sampleTypes.size)
         {
             val sampleType : String = SampleTypeConverter.array[position]
             _currentStudy?.value?.let {

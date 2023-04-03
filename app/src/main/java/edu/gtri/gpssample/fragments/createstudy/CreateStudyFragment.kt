@@ -150,6 +150,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 Toast.makeText(activity!!.applicationContext, "You must create at least one rule before you can create a filter", Toast.LENGTH_SHORT).show()
             }else
             {
+                sharedViewModel.createFilterModel.createNewFiler()
                 findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
             }
         }
