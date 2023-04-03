@@ -49,7 +49,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:hint="@string/enter_rule_name"
-                    android:text="@={viewModel.currentRule.name}"/>
+                    android:text="@={viewModel.createRuleModel.currentRule.name}"/>
 
                 <TextView
                     android:layout_marginTop="20dp"
@@ -72,8 +72,8 @@
                         android:id="@+id/field_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:entries="@{viewModel.currentStudy.fields}"
-                        android:selectedItemPosition="@={viewModel.ruleFieldPosition}"
+                        android:entries="@{viewModel.createStudyModel.currentStudy.fields}"
+                        android:selectedItemPosition="@={viewModel.createRuleModel.ruleFieldPosition}"
                         android:onItemSelected="@{viewModel::onRuleFieldSelected}"/>
                 </FrameLayout>
 
@@ -98,7 +98,8 @@
                         android:id="@+id/operator_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:entries="@{viewModel.operators}"
+                        android:entries="@{viewModel.createRuleModel.operators}"
+                        android:selectedItemPosition="@={viewModel.createRuleModel.ruleOperationPosition}"
                         android:onItemSelected="@{viewModel::onRuleOperatorSelected}"/>
                 </FrameLayout>
 
@@ -119,7 +120,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:hint="@string/enter_value"
-                    android:text="@={viewModel.currentRule.value}"/>
+                    android:text="@={viewModel.createRuleModel.currentRule.value}"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>

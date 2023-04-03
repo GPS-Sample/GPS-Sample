@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.constants.SampleType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -11,13 +12,17 @@ data class Filter(
     var uuid: String,
     var study_id : Int,
     var name: String,
+    var samplingType : SampleType,
     var sampleSize: Int,
     var sampleSizeIndex: Int,
     var filterRules : ArrayList<FilterRule>)
 {
     constructor(uuid: String, study_id: Int, name: String, sampleSize: Int,
-                sampleSizeIndex: Int) : this(null, uuid, study_id, name, sampleSize, sampleSizeIndex,
+                sampleSizeIndex: Int) : this(null, uuid, study_id, name, SampleType.None, sampleSize, sampleSizeIndex,
                 ArrayList<FilterRule>())
+    constructor(id: Int, uuid: String, study_id: Int, name: String, sampleSize: Int,
+                sampleSizeIndex: Int) : this(id, uuid, study_id, name, SampleType.None,sampleSize, sampleSizeIndex,
+        ArrayList<FilterRule>())
     fun pack() : String
     {
         return Json.encodeToString( this )

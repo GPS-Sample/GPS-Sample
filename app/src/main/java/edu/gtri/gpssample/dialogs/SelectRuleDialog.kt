@@ -9,14 +9,17 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.FilterRule
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 import kotlin.collections.ArrayList
 
 class SelectRuleDialog
 {
+    private lateinit var sharedViewModel : ConfigurationViewModel
     interface SelectRuleDialogDelegate
     {
         fun didDismissSelectRuleDialog()
@@ -26,19 +29,22 @@ class SelectRuleDialog
     {
     }
 
-    constructor(context: Context, study_id: Int, filter_uuid: String, filterRule: FilterRule?, delegate: SelectRuleDialogDelegate )
+    constructor(context: Context, vm : ConfigurationViewModel, filter_uuid: String?, filterRule: FilterRule?, delegate: SelectRuleDialogDelegate )
     {
-//        val inflater = LayoutInflater.from(context)
-//
-//        val view = inflater.inflate(R.layout.dialog_select_rule, null)
-//
-//        val builder = AlertDialog.Builder(context)
-//        builder.setTitle("Select Rule").setView(view)
-//
-//        val alertDialog = builder.create()
-//
-//        alertDialog.setCancelable(false)
-//        alertDialog.show()
+        val inflater = LayoutInflater.from(context)
+
+        sharedViewModel = vm
+        val view = inflater.inflate(R.layout.dialog_select_rule, null)
+
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Select Rule").setView(view)
+
+        val alertDialog = builder.create()
+
+        alertDialog.setCancelable(false)
+        alertDialog.show()
+
+
 //
 //        val rules = DAO.ruleDAO.getRules( study_id )
 //

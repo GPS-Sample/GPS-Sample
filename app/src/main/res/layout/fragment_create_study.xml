@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     tools:context=".fragments.createstudy.CreateStudyFragment"
     >
     <data>
+        <import type="android.view.View" />
         <variable
             name="viewModel"
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
@@ -41,7 +41,7 @@
             android:hint="@string/enter_study_name"
             android:imeOptions="actionDone"
             android:inputType="textCapWords"
-            android:text="@={viewModel.currentStudy.name}" />
+            android:text="@={viewModel.createStudyModel.currentStudy.name}" />
 
         <TextView
             android:layout_width="match_parent"
@@ -65,9 +65,9 @@
                 android:id="@+id/sampling_method_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:entries="@{viewModel.samplingMethods}"
-                android:selectedItemPosition="@={viewModel.samplingMethodPosition}"
-                android:onItemSelected="@{viewModel::onSamplingMethodSelected}"
+                android:entries="@{viewModel.createStudyModel.samplingMethods}"
+                android:selectedItemPosition="@={viewModel.createStudyModel.samplingMethodPosition}"
+                android:onItemSelected="@{viewModel.createStudyModel::onSamplingMethodSelected}"
                 android:contentDescription="Sampling Method"/>
         </FrameLayout>
 
@@ -81,7 +81,9 @@
             android:gravity="center_vertical"
             android:text="@string/total_sample_size"
             android:textSize="17sp"
-            android:textColor="@color/primary_textcolor" />
+            android:textColor="@color/primary_textcolor"
+            android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}"
+            />
 
         <LinearLayout
             android:id="@+id/sample_size_layout"
@@ -97,7 +99,9 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
-                android:text="@={viewModel.currentSampleSize}"
+                android:text="@={viewModel.createStudyModel.currentSampleSize}"
+                android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}"
+
                 />
             <FrameLayout
                 android:layout_width="match_parent"
@@ -105,14 +109,16 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
+                android:background="@drawable/spinner_frame"
+                android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}"
+                >
             <Spinner
                 android:id="@+id/sampling_type_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:entries="@{viewModel.SampleTypes}"
-                android:selectedItemPosition="@={viewModel.samplingTypePosition}"
-                android:onItemSelected="@{viewModel::onSampleTypeSelected}"
+                android:entries="@{viewModel.createStudyModel.SampleTypes}"
+                android:selectedItemPosition="@={viewModel.createStudyModel.samplingTypePosition}"
+                android:onItemSelected="@{viewModel.createStudyModel::onSampleTypeSelected}"
                 android:contentDescription="Sampling Type"/>
             </FrameLayout>
 

@@ -555,7 +555,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                     for (filterRule in networkFilterRules.filterRules)
                     {
-                        DAO.filterRuleDAO.createFilterRule( filterRule )
+                    //    DAO.filterRuleDAO.createFilterRule( filterRule )
                     }
 
                     activity!!.runOnUiThread {

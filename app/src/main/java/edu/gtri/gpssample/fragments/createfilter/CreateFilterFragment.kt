@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.CreateFilter
+package edu.gtri.gpssample.fragments.createfilter
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,24 +20,24 @@ import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.SelectRuleDialog
-import edu.gtri.gpssample.fragments.createrule.CreateRuleViewModel
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
 
-    private lateinit var viewModel: CreateRuleViewModel
     private var _binding: FragmentCreateFilterBinding? = null
     private val binding get() = _binding!!
     private lateinit var createFilterAdapter: CreateFilterAdapter
     private lateinit var study_uuid: String
     private lateinit var filter: Filter
     private var sampleSizeIsVisible = true
-
+    private lateinit var sharedViewModel : ConfigurationViewModel
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CreateRuleViewModel::class.java)
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -50,64 +50,19 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            // Specify the fragment as the lifecycle owner
+            lifecycleOwner = viewLifecycleOwner
 
-        if (arguments == null)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
-            return
+            // Assign the view model to a property in the binding class
+            viewModel = sharedViewModel
+
+            // Assign the fragment
+            createFieldFragment = this@CreateFilterFragment
+            this.executePendingBindings()
         }
 
-        // required: Study_uuid
-        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
 
-        if (study_uuid.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // required: SamplingMethod
-        val samplingMethod = arguments!!.getString( Keys.kSamplingMethod.toString(), "");
-
-        if (samplingMethod.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: samplingMethod.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val samplingMethods by lazy { resources.getStringArray(R.array.samling_methods) }
-
-        if (samplingMethod == samplingMethods[0] || samplingMethod == samplingMethods[1])
-        {
-            sampleSizeIsVisible = false
-            binding.sampleSizeTextView.visibility = View.GONE
-            binding.sampleSize1Layout.visibility = View.GONE
-            binding.sampleSize2Layout.visibility = View.GONE
-            binding.sampleSize3Layout.visibility = View.GONE
-        }
-
-        // optional: filterId
-        val filter_uuid = arguments!!.getString( Keys.kFilter_uuid.toString(), "");
-
-        if (filter_uuid.isNotEmpty())
-        {
-            DAO.filterDAO.getFilter( filter_uuid )?.let {
-                this.filter = it
-            }
-
-            if (!this::filter.isInitialized)
-            {
-                Toast.makeText(activity!!.applicationContext, "Fatal! Filter with id $filter_uuid not found.", Toast.LENGTH_SHORT).show()
-                return
-            }
-        }
-
-        if (!this::filter.isInitialized)
-        {
-            //filter = Filter( UUID.randomUUID().toString(), study_uuid, "", -1, 0 )
-        }
-        else
-        {
             binding.nameEditText.setText( filter.name )
 
             if (sampleSizeIsVisible)
@@ -122,7 +77,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
                     }
                 }
             }
-        }
+
 
         createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
         createFilterAdapter.shouldEditFilterRule = this::shouldEditFilterRule
@@ -133,7 +88,7 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
-           // SelectRuleDialog( activity!!, study_uuid, filter!!.uuid, null, this )
+            SelectRuleDialog( activity!!, sharedViewModel, null, null, this )
         }
 
         binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->

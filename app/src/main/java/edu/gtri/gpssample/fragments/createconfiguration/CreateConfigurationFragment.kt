@@ -111,7 +111,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
         mapFragment.getMapAsync(this)
 
         binding.addStudyButton.setOnClickListener{
-            sharedViewModel.createNewStudy()
+            sharedViewModel.createStudyModel.createNewStudy()
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
         }
 
@@ -140,7 +140,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
         //bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
         //bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-        sharedViewModel.setCurrentStudy(study)
+        sharedViewModel.createStudyModel.setStudy(study)
         findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
     }
     private fun shouldDeleteStudy(study: Study)
@@ -181,7 +181,6 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
                                             LatLng( rectangle.botLeft_lat, rectangle.botLeft_lon ),
                                             LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
                                         ))
-
                             }
                         }
                     }

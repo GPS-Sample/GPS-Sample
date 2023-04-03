@@ -61,7 +61,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        study = sharedViewModel.currentStudy!!.value!!
+
         createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
         createStudyAdapter.didSelectField = this::didSelectField
         createStudyAdapter.didSelectRule = this::didSelectRule
@@ -92,6 +92,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             quickStart = it
         }
 
+
         ArrayAdapter.createFromResource(activity!!, R.array.samling_methods, android.R.layout.simple_spinner_item)
             .also { adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -111,7 +112,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        sharedViewModel.currentStudy?.value?.let{ study->
+        sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
             createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
         }
     }
@@ -119,20 +120,20 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private fun shouldAddField()
     {
         val bundle = Bundle()
-        sharedViewModel.createNewField()
+        sharedViewModel.createFieldModel.createNewField()
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
     private fun shouldAddRule()
     {
         val bundle = Bundle()
-        sharedViewModel.currentStudy?.value?.let{study ->
+        sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.fields.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
             }else
             {
-                sharedViewModel.createNewRule()
+                sharedViewModel.createRuleModel.createNewRule()
                 findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
             }
 
@@ -143,7 +144,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private fun shouldAddFilter()
     {
         val bundle = Bundle()
-        sharedViewModel.currentStudy?.value?.let{study ->
+        sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.rules.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "You must create at least one rule before you can create a filter", Toast.LENGTH_SHORT).show()
@@ -157,7 +158,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private fun didSelectField( field: Field )
     {
         val bundle = Bundle()
-        sharedViewModel.setSelectedField(field)
+        sharedViewModel.createFieldModel.setSelectedField(field)
 
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
@@ -182,14 +183,14 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     private fun didDeleteField( field: Field )
     {
-        sharedViewModel.setSelectedField(field)
+        sharedViewModel.createFieldModel.setSelectedField(field)
         ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?",
             DeleteMode.deleteFieldTag.value, this)
     }
 
     private fun didDeleteRule( rule: Rule )
     {
-        sharedViewModel.setSelectedRule(rule)
+        sharedViewModel.deleteRule(rule)
         ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?",
             DeleteMode.deleteRuleTag.value, this)
     }
@@ -217,7 +218,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         when (item.itemId) {
             android.R.id.home -> // intercept the back button press
             {
-                sharedViewModel.currentStudy?.value?.let{study ->
+                sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
 
                     if (study.name.isNotEmpty() || study.fields.size > 0 || study.rules.size > 0 || study.filters.size > 0)
                     {
@@ -251,19 +252,16 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
     }
 
-    fun updateStudy()
+    private fun updateStudy()
     {
         val name = binding.studyNameEditText.text.toString()
-
         if (name.length == 0)
         {
             Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
             return
         }
-
         sharedViewModel.addStudy()
         val bundle = Bundle()
-        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
         findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
     }
 
@@ -283,13 +281,13 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             DeleteMode.deleteFieldTag.value -> {
 
                 sharedViewModel.deleteSelectedField()
-                sharedViewModel.currentStudy?.value?.let{ study->
+                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
                     createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
                 }
             }
             DeleteMode.deleteRuleTag.value -> {
                 sharedViewModel.deleteSelectedRule()
-                sharedViewModel.currentStudy?.value?.let{ study->
+                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
                     createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
                 }
             }

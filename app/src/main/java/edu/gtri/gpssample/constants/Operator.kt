@@ -53,6 +53,21 @@ object OperatorConverter
             else -> Operator.None
         }
     }
+
+    fun toArrayPosition(operator: Operator) : Int
+    {
+        return when(operator)
+        {
+            Operator.Equal -> 0
+            Operator.NotEqual -> 1
+            Operator.LessThan -> 2
+            Operator.GreaterThan -> 3
+            Operator.LessThanOrEqual -> 4
+            Operator.GreaterThanOrEqual -> 5
+            else -> 0
+        }
+    }
+
     fun fromString( type : String) : Operator
     {
         return when(type)

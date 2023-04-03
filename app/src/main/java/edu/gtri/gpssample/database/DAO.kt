@@ -125,12 +125,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // this is a logic chain
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
-
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FILTERRULE_STUDY_UUID + " TEXT" + "," +
-                COLUMN_FILTERRULE_FILTER_UUID + " TEXT" + "," +
-                COLUMN_FILTERRULE_RULE_UUID + " TEXT" + "," +
-                COLUMN_FILTERRULE_CONNECTOR + " TEXT" +
+                COLUMN_FILTER_ID + " INTEGER" + "," +
+                COLUMN_RULE_ID + " INTEGER" + "," +
+                COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" +
+                "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" +
+                "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFilterRule)
 
@@ -263,6 +264,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_ID = "config_id"
         const val COLUMN_STUDY_ID = "study_id"
         const val COLUMN_FIELD_ID = "field_id"
+        const val COLUMN_RULE_ID = "rule_id"
+        const val COLUMN_FILTER_ID = "filter_id"
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
         const val COLUMN_TEAM_ID = "team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
@@ -330,7 +333,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FILTERRULE_STUDY_UUID = "filterrule_study_id"
         const val COLUMN_FILTERRULE_FILTER_UUID = "filterrule_filter_id"
         const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
-        const val COLUMN_FILTERRULE_CONNECTOR = "filterrule_connector"
+        const val COLUMN_FILTERRULE_CONNECTOR_INDEX = "filterrule_connector_index"
 
         // Sample Table
         const val TABLE_SAMPLE = "sample"

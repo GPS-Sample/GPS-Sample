@@ -67,7 +67,7 @@ class FilterDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            filter = createFilter( cursor )
+            filter = buildFilter( cursor )
         }
 
         cursor.close()
@@ -78,7 +78,7 @@ class FilterDAO(private var dao: DAO)
 
     //--------------------------------------------------------------------------
     @SuppressLint("Range")
-    private fun  createFilter(cursor: Cursor ): Filter
+    private fun  buildFilter(cursor: Cursor ): Filter
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
@@ -100,7 +100,7 @@ class FilterDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            filters.add( createFilter( cursor ))
+            filters.add( buildFilter( cursor ))
         }
 
         cursor.close()
@@ -119,7 +119,7 @@ class FilterDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            filters.add( createFilter( cursor ))
+            filters.add( buildFilter( cursor ))
         }
 
         cursor.close()

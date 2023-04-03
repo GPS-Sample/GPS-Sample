@@ -262,7 +262,7 @@
 
     <fragment
         android:id="@+id/CreateFilterFragment"
-        android:name="edu.gtri.gpssample.fragments.CreateFilter.CreateFilterFragment"
+        android:name="edu.gtri.gpssample.fragments.createfilter.CreateFilterFragment"
         tools:layout="@layout/fragment_create_filter">
     </fragment>
 

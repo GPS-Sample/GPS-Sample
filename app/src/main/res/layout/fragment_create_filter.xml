@@ -1,190 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/fragment_root_layout"
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.createrule.CreateRuleFragment">
-
+    tools:context=".fragments.createfilter.CreateFilterFragment">
+    <data>
+        <variable
+            name="viewModel"
+            type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
+        <variable
+            name="createFieldFragment"
+            type="edu.gtri.gpssample.fragments.createfilter.CreateFilterFragment" />
+    </data>
     <LinearLayout
+        android:id="@+id/fragment_root_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/filter_name"
-            android:textSize="17sp"
-            android:textColor="@color/primary_textcolor" />
-
-        <EditText
-            android:id="@+id/name_edit_text"
-            android:inputType="textCapWords"
-            android:imeOptions="actionDone"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="@string/enter_filter_name" />
-
-        <TextView
-            android:layout_marginTop="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginStart="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/filters"
-            android:textSize="17sp"
-            android:textColor="@color/primary_textcolor" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_margin="20dp"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"/>
-
-        <Button
-            android:id="@+id/add_rule_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="Add Condition" />
-
-        <TextView
-            android:id="@+id/sample_size_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/sample_size"
-            android:textSize="17sp"
-            android:textColor="@color/primary_textcolor" />
+        android:layout_height="match_parent"
+        >
 
         <LinearLayout
-            android:id="@+id/sample_size_1_layout"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <EditText
-                android:id="@+id/sample_size_1_edit_text"
-                android:gravity="center"
-                android:inputType="number"
-                android:imeOptions="actionDone"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/sample_size_1_text_view"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
-                android:lines="2"
-                android:text="Fixed # of Households per cluster"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/sample_size_2_layout"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
+                android:text="@string/filter_name"
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
 
             <EditText
-                android:id="@+id/sample_size_2_edit_text"
-                android:gravity="center"
-                android:inputType="number"
+                android:id="@+id/name_edit_text"
+                android:inputType="textCapWords"
                 android:imeOptions="actionDone"
-                android:layout_width="50dp"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginLeft="20dp"/>
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="@string/enter_filter_name" />
 
             <TextView
-                android:id="@+id/sample_size_2_text_view"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_weight="1"
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
                 android:gravity="center_vertical"
-                android:lines="2"
-                android:text="Fixed # of Households"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="15sp" />
-        </LinearLayout>
+                android:text="@string/filters"
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
 
-        <LinearLayout
-            android:id="@+id/sample_size_3_layout"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <EditText
-                android:id="@+id/sample_size_3_edit_text"
-                android:gravity="center"
-                android:inputType="number"
-                android:imeOptions="actionDone"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"/>
-
-            <TextView
-                android:id="@+id/sample_size_3_text_view"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="20dp"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_margin="20dp"
                 android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:lines="2"
-                android:text="Fixed % of households"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_gravity="bottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="0dp"/>
 
             <Button
-                android:id="@+id/cancel_button"
-                android:layout_weight="1"
-                android:layout_width="0dp"
+                android:id="@+id/add_rule_button"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_margin="20dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="@string/cancel" />
+                android:text="Add Condition" />
 
-            <Button
-                android:id="@+id/save_button"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/save" />
+            <TextView
+                android:id="@+id/sample_size_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="center_vertical"
+                android:text="@string/sample_size"
+                android:textSize="17sp"
+                android:textColor="@color/primary_textcolor" />
+
+            <LinearLayout
+                android:id="@+id/sample_size_1_layout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <EditText
+                    android:id="@+id/sample_size_1_edit_text"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"/>
+
+                <TextView
+                    android:id="@+id/sample_size_1_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:lines="2"
+                    android:text="Fixed # of Households per cluster"
+                    android:textColor="@color/primary_textcolor"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sample_size_2_layout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <EditText
+                    android:id="@+id/sample_size_2_edit_text"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"/>
+
+                <TextView
+                    android:id="@+id/sample_size_2_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:lines="2"
+                    android:text="Fixed # of Households"
+                    android:textColor="@color/primary_textcolor"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sample_size_3_layout"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <EditText
+                    android:id="@+id/sample_size_3_edit_text"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"/>
+
+                <TextView
+                    android:id="@+id/sample_size_3_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:lines="2"
+                    android:text="Fixed % of households"
+                    android:textColor="@color/primary_textcolor"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_gravity="bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="20dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/cancel" />
+
+                <Button
+                    android:id="@+id/save_button"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="20dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/save" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</layout>

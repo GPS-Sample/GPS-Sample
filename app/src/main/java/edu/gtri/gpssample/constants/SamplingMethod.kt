@@ -16,6 +16,7 @@ object SamplingMethodConverter
             0 -> SamplingMethod.SimpleRandom.format
             1 -> SamplingMethod.Cluster.format
             2 -> SamplingMethod.Subsets.format
+            3 -> SamplingMethod.Strata.format
             else -> String()
         }
     }
@@ -27,6 +28,7 @@ object SamplingMethodConverter
             SamplingMethod.SimpleRandom -> 1
             SamplingMethod.Cluster -> 2
             SamplingMethod.Subsets -> 3
+            SamplingMethod.Strata -> 4
             else -> 0
         }
     }
@@ -38,7 +40,20 @@ object SamplingMethodConverter
             1 -> SamplingMethod.SimpleRandom
             2 -> SamplingMethod.Cluster
             3 -> SamplingMethod.Subsets
+            4 -> SamplingMethod.Strata
             else -> SamplingMethod.None
+        }
+    }
+
+    fun toArrayPosition(samplingMethod : SamplingMethod) : Int
+    {
+        return when(samplingMethod)
+        {
+            SamplingMethod.SimpleRandom -> 0
+            SamplingMethod.Cluster -> 1
+            SamplingMethod.Subsets -> 2
+            SamplingMethod.Strata -> 3
+            else -> 0
         }
     }
     fun fromString( type : String) : SamplingMethod

@@ -46,7 +46,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:hint="@string/enter_field_name"
-                    android:text="@={viewModel.currentField.name}"
+                    android:text="@={viewModel.createFieldModel.currentField.name}"
                     android:imeOptions="actionDone"
                     android:inputType="textCapWords" />
 
@@ -71,9 +71,9 @@
                         android:id="@+id/field_type_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:entries="@{viewModel.fieldTypes}"
-                        android:selectedItemPosition="@={viewModel.fieldTypePosition}"
-                        android:onItemSelected="@{viewModel::onFieldTypeSelected}"/>
+                        android:entries="@{viewModel.createFieldModel.fieldTypes}"
+                        android:selectedItemPosition="@={viewModel.createFieldModel.fieldTypePosition}"
+                        android:onItemSelected="@{viewModel.createFieldModel::onFieldTypeSelected}"/>
                 </FrameLayout>
                 <include
                     android:visibility="visible"

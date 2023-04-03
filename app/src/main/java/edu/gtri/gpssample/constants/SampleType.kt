@@ -41,6 +41,17 @@ object SampleTypeConverter
             else -> SampleType.None
         }
     }
+
+    fun toArrayPosition(sampleType : SampleType) : Int
+    {
+        return when(sampleType)
+        {
+            SampleType.NumberHouseholds -> 0
+            SampleType.PercentHouseholds -> 1
+            SampleType.PercentTotal -> 2
+            else -> 0
+        }
+    }
     fun fromString( type : String) : SampleType
     {
         return when(type)

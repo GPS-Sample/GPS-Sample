@@ -11,10 +11,13 @@ import edu.gtri.gpssample.database.DAO
 
 import java.util.*
 import kotlin.collections.ArrayList
-import edu.gtri.gpssample.R
 
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
+import edu.gtri.gpssample.viewmodels.models.CreateFieldModel
+import edu.gtri.gpssample.viewmodels.models.CreateFilterModel
+import edu.gtri.gpssample.viewmodels.models.CreateRuleModel
+import edu.gtri.gpssample.viewmodels.models.CreateStudyModel
 
 class ConfigurationViewModel : ViewModel()
 {
@@ -24,24 +27,29 @@ class ConfigurationViewModel : ViewModel()
     private var _distanceFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _timeFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _dateFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
-    private var _samplingMethodPosition : MutableLiveData<Int> = MutableLiveData(0)
-    private var _samplingTypePosition : MutableLiveData<Int> = MutableLiveData(0)
-    private var _fieldTypePosition : MutableLiveData<Int> = MutableLiveData(0)
-    private var _ruleFieldPosition : MutableLiveData<Int> = MutableLiveData(0)
+
+
+
 
     // live data for each screen being controlled by the view model
     private var _currentConfiguration : MutableLiveData<Config>? = null
-    private var _currentStudy : MutableLiveData<Study>? = null
-    private var _currentField : MutableLiveData<Field>? = null
-    private var _currentFilter : MutableLiveData<Filter>? = null
-    private var _currentRule : MutableLiveData<Rule>? = null
+
+    // Since we are utilizing a main view model per "section" of the app, i.e. the set up of a
+    // configuration with enumerations, studies, fields, rules and filters, each with its own
+    // fragment, we employ what we call "fragment models" that control each fragment data, but
+    // are commonly available across all fragments, since they share data between themselves.
+
+    val createFilterModel : CreateFilterModel = CreateFilterModel()
+    val createStudyModel : CreateStudyModel = CreateStudyModel()
+    val createFieldModel : CreateFieldModel = CreateFieldModel()
+    val createRuleModel : CreateRuleModel = CreateRuleModel()
 
     // Exposed LiveData each screen being controlled by the view model
     var currentConfiguration : LiveData<Config>? =_currentConfiguration
-    var currentStudy : LiveData<Study>? = _currentStudy
-    var currentField : LiveData<Field>? = _currentField
-    var currentFilter : LiveData<Filter>? = _currentFilter
-    var currentRule : LiveData<Rule>? = _currentRule
+
+
+
+
 
     val configurations : ArrayList<Config>
         get() = _configurations
@@ -55,17 +63,8 @@ class ConfigurationViewModel : ViewModel()
     val dateFormats : Array<String>
         get() = DateFormatConverter.array
 
-    val samplingMethods : Array<String>
-        get() = SamplingMethodConverter.array
 
-    val sampleTypes : Array<String>
-        get() = SampleTypeConverter.array
 
-    val fieldTypes : Array<String>
-        get() = FieldTypeConverter.array
-
-    val operators : Array<String>
-        get() = OperatorConverter.array
 
     val distanceFormatPosition : MutableLiveData<Int>
         get() = _distanceFormatPosition
@@ -73,14 +72,7 @@ class ConfigurationViewModel : ViewModel()
         get() = _dateFormatPosition
     val timeFormatPosition : MutableLiveData<Int>
         get() = _timeFormatPosition
-    val samplingMethodPosition : MutableLiveData<Int>
-        get() = _samplingMethodPosition
-    val samplingTypePosition : MutableLiveData<Int>
-        get() = _samplingTypePosition
-    val fieldTypePosition : MutableLiveData<Int>
-        get() = _fieldTypePosition
-    val ruleFieldPosition : MutableLiveData<Int>
-        get() = _ruleFieldPosition
+
 
     val currentConfigurationTimeFormat : String
         get(){
@@ -104,21 +96,7 @@ class ConfigurationViewModel : ViewModel()
             return unavailable
         }
 
-    var currentSampleSize : String
-        get(){
-            currentStudy?.value?.let{study ->
-                return study.sampleSize.toString()
-            }
-            return ""
-        }
-        set(value){
-            currentStudy?.value?.let{study ->
-                value.toIntOrNull()?.let {size ->
-                    study.sampleSize = size
-                } ?: run{ study.sampleSize = 0
-                }
-            }
-        }
+
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < distanceFormats.size)
@@ -148,31 +126,6 @@ class ConfigurationViewModel : ViewModel()
             val date : String = dateFormats[position]
             _currentConfiguration?.value?.let {
                 it.dateFormat = DateFormatConverter.fromString(date)
-            }
-        }
-
-    }
-
-    fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
-    {
-        if(position > samplingMethods.size)
-        {
-            val samplingMethod : String = samplingMethods[position]
-            _currentStudy?.value?.let {
-                it.samplingMethod = SamplingMethodConverter.fromString(samplingMethod)
-            }
-
-        }
-
-    }
-
-    fun onSampleTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
-    {
-        if(position > sampleTypes.size)
-        {
-            val sampleType : String = SampleTypeConverter.array[position]
-            _currentStudy?.value?.let {
-                it.sampleType = SampleTypeConverter.fromString(sampleType)
             }
         }
 
@@ -228,41 +181,32 @@ class ConfigurationViewModel : ViewModel()
     }
 
     // Study
-    fun createNewStudy()
-    {
-        val newStudy = Study(UUID.randomUUID().toString(),"","",SamplingMethod.None,0, SampleType.None,)
-        _currentStudy = MutableLiveData(newStudy)
-        currentStudy = _currentStudy
-    }
-
-    fun setCurrentStudy(study : Study)
-    {
-        _currentStudy = MutableLiveData(study)
-        currentStudy = _currentStudy
-    }
 
     fun addStudy()
     {
-        currentStudy?.value?.let{study ->
-            currentConfiguration?.value?.let { config ->
-                if(!config.studies.contains(study))
-                {
-                    config.studies.add(study)
-                }
-            }
+        currentConfiguration?.let{configuration->
+            createStudyModel.addStudy(configuration.value)
         }
     }
     fun removeStudy(study: Study?)
     {
-        study?.let { study ->
-            currentConfiguration?.value?.let{config ->
-                config.studies.remove(study)
-
-            }
-            DAO.studyDAO.deleteStudy(study)
+        currentConfiguration?.let { configuration ->
+            createStudyModel.removeStudy(study, configuration.value)
         }
     }
+    fun deleteCurrentStudy()
+    {
+        _currentConfiguration?.value?.let { configuration ->
+            createStudyModel.currentStudy?.value?.let{study ->
+                createFieldModel.deleteSelectedField(study)
+            }
+            createStudyModel.deleteCurrentStudy(configuration)
+            // TODO: remove rules and filters and fields
+        }
 
+        createFilterModel.deleteCurrentFilter()
+    }
+    //endregion
     //region Enumerations
     fun addEnumerationAreas(enumAreas : List<EnumArea>? )
     {
@@ -273,165 +217,61 @@ class ConfigurationViewModel : ViewModel()
     //endregion
 
     //region Fields
-    fun createNewField()
-    {
-        val newField = Field( UUID.randomUUID().toString(), "", FieldType.None, false, false, false, false, false, "", "", "", "" )
-        _currentField = MutableLiveData(newField)
-        currentField = _currentField
-    }
     fun addField()
     {
-        currentStudy?.value?.let{study ->
-            currentField?.value?.let { field ->
-                if(!study.fields.contains(field))
-                {
-                    study.fields.add(field)
-                }
-            }
+        createStudyModel.currentStudy?.value?.let{study ->
+            createFieldModel.addField(study)
         }
     }
-
-    fun setSelectedField(field : Field)
-    {
-        _currentField = MutableLiveData(field)
-        currentField = _currentField
-    }
-
-    fun setSelectedRule(rule : Rule)
-    {
-        _currentRule = MutableLiveData(rule)
-        currentRule = _currentRule
-    }
-
-    fun deleteCurrentStudy()
-    {
-        _currentStudy?.value?.let{study ->
-            DAO.studyDAO.deleteStudy(study)
-            _currentConfiguration?.value?.let { config->
-                config.studies.remove(study)
-            }
-
-        }
-        _currentStudy = null
-        _currentField = null
-        _currentRule = null
-        _currentFilter = null
-    }
-
     fun deleteSelectedField()
     {
-        _currentField?.value?.let{field ->
-            currentStudy?.value?.let { study ->
-                study.fields.remove(field)
-            }
-            DAO.fieldDAO.deleteField(field)
-
+        createStudyModel.currentStudy?.value?.let { study ->
+            createFieldModel.deleteSelectedField(study)
         }
-        _currentField = null
-    }
-    fun deleteSelectedRule()
-    {
-        _currentRule?.value?.let{rule ->
-            currentStudy?.value?.let { study ->
-                study.rules.remove(rule)
-            }
-            DAO.ruleDAO.deleteRule(rule)
-
-        }
-        _currentField = null
-    }
-
-    fun onFieldTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
-    {
-        Log.d("TEST","xxxxx")
-        if(position < FieldTypeConverter.array.size)
-        {
-            val fieldType : String = FieldTypeConverter.array[position]
-            _currentField?.value?.let {
-                it.type = FieldTypeConverter.fromString( fieldType)
-            }
-        }
-    }
-    fun onFieldPIISelected(buttonView : CompoundButton,  isChecked : Boolean)
-    {
-        Log.d("xxx", "PII SELECTED CHANGED $isChecked")
-        currentField?.value?.let{field ->
-            field.pii = isChecked
-        }
-    }
-
-    fun onFieldRequiredSelected(buttonView : CompoundButton,  isChecked : Boolean)
-    {
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
-        currentField?.value?.let{field ->
-            field.required = isChecked
-        }
-    }
-    fun onFieldIntegerOnlySelected(buttonView : CompoundButton,  isChecked : Boolean)
-    {
-        currentField?.value?.let{field ->
-            field.integerOnly = isChecked
-        }
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
-    }
-    fun onFieldDateSelected(buttonView : CompoundButton,  isChecked : Boolean)
-    {
-        currentField?.value?.let{field ->
-            field.date = isChecked
-        }
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
-    }
-    fun onFieldTimeSelected(buttonView : CompoundButton,  isChecked : Boolean)
-    {
-        currentField?.value?.let{field ->
-            field.time = isChecked
-        }
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
     }
     //endregion
 
     //region Rule
 
-    fun createNewRule() : Boolean
-    {
-        currentStudy?.value?.let{study ->
-            val newRule = Rule( UUID.randomUUID().toString(), null, "", Operator.None, "" )
-            _currentRule = MutableLiveData(newRule)
-            currentRule = _currentRule
-            return true
-        }
-        return false
-    }
-
     fun addRule()
     {
-        currentStudy?.value?.let{study ->
-            currentRule?.value?.let { rule ->
-                study.rules.add(rule)
-            }
+        createStudyModel.currentStudy?.value?.let{study ->
+            createRuleModel.addRule(study)
+        }
+    }
+    fun setSelectedRule(rule : Rule)
+    {
+        createStudyModel.currentStudy?.value?.let { study ->
+            createRuleModel.setSelectedRule(rule, study)
+
         }
     }
 
+    fun deleteRule(rule:Rule)
+    {
+        createStudyModel.currentStudy?.value?.let { study ->
+            createRuleModel.deleteRule(rule, study)
+        }
+    }
+
+    fun deleteSelectedRule()
+    {
+        createStudyModel.currentStudy?.value?.let { study ->
+            createRuleModel.deleteSelectedRule(study)
+        }
+    }
     fun onRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        currentRule?.value?.let{rule ->
-            currentStudy?.value?.let{study ->
-                rule.field = study.fields[position]
-            }
-
+         createStudyModel.currentStudy?.value?.let{study ->
+             createRuleModel.onRuleFieldSelected(study, position)
         }
         Log.d("HERE", "HERE")
     }
     fun onRuleOperatorSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        currentRule?.value?.let{rule ->
-            currentStudy?.value?.let{study ->
-                val operator = operators[position]
-                rule.operator = OperatorConverter.fromString(operator)
-            }
-
+        createStudyModel.currentStudy?.value?.let{study ->
+             createRuleModel.onRuleOperatorSelected(study, position)
         }
-        Log.d("HERE", "HERE")
     }
     //endregion
 }

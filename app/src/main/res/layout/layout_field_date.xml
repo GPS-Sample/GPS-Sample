@@ -25,7 +25,7 @@
             android:layout_marginEnd="20dp"
             android:text="Date"
             android:textSize="18sp"
-            android:onCheckedChanged="@{viewModel::onFieldDateSelected}"/>
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldDateSelected}"/>
 
         <CheckBox
             android:id="@+id/time_checkBox"
@@ -35,7 +35,7 @@
             android:layout_marginEnd="20dp"
             android:text="Time"
             android:textSize="18sp"
-            android:onCheckedChanged="@{viewModel::onFieldTimeSelected}"/>
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldTimeSelected}"/>
 
         <CheckBox
             android:id="@+id/pii_checkBox"
@@ -45,7 +45,7 @@
             android:layout_marginEnd="20dp"
             android:text="Personally Identifiable Information"
             android:textSize="18sp"
-            android:onCheckedChanged="@{viewModel::onFieldPIISelected}"/>
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"/>
 
         <CheckBox
             android:id="@+id/required_checkBox"
@@ -55,6 +55,6 @@
             android:layout_marginEnd="20dp"
             android:text="Required"
             android:textSize="18sp"
-            android:onCheckedChanged="@{viewModel::onFieldRequiredSelected}"/>
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldRequiredSelected}"/>
     </LinearLayout>
 </layout>

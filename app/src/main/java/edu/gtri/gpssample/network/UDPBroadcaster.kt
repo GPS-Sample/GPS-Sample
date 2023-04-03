@@ -174,17 +174,17 @@ class UDPBroadcaster
 
             NetworkCommand.NetworkFilterRulesRequest -> {
                 fragment.lifecycleScope.launch {
-                    val filterRules = DAO.filterRuleDAO.getFilterRules( networkCommand.parm1 )
-                    if (filterRules.isEmpty())
-                    {
-                        Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} does not contain any FilterRules.>", Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        val networkFilterRules = NetworkFilterRules( filterRules )
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFilterRulesResponse, networkCommand.uuid, "", "", networkFilterRules.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    }
+//                    val filterRules = DAO.filterRuleDAO.getFilterRules( networkCommand.parm1 )
+//                    if (filterRules.isEmpty())
+//                    {
+//                        Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} does not contain any FilterRules.>", Toast.LENGTH_SHORT).show()
+//                    }
+//                    else
+//                    {
+//                        val networkFilterRules = NetworkFilterRules( filterRules )
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFilterRulesResponse, networkCommand.uuid, "", "", networkFilterRules.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    }
                 }
             }
 

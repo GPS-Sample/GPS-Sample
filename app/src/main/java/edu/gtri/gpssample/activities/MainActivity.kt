@@ -40,13 +40,6 @@ class MainActivity : AppCompatActivity()
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
         configurationViewModel = viewModel
-        lifecycleScope.launch {
-        //    repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.uiState.collect {
-//                    // Update UI elements
-//                }
-        //    }
-        }
 
         if (savedInstanceState == null)
         {
@@ -55,10 +48,10 @@ class MainActivity : AppCompatActivity()
 
             // These are hacks
 
-            DAO.fieldDAO.deleteOrphans()
-            DAO.filterDAO.deleteOrphans()
+//            DAO.fieldDAO.deleteOrphans()
+//            DAO.filterDAO.deleteOrphans()
 
-            DAO.filterRuleDAO.deleteOrphans()
+            //DAO.filterRuleDAO.deleteOrphans()
             DAO.sampleDAO.deleteOrphans()
             //DAO.navPlanDAO.deleteOrphans()
             DAO.enumAreaDAO.deleteOrphans()
@@ -76,11 +69,11 @@ class MainActivity : AppCompatActivity()
 //            val rules = DAO.ruleDAO.getRules()
 //            Log.d( "xxx", "found ${rules.size} Rules" )
 
-            val filters = DAO.filterDAO.getFilters()
-            Log.d( "xxx", "found ${filters.size} Filters" )
-
-            val filterRules = DAO.filterRuleDAO.getFilterRules()
-            Log.d( "xxx", "found ${filterRules.size} FilterRules" )
+//            val filters = DAO.filterDAO.getFilters()
+//            Log.d( "xxx", "found ${filters.size} Filters" )
+//
+//            val filterRules = DAO.filterRuleDAO.getFilterRules()
+//            Log.d( "xxx", "found ${filterRules.size} FilterRules" )
 
             val enumAreas = DAO.enumAreaDAO.getEnumAreas()
             Log.d( "xxx", "found ${enumAreas.size} EnumAreas" )
