@@ -262,8 +262,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
         sharedViewModel.addStudy()
-        val bundle = Bundle()
-        findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
+        findNavController().popBackStack()
     }
 
     override fun didAnswerNo()
