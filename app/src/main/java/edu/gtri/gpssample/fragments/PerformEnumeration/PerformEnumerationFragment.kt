@@ -13,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -28,8 +29,9 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 {
     private lateinit var team: Team
     private lateinit var study: Study
-    private lateinit var enumArea: EnumArea
     private lateinit var map: GoogleMap
+    private lateinit var location: LatLng;
+    private lateinit var enumArea: EnumArea
     private lateinit var viewModel: DefineEnumerationAreaViewModel
 
     private var _binding: FragmentPerformEnumerationBinding? = null
@@ -135,6 +137,12 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+
+        map.setOnMapClickListener {
+            location = it;
+            map.clear()
+            map.addMarker(MarkerOptions().position(it))
+        }
 
         if (enumArea.shape == Shape.Rectangle.toString())
         {
