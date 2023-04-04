@@ -61,7 +61,7 @@ class AddHouseholdFragment : Fragment()
 
         //val fields = DAO.fieldDAO.getFields( study_uuid )
 
-      //  addHouseholdAdapter = AddHouseholdAdapter( fields )
+        addHouseholdAdapter = AddHouseholdAdapter( ArrayList<Field>())
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = addHouseholdAdapter
