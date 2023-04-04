@@ -95,7 +95,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         selectedConfig?.let {
             sharedViewModel.deleteConfig(it)
-          //  manageConfigurationsAdapter.updateConfigurations( sharedViewModel.Configurations)
+            manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations)
         }
     }
 
