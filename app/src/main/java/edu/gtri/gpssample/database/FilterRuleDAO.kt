@@ -115,7 +115,7 @@ class FilterRuleDAO(private var dao: DAO)
         val connector = ConnectorConverter.fromIndex(
             cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX)))
 
-        return FilterRule(id, -1 , uuid, rule, connector)
+        return FilterRule(id, uuid, -1, rule, connector)
     }
 
     //--------------------------------------------------------------------------

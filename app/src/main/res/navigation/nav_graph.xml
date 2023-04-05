@@ -264,6 +264,9 @@
         android:id="@+id/CreateFilterFragment"
         android:name="edu.gtri.gpssample.fragments.createfilter.CreateFilterFragment"
         tools:layout="@layout/fragment_create_filter">
+        <action
+            android:id="@+id/action_navigate_to_SelectRuleDialogFragment"
+            app:destination="@id/SelectRuleDialogFragment" />
     </fragment>
 
     <!--ManageSampleFragment-->
@@ -359,5 +362,10 @@
         android:name="edu.gtri.gpssample.fragments.AddLocation.AddLocationFragment"
         tools:layout="@layout/fragment_add_location">
     </fragment>
+    <dialog
+        android:id="@+id/SelectRuleDialogFragment"
+        android:name="edu.gtri.gpssample.dialogs.SelectRuleDialogFragment"
+        android:label="dialog_select_rule"
+        tools:layout="@layout/dialog_select_rule" />
 
 </navigation>

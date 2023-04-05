@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.Operator
 import edu.gtri.gpssample.constants.OperatorConverter
 import edu.gtri.gpssample.database.DAO
@@ -26,6 +27,7 @@ class CreateRuleModel {
 
     val operators : Array<String>
         get() = OperatorConverter.array
+
 
     fun addRule(study : Study)
     {
@@ -62,7 +64,6 @@ class CreateRuleModel {
 
 
     }
-
     fun deleteRule(rule:Rule, study : Study)
     {
 
@@ -91,7 +92,7 @@ class CreateRuleModel {
     {
         currentRule?.value?.let{rule ->
             val operator = OperatorConverter.array[position]
-                rule.operator = OperatorConverter.fromString(operator)
+            rule.operator = OperatorConverter.fromString(operator)
         }
 
 

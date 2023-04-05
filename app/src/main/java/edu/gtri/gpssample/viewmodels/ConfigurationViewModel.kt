@@ -14,10 +14,7 @@ import kotlin.collections.ArrayList
 
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.viewmodels.models.CreateFieldModel
-import edu.gtri.gpssample.viewmodels.models.CreateFilterModel
-import edu.gtri.gpssample.viewmodels.models.CreateRuleModel
-import edu.gtri.gpssample.viewmodels.models.CreateStudyModel
+import edu.gtri.gpssample.viewmodels.models.*
 
 class ConfigurationViewModel : ViewModel()
 {
@@ -43,13 +40,10 @@ class ConfigurationViewModel : ViewModel()
     val createStudyModel : CreateStudyModel = CreateStudyModel()
     val createFieldModel : CreateFieldModel = CreateFieldModel()
     val createRuleModel : CreateRuleModel = CreateRuleModel()
+    val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
 
     // Exposed LiveData each screen being controlled by the view model
     var currentConfiguration : LiveData<Config>? =_currentConfiguration
-
-
-
-
 
     val configurations : ArrayList<Config>
         get() = _configurations
@@ -265,7 +259,7 @@ class ConfigurationViewModel : ViewModel()
          createStudyModel.currentStudy?.value?.let{study ->
              createRuleModel.onRuleFieldSelected(study, position)
         }
-        Log.d("HERE", "HERE")
+
     }
     fun onRuleOperatorSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
@@ -274,4 +268,22 @@ class ConfigurationViewModel : ViewModel()
         }
     }
     //endregion
+
+    //region FilterRule
+    fun onFilterRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        createStudyModel.currentStudy?.value?.let{study ->
+            createFilterRuleModel.onFilterRuleFieldSelected(study, position)
+        }
+
+    }
+
+    fun addFilerRule()
+    {
+        createFilterModel.currentFilter?.value?.let{filter ->
+            createFilterRuleModel.addFilterRule(filter)
+
+        }
+    }
+
 }

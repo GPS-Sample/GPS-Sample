@@ -19,6 +19,10 @@ data class Rule(
 {
     constructor(uuid: String, field: Field?, name: String, operator: Operator,
                 value: String) : this(null, uuid, field, name, operator, value)
+
+    override fun toString(): String {
+        return name
+    }
     fun pack() : String
     {
         return Json.encodeToString( this )

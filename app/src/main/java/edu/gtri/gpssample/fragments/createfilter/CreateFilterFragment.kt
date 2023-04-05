@@ -13,17 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.SelectRuleDialog
+
+import edu.gtri.gpssample.dialogs.SelectRuleDialogFragment
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
+class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogDelegate
 {
 
     private var _binding: FragmentCreateFilterBinding? = null
@@ -86,7 +86,14 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
-            SelectRuleDialog( activity!!, sharedViewModel, null, null, this )
+            val bundle = Bundle()
+            sharedViewModel.createFilterRuleModel.createNewFilterRule()
+            findNavController().navigate(R.id.action_navigate_to_SelectRuleDialogFragment, bundle)
+
+//            SelectRuleDialogFragment().show(
+//                childFragmentManager, SelectRuleDialogFragment.TAG)
+
+            //SelectedRuleDialog( activity!!, sharedViewModel, null, null, this )
         }
 
 //        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
@@ -201,12 +208,12 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         }
     }
 
-    override fun didDismissSelectRuleDialog()
-    {
-       // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-
-      //  createFilterAdapter.updateFilterRules( filterRules )
-    }
+//    override fun didDismissSelectRuleDialog()
+//    {
+//       // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+//
+//      //  createFilterAdapter.updateFilterRules( filterRules )
+//    }
 
     override fun onDestroyView()
     {

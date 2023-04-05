@@ -4,8 +4,12 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import edu.gtri.gpssample.constants.Connector
+import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.models.Filter
+import edu.gtri.gpssample.database.models.FilterRule
+import edu.gtri.gpssample.database.models.Rule
 import java.util.*
 
 class CreateFilterModel {
@@ -32,12 +36,23 @@ class CreateFilterModel {
                 }
             }
         }
+
     fun createNewFiler()
     {
         val newFilter = Filter( UUID.randomUUID().toString(), -1,"", -1, 0 )
         _currentFilter = MutableLiveData(newFilter)
         currentFilter = _currentFilter
     }
+
+    fun addFilterRule(order : Int, rule : Rule, connector : Connector)
+    {
+        _currentFilter?.value?.let{filter ->
+            //val count
+        }
+
+
+    }
+
     fun deleteCurrentFilter()
     {
         _currentFilter = null
