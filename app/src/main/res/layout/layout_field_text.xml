@@ -25,6 +25,7 @@
             android:layout_marginEnd="20dp"
             android:text="Personally Identifiable Information"
             android:textSize="18sp"
+            android:checked="@{viewModel.createFieldModel.tempField.pii}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"/>
 
         <CheckBox
@@ -35,6 +36,7 @@
             android:layout_marginEnd="20dp"
             android:text="Required"
             android:textSize="18sp"
+            android:checked="@{viewModel.createFieldModel.tempField.required}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldRequiredSelected}"/>
     </LinearLayout>
 </layout>

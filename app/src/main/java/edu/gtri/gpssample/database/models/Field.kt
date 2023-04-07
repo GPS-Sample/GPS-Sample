@@ -28,6 +28,11 @@ data class Field(
                 option3: String, option4: String ) : this(null, uuid, name, type,
                 pii, required, integerOnly, date, time, option1, option2, option3, option4)
 
+    fun copy() : Field
+    {
+        return Field( uuid, name, type, pii, required, integerOnly, date, time, option1, option2, option3, option4 )
+    }
+
     fun pack() : String
     {
         return Json.encodeToString( this )

@@ -13,12 +13,15 @@ import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
 import java.util.*
 
-class CreateFieldModel {
-
-    private var _fieldTypePosition : MutableLiveData<Int> = MutableLiveData(0)
+class CreateFieldModel
+{
     private var _currentField : MutableLiveData<Field>? = null
+    private var _fieldTypePosition : MutableLiveData<Int> = MutableLiveData(0)
+    private var _fieldType: MutableLiveData<FieldType> = MutableLiveData( FieldType.Text )
 
+    var tempField : MutableLiveData<Field>? = null
     var currentField : LiveData<Field>? = _currentField
+    var fieldType : LiveData<FieldType> = _fieldType
 
     val fieldTypePosition : MutableLiveData<Int>
         get() = _fieldTypePosition
@@ -28,7 +31,7 @@ class CreateFieldModel {
 
     fun createNewField()
     {
-        val newField = Field( UUID.randomUUID().toString(), "", FieldType.None, false, false, false, false, false, "", "", "", "" )
+        val newField = Field( UUID.randomUUID().toString(), "", FieldType.Text, false, false, false, false, false, "", "", "", "" )
         _currentField = MutableLiveData(newField)
         currentField = _currentField
     }
@@ -46,7 +49,7 @@ class CreateFieldModel {
 
     fun setSelectedField(field : Field)
     {
-        _currentField?.value = field
+        _currentField = MutableLiveData(field)
         currentField = _currentField
     }
 
@@ -62,49 +65,46 @@ class CreateFieldModel {
 
     fun onFieldTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        Log.d("TEST","xxxxx")
         if(position < FieldTypeConverter.array.size)
         {
-            val fieldType : String = FieldTypeConverter.array[position]
-            _currentField?.value?.let {
-                it.type = FieldTypeConverter.fromString( fieldType)
+            val type : String = FieldTypeConverter.array[position]
+            tempField?.value?.let {
+                it.type = FieldTypeConverter.fromString( type )
+                _fieldType.value = it.type
             }
         }
     }
+
     fun onFieldPIISelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        Log.d("xxx", "PII SELECTED CHANGED $isChecked")
-        currentField?.value?.let{field ->
+        tempField?.value?.let{field ->
             field.pii = isChecked
         }
     }
 
     fun onFieldRequiredSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
-        currentField?.value?.let{field ->
+        tempField?.value?.let{field ->
             field.required = isChecked
         }
     }
+
     fun onFieldIntegerOnlySelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        currentField?.value?.let{field ->
+        tempField?.value?.let{field ->
             field.integerOnly = isChecked
         }
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
     }
     fun onFieldDateSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        currentField?.value?.let{field ->
+        tempField?.value?.let{field ->
             field.date = isChecked
         }
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
     }
     fun onFieldTimeSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        currentField?.value?.let{field ->
+        tempField?.value?.let{field ->
             field.time = isChecked
         }
-        Log.d("xxx", "Required SELECTED CHANGED $isChecked")
     }
 }

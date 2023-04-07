@@ -46,7 +46,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:hint="@string/enter_field_name"
-                    android:text="@={viewModel.createFieldModel.currentField.name}"
+                    android:text="@={viewModel.createFieldModel.tempField.name}"
                     android:imeOptions="actionDone"
                     android:inputType="textCapWords" />
 

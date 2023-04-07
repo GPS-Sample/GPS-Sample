@@ -37,6 +37,7 @@ class FieldDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_STUDY_ID, study.id )
 
+        values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
         values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
         values.put( DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
@@ -74,39 +75,6 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-//    fun exists( uuid: String ) : Boolean
-//    {
-//        return getField( uuid ) != null
-//    }
-
-    //--------------------------------------------------------------------------
-//    fun doesNotExist( uuid: String ) : Boolean
-//    {
-//        return !exists( uuid )
-//    }
-
-    //--------------------------------------------------------------------------
-//    private fun getField( uuid: String ): Field?
-//    {
-//        var field: Field? = null
-//        val db = dao.writableDatabase
-//        val query = "SELECT * FROM ${DAO.TABLE_FIELD} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-//        val cursor = db.rawQuery(query, null)
-//
-//        if (cursor.count > 0)
-//        {
-//            cursor.moveToNext()
-//
-//            field = createField( cursor )
-//        }
-//
-//        cursor.close()
-//        db.close()
-//
-//        return field
-//    }
-
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun  buildField(cursor: Cursor ): Field
     {
@@ -126,6 +94,7 @@ class FieldDAO(private var dao: DAO)
         val option4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_4))
 
         val type = FieldTypeConverter.fromIndex(type_index)
+
         return Field(id, uuid,  name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
@@ -158,19 +127,5 @@ class FieldDAO(private var dao: DAO)
 
         db.delete(DAO.TABLE_FIELD, whereClause, args)
         db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteOrphans()
-    {
-//        val fields = getFields()
-//
-//        for (field in fields)
-//        {
-//            if (DAO.studyDAO.doesNotExist( field.study_uuid ))
-//            {
-//                deleteField( field )
-//            }
-//        }
     }
 }

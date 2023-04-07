@@ -31,7 +31,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.currentField.option1}"/>
+                android:text="@={viewModel.createFieldModel.tempField.option1}"/>
 
             <Button
                 android:id="@+id/option_1_button"
@@ -57,7 +57,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.currentField.option2}"/>
+                android:text="@={viewModel.createFieldModel.tempField.option2}"/>
 
             <Button
                 android:id="@+id/option_2_button"
@@ -83,7 +83,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.currentField.option3}"/>
+                android:text="@={viewModel.createFieldModel.tempField.option3}"/>
 
             <Button
                 android:id="@+id/option_3_button"
@@ -109,7 +109,7 @@
                 android:layout_height="50dp"
                 android:layout_weight="1"
                 android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.currentField.option4}"/>
+                android:text="@={viewModel.createFieldModel.tempField.option4}"/>
 
             <Button
                 android:id="@+id/option_4_button"
@@ -135,8 +135,8 @@
             android:layout_marginEnd="20dp"
             android:text="Personally Identifiable Information"
             android:textSize="18sp"
-            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"
-            />
+            android:checked="@{viewModel.createFieldModel.tempField.pii}"
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"/>
 
         <CheckBox
             android:id="@+id/required_checkBox"
@@ -146,8 +146,7 @@
             android:layout_marginEnd="20dp"
             android:text="Required"
             android:textSize="18sp"
+            android:checked="@{viewModel.createFieldModel.tempField.required}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldRequiredSelected}"/>
-
-
     </LinearLayout>
 </layout>

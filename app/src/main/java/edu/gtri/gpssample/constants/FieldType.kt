@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 enum class FieldType (val format : String) {
-    None("None"),
     Text("Text"),
     Number("Number"),
     Date("Date"),
@@ -35,25 +34,23 @@ object FieldTypeConverter
     {
         return when(fieldType)
         {
-            FieldType.Text -> 1
-            FieldType.Number -> 2
-            FieldType.Date -> 3
-            FieldType.Checkbox -> 4
-            FieldType.Dropdown -> 5
-            else -> 0
+            FieldType.Text -> 0
+            FieldType.Number -> 1
+            FieldType.Date -> 2
+            FieldType.Checkbox -> 3
+            FieldType.Dropdown -> 4
         }
     }
     fun fromIndex( index : Int) : FieldType
     {
         return when(index)
         {
-            1 -> FieldType.Text
-            2 -> FieldType.Number
-            3 -> FieldType.Date
-            4 -> FieldType.Checkbox
-            5 -> FieldType.Dropdown
-
-            else -> FieldType.None
+            0 -> FieldType.Text
+            1 -> FieldType.Number
+            2 -> FieldType.Date
+            3 -> FieldType.Checkbox
+            4 -> FieldType.Dropdown
+            else -> FieldType.Text
         }
     }
 
@@ -66,7 +63,7 @@ object FieldTypeConverter
             FieldType.Date.format -> FieldType.Date
             FieldType.Checkbox.format -> FieldType.Checkbox
             FieldType.Dropdown.format -> FieldType.Dropdown
-            else -> FieldType.None
+            else -> FieldType.Text
         }
     }
 }
