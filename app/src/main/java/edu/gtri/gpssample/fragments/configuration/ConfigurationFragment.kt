@@ -98,18 +98,18 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
         studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
-        enumerationAreasAdapter.updateEnumAreas(sharedViewModel.currentConfiguration?.value?.enumAreas)
+
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            enumerationAreasAdapter.updateEnumAreas(DAO.enumAreaDAO.getEnumAreas(config.id!!))
+        }
 
         // set the first study as selected.  TODO: save the id of the selected study
         sharedViewModel.currentConfiguration?.value?.let { config ->
             if(config.studies.count() > 0)
             {
                 config.currentStudy = config.studies[0]
-
             }
         }
-
-
     }
     override fun onDestroyView()
     {
@@ -153,7 +153,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                 }
 
                 // HACK HACK
-                val srb = LatLng(30.330603,-86.165004 )
+                val srb = LatLng(30.335603,-86.165004 )
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
             }
         }

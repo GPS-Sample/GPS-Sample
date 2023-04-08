@@ -106,7 +106,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
         binding.saveButton.setOnClickListener {
 
             // TODO: add enumeration area to current configuration
-            sharedViewModel.addEnumerationAreas(enumAreas  )
+//            sharedViewModel.addEnumerationAreas(enumAreas  )
 
             findNavController().popBackStack()
 
