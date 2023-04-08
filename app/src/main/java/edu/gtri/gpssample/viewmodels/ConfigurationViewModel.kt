@@ -14,10 +14,7 @@ import kotlin.collections.ArrayList
 
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.viewmodels.models.CreateFieldModel
-import edu.gtri.gpssample.viewmodels.models.CreateFilterModel
-import edu.gtri.gpssample.viewmodels.models.CreateRuleModel
-import edu.gtri.gpssample.viewmodels.models.CreateStudyModel
+import edu.gtri.gpssample.viewmodels.models.*
 
 class ConfigurationViewModel : ViewModel()
 {
@@ -43,6 +40,8 @@ class ConfigurationViewModel : ViewModel()
     val createStudyModel : CreateStudyModel = CreateStudyModel()
     val createFieldModel : CreateFieldModel = CreateFieldModel()
     val createRuleModel : CreateRuleModel = CreateRuleModel()
+    val enumAreaViewModel : EnumAreaViewModel = EnumAreaViewModel()
+    var teamViewModel : TeamViewModel = TeamViewModel()
 
     // Exposed LiveData each screen being controlled by the view model
     var currentConfiguration : LiveData<Config>? =_currentConfiguration

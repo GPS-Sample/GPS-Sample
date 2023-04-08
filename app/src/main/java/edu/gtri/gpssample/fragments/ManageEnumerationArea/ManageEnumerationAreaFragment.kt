@@ -11,6 +11,7 @@ import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -28,6 +29,7 @@ import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -41,13 +43,13 @@ import java.net.NetworkInterface
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-
 class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate
 {
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
     private lateinit var studyAdapter: ManageEnumerationAreaAdapter
     private lateinit var viewModel: ManageEnumerationAreaViewModel
+    private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var dataIsFresh = false
     private var _binding: FragmentManageEnumerationAreaBinding? = null
@@ -55,13 +57,13 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     private val compositeDisposable = CompositeDisposable()
     private var users = ArrayList<User>()
     private var gpsSamleWifiManager: GPSSampleWifiManager? = null
-
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ManageEnumerationAreaViewModel::class.java)
-    }
 
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         setHasOptionsMenu( true )
@@ -75,46 +77,12 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         super.onViewCreated(view, savedInstanceState)
 
-        // required: studyId
-        if (arguments == null)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.",Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.createStudyModel.currentStudy?.value?.let {
+            study = it
         }
 
-        val study_uuid = arguments!!.getString(Keys.kStudy_uuid.toString(), "");
-
-        if (study_uuid.isEmpty()) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
-            this.study = study
-        }
-
-        if (!this::study.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id ${study_uuid} not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // required enumArea_uuid
-        val enumArea_id = arguments!!.getInt(Keys.kEnumArea_id.toString(), -1);
-
-        if (enumArea_id < 0) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: enumArea_uuid.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.enumAreaDAO.getEnumArea( enumArea_id )?.let {
-            this.enumArea = it
-        }
-
-        if (!this::enumArea.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_id} not found.", Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
         }
 
         binding.studyNameTextView.setText( enumArea.name )
@@ -151,10 +119,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         }
 
         binding.superviseButton.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-            bundle.putInt( Keys.kEnumArea_id.toString(), enumArea.id!! )
-            findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
+            findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment)
         }
 
         binding.finishButton.setOnClickListener {

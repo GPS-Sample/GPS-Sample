@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Team
 
 class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<ManageEnumerationTeamsAdapter.ViewHolder>()

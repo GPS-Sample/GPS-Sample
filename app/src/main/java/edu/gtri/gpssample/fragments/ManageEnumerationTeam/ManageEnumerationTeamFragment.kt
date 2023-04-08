@@ -14,6 +14,7 @@ import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -35,6 +36,7 @@ import edu.gtri.gpssample.fragments.configuration.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -55,7 +57,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
     private lateinit var studyAdapter: ManageEnumerationAreaAdapter
-    private lateinit var viewModel: ManageEnumerationAreaViewModel
+    private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var dataIsFresh = false
     private var _binding: FragmentManageEnumerationTeamBinding? = null
@@ -67,7 +69,9 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ManageEnumerationAreaViewModel::class.java)
+
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -83,64 +87,16 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         super.onViewCreated(view, savedInstanceState)
 
-        // required: studyId
-        if (arguments == null)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.",Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.createStudyModel.currentStudy?.value?.let {
+            study = it
         }
 
-        val study_uuid = arguments!!.getString(Keys.kStudy_uuid.toString(), "");
-
-        if (study_uuid.isEmpty()) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
         }
 
-        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
-            this.study = study
-        }
-
-        if (!this::study.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id ${study_uuid} not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // required enumArea_uuid
-        val enumArea_id = arguments!!.getInt(Keys.kEnumArea_id.toString(), -1);
-
-        if (enumArea_id < 0) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: enumArea_uuid.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.enumAreaDAO.getEnumArea( enumArea_id )?.let {
-            this.enumArea = it
-        }
-
-        if (!this::enumArea.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_id} not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // required team_uuid
-        val team_uuid = arguments!!.getString(Keys.kTeam_uuid.toString(), "");
-
-        if (team_uuid.isEmpty()) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: team_uuid.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.teamDAO.getTeam( team_uuid )?.let {
-            this.team = it
-        }
-
-        if (!this::team.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Team with id ${team_uuid} not found.", Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.teamViewModel.currentTeam?.value?.let {
+            team = it
         }
 
         binding.teamNameTextView.setText( team.name )
@@ -177,11 +133,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         }
 
         binding.performEnumerationButton.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
-            bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-            bundle.putInt( Keys.kEnumArea_id.toString(), enumArea.id!! )
-            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
+            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
         }
 
         binding.finishButton.setOnClickListener {
@@ -205,7 +157,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         val jsonObject = JSONObject()
         jsonObject.put( Keys.kSSID.toString(), ssid )
         jsonObject.put( Keys.kPass.toString(), pass )
-        jsonObject.put( Keys.kTeam_uuid.toString(), team.uuid )
+        jsonObject.put( Keys.kTeam_id.toString(), team.id )
         jsonObject.put( Keys.kStudy_uuid.toString(), study.uuid )
         jsonObject.put( Keys.kEnumArea_id.toString(), enumArea.id )
         jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )

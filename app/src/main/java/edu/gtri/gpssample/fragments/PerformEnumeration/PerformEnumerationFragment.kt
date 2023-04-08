@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -24,6 +25,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.fragments.defineenumeration.DefineEnumerationAreaViewModel
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 {
@@ -32,7 +34,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     private lateinit var map: GoogleMap
     private lateinit var location: LatLng;
     private lateinit var enumArea: EnumArea
-    private lateinit var viewModel: DefineEnumerationAreaViewModel
+    private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
@@ -40,7 +42,9 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(DefineEnumerationAreaViewModel::class.java)
+
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -53,57 +57,16 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val study_uuid = arguments!!.getString(Keys.kStudy_uuid.toString(), "");
-
-        if (study_uuid.isEmpty()) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.createStudyModel.currentStudy?.value?.let {
+            study = it
         }
 
-        DAO.studyDAO.getStudy( study_uuid )?.let { study ->
-            this.study = study
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
         }
 
-        if (!this::study.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Study with id ${study_uuid} not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // required enumArea_uuid
-        val enumArea_id = arguments!!.getInt(Keys.kEnumArea_id.toString(), -1);
-
-        if (enumArea_id < 0) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: enumArea_uuid.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.enumAreaDAO.getEnumArea( enumArea_id )?.let {
-            this.enumArea = it
-        }
-
-        if (!this::enumArea.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_id} not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // required team_uuid
-        val team_uuid = arguments!!.getString(Keys.kTeam_uuid.toString(), "");
-
-        if (team_uuid.isEmpty()) {
-            Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: team_uuid.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.teamDAO.getTeam( team_uuid )?.let {
-            this.team = it
-        }
-
-        if (!this::team.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Team with id ${team_uuid} not found.", Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.teamViewModel.currentTeam?.value?.let {
+            team = it
         }
 
         binding.titleTextView.text = enumArea.name + " (" + team.name + ")"
@@ -114,9 +77,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         binding.addHouseholdButton.setOnClickListener {
 
-            val bundle = Bundle()
-            bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
         }
 
         binding.addLocationButton.setOnClickListener {

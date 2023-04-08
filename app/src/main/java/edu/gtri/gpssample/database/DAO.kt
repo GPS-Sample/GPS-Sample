@@ -170,12 +170,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableTeam = ("CREATE TABLE " +
                 TABLE_TEAM + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
-
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                // this needs to be a foreign key
-                COLUMN_TEAM_ENUM_AREA_UUID + " TEXT" + "," +
-
                 COLUMN_TEAM_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
@@ -184,12 +179,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableTeamMember = ("CREATE TABLE " +
                 TABLE_TEAM_MEMBER + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
-
                 COLUMN_TEAM_ID + " INTEGER" + "," +
-                // this needs to be a foreign key
-                COLUMN_TEAM_MEMBER_TEAM_UUID + " TEXT" + "," +
-
                 COLUMN_TEAM_MEMBER_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                 ")")
@@ -326,12 +316,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // Team Table
         const val TABLE_TEAM = "team"
-        const val COLUMN_TEAM_ENUM_AREA_UUID = "team_enum_area_uuid"
         const val COLUMN_TEAM_NAME = "team_name"
 
         // Team Member Table
         const val TABLE_TEAM_MEMBER = "team_member"
-        const val COLUMN_TEAM_MEMBER_TEAM_UUID = "team_member_team_uuid"
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
 
         // DAO's

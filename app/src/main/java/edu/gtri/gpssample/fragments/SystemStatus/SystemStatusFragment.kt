@@ -242,7 +242,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             if (team_uuid.isNotEmpty())
             {
                 val bundle = Bundle()
-                bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
+//                bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
                 bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
                 bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
                 findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
@@ -332,7 +332,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             val ssid = jsonObject.getString( Keys.kSSID.toString() )
             val pass = jsonObject.getString( Keys.kPass.toString() )
 
-            val team_uuid = jsonObject.opt( Keys.kTeam_uuid.toString())
+//            val team_uuid = jsonObject.opt( Keys.kTeam_uuid.toString())
 
             team_uuid?.let {
                 this.team_uuid = it as String

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -16,22 +17,26 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.NavPlan
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.fragments.CreateSample.CreateSampleAdapter
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class AddHouseholdFragment : Fragment()
 {
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var study_uuid: String
-    private lateinit var viewModel: AddHouseholdViewModel
+    private lateinit var study: Study
+    private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AddHouseholdViewModel::class.java)
+
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -44,19 +49,8 @@ class AddHouseholdFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        if (arguments == null)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // required: Study_uuid
-        study_uuid = arguments!!.getString( Keys.kStudy_uuid.toString(), "");
-
-        if (study_uuid.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: studyId.", Toast.LENGTH_SHORT).show()
-            return
+        sharedViewModel.createStudyModel.currentStudy?.value?.let {
+            study = it
         }
 
         //val fields = DAO.fieldDAO.getFields( study_uuid )

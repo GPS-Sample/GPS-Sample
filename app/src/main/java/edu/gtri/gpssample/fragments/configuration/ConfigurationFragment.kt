@@ -44,8 +44,6 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         studiesAdapter = StudiesAdapter(listOf<Study>())
         studiesAdapter.didSelectStudy = this::didSelectStudy
 
-
-
         enumerationAreasAdapter = ManageEnumerationAreasAdapter( listOf<EnumArea>() )
         enumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
     }
@@ -161,13 +159,10 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
-        val bundle = Bundle()
         sharedViewModel.currentConfiguration?.value?.currentStudy?.let{study ->
 
-            bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-            bundle.putInt( Keys.kEnumArea_id.toString(), enumArea.id!! )
-            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
+            sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
         }
-
     }
 }

@@ -11,7 +11,7 @@ enum class Keys {
     kConfigName,
     kUser_uuid,
     kRule_uuid,
-    kTeam_uuid,
+    kTeam_id,
     kField_uuid,
     kStudy_uuid,
     kQuickStart,
