@@ -104,7 +104,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
                 // TODO:  this should be a look up table
                 COLUMN_OPERATOR_ID + " INTEGER" + "," +
-                COLUMN_RULE_VALUE + " TEXT, " +
+                COLUMN_RULE_VALUE + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableRule)

@@ -107,7 +107,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
             // TODO: add enumeration area to current configuration
             sharedViewModel.addEnumerationAreas(enumAreas  )
-            findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
+
+            findNavController().popBackStack()
+
 //            sharedViewModel.saveNewConfiguration()
 //            if (quickStart)
 //            {
@@ -133,16 +135,18 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        enumAreas = DAO.enumAreaDAO.getEnumAreas( config.id!! )
-
         val user = (activity!!.application as? MainApplication)?.user
 
-        if (user!!.role == Role.Admin.toString() && enumAreas!!.isEmpty())
-        {
-            createTestAreas()
-        }
+        config.id?.let {id ->
+            enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
 
-        enumAreas = DAO.enumAreaDAO.getEnumAreas( config.id!! )
+            if (user!!.role == Role.Admin.toString() && enumAreas!!.isEmpty())
+            {
+                createTestAreas()
+            }
+
+            enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
+        }
 
         enumAreas?.let {enumAreas->
             for (enumArea in enumAreas)
@@ -172,7 +176,6 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
             }
         }
-
     }
 
     fun getCenter( enumArea: EnumArea ) : LatLng
