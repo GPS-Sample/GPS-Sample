@@ -48,7 +48,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private var team_uuid = ""
     private var study_uuid = ""
     private var config_uuid = ""
-    private var enum_area_uuid = ""
+    private var enum_area_id = -1
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
     private var udpBroadcaster: UDPBroadcaster? = null
@@ -201,20 +201,20 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.requestEnumAreaButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkEnumAreaRequest, user.uuid, enum_area_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            binding.enumAreaCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
+//            if (!connected())
+//            {
+//                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
+//
+//            val networkCommand = NetworkCommand( NetworkCommand.NetworkEnumAreaRequest, user.uuid, enum_area_id, "", "" )
+//            val networkCommandMessage = Json.encodeToString( networkCommand )
+//
+//            binding.enumAreaCheckBox.isChecked = false
+//
+//            lifecycleScope.launch {
+//                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+//            }
         }
 
         binding.requestTeamButton.setOnClickListener {
@@ -244,14 +244,14 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 val bundle = Bundle()
                 bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
                 bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-                bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
+                bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
                 findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
             }
-            else if (enum_area_uuid.isNotEmpty())
+            else if (enum_area_id > 0)
             {
                 val bundle = Bundle()
                 bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-                bundle.putString( Keys.kEnumArea_uuid.toString(), enum_area_uuid )
+                bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
                 findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
             }
         }
@@ -340,7 +340,7 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
             study_uuid = jsonObject.getString( Keys.kStudy_uuid.toString() )
             config_uuid = jsonObject.getString( Keys.kConfig_uuid.toString() )
-            enum_area_uuid = jsonObject.getString( Keys.kEnumArea_uuid.toString() )
+//            enum_area_uuid = jsonObject.getString( Keys.kEnumArea_uuid.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 try {
@@ -455,15 +455,15 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            val serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
-            // linkProperties.linkAddresses[0] is the IPV6 address
-            val myAddress = linkProperties.linkAddresses[1].toString().substring(0, linkProperties.linkAddresses[1].toString().length-3)
-
-            val components = serverAddress.split(".")
-            val server_udp_address = components[0] + "." + components[1] + "." + components[2] + ".255"
-
-            myInetAddress = InetAddress.getByName( myAddress )
-            broadcastInetAddress = InetAddress.getByName( server_udp_address )
+//            val serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
+//            // linkProperties.linkAddresses[0] is the IPV6 address
+//            val myAddress = linkProperties.linkAddresses[1].toString().substring(0, linkProperties.linkAddresses[1].toString().length-3)
+//
+//            val components = serverAddress.split(".")
+//            val server_udp_address = components[0] + "." + components[1] + "." + components[2] + ".255"
+//
+//            myInetAddress = InetAddress.getByName( myAddress )
+//            broadcastInetAddress = InetAddress.getByName( server_udp_address )
         }
     }
 
@@ -565,30 +565,30 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                 NetworkCommand.NetworkEnumAreaResponse ->
                 {
-                    val enumArea = EnumArea.unpack( networkCommand.message )
-
-                    DAO.enumAreaDAO.createEnumArea( enumArea )
-
-                    if (enumArea.shape == Shape.Rectangle.toString())
-                    {
-                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRectangleRequest, user.uuid, enumArea.shape_uuid, "", "" )
-                        val networkCommandMessage = Json.encodeToString( networkCommand )
-
-                        lifecycleScope.launch {
-                            udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-                        }
-                    }
+//                    val enumArea = EnumArea.unpack( networkCommand.message )
+//
+//                    DAO.enumAreaDAO.createEnumArea( enumArea )
+//
+//                    if (enumArea.shape == Shape.Rectangle.toString())
+//                    {
+//                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRectangleRequest, user.uuid, enumArea.shape_uuid, "", "" )
+//                        val networkCommandMessage = Json.encodeToString( networkCommand )
+//
+//                        lifecycleScope.launch {
+//                            udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
+//                        }
+//                    }
                 }
 
                 NetworkCommand.NetworkRectangleResponse ->
                 {
-                    val rectangle = Rectangle.unpack( networkCommand.message )
-
-                    DAO.rectangleDAO.createRectangle( rectangle )
-
-                    activity!!.runOnUiThread {
-                        binding.enumAreaCheckBox.isChecked = true
-                    }
+//                    val rectangle = Rectangle.unpack( networkCommand.message )
+//
+//                    DAO.rectangleDAO.createRectangle( rectangle )
+//
+//                    activity!!.runOnUiThread {
+//                        binding.enumAreaCheckBox.isChecked = true
+//                    }
                 }
 
                 NetworkCommand.NetworkTeamResponse ->

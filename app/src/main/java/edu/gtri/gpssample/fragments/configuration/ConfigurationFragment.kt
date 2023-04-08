@@ -22,7 +22,6 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.Rectangle
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -136,34 +135,26 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
             // put the enums
             sharedViewModel.currentConfiguration?.value?.let {config ->
-                config.enumAreas?.let {enumAreas ->
-                    for (enumArea in enumAreas)
-                    {
-                        if (enumArea.shape == Shape.Rectangle.toString())
-                        {
-                            val rectangle = DAO.rectangleDAO.getRectangle( enumArea.shape_uuid )
+                val enumAreas = DAO.enumAreaDAO.getEnumAreas( config.id!! )
 
-                            rectangle?.let { rectangle
-                                googleMap.addPolyline(
-                                    PolylineOptions()
-                                        .clickable(true)
-                                        .add(
-                                            LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                                            LatLng( rectangle.topRight_lat, rectangle.topRight_lon ),
-                                            LatLng( rectangle.botRight_lat, rectangle.botRight_lon ),
-                                            LatLng( rectangle.botLeft_lat, rectangle.botLeft_lon ),
-                                            LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                                        ))
-
-                            }
-                        }
-                    }
-                    // HACK HACK
-                    val srb = LatLng(30.330603,-86.165004 )
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
-
-
+                for (enumArea in enumAreas)
+                {
+                    googleMap.addPolyline(
+                        PolylineOptions()
+                            .clickable(true)
+                            .add(
+                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                                LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
+                                LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
+                                LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
+                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                            )
+                    )
                 }
+
+                // HACK HACK
+                val srb = LatLng(30.330603,-86.165004 )
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
             }
         }
     }
@@ -174,17 +165,9 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         sharedViewModel.currentConfiguration?.value?.currentStudy?.let{study ->
 
             bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-            bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+            bundle.putInt( Keys.kEnumArea_id.toString(), enumArea.id!! )
             findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
         }
 
-    }
-    // HACK
-    private fun getCenter( rectangle: Rectangle) : LatLng
-    {
-        var sumLat = rectangle.topLeft_lat + rectangle.topRight_lat + rectangle.botRight_lat + rectangle.botLeft_lat
-        var sumLon = rectangle.topLeft_lon + rectangle.topRight_lon + rectangle.botRight_lon + rectangle.botLeft_lon
-
-        return LatLng( sumLat/4.0, sumLon/4.0 )
     }
 }

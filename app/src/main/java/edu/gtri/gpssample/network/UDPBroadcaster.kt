@@ -189,21 +189,21 @@ class UDPBroadcaster
             }
 
             NetworkCommand.NetworkEnumAreaRequest -> {
-                fragment.lifecycleScope.launch {
-                    DAO.enumAreaDAO.getEnumArea( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkEnumAreaResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "enum_area<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.enumAreaDAO.getEnumArea( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkEnumAreaResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "enum_area<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkRectangleRequest -> {
-                fragment.lifecycleScope.launch {
-                    DAO.rectangleDAO.getRectangle( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRectangleResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "rectangle<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.rectangleDAO.getRectangle( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRectangleResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "rectangle<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkTeamRequest -> {

@@ -31,6 +31,7 @@ import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamBinding
 import edu.gtri.gpssample.dialogs.CreateTeamDialog
+import edu.gtri.gpssample.fragments.configuration.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -107,20 +108,20 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         }
 
         // required enumArea_uuid
-        val enumArea_uuid = arguments!!.getString(Keys.kEnumArea_uuid.toString(), "");
+        val enumArea_id = arguments!!.getInt(Keys.kEnumArea_id.toString(), -1);
 
-        if (enumArea_uuid.isEmpty()) {
+        if (enumArea_id < 0) {
             Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: enumArea_uuid.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.enumAreaDAO.getEnumArea( enumArea_uuid )?.let {
+        DAO.enumAreaDAO.getEnumArea( enumArea_id )?.let {
             this.enumArea = it
         }
 
         if (!this::enumArea.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_uuid} not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_id} not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -179,7 +180,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             val bundle = Bundle()
             bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
             bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-            bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+            bundle.putInt( Keys.kEnumArea_id.toString(), enumArea.id!! )
             findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
         }
 
@@ -206,7 +207,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         jsonObject.put( Keys.kPass.toString(), pass )
         jsonObject.put( Keys.kTeam_uuid.toString(), team.uuid )
         jsonObject.put( Keys.kStudy_uuid.toString(), study.uuid )
-        jsonObject.put( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+        jsonObject.put( Keys.kEnumArea_id.toString(), enumArea.id )
         jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )
 
         val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )

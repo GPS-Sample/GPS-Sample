@@ -19,6 +19,6 @@ enum class Keys {
     kConfig_uuid,
     kSample_uuid,
     kNavPlan_uuid,
-    kEnumArea_uuid,
+    kEnumArea_id,
     kSamplingMethod,
 }

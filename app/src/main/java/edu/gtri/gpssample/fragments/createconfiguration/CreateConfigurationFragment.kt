@@ -161,35 +161,28 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
         map?.let{googleMap ->
             googleMap.setOnMapClickListener(this)
             googleMap.uiSettings.isScrollGesturesEnabled = false
-            // put the enums
+
             sharedViewModel.currentConfiguration?.value?.let {config ->
-                config.enumAreas?.let {enumAreas ->
-                    for (enumArea in enumAreas)
-                    {
-                        if (enumArea.shape == Shape.Rectangle.toString())
-                        {
-                            val rectangle = DAO.rectangleDAO.getRectangle( enumArea.shape_uuid )
+                val enumAreas = DAO.enumAreaDAO.getEnumAreas( config.id!! )
 
-                            rectangle?.let { rectangle
-                                googleMap.addPolyline(
-                                    PolylineOptions()
-                                        .clickable(true)
-                                        .add(
-                                            LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                                            LatLng( rectangle.topRight_lat, rectangle.topRight_lon ),
-                                            LatLng( rectangle.botRight_lat, rectangle.botRight_lon ),
-                                            LatLng( rectangle.botLeft_lat, rectangle.botLeft_lon ),
-                                            LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                                        ))
-                            }
-                        }
-                    }
-                    // HACK HACK
-                    val srb = LatLng(30.330603,-86.165004 )
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
-
-
+                for (enumArea in enumAreas)
+                {
+                    googleMap.addPolyline(
+                        PolylineOptions()
+                            .clickable(true)
+                            .add(
+                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                                LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
+                                LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
+                                LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
+                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                            )
+                    )
                 }
+
+                // HACK HACK
+                val srb = LatLng(30.330603,-86.165004 )
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
             }
         }
     }

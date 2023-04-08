@@ -71,20 +71,20 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         }
 
         // required enumArea_uuid
-        val enumArea_uuid = arguments!!.getString(Keys.kEnumArea_uuid.toString(), "");
+        val enumArea_id = arguments!!.getInt(Keys.kEnumArea_id.toString(), -1);
 
-        if (enumArea_uuid.isEmpty()) {
+        if (enumArea_id < 0) {
             Toast.makeText( activity!!.applicationContext, "Fatal! Missing required parameter: enumArea_uuid.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        DAO.enumAreaDAO.getEnumArea( enumArea_uuid )?.let {
+        DAO.enumAreaDAO.getEnumArea( enumArea_id )?.let {
             this.enumArea = it
         }
 
         if (!this::enumArea.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_uuid} not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! EnumArea with id ${enumArea_id} not found.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -144,31 +144,24 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             map.addMarker(MarkerOptions().position(it))
         }
 
-        if (enumArea.shape == Shape.Rectangle.toString())
-        {
-            val rectangle = DAO.rectangleDAO.getRectangle( enumArea.shape_uuid )
-
-            rectangle?.let { rectangle
-                googleMap.addPolyline(
-                    PolylineOptions()
-                        .clickable(true)
-                        .add(
-                            LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                            LatLng( rectangle.topRight_lat, rectangle.topRight_lon ),
-                            LatLng( rectangle.botRight_lat, rectangle.botRight_lon ),
-                            LatLng( rectangle.botLeft_lat, rectangle.botLeft_lon ),
-                            LatLng( rectangle.topLeft_lat, rectangle.topLeft_lon ),
-                        ))
-                val latLng = getCenter( rectangle )
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
-            }
-        }
+        googleMap.addPolyline(
+            PolylineOptions()
+                .clickable(true)
+                .add(
+                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                    LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
+                    LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
+                    LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
+                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                ))
+        val latLng = getCenter()
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
     }
 
-    fun getCenter( rectangle: Rectangle ) : LatLng
+    fun getCenter() : LatLng
     {
-        var sumLat = rectangle.topLeft_lat + rectangle.topRight_lat + rectangle.botRight_lat + rectangle.botLeft_lat
-        var sumLon = rectangle.topLeft_lon + rectangle.topRight_lon + rectangle.botRight_lon + rectangle.botLeft_lon
+        var sumLat = enumArea.topLeft.latitude + enumArea.topRight.latitude + enumArea.botRight.latitude + enumArea.botLeft.latitude
+        var sumLon = enumArea.topLeft.longitude + enumArea.topRight.longitude + enumArea.botRight.longitude + enumArea.botLeft.longitude
 
         return LatLng( sumLat/4.0, sumLon/4.0 )
     }

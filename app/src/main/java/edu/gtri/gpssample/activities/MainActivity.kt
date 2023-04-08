@@ -45,41 +45,6 @@ class MainActivity : AppCompatActivity()
         {
             DAO.createSharedInstance(applicationContext)
             configurationViewModel.initializeConfigurations()
-
-            // These are hacks
-
-//            DAO.fieldDAO.deleteOrphans()
-//            DAO.filterDAO.deleteOrphans()
-
-            //DAO.filterRuleDAO.deleteOrphans()
-            DAO.sampleDAO.deleteOrphans()
-            //DAO.navPlanDAO.deleteOrphans()
-            DAO.enumAreaDAO.deleteOrphans()
-            DAO.teamDAO.deleteOrphans()
-
-//            val configurations = DAO.configDAO.getConfigs()
-//            Log.d( "xxx", "found ${configurations.size} Configurations" )
-
-//            val studies = DAO.studyDAO.getStudies()
-//            Log.d( "xxx", "found ${studies.size} Studies" )
-
-//            val fields = DAO.fieldDAO.getFields()
-//            Log.d( "xxx", "found ${fields.size} Fields" )
-//
-//            val rules = DAO.ruleDAO.getRules()
-//            Log.d( "xxx", "found ${rules.size} Rules" )
-
-//            val filters = DAO.filterDAO.getFilters()
-//            Log.d( "xxx", "found ${filters.size} Filters" )
-//
-//            val filterRules = DAO.filterRuleDAO.getFilterRules()
-//            Log.d( "xxx", "found ${filterRules.size} FilterRules" )
-
-            val enumAreas = DAO.enumAreaDAO.getEnumAreas()
-            Log.d( "xxx", "found ${enumAreas.size} EnumAreas" )
-
-            val teams = DAO.teamDAO.getTeams()
-            Log.d( "xxx", "found ${teams.size} Teams" )
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

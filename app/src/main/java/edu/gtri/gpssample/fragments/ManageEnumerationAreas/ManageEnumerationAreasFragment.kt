@@ -72,9 +72,11 @@ class ManageEnumerationAreasFragment : Fragment()
             return
         }
 
-        val enumAreas = DAO.enumAreaDAO.getEnumAreas( study.config_uuid )
+        DAO.configDAO.getConfig( study.config_uuid )?.let { config ->
+            val enumAreas = DAO.enumAreaDAO.getEnumAreas( config.id!! )
+            manageEnumerationAreasAdapter = ManageEnumerationAreasAdapter( enumAreas )
+        }
 
-        manageEnumerationAreasAdapter = ManageEnumerationAreasAdapter( enumAreas )
         manageEnumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -96,7 +98,7 @@ class ManageEnumerationAreasFragment : Fragment()
     {
         val bundle = Bundle()
         bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-        bundle.putString( Keys.kEnumArea_uuid.toString(), enumArea.uuid )
+        bundle.putInt( Keys.kEnumArea_id.toString(), enumArea.id!! )
         findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment, bundle )
     }
 

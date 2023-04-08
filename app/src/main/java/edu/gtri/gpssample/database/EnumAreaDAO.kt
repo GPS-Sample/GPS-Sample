@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import com.google.android.gms.maps.model.LatLng
 import edu.gtri.gpssample.database.models.EnumArea
 
 class EnumAreaDAO(private var dao: DAO)
@@ -20,11 +21,16 @@ class EnumAreaDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putEnumArea( enumArea: EnumArea, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, enumArea.uuid )
-        values.put( DAO.COLUMN_ENUM_AREA_CONFIG_UUID, enumArea.config_uuid )
+        values.put( DAO.COLUMN_CONFIG_ID, enumArea.config_id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
-        values.put( DAO.COLUMN_ENUM_AREA_SHAPE, enumArea.shape )
-        values.put( DAO.COLUMN_ENUM_AREA_SHAPE_UUID, enumArea.shape_uuid )
+        values.put( DAO.COLUMN_ENUM_AREA_TL_LAT, enumArea.topLeft.latitude )
+        values.put( DAO.COLUMN_ENUM_AREA_TL_LON, enumArea.topLeft.longitude )
+        values.put( DAO.COLUMN_ENUM_AREA_TR_LAT, enumArea.topRight.latitude )
+        values.put( DAO.COLUMN_ENUM_AREA_TR_LON, enumArea.topRight.longitude )
+        values.put( DAO.COLUMN_ENUM_AREA_BR_LAT, enumArea.botRight.latitude )
+        values.put( DAO.COLUMN_ENUM_AREA_BR_LON, enumArea.botRight.longitude )
+        values.put( DAO.COLUMN_ENUM_AREA_BL_LAT, enumArea.botLeft.latitude )
+        values.put( DAO.COLUMN_ENUM_AREA_BL_LON, enumArea.botLeft.longitude )
     }
 
     //--------------------------------------------------------------------------
@@ -32,35 +38,26 @@ class EnumAreaDAO(private var dao: DAO)
     private fun createEnumArea(cursor: Cursor): EnumArea
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID) )
-        val config_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_CONFIG_UUID))
+        val config_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
-        val shape = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_SHAPE))
-        val shape_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_SHAPE_UUID))
+        val tl_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TL_LAT))
+        val tl_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TL_LON))
+        val tr_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TR_LAT))
+        val tr_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TR_LON))
+        val br_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BR_LAT))
+        val br_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BR_LON))
+        val bl_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BL_LAT))
+        val bl_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BL_LON))
 
-        return EnumArea( id, uuid, config_uuid, name, shape, shape_uuid )
+        return EnumArea( id, config_id, name, LatLng(tl_lat,tl_lon), LatLng(tr_lat,tr_lon), LatLng(br_lat,br_lon), LatLng(bl_lat,bl_lon))
     }
 
     //--------------------------------------------------------------------------
-    fun updateEnumArea( enumArea: EnumArea )
-    {
-        val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(enumArea.uuid)
-        val values = ContentValues()
-
-        putEnumArea( enumArea, values )
-
-        db.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun getEnumArea( uuid: String ): EnumArea?
+    fun getEnumArea( id: Int ): EnumArea?
     {
         var enumArea: EnumArea? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_ID} = $id"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -77,23 +74,11 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun exists( uuid: String ) : Boolean
-    {
-        return getEnumArea( uuid ) != null
-    }
-
-    //--------------------------------------------------------------------------
-    fun doesNotExist( uuid: String ) : Boolean
-    {
-        return !exists( uuid )
-    }
-
-    //--------------------------------------------------------------------------
-    fun getEnumAreas( config_uuid: String ): List<EnumArea>
+    fun getEnumAreas( config_id: Int ): List<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_ENUM_AREA_CONFIG_UUID} = '$config_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_ID} = $config_id"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -105,49 +90,5 @@ class EnumAreaDAO(private var dao: DAO)
         db.close()
 
         return enumAreas
-    }
-
-    //--------------------------------------------------------------------------
-    fun getEnumAreas(): List<EnumArea>
-    {
-        val enumAreas = ArrayList<EnumArea>()
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA}"
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            enumAreas.add( createEnumArea( cursor ))
-        }
-
-        cursor.close()
-        db.close()
-
-        return enumAreas
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteEnumArea( enumArea: EnumArea )
-    {
-        val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(enumArea.uuid.toString())
-
-        db.delete(DAO.TABLE_ENUM_AREA, whereClause, args)
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteOrphans()
-    {
-        val enumAreas = getEnumAreas()
-
-        for (enumArea in enumAreas)
-        {
-            if (DAO.configDAO.doesNotExist( enumArea.config_uuid ))
-            {
-                deleteEnumArea( enumArea )
-            }
-        }
     }
 }
