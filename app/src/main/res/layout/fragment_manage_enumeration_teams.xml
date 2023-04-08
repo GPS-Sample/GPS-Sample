@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ManageEnumerationTeams.ManageEnumerationTeamsFragment">
+    tools:context=".fragments.manage_enumeration_teams.ManageEnumerationTeamsFragment">
 
     <FrameLayout
         android:layout_marginBottom="2dp"

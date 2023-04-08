@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.AddLocation
+package edu.gtri.gpssample.fragments.add_location
 
 import androidx.lifecycle.ViewModel
 

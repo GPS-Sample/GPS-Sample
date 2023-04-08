@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.AddHousehold
+package edu.gtri.gpssample.fragments.add_household
 
 import androidx.lifecycle.ViewModel
 

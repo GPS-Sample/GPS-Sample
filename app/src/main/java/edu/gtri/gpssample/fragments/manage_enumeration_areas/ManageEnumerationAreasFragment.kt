@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationAreas
+package edu.gtri.gpssample.fragments.manage_enumeration_areas
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +19,6 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreasBinding
 import edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesViewModel
-import edu.gtri.gpssample.fragments.configuration.ManageEnumerationAreasAdapter
 
 class ManageEnumerationAreasFragment : Fragment()
 {

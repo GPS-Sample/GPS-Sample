@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.configuration
+package edu.gtri.gpssample.fragments.manage_enumeration_areas
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.Study
 
 class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ManageEnumerationAreasAdapter.ViewHolder>()
 {

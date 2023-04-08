@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragments.ManageEnumerationTeam.ManageEnumerationTeamFragment">
+        tools:context=".fragments.manage_enumeration_team.ManageEnumerationTeamFragment">
 
         <TextView
             android:id="@+id/team_name_text_view"

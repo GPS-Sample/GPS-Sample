@@ -186,7 +186,7 @@
 
     <fragment
         android:id="@+id/ManageEnumerationAreasFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageEnumerationAreas.ManageEnumerationAreasFragment"
+        android:name="edu.gtri.gpssample.fragments.manage_enumeration_areas.ManageEnumerationAreasFragment"
         tools:layout="@layout/fragment_manage_enumeration_areas">
 
         <action
@@ -304,7 +304,7 @@
 
     <fragment
         android:id="@+id/ManageEnumerationTeamsFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageEnumerationTeams.ManageEnumerationTeamsFragment"
+        android:name="edu.gtri.gpssample.fragments.manage_enumeration_teams.ManageEnumerationTeamsFragment"
         tools:layout="@layout/fragment_manage_enumeration_teams">
 
         <action
@@ -318,7 +318,7 @@
 
     <fragment
         android:id="@+id/ManageEnumerationTeamFragment"
-        android:name="edu.gtri.gpssample.fragments.ManageEnumerationTeam.ManageEnumerationTeamFragment"
+        android:name="edu.gtri.gpssample.fragments.manage_enumeration_team.ManageEnumerationTeamFragment"
         tools:layout="@layout/fragment_manage_enumeration_team">
 
         <action
@@ -332,7 +332,7 @@
 
     <fragment
         android:id="@+id/PerformEnumerationFragment"
-        android:name="edu.gtri.gpssample.fragments.PerformEnumeration.PerformEnumerationFragment"
+        android:name="edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationFragment"
         tools:layout="@layout/fragment_perform_enumeration">
 
         <action
@@ -350,13 +350,13 @@
 
     <fragment
         android:id="@+id/AddHouseholdFragment"
-        android:name="edu.gtri.gpssample.fragments.AddHousehold.AddHouseholdFragment"
+        android:name="edu.gtri.gpssample.fragments.add_household.AddHouseholdFragment"
         tools:layout="@layout/fragment_add_household">
     </fragment>
 
     <fragment
         android:id="@+id/AddLocationFragment"
-        android:name="edu.gtri.gpssample.fragments.AddLocation.AddLocationFragment"
+        android:name="edu.gtri.gpssample.fragments.add_location.AddLocationFragment"
         tools:layout="@layout/fragment_add_location">
     </fragment>
 

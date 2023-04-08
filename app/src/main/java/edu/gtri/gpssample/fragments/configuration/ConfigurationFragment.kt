@@ -5,7 +5,6 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -24,7 +23,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.fragments.manage_enumeration_areas.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener {

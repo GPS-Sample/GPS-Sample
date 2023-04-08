@@ -1,22 +1,15 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationTeam
+package edu.gtri.gpssample.fragments.manage_enumeration_team
 
 import edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaAdapter
-import edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaViewModel
 
 import android.graphics.Color
-import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,10 +22,8 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.database.models.User
-import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamBinding
 import edu.gtri.gpssample.dialogs.CreateTeamDialog
-import edu.gtri.gpssample.fragments.configuration.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -42,12 +33,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.net.DatagramPacket
-import java.net.InetAddress
-import java.net.NetworkInterface
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 

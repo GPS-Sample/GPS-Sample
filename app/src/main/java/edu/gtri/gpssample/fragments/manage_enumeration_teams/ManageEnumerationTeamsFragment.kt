@@ -1,10 +1,9 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationTeams
+package edu.gtri.gpssample.fragments.manage_enumeration_teams
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -13,14 +12,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
 import edu.gtri.gpssample.dialogs.CreateTeamDialog
-import edu.gtri.gpssample.fragments.ManageSamples.ManageSamplesViewModel
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDialogDelegate

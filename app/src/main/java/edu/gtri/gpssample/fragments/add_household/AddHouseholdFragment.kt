@@ -1,25 +1,19 @@
-package edu.gtri.gpssample.fragments.AddHousehold
+package edu.gtri.gpssample.fragments.add_household
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.NavPlan
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
-import edu.gtri.gpssample.fragments.CreateSample.CreateSampleAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class AddHouseholdFragment : Fragment()

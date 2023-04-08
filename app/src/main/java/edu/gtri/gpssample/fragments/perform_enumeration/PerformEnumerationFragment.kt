@@ -1,13 +1,11 @@
-package edu.gtri.gpssample.fragments.PerformEnumeration
+package edu.gtri.gpssample.fragments.perform_enumeration
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -19,12 +17,8 @@ import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.Shape
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
-import edu.gtri.gpssample.fragments.defineenumeration.DefineEnumerationAreaViewModel
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class PerformEnumerationFragment : Fragment(), OnMapReadyCallback

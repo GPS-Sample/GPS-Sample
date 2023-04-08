@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationTeam
+package edu.gtri.gpssample.fragments.manage_enumeration_team
 
 import androidx.lifecycle.ViewModel
 

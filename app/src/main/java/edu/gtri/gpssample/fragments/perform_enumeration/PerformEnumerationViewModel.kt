@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.PerformEnumeration
+package edu.gtri.gpssample.fragments.perform_enumeration
 
 import androidx.lifecycle.ViewModel
 

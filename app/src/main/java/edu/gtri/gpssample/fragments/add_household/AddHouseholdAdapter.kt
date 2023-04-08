@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.AddHousehold
+package edu.gtri.gpssample.fragments.add_household
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.NavPlan
 
 class AddHouseholdAdapter(var fields: List<Field>?) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
 {
