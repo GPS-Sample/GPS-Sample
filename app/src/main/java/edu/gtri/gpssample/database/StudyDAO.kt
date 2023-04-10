@@ -108,6 +108,8 @@ class StudyDAO(private var dao: DAO)
             study = buildStudy( cursor )
             // now get fields
             study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+
+            // and filters
             Log.d("xxxx ", "")
         }
 
@@ -184,7 +186,10 @@ class StudyDAO(private var dao: DAO)
                 // Add rules to study
                 study.rules.addAll(rules)
             }
-            //study.rules = DAO.ruleDAO.getRulesForField()
+            // find filters
+
+            study.filters.addAll(DAO.filterDAO.getFiltersForStudy(study))
+
         }
         cursor.close()
         db.close()

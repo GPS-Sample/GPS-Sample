@@ -46,7 +46,7 @@ class CreateFieldModel {
 
     fun setSelectedField(field : Field)
     {
-        _currentField?.value = field
+        _currentField = MutableLiveData(field)
         currentField = _currentField
     }
 

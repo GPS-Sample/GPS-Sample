@@ -126,7 +126,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // this is a logic chain
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
                 COLUMN_UUID + " TEXT" + "," +
+                COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
                 COLUMN_FILTER_ID + " INTEGER" + "," +
                 COLUMN_RULE_ID + " INTEGER" + "," +
                 COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
@@ -330,9 +332,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // FilterRule Table
         const val TABLE_FILTERRULE = "filterrule"
-        const val COLUMN_FILTERRULE_STUDY_UUID = "filterrule_study_id"
-        const val COLUMN_FILTERRULE_FILTER_UUID = "filterrule_filter_id"
-        const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
+//        const val COLUMN_FILTERRULE_STUDY_UUID = "filterrule_study_id"
+//        const val COLUMN_FILTERRULE_FILTER_UUID = "filterrule_filter_id"
+//        const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
+        const val COLUMN_FILTERRULE_ORDER = "filterrule_order"
         const val COLUMN_FILTERRULE_CONNECTOR_INDEX = "filterrule_connector_index"
 
         // Sample Table
@@ -425,6 +428,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 77
+        private const val DATABASE_VERSION = 78
     }
 }
