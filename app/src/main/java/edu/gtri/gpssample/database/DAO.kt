@@ -184,6 +184,29 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableTeamMember)
+
+        val createTableEnumData = ("CREATE TABLE " +
+                TABLE_ENUM_DATA + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_USER_ID + " INTEGER" + "," +
+                COLUMN_STUDY_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
+                COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
+                "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
+                ")")
+        db.execSQL(createTableEnumData)
+
+        val createTableFieldData = ("CREATE TABLE " +
+                TABLE_ENUM_DATA + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_FIELD_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
+                COLUMN_FIELD_DATA_RESPONSE + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" + "," +
+                ")")
+        db.execSQL(createTableFieldData)
     }
 
     //--------------------------------------------------------------------------
@@ -203,6 +226,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_MEMBER")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_DATA")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
 
         onCreate(db)
     }
@@ -216,6 +241,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_UUID = "uuid"
         const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
         // foreign key columns
+        const val COLUMN_USER_ID = "user_id"
         const val COLUMN_CONFIG_ID = "config_id"
         const val COLUMN_STUDY_ID = "study_id"
         const val COLUMN_FIELD_ID = "field_id"
@@ -224,6 +250,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
         const val COLUMN_TEAM_ID = "team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
+        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
+
         // Connector Tables
         const val TABLE_CONFIG_STUDY = "config_study_conn"
 
@@ -322,6 +350,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_TEAM_MEMBER = "team_member"
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
 
+        const val TABLE_ENUM_DATA = "enum_data"
+//        const val COLUMN_USER_ID = "user_id"
+//        const val COLUMN_STUDY_ID = "study_id"
+        const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
+        const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
+
+        const val TABLE_FIELD_DATA = "field_data"
+//        const val COLUMN_FIELD_ID = "field_id"
+//        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
+        const val COLUMN_FIELD_DATA_RESPONSE = "field_data_response"
+
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -335,6 +374,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var enumAreaDAO: EnumAreaDAO
         lateinit var teamDAO: TeamDAO
         lateinit var teamMemberDAO: TeamMemberDAO
+        lateinit var enumDataDAO: EnumDataDAO
+        lateinit var fieldDataDAO: FieldDataDAO
 
         // creation/access methods
 
@@ -358,6 +399,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 enumAreaDAO = EnumAreaDAO( instance!! )
                 teamDAO = TeamDAO( instance!! )
                 teamMemberDAO = TeamMemberDAO( instance!! )
+                enumDataDAO = EnumDataDAO( instance!! )
+                fieldDataDAO = FieldDataDAO( instance!! )
             }
 
             return instance!!
