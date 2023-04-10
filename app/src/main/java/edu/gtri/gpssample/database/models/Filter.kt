@@ -10,17 +10,15 @@ import kotlinx.serialization.json.Json
 data class Filter(
     var id : Int? = null,
     var uuid: String,
-    var study_id : Int,
     var name: String,
     var samplingType : SampleType,
     var sampleSize: Int,
     var filterRules : ArrayList<FilterRule>)
 {
-    constructor(uuid: String, study_id: Int, name: String, sampleSize: Int,
-                sampleSizeIndex: Int) : this(null, uuid, study_id, name, SampleType.None, sampleSize,
-                ArrayList<FilterRule>())
-    constructor(id: Int, uuid: String, study_id: Int, name: String, samplingType : SampleType, sampleSize: Int,
-                sampleSizeIndex: Int) : this(id, uuid, study_id, name, samplingType,sampleSize,
+    constructor(uuid: String,  name: String) :
+                this(null, uuid, name, SampleType.None, 0, ArrayList<FilterRule>())
+    constructor(id: Int, uuid: String, name: String, samplingType : SampleType, sampleSize: Int) :
+            this(id, uuid, name, samplingType,sampleSize,
         ArrayList<FilterRule>())
     fun pack() : String
     {

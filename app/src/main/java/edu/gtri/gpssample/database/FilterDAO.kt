@@ -4,10 +4,13 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.constants.Connector
 import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
+import edu.gtri.gpssample.database.models.Rule
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
 
 class FilterDAO(private var dao: DAO)
@@ -79,7 +82,8 @@ class FilterDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun exists( uuid: String ) : Boolean
     {
-        return getFilter( uuid ) != null
+        return false
+        //return getFilter( uuid ) != null
     }
 
     //--------------------------------------------------------------------------
@@ -89,25 +93,25 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFilter( uuid: String ) : Filter?
-    {
-        var filter: Filter? = null
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = db.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            filter = buildFilter( cursor )
-        }
-
-        cursor.close()
-        db.close()
-
-        return filter
-    }
+//    fun getFilter( uuid: String ) : Filter?
+//    {
+//        var filter: Filter? = null
+//        val db = dao.writableDatabase
+//        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+//        val cursor = db.rawQuery(query, null)
+//
+//        if (cursor.count > 0)
+//        {
+//            cursor.moveToNext()
+//
+//            filter = buildFilter( cursor )
+//        }
+//
+//        cursor.close()
+//        db.close()
+//
+//        return filter
+//    }
 
     //--------------------------------------------------------------------------
     @SuppressLint("Range")
@@ -115,26 +119,58 @@ class FilterDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
 
-        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
-        return Filter( id, uuid, study_id, name, type, sampleSize, sampleSizeIndex )
+
+        return Filter( id, uuid, name, type, sampleSize )
     }
 
-    //--------------------------------------------------------------------------
-    fun getFilters( study_id: Int ): List<Filter>
+    // Pass in the list of rules since they were already pulled from the database
+    // TODO:  maybe build a better search through the list to find the matching rule for
+    //        the rule_id that is in the database.
+    @SuppressLint("Range")
+    private fun  buildFilterRule(cursor: Cursor, rules : ArrayList<Rule> ): FilterRule
+    {
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val order = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_ORDER))
+        val rule_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_ID))
+
+//        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRU_NAME))
+//        val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
+
+        val connector = ConnectorConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX))
+
+        var found_rule : Rule? = null
+
+        // this could be more clever
+        for(rule in rules)
+        {
+            if(rule.id == rule_id)
+            {
+                found_rule = rule
+                break
+            }
+        }
+
+        return FilterRule(id, uuid, order, found_rule, connector) //Filter( id, uuid, name, type, sampleSize )
+    }
+
+    fun getFiltersForStudy(study : Study) : ArrayList<Filter>
     {
         val filters = ArrayList<Filter>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_FILTER_STUDY_UUID} = '$study_id'"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_STUDY_ID} = '${study.id}'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            filters.add( buildFilter( cursor ))
+            val filter = buildFilter(cursor)
+            getFilterRulesForFilter(filter, study.rules)
+
+            filters.add( filter)
         }
 
         cursor.close()
@@ -143,23 +179,25 @@ class FilterDAO(private var dao: DAO)
         return filters
     }
 
-    //--------------------------------------------------------------------------
-    fun getFilters(): List<Filter>
+    private fun getFilterRulesForFilter(filter : Filter, rules : ArrayList<Rule>) : ArrayList<FilterRule>
     {
-        val filters = ArrayList<Filter>()
+        val filterRules = ArrayList<FilterRule>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER}"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_FILTER_ID} = '${filter.id}'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            filters.add( buildFilter( cursor ))
+            val filterRule = buildFilterRule(cursor, rules)
+            filter.filterRules.add(filterRule)
+
+            //filters.add( filter)
         }
 
         cursor.close()
         db.close()
 
-        return filters
+        return filterRules
     }
 
     //--------------------------------------------------------------------------

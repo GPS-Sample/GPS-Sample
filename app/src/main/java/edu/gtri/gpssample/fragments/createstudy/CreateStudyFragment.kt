@@ -150,7 +150,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 Toast.makeText(activity!!.applicationContext, "You must create at least one rule before you can create a filter", Toast.LENGTH_SHORT).show()
             }else
             {
-                sharedViewModel.createFilterModel.createNewFiler()
+                sharedViewModel.createFilterModel.createNewFilter()
                 findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
             }
         }
@@ -174,10 +174,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private fun didSelectFilter( filter: Filter )
     {
         val bundle = Bundle()
-        bundle.putString( Keys.kFilter_uuid.toString(), filter.uuid )
-        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-        bundle.putString( Keys.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
-
+        sharedViewModel.createFilterModel.setSelectedFilter(filter)
         findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }
 
