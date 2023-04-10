@@ -105,6 +105,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
             if(config.studies.count() > 0)
             {
                 config.currentStudy = config.studies[0]
+                sharedViewModel.createStudyModel.setStudy(config.currentStudy!!) // ugh!
             }
         }
     }
@@ -117,13 +118,14 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     private fun didSelectStudy(study: Study)
     {
-        val bundle = Bundle()
-
-        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+        sharedViewModel.createStudyModel.setStudy(study)
+        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
     }
+
     override fun onMapClick(p0: LatLng) {
         // Your code here to make it look like the map is clicked on touch
     }
+
     override fun onMapReady(p0: GoogleMap) {
         map = p0
         map?.let{googleMap ->

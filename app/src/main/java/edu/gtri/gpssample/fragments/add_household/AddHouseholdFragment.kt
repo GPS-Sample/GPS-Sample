@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.add_household
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,9 +48,7 @@ class AddHouseholdFragment : Fragment()
             study = it
         }
 
-        //val fields = DAO.fieldDAO.getFields( study_uuid )
-
-        addHouseholdAdapter = AddHouseholdAdapter( ArrayList<Field>())
+        addHouseholdAdapter = AddHouseholdAdapter( study.fields )
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = addHouseholdAdapter
