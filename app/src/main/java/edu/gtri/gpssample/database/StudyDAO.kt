@@ -23,8 +23,7 @@ class StudyDAO(private var dao: DAO)
 
         study.id?.let{id ->
             var testStudy = DAO.studyDAO.getStudy(id)
-            val test = study.equals( testStudy)
-            Log.d("TEST", "${test}")
+
             if(study.equals( testStudy))
             {
                 return id
@@ -36,20 +35,33 @@ class StudyDAO(private var dao: DAO)
         putStudy(study, values)
         val id = dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
         study.id = id
-        for (field in study.fields) {
-            // add the study id to the field
 
-            val field_id = DAO.fieldDAO.createField(field, study)
-            field.id = field_id
+        // add fields
+        for (field in study.fields)
+        {
+            // add the study id to the field
+            field.id = DAO.fieldDAO.createField(field, study)
         }
-        for (rule in study.rules) {
+
+        // add rules
+        for (rule in study.rules)
+        {
             // add rules
             rule.field?.let { field ->
                 Log.d("RULE", "${field.id}")
-                DAO.ruleDAO.createRule(rule)
+                rule.id = DAO.ruleDAO.createRule(rule)
             }
         }
 
+        // add filters
+        for(filter in study.filters)
+        {
+            // filter must have a filter rule
+            if(filter.filterRules.size > 0)
+            {
+                DAO.filterDAO.createFilter(filter, id)
+            }
+        }
         return id
     }
 

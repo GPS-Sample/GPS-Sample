@@ -14,14 +14,13 @@ data class Filter(
     var name: String,
     var samplingType : SampleType,
     var sampleSize: Int,
-    var sampleSizeIndex: Int,
     var filterRules : ArrayList<FilterRule>)
 {
     constructor(uuid: String, study_id: Int, name: String, sampleSize: Int,
-                sampleSizeIndex: Int) : this(null, uuid, study_id, name, SampleType.None, sampleSize, sampleSizeIndex,
+                sampleSizeIndex: Int) : this(null, uuid, study_id, name, SampleType.None, sampleSize,
                 ArrayList<FilterRule>())
-    constructor(id: Int, uuid: String, study_id: Int, name: String, sampleSize: Int,
-                sampleSizeIndex: Int) : this(id, uuid, study_id, name, SampleType.None,sampleSize, sampleSizeIndex,
+    constructor(id: Int, uuid: String, study_id: Int, name: String, samplingType : SampleType, sampleSize: Int,
+                sampleSizeIndex: Int) : this(id, uuid, study_id, name, samplingType,sampleSize,
         ArrayList<FilterRule>())
     fun pack() : String
     {

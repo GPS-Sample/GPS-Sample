@@ -10,6 +10,8 @@ import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.database.models.Rule
+import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
 import java.util.*
 
 class CreateFilterModel {
@@ -37,11 +39,20 @@ class CreateFilterModel {
             }
         }
 
+    val createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
     fun createNewFiler()
     {
         val newFilter = Filter( UUID.randomUUID().toString(), -1,"", -1, 0 )
         _currentFilter = MutableLiveData(newFilter)
         currentFilter = _currentFilter
+    }
+
+    fun addFilter(study : Study)
+    {
+        currentFilter?.value?.let { filter ->
+            study.filters.add(filter)
+
+        }
     }
 
     fun addFilterRule(order : Int, rule : Rule, connector : Connector)

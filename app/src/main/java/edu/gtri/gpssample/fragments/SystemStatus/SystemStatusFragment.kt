@@ -535,10 +535,10 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
                     if (networkFilters.filters.isNotEmpty())
                     {
-                        for (filter in networkFilters.filters)
-                        {
-                            DAO.filterDAO.createFilter( filter )
-                        }
+//                        for (filter in networkFilters.filters)
+//                        {
+//                            DAO.filterDAO.createFilter( filter )
+//                        }
 
                         val networkCommand = NetworkCommand( NetworkCommand.NetworkFilterRulesRequest, user.uuid, study_uuid, "", "" )
                         val networkCommandMessage = Json.encodeToString( networkCommand )

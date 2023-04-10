@@ -77,12 +77,12 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
 //            }
 
 
-        createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
+        createFilterAdapter = sharedViewModel.createFilterModel.createFilterAdapter
         createFilterAdapter.shouldEditFilterRule = this::shouldEditFilterRule
         createFilterAdapter.shouldDeleteFilterRule = this::shouldDeleteFilterRule
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = createFilterAdapter
+        //binding.recyclerView.adapter = createFilterAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
@@ -120,56 +120,10 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
             if (binding.nameEditText.text.toString().length == 0)
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+
                 return@setOnClickListener
             }
-
-            //val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-
-//            if (filterRules.isEmpty())
-//            {
-//                Toast.makeText(activity!!.applicationContext, "You must add at least one rule", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
-
-//            if (sampleSizeIsVisible)
-//            {
-//                val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
-//                val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
-//                val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
-//
-//                if (sample1Size == null && sample2Size == null && sample3Size == null)
-//                {
-//                    Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
-//                    return@setOnClickListener
-//                }
-//
-//                sample1Size?.let { sampleSize ->
-//                    filter.sampleSize = sampleSize
-//                    filter.sampleSizeIndex = 0
-//                }
-//
-//                sample2Size?.let { sampleSize ->
-//                    filter.sampleSize = sampleSize
-//                    filter.sampleSizeIndex = 1
-//                }
-//
-//                sample3Size?.let { sampleSize ->
-//                    filter.sampleSize = sampleSize
-//                    filter.sampleSizeIndex = 2
-//                }
-//            }
-//
-//            filter.name = binding.nameEditText.text.toString()
-//
-//            if (DAO.filterDAO.exists( filter.uuid ))
-//            {
-//                DAO.filterDAO.updateFilter( filter )
-//            }
-//            else
-//            {
-//                DAO.filterDAO.createFilter( filter )
-//            }
-
+            sharedViewModel.addFilter()
             findNavController().popBackStack()
         }
     }

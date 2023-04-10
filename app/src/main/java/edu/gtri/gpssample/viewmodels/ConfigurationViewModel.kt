@@ -282,7 +282,14 @@ class ConfigurationViewModel : ViewModel()
     {
         createFilterModel.currentFilter?.value?.let{filter ->
             createFilterRuleModel.addFilterRule(filter)
+            createFilterModel.createFilterAdapter.updateFilterRules(filter.filterRules)
+        }
+    }
 
+    fun addFilter()
+    {
+        createStudyModel.currentStudy?.value?.let{study ->
+            createFilterModel.addFilter(study)
         }
     }
 

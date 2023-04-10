@@ -43,6 +43,7 @@ class CreateFilterRuleModel {
             filterRule.rule?.let { rule ->
                 if (filterRule.connector != Connector.None) {
                     filter.filterRules.add(filterRule)
+
                 }
             }
         }
