@@ -114,10 +114,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 // this needs to be a foreign key
-                COLUMN_FILTER_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FILTER_NAME + " TEXT" + "," +
                 COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
-                COLUMN_FILTER_SAMPLE_SIZE_INDEX + " INTEGER" +
+                COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
+                COLUMN_STUDY_ID + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFilter)
 
@@ -126,7 +127,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
                 COLUMN_UUID + " TEXT" + "," +
-                COLUMN_FILTERRULE_STUDY_UUID + " TEXT" + "," +
                 COLUMN_FILTER_ID + " INTEGER" + "," +
                 COLUMN_RULE_ID + " INTEGER" + "," +
                 COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
@@ -281,7 +281,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FILTER_STUDY_UUID = "filter_study_id"
         const val COLUMN_FILTER_NAME = "filter_name"
         const val COLUMN_FILTER_SAMPLE_SIZE = "filter_sample_size"
-        const val COLUMN_FILTER_SAMPLE_SIZE_INDEX = "filter_sample_size_index"
+        const val COLUMN_FILTER_SAMPLE_TYPE_INDEX = "filter_sample_type_index"
 
         // FilterRule Table
         const val TABLE_FILTERRULE = "filterrule"
@@ -363,6 +363,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 76
+        private const val DATABASE_VERSION = 77
+
     }
 }

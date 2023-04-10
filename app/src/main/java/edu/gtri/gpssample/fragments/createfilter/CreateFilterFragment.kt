@@ -13,17 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.SelectRuleDialog
+
+import edu.gtri.gpssample.dialogs.SelectRuleDialogFragment
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
+class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogDelegate
 {
 
     private var _binding: FragmentCreateFilterBinding? = null
@@ -77,16 +77,23 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
 //            }
 
 
-        createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
+        createFilterAdapter = sharedViewModel.createFilterModel.createFilterAdapter
         createFilterAdapter.shouldEditFilterRule = this::shouldEditFilterRule
         createFilterAdapter.shouldDeleteFilterRule = this::shouldDeleteFilterRule
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = createFilterAdapter
+        //binding.recyclerView.adapter = createFilterAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
-            SelectRuleDialog( activity!!, sharedViewModel, null, null, this )
+            val bundle = Bundle()
+            sharedViewModel.createFilterRuleModel.createNewFilterRule()
+            findNavController().navigate(R.id.action_navigate_to_SelectRuleDialogFragment, bundle)
+
+//            SelectRuleDialogFragment().show(
+//                childFragmentManager, SelectRuleDialogFragment.TAG)
+
+            //SelectedRuleDialog( activity!!, sharedViewModel, null, null, this )
         }
 
 //        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
@@ -113,56 +120,10 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
             if (binding.nameEditText.text.toString().length == 0)
             {
                 Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+
                 return@setOnClickListener
             }
-
-            //val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-
-//            if (filterRules.isEmpty())
-//            {
-//                Toast.makeText(activity!!.applicationContext, "You must add at least one rule", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
-
-//            if (sampleSizeIsVisible)
-//            {
-//                val sample1Size = binding.sampleSize1EditText.text.toString().toIntOrNull()
-//                val sample2Size = binding.sampleSize2EditText.text.toString().toIntOrNull()
-//                val sample3Size = binding.sampleSize3EditText.text.toString().toIntOrNull()
-//
-//                if (sample1Size == null && sample2Size == null && sample3Size == null)
-//                {
-//                    Toast.makeText(activity!!.applicationContext, "Please enter a sample size.", Toast.LENGTH_SHORT).show()
-//                    return@setOnClickListener
-//                }
-//
-//                sample1Size?.let { sampleSize ->
-//                    filter.sampleSize = sampleSize
-//                    filter.sampleSizeIndex = 0
-//                }
-//
-//                sample2Size?.let { sampleSize ->
-//                    filter.sampleSize = sampleSize
-//                    filter.sampleSizeIndex = 1
-//                }
-//
-//                sample3Size?.let { sampleSize ->
-//                    filter.sampleSize = sampleSize
-//                    filter.sampleSizeIndex = 2
-//                }
-//            }
-//
-//            filter.name = binding.nameEditText.text.toString()
-//
-//            if (DAO.filterDAO.exists( filter.uuid ))
-//            {
-//                DAO.filterDAO.updateFilter( filter )
-//            }
-//            else
-//            {
-//                DAO.filterDAO.createFilter( filter )
-//            }
-
+            sharedViewModel.addFilter()
             findNavController().popBackStack()
         }
     }
@@ -201,12 +162,12 @@ class CreateFilterFragment : Fragment(), SelectRuleDialog.SelectRuleDialogDelega
         }
     }
 
-    override fun didDismissSelectRuleDialog()
-    {
-       // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-
-      //  createFilterAdapter.updateFilterRules( filterRules )
-    }
+//    override fun didDismissSelectRuleDialog()
+//    {
+//       // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+//
+//      //  createFilterAdapter.updateFilterRules( filterRules )
+//    }
 
     override fun onDestroyView()
     {

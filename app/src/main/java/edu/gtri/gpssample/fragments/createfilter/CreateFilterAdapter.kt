@@ -24,10 +24,10 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.context = parent.context
-
         var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_filter, parent, false))
 
         viewHolder.itemView.isSelected = false
+
         allHolders.add(viewHolder)
 
         return viewHolder
@@ -41,7 +41,7 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
-        val titleTextView: TextView = itemView.findViewById(R.id.title_text_view);
+        var titleTextView: TextView = itemView.findViewById(R.id.title_text_view);
         val editButton: ImageView = itemView.findViewById(R.id.edit_image_view);
         val deleteButton: ImageView = itemView.findViewById(R.id.image_view);
     }
@@ -51,15 +51,14 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
         holder.itemView.isSelected = false
 
         val filterRule = filterRules!!.get(holder.adapterPosition)
-
-       // val rule = DAO.ruleDAO.getRule( filterRule.rule_uuid )
-
         if (position == 0)
         {
+            holder.titleTextView.text = filterRule!!.connector.format
        //     holder.titleTextView.setText( rule!!.name )
         }
         else
         {
+            holder.titleTextView.text = filterRule!!.connector.format
        //     holder.titleTextView.setText( filterRule!!.connector + " " + rule!!.name )
         }
 

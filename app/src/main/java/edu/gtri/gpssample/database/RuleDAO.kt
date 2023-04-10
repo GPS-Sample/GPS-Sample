@@ -16,8 +16,8 @@ class RuleDAO(private var dao: DAO)
         val values = ContentValues()
 
         putRule( rule, values )
-
-        return dao.writableDatabase.insert(DAO.TABLE_RULE, null, values).toInt()
+        val id = dao.writableDatabase.insert(DAO.TABLE_RULE, null, values).toInt()
+        return id
     }
 
     //--------------------------------------------------------------------------

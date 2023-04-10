@@ -12,7 +12,7 @@ object ConnectorConverter
 {
 
     // array indicies start at zero and we want to exclude the NONE option
-    val array : Array<String> = Array(5) { i ->
+    val array : Array<String> = Array(3) { i ->
         when (i) {
             0 -> Connector.AND.format
             1 -> Connector.OR.format

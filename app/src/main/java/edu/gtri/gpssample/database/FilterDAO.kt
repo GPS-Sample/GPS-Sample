@@ -4,40 +4,73 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.constants.ConnectorConverter
+import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.models.Filter
+import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.extensions.toBoolean
 
 class FilterDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createFilter( filter: Filter ) : Int
+    fun createFilter( filter: Filter, study_id: Int ) : Int
     {
         val values = ContentValues()
 
-        putFilter( filter, values )
+        putFilter( filter, study_id, values )
+        val id = dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values).toInt()
+        filter.id = id
 
-        return dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values).toInt()
+        // write out filter rules
+        for(filterRule in filter.filterRules)
+        {
+            createFilterRule(filterRule, id)
+        }
+        return id
     }
 
+    fun createFilterRule(filterRule : FilterRule, filterId : Int) : Int
+    {
+        val values = ContentValues()
+        putFilterRule(filterRule, filterId, values)
+        val id = dao.writableDatabase.insert(DAO.TABLE_FILTERRULE, null, values).toInt()
+        filterRule.id = id
+        return id
+    }
+
+    private fun putFilterRule(filterRule: FilterRule, filter_id : Int, values: ContentValues )
+    {
+
+        values.put( DAO.COLUMN_UUID, filterRule.uuid )
+        filterRule.rule?.let{rule ->
+            values.put(DAO.COLUMN_RULE_ID, rule.id)
+        }
+
+        values.put(DAO.COLUMN_FILTER_ID, filter_id)
+        val index = ConnectorConverter.toIndex(filterRule.connector)
+        values.put(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX, index)
+    }
     //--------------------------------------------------------------------------
-    fun putFilter( filter: Filter, values: ContentValues )
+    private fun putFilter( filter: Filter, study_id: Int, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, filter.uuid )
-        values.put( DAO.COLUMN_FILTER_STUDY_UUID, filter.study_id )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
-        values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE_INDEX, filter.sampleSizeIndex )
+
+        val index = SampleTypeConverter.toIndex(filter.samplingType)
+        values.put( DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX, index )
+        values.put(DAO.COLUMN_STUDY_ID, study_id)
     }
 
     //--------------------------------------------------------------------------
-    fun updateFilter( filter: Filter )
+    fun updateFilter( filter: Filter, study_id: Int )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(filter.uuid.toString())
         val values = ContentValues()
 
-        putFilter( filter, values )
+        putFilter( filter, study_id, values )
 
         db.update(DAO.TABLE_FILTER, values, whereClause, args )
         db.close()
@@ -85,9 +118,10 @@ class FilterDAO(private var dao: DAO)
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
-        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE_INDEX))
 
-        return Filter( id, uuid, study_id, name, sampleSize, sampleSizeIndex )
+        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
+        val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
+        return Filter( id, uuid, study_id, name, type, sampleSize, sampleSizeIndex )
     }
 
     //--------------------------------------------------------------------------

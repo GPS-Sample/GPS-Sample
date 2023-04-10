@@ -42,13 +42,10 @@ class ConfigurationViewModel : ViewModel()
     val createRuleModel : CreateRuleModel = CreateRuleModel()
     val enumAreaViewModel : EnumAreaViewModel = EnumAreaViewModel()
     var teamViewModel : TeamViewModel = TeamViewModel()
+    val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
 
     // Exposed LiveData each screen being controlled by the view model
     var currentConfiguration : LiveData<Config>? =_currentConfiguration
-
-
-
-
 
     val configurations : ArrayList<Config>
         get() = _configurations
@@ -264,7 +261,7 @@ class ConfigurationViewModel : ViewModel()
          createStudyModel.currentStudy?.value?.let{study ->
              createRuleModel.onRuleFieldSelected(study, position)
         }
-        Log.d("HERE", "HERE")
+
     }
     fun onRuleOperatorSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
@@ -273,4 +270,29 @@ class ConfigurationViewModel : ViewModel()
         }
     }
     //endregion
+
+    //region FilterRule
+    fun onFilterRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        createStudyModel.currentStudy?.value?.let{study ->
+            createFilterRuleModel.onFilterRuleFieldSelected(study, position)
+        }
+
+    }
+
+    fun addFilerRule()
+    {
+        createFilterModel.currentFilter?.value?.let{filter ->
+            createFilterRuleModel.addFilterRule(filter)
+            createFilterModel.createFilterAdapter.updateFilterRules(filter.filterRules)
+        }
+    }
+
+    fun addFilter()
+    {
+        createStudyModel.currentStudy?.value?.let{study ->
+            createFilterModel.addFilter(study)
+        }
+    }
+
 }
