@@ -51,6 +51,7 @@ class FilterDAO(private var dao: DAO)
 
         values.put(DAO.COLUMN_FILTER_ID, filter_id)
         val index = ConnectorConverter.toIndex(filterRule.connector)
+
         values.put(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX, index)
     }
     //--------------------------------------------------------------------------
@@ -137,11 +138,8 @@ class FilterDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val order = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_ORDER))
         val rule_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_ID))
-
-//        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTERRU_NAME))
-//        val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
-
-        val connector = ConnectorConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX))
+        val connector_index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX))
+        val connector = ConnectorConverter.fromIndex(connector_index)
 
         var found_rule : Rule? = null
 
