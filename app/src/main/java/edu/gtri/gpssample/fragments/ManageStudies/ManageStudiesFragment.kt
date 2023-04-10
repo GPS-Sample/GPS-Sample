@@ -1,14 +1,14 @@
 package edu.gtri.gpssample.fragments.ManageStudies
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -18,6 +18,8 @@ import edu.gtri.gpssample.databinding.FragmentManageStudiesBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.fragments.createconfiguration.ManageStudiesAdapter
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -25,12 +27,20 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     private var _binding: FragmentManageStudiesBinding? = null
     private val binding get() = _binding!!
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
-    private lateinit var viewModel: ManageStudiesViewModel
+
+    private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ManageStudiesViewModel::class.java)
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
+
+        Log.d("BIG TEST ", "THE CONFIG ${sharedViewModel.currentConfiguration!!.value!!.name}")
+
+        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
+        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
+        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -51,17 +61,22 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
             return
         }
+        val test = arguments!!.getSerializable("currentConfig")
+        test?.let {
+            val config = it as Config
+            Log.d("TEST", "config name ${config.name}")
+        }
 
         val config_uuid = arguments!!.getString( Keys.kConfig_uuid.toString(), "");
 
-        if (config_uuid.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        DAO.configDAO.getConfig( config_uuid )?.let {
+        sharedViewModel.currentConfiguration?.value?.let {
             config = it
+        }?: {
+            Toast.makeText(
+                activity!!.applicationContext,
+                "Fatal! Live data binding is null.",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         if (!this::config.isInitialized)
@@ -69,10 +84,10 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
             Toast.makeText(activity!!.applicationContext, "Fatal! Configuration with id: $config_uuid not found.", Toast.LENGTH_SHORT).show()
             return
         }
-
-        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
-        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
-        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
+//
+//        manageStudiesAdapter = ManageStudiesAdapter(listOf<Study>())
+//        manageStudiesAdapter.didSelectStudy = this::didSelectStudy
+//        manageStudiesAdapter.shouldDeleteStudy = this::shouldDeleteStudy
 
         binding.configNameTextView.text = "Configuration " + config.name + " Studies"
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -99,20 +114,24 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageStudiesFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        val studies = DAO.studyDAO.getStudies( config.uuid )
+        sharedViewModel.currentConfiguration?.value?.let {curConfig ->
 
-        if (studies.isEmpty())
-        {
-            binding.recyclerView.visibility = View.GONE
-            binding.relativeLayout.visibility = View.VISIBLE
-        }
-        else
-        {
-            binding.recyclerView.visibility = View.VISIBLE
-            binding.relativeLayout.visibility = View.GONE
+            val studies = curConfig.studies//DAO.studyDAO.getStudies( config.uuid )
+
+            if (studies.isEmpty())
+            {
+                binding.recyclerView.visibility = View.GONE
+                binding.relativeLayout.visibility = View.VISIBLE
+            }
+            else
+            {
+                binding.recyclerView.visibility = View.VISIBLE
+                binding.relativeLayout.visibility = View.GONE
+            }
+
+            manageStudiesAdapter.updateStudies(studies)
         }
 
-        manageStudiesAdapter.updateStudies(studies)
     }
 
     fun didSelectStudy(study: Study)
@@ -140,7 +159,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     {
         selectedStudy?.let {
             DAO.studyDAO.deleteStudy( it )
-            manageStudiesAdapter.updateStudies(DAO.studyDAO.getStudies())
+            //manageStudiesAdapter.updateStudies(DAO.studyDAO.getStudies())
         }
     }
 

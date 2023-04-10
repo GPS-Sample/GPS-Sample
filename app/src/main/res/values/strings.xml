@@ -90,6 +90,7 @@
     <string name="cancel">Cancel</string>
     <string name="finish">Finish</string>
     <string name="save">Save</string>
+    <string name="done">Done</string>
     <string name="select_role">Select your Role</string>
     <string name="admin_select_role">Admin Select Role</string>
     <string name="supervisor_select_role">Supervisor Select Role</string>
@@ -131,7 +132,8 @@
     <string name="define_enumeration_fields">Define Enumeration Fields</string>
     <string name="define_enumeration_area">Define Enumeration Area</string>
     <string name="define_sampling_method">Define Sampling Method</string>
-
+    <string name="studies">Studies</string>
+    <string name="enumeration_area">Enumeration Areas</string>
     <string name="barcode_result" translatable="false">Barcode detected.\n%1$s</string>
     <string name="error_scanner_cancelled" translatable="false">Code scanner is cancelled.</string>
     <string name="error_camera_permission_not_granted" translatable="false">Camera permission is not granted.</string>
@@ -166,7 +168,7 @@
     <string name="sample_size">Sample Size</string>
     <string name="filter_name">Filter Name</string>
     <string name="rule_name">Rule Name</string>
-    <string name="total_sample_size">Total Sample Size</string>
+    <string name="total_sample_size">Total Sample Size Across All Clusters</string>
     <string name="manage_studies">Manage Studies</string>
     <string name="manage_samples">Manage Samples</string>
     <string name="create_sample">Create Sample</string>

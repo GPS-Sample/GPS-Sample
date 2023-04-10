@@ -1,28 +1,20 @@
 package edu.gtri.gpssample.database.models
 
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Serializable
 data class EnumArea (
-    var uuid: String,
-    var config_uuid: String,
+    var id : Int? = null,
+    var config_id: Int,
     var name: String,
-    var shape: String,
-    var shape_uuid: String)
+    var topLeft: LatLng,
+    var topRight: LatLng,
+    var botRight: LatLng,
+    var botLeft: LatLng)
 {
-    fun pack() : String
-    {
-        return Json.encodeToString( this )
-    }
-
-    companion object
-    {
-        fun unpack( message: String ) : EnumArea
-        {
-            return Json.decodeFromString<EnumArea>( message )
-        }
-    }
+    constructor(config_id: Int, name: String, topLeft: LatLng, topRight: LatLng, botRight: LatLng, botLeft: LatLng) :
+            this(null, config_id, name, topLeft, topRight, botRight, botLeft )
 }

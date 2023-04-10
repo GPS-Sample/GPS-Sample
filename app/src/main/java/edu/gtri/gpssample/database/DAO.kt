@@ -12,7 +12,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     {
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_USER_ROLE + " TEXT" +  "," +
                 COLUMN_USER_NAME + " TEXT" + "," +
                 COLUMN_USER_PIN + " INTEGER" + "," +
@@ -24,32 +25,59 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_CONFIG_NAME + " TEXT" + "," +
-                COLUMN_CONFIG_DATE_FORMAT + " TEXT" + "," +
-                COLUMN_CONFIG_TIME_FORMAT + " TEXT" + "," +
-                COLUMN_CONFIG_DISTANCE_FORMAT + " TEXT" + "," +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
+                COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
+
+                // this needs to be a look up table
+                COLUMN_CONFIG_DATE_FORMAT_INDEX + " INTEGER" + "," +
+                COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
+                COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
+
                 COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" +
                 ")")
         db.execSQL(createTableConfig)
 
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
+
+                COLUMN_CONFIG_ID + " INTEGER" + "," +
+                // REMOVE THIS
                 COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
-                COLUMN_STUDY_SAMPLING_METHOD + " TEXT" + "," +
+
+                // this needs to be a look up table
+                COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
                 COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
-                COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" +
+
+                // this needs to be a look up table
+                COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableStudy)
 
+        val createTableConfigStudy = ("CREATE TABLE " +
+                TABLE_CONFIG_STUDY + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CONFIG_ID + " INTEGER NOT NULL" + "," +
+                COLUMN_STUDY_ID + " INTEGER NOT NULL" + "," +
+                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                ")")
+        db.execSQL(createTableConfigStudy)
+
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FIELD_NAME + " TEXT" + "," +
-                COLUMN_FIELD_STUDY_UUID + " TEXT" + "," +
-                COLUMN_FIELD_TYPE + " TEXT" + "," +
+
+                COLUMN_STUDY_ID + " INTEGER" + "," +
+
+                // should be look up table
+                COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
                 COLUMN_FIELD_PII + " BOOLEAN" + "," +
                 COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
                 COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN" + "," +
@@ -58,126 +86,150 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_FIELD_OPTION_1 + " TEXT" + "," +
                 COLUMN_FIELD_OPTION_2 + " TEXT" + "," +
                 COLUMN_FIELD_OPTION_3 + " TEXT" + "," +
-                COLUMN_FIELD_OPTION_4 + " TEXT" +
+                COLUMN_FIELD_OPTION_4 + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableField)
 
         val createTableRule = ("CREATE TABLE " +
                 TABLE_RULE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_RULE_STUDY_UUID + " TEXT" + "," +
-                COLUMN_RULE_FIELD_UUID + " TEXT" + "," +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
+
+                // i think we can just use one key here.  if a field is connected to a study and
+                // a rule is connected to a field
+                // this needs to be a foreign key
+                COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
-                COLUMN_RULE_OPERATOR + " TEXT" + "," +
-                COLUMN_RULE_VALUE + " TEXT" +
+
+                // TODO:  this should be a look up table
+                COLUMN_OPERATOR_ID + " INTEGER" + "," +
+                COLUMN_RULE_VALUE + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableRule)
 
         val createTableFilter = ("CREATE TABLE " +
                 TABLE_FILTER + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_FILTER_STUDY_UUID + " TEXT" + "," +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
+                COLUMN_UUID + " TEXT" + "," +
+                // this needs to be a foreign key
                 COLUMN_FILTER_NAME + " TEXT" + "," +
                 COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
-                COLUMN_FILTER_SAMPLE_SIZE_INDEX + " INTEGER" +
+                COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
+                COLUMN_STUDY_ID + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFilter)
 
+        // connector table
+        // this is a logic chain
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_FILTERRULE_STUDY_UUID + " TEXT" + "," +
-                COLUMN_FILTERRULE_FILTER_UUID + " TEXT" + "," +
-                COLUMN_FILTERRULE_RULE_UUID + " TEXT" + "," +
-                COLUMN_FILTERRULE_CONNECTOR + " TEXT" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
+                COLUMN_UUID + " TEXT" + "," +
+                COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
+                COLUMN_FILTER_ID + " INTEGER" + "," +
+                COLUMN_RULE_ID + " INTEGER" + "," +
+                COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFilterRule)
 
         val createTableSample = ("CREATE TABLE " +
                 TABLE_SAMPLE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
+
+                COLUMN_STUDY_ID + " INTEGER" + "," +
+                // this needs to be a foreign key
                 COLUMN_SAMPLE_STUDY_UUID + " TEXT" + "," +
+
                 COLUMN_SAMPLE_NAME + " TEXT" + "," +
-                COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" +
+                COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableSample)
 
-        val createTableNavigationPlan = ("CREATE TABLE " +
-                TABLE_NAV_PLAN + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_NAV_PLAN_SAMPLE_UUID + " TEXT" + "," +
-                COLUMN_NAV_PLAN_NAME + " TEXT" +
-                ")")
-        db.execSQL(createTableNavigationPlan)
-
         val createTableEnumArea = ("CREATE TABLE " +
                 TABLE_ENUM_AREA + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_ENUM_AREA_CONFIG_UUID + " TEXT" + "," +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CONFIG_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
-                COLUMN_ENUM_AREA_SHAPE + " TEXT" + "," +
-                COLUMN_ENUM_AREA_SHAPE_UUID + " TEXT" +
+                COLUMN_ENUM_AREA_TL_LAT + " REAL" + "," +
+                COLUMN_ENUM_AREA_TL_LON + " REAL" + "," +
+                COLUMN_ENUM_AREA_TR_LAT + " REAL" + "," +
+                COLUMN_ENUM_AREA_TR_LON + " REAL" + "," +
+                COLUMN_ENUM_AREA_BR_LAT + " REAL" + "," +
+                COLUMN_ENUM_AREA_BR_LON + " REAL" + "," +
+                COLUMN_ENUM_AREA_BL_LAT + " REAL" + "," +
+                COLUMN_ENUM_AREA_BL_LON + " REAL" + "," +
+                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumArea)
 
-        val createTableCircle = ("CREATE TABLE " +
-                TABLE_CIRCLE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_CIRCLE_LAT + " REAL" + "," +
-                COLUMN_CIRCLE_LON + " REAL" + "," +
-                COLUMN_CIRCLE_RADIUS + " REAL" +
-                ")")
-        db.execSQL(createTableCircle)
-
-        val createTableRectangle = ("CREATE TABLE " +
-                TABLE_RECTANGLE + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_RECTANGLE_TL_LAT + " REAL" + "," +
-                COLUMN_RECTANGLE_TL_LON + " REAL" + "," +
-                COLUMN_RECTANGLE_TR_LAT + " REAL" + "," +
-                COLUMN_RECTANGLE_TR_LON + " REAL" + "," +
-                COLUMN_RECTANGLE_BR_LAT + " REAL" + "," +
-                COLUMN_RECTANGLE_BR_LON + " REAL" + "," +
-                COLUMN_RECTANGLE_BL_LAT + " REAL" + "," +
-                COLUMN_RECTANGLE_BL_LON + " REAL" +
-                ")")
-        db.execSQL(createTableRectangle)
-
         val createTableTeam = ("CREATE TABLE " +
                 TABLE_TEAM + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_TEAM_ENUM_AREA_UUID + " TEXT" + "," +
-                COLUMN_TEAM_NAME + " TEXT" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                COLUMN_TEAM_NAME + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableTeam)
 
         val createTableTeamMember = ("CREATE TABLE " +
                 TABLE_TEAM_MEMBER + "(" +
-                COLUMN_UUID + " TEXT PRIMARY KEY" + "," +
-                COLUMN_TEAM_MEMBER_TEAM_UUID + " TEXT" + "," +
-                COLUMN_TEAM_MEMBER_NAME + " TEXT" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_TEAM_ID + " INTEGER" + "," +
+                COLUMN_TEAM_MEMBER_NAME + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableTeamMember)
+
+        val createTableEnumData = ("CREATE TABLE " +
+                TABLE_ENUM_DATA + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_USER_ID + " INTEGER" + "," +
+                COLUMN_STUDY_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
+                COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
+                "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                ")")
+        db.execSQL(createTableEnumData)
+
+        val createTableFieldData = ("CREATE TABLE " +
+                TABLE_FIELD_DATA + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_FIELD_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
+                COLUMN_FIELD_DATA_RESPONSE + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" +
+                ")")
+        db.execSQL(createTableFieldData)
     }
 
     //--------------------------------------------------------------------------
     override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int )
     {
         // clear all tables
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONFIG)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_STUDY)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FIELD)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RULE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTERRULE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SAMPLE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAV_PLAN)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUM_AREA)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CIRCLE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECTANGLE)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM)
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEAM_MEMBER)
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG_STUDY")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTERRULE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NAV_PLAN")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_MEMBER")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_DATA")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
 
         onCreate(db)
     }
@@ -186,7 +238,24 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     companion object
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
+
+        const val COLUMN_ID = "id"
         const val COLUMN_UUID = "uuid"
+        const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
+        // foreign key columns
+        const val COLUMN_USER_ID = "user_id"
+        const val COLUMN_CONFIG_ID = "config_id"
+        const val COLUMN_STUDY_ID = "study_id"
+        const val COLUMN_FIELD_ID = "field_id"
+        const val COLUMN_RULE_ID = "rule_id"
+        const val COLUMN_FILTER_ID = "filter_id"
+        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
+        const val COLUMN_TEAM_ID = "team_id"
+        const val COLUMN_OPERATOR_ID = "operator_id"
+        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
+
+        // Connector Tables
+        const val TABLE_CONFIG_STUDY = "config_study_conn"
 
         // User Table
         const val TABLE_USER = "user"
@@ -200,16 +269,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Config Table
         const val TABLE_CONFIG = "config"
         const val COLUMN_CONFIG_NAME = "config_name"
-        const val COLUMN_CONFIG_DISTANCE_FORMAT = "config_distance_format"
-        const val COLUMN_CONFIG_DATE_FORMAT = "config_date_format"
-        const val COLUMN_CONFIG_TIME_FORMAT = "config_time_format"
+        const val COLUMN_CONFIG_DISTANCE_FORMAT_INDEX = "config_distance_format_index"
+        const val COLUMN_CONFIG_DATE_FORMAT_INDEX = "config_date_format_index"
+        const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
         const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
 
         // Study Table
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
+
         const val COLUMN_STUDY_CONFIG_UUID = "study_config_id"
-        const val COLUMN_STUDY_SAMPLING_METHOD = "study_sampling_method"
+        const val COLUMN_STUDY_SAMPLING_METHOD_INDEX = "study_sampling_method_index"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
 
@@ -217,7 +287,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_FIELD = "field"
         const val COLUMN_FIELD_NAME = "field_name"
         const val COLUMN_FIELD_STUDY_UUID = "field_study_id"
-        const val COLUMN_FIELD_TYPE = "field_type"
+        const val COLUMN_FIELD_TYPE_INDEX = "field_type_index"
         const val COLUMN_FIELD_PII = "field_pii"
         const val COLUMN_FIELD_REQUIRED = "field_required"
         const val COLUMN_FIELD_INTEGER_ONLY = "field_integer_only"
@@ -233,7 +303,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RULE_STUDY_UUID = "rule_study_id"
         const val COLUMN_RULE_FIELD_UUID = "rule_field_id"
         const val COLUMN_RULE_NAME = "rule_name"
-        const val COLUMN_RULE_OPERATOR = "rule_operator"
+
         const val COLUMN_RULE_VALUE = "rule_value"
 
         // Filter Table
@@ -241,14 +311,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FILTER_STUDY_UUID = "filter_study_id"
         const val COLUMN_FILTER_NAME = "filter_name"
         const val COLUMN_FILTER_SAMPLE_SIZE = "filter_sample_size"
-        const val COLUMN_FILTER_SAMPLE_SIZE_INDEX = "filter_sample_size_index"
+        const val COLUMN_FILTER_SAMPLE_TYPE_INDEX = "filter_sample_type_index"
 
         // FilterRule Table
         const val TABLE_FILTERRULE = "filterrule"
-        const val COLUMN_FILTERRULE_STUDY_UUID = "filterrule_study_id"
-        const val COLUMN_FILTERRULE_FILTER_UUID = "filterrule_filter_id"
-        const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
-        const val COLUMN_FILTERRULE_CONNECTOR = "filterrule_connector"
+//        const val COLUMN_FILTERRULE_STUDY_UUID = "filterrule_study_id"
+//        const val COLUMN_FILTERRULE_FILTER_UUID = "filterrule_filter_id"
+//        const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
+        const val COLUMN_FILTERRULE_ORDER = "filterrule_order"
+        const val COLUMN_FILTERRULE_CONNECTOR_INDEX = "filterrule_connector_index"
 
         // Sample Table
         const val TABLE_SAMPLE = "sample"
@@ -265,35 +336,33 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_ENUM_AREA = "enum_area"
         const val COLUMN_ENUM_AREA_CONFIG_UUID = "enum_area_config_uuid"
         const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
-        const val COLUMN_ENUM_AREA_SHAPE = "enum_area_shape"
-        const val COLUMN_ENUM_AREA_SHAPE_UUID = "enum_area_shape_uuid"
-
-        // Circle Table
-        const val TABLE_CIRCLE = "circle"
-        const val COLUMN_CIRCLE_LAT = "circle_lat"
-        const val COLUMN_CIRCLE_LON = "circle_lon"
-        const val COLUMN_CIRCLE_RADIUS = "circle_radius"
-
-        // Rectangle Table
-        const val TABLE_RECTANGLE = "rectangle"
-        const val COLUMN_RECTANGLE_TL_LAT = "rectangle_tl_lat"
-        const val COLUMN_RECTANGLE_TL_LON = "rectangle_tl_lon"
-        const val COLUMN_RECTANGLE_TR_LAT = "rectangle_tr_lat"
-        const val COLUMN_RECTANGLE_TR_LON = "rectangle_tr_lon"
-        const val COLUMN_RECTANGLE_BR_LAT = "rectangle_br_lat"
-        const val COLUMN_RECTANGLE_BR_LON = "rectangle_br_lon"
-        const val COLUMN_RECTANGLE_BL_LAT = "rectangle_bl_lat"
-        const val COLUMN_RECTANGLE_BL_LON = "rectangle_bl_lon"
+        const val COLUMN_ENUM_AREA_TL_LAT = "enum_area_tl_lat"
+        const val COLUMN_ENUM_AREA_TL_LON = "enum_area_tl_lon"
+        const val COLUMN_ENUM_AREA_TR_LAT = "enum_area_tr_lat"
+        const val COLUMN_ENUM_AREA_TR_LON = "enum_area_tr_lon"
+        const val COLUMN_ENUM_AREA_BR_LAT = "enum_area_br_lat"
+        const val COLUMN_ENUM_AREA_BR_LON = "enum_area_br_lon"
+        const val COLUMN_ENUM_AREA_BL_LAT = "enum_area_bl_lat"
+        const val COLUMN_ENUM_AREA_BL_LON = "enum_area_bl_lon"
 
         // Team Table
         const val TABLE_TEAM = "team"
-        const val COLUMN_TEAM_ENUM_AREA_UUID = "team_enum_area_uuid"
         const val COLUMN_TEAM_NAME = "team_name"
 
         // Team Member Table
         const val TABLE_TEAM_MEMBER = "team_member"
-        const val COLUMN_TEAM_MEMBER_TEAM_UUID = "team_member_team_uuid"
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
+
+        const val TABLE_ENUM_DATA = "enum_data"
+//        const val COLUMN_USER_ID = "user_id"
+//        const val COLUMN_STUDY_ID = "study_id"
+        const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
+        const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
+
+        const val TABLE_FIELD_DATA = "field_data"
+//        const val COLUMN_FIELD_ID = "field_id"
+//        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
+        const val COLUMN_FIELD_DATA_RESPONSE = "field_data_response"
 
         // DAO's
         lateinit var userDAO: UserDAO
@@ -306,10 +375,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var sampleDAO: SampleDAO
         lateinit var navPlanDAO: NavPlanDAO
         lateinit var enumAreaDAO: EnumAreaDAO
-        lateinit var rectangleDAO: RectangleDAO
-        lateinit var circleDAO: CircleDAO
         lateinit var teamDAO: TeamDAO
         lateinit var teamMemberDAO: TeamMemberDAO
+        lateinit var enumDataDAO: EnumDataDAO
+        lateinit var fieldDataDAO: FieldDataDAO
 
         // creation/access methods
 
@@ -331,15 +400,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 sampleDAO = SampleDAO( instance!! )
                 navPlanDAO = NavPlanDAO( instance!! )
                 enumAreaDAO = EnumAreaDAO( instance!! )
-                rectangleDAO = RectangleDAO( instance!! )
-                circleDAO = CircleDAO( instance!! )
                 teamDAO = TeamDAO( instance!! )
                 teamMemberDAO = TeamMemberDAO( instance!! )
+                enumDataDAO = EnumDataDAO( instance!! )
+                fieldDataDAO = FieldDataDAO( instance!! )
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 55
+        private const val DATABASE_VERSION = 79
     }
 }

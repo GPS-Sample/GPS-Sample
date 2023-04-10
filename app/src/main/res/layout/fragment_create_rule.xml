@@ -1,135 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.CreateRule.CreateRuleFragment">
+    tools:context=".fragments.createconfiguration.CreateConfigurationFragment">
+    <data>
+        <variable
+            name="viewModel"
+            type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fragment_root_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/rule_name"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <EditText
-                android:id="@+id/name_edit_text"
-                android:imeOptions="actionDone"
-                android:inputType="textCapWords"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:hint="@string/enter_rule_name" />
-
-            <TextView
-                android:layout_marginTop="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/field"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
-
-                <Spinner
-                    android:id="@+id/field_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
-
-            <TextView
-                android:layout_marginTop="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/operator"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
-
-                <Spinner
-                    android:id="@+id/operator_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
-
-            <TextView
-                android:layout_marginTop="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/value"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <EditText
-                android:id="@+id/value_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:hint="@string/enter_value" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </ScrollView>
-
+        <variable
+            name="createFieldFragment"
+            type="edu.gtri.gpssample.fragments.createrule.CreateRuleFragment" />
+    </data>
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
+
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/cancel" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-        <Button
-            android:id="@+id/save_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/save" />
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fragment_root_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/rule_name"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <EditText
+                    android:id="@+id/name_edit_text"
+                    android:imeOptions="actionDone"
+                    android:inputType="textCapWords"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:hint="@string/enter_rule_name"
+                    android:text="@={viewModel.createRuleModel.currentRule.name}"/>
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/field"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:id="@+id/field_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:entries="@{viewModel.createStudyModel.currentStudy.fields}"
+                        android:selectedItemPosition="@={viewModel.createRuleModel.ruleFieldPosition}"
+                        android:onItemSelected="@{viewModel::onRuleFieldSelected}"/>
+                </FrameLayout>
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/operator"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:id="@+id/operator_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:entries="@{viewModel.createRuleModel.operators}"
+                        android:selectedItemPosition="@={viewModel.createRuleModel.ruleOperationPosition}"
+                        android:onItemSelected="@{viewModel::onRuleOperatorSelected}"/>
+                </FrameLayout>
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/value"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <EditText
+                    android:id="@+id/value_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:hint="@string/enter_value"
+                    android:text="@={viewModel.createRuleModel.currentRule.value}"/>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </ScrollView>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/save" />
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</layout>

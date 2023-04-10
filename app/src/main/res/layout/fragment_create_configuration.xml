@@ -1,139 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.CreateConfiguration.CreateConfigurationFragment">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="90dp">
+    tools:context=".fragments.createconfiguration.CreateConfigurationFragment"
+    >
+    <data>
+        <variable
+            name="viewModel"
+            type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fragment_root_layout"
+        <variable
+            name="createConfigurationFragment"
+            type="edu.gtri.gpssample.fragments.createconfiguration.CreateConfigurationFragment" />
+    </data>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_weight="10"
+            android:layout_marginBottom="0dp">
 
-            <TextView
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fragment_root_layout"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/config_name"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
+                android:layout_height="2048dp"
+                android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/config_name_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:inputType="textCapWords"
-                android:imeOptions="actionDone"
-                android:hint="@string/enter_config_name" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/preferred_units"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
-
-                <Spinner
-                    android:id="@+id/distance_format_spinner"
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/config_name"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/date_format"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
-
-                <Spinner
-                    android:id="@+id/date_format_spinner"
+                <EditText
+                    android:id="@+id/config_name_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:inputType="textCapWords"
+                    android:imeOptions="actionDone"
+                    android:text="@={viewModel.currentConfiguration.name}"
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/time_format"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
+                    android:hint="@string/enter_config_name" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
-
-                <Spinner
-                    android:id="@+id/time_format_spinner"
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/preferred_units"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/min_gps_precision"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/spinner_frame">
 
-            <EditText
-                android:id="@+id/min_gps_precision_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:text="20"
-                android:hint="@string/enter_min_gps_precision" />
+                    <Spinner
+                        android:id="@+id/distance_format_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:entries="@{viewModel.distanceFormats}"
+                        android:selectedItemPosition="@={viewModel.distanceFormatPosition}"
+                        android:onItemSelected="@{viewModel::onDistanceFormatSelected}"
+                        />
+                </FrameLayout>
 
-            <Button
-                android:id="@+id/next_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:layout_gravity="bottom"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/next" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </ScrollView>
-</FrameLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/date_format"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:id="@+id/date_format_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:entries="@{viewModel.dateFormats}"
+                        android:selectedItemPosition="@={viewModel.dateFormatPosition}"
+                        android:onItemSelected="@{viewModel::onDateFormatSelected}"
+                        />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/time_format"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:id="@+id/time_format_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:entries="@{viewModel.timeFormats}"
+                        android:selectedItemPosition="@={viewModel.timeFormatPosition}"
+                        android:onItemSelected="@{viewModel::onTimeFormatSelected}"/>
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/min_gps_precision"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <EditText
+                    android:id="@+id/min_gps_precision_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
+                    android:hint="@string/enter_min_gps_precision" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/enumeration_area"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp" >
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/map_fragment"
+                    android:layout_width="300dp"
+                    android:layout_height="200dp"
+                    android:layout_centerHorizontal="true"
+                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+                </RelativeLayout>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+                <FrameLayout
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/studies"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                    <ImageView
+                        android:id="@+id/add_study_button"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="end"
+                        android:src="@drawable/plus_blue" />
+                </FrameLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/studies_recycler"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_height="100dp"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </ScrollView>
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:layout_gravity="bottom"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/save" />
+    </LinearLayout>
+</layout>

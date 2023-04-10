@@ -1,45 +1,64 @@
-<LinearLayout
-    android:id="@+id/fragment_root_layout"
+<?xml version="1.0" encoding="utf-8"?>
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    tools:context=".fragments.createconfiguration.CreateConfigurationFragment">
+    <data>
+        <variable
+            name="viewModel"
+            type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
 
-    <CheckBox
-        android:id="@+id/date_checkBox"
+    </data>
+    <LinearLayout
+        android:id="@+id/fragment_root_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="Date"
-        android:textSize="18sp" />
+        android:layout_height="match_parent">
 
-    <CheckBox
-        android:id="@+id/time_checkBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="Time"
-        android:textSize="18sp" />
+        <CheckBox
+            android:id="@+id/date_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Date"
+            android:textSize="18sp"
+            android:checked="@{viewModel.createFieldModel.tempField.date}"
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldDateSelected}"/>
 
-    <CheckBox
-        android:id="@+id/pii_checkBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="Personally Identifiable Information"
-        android:textSize="18sp" />
+        <CheckBox
+            android:id="@+id/time_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Time"
+            android:textSize="18sp"
+            android:checked="@{viewModel.createFieldModel.tempField.time}"
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldTimeSelected}"/>
 
-    <CheckBox
-        android:id="@+id/required_checkBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:text="Required"
-        android:textSize="18sp" />
-</LinearLayout>
+        <CheckBox
+            android:id="@+id/pii_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Personally Identifiable Information"
+            android:textSize="18sp"
+            android:checked="@{viewModel.createFieldModel.tempField.pii}"
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"/>
+
+        <CheckBox
+            android:id="@+id/required_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Required"
+            android:textSize="18sp"
+            android:checked="@{viewModel.createFieldModel.tempField.required}"
+            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldRequiredSelected}"/>
+    </LinearLayout>
+</layout>

@@ -126,93 +126,93 @@ class UDPBroadcaster
 
             NetworkCommand.NetworkFieldsRequest -> {
                 fragment.lifecycleScope.launch {
-                    val fields = DAO.fieldDAO.getFields( networkCommand.parm1 )
-                    if (fields.isEmpty())
-                    {
-                        Toast.makeText( fragment.activity!!.applicationContext, "fields<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        val networkFields = NetworkFields( fields )
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFieldsResponse, networkCommand.uuid, "", "", networkFields.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    }
+                  //  val fields = DAO.fieldDAO.getFields( networkCommand.parm1 )
+//                    if (fields.isEmpty())
+//                    {
+//                        Toast.makeText( fragment.activity!!.applicationContext, "fields<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                    }
+//                    else
+//                    {
+//                        val networkFields = NetworkFields( fields )
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFieldsResponse, networkCommand.uuid, "", "", networkFields.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    }
                 }
             }
 
             NetworkCommand.NetworkRulesRequest -> {
                 fragment.lifecycleScope.launch {
-                    val rules = DAO.ruleDAO.getRules( networkCommand.parm1 )
-                    if (rules.isEmpty())
-                    {
-                        Toast.makeText( fragment.activity!!.applicationContext, "rules<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        val networkRules = NetworkRules( rules )
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRulesResponse, networkCommand.uuid, "", "", networkRules.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    }
+                   // val rules = DAO.ruleDAO.getRules( networkCommand.parm1 )
+//                    if (rules.isEmpty())
+//                    {
+//                        Toast.makeText( fragment.activity!!.applicationContext, "rules<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                    }
+//                    else
+//                    {
+//                        val networkRules = NetworkRules( rules )
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRulesResponse, networkCommand.uuid, "", "", networkRules.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    }
                 }
             }
 
             NetworkCommand.NetworkFiltersRequest -> {
-                fragment.lifecycleScope.launch {
-                    val filters = DAO.filterDAO.getFilters( networkCommand.parm1 )
-                    if (filters.isEmpty())
-                    {
-                        Toast.makeText( fragment.activity!!.applicationContext, "filters<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        val networkFilters = NetworkFilters( filters )
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFiltersResponse, networkCommand.uuid, "", "", networkFilters.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    }
-                }
+//                fragment.lifecycleScope.launch {
+//                    val filters = DAO.filterDAO.getFilters( networkCommand.parm1 )
+//                    if (filters.isEmpty())
+//                    {
+//                        Toast.makeText( fragment.activity!!.applicationContext, "filters<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                    }
+//                    else
+//                    {
+//                        val networkFilters = NetworkFilters( filters )
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFiltersResponse, networkCommand.uuid, "", "", networkFilters.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    }
+//                }
             }
 
             NetworkCommand.NetworkFilterRulesRequest -> {
                 fragment.lifecycleScope.launch {
-                    val filterRules = DAO.filterRuleDAO.getFilterRules( networkCommand.parm1 )
-                    if (filterRules.isEmpty())
-                    {
-                        Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} does not contain any FilterRules.>", Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        val networkFilterRules = NetworkFilterRules( filterRules )
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFilterRulesResponse, networkCommand.uuid, "", "", networkFilterRules.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    }
+//                    val filterRules = DAO.filterRuleDAO.getFilterRules( networkCommand.parm1 )
+//                    if (filterRules.isEmpty())
+//                    {
+//                        Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} does not contain any FilterRules.>", Toast.LENGTH_SHORT).show()
+//                    }
+//                    else
+//                    {
+//                        val networkFilterRules = NetworkFilterRules( filterRules )
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkFilterRulesResponse, networkCommand.uuid, "", "", networkFilterRules.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    }
                 }
             }
 
             NetworkCommand.NetworkEnumAreaRequest -> {
-                fragment.lifecycleScope.launch {
-                    DAO.enumAreaDAO.getEnumArea( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkEnumAreaResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "enum_area<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.enumAreaDAO.getEnumArea( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkEnumAreaResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "enum_area<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkRectangleRequest -> {
-                fragment.lifecycleScope.launch {
-                    DAO.rectangleDAO.getRectangle( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRectangleResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "rectangle<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.rectangleDAO.getRectangle( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkRectangleResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "rectangle<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkTeamRequest -> {
-                fragment.lifecycleScope.launch {
-                    DAO.teamDAO.getTeam( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkTeamResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "team<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.teamDAO.getTeam( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkTeamResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "team<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
         }
 

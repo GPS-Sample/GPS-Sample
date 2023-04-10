@@ -6,10 +6,12 @@ import kotlinx.serialization.json.Json
 
 @kotlinx.serialization.Serializable
 data class TeamMember(
-    var uuid: String,
-    var team_uuid: String,
+    var id : Int? = null,
+    var team_id: Int,
     var name: String)
 {
+    constructor(team_id: Int, name: String) : this(null, team_id, name)
+
     fun pack() : String
     {
         return Json.encodeToString( this )

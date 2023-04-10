@@ -5,7 +5,7 @@
     android:id="@+id/fragment_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.DefineEnumerationArea.DefineEnumerationAreaFragment">
+    tools:context=".fragments.defineenumeration.DefineEnumerationAreaFragment">
 
     <fragment
         android:id="@+id/map_fragment"

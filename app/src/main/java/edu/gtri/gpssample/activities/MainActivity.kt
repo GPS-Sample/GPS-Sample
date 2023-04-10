@@ -7,66 +7,44 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity()
 {
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var udpBroadcastReceiverService: UDPBroadcastReceiverService
+    private lateinit var configurationViewModel : ConfigurationViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
+        // build view models
+        val viewModel: ConfigurationViewModel by viewModels()
+        configurationViewModel = viewModel
+
         if (savedInstanceState == null)
         {
             DAO.createSharedInstance(applicationContext)
-
-            DAO.studyDAO.deleteOrphans()
-            DAO.fieldDAO.deleteOrphans()
-            DAO.filterDAO.deleteOrphans()
-            DAO.ruleDAO.deleteOrphans()
-            DAO.filterRuleDAO.deleteOrphans()
-            DAO.sampleDAO.deleteOrphans()
-            DAO.navPlanDAO.deleteOrphans()
-            DAO.enumAreaDAO.deleteOrphans()
-            DAO.teamDAO.deleteOrphans()
-
-            val configurations = DAO.configDAO.getConfigs()
-            Log.d( "xxx", "found ${configurations.size} Configurations" )
-
-            val studies = DAO.studyDAO.getStudies()
-            Log.d( "xxx", "found ${studies.size} Studies" )
-
-            val fields = DAO.fieldDAO.getFields()
-            Log.d( "xxx", "found ${fields.size} Fields" )
-
-            val rules = DAO.ruleDAO.getRules()
-            Log.d( "xxx", "found ${rules.size} Rules" )
-
-            val filters = DAO.filterDAO.getFilters()
-            Log.d( "xxx", "found ${filters.size} Filters" )
-
-            val filterRules = DAO.filterRuleDAO.getFilterRules()
-            Log.d( "xxx", "found ${filterRules.size} FilterRules" )
-
-            val enumAreas = DAO.enumAreaDAO.getEnumAreas()
-            Log.d( "xxx", "found ${enumAreas.size} EnumAreas" )
-
-            val teams = DAO.teamDAO.getTeams()
-            Log.d( "xxx", "found ${teams.size} Teams" )
+            configurationViewModel.initializeConfigurations()
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

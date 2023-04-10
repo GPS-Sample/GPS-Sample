@@ -6,14 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.Main.MainFragment">
+    tools:context=".fragments.main.MainFragment">
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="50dp" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:theme="@style/Theme.GPSSample"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -46,15 +46,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginStart="22dp"
+                android:layout_marginLeft="22dp"
+                android:layout_marginBottom="5dp"
                 android:gravity="center_horizontal"
                 app:layout_constraintTop_toBottomOf="@+id/textView">
             <RadioButton
                 android:id="@+id/admin_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="22dp"
-                android:layout_marginLeft="22dp"
-                android:layout_marginBottom="5dp"
                 android:text="@string/admin"
                 android:textSize="20sp"/>
 
@@ -62,9 +62,6 @@
                 android:id="@+id/supervisor_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="22dp"
-                android:layout_marginLeft="22dp"
-                android:layout_marginBottom="5dp"
                 android:text="@string/supervisor"
                 android:textSize="20sp" />
 
@@ -72,9 +69,6 @@
                 android:id="@+id/data_collector_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="22dp"
-                android:layout_marginLeft="22dp"
-                android:layout_marginBottom="5dp"
                 android:text="@string/data_collector"
                 android:textSize="20sp" />
             </RadioGroup>
@@ -88,7 +82,6 @@
 
             <Button
                 android:id="@+id/sign_in_button"
-                android:theme="@style/Theme.GPSSample.ActionButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginStart="20dp"

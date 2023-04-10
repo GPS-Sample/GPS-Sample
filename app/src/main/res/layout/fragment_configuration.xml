@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    tools:context=".fragments.configuration.ConfigurationFragment"
+    >
+    <data>
+        <variable
+            name="viewModel"
+            type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
+
+        <variable
+            name="configurationFragment"
+            type="edu.gtri.gpssample.fragments.configuration.ConfigurationFragment" />
+    </data>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:layout_marginBottom="0dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fragment_root_layout"
+                android:layout_width="match_parent"
+                android:layout_height="2048dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/config_name"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <TextView
+                    android:id="@+id/config_name_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textSize="17sp"
+                    android:text="@={viewModel.currentConfiguration.name}" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/preferred_units"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+                <TextView
+                    android:id="@+id/config_preferred_units_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textSize="17sp"
+                    android:text="@{viewModel.currentConfigurationDistanceFormat}" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/date_format"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <TextView
+                    android:id="@+id/config_date_format_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textSize="17sp"
+                    android:text="@{viewModel.currentConfigurationDateFormat}" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/time_format"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <TextView
+                    android:id="@+id/config_time_format_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textSize="17sp"
+                    android:text="@{viewModel.currentConfigurationTimeFormat}" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/min_gps_precision"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <TextView
+                    android:id="@+id/min_gps_precision_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textSize="17sp"
+                    android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
+                     />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/enumeration_area"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp" >
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/map_fragment"
+                    android:layout_width="300dp"
+                    android:layout_height="200dp"
+                    android:layout_centerHorizontal="true"
+                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+                </RelativeLayout>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/enum_areas_recycler"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_height="0dp"
+                    />
+
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+                <FrameLayout
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/studies"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                </FrameLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/studies_recycler"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_height="100dp"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </ScrollView>
+        <Button
+            android:id="@+id/done_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:layout_gravity="bottom"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/done" />
+    </LinearLayout>
+</layout>

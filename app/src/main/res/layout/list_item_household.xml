@@ -1,40 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/frame_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_view"
-        android:layout_margin="10dp"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        card_view:cardCornerRadius="4dp">
+    <include android:id="@+id/text_layout" android:visibility="gone" layout="@layout/list_item_text_field" />
+    <include android:id="@+id/number_layout" android:visibility="gone" layout="@layout/list_item_number_field" />
+    <include android:id="@+id/date_layout" android:visibility="gone" layout="@layout/list_item_date_field" />
+    <include android:id="@+id/checkbox_layout" android:visibility="gone" layout="@layout/list_item_checkbox_field" />
+    <include android:id="@+id/dropdown_layout" android:visibility="gone" layout="@layout/list_item_dropdown_field" />
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/text_view"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:gravity="center_vertical"
-                android:text="Name" />
-
-            <EditText
-                android:id="@+id/edit_text"
-                android:inputType="textCapWords"
-                android:imeOptions="actionDone"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
 </FrameLayout>

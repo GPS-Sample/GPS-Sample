@@ -1,129 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.CreateField.CreateFieldFragment">
+    tools:context=".fragments.createconfiguration.CreateConfigurationFragment">
+    <data>
+        <variable
+            name="viewModel"
+            type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/fragment_root_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/field_name"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <EditText
-                android:id="@+id/field_name_edit_text"
-                android:inputType="textCapWords"
-                android:imeOptions="actionDone"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:hint="@string/enter_field_name" />
-
-            <TextView
-                android:layout_marginTop="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginStart="20dp"
-                android:gravity="center_vertical"
-                android:text="@string/field_type"
-                android:textSize="17sp"
-                android:textColor="@color/primary_textcolor" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/spinner_frame">
-
-                <Spinner
-                    android:id="@+id/field_type_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
-
-            <include
-                android:visibility="visible"
-                android:id="@+id/layout_field_text"
-                layout="@layout/layout_field_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_number"
-                layout="@layout/layout_field_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_date"
-                layout="@layout/layout_field_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_checkbox"
-                layout="@layout/layout_field_checkbox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <include
-                android:visibility="gone"
-                android:id="@+id/layout_field_dropdown"
-                layout="@layout/layout_field_dropdown"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </ScrollView>
-
+        <variable
+            name="createFieldFragment"
+            type="edu.gtri.gpssample.fragments.createfield.CreateFieldFragment" />
+    </data>
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/cancel" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-        <Button
-            android:id="@+id/save_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/save" />
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fragment_root_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/field_name"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <EditText
+                    android:id="@+id/field_name_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:hint="@string/enter_field_name"
+                    android:text="@={viewModel.createFieldModel.tempField.name}"
+                    android:imeOptions="actionDone"
+                    android:inputType="textCapSentences" />
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/field_type"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:id="@+id/field_type_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:entries="@{viewModel.createFieldModel.fieldTypes}"
+                        android:selectedItemPosition="@={viewModel.createFieldModel.fieldTypePosition}"
+                        android:onItemSelected="@{viewModel.createFieldModel::onFieldTypeSelected}"/>
+                </FrameLayout>
+                <include
+                    android:visibility="visible"
+                    android:id="@+id/layout_field_text"
+                    layout="@layout/layout_field_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:viewModel="@{viewModel}"
+                    />
+
+                <include
+                    android:visibility="gone"
+                    android:id="@+id/layout_field_number"
+                    layout="@layout/layout_field_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:viewModel="@{viewModel}"/>
+
+                <include
+                    android:visibility="gone"
+                    android:id="@+id/layout_field_date"
+                    layout="@layout/layout_field_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:viewModel="@{viewModel}"
+                    />
+
+                <include
+                    android:visibility="gone"
+                    android:id="@+id/layout_field_checkbox"
+                    layout="@layout/layout_field_checkbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:viewModel="@{viewModel}"/>
+
+                <include
+                    android:visibility="gone"
+                    android:id="@+id/layout_field_dropdown"
+                    layout="@layout/layout_field_dropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:viewModel="@{viewModel}"
+                    />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </ScrollView>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/save" />
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</layout>

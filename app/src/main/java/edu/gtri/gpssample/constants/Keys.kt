@@ -11,7 +11,7 @@ enum class Keys {
     kConfigName,
     kUser_uuid,
     kRule_uuid,
-    kTeam_uuid,
+    kTeam_id,
     kField_uuid,
     kStudy_uuid,
     kQuickStart,
@@ -19,6 +19,6 @@ enum class Keys {
     kConfig_uuid,
     kSample_uuid,
     kNavPlan_uuid,
-    kEnumArea_uuid,
+    kEnumArea_id,
     kSamplingMethod,
 }

@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.*
@@ -19,41 +20,27 @@ class TeamMemberDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putTeamMember(teamMember: TeamMember, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, teamMember.uuid )
-        values.put( DAO.COLUMN_TEAM_MEMBER_TEAM_UUID, teamMember.team_uuid )
+        values.put( DAO.COLUMN_TEAM_ID, teamMember.team_id )
         values.put( DAO.COLUMN_TEAM_MEMBER_NAME, teamMember.name )
     }
 
     //--------------------------------------------------------------------------
-    private fun createTeamMember( cursor: Cursor): TeamMember
+    @SuppressLint("Range")
+    private fun createTeamMember(cursor: Cursor): TeamMember
     {
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val team_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_MEMBER_TEAM_UUID))
+        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val team_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_MEMBER_NAME))
 
-        return TeamMember( uuid, team_uuid, name )
+        return TeamMember(id, team_id, name )
     }
 
     //--------------------------------------------------------------------------
-    fun updateTeamMember( teamMember: TeamMember )
-    {
-        val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(teamMember.uuid)
-        val values = ContentValues()
-
-        putTeamMember( teamMember, values )
-
-        db.update(DAO.TABLE_TEAM_MEMBER, values, whereClause, args )
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun getTeamMember( uuid: String ): TeamMember?
+    fun getTeamMember( id: Int ): TeamMember?
     {
         var teamMember: TeamMember? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM_MEMBER} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM_MEMBER} WHERE ${DAO.COLUMN_UUID} = $id"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -70,11 +57,11 @@ class TeamMemberDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getTeamMembers( team_uuid: String ): List<TeamMember>
+    fun getTeamMembers( team_id: Int ): List<TeamMember>
     {
         val teamMembers = ArrayList<TeamMember>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM_MEMBER} WHERE ${DAO.COLUMN_TEAM_MEMBER_TEAM_UUID} = '$team_uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM_MEMBER} WHERE ${DAO.COLUMN_TEAM_ID} = '$team_id'"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -89,23 +76,11 @@ class TeamMemberDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun exists( uuid: String ) : Boolean
-    {
-        return getTeamMember( uuid ) != null
-    }
-
-    //--------------------------------------------------------------------------
-    fun doesNotExist( uuid: String ) : Boolean
-    {
-        return !exists( uuid )
-    }
-
-    //--------------------------------------------------------------------------
     fun deleteTeamMember( teamMember: TeamMember )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(teamMember.uuid.toString())
+        val args = arrayOf(teamMember.id.toString())
 
         db.delete(DAO.TABLE_TEAM_MEMBER, whereClause, args)
         db.close()
