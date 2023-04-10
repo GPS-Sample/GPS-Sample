@@ -2,18 +2,24 @@ package edu.gtri.gpssample.fragments.add_household
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
 import androidx.cardview.widget.CardView
+import androidx.core.widget.doAfterTextChanged
+import androidx.databinding.adapters.AdapterViewBindingAdapter.OnItemSelected
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldData
 import kotlinx.coroutines.NonDisposableHandle.parent
 
-class AddHouseholdAdapter(var fields: List<Field>?) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
+class AddHouseholdAdapter(var fields : List<Field>?, var fieldDataList : List<FieldData>) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
 {
     override fun getItemCount() = fields!!.size
 
@@ -43,9 +49,39 @@ class AddHouseholdAdapter(var fields: List<Field>?) : RecyclerView.Adapter<AddHo
         holder.itemView.isSelected = false
 
         when (field.type) {
-            FieldType.Text -> frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
-            FieldType.Number -> frameLayout = holder.frameLayout.findViewById(R.id.number_layout)
-            FieldType.Date -> frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
+            FieldType.Text -> {
+                frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
+                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+                editText.setText( fieldDataList[position].response )
+                editText.doAfterTextChanged {
+                    val fieldData = fieldDataList[position]
+                    fieldData.response = it.toString()
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
+                }
+            }
+
+            FieldType.Number -> {
+                frameLayout = holder.frameLayout.findViewById(R.id.number_layout)
+                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+                editText.setText( fieldDataList[position].response )
+                editText.doAfterTextChanged {
+                    val fieldData = fieldDataList[position]
+                    fieldData.response = it.toString()
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
+                }
+            }
+
+            FieldType.Date -> {
+                frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
+                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+                editText.setText( fieldDataList[position].response )
+                editText.doAfterTextChanged {
+                    val fieldData = fieldDataList[position]
+                    fieldData.response = it.toString()
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
+                }
+            }
+
             FieldType.Checkbox ->
             {
                 frameLayout = holder.frameLayout.findViewById(R.id.checkbox_layout)
@@ -96,6 +132,17 @@ class AddHouseholdAdapter(var fields: List<Field>?) : RecyclerView.Adapter<AddHo
 
                 val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
                 spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
+
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+                {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                    {
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>)
+                    {
+                    }
+                }
             }
             else -> {}
         }

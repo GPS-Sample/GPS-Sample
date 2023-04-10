@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FieldData (
-    val id : Int? = null,
-    val enumDataId : Int,
-    val fieldId : Int,
+    var id : Int? = null,
+    var enumDataId : Int,
+    var fieldId : Int,
     var response : String)
 {
     constructor( enumDataId: Int, fieldId: Int, response: String ) : this( null, enumDataId, fieldId, response )

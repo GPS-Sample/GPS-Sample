@@ -171,7 +171,6 @@ class ConfigDAO(private var dao: DAO)
             updateStudies(config)
             db.close()
         }
-
     }
 
     //--------------------------------------------------------------------------

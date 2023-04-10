@@ -59,4 +59,24 @@ class EnumDataDAO(private var dao: DAO)
 
         return enumData
     }
+
+    fun getEnumData( userId: Int, studyId: Int ) : EnumData?
+    {
+        var enumData: EnumData? = null
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_USER_ID} = $userId AND ${DAO.COLUMN_STUDY_ID} = $studyId"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            enumData = createEnumData( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return enumData
+    }
 }

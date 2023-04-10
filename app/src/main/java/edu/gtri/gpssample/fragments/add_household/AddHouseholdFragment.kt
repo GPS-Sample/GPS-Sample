@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -12,7 +13,10 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -22,7 +26,10 @@ class AddHouseholdFragment : Fragment()
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
 
+    private var userId: Int = -1
+    private var studyId: Int = -1
     private lateinit var study: Study
+    private lateinit var enumData: EnumData
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
 
@@ -48,13 +55,51 @@ class AddHouseholdFragment : Fragment()
             study = it
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( study.fields )
+        val user = (activity!!.application as? MainApplication)?.user
+
+        user?.id?.let {
+            userId = it
+        }
+
+        study?.id?.let {
+            studyId = it
+        }
+
+        var fieldDataList = ArrayList<FieldData>()
+
+        DAO.enumDataDAO.getEnumData( userId, studyId )?.let {enum_data ->
+            enumData = enum_data
+            enumData.id?.let {enum_data_id ->
+                DAO.fieldDataDAO.getFieldDataList( enum_data_id )?.let { field_data_list ->
+                    fieldDataList = field_data_list
+                }
+            }
+        } ?: kotlin.run {
+            enumData = EnumData( userId, studyId, 30.341676, -86.168010 )
+            enumData.id = DAO.enumDataDAO.createEnumData( enumData )
+            enumData.id?.let {enum_data_id ->
+                for (field in study.fields)
+                {
+                    field.id?.let { fieldId ->
+                        val fieldData = FieldData( enum_data_id, fieldId, "")
+                        fieldData.id = DAO.fieldDataDAO.createFieldData( fieldData )
+                        fieldDataList.add(fieldData)
+                    }
+                }
+            }
+        }
+
+        addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataList )
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.saveButton.setOnClickListener {
             findNavController().popBackStack()
         }
     }

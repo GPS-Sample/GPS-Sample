@@ -195,18 +195,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
                 "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumData)
 
         val createTableFieldData = ("CREATE TABLE " +
-                TABLE_ENUM_DATA + "(" +
+                TABLE_FIELD_DATA + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
                 COLUMN_FIELD_DATA_RESPONSE + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFieldData)
     }
