@@ -40,9 +40,10 @@ class CreateFilterModel {
         }
 
     val createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
-    fun createNewFiler()
+    fun createNewFilter()
     {
-        val newFilter = Filter( UUID.randomUUID().toString(), -1,"", -1, 0 )
+        val newFilter = Filter(
+            UUID.randomUUID().toString(),"" )
         _currentFilter = MutableLiveData(newFilter)
         currentFilter = _currentFilter
     }
@@ -53,6 +54,14 @@ class CreateFilterModel {
             study.filters.add(filter)
 
         }
+    }
+
+    fun setSelectedFilter(filter: Filter)
+    {
+        _currentFilter = MutableLiveData(filter)
+        currentFilter = _currentFilter
+        createFilterAdapter.updateFilterRules(filter.filterRules)
+
     }
 
     fun addFilterRule(order : Int, rule : Rule, connector : Connector)
