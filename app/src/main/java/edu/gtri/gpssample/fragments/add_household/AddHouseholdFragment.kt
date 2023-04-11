@@ -55,31 +55,20 @@ class AddHouseholdFragment : Fragment()
             study = it
         }
 
-        val user = (activity!!.application as? MainApplication)?.user
+        val enumData = sharedViewModel.enumDataViewModel.currentEnumData
 
-        user?.id?.let {
-            userId = it
+        enumData?.value?.let { enum_data ->
+            addHouseholdAdapter = AddHouseholdAdapter( study.fields, enum_data )
+            binding.recyclerView.adapter = addHouseholdAdapter
+            binding.recyclerView.itemAnimator = DefaultItemAnimator()
+            binding.recyclerView.layoutManager = LinearLayoutManager(activity )
         }
 
-        study?.id?.let {
-            studyId = it
-        }
-
-        DAO.enumDataDAO.getEnumData( userId, studyId )?.let {enum_data ->
-            enumData = enum_data
-        } ?: kotlin.run {
-            enumData = EnumData( userId, studyId, 30.341676, -86.168010 )
-            enumData.id = DAO.enumDataDAO.createEnumData( enumData )
-        }
-
-        addHouseholdAdapter = AddHouseholdAdapter( study.fields, enumData )
-
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = addHouseholdAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
-
-        binding.cancelButton.setOnClickListener {
-            findNavController().popBackStack()
+        binding.deleteButton.setOnClickListener {
+            enumData?.value?.let { enum_data ->
+                DAO.enumDataDAO.delete( enum_data )
+                findNavController().popBackStack()
+            }
         }
 
         binding.saveButton.setOnClickListener {

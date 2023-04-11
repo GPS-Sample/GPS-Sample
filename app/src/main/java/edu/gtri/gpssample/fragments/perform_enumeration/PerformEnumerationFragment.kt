@@ -1,6 +1,8 @@
 package edu.gtri.gpssample.fragments.perform_enumeration
 
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +14,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -26,10 +30,13 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     private lateinit var team: Team
     private lateinit var study: Study
     private lateinit var map: GoogleMap
-    private lateinit var location: LatLng;
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var userId = 0
+    private var studyId = 0
+    private var dropMode = false
+    private var location: LatLng? = null
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
 
@@ -53,6 +60,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
+            studyId = study.id!!
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
@@ -63,23 +71,55 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             team = it
         }
 
+        val user = (activity!!.application as? MainApplication)?.user
+
+        user?.id?.let {
+            userId = it
+        }
+
         binding.titleTextView.text = enumArea.name + " (" + team.name + ")"
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
 
+        val defaultColorList = binding.dropPinButton.backgroundTintList
+
+        binding.dropPinButton.setOnClickListener {
+
+            dropMode = true
+            location = null
+            addHouseholdMarkers()
+            binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+
+            map.setOnMapClickListener {
+                if (dropMode)
+                {
+                    location = it
+                    map.addMarker(MarkerOptions().position(it))
+                    dropMode = false
+                    binding.dropPinButton.setBackgroundTintList(defaultColorList);
+                }
+            }
+        }
+
         binding.addHouseholdButton.setOnClickListener {
 
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            location?.let { location ->
+                var enumData = EnumData(userId, studyId, location.latitude, location.longitude)
+                enumData.id = DAO.enumDataDAO.createEnumData(enumData)
+                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            }
         }
 
         binding.addLocationButton.setOnClickListener {
-
             findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
         }
 
         binding.finishButton.setOnClickListener {
+
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
         }
     }
@@ -87,17 +127,44 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     override fun onResume()
     {
         super.onResume()
+
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+
+        if (this::map.isInitialized)
+        {
+            addHouseholdMarkers()
+        }
+    }
+
+    fun addHouseholdMarkers()
+    {
+        map.clear()
+
+        val enumDataList = DAO.enumDataDAO.getEnumData(userId, studyId)
+
+        for (enumData in enumDataList)
+        {
+            val marker = map.addMarker(MarkerOptions().position(LatLng( enumData.latitude, enumData.longitude )))
+
+            marker?.let {marker ->
+                marker.tag = enumData
+            }
+
+            map.setOnMarkerClickListener { marker ->
+                marker.tag?.let {tag ->
+                    val enum_data = tag as EnumData
+                    sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                }
+                false
+            }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        map.setOnMapClickListener {
-            location = it;
-            map.clear()
-            map.addMarker(MarkerOptions().position(it))
-        }
+        addHouseholdMarkers()
 
         googleMap.addPolyline(
             PolylineOptions()

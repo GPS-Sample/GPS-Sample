@@ -85,7 +85,7 @@ class FieldDataDAO(private var dao: DAO)
     {
         var fieldData: FieldData? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUM_DATA_ID} = $enum_data_id"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
