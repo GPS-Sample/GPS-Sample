@@ -89,7 +89,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
             dropMode = true
             location = null
-            addHouseholdMarkers()
+            addMapObjects()
             binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
             map.setOnMapClickListener {
@@ -132,13 +132,26 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         if (this::map.isInitialized)
         {
-            addHouseholdMarkers()
+            addMapObjects()
         }
     }
 
-    fun addHouseholdMarkers()
+    fun addMapObjects()
     {
         map.clear()
+
+        map.addPolyline(
+            PolylineOptions()
+                .clickable(true)
+                .add(
+                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                    LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
+                    LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
+                    LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
+                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
+                ))
+        val latLng = getCenter()
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
 
         val enumDataList = DAO.enumDataDAO.getEnumData(userId, studyId)
 
@@ -164,20 +177,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        addHouseholdMarkers()
-
-        googleMap.addPolyline(
-            PolylineOptions()
-                .clickable(true)
-                .add(
-                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                    LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
-                    LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
-                    LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
-                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                ))
-        val latLng = getCenter()
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
+        addMapObjects()
     }
 
     fun getCenter() : LatLng

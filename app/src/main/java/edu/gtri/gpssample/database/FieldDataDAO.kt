@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
 
 class FieldDataDAO(private var dao: DAO)
@@ -123,5 +124,35 @@ class FieldDataDAO(private var dao: DAO)
         db.close()
 
         return fieldDataList
+    }
+
+    fun delete( fieldData: FieldData )
+    {
+        fieldData.id?.let {field_data_id ->
+            val db = dao.writableDatabase
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args = arrayOf(field_data_id.toString())
+
+            db.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
+            db.close()
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    fun deleteAllFields( enum_data_id: Int )
+    {
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUM_DATA_ID} = $enum_data_id"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            val fieldData = createFieldData( cursor )
+            delete( fieldData )
+        }
+
+        cursor.close()
+        db.close()
     }
 }

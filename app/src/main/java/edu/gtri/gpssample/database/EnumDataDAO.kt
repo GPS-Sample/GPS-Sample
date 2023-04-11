@@ -81,10 +81,13 @@ class EnumDataDAO(private var dao: DAO)
 
     fun delete( enumData: EnumData )
     {
-        val id = enumData.id?.let {id ->
+        enumData.id?.let {enum_data_id ->
+
+            DAO.fieldDataDAO.deleteAllFields( enum_data_id )
+
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args = arrayOf(id.toString())
+            val args = arrayOf(enum_data_id.toString())
 
             db.delete(DAO.TABLE_ENUM_DATA, whereClause, args)
             db.close()
