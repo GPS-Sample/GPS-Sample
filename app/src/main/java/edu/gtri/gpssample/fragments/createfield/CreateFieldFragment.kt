@@ -47,10 +47,10 @@ class CreateFieldFragment : Fragment()
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
 
-        sharedViewModel.createFieldModel?.tempField = MutableLiveData( sharedViewModel.createFieldModel?.currentField?.value?.copy())
+        sharedViewModel.createFieldModel.tempField = MutableLiveData( sharedViewModel.createFieldModel.currentField?.value?.copy())
 
-        sharedViewModel.createFieldModel?.tempField?.value?.type?.let { fieldType ->
-            sharedViewModel.createFieldModel?.fieldTypePosition?.value = FieldTypeConverter.toIndex( fieldType )
+        sharedViewModel.createFieldModel.tempField?.value?.type?.let { fieldType ->
+            sharedViewModel.createFieldModel.fieldTypePosition?.value = FieldTypeConverter.toIndex( fieldType )
         }
     }
 
