@@ -204,7 +204,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_RESPONSE + " TEXT" + "," +
+                COLUMN_FIELD_DATA_RESPONSE1 + " TEXT" + "," +
+                COLUMN_FIELD_DATA_RESPONSE2 + " TEXT" + "," +
+                COLUMN_FIELD_DATA_RESPONSE3 + " TEXT" + "," +
+                COLUMN_FIELD_DATA_RESPONSE4 + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" +
                 ")")
@@ -242,6 +245,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ID = "id"
         const val COLUMN_UUID = "uuid"
         const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
+
         // foreign key columns
         const val COLUMN_USER_ID = "user_id"
         const val COLUMN_CONFIG_ID = "config_id"
@@ -362,7 +366,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_FIELD_DATA = "field_data"
 //        const val COLUMN_FIELD_ID = "field_id"
 //        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
-        const val COLUMN_FIELD_DATA_RESPONSE = "field_data_response"
+        const val COLUMN_FIELD_DATA_RESPONSE1 = "field_data_response_1"
+        const val COLUMN_FIELD_DATA_RESPONSE2 = "field_data_response_2"
+        const val COLUMN_FIELD_DATA_RESPONSE3 = "field_data_response_3"
+        const val COLUMN_FIELD_DATA_RESPONSE4 = "field_data_response_4"
 
         // DAO's
         lateinit var userDAO: UserDAO
@@ -409,6 +416,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 79
+        private const val DATABASE_VERSION = 86
     }
 }

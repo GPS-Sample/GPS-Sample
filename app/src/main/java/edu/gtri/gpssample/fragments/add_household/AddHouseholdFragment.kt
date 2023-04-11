@@ -65,31 +65,14 @@ class AddHouseholdFragment : Fragment()
             studyId = it
         }
 
-        var fieldDataList = ArrayList<FieldData>()
-
         DAO.enumDataDAO.getEnumData( userId, studyId )?.let {enum_data ->
             enumData = enum_data
-            enumData.id?.let {enum_data_id ->
-                DAO.fieldDataDAO.getFieldDataList( enum_data_id )?.let { field_data_list ->
-                    fieldDataList = field_data_list
-                }
-            }
         } ?: kotlin.run {
             enumData = EnumData( userId, studyId, 30.341676, -86.168010 )
             enumData.id = DAO.enumDataDAO.createEnumData( enumData )
-            enumData.id?.let {enum_data_id ->
-                for (field in study.fields)
-                {
-                    field.id?.let { fieldId ->
-                        val fieldData = FieldData( enum_data_id, fieldId, "")
-                        fieldData.id = DAO.fieldDataDAO.createFieldData( fieldData )
-                        fieldDataList.add(fieldData)
-                    }
-                }
-            }
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataList )
+        addHouseholdAdapter = AddHouseholdAdapter( study.fields, enumData )
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = addHouseholdAdapter
