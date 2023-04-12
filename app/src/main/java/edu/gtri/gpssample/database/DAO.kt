@@ -212,6 +212,16 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFieldData)
+
+        val createTableLatLon = ("CREATE TABLE " +
+                TABLE_LAT_LON + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_LAT + " DOUBLE" + "," +
+                COLUMN_LON + " DOUBLE" + "," +
+                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
+                ")")
+        db.execSQL(createTableLatLon)
     }
 
     //--------------------------------------------------------------------------
@@ -233,6 +243,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_MEMBER")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_DATA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
 
         onCreate(db)
     }
@@ -257,6 +268,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_TEAM_ID = "team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
         const val COLUMN_ENUM_DATA_ID = "enum_data_id"
+        const val COLUMN_LAT_LON_ID = "lat_lon_id"
 
         // Connector Tables
         const val TABLE_CONFIG_STUDY = "config_study_conn"
@@ -371,6 +383,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_DATA_RESPONSE3 = "field_data_response_3"
         const val COLUMN_FIELD_DATA_RESPONSE4 = "field_data_response_4"
 
+        const val TABLE_LAT_LON = "lat_lon"
+        const val COLUMN_LAT = "lat"
+        const val COLUMN_LON = "lon"
+//        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
+
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -386,6 +403,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var teamMemberDAO: TeamMemberDAO
         lateinit var enumDataDAO: EnumDataDAO
         lateinit var fieldDataDAO: FieldDataDAO
+        lateinit var latLonDAO: LatLonDAO
 
         // creation/access methods
 
@@ -411,11 +429,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 teamMemberDAO = TeamMemberDAO( instance!! )
                 enumDataDAO = EnumDataDAO( instance!! )
                 fieldDataDAO = FieldDataDAO( instance!! )
+                latLonDAO = LatLonDAO( instance !!)
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 87
+        private const val DATABASE_VERSION = 92
     }
 }

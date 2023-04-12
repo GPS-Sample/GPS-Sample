@@ -138,16 +138,18 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
                 for (enumArea in enumAreas)
                 {
+                    val points = ArrayList<LatLng>()
+
+                    enumArea.vertices.map {
+                        points.add( it.toLatLng())
+                    }
+
+                    points.add( enumArea.vertices[0].toLatLng())
+
                     googleMap.addPolyline(
                         PolylineOptions()
                             .clickable(true)
-                            .add(
-                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                                LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
-                                LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
-                                LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
-                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                            )
+                            .addAll( points )
                     )
                 }
 

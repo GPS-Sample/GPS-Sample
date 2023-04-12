@@ -9,13 +9,25 @@ import edu.gtri.gpssample.database.models.EnumArea
 class EnumAreaDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createEnumArea( enumArea: EnumArea) : Int
+    fun createEnumArea( enumArea: EnumArea ) : Int
     {
         val values = ContentValues()
 
         putEnumArea( enumArea, values )
 
-        return dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
+        enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
+
+        enumArea.id?.let {enum_area_id ->
+            for (latLon in enumArea.vertices)
+            {
+                latLon.enumAreaId = enum_area_id
+                latLon.id = DAO.latLonDAO.createLatLon(latLon)
+            }
+
+            return enum_area_id
+        }
+
+        return -1
     }
 
     //--------------------------------------------------------------------------
@@ -23,14 +35,6 @@ class EnumAreaDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_CONFIG_ID, enumArea.config_id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
-        values.put( DAO.COLUMN_ENUM_AREA_TL_LAT, enumArea.topLeft.latitude )
-        values.put( DAO.COLUMN_ENUM_AREA_TL_LON, enumArea.topLeft.longitude )
-        values.put( DAO.COLUMN_ENUM_AREA_TR_LAT, enumArea.topRight.latitude )
-        values.put( DAO.COLUMN_ENUM_AREA_TR_LON, enumArea.topRight.longitude )
-        values.put( DAO.COLUMN_ENUM_AREA_BR_LAT, enumArea.botRight.latitude )
-        values.put( DAO.COLUMN_ENUM_AREA_BR_LON, enumArea.botRight.longitude )
-        values.put( DAO.COLUMN_ENUM_AREA_BL_LAT, enumArea.botLeft.latitude )
-        values.put( DAO.COLUMN_ENUM_AREA_BL_LON, enumArea.botLeft.longitude )
     }
 
     //--------------------------------------------------------------------------
@@ -40,16 +44,8 @@ class EnumAreaDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val config_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
-        val tl_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TL_LAT))
-        val tl_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TL_LON))
-        val tr_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TR_LAT))
-        val tr_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_TR_LON))
-        val br_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BR_LAT))
-        val br_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BR_LON))
-        val bl_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BL_LAT))
-        val bl_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_BL_LON))
 
-        return EnumArea( id, config_id, name, LatLng(tl_lat,tl_lon), LatLng(tr_lat,tr_lon), LatLng(br_lat,br_lon), LatLng(bl_lat,bl_lon))
+        return EnumArea( id, config_id, name )
     }
 
     //--------------------------------------------------------------------------
@@ -83,7 +79,9 @@ class EnumAreaDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            enumAreas.add( createEnumArea( cursor ))
+            val enumArea = createEnumArea( cursor )
+            enumArea.vertices = DAO.latLonDAO.getLatLons( enumArea.id!! )
+            enumAreas.add( enumArea )
         }
 
         cursor.close()

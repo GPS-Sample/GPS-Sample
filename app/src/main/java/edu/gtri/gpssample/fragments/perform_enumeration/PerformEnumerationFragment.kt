@@ -140,16 +140,20 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     {
         map.clear()
 
+        val points = ArrayList<LatLng>()
+
+        enumArea.vertices.map {
+            points.add( it.toLatLng())
+        }
+
+        points.add( enumArea.vertices[0].toLatLng())
+
         map.addPolyline(
             PolylineOptions()
                 .clickable(true)
-                .add(
-                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                    LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
-                    LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
-                    LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
-                    LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                ))
+                .addAll( points )
+        )
+
         val latLng = getCenter()
         map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
 
@@ -182,10 +186,16 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
     fun getCenter() : LatLng
     {
-        var sumLat = enumArea.topLeft.latitude + enumArea.topRight.latitude + enumArea.botRight.latitude + enumArea.botLeft.latitude
-        var sumLon = enumArea.topLeft.longitude + enumArea.topRight.longitude + enumArea.botRight.longitude + enumArea.botLeft.longitude
+        var sumLat: Double = 0.0
+        var sumLon: Double = 0.0
 
-        return LatLng( sumLat/4.0, sumLon/4.0 )
+        for (latLon in enumArea.vertices)
+        {
+            sumLat += latLon.latitude
+            sumLon += latLon.longitude
+        }
+
+        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
     override fun onDestroyView()

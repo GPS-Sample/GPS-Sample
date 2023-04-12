@@ -23,6 +23,7 @@ import edu.gtri.gpssample.constants.Shape
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
@@ -151,16 +152,18 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
         enumAreas?.let {enumAreas->
             for (enumArea in enumAreas)
             {
+                val points = ArrayList<LatLng>()
+
+                enumArea.vertices.map {
+                    points.add( it.toLatLng())
+                }
+
+                points.add( enumArea.vertices[0].toLatLng())
+
                 googleMap.addPolyline(
                     PolylineOptions()
                         .clickable(true)
-                        .add(
-                            LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                            LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
-                            LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
-                            LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
-                            LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                        )
+                        .addAll( points )
                 )
 
                 if (user!!.role == Role.Supervisor.toString())
@@ -180,45 +183,56 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
     fun getCenter( enumArea: EnumArea ) : LatLng
     {
-        var sumLat = enumArea.topLeft.latitude + enumArea.topRight.latitude + enumArea.botRight.latitude + enumArea.botLeft.latitude
-        var sumLon = enumArea.topLeft.longitude + enumArea.topRight.longitude + enumArea.botRight.longitude + enumArea.botLeft.longitude
+        var sumLat: Double = 0.0
+        var sumLon: Double = 0.0
 
-        return LatLng( sumLat/4.0, sumLon/4.0 )
+        for (latLon in enumArea.vertices)
+        {
+            sumLat += latLon.latitude
+            sumLon += latLon.longitude
+        }
+
+        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
     fun createTestAreas()
     {
-        var topLeft = LatLng( 30.343716828800115, -86.16672319932157 )
-        var topRight = LatLng( 30.343716828800115, -86.1627468263619 )
-        var botRight = LatLng( 30.3389857458543, -86.1627468263619 )
-        var botLeft = LatLng( 30.3389857458543, -86.16662109919962 )
+        var vertices = ArrayList<LatLon>()
 
-        var enumArea = EnumArea( config.id!!, "EA NORTH", topLeft, topRight, botRight, botLeft )
-        DAO.enumAreaDAO.createEnumArea( enumArea )
+        vertices.add( LatLon( 30.343716828800115, -86.16672319932157 ))
+        vertices.add( LatLon( 30.343716828800115, -86.1627468263619 ))
+        vertices.add( LatLon( 30.3389857458543, -86.1627468263619 ))
+        vertices.add( LatLon( 30.3389857458543, -86.16662109919962 ))
 
-        topLeft = LatLng( 30.332241965564545, -86.16700455200723 )
-        topRight = LatLng( 30.332241965564545, -86.16187525250082 )
-        botRight = LatLng( 30.328614485534533, -86.16187525250082 )
-        botLeft = LatLng( 30.328614485534533, -86.16700455200723 )
+        var enumArea = EnumArea( config.id!!, "EA NORTH", vertices )
+        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
 
-        enumArea = EnumArea( config.id!!, "EA SOUTH", topLeft, topRight, botRight, botLeft )
-        DAO.enumAreaDAO.createEnumArea( enumArea )
+        vertices.clear()
+        vertices.add( LatLon( 30.332241965564545, -86.16700455200723 ))
+        vertices.add( LatLon( 30.332241965564545, -86.16187525250082 ))
+        vertices.add( LatLon( 30.328614485534533, -86.16187525250082 ))
+        vertices.add( LatLon( 30.328614485534533, -86.16700455200723 ))
 
-        topLeft = LatLng( 30.337854506153278, -86.1716915111437 )
-        topRight = LatLng( 30.337854506153278, -86.16865136128406 )
-        botRight = LatLng( 30.33380130566348, -86.16865136128406 )
-        botLeft = LatLng( 30.33380130566348, -86.171641010582 )
+        enumArea = EnumArea( config.id!!, "EA SOUTH", vertices )
+        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
 
-        enumArea = EnumArea( config.id!!, "EA WEST", topLeft, topRight, botRight, botLeft )
-        DAO.enumAreaDAO.createEnumArea( enumArea )
+        vertices.clear()
+        vertices.add( LatLon( 30.337854506153278, -86.1716915111437 ))
+        vertices.add( LatLon( 30.337854506153278, -86.16865136128406 ))
+        vertices.add( LatLon( 30.33380130566348, -86.16865136128406 ))
+        vertices.add( LatLon( 30.33380130566348, -86.171641010582 ))
 
-        topLeft = LatLng( 30.33747998467289, -86.16498340055223 )
-        topRight = LatLng( 30.33747998467289, -86.16076498381355 )
-        botRight = LatLng( 30.334410467082552, -86.16076498381355 )
-        botLeft = LatLng( 30.334410467082552, -86.16498340055223 )
+        enumArea = EnumArea( config.id!!, "EA WEST", vertices )
+        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
 
-        enumArea = EnumArea( config.id!!, "EA EAST", topLeft, topRight, botRight, botLeft )
-        DAO.enumAreaDAO.createEnumArea( enumArea )
+        vertices.clear()
+        vertices.add( LatLon( 30.33747998467289, -86.16498340055223 ))
+        vertices.add( LatLon( 30.33747998467289, -86.16076498381355 ))
+        vertices.add( LatLon( 30.334410467082552, -86.16076498381355 ))
+        vertices.add( LatLon( 30.334410467082552, -86.16498340055223 ))
+
+        enumArea = EnumArea( config.id!!, "EA EAST", vertices )
+        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
     }
 
     override fun onDestroyView()
