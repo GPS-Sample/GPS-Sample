@@ -70,6 +70,25 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun deleteEnumArea( enumArea: EnumArea )
+    {
+        enumArea.id?.let {enum_area_id ->
+
+            for (vertex in enumArea.vertices)
+            {
+                DAO.latLonDAO.deleteLatLon( vertex )
+            }
+
+            val db = dao.writableDatabase
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args = arrayOf(enum_area_id.toString())
+
+            db.delete(DAO.TABLE_ENUM_AREA, whereClause, args)
+            db.close()
+        }
+    }
+
+    //--------------------------------------------------------------------------
     fun getEnumAreas( config_id: Int ): List<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()

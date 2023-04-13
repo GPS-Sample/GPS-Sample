@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
 
 class LatLonDAO(private var dao: DAO)
@@ -54,5 +55,19 @@ class LatLonDAO(private var dao: DAO)
         db.close()
 
         return latLons
+    }
+
+    //--------------------------------------------------------------------------
+    fun deleteLatLon( latLon: LatLon )
+    {
+        latLon.id?.let {lat_lon_id ->
+
+            val db = dao.writableDatabase
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args = arrayOf(lat_lon_id.toString())
+
+            db.delete(DAO.TABLE_LAT_LON, whereClause, args)
+            db.close()
+        }
     }
 }

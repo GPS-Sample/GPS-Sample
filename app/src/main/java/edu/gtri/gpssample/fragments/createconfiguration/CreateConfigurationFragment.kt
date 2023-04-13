@@ -16,6 +16,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -30,12 +31,13 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
     ConfirmationDialog.ConfirmationDialogDelegate {
+
     private var quickStart = false
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
+
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private var map : GoogleMap? = null
-    private lateinit var createStudyAdapter: CreateStudyAdapter
+    private lateinit var map : GoogleMap
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
     private var selectedStudy: Study? = null
 
@@ -123,8 +125,15 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     override fun onResume()
     {
         super.onResume()
+
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
+
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
+
+        if (this::map.isInitialized)
+        {
+            addPolygons()
+        }
     }
 
     override fun onDestroyView()
@@ -158,44 +167,46 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     }
     override fun onMapReady(p0: GoogleMap) {
         map = p0
-        map?.let{googleMap ->
-            googleMap.setOnMapClickListener(this)
-            googleMap.uiSettings.isScrollGesturesEnabled = false
+        map.setOnMapClickListener(this)
+        map.uiSettings.isScrollGesturesEnabled = false
 
-            sharedViewModel.currentConfiguration?.value?.let {config ->
-                config.id?.let {id ->
-                    val enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
+        addPolygons()
+    }
 
-                    for (enumArea in enumAreas)
-                    {
-                        val points = ArrayList<LatLng>()
+    fun addPolygons()
+    {
+        map.clear()
 
-                        enumArea.vertices.map {
-                            points.add( it.toLatLng())
-                        }
+        sharedViewModel.currentConfiguration?.value?.let {config ->
+            config.id?.let {id ->
+                val enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
 
-                        points.add( enumArea.vertices[0].toLatLng())
+                for (enumArea in enumAreas)
+                {
+                    val points = ArrayList<LatLng>()
 
-                        googleMap.addPolyline(
-                            PolylineOptions()
-                                .clickable(true)
-                                .addAll(points)
-                        )
+                    enumArea.vertices.map {
+                        points.add( it.toLatLng())
                     }
 
-                    // HACK HACK
-                    val srb = LatLng(30.335603,-86.165004 )
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
+                    val polygon = PolygonOptions()
+                        .clickable(true)
+                        .addAll(points)
+
+                    map.addPolygon(polygon)
                 }
+
+                // HACK HACK
+                val srb = LatLng(30.335603,-86.165004 )
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
             }
         }
     }
 
     override fun didAnswerNo() {
-
     }
 
-    override fun didAnswerYes(tag: Int) {
+    override fun didAnswerYes(tag: Any?) {
         sharedViewModel.removeStudy(selectedStudy)
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
     }

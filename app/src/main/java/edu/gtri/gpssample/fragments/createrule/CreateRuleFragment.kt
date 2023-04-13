@@ -119,7 +119,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
     {
     }
 
-    override fun didAnswerYes( tag: Int )
+    override fun didAnswerYes( tag: Any? )
     {
         rule?.let { rule ->
             DAO.ruleDAO.deleteRule( rule )

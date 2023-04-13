@@ -91,7 +91,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
     }
 
-    override fun didAnswerYes( tag: Int )
+    override fun didAnswerYes( tag: Any? )
     {
         selectedConfig?.let {
             sharedViewModel.deleteConfig(it)

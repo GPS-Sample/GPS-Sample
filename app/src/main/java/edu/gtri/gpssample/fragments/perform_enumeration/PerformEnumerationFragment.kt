@@ -13,10 +13,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -146,13 +143,11 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             points.add( it.toLatLng())
         }
 
-        points.add( enumArea.vertices[0].toLatLng())
+        val polygon = PolygonOptions()
+            .clickable(true)
+            .addAll( points )
 
-        map.addPolyline(
-            PolylineOptions()
-                .clickable(true)
-                .addAll( points )
-        )
+        map.addPolygon(polygon)
 
         val latLng = getCenter()
         map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))

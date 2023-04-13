@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -144,13 +145,11 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                         points.add( it.toLatLng())
                     }
 
-                    points.add( enumArea.vertices[0].toLatLng())
+                    val polygon = PolygonOptions()
+                        .clickable(true)
+                        .addAll( points )
 
-                    googleMap.addPolyline(
-                        PolylineOptions()
-                            .clickable(true)
-                            .addAll( points )
-                    )
+                    googleMap.addPolygon(polygon)
                 }
 
                 // HACK HACK

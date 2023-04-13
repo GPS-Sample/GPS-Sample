@@ -267,9 +267,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         findNavController().popBackStack()
     }
 
-    override fun didAnswerYes( tag: Int )
+    override fun didAnswerYes( tag: Any? )
     {
-        when( tag )
+        val t = tag as Int
+
+        when( t )
         {
             DeleteMode.deleteStudyTag.value -> {
                 sharedViewModel.deleteCurrentStudy()

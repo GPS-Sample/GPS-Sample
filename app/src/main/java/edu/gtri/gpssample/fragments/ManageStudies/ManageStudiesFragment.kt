@@ -155,7 +155,7 @@ class ManageStudiesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     override fun didAnswerNo() {
     }
 
-    override fun didAnswerYes( tag: Int )
+    override fun didAnswerYes( tag: Any? )
     {
         selectedStudy?.let {
             DAO.studyDAO.deleteStudy( it )

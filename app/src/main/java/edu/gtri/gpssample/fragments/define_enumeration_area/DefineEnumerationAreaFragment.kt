@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.define_enumeration_area
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +13,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -24,19 +24,23 @@ import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
-class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
+class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var config: Config
-    private var quickStart = false
-    private var _binding: FragmentDefineEnumerationAreaBinding? = null
-    private val binding get() = _binding!!
     private lateinit var map: GoogleMap
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var createMode = false
+    private var _binding: FragmentDefineEnumerationAreaBinding? = null
+    private val binding get() = _binding!!
+
     private var enumAreas : List<EnumArea>? = null
+    private var markers = ArrayList<Marker>()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -63,20 +67,6 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
             // Assign the fragment
             defineEnumerationAreaFragment = this@DefineEnumerationAreaFragment
         }
-        // required: configId
-        if (arguments == null)
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val config_uuid = arguments!!.getString( Keys.kConfig_uuid.toString(), "");
-
-        if (config_uuid.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: configId.", Toast.LENGTH_SHORT).show()
-            return
-        }
 
         sharedViewModel.currentConfiguration?.value.let {
             this.config = it!!
@@ -84,45 +74,45 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Config with id $config_uuid not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "Fatal! Config not found.", Toast.LENGTH_SHORT).show()
             return
-        }
-
-        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
-
-        quick_start?.let {
-            quickStart = it
-        }
-
-        if (quickStart)
-        {
-            binding.saveButton.setText( "NEXT" )
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
 
-        binding.saveButton.setOnClickListener {
+        binding.createSaveButton.setOnClickListener {
 
-            // TODO: add enumeration area to current configuration
-//            sharedViewModel.addEnumerationAreas(enumAreas  )
+            if (createMode)
+            {
+                createMode = false
+                binding.createSaveButton.text = "Create Polygon"
 
-            findNavController().popBackStack()
+                if (markers.size > 2)
+                {
+                    var vertices = ArrayList<LatLon>()
 
-//            sharedViewModel.saveNewConfiguration()
-//            if (quickStart)
-//            {
-//                val bundle = Bundle()
-//                bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
-//                bundle.putString( Keys.kConfig_uuid.toString(), config_uuid )
-//
-//                findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
-//            }
-//            else
-//            {
-//                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
-//            }
+                    markers.map {
+                        vertices.add( LatLon( it.position.latitude, it.position.longitude ))
+                    }
+
+                    var enumArea = EnumArea( config.id!!, "EA TBD", vertices )
+                    enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
+
+                    addPolygon( enumArea )
+
+                    markers.map {
+                        it.remove()
+                    }
+                }
+            }
+            else
+            {
+                markers.clear()
+                createMode = true
+                binding.createSaveButton.text = "Save Polygon"
+            }
         }
     }
 
@@ -135,35 +125,26 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
+        map.setOnMapClickListener {
+            if (createMode)
+            {
+                val marker = map.addMarker( MarkerOptions().position(it))
+                marker?.let {
+                    markers.add( marker )
+                }
+            }
+        }
+
         val user = (activity!!.application as? MainApplication)?.user
 
         config.id?.let {id ->
-            enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
-
-            if (user!!.role == Role.Admin.toString() && enumAreas!!.isEmpty())
-            {
-                createTestAreas()
-            }
-
             enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
         }
 
         enumAreas?.let {enumAreas->
             for (enumArea in enumAreas)
             {
-                val points = ArrayList<LatLng>()
-
-                enumArea.vertices.map {
-                    points.add( it.toLatLng())
-                }
-
-                points.add( enumArea.vertices[0].toLatLng())
-
-                googleMap.addPolyline(
-                    PolylineOptions()
-                        .clickable(true)
-                        .addAll( points )
-                )
+                addPolygon( enumArea )
 
                 if (user!!.role == Role.Supervisor.toString())
                 {
@@ -177,6 +158,26 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
                 val srb = LatLng(30.330603,-86.165004 )
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
             }
+        }
+    }
+
+    fun addPolygon( enumArea: EnumArea )
+    {
+        val points = ArrayList<LatLng>()
+
+        enumArea.vertices.map {
+            points.add( it.toLatLng())
+        }
+
+        val polygonOptions = PolygonOptions()
+            .clickable(true)
+            .addAll( points )
+
+        val polygon = map.addPolygon( polygonOptions )
+        polygon.tag = enumArea
+
+        map.setOnPolygonClickListener {polygon ->
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this Enumeration Area?", polygon, this)
         }
     }
 
@@ -194,44 +195,15 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback
         return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
-    fun createTestAreas()
+    override fun didAnswerNo() {
+    }
+
+    override fun didAnswerYes( tag: Any? )
     {
-        var vertices = ArrayList<LatLon>()
-
-        vertices.add( LatLon( 30.343716828800115, -86.16672319932157 ))
-        vertices.add( LatLon( 30.343716828800115, -86.1627468263619 ))
-        vertices.add( LatLon( 30.3389857458543, -86.1627468263619 ))
-        vertices.add( LatLon( 30.3389857458543, -86.16662109919962 ))
-
-        var enumArea = EnumArea( config.id!!, "EA NORTH", vertices )
-        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
-
-        vertices.clear()
-        vertices.add( LatLon( 30.332241965564545, -86.16700455200723 ))
-        vertices.add( LatLon( 30.332241965564545, -86.16187525250082 ))
-        vertices.add( LatLon( 30.328614485534533, -86.16187525250082 ))
-        vertices.add( LatLon( 30.328614485534533, -86.16700455200723 ))
-
-        enumArea = EnumArea( config.id!!, "EA SOUTH", vertices )
-        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
-
-        vertices.clear()
-        vertices.add( LatLon( 30.337854506153278, -86.1716915111437 ))
-        vertices.add( LatLon( 30.337854506153278, -86.16865136128406 ))
-        vertices.add( LatLon( 30.33380130566348, -86.16865136128406 ))
-        vertices.add( LatLon( 30.33380130566348, -86.171641010582 ))
-
-        enumArea = EnumArea( config.id!!, "EA WEST", vertices )
-        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
-
-        vertices.clear()
-        vertices.add( LatLon( 30.33747998467289, -86.16498340055223 ))
-        vertices.add( LatLon( 30.33747998467289, -86.16076498381355 ))
-        vertices.add( LatLon( 30.334410467082552, -86.16076498381355 ))
-        vertices.add( LatLon( 30.334410467082552, -86.16498340055223 ))
-
-        enumArea = EnumArea( config.id!!, "EA EAST", vertices )
-        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
+        val polygon = tag as Polygon
+        val enumArea = polygon.tag as EnumArea
+        DAO.enumAreaDAO.deleteEnumArea( enumArea )
+        polygon.remove()
     }
 
     override fun onDestroyView()
