@@ -7,14 +7,14 @@
 
         <variable
             name="defineEnumerationAreaFragment"
-            type="edu.gtri.gpssample.fragments.defineenumeration.DefineEnumerationAreaFragment" />
+            type="edu.gtri.gpssample.fragments.define_enumeration_area.DefineEnumerationAreaFragment" />
     </data>
     <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragments.defineenumeration.DefineEnumerationAreaFragment">
+        tools:context=".fragments.define_enumeration_area.DefineEnumerationAreaFragment">
 
         <fragment
             android:id="@+id/map_fragment"

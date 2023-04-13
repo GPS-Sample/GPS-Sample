@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.defineenumeration
+package edu.gtri.gpssample.fragments.define_enumeration_area
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +19,6 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
-import edu.gtri.gpssample.constants.Shape
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea

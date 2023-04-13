@@ -108,7 +108,7 @@
 
     <fragment
         android:id="@+id/DefineEnumerationAreaFragment"
-        android:name="edu.gtri.gpssample.fragments.defineenumeration.DefineEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.define_enumeration_area.DefineEnumerationAreaFragment"
         tools:layout="@layout/fragment_define_enumeration_area">
 
         <action

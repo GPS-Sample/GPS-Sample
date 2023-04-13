@@ -33,7 +33,6 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
 
         enumData.id?.let {
             enum_data_id = it
-            Log.d( "xxx", "enum_data_id = ${it}")
         }
 
         var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_household, parent, false))

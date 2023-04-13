@@ -30,7 +30,7 @@ data class Field(
 
     fun copy() : Field
     {
-        return Field( uuid, name, type, pii, required, integerOnly, date, time, option1, option2, option3, option4 )
+        return unpack(pack())
     }
 
     fun pack() : String
@@ -43,9 +43,9 @@ data class Field(
     }
     companion object
     {
-        fun unpack( message: String ) : Field
+        fun unpack( string: String ) : Field
         {
-            return Json.decodeFromString<Field>( message )
+            return Json.decodeFromString<Field>( string )
         }
     }
 }
