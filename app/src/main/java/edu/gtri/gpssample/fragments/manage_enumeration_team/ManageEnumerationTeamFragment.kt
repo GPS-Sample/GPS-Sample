@@ -23,7 +23,7 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamBinding
-import edu.gtri.gpssample.dialogs.CreateTeamDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -38,7 +38,7 @@ import java.net.DatagramPacket
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate, CreateTeamDialog.CreateTeamDialogDelegate
+class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate, InputDialog.InputDialogDelegate
 {
     private lateinit var team: Team
     private lateinit var study: Study
@@ -168,7 +168,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         when (item.itemId) {
             R.id.action_edit_team -> {
-                CreateTeamDialog( activity!!, team, this )
+                InputDialog( activity!!, "Team Name", team.name, this )
             }
 
             R.id.action_delete_team -> {
@@ -181,14 +181,11 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         return false
     }
 
-    override fun shouldUpdateTeam( team: Team )
+    override fun didEnterText( name: String )
     {
+        team.name = name
         DAO.teamDAO.updateTeam( team )
         binding.teamNameTextView.setText( team.name )
-    }
-
-    override fun shouldCreateTeamNamed( name: String )
-    {
     }
 
     override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )

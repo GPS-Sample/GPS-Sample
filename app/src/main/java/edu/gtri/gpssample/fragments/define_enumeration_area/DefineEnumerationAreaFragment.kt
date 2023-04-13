@@ -23,12 +23,14 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
+import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
-class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
+class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate, InputDialog.InputDialogDelegate
 {
     private lateinit var config: Config
     private lateinit var map: GoogleMap
@@ -86,25 +88,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
             if (createMode)
             {
-                createMode = false
-                binding.createSaveButton.text = "Create Polygon"
-
                 if (markers.size > 2)
                 {
-                    var vertices = ArrayList<LatLon>()
-
-                    markers.map {
-                        vertices.add( LatLon( it.position.latitude, it.position.longitude ))
-                    }
-
-                    var enumArea = EnumArea( config.id!!, "EA TBD", vertices )
-                    enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
-
-                    addPolygon( enumArea )
-
-                    markers.map {
-                        it.remove()
-                    }
+                    InputDialog( activity!!, "Enter Enumeration Area Name", null, this )
                 }
             }
             else
@@ -113,6 +99,32 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 createMode = true
                 binding.createSaveButton.text = "Save Polygon"
             }
+        }
+    }
+
+    override fun didEnterText( name: String )
+    {
+        createEnumArea( name )
+    }
+
+    fun createEnumArea( name: String )
+    {
+        createMode = false
+        binding.createSaveButton.text = "Create Polygon"
+
+        var vertices = ArrayList<LatLon>()
+
+        markers.map {
+            vertices.add( LatLon( it.position.latitude, it.position.longitude ))
+        }
+
+        var enumArea = EnumArea( config.id!!, name, vertices )
+        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
+
+        addPolygon( enumArea )
+
+        markers.map {
+            it.remove()
         }
     }
 

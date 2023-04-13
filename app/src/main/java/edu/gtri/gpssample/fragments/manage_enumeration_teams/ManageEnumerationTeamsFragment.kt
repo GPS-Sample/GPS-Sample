@@ -17,10 +17,10 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
-import edu.gtri.gpssample.dialogs.CreateTeamDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDialogDelegate
+class ManageEnumerationTeamsFragment : Fragment(), InputDialog.InputDialogDelegate
 {
     private var _binding: FragmentManageEnumerationTeamsBinding? = null
     private val binding get() = _binding!!
@@ -73,7 +73,7 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.addButton.setOnClickListener {
-            CreateTeamDialog( activity!!, null, this )
+            InputDialog( activity!!, "Enter Team Name", null, this )
         }
 
         binding.finishButton.setOnClickListener {
@@ -87,11 +87,7 @@ class ManageEnumerationTeamsFragment : Fragment(), CreateTeamDialog.CreateTeamDi
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    override fun shouldUpdateTeam( team: Team )
-    {
-    }
-
-    override fun shouldCreateTeamNamed( name: String )
+    override fun didEnterText( name: String )
     {
         enumArea.id?.let { enum_area_id ->
             val team = Team( enum_area_id, name )

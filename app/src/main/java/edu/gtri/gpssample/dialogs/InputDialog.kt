@@ -7,30 +7,33 @@ import android.widget.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Team
 
-class CreateTeamDialog
+class InputDialog
 {
-    interface CreateTeamDialogDelegate
+    interface InputDialogDelegate
     {
-        fun shouldUpdateTeam( team: Team )
-        fun shouldCreateTeamNamed( name: String )
+        fun didEnterText( text: String )
     }
 
     constructor()
     {
     }
 
-    constructor( context: Context, team: Team?, delegate: CreateTeamDialogDelegate )
+    constructor( context: Context, title: String, text: String?, delegate: InputDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
-        val view = inflater.inflate(R.layout.dialog_create_team, null)
+        val view = inflater.inflate(R.layout.dialog_input, null)
 
         val builder = AlertDialog.Builder(context)
         builder.setView(view)
+
+        val textView = view.findViewById<TextView>(R.id.title_text_view)
+        textView.text = title
+
         val editText = view.findViewById<EditText>(R.id.edit_text)
 
-        team?.let {
-            editText.setText( it.name )
+        text?.let {
+            editText.setText( it )
         }
 
         val alertDialog = builder.create()
@@ -51,10 +54,7 @@ class CreateTeamDialog
             {
                 alertDialog.dismiss()
 
-                team?.let {
-                    it.name = editText.text.toString()
-                    delegate.shouldUpdateTeam( it )
-                } ?: delegate.shouldCreateTeamNamed( editText.text.toString())
+                delegate.didEnterText( editText.text.toString())
             }
         }
     }
