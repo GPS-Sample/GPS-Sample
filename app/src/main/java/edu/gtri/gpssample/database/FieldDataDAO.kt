@@ -82,7 +82,7 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFieldData( field_id: Int, enum_data_id: Int ): FieldData
+    fun getOrCreateFieldData( field_id: Int, enum_data_id: Int ): FieldData
     {
         var fieldData: FieldData? = null
         val db = dao.writableDatabase

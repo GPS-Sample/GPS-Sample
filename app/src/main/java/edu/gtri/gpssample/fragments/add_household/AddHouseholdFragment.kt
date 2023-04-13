@@ -12,6 +12,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumData
+import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -53,15 +54,38 @@ class AddHouseholdFragment : Fragment()
             enumData = it
         }
 
+        val fieldDataMap = HashMap<Int, FieldData>()
+        val fieldDataMapCopy = HashMap<Int, FieldData>()
+
         if (this::study.isInitialized && this::enumData.isInitialized)
         {
-            addHouseholdAdapter = AddHouseholdAdapter( study.fields, enumData )
+            for (field in study.fields)
+            {
+                val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
+                fieldDataMap[field.id!!] = fieldData
+                val fieldDataCopy = fieldData.copy()
+                fieldDataMapCopy[field.id!!] = fieldDataCopy
+            }
+
+            addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataMapCopy )
             binding.recyclerView.adapter = addHouseholdAdapter
             binding.recyclerView.itemAnimator = DefaultItemAnimator()
             binding.recyclerView.layoutManager = LinearLayoutManager(activity )
         }
 
+        binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         binding.saveButton.setOnClickListener {
+
+            for (key in fieldDataMap.keys)
+            {
+                fieldDataMapCopy[key]?.let {
+                    DAO.fieldDataDAO.updateFieldData( it.copy())
+                }
+            }
+
             findNavController().popBackStack()
         }
     }

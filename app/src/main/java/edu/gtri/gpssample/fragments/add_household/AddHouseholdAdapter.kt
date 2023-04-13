@@ -2,38 +2,26 @@ package edu.gtri.gpssample.fragments.add_household
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.AdapterView.OnItemSelectedListener
-import androidx.cardview.widget.CardView
 import androidx.core.widget.doAfterTextChanged
-import androidx.databinding.adapters.AdapterViewBindingAdapter.OnItemSelected
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
-import kotlinx.coroutines.NonDisposableHandle.parent
 
-class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
+class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
 {
     override fun getItemCount() = fields.size
 
-    private var enum_data_id = 0
     private var context: Context? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.context = parent.context
-
-        enumData.id?.let {
-            enum_data_id = it
-        }
 
         var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_household, parent, false))
 
@@ -51,9 +39,17 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
     {
         var frameLayout: FrameLayout? = null
         val field = fields.get(holder.adapterPosition)
-        var field_id : Int = 0
-        field.id?.let {
-            field_id = it
+
+        if (field.id == null)
+        {
+            return
+        }
+
+        val fieldData = fieldDataMap[field.id!!]
+
+        if (fieldData == null)
+        {
+            return
         }
 
         holder.itemView.isSelected = false
@@ -62,41 +58,33 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
             FieldType.Text -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                var fieldData = DAO.fieldDataDAO.getFieldData(field_id, enum_data_id)
                 editText.setText( fieldData.response1 )
                 editText.doAfterTextChanged {
                     fieldData.response1 = it.toString()
-                    DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }
 
             FieldType.Number -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.number_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                var fieldData = DAO.fieldDataDAO.getFieldData(field_id, enum_data_id)
                 editText.setText( fieldData.response1 )
                 editText.doAfterTextChanged {
                     fieldData.response1 = it.toString()
-                    DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }
 
             FieldType.Date -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                var fieldData = DAO.fieldDataDAO.getFieldData(field_id, enum_data_id)
                 editText.setText( fieldData.response1 )
                 editText.doAfterTextChanged {
                     fieldData.response1 = it.toString()
-                    DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }
 
             FieldType.Checkbox ->
             {
                 frameLayout = holder.frameLayout.findViewById(R.id.checkbox_layout)
-                var fieldData = DAO.fieldDataDAO.getFieldData(field_id, enum_data_id)
-
                 var checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox1)
                 checkBox.visibility = View.GONE
                 if (field.option1.length > 0)
@@ -115,8 +103,6 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
                         } else {
                             fieldData.response1 = ""
                         }
-
-                        DAO.fieldDataDAO.updateFieldData(fieldData)
                     }
                 }
 
@@ -138,8 +124,6 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
                         } else {
                             fieldData.response2 = ""
                         }
-
-                        DAO.fieldDataDAO.updateFieldData(fieldData)
                     }
                 }
 
@@ -161,8 +145,6 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
                         } else {
                             fieldData.response3 = ""
                         }
-
-                        DAO.fieldDataDAO.updateFieldData(fieldData)
                     }
                 }
 
@@ -184,8 +166,6 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
                         } else {
                             fieldData.response4 = ""
                         }
-
-                        DAO.fieldDataDAO.updateFieldData(fieldData)
                     }
                 }
             }
@@ -203,8 +183,6 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
 
                 val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
                 spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
-
-                var fieldData = DAO.fieldDataDAO.getFieldData(field_id, enum_data_id)
 
                 if (fieldData.response1 == field.option1)
                     spinner.setSelection(0)
@@ -226,8 +204,6 @@ class AddHouseholdAdapter(var fields : List<Field>, var enumData: EnumData) : Re
                             2 -> fieldData.response1 = field.option3
                             3 -> fieldData.response1 = field.option4
                         }
-
-                        DAO.fieldDataDAO.updateFieldData( fieldData )
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>)
