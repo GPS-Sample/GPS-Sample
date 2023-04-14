@@ -124,7 +124,9 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     }
 
     override fun onMapClick(p0: LatLng) {
-        // Your code here to make it look like the map is clicked on touch
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.toString(), false )
+        findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
     }
 
     override fun onMapReady(p0: GoogleMap) {
@@ -146,7 +148,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                     }
 
                     val polygon = PolygonOptions()
-                        .clickable(true)
+                        .clickable(false)
                         .addAll( points )
 
                     googleMap.addPolygon(polygon)

@@ -76,6 +76,9 @@
         tools:layout="@layout/fragment_configuration">
 
         <action
+            android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
+            app:destination="@id/DefineEnumerationAreaFragment"/>
+        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
         <action

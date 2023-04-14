@@ -192,10 +192,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_USER_ID + " INTEGER" + "," +
                 COLUMN_STUDY_ID + " INTEGER" + "," +
+                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
                 "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumData)
 
@@ -435,6 +436,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 94
+        private const val DATABASE_VERSION = 95
     }
 }

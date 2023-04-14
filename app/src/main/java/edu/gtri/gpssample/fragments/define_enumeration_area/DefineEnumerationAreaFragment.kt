@@ -20,10 +20,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.LatLon
-import edu.gtri.gpssample.database.models.Team
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
@@ -80,6 +77,13 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         {
             Toast.makeText(activity!!.applicationContext, "Fatal! Config not found.", Toast.LENGTH_SHORT).show()
             return
+        }
+
+        arguments?.let {
+            if (!it.getBoolean( Keys.kEditMode.toString(), true))
+            {
+                binding.createSaveButton.visibility = View.GONE
+            }
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
@@ -170,6 +174,27 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 {
                     val latLng = getCenter( enumArea )
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
+                }
+
+                val enumDataList = DAO.enumDataDAO.getEnumData(enumArea.id!!)
+
+                for (enumData in enumDataList)
+                {
+                    val marker = map.addMarker(MarkerOptions().position(LatLng( enumData.latitude, enumData.longitude )))
+
+                    marker?.let {marker ->
+                        marker.tag = enumData
+                    }
+
+                    map.setOnMarkerClickListener { marker ->
+                        marker.tag?.let {tag ->
+                            val enum_data = tag as EnumData
+                            sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                        }
+
+                        false
+                    }
                 }
             }
 

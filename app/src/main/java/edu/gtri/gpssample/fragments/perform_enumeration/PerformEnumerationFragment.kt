@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -25,13 +26,12 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 {
     private lateinit var team: Team
-    private lateinit var study: Study
     private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var userId = 0
-    private var studyId = 0
+    private var enumAreaId = 0
     private var dropMode = false
     private var location: LatLng? = null
     private var _binding: FragmentPerformEnumerationBinding? = null
@@ -55,13 +55,11 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.createStudyModel.currentStudy?.value?.let {
-            study = it
-            studyId = study.id!!
-        }
-
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
-            enumArea = it
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
+            enumArea = enum_area
+            enumArea.id?.let {id ->
+                enumAreaId = id
+            }
         }
 
         sharedViewModel.teamViewModel.currentTeam?.value?.let {
@@ -103,7 +101,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.addHouseholdButton.setOnClickListener {
 
             location?.let { location ->
-                var enumData = EnumData(userId, studyId, location.latitude, location.longitude)
+                var enumData = EnumData(userId, enumAreaId, location.latitude, location.longitude)
                 enumData.id = DAO.enumDataDAO.createEnumData(enumData)
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
@@ -152,7 +150,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         val latLng = getCenter()
         map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
 
-        val enumDataList = DAO.enumDataDAO.getEnumData(userId, studyId)
+        val enumDataList = DAO.enumDataDAO.getEnumData(userId, enumAreaId)
 
         for (enumData in enumDataList)
         {
