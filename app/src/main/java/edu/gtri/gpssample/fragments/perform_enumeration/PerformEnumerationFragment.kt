@@ -82,19 +82,27 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         binding.dropPinButton.setOnClickListener {
 
-            dropMode = true
-            location = null
-            addMapObjects()
-            binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            if (!dropMode)
+            {
+                dropMode = true
+                location = null
+                addMapObjects()
+                binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
-            map.setOnMapClickListener {
-                if (dropMode)
-                {
-                    location = it
-                    map.addMarker(MarkerOptions().position(it))
-                    dropMode = false
-                    binding.dropPinButton.setBackgroundTintList(defaultColorList);
+                map.setOnMapClickListener {
+                    if (dropMode)
+                    {
+                        location = it
+                        map.addMarker(MarkerOptions().position(it))
+                        dropMode = false
+                        binding.dropPinButton.setBackgroundTintList(defaultColorList);
+                    }
                 }
+            }
+            else
+            {
+                dropMode = false
+                binding.dropPinButton.setBackgroundTintList(defaultColorList);
             }
         }
 
