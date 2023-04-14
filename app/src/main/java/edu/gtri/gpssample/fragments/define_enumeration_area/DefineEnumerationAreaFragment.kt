@@ -27,6 +27,8 @@ import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.fragments.createstudy.DeleteMode
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
@@ -37,11 +39,11 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var createMode = false
+    private var notificationShown = false
+    private var markers = ArrayList<Marker>()
+    private var enumAreas : List<EnumArea>? = null
     private var _binding: FragmentDefineEnumerationAreaBinding? = null
     private val binding get() = _binding!!
-
-    private var enumAreas : List<EnumArea>? = null
-    private var markers = ArrayList<Marker>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -95,6 +97,12 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
             else
             {
+                if (!notificationShown)
+                {
+                    notificationShown = true
+                    NotificationDialog( activity, "Note!", "Create a polygon by tapping on the screen to drop markers. Markers will need to be created starting from the top left most vertex and proceeding clockwise.")
+                }
+
                 markers.clear()
                 createMode = true
                 binding.createSaveButton.text = "Save Polygon"

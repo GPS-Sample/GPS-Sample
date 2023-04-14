@@ -144,7 +144,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         }
 
         val polygon = PolygonOptions()
-            .clickable(true)
+            .clickable(false)
             .addAll( points )
 
         map.addPolygon(polygon)
@@ -168,6 +168,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
                     sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
                 }
+
                 false
             }
         }
