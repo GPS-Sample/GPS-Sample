@@ -39,11 +39,11 @@ class LatLonDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getLatLons( enum_area_id: Int ): ArrayList<LatLon>
+    fun getLatLons( enumAreaId: Int ): ArrayList<LatLon>
     {
         var latLons = ArrayList<LatLon>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enum_area_id"
+        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -58,7 +58,7 @@ class LatLonDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun deleteLatLon( latLon: LatLon )
+    fun delete( latLon: LatLon )
     {
         latLon.id?.let {lat_lon_id ->
 

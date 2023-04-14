@@ -37,8 +37,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
     private var createMode = false
     private var notificationShown = false
-    private var markers = ArrayList<Marker>()
     private var enumAreas : List<EnumArea>? = null
+    private var vertexMarkers = ArrayList<Marker>()
+    private var enumDataMarkers = ArrayList<Marker>()
     private var _binding: FragmentDefineEnumerationAreaBinding? = null
     private val binding get() = _binding!!
 
@@ -94,7 +95,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
             if (createMode)
             {
-                if (markers.size > 2)
+                if (vertexMarkers.size > 2)
                 {
                     InputDialog( activity!!, "Enter Enumeration Area Name", null, this )
                 }
@@ -107,7 +108,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                     NotificationDialog( activity, "Note!", "Create a polygon by tapping on the screen to drop markers. Markers will need to be created starting from the top left most vertex and proceeding clockwise.")
                 }
 
-                markers.clear()
+                vertexMarkers.clear()
                 createMode = true
                 binding.createSaveButton.text = "Save Polygon"
             }
@@ -126,7 +127,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         var vertices = ArrayList<LatLon>()
 
-        markers.map {
+        vertexMarkers.map {
             vertices.add( LatLon( it.position.latitude, it.position.longitude ))
         }
 
@@ -135,7 +136,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         addPolygon( enumArea )
 
-        markers.map {
+        vertexMarkers.map {
             it.remove()
         }
     }
@@ -154,7 +155,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             {
                 val marker = map.addMarker( MarkerOptions().position(it))
                 marker?.let {
-                    markers.add( marker )
+                    vertexMarkers.add( marker )
                 }
             }
         }
@@ -184,16 +185,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                     marker?.let {marker ->
                         marker.tag = enumData
-                    }
-
-                    map.setOnMarkerClickListener { marker ->
-                        marker.tag?.let {tag ->
-                            val enum_data = tag as EnumData
-                            sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
-                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-                        }
-
-                        false
+                        enumDataMarkers.add( marker )
                     }
                 }
             }
@@ -247,8 +239,12 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     {
         val polygon = tag as Polygon
         val enumArea = polygon.tag as EnumArea
-        DAO.enumAreaDAO.deleteEnumArea( enumArea )
+        DAO.enumAreaDAO.delete( enumArea )
         polygon.remove()
+
+        enumDataMarkers.map {
+            it.remove()
+        }
     }
 
     override fun onDestroyView()
