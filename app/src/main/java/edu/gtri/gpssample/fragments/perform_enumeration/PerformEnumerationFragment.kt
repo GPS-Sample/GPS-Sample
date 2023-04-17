@@ -162,7 +162,10 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         for (enumData in enumDataList)
         {
-            val marker = map.addMarker(MarkerOptions().position(LatLng( enumData.latitude, enumData.longitude )))
+            val marker = map.addMarker( MarkerOptions()
+                .position( LatLng( enumData.latitude, enumData.longitude ))
+                .icon( BitmapDescriptorFactory.fromResource(R.drawable.home_red))
+            )
 
             marker?.let {marker ->
                 marker.tag = enumData
