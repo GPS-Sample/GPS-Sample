@@ -76,6 +76,9 @@
         tools:layout="@layout/fragment_configuration">
 
         <action
+            android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
+            app:destination="@id/DefineEnumerationAreaFragment"/>
+        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
         <action
@@ -108,7 +111,7 @@
 
     <fragment
         android:id="@+id/DefineEnumerationAreaFragment"
-        android:name="edu.gtri.gpssample.fragments.defineenumeration.DefineEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.define_enumeration_area.DefineEnumerationAreaFragment"
         tools:layout="@layout/fragment_define_enumeration_area">
 
         <action

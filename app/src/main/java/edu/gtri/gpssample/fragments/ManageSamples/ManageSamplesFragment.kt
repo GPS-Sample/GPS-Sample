@@ -124,7 +124,7 @@ class ManageSamplesFragment : Fragment(), ConfirmationDialog.ConfirmationDialogD
     override fun didAnswerNo() {
     }
 
-    override fun didAnswerYes( tag: Int )
+    override fun didAnswerYes( tag: Any? )
     {
         selectedSample?.let {
             DAO.sampleDAO.deleteSample( it )

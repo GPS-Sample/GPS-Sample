@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -123,7 +124,9 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     }
 
     override fun onMapClick(p0: LatLng) {
-        // Your code here to make it look like the map is clicked on touch
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.toString(), false )
+        findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
     }
 
     override fun onMapReady(p0: GoogleMap) {
@@ -138,17 +141,17 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
                 for (enumArea in enumAreas)
                 {
-                    googleMap.addPolyline(
-                        PolylineOptions()
-                            .clickable(true)
-                            .add(
-                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                                LatLng( enumArea.topRight.latitude, enumArea.topRight.longitude ),
-                                LatLng( enumArea.botRight.latitude, enumArea.botRight.longitude ),
-                                LatLng( enumArea.botLeft.latitude, enumArea.botLeft.longitude ),
-                                LatLng( enumArea.topLeft.latitude, enumArea.topLeft.longitude ),
-                            )
-                    )
+                    val points = ArrayList<LatLng>()
+
+                    enumArea.vertices.map {
+                        points.add( it.toLatLng())
+                    }
+
+                    val polygon = PolygonOptions()
+                        .clickable(false)
+                        .addAll( points )
+
+                    googleMap.addPolygon(polygon)
                 }
 
                 // HACK HACK

@@ -7,14 +7,14 @@
 
         <variable
             name="defineEnumerationAreaFragment"
-            type="edu.gtri.gpssample.fragments.defineenumeration.DefineEnumerationAreaFragment" />
+            type="edu.gtri.gpssample.fragments.define_enumeration_area.DefineEnumerationAreaFragment" />
     </data>
     <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragments.defineenumeration.DefineEnumerationAreaFragment">
+        tools:context=".fragments.define_enumeration_area.DefineEnumerationAreaFragment">
 
         <fragment
             android:id="@+id/map_fragment"
@@ -34,13 +34,13 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/save_button"
+            android:id="@+id/create_save_button"
             android:layout_width="match_parent"
             android:layout_gravity="bottom"
             android:layout_height="50dp"
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/save" />
+            android:text="Create Polygon" />
     </FrameLayout>
 </layout>

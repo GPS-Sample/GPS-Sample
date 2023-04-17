@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="edu.gtri.gpssample.activities.CreateFieldActivity">
     <item
-        android:id="@+id/action_delete_field"
-        android:title="@string/delete_field"
+        android:id="@+id/action_delete"
+        android:title="Delete"
         app:showAsAction="never" />
 </menu>

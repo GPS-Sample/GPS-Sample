@@ -21,7 +21,7 @@ class EnumDataDAO(private var dao: DAO)
     fun putEnumData(enumData: EnumData, values: ContentValues)
     {
         values.put( DAO.COLUMN_USER_ID, enumData.userId )
-        values.put( DAO.COLUMN_STUDY_ID, enumData.studyId )
+        values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
         values.put( DAO.COLUMN_ENUM_DATA_LATITUDE, enumData.latitude )
         values.put( DAO.COLUMN_ENUM_DATA_LONGITUDE, enumData.longitude )
     }
@@ -31,52 +31,64 @@ class EnumDataDAO(private var dao: DAO)
     private fun createEnumData(cursor: Cursor): EnumData
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val user_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_ID))
-        val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
+        val userId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_ID))
+        val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LONGITUDE))
 
-        return EnumData( id, user_id, study_id, latitude, longitude )
+        return EnumData( id, userId, enumAreaId, latitude, longitude )
     }
 
-    //--------------------------------------------------------------------------
-    fun getEnumData( id: Int ): EnumData?
+    fun getEnumData( enumAreaId: Int ) : ArrayList<EnumData>
     {
-        var enumData: EnumData? = null
+        var enumDataList = ArrayList<EnumData>()
+
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
         val cursor = db.rawQuery(query, null)
 
-        if (cursor.count > 0)
+        while (cursor.moveToNext())
         {
-            cursor.moveToNext()
-
-            enumData = createEnumData( cursor )
+            enumDataList.add( createEnumData( cursor ))
         }
 
         cursor.close()
         db.close()
 
-        return enumData
+        return enumDataList
     }
 
-    fun getEnumData( userId: Int, studyId: Int ) : EnumData?
+    fun getEnumData( userId: Int, enumAreaId: Int ) : ArrayList<EnumData>
     {
-        var enumData: EnumData? = null
+        var enumDataList = ArrayList<EnumData>()
+
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_USER_ID} = $userId AND ${DAO.COLUMN_STUDY_ID} = $studyId"
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_USER_ID} = $userId AND ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
         val cursor = db.rawQuery(query, null)
 
-        if (cursor.count > 0)
+        while (cursor.moveToNext())
         {
-            cursor.moveToNext()
-
-            enumData = createEnumData( cursor )
+            enumDataList.add( createEnumData( cursor ))
         }
 
         cursor.close()
         db.close()
 
-        return enumData
+        return enumDataList
+    }
+
+    fun delete( enumData: EnumData )
+    {
+        enumData.id?.let {enum_data_id ->
+
+            DAO.fieldDataDAO.deleteAllFields( enum_data_id )
+
+            val db = dao.writableDatabase
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args = arrayOf(enum_data_id.toString())
+
+            db.delete(DAO.TABLE_ENUM_DATA, whereClause, args)
+            db.close()
+        }
     }
 }

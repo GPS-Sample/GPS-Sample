@@ -153,7 +153,7 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
     {
     }
 
-    override fun didAnswerYes( tag: Int )
+    override fun didAnswerYes( tag: Any? )
     {
         selectedFilterRule?.let {
             DAO.filterRuleDAO.deleteFilterRule( it )

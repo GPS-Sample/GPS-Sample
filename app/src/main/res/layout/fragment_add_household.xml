@@ -27,7 +27,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/cancel" />
+            android:text="Cancel" />
 
         <Button
             android:id="@+id/save_button"

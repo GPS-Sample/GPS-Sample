@@ -41,6 +41,7 @@ class ConfigurationViewModel : ViewModel()
     val createFieldModel : CreateFieldModel = CreateFieldModel()
     val createRuleModel : CreateRuleModel = CreateRuleModel()
     val enumAreaViewModel : EnumAreaViewModel = EnumAreaViewModel()
+    val enumDataViewModel : EnumDataViewModel = EnumDataViewModel()
     var teamViewModel : TeamViewModel = TeamViewModel()
     val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
 

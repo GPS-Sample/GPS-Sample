@@ -228,7 +228,7 @@ class CreateSampleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDe
     {
     }
 
-    override fun didAnswerYes( tag: Int )
+    override fun didAnswerYes( tag: Any? )
     {
         DAO.sampleDAO.deleteSample( sample )
         findNavController().popBackStack()

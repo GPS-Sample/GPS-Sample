@@ -1,21 +1,17 @@
 package edu.gtri.gpssample.fragments.add_household
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumData
-import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
@@ -26,8 +22,6 @@ class AddHouseholdFragment : Fragment()
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
 
-    private var userId: Int = -1
-    private var studyId: Int = -1
     private lateinit var study: Study
     private lateinit var enumData: EnumData
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -43,6 +37,7 @@ class AddHouseholdFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        setHasOptionsMenu( true )
         _binding = FragmentAddHouseholdBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -55,34 +50,42 @@ class AddHouseholdFragment : Fragment()
             study = it
         }
 
-        val user = (activity!!.application as? MainApplication)?.user
-
-        user?.id?.let {
-            userId = it
+        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let {
+            enumData = it
         }
 
-        study?.id?.let {
-            studyId = it
+        val fieldDataMap = HashMap<Int, FieldData>()
+        val fieldDataMapCopy = HashMap<Int, FieldData>()
+
+        if (this::study.isInitialized && this::enumData.isInitialized)
+        {
+            for (field in study.fields)
+            {
+                val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
+                fieldDataMap[field.id!!] = fieldData
+                val fieldDataCopy = fieldData.copy()
+                fieldDataMapCopy[field.id!!] = fieldDataCopy
+            }
+
+            addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataMapCopy )
+            binding.recyclerView.adapter = addHouseholdAdapter
+            binding.recyclerView.itemAnimator = DefaultItemAnimator()
+            binding.recyclerView.layoutManager = LinearLayoutManager(activity )
         }
-
-        DAO.enumDataDAO.getEnumData( userId, studyId )?.let {enum_data ->
-            enumData = enum_data
-        } ?: kotlin.run {
-            enumData = EnumData( userId, studyId, 30.341676, -86.168010 )
-            enumData.id = DAO.enumDataDAO.createEnumData( enumData )
-        }
-
-        addHouseholdAdapter = AddHouseholdAdapter( study.fields, enumData )
-
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = addHouseholdAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
+
+            for (key in fieldDataMap.keys)
+            {
+                fieldDataMapCopy[key]?.let {
+                    DAO.fieldDataDAO.updateFieldData( it.copy())
+                }
+            }
+
             findNavController().popBackStack()
         }
     }
@@ -91,6 +94,26 @@ class AddHouseholdFragment : Fragment()
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_delete, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId) {
+            R.id.action_delete -> {
+                DAO.enumDataDAO.delete( enumData )
+                findNavController().popBackStack()
+                return true
+            }
+        }
+
+        return false
     }
 
     override fun onDestroyView()
