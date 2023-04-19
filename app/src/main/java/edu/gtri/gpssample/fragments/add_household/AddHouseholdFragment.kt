@@ -85,7 +85,7 @@ class AddHouseholdFragment : Fragment()
             {
                 val uri = Uri.parse(enumData.imageFileName )
 
-//                activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                Log.d( "xxx", enumData.imageFileName )
 
                 val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
                 binding.imageView.setImageBitmap(bitmap)

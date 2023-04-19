@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import edu.gtri.gpssample.database.models.EnumData
+import edu.gtri.gpssample.extensions.toBoolean
+import edu.gtri.gpssample.extensions.toInt
 
 class EnumDataDAO(private var dao: DAO)
 {
@@ -38,6 +40,8 @@ class EnumDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
         values.put( DAO.COLUMN_ENUM_DATA_LATITUDE, enumData.latitude )
         values.put( DAO.COLUMN_ENUM_DATA_LONGITUDE, enumData.longitude )
+        values.put( DAO.COLUMN_ENUM_DATA_IS_LOCATION, enumData.isLocation.toInt())
+        values.put( DAO.COLUMN_ENUM_DATA_DESCRIPTION, enumData.description )
         values.put( DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME, enumData.imageFileName )
     }
 
@@ -50,9 +54,11 @@ class EnumDataDAO(private var dao: DAO)
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LONGITUDE))
+        val isLocation = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IS_LOCATION)).toBoolean()
+        val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_DESCRIPTION))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME))
 
-        return EnumData( id, userId, enumAreaId, latitude, longitude, imageFileName )
+        return EnumData( id, userId, enumAreaId, latitude, longitude, isLocation, description, imageFileName )
     }
 
     fun getEnumData( enumAreaId: Int ) : ArrayList<EnumData>

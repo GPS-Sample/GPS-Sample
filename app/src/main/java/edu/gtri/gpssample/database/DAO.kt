@@ -157,14 +157,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_CONFIG_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
-                COLUMN_ENUM_AREA_TL_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_TL_LON + " REAL" + "," +
-                COLUMN_ENUM_AREA_TR_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_TR_LON + " REAL" + "," +
-                COLUMN_ENUM_AREA_BR_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_BR_LON + " REAL" + "," +
-                COLUMN_ENUM_AREA_BL_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_BL_LON + " REAL" + "," +
                 "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumArea)
@@ -195,6 +187,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
+                COLUMN_ENUM_DATA_IS_LOCATION + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_DESCRIPTION + " TEXT" + "," +
                 COLUMN_ENUM_DATA_IMAGE_FILE_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
@@ -376,6 +370,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_STUDY_ID = "study_id"
         const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
         const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
+        const val COLUMN_ENUM_DATA_IS_LOCATION = "enum_data_is_location"
+        const val COLUMN_ENUM_DATA_DESCRIPTION = "enum_data_description"
         const val COLUMN_ENUM_DATA_IMAGE_FILE_NAME = "enum_data_image_file_name"
 
         const val TABLE_FIELD_DATA = "field_data"
@@ -438,6 +434,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 96
+        private const val DATABASE_VERSION = 98
     }
 }
