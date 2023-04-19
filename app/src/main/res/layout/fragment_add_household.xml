@@ -13,6 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:background="@drawable/background_rounded_primary_frame_clear_fill"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"/>
+
+        <ImageButton
+            android:id="@+id/add_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:src="@drawable/plus_blue" />
+    </FrameLayout>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_gravity="bottom"
