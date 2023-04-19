@@ -18,12 +18,27 @@ class EnumDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun updateEnumData( enumData: EnumData)
+    {
+        val db = dao.writableDatabase
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(enumData.id!!.toString())
+        val values = ContentValues()
+
+        putEnumData( enumData, values )
+
+        db.update(DAO.TABLE_ENUM_DATA, values, whereClause, args )
+        db.close()
+    }
+
+    //--------------------------------------------------------------------------
     fun putEnumData(enumData: EnumData, values: ContentValues)
     {
         values.put( DAO.COLUMN_USER_ID, enumData.userId )
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
         values.put( DAO.COLUMN_ENUM_DATA_LATITUDE, enumData.latitude )
         values.put( DAO.COLUMN_ENUM_DATA_LONGITUDE, enumData.longitude )
+        values.put( DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME, enumData.imageFileName )
     }
 
     //--------------------------------------------------------------------------
@@ -35,8 +50,9 @@ class EnumDataDAO(private var dao: DAO)
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LONGITUDE))
+        val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME))
 
-        return EnumData( id, userId, enumAreaId, latitude, longitude )
+        return EnumData( id, userId, enumAreaId, latitude, longitude, imageFileName )
     }
 
     fun getEnumData( enumAreaId: Int ) : ArrayList<EnumData>

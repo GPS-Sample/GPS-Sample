@@ -195,6 +195,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
+                COLUMN_ENUM_DATA_IMAGE_FILE_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
@@ -375,6 +376,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_STUDY_ID = "study_id"
         const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
         const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
+        const val COLUMN_ENUM_DATA_IMAGE_FILE_NAME = "enum_data_image_file_name"
 
         const val TABLE_FIELD_DATA = "field_data"
 //        const val COLUMN_FIELD_ID = "field_id"
@@ -436,6 +438,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 95
+        private const val DATABASE_VERSION = 96
     }
 }
