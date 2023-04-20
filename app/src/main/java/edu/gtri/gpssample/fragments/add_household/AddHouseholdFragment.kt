@@ -66,40 +66,37 @@ class AddHouseholdFragment : Fragment()
         val fieldDataMap = HashMap<Int, FieldData>()
         val fieldDataMapCopy = HashMap<Int, FieldData>()
 
-        if (this::study.isInitialized && this::enumData.isInitialized)
+        for (field in study.fields)
         {
-            for (field in study.fields)
-            {
-                val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
-                fieldDataMap[field.id!!] = fieldData
-                val fieldDataCopy = fieldData.copy()
-                fieldDataMapCopy[field.id!!] = fieldDataCopy
-            }
+            val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
+            fieldDataMap[field.id!!] = fieldData
+            val fieldDataCopy = fieldData.copy()
+            fieldDataMapCopy[field.id!!] = fieldDataCopy
+        }
 
-            addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataMapCopy )
-            binding.recyclerView.adapter = addHouseholdAdapter
-            binding.recyclerView.itemAnimator = DefaultItemAnimator()
-            binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+        addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataMapCopy )
+        binding.recyclerView.adapter = addHouseholdAdapter
+        binding.recyclerView.itemAnimator = DefaultItemAnimator()
+        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-            if (enumData.imageFileName.isNotEmpty())
-            {
-                val uri = Uri.parse(enumData.imageFileName )
+        if (enumData.imageFileName.isNotEmpty())
+        {
+            val uri = Uri.parse(enumData.imageFileName )
 
-                Log.d( "xxx", enumData.imageFileName )
+            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
-                val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-                binding.imageView.setImageBitmap(bitmap)
+            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+            binding.imageView.setImageBitmap(bitmap)
 
-                var width = bitmap.width.toDouble()
-                val height = bitmap.height.toDouble()
+            var width = bitmap.width.toDouble()
+            val height = bitmap.height.toDouble()
 
-                val orgWidth = binding.imageView.layoutParams.width.toDouble()
+            val orgWidth = binding.imageView.layoutParams.width.toDouble()
 
-                width = width / height * orgWidth
+            width = width / height * orgWidth
 
-                binding.imageView.layoutParams.width = width.toInt()
-                binding.addImageButton.visibility = View.GONE
-            }
+            binding.imageView.layoutParams.width = width.toInt()
+            binding.addImageButton.visibility = View.GONE
         }
 
         binding.imageView.setOnClickListener {
@@ -167,11 +164,23 @@ class AddHouseholdFragment : Fragment()
             if (requestCode == OPEN_DOCUMENT_CODE) {
                 data?.data?.let {uri ->
 
-                    binding.imageView.setImageURI(uri)
-                    binding.imageView.setTag(uri)
+                    activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+
+                    val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+
+                    binding.imageView.setImageBitmap(bitmap)
                     binding.imageView.setScaleType(ImageView.ScaleType.FIT_XY)
                     binding.imageView.setClipToOutline(true)
                     binding.addImageButton.visibility = View.GONE
+
+                    var width = bitmap.width.toDouble()
+                    val height = bitmap.height.toDouble()
+
+                    val orgWidth = binding.imageView.layoutParams.width.toDouble()
+
+                    width = width / height * orgWidth
+
+                    binding.imageView.layoutParams.width = width.toInt()
 
                     enumData.imageFileName = uri.toString()
                     DAO.enumDataDAO.updateEnumData( enumData )

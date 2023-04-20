@@ -60,7 +60,7 @@ class AddLocationFragment : Fragment()
         {
             val uri = Uri.parse(enumData.imageFileName )
 
-            Log.d( "xxx", enumData.imageFileName )
+            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
             val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
             binding.imageView.setImageBitmap(bitmap)
@@ -137,11 +137,23 @@ class AddLocationFragment : Fragment()
             if (requestCode == OPEN_DOCUMENT_CODE) {
                 data?.data?.let {uri ->
 
-                    binding.imageView.setImageURI(uri)
-                    binding.imageView.setTag(uri)
+                    activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+
+                    val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+
+                    binding.imageView.setImageBitmap(bitmap)
                     binding.imageView.setScaleType(ImageView.ScaleType.FIT_XY)
                     binding.imageView.setClipToOutline(true)
                     binding.addImageButton.visibility = View.GONE
+
+                    var width = bitmap.width.toDouble()
+                    val height = bitmap.height.toDouble()
+
+                    val orgWidth = binding.imageView.layoutParams.width.toDouble()
+
+                    width = width / height * orgWidth
+
+                    binding.imageView.layoutParams.width = width.toInt()
 
                     enumData.imageFileName = uri.toString()
                     DAO.enumDataDAO.updateEnumData( enumData )

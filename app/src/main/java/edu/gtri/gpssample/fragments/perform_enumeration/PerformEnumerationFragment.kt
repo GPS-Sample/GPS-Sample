@@ -189,7 +189,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
                     val enum_data = tag as EnumData
                     sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
 
-                    if (enumData.isLocation)
+                    if (enum_data.isLocation)
                     {
                         findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
                     }
