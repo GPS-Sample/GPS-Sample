@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -77,28 +78,10 @@ class AddLocationFragment : Fragment()
         if (enumData.imageFileName.isNotEmpty())
         {
             val uri = Uri.parse(enumData.imageFileName )
-
             activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
             val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
             binding.imageView.setImageBitmap(bitmap)
-
-            var width = bitmap.width.toDouble()
-            val height = bitmap.height.toDouble()
-
-            val orgWidth = binding.imageView.layoutParams.width.toDouble()
-
-            width = width / height * orgWidth
-
-            binding.imageView.layoutParams.width = width.toInt()
-            binding.addImageButton.visibility = View.GONE
-        }
-
-        binding.imageView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/*"
-            startActivityForResult(intent, OPEN_DOCUMENT_CODE)
         }
 
         binding.addImageButton.setOnClickListener {
@@ -165,25 +148,10 @@ class AddLocationFragment : Fragment()
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == OPEN_DOCUMENT_CODE) {
                 data?.data?.let {uri ->
-
                     activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
                     val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-
+                    (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
                     binding.imageView.setImageBitmap(bitmap)
-                    binding.imageView.setScaleType(ImageView.ScaleType.FIT_XY)
-                    binding.imageView.setClipToOutline(true)
-                    binding.addImageButton.visibility = View.GONE
-
-                    var width = bitmap.width.toDouble()
-                    val height = bitmap.height.toDouble()
-
-                    val orgWidth = binding.imageView.layoutParams.width.toDouble()
-
-                    width = width / height * orgWidth
-
-                    binding.imageView.layoutParams.width = width.toInt()
-
                     enumData.imageFileName = uri.toString()
                     DAO.enumDataDAO.updateEnumData( enumData )
                 }
