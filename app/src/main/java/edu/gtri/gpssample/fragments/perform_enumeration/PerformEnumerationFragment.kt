@@ -110,11 +110,12 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
             location?.let { location ->
                 var enumData = EnumData(userId, enumAreaId, location.latitude, location.longitude)
-                enumData.id = DAO.enumDataDAO.createEnumData(enumData)
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
             }
+
+            location = null
         }
 
         binding.addLocationButton.setOnClickListener {
@@ -122,11 +123,12 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             location?.let { location ->
                 var enumData = EnumData(userId, enumAreaId, location.latitude, location.longitude)
                 enumData.isLocation = true
-                enumData.id = DAO.enumDataDAO.createEnumData(enumData)
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
             }
+
+            location = null
         }
 
         binding.finishButton.setOnClickListener {

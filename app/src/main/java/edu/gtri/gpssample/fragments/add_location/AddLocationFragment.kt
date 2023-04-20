@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +24,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class AddLocationFragment : Fragment()
 {
+    private var createMode = false
     private var _binding: FragmentAddLocationBinding? = null
     private val binding get() = _binding!!
     private val OPEN_DOCUMENT_CODE = 2
@@ -37,6 +39,16 @@ class AddLocationFragment : Fragment()
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (createMode)
+                {
+                    DAO.enumDataDAO.delete( enumData )
+                }
+                findNavController().popBackStack()
+            }
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -52,6 +64,12 @@ class AddLocationFragment : Fragment()
 
         sharedViewModel.enumDataViewModel.currentEnumData?.value?.let {
             enumData = it
+        }
+
+        if (enumData.id == null)
+        {
+            createMode = true
+            enumData.id = DAO.enumDataDAO.createEnumData(enumData)
         }
 
         binding.editText.setText( enumData.description )
@@ -90,15 +108,20 @@ class AddLocationFragment : Fragment()
             startActivityForResult(intent, OPEN_DOCUMENT_CODE)
         }
 
+        binding.cancelButton.setOnClickListener {
+            if (createMode)
+            {
+                DAO.enumDataDAO.delete( enumData )
+            }
+
+            findNavController().popBackStack()
+        }
+
         binding.saveButton.setOnClickListener {
 
             enumData.description = binding.editText.text.toString()
             DAO.enumDataDAO.updateEnumData( enumData )
 
-            findNavController().popBackStack()
-        }
-
-        binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
     }
@@ -119,6 +142,12 @@ class AddLocationFragment : Fragment()
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId) {
+            android.R.id.home -> {
+                if (createMode)
+                {
+                    DAO.enumDataDAO.delete( enumData )
+                }
+            }
             R.id.action_delete -> {
                 DAO.enumDataDAO.delete( enumData )
                 findNavController().popBackStack()
