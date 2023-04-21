@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.add_household
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +13,12 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.dialogs.DatePickerDialog
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
-class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
+class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(), DatePickerDialog.DatePickerDialogDelegate
 {
     override fun getItemCount() = fields.size
 
@@ -33,6 +38,11 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val frameLayout: FrameLayout = itemView as FrameLayout
+    }
+
+    override fun didSelectDate(date: Date )
+    {
+        Log.d( "xxx", date.toString() )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
@@ -75,10 +85,14 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
 
             FieldType.Date -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
+
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
                 editText.setText( fieldData.response1 )
-                editText.doAfterTextChanged {
-                    fieldData.response1 = it.toString()
+
+                val editView = frameLayout.findViewById<View>(R.id.edit_view)
+                editView.setOnClickListener {
+
+                    DatePickerDialog( context!!, "Select a Date", Date(), this)
                 }
             }
 
