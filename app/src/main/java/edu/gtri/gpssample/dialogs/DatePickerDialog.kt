@@ -6,18 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.DatePicker
+import android.widget.EditText
 import android.widget.TextView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldData
 import java.util.*
 
 class DatePickerDialog
 {
     interface DatePickerDialogDelegate
     {
-        fun didSelectDate( date: Date )
+        fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText )
     }
 
-    constructor(context: Context, title: String, date: Date, delegate: DatePickerDialogDelegate )
+    constructor(context: Context, title: String, date: Date, field: Field, fieldData: FieldData, editText: EditText, delegate: DatePickerDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -50,7 +53,7 @@ class DatePickerDialog
             val calendar = Calendar.getInstance()
             calendar[datePicker.year, datePicker.month] = datePicker.dayOfMonth
             val date = calendar.time
-            delegate.didSelectDate(date)
+            delegate.didSelectDate(date,field,fieldData,editText)
             alertDialog.dismiss()
         })
 
