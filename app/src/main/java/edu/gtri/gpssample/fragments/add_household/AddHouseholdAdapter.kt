@@ -14,9 +14,13 @@ import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.dialogs.DatePickerDialog
+import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(), DatePickerDialog.DatePickerDialogDelegate
+class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) :
+    RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
+    DatePickerDialog.DatePickerDialogDelegate,
+    TimePickerDialog.TimePickerDialogDelegate
 {
     override fun getItemCount() = fields.size
 
@@ -44,7 +48,7 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
         calendar.time = date
 
         val day = calendar[Calendar.DAY_OF_MONTH]
-        val month = calendar[Calendar.MONTH]
+        val month = calendar[Calendar.MONTH] + 1
         val year = calendar[Calendar.YEAR]
 
         return "${month}/${day}/${year}"
@@ -87,6 +91,19 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
     }
 
     override fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+    {
+        if (field.date && !field.time)
+        {
+            fieldData.dateValue = date.time
+            displayDate( date, field, fieldData, editText )
+        }
+        else
+        {
+            TimePickerDialog( context!!, "Select Time", date, field, fieldData, editText,this )
+        }
+    }
+
+    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData, editText: EditText)
     {
         fieldData.dateValue = date.time
         displayDate( date, field, fieldData, editText )
@@ -159,7 +176,43 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
                 val editView = frameLayout.findViewById<View>(R.id.edit_view)
                 editView.setOnClickListener {
 
-                    DatePickerDialog( context!!, "Select a Date", date, field, fieldData, editText,this )
+                    if (!field.date && field.time)
+                    {
+                        TimePickerDialog( context!!, "Select Time", date, field, fieldData, editText,this )
+                    }
+                    else
+                    {
+                        DatePickerDialog( context!!, "Select Date", date, field, fieldData, editText,this )
+                    }
+                }
+            }
+
+            FieldType.Dropdown ->
+            {
+                frameLayout = holder.frameLayout.findViewById(R.id.dropdown_layout)
+
+                var data = ArrayList<String>()
+
+                if (field.option1.length > 0) data.add(field.option1)
+                if (field.option2.length > 0) data.add(field.option2)
+                if (field.option3.length > 0) data.add(field.option3)
+                if (field.option4.length > 0) data.add(field.option4)
+
+                val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
+                spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
+
+                spinner.setSelection( fieldData.dropdownIndex )
+
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+                {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                    {
+                        fieldData.dropdownIndex = position
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>)
+                    {
+                    }
                 }
             }
 
@@ -216,35 +269,6 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
 
                     checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
                         fieldData.checkbox4 = isChecked
-                    }
-                }
-            }
-
-            FieldType.Dropdown ->
-            {
-                frameLayout = holder.frameLayout.findViewById(R.id.dropdown_layout)
-
-                var data = ArrayList<String>()
-
-                if (field.option1.length > 0) data.add(field.option1)
-                if (field.option2.length > 0) data.add(field.option2)
-                if (field.option3.length > 0) data.add(field.option3)
-                if (field.option4.length > 0) data.add(field.option4)
-
-                val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
-                spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
-
-                spinner.setSelection( fieldData.dropdownIndex )
-
-                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-                {
-                    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
-                    {
-                        fieldData.dropdownIndex = position
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>)
-                    {
                     }
                 }
             }
