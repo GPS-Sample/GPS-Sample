@@ -2,6 +2,7 @@ package edu.gtri.gpssample.dialogs
 
 import android.app.AlertDialog
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -31,7 +32,7 @@ class TimePickerDialog
         val calendar = Calendar.getInstance()
         calendar.time = date
 
-        timePicker.hour = calendar[Calendar.HOUR]
+        timePicker.hour = calendar[Calendar.HOUR_OF_DAY]
         timePicker.minute = calendar[Calendar.MINUTE]
 
         val titleView = view.findViewById<TextView>(R.id.title_text_view)
@@ -46,10 +47,7 @@ class TimePickerDialog
 
         saveButton.setOnClickListener(View.OnClickListener {
 
-            calendar[Calendar.YEAR] = date.day
-            calendar[Calendar.MONTH] = date.month
-            calendar[Calendar.DAY_OF_MONTH] = date.year
-            calendar[Calendar.HOUR] = timePicker.hour
+            calendar[Calendar.HOUR_OF_DAY] = timePicker.hour
             calendar[Calendar.MINUTE] = timePicker.minute
             val date = calendar.time
             delegate.didSelectTime(date,field,fieldData,editText)

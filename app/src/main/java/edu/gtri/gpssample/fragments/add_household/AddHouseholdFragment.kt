@@ -20,6 +20,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Study
@@ -35,6 +36,7 @@ class AddHouseholdFragment : Fragment()
     private val OPEN_DOCUMENT_CODE = 2
 
     private lateinit var study: Study
+    private lateinit var config: Config
     private lateinit var enumData: EnumData
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
@@ -68,6 +70,10 @@ class AddHouseholdFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
+        }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
         }
@@ -83,17 +89,15 @@ class AddHouseholdFragment : Fragment()
         }
 
         val fieldDataMap = HashMap<Int, FieldData>()
-        val fieldDataMapCopy = HashMap<Int, FieldData>()
 
         for (field in study.fields)
         {
             val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
             fieldDataMap[field.id!!] = fieldData
-            val fieldDataCopy = fieldData.copy()
-            fieldDataMapCopy[field.id!!] = fieldDataCopy
+            fieldDataMap[field.id!!] = fieldData.copy()
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataMapCopy )
+        addHouseholdAdapter = AddHouseholdAdapter( config, study.fields, fieldDataMap )
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
@@ -127,8 +131,8 @@ class AddHouseholdFragment : Fragment()
 
             for (key in fieldDataMap.keys)
             {
-                fieldDataMapCopy[key]?.let {
-                    DAO.fieldDataDAO.updateFieldData( it.copy())
+                fieldDataMap[key]?.let {
+                    DAO.fieldDataDAO.updateFieldData( it )
                 }
             }
 

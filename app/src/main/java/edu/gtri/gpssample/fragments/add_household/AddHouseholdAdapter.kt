@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.add_household
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +11,17 @@ import android.widget.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.FieldType
+import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) :
+class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) :
     RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
@@ -51,7 +55,13 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
         val month = calendar[Calendar.MONTH] + 1
         val year = calendar[Calendar.YEAR]
 
-        return "${month}/${day}/${year}"
+        when (config.dateFormat)
+        {
+            DateFormat.DayMonthYear -> return "${day}/${month}/${year}"
+            DateFormat.MonthDayYear -> return "${month}/${day}/${year}"
+            DateFormat.YearMonthDay -> return "${year}/${month}/${day}"
+            else -> return "${day}/${month}/${year}"
+        }
     }
 
     fun timeString(date: Date?): String
@@ -64,14 +74,22 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
 
         var meridiem = "am"
 
-        if (hour >= 12) {
-            meridiem = "pm"
-            if (hour > 12) {
-                hour -= 12
+        if (config.timeFormat == TimeFormat.twelveHour)
+        {
+            if (hour >= 12) {
+                meridiem = "pm"
+                if (hour > 12) {
+                    hour -= 12
+                }
             }
         }
 
-        return String.format("%d:%02d %s", hour, minute, meridiem)
+        when (config.timeFormat)
+        {
+            TimeFormat.twelveHour -> return String.format("%d:%02d %s", hour, minute, meridiem)
+            TimeFormat.twentyFourHour -> return String.format("%d:%02d", hour, minute)
+            else -> return String.format("%d:%02d %s", hour, minute, meridiem)
+        }
     }
 
     fun displayDate( date: Date, field: Field, fieldData: FieldData, editText: EditText )
@@ -175,6 +193,11 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
 
                 val editView = frameLayout.findViewById<View>(R.id.edit_view)
                 editView.setOnClickListener {
+
+                    if (fieldData.dateValue != 0L)
+                    {
+                        date = Date( fieldData.dateValue )
+                    }
 
                     if (!field.date && field.time)
                     {
