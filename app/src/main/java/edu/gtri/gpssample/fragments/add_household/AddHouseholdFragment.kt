@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
@@ -131,8 +133,37 @@ class AddHouseholdFragment : Fragment()
 
             for (key in fieldDataMap.keys)
             {
-                fieldDataMap[key]?.let {
-                    DAO.fieldDataDAO.updateFieldData( it )
+                fieldDataMap[key]?.let {fieldData ->
+                    val field = DAO.fieldDAO.getField( fieldData.fieldId )
+
+                    if (field.required)
+                    {
+                        when (field.type)
+                        {
+                            FieldType.Text -> {
+                                if (fieldData.textValue.isEmpty()) {
+                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                            }
+                            FieldType.Number -> {
+                                if (fieldData.numberValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                            }
+                            FieldType.Date -> {
+                                if (fieldData.dateValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                            }
+                            else -> {
+                            }
+                        }
+                    }
+
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }
 

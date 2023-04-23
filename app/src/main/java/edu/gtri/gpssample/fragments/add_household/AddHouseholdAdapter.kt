@@ -163,12 +163,16 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 if (field.integerOnly)
                 {
                     editText.inputType = InputType.TYPE_CLASS_NUMBER
-                    editText.setText( fieldData.numberValue.toInt().toString())
+                    fieldData.numberValue?.let {
+                        editText.setText( it.toInt().toString())
+                    }
                 }
                 else
                 {
                     editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-                    editText.setText( String.format( "%.2f", fieldData.numberValue ))
+                    fieldData.numberValue?.let {
+                        editText.setText( String.format( "%.2f", it ))
+                    }
                 }
 
                 editText.doAfterTextChanged {
@@ -185,18 +189,16 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 var date = Date()
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
 
-                if (fieldData.dateValue != 0L)
-                {
-                    date = Date( fieldData.dateValue )
+                fieldData.dateValue?.let {
+                    date = Date( it )
                     displayDate( date, field, fieldData, editText )
                 }
 
                 val editView = frameLayout.findViewById<View>(R.id.edit_view)
                 editView.setOnClickListener {
 
-                    if (fieldData.dateValue != 0L)
-                    {
-                        date = Date( fieldData.dateValue )
+                    fieldData.dateValue?.let {
+                        date = Date( it )
                     }
 
                     if (!field.date && field.time)

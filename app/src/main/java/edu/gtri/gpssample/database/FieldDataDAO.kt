@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import androidx.core.database.getDoubleOrNull
+import androidx.core.database.getLongOrNull
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
@@ -48,8 +50,8 @@ class FieldDataDAO(private var dao: DAO)
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
         val enum_data_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_ID))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
-        val numberValue = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_NUMBER_VALUE))
-        val dateValue = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DATE_VALUE))
+        val numberValue = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_NUMBER_VALUE))
+        val dateValue = cursor.getLongOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DATE_VALUE))
         val dropdownIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX))
         val checkbox1 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX1)).toBoolean()
         val checkbox2 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX2)).toBoolean()
