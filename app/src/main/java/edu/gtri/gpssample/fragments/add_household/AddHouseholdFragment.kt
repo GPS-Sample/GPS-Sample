@@ -9,6 +9,9 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -16,8 +19,10 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Study
@@ -27,11 +32,13 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class AddHouseholdFragment : Fragment()
 {
+    private var createMode = false
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
     private val OPEN_DOCUMENT_CODE = 2
 
     private lateinit var study: Study
+    private lateinit var config: Config
     private lateinit var enumData: EnumData
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
@@ -42,6 +49,16 @@ class AddHouseholdFragment : Fragment()
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (createMode)
+                {
+                    DAO.enumDataDAO.delete( enumData )
+                }
+                findNavController().popBackStack()
+            }
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -55,6 +72,10 @@ class AddHouseholdFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
+        }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
         }
@@ -63,50 +84,33 @@ class AddHouseholdFragment : Fragment()
             enumData = it
         }
 
-        val fieldDataMap = HashMap<Int, FieldData>()
-        val fieldDataMapCopy = HashMap<Int, FieldData>()
-
-        if (this::study.isInitialized && this::enumData.isInitialized)
+        if (enumData.id == null)
         {
-            for (field in study.fields)
-            {
-                val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
-                fieldDataMap[field.id!!] = fieldData
-                val fieldDataCopy = fieldData.copy()
-                fieldDataMapCopy[field.id!!] = fieldDataCopy
-            }
-
-            addHouseholdAdapter = AddHouseholdAdapter( study.fields, fieldDataMapCopy )
-            binding.recyclerView.adapter = addHouseholdAdapter
-            binding.recyclerView.itemAnimator = DefaultItemAnimator()
-            binding.recyclerView.layoutManager = LinearLayoutManager(activity )
-
-            if (enumData.imageFileName.isNotEmpty())
-            {
-                val uri = Uri.parse(enumData.imageFileName )
-
-//                activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
-                val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-                binding.imageView.setImageBitmap(bitmap)
-
-                var width = bitmap.width.toDouble()
-                val height = bitmap.height.toDouble()
-
-                val orgWidth = binding.imageView.layoutParams.width.toDouble()
-
-                width = width / height * orgWidth
-
-                binding.imageView.layoutParams.width = width.toInt()
-                binding.addImageButton.visibility = View.GONE
-            }
+            createMode = true
+            enumData.id = DAO.enumDataDAO.createEnumData(enumData)
         }
 
-        binding.imageView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/*"
-            startActivityForResult(intent, OPEN_DOCUMENT_CODE)
+        val fieldDataMap = HashMap<Int, FieldData>()
+
+        for (field in study.fields)
+        {
+            val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
+            fieldDataMap[field.id!!] = fieldData
+            fieldDataMap[field.id!!] = fieldData.copy()
+        }
+
+        addHouseholdAdapter = AddHouseholdAdapter( config, study.fields, fieldDataMap )
+        binding.recyclerView.adapter = addHouseholdAdapter
+        binding.recyclerView.itemAnimator = DefaultItemAnimator()
+        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+
+        if (enumData.imageFileName.isNotEmpty())
+        {
+            val uri = Uri.parse(enumData.imageFileName )
+            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
+            binding.imageView.setImageBitmap(bitmap)
         }
 
         binding.addImageButton.setOnClickListener {
@@ -117,6 +121,11 @@ class AddHouseholdFragment : Fragment()
         }
 
         binding.cancelButton.setOnClickListener {
+            if (createMode)
+            {
+                DAO.enumDataDAO.delete( enumData )
+            }
+
             findNavController().popBackStack()
         }
 
@@ -124,8 +133,37 @@ class AddHouseholdFragment : Fragment()
 
             for (key in fieldDataMap.keys)
             {
-                fieldDataMapCopy[key]?.let {
-                    DAO.fieldDataDAO.updateFieldData( it.copy())
+                fieldDataMap[key]?.let {fieldData ->
+                    val field = DAO.fieldDAO.getField( fieldData.fieldId )
+
+                    if (field.required)
+                    {
+                        when (field.type)
+                        {
+                            FieldType.Text -> {
+                                if (fieldData.textValue.isEmpty()) {
+                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                            }
+                            FieldType.Number -> {
+                                if (fieldData.numberValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                            }
+                            FieldType.Date -> {
+                                if (fieldData.dateValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                            }
+                            else -> {
+                            }
+                        }
+                    }
+
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }
 
@@ -149,6 +187,12 @@ class AddHouseholdFragment : Fragment()
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId) {
+            android.R.id.home -> {
+                if (createMode)
+                {
+                    DAO.enumDataDAO.delete( enumData )
+                }
+            }
             R.id.action_delete -> {
                 DAO.enumDataDAO.delete( enumData )
                 findNavController().popBackStack()
@@ -166,13 +210,10 @@ class AddHouseholdFragment : Fragment()
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == OPEN_DOCUMENT_CODE) {
                 data?.data?.let {uri ->
-
-                    binding.imageView.setImageURI(uri)
-                    binding.imageView.setTag(uri)
-                    binding.imageView.setScaleType(ImageView.ScaleType.FIT_XY)
-                    binding.imageView.setClipToOutline(true)
-                    binding.addImageButton.visibility = View.GONE
-
+                    activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+                    (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
+                    binding.imageView.setImageBitmap(bitmap)
                     enumData.imageFileName = uri.toString()
                     DAO.enumDataDAO.updateEnumData( enumData )
                 }

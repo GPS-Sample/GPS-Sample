@@ -98,6 +98,22 @@ class FieldDAO(private var dao: DAO)
         return Field(id, uuid,  name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
+    //--------------------------------------------------------------------------
+    fun getField( id : Int ): Field
+    {
+        val fields = ArrayList<Field>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where id=${id}"
+        val cursor = db.rawQuery(query, null)
+
+        cursor.moveToNext()
+        val field = buildField( cursor )
+
+        cursor.close()
+        db.close()
+
+        return field
+    }
 
     //--------------------------------------------------------------------------
     fun getFields(study : Study): List<Field>

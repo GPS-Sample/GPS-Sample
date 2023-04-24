@@ -27,15 +27,24 @@
                 android:gravity="center_vertical"
                 android:text="Date" />
 
-            <EditText
-                android:id="@+id/edit_text"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:ems="10"
-                android:inputType="date" />
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"/>
+
+                <View
+                    android:id="@+id/edit_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"/>
+            </FrameLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </FrameLayout>

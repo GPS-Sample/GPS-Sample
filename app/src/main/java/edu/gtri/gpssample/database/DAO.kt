@@ -157,14 +157,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_CONFIG_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
-                COLUMN_ENUM_AREA_TL_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_TL_LON + " REAL" + "," +
-                COLUMN_ENUM_AREA_TR_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_TR_LON + " REAL" + "," +
-                COLUMN_ENUM_AREA_BR_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_BR_LON + " REAL" + "," +
-                COLUMN_ENUM_AREA_BL_LAT + " REAL" + "," +
-                COLUMN_ENUM_AREA_BL_LON + " REAL" + "," +
                 "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumArea)
@@ -195,6 +187,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
+                COLUMN_ENUM_DATA_IS_LOCATION + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_DESCRIPTION + " TEXT" + "," +
                 COLUMN_ENUM_DATA_IMAGE_FILE_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
@@ -206,10 +200,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_RESPONSE1 + " TEXT" + "," +
-                COLUMN_FIELD_DATA_RESPONSE2 + " TEXT" + "," +
-                COLUMN_FIELD_DATA_RESPONSE3 + " TEXT" + "," +
-                COLUMN_FIELD_DATA_RESPONSE4 + " TEXT" + "," +
+                COLUMN_FIELD_DATA_TEXT_VALUE + " TEXT" + "," +
+                COLUMN_FIELD_DATA_NUMBER_VALUE + " DOUBLE" + "," +
+                COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +
+                COLUMN_FIELD_DATA_DROPDOWN_INDEX + " INTEGER" + "," +
+                COLUMN_FIELD_DATA_CHECKBOX1 + " INTEGER" + "," +
+                COLUMN_FIELD_DATA_CHECKBOX2 + " INTEGER" + "," +
+                COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
+                COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" +
                 ")")
@@ -376,15 +374,21 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_STUDY_ID = "study_id"
         const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
         const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
+        const val COLUMN_ENUM_DATA_IS_LOCATION = "enum_data_is_location"
+        const val COLUMN_ENUM_DATA_DESCRIPTION = "enum_data_description"
         const val COLUMN_ENUM_DATA_IMAGE_FILE_NAME = "enum_data_image_file_name"
 
         const val TABLE_FIELD_DATA = "field_data"
 //        const val COLUMN_FIELD_ID = "field_id"
 //        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
-        const val COLUMN_FIELD_DATA_RESPONSE1 = "field_data_response_1"
-        const val COLUMN_FIELD_DATA_RESPONSE2 = "field_data_response_2"
-        const val COLUMN_FIELD_DATA_RESPONSE3 = "field_data_response_3"
-        const val COLUMN_FIELD_DATA_RESPONSE4 = "field_data_response_4"
+        const val COLUMN_FIELD_DATA_TEXT_VALUE = "field_data_text_value"
+        const val COLUMN_FIELD_DATA_NUMBER_VALUE = "field_data_number_value"
+        const val COLUMN_FIELD_DATA_DATE_VALUE = "field_data_date_value"
+        const val COLUMN_FIELD_DATA_DROPDOWN_INDEX = "field_data_dropdown_index"
+        const val COLUMN_FIELD_DATA_CHECKBOX1 = "field_data_checkbox1"
+        const val COLUMN_FIELD_DATA_CHECKBOX2 = "field_data_checkbox2"
+        const val COLUMN_FIELD_DATA_CHECKBOX3 = "field_data_checkbox3"
+        const val COLUMN_FIELD_DATA_CHECKBOX4 = "field_data_checkbox4"
 
         const val TABLE_LAT_LON = "lat_lon"
         const val COLUMN_LAT = "lat"
@@ -438,6 +442,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 96
+        private const val DATABASE_VERSION = 100
     }
 }

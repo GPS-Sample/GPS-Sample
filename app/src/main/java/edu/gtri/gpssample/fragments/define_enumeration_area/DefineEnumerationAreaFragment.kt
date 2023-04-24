@@ -181,9 +181,14 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                 for (enumData in enumDataList)
                 {
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+
+                    if (enumData.isLocation)
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+
                     val marker = map.addMarker( MarkerOptions()
                         .position( LatLng( enumData.latitude, enumData.longitude ))
-                        .icon( BitmapDescriptorFactory.fromResource(R.drawable.home_red))
+                        .icon( icon )
                     )
 
                     marker?.let {marker ->

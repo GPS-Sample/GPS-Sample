@@ -9,9 +9,11 @@ data class EnumData(
     var enumAreaId : Int,
     var latitude : Double,
     var longitude : Double,
+    var isLocation: Boolean,
+    var description : String,
     var imageFileName: String
 )
 {
     constructor( userId: Int, enumAreaId: Int, latitude: Double, longitude: Double) :
-            this( null, userId, enumAreaId, latitude, longitude, "" )
+            this( null, userId, enumAreaId, latitude, longitude, false,"", "" )
 }

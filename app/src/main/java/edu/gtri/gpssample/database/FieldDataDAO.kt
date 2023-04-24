@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import androidx.core.database.getDoubleOrNull
+import androidx.core.database.getLongOrNull
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataDAO(private var dao: DAO)
 {
@@ -29,10 +32,14 @@ class FieldDataDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_FIELD_ID, fieldData.fieldId )
         values.put( DAO.COLUMN_ENUM_DATA_ID, fieldData.enumDataId )
-        values.put( DAO.COLUMN_FIELD_DATA_RESPONSE1, fieldData.response1 )
-        values.put( DAO.COLUMN_FIELD_DATA_RESPONSE2, fieldData.response2 )
-        values.put( DAO.COLUMN_FIELD_DATA_RESPONSE3, fieldData.response3 )
-        values.put( DAO.COLUMN_FIELD_DATA_RESPONSE4, fieldData.response4 )
+        values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
+        values.put( DAO.COLUMN_FIELD_DATA_NUMBER_VALUE, fieldData.numberValue )
+        values.put( DAO.COLUMN_FIELD_DATA_DATE_VALUE, fieldData.dateValue )
+        values.put( DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX, fieldData.dropdownIndex )
+        values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX1, fieldData.checkbox1 )
+        values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX2, fieldData.checkbox2 )
+        values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX3, fieldData.checkbox3 )
+        values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX4, fieldData.checkbox4 )
     }
 
     //--------------------------------------------------------------------------
@@ -42,12 +49,16 @@ class FieldDataDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
         val enum_data_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_ID))
-        val response1 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_RESPONSE1))
-        val response2 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_RESPONSE2))
-        val response3 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_RESPONSE3))
-        val response4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_RESPONSE4))
+        val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
+        val numberValue = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_NUMBER_VALUE))
+        val dateValue = cursor.getLongOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DATE_VALUE))
+        val dropdownIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX))
+        val checkbox1 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX1)).toBoolean()
+        val checkbox2 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX2)).toBoolean()
+        val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
+        val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
 
-        return FieldData( id, field_id, enum_data_id, response1, response2, response3, response4 )
+        return FieldData( id, field_id, enum_data_id, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
     }
 
     //--------------------------------------------------------------------------
@@ -96,7 +107,7 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
-            fieldData = FieldData( field_id, enum_data_id, "", "", "", "")
+            fieldData = FieldData( field_id, enum_data_id )
             fieldData.id = createFieldData( fieldData )
         }
 

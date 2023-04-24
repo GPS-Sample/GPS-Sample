@@ -110,15 +110,25 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
             location?.let { location ->
                 var enumData = EnumData(userId, enumAreaId, location.latitude, location.longitude)
-                enumData.id = DAO.enumDataDAO.createEnumData(enumData)
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
             }
+
+            location = null
         }
 
         binding.addLocationButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+
+            location?.let { location ->
+                var enumData = EnumData(userId, enumAreaId, location.latitude, location.longitude)
+                enumData.isLocation = true
+                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+
+                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+            }
+
+            location = null
         }
 
         binding.finishButton.setOnClickListener {
@@ -162,9 +172,14 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         for (enumData in enumDataList)
         {
+            var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+
+            if (enumData.isLocation)
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+
             val marker = map.addMarker( MarkerOptions()
                 .position( LatLng( enumData.latitude, enumData.longitude ))
-                .icon( BitmapDescriptorFactory.fromResource(R.drawable.home_red))
+                .icon( icon )
             )
 
             marker?.let {marker ->
@@ -175,7 +190,15 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
                 marker.tag?.let {tag ->
                     val enum_data = tag as EnumData
                     sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+
+                    if (enum_data.isLocation)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                    }
+                    else
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                    }
                 }
 
                 false

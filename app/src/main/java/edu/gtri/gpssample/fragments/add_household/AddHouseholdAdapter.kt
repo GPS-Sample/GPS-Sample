@@ -2,6 +2,8 @@ package edu.gtri.gpssample.fragments.add_household
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +11,20 @@ import android.widget.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.FieldType
+import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.dialogs.DatePickerDialog
+import edu.gtri.gpssample.dialogs.TimePickerDialog
+import java.util.*
 
-class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) : RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>()
+class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) :
+    RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
+    DatePickerDialog.DatePickerDialogDelegate,
+    TimePickerDialog.TimePickerDialogDelegate
 {
     override fun getItemCount() = fields.size
 
@@ -33,6 +44,87 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val frameLayout: FrameLayout = itemView as FrameLayout
+    }
+
+    fun dateString(date: Date?): String
+    {
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+
+        val day = calendar[Calendar.DAY_OF_MONTH]
+        val month = calendar[Calendar.MONTH] + 1
+        val year = calendar[Calendar.YEAR]
+
+        when (config.dateFormat)
+        {
+            DateFormat.DayMonthYear -> return "${day}/${month}/${year}"
+            DateFormat.MonthDayYear -> return "${month}/${day}/${year}"
+            DateFormat.YearMonthDay -> return "${year}/${month}/${day}"
+            else -> return "${day}/${month}/${year}"
+        }
+    }
+
+    fun timeString(date: Date?): String
+    {
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+
+        var hour = calendar[Calendar.HOUR_OF_DAY]
+        val minute = calendar[Calendar.MINUTE]
+
+        var meridiem = "am"
+
+        if (config.timeFormat == TimeFormat.twelveHour)
+        {
+            if (hour >= 12) {
+                meridiem = "pm"
+                if (hour > 12) {
+                    hour -= 12
+                }
+            }
+        }
+
+        when (config.timeFormat)
+        {
+            TimeFormat.twelveHour -> return String.format("%d:%02d %s", hour, minute, meridiem)
+            TimeFormat.twentyFourHour -> return String.format("%d:%02d", hour, minute)
+            else -> return String.format("%d:%02d %s", hour, minute, meridiem)
+        }
+    }
+
+    fun displayDate( date: Date, field: Field, fieldData: FieldData, editText: EditText )
+    {
+        if (field.date && !field.time)
+        {
+            editText.setText( dateString( date ))
+        }
+        else if (!field.date && field.time)
+        {
+            editText.setText( timeString( date ))
+        }
+        else
+        {
+            editText.setText( date.toString())
+        }
+    }
+
+    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+    {
+        if (field.date && !field.time)
+        {
+            fieldData.dateValue = date.time
+            displayDate( date, field, fieldData, editText )
+        }
+        else
+        {
+            TimePickerDialog( context!!, "Select Time", date, field, fieldData, editText,this )
+        }
+    }
+
+    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+    {
+        fieldData.dateValue = date.time
+        displayDate( date, field, fieldData, editText )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
@@ -58,114 +150,64 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
             FieldType.Text -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                editText.setText( fieldData.response1 )
+                editText.setText( fieldData.textValue )
                 editText.doAfterTextChanged {
-                    fieldData.response1 = it.toString()
+                    fieldData.textValue = it.toString()
                 }
             }
 
             FieldType.Number -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.number_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                editText.setText( fieldData.response1 )
+
+                if (field.integerOnly)
+                {
+                    editText.inputType = InputType.TYPE_CLASS_NUMBER
+                    fieldData.numberValue?.let {
+                        editText.setText( it.toInt().toString())
+                    }
+                }
+                else
+                {
+                    editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    fieldData.numberValue?.let {
+                        editText.setText( String.format( "%.2f", it ))
+                    }
+                }
+
                 editText.doAfterTextChanged {
-                    fieldData.response1 = it.toString()
+                    if (it.toString().isNotEmpty())
+                    {
+                        fieldData.numberValue = it.toString().toDouble()
+                    }
                 }
             }
 
             FieldType.Date -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
+
+                var date = Date()
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                editText.setText( fieldData.response1 )
-                editText.doAfterTextChanged {
-                    fieldData.response1 = it.toString()
-                }
-            }
 
-            FieldType.Checkbox ->
-            {
-                frameLayout = holder.frameLayout.findViewById(R.id.checkbox_layout)
-                var checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox1)
-                checkBox.visibility = View.GONE
-                if (field.option1.length > 0)
-                {
-                    checkBox.text = field.option1
-                    checkBox.visibility = View.VISIBLE
-
-                    if (fieldData.response1 == field.option1)
-                    {
-                        checkBox.isChecked = true
-                    }
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        if (isChecked) {
-                            fieldData.response1 = field.option1
-                        } else {
-                            fieldData.response1 = ""
-                        }
-                    }
+                fieldData.dateValue?.let {
+                    date = Date( it )
+                    displayDate( date, field, fieldData, editText )
                 }
 
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox2)
-                checkBox.visibility = View.GONE
-                if (field.option2.length > 0)
-                {
-                    checkBox.text = field.option2
-                    checkBox.visibility = View.VISIBLE
+                val editView = frameLayout.findViewById<View>(R.id.edit_view)
+                editView.setOnClickListener {
 
-                    if (fieldData.response2 == field.option2)
+                    fieldData.dateValue?.let {
+                        date = Date( it )
+                    }
+
+                    if (!field.date && field.time)
                     {
-                        checkBox.isChecked = true
+                        TimePickerDialog( context!!, "Select Time", date, field, fieldData, editText,this )
                     }
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        if (isChecked) {
-                            fieldData.response2 = field.option2
-                        } else {
-                            fieldData.response2 = ""
-                        }
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox3)
-                checkBox.visibility = View.GONE
-                if (field.option3.length > 0)
-                {
-                    checkBox.text = field.option3
-                    checkBox.visibility = View.VISIBLE
-
-                    if (fieldData.response3 == field.option3)
+                    else
                     {
-                        checkBox.isChecked = true
-                    }
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        if (isChecked) {
-                            fieldData.response3 = field.option3
-                        } else {
-                            fieldData.response3 = ""
-                        }
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox4)
-                checkBox.visibility = View.GONE
-                if (field.option4.length > 0)
-                {
-                    checkBox.text = field.option4
-                    checkBox.visibility = View.VISIBLE
-
-                    if (fieldData.response4 == field.option4)
-                    {
-                        checkBox.isChecked = true
-                    }
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        if (isChecked) {
-                            fieldData.response4 = field.option4
-                        } else {
-                            fieldData.response4 = ""
-                        }
+                        DatePickerDialog( context!!, "Select Date", date, field, fieldData, editText,this )
                     }
                 }
             }
@@ -184,30 +226,74 @@ class AddHouseholdAdapter( var fields : List<Field>, var fieldDataMap: HashMap<I
                 val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
                 spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
 
-                if (fieldData.response1 == field.option1)
-                    spinner.setSelection(0)
-                else if (fieldData.response1 == field.option2)
-                    spinner.setSelection(1)
-                else if (fieldData.response1 == field.option3)
-                    spinner.setSelection(2)
-                else if (fieldData.response1 == field.option4)
-                    spinner.setSelection(3)
+                spinner.setSelection( fieldData.dropdownIndex )
 
                 spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
                 {
                     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
                     {
-                        when( position )
-                        {
-                            0 -> fieldData.response1 = field.option1
-                            1 -> fieldData.response1 = field.option2
-                            2 -> fieldData.response1 = field.option3
-                            3 -> fieldData.response1 = field.option4
-                        }
+                        fieldData.dropdownIndex = position
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>)
                     {
+                    }
+                }
+            }
+
+            FieldType.Checkbox ->
+            {
+                frameLayout = holder.frameLayout.findViewById(R.id.checkbox_layout)
+
+                var checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox1)
+                checkBox.visibility = View.GONE
+                if (field.option1.length > 0)
+                {
+                    checkBox.text = field.option1
+                    checkBox.visibility = View.VISIBLE
+                    checkBox.isChecked = fieldData.checkbox1
+
+                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                        fieldData.checkbox1 = isChecked
+                    }
+                }
+
+                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox2)
+                checkBox.visibility = View.GONE
+                if (field.option2.length > 0)
+                {
+                    checkBox.text = field.option2
+                    checkBox.visibility = View.VISIBLE
+                    checkBox.isChecked = fieldData.checkbox2
+
+                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                        fieldData.checkbox2 = isChecked
+                    }
+                }
+
+                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox3)
+                checkBox.visibility = View.GONE
+                if (field.option3.length > 0)
+                {
+                    checkBox.text = field.option3
+                    checkBox.visibility = View.VISIBLE
+                    checkBox.isChecked = fieldData.checkbox3
+
+                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                        fieldData.checkbox3 = isChecked
+                    }
+                }
+
+                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox4)
+                checkBox.visibility = View.GONE
+                if (field.option4.length > 0)
+                {
+                    checkBox.text = field.option4
+                    checkBox.visibility = View.VISIBLE
+                    checkBox.isChecked = fieldData.checkbox4
+
+                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                        fieldData.checkbox4 = isChecked
                     }
                 }
             }
