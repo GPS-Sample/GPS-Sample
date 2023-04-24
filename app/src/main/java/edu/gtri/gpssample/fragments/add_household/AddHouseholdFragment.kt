@@ -158,6 +158,13 @@ class AddHouseholdFragment : Fragment()
                                     return@setOnClickListener
                                 }
                             }
+                            FieldType.Checkbox -> {
+                                val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
+                                if (!selection) {
+                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                            }
                             else -> {
                             }
                         }
