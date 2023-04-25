@@ -155,8 +155,9 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                 }
 
                 // HACK HACK
+                val atl = LatLng( 33.774881, -84.396341 )
                 val srb = LatLng(30.335603,-86.165004 )
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 13.5f))
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 13.5f))
             }
         }
     }

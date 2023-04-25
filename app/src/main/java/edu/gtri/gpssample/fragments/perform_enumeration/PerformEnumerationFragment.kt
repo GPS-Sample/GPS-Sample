@@ -113,6 +113,8 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            } ?: kotlin.run {
+                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
             }
 
             location = null
@@ -126,6 +128,8 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+            } ?: kotlin.run {
+                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
             }
 
             location = null
@@ -166,7 +170,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         map.addPolygon(polygon)
 
         val latLng = getCenter()
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 16.0f))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 15.0f))
 
         val enumDataList = DAO.enumDataDAO.getEnumData(userId, enumAreaId)
 

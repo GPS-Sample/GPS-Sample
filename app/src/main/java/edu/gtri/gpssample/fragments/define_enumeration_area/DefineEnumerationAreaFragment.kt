@@ -200,8 +200,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
             if (user!!.role == Role.Admin.toString())
             {
+                val atl = LatLng( 33.774881, -84.396341 )
                 val srb = LatLng(30.330603,-86.165004 )
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom( srb, 15.0f))
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 15.0f))
             }
         }
     }
