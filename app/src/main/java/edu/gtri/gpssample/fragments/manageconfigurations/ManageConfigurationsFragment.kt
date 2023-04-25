@@ -82,9 +82,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     private fun shouldEditConfig(config: Config)
     {
-        val bundle = Bundle()
         sharedViewModel.setCurrentConfig(config)
-        findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment, bundle)
+        findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
     }
 
     override fun didAnswerNo()

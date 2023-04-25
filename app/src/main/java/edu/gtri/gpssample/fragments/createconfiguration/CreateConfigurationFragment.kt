@@ -80,7 +80,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.nextButton.setOnClickListener {
+        binding.saveButton.setOnClickListener {
 
             if (binding.configNameEditText.text.toString().isEmpty())
             {
@@ -106,7 +106,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
                     sharedViewModel.updateConfiguration()
                 }
 
-                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                findNavController().popBackStack()
             }
         }
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment

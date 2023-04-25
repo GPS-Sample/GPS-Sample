@@ -27,6 +27,7 @@
         android:textColor="@color/white"/>
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/edit_view"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
@@ -36,6 +37,7 @@
 
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/image_view"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"

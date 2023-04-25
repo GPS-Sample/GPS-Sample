@@ -2,9 +2,11 @@ package edu.gtri.gpssample.fragments.configuration
 
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -24,10 +26,12 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.fragments.manage_enumeration_areas.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
+class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener, ConfirmationDialog.ConfirmationDialogDelegate
+{
     private var quickStart = false
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -74,11 +78,20 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
             quickStart = it
         }
 
+        binding.editImageView.setOnClickListener {
+            findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
+        }
+
+        binding.deleteImageView.setOnClickListener {
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
+        }
+
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.doneButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
         }
+
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -119,8 +132,8 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     private fun didSelectStudy(study: Study)
     {
-        sharedViewModel.createStudyModel.setStudy(study)
-        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
+//        sharedViewModel.createStudyModel.setStudy(study)
+//        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
     }
 
     override fun onMapClick(p0: LatLng) {
@@ -159,6 +172,18 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                 val srb = LatLng(30.335603,-86.165004 )
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 13.5f))
             }
+        }
+    }
+
+    override fun didAnswerNo()
+    {
+    }
+
+    override fun didAnswerYes( tag: Any? )
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            sharedViewModel.deleteConfig(config)
+            findNavController().popBackStack()
         }
     }
 
