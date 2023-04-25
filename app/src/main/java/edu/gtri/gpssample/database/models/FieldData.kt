@@ -13,15 +13,15 @@ data class FieldData (
     var textValue : String,
     var numberValue : Double?,
     var dateValue : Long?,
-    var dropdownIndex : Int,
+    var dropdownIndex : Int?,
     var checkbox1 : Boolean,
     var checkbox2 : Boolean,
     var checkbox3 : Boolean,
     var checkbox4 : Boolean)
 {
-    constructor( fieldId: Int, enumDataId: Int ) : this( null, fieldId, enumDataId, "", null, null, 0, false, false, false, false )
+    constructor( fieldId: Int, enumDataId: Int ) : this( null, fieldId, enumDataId, "", null, null, null, false, false, false, false )
 
-    constructor( fieldId: Int, enumDataId: Int, textValue: String, numberValue: Double, dateValue: Long, dropdownIndex: Int, checkbox1: Boolean, checkbox2: Boolean, checkbox3: Boolean, checkbox4: Boolean ) :
+    constructor( fieldId: Int, enumDataId: Int, textValue: String, numberValue: Double?, dateValue: Long?, dropdownIndex: Int?, checkbox1: Boolean, checkbox2: Boolean, checkbox3: Boolean, checkbox4: Boolean ) :
             this( null, fieldId, enumDataId, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
 
     fun copy() : FieldData

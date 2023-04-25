@@ -12,43 +12,72 @@
         android:layout_height="match_parent"
         tools:context=".fragments.ManageEnumerationArea.ManageEnumerationAreaFragment">
 
-        <TextView
-            android:id="@+id/study_name_text_view"
+        <FrameLayout
+            android:layout_marginBottom="2dp"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_margin="20dp"
-            android:gravity="center"
-            android:text="@string/study_name"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_height="50dp">
 
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="200dp"
-            android:layout_height="200dp">
-        </ImageView>
+            <TextView
+                android:id="@+id/title_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="Teams"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/users_online_text_view"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginStart="20dp"
-            android:gravity="start"
-            android:text="Users Online"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            <ImageView
+                android:id="@+id/add_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end"
+                android:src="@drawable/plus_blue" />
+        </FrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
-            android:layout_margin="20dp"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="0dp"/>
+
+<!--        <TextView-->
+<!--            android:id="@+id/study_name_text_view"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:layout_margin="20dp"-->
+<!--            android:gravity="center"-->
+<!--            android:text="@string/study_name"-->
+<!--            android:textColor="@color/primary_textcolor"-->
+<!--            android:textSize="20sp"-->
+<!--            android:textStyle="bold" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/image_view"-->
+<!--            android:layout_gravity="center_horizontal"-->
+<!--            android:layout_width="200dp"-->
+<!--            android:layout_height="200dp">-->
+<!--        </ImageView>-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/users_online_text_view"-->
+<!--            android:visibility="gone"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:layout_marginTop="40dp"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:gravity="start"-->
+<!--            android:text="Users Online"-->
+<!--            android:textColor="@color/primary_textcolor"-->
+<!--            android:textSize="17sp"-->
+<!--            android:textStyle="bold" />-->
+
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/recycler_view"-->
+<!--            android:layout_margin="20dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"/>-->
 
         <Button
             android:id="@+id/generate_barcode_button"
@@ -59,14 +88,14 @@
             android:insetBottom="0dp"
             android:text="Generate Barcode" />
 
-        <Button
-            android:id="@+id/supervise_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="Supervise Area" />
+<!--        <Button-->
+<!--            android:id="@+id/supervise_button"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_margin="20dp"-->
+<!--            android:insetTop="0dp"-->
+<!--            android:insetBottom="0dp"-->
+<!--            android:text="Supervise Area" />-->
 
         <Button
             android:id="@+id/finish_button"

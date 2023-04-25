@@ -43,7 +43,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     private lateinit var team: Team
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
-    private lateinit var studyAdapter: ManageEnumerationAreaAdapter
+//    private lateinit var studyAdapter: ManageEnumerationAreaAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var dataIsFresh = false
@@ -88,30 +88,30 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         binding.teamNameTextView.setText( team.name )
 
-        studyAdapter = ManageEnumerationAreaAdapter(users)
+//        studyAdapter = ManageEnumerationAreaAdapter(users)
+//
+//        binding.recyclerView.itemAnimator = DefaultItemAnimator()
+//        binding.recyclerView.adapter = studyAdapter
+//        binding.recyclerView.layoutManager = LinearLayoutManager(activity!!)
 
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = studyAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity!!)
-
-        Observable
-            .interval(2000, TimeUnit.MILLISECONDS)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe( {
-                if (dataIsFresh)
-                {
-                    dataIsFresh = false;
-                }
-                else
-                {
-                    users.clear()
-                    studyAdapter.updateUsers( users )
-                }
-            },{throwable->
-                Log.d( "xxx", throwable.stackTraceToString())
-            })
-            .addTo( compositeDisposable )
+//        Observable
+//            .interval(2000, TimeUnit.MILLISECONDS)
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe( {
+//                if (dataIsFresh)
+//                {
+//                    dataIsFresh = false;
+//                }
+//                else
+//                {
+//                    users.clear()
+//                    studyAdapter.updateUsers( users )
+//                }
+//            },{throwable->
+//                Log.d( "xxx", throwable.stackTraceToString())
+//            })
+//            .addTo( compositeDisposable )
 
         binding.generateBarcodeButton.setOnClickListener {
             binding.progressBar.visibility = View.VISIBLE
@@ -203,9 +203,9 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
                 {
                     users.add( user )
 
-                    activity!!.runOnUiThread{
-                        studyAdapter.updateUsers( users )
-                    }
+//                    activity!!.runOnUiThread{
+//                        studyAdapter.updateUsers( users )
+//                    }
                 }
             }
         }

@@ -226,7 +226,11 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
                 spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
 
-                spinner.setSelection( fieldData.dropdownIndex )
+                fieldData.dropdownIndex?.let {
+                    spinner.setSelection( it )
+                } ?: run {
+                    spinner.setSelection( data.size-1 )
+                }
 
                 spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
                 {
