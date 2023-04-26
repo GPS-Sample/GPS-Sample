@@ -7,11 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -61,6 +61,53 @@ class SignInFragment : Fragment()
         userName?.let {
             binding.nameEditText.setText( userName )
         }
+
+        binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
+            val pin = binding.pinEditText.text.toString()
+            val userName = binding.nameEditText.text.toString()
+
+            if (userName.isNotEmpty() && pin.isNotEmpty()) {
+                val user = DAO.userDAO.getUser(userName, pin)
+
+                user?.let {
+                    user
+                    if (user.role != role) {
+                        Toast.makeText(
+                            activity!!.applicationContext,
+                            "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        val sharedPreferences: SharedPreferences =
+                            activity!!.getSharedPreferences("default", 0)
+                        val editor = sharedPreferences.edit()
+                        editor.putString(Keys.kUserName.toString(), userName)
+                        editor.commit()
+
+                        (activity!!.application as? MainApplication)?.user = user
+
+                        binding.pinEditText.setText("")
+
+                        val bundle = Bundle()
+                        bundle.putString(Keys.kRole.toString(), role.toString())
+
+                        if (role == Role.Admin.toString()) {
+                            findNavController().navigate(
+                                R.id.action_navigate_to_ManageConfigurationsFragment,
+                                bundle
+                            )
+                        } else {
+                            findNavController().navigate(
+                                R.id.action_navigate_to_SystemStatusFragment,
+                                bundle
+                            )
+                        }
+                    }
+                }
+            }
+
+            false
+        })
 
         binding.pinEditText.setOnEditorActionListener { v, actionId, event ->
             when(actionId){
