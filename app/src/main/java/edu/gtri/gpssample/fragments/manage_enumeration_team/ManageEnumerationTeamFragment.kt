@@ -1,18 +1,12 @@
 package edu.gtri.gpssample.fragments.manage_enumeration_team
-
-import edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaAdapter
-
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -28,14 +22,9 @@ import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import java.net.DatagramPacket
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate, InputDialog.InputDialogDelegate

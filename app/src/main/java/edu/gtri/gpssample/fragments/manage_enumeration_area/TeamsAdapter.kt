@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Team
 
-class ManageEnumerationAreaAdapter(var teams: List<Team>?) : RecyclerView.Adapter<ManageEnumerationAreaAdapter.ViewHolder>()
+class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.ViewHolder>()
 {
     override fun getItemCount() = teams!!.size
 

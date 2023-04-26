@@ -1,19 +1,13 @@
 package edu.gtri.gpssample.fragments.ManageEnumerationArea
 
 import android.graphics.Color
-import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +22,7 @@ import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.fragments.manage_enumeration_teams.ManageEnumerationTeamsAdapter
+import edu.gtri.gpssample.fragments.manage_enumeration_area.UsersAdapter
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.*
@@ -38,27 +32,24 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.net.DatagramPacket
-import java.net.InetAddress
-import java.net.NetworkInterface
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate, InputDialog.InputDialogDelegate
 {
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
+    private lateinit var usersAdapter: UsersAdapter
+    private lateinit var teamsAdapter: TeamsAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var manageEnumerationAreaAdapter: ManageEnumerationAreaAdapter
+    private lateinit var gpsSampleWifiManager: GPSSampleWifiManager
 
     private var dataIsFresh = false
     private var _binding: FragmentManageEnumerationAreaBinding? = null
     private val binding get() = _binding!!
     private val compositeDisposable = CompositeDisposable()
     private var users = ArrayList<User>()
-    private var gpsSamleWifiManager: GPSSampleWifiManager? = null
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -68,8 +59,6 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-//        setHasOptionsMenu( true )
-
         _binding = FragmentManageEnumerationAreaBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -89,14 +78,14 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         enumArea.id?.let {
             val teams = DAO.teamDAO.getTeams( it )
-            manageEnumerationAreaAdapter = ManageEnumerationAreaAdapter( teams )
+            teamsAdapter = TeamsAdapter( teams )
         }
 
-        manageEnumerationAreaAdapter.didSelectTeam = this::didSelectTeam
+        teamsAdapter.didSelectTeam = this::didSelectTeam
 
-        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.adapter = manageEnumerationAreaAdapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.teamRecyclerView.itemAnimator = DefaultItemAnimator()
+        binding.teamRecyclerView.adapter = teamsAdapter
+        binding.teamRecyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.titleTextView.text = enumArea.name + " Teams"
 
@@ -104,42 +93,39 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             InputDialog( activity!!, "Enter Team Name", null, this )
         }
 
-//        binding.studyNameTextView.setText( enumArea.name )
+        usersAdapter = UsersAdapter(users)
 
-//        studyAdapter = ManageEnumerationAreaAdapter(users)
-//
-//        binding.recyclerView.itemAnimator = DefaultItemAnimator()
-//        binding.recyclerView.adapter = studyAdapter
-//        binding.recyclerView.layoutManager = LinearLayoutManager(activity!!)
+        binding.usersRecyclerView.itemAnimator = DefaultItemAnimator()
+        binding.usersRecyclerView.adapter = usersAdapter
+        binding.usersRecyclerView.layoutManager = LinearLayoutManager(activity!!)
 
-//        Observable
-//            .interval(2000, TimeUnit.MILLISECONDS)
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe( {
-//                if (dataIsFresh)
-//                {
-//                    dataIsFresh = false;
-//                }
-//                else
-//                {
-//                    users.clear()
-//                    studyAdapter.updateUsers( users )
-//                }
-//            },{throwable->
-//                Log.d( "xxx", throwable.stackTraceToString())
-//            })
-//            .addTo( compositeDisposable )
+        Observable
+            .interval(2000, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe( {
+                if (dataIsFresh)
+                {
+                    dataIsFresh = false;
+                }
+                else
+                {
+                    users.clear()
+                    usersAdapter.updateUsers( users )
+                }
+            },{throwable->
+                Log.d( "xxx", throwable.stackTraceToString())
+            })
+            .addTo( compositeDisposable )
 
         binding.generateBarcodeButton.setOnClickListener {
-            binding.progressBar.visibility = View.VISIBLE
-            gpsSamleWifiManager = GPSSampleWifiManager( this )
-            gpsSamleWifiManager!!.startHotSpot()
+            if (!this::gpsSampleWifiManager.isInitialized)
+            {
+                binding.progressBar.visibility = View.VISIBLE
+                gpsSampleWifiManager = GPSSampleWifiManager( this )
+                gpsSampleWifiManager.startHotSpot()
+            }
         }
-
-//        binding.superviseButton.setOnClickListener {
-//            findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment)
-//        }
 
         binding.finishButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
@@ -163,8 +149,8 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         binding.progressBar.visibility = View.GONE
 
-//        binding.imageView.visibility = View.VISIBLE
-//        binding.usersOnlineTextView.visibility = View.VISIBLE
+        binding.qrImageView.visibility = View.VISIBLE
+        binding.usersOnlineTextView.visibility = View.VISIBLE
 
         val jsonObject = JSONObject()
         jsonObject.put( Keys.kSSID.toString(), ssid )
@@ -173,37 +159,13 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         jsonObject.put( Keys.kEnumArea_id.toString(), enumArea.id )
         jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )
 
-//        val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.imageView.width )
-//        qrgEncoder.setColorBlack(Color.WHITE);
-//        qrgEncoder.setColorWhite(Color.BLACK);
+        val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.qrImageView.width )
+        qrgEncoder.setColorBlack(Color.WHITE);
+        qrgEncoder.setColorWhite(Color.BLACK);
 
-//        val bitmap = qrgEncoder.bitmap
-//        binding.imageView.setImageBitmap(bitmap)
+        val bitmap = qrgEncoder.bitmap
+        binding.qrImageView.setImageBitmap(bitmap)
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
-//    {
-//        super.onCreateOptionsMenu(menu, inflater)
-//
-//        inflater.inflate(R.menu.menu_manage_enumeration_area, menu)
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//
-//        when (item.itemId) {
-//            R.id.action_supervise_area -> {
-//                val bundle = Bundle()
-//                bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-//                bundle.putInt( Keys.kEnumArea_id.toString(), enumArea.id!! )
-//                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
-//
-//                return true
-//            }
-//
-//        }
-//
-//        return false
-//    }
 
     override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
     {
@@ -220,9 +182,9 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
                 {
                     users.add( user )
 
-//                    activity!!.runOnUiThread{
-//                        studyAdapter.updateUsers( users )
-//                    }
+                    activity!!.runOnUiThread{
+                        usersAdapter.updateUsers( users )
+                    }
                 }
             }
         }
@@ -233,7 +195,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         enumArea.id?.let { enum_area_id ->
             val team = Team( enum_area_id, name )
             DAO.teamDAO.createTeam( team )
-            manageEnumerationAreaAdapter.updateTeams( DAO.teamDAO.getTeams( enum_area_id ))
+            teamsAdapter.updateTeams( DAO.teamDAO.getTeams( enum_area_id ))
         }
     }
 
@@ -243,9 +205,9 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         compositeDisposable.clear()
 
-        if (gpsSamleWifiManager != null)
+        if (this::gpsSampleWifiManager.isInitialized)
         {
-            gpsSamleWifiManager!!.stopHotSpot()
+            gpsSampleWifiManager.stopHotSpot()
         }
 
         _binding = null
