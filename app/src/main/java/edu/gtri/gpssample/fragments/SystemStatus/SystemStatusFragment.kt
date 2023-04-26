@@ -263,8 +263,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SystemStatusFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        udpBroadcaster = null
-
         binding.configCheckBox.isChecked = false
         binding.studyCheckBox.isChecked = false
         binding.fieldsCheckBox.isChecked = false
@@ -437,10 +435,15 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         {
             super.onCapabilitiesChanged(network, networkCapabilities)
 
-            val not_suspended = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
-            val validated = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-            val trusted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-            val not_restricted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+//            val not_suspended = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
+//            val validated = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+//            val trusted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+//            val not_restricted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+//
+//            Log.d( "xxx", "not_suspended = ${not_suspended}")
+//            Log.d( "xxx", "validated = ${validated}")
+//            Log.d( "xxx", "trusted = ${trusted}")
+//            Log.d( "xxx", "not_restricted = ${not_restricted}")
 
             if (udpBroadcaster == null && networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED))
             {
@@ -456,14 +459,14 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             super.onLinkPropertiesChanged(network, linkProperties)
 
 //            val serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
-//            // linkProperties.linkAddresses[0] is the IPV6 address
-//            val myAddress = linkProperties.linkAddresses[1].toString().substring(0, linkProperties.linkAddresses[1].toString().length-3)
-//
-//            val components = serverAddress.split(".")
-//            val server_udp_address = components[0] + "." + components[1] + "." + components[2] + ".255"
-//
-//            myInetAddress = InetAddress.getByName( myAddress )
-//            broadcastInetAddress = InetAddress.getByName( server_udp_address )
+            // linkProperties.linkAddresses[0] is the IPV6 address
+            val myAddress = linkProperties.linkAddresses[1].toString().substring(0, linkProperties.linkAddresses[1].toString().length-3)
+
+            val components = myAddress.split(".")
+            val server_udp_address = components[0] + "." + components[1] + "." + components[2] + ".255"
+
+            myInetAddress = InetAddress.getByName( myAddress )
+            broadcastInetAddress = InetAddress.getByName( server_udp_address )
         }
     }
 
@@ -627,6 +630,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     override fun onDestroyView()
     {
         super.onDestroyView()
+
+        udpBroadcaster?.closeSocket()
 
         _binding = null
     }
