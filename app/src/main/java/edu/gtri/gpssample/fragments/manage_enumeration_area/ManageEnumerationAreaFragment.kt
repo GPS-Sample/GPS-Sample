@@ -118,7 +118,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             })
             .addTo( compositeDisposable )
 
-        binding.generateBarcodeButton.setOnClickListener {
+        binding.generateQrButton.setOnClickListener {
             if (!this::gpsSampleWifiManager.isInitialized)
             {
                 binding.progressBar.visibility = View.VISIBLE
@@ -127,8 +127,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             }
         }
 
-        binding.finishButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+        binding.exportButton.setOnClickListener {
         }
     }
 

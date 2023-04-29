@@ -3,9 +3,7 @@ package edu.gtri.gpssample.fragments.configuration
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -88,8 +86,10 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.doneButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+        binding.generateQrButton.setOnClickListener {
+        }
+
+        binding.exportButton.setOnClickListener {
         }
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -122,12 +122,6 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                 sharedViewModel.createStudyModel.setStudy(config.currentStudy!!) // ugh!
             }
         }
-    }
-    override fun onDestroyView()
-    {
-        super.onDestroyView()
-
-        _binding = null
     }
 
     private fun didSelectStudy(study: Study)
@@ -194,5 +188,12 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
             sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
             findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
         }
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }

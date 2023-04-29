@@ -96,9 +96,16 @@ class SignInFragment : Fragment()
                                 R.id.action_navigate_to_ManageConfigurationsFragment,
                                 bundle
                             )
-                        } else {
+                        }
+                        else if (role == Role.Supervisor.toString()) {
                             findNavController().navigate(
-                                R.id.action_navigate_to_SystemStatusFragment,
+                                R.id.action_navigate_to_ManageConfigurationsFragment,
+                                bundle
+                            )
+                        }
+                        else {
+                            findNavController().navigate(
+                                R.id.action_navigate_to_EnumeratorFragment,
                                 bundle
                             )
                         }
@@ -171,7 +178,7 @@ class SignInFragment : Fragment()
                 }
                 else
                 {
-                    findNavController().navigate(R.id.action_navigate_to_SystemStatusFragment, bundle)
+                    findNavController().navigate(R.id.action_navigate_to_EnumeratorFragment, bundle)
                 }
             }
         }

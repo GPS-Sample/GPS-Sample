@@ -11,6 +11,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -51,6 +52,15 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageConfigurationsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+
+        val user = (activity!!.application as MainApplication).user
+
+        user?.let { user ->
+            if (user.role == Role.Supervisor.toString())
+            {
+                binding.addButton.visibility = View.GONE
+            }
+        }
 
         binding.addButton.setOnClickListener {
             sharedViewModel.createNewConfiguration()

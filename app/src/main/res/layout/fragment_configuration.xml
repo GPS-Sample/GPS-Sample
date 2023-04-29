@@ -149,11 +149,12 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:textSize="17sp"
-                    android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
-                     />
+                    android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"/>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
@@ -163,34 +164,37 @@
                     android:text="@string/enumeration_area"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingLeft="16dp"
-                    android:paddingRight="16dp" >
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/map_fragment"
-                    android:layout_width="300dp"
-                    android:layout_height="200dp"
-                    android:layout_centerHorizontal="true"
-                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+                    android:paddingRight="16dp">
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/map_fragment"
+                        android:layout_width="300dp"
+                        android:layout_height="200dp"
+                        android:layout_centerHorizontal="true"
+                        android:name="com.google.android.gms.maps.SupportMapFragment" />
                 </RelativeLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/enum_areas_recycler"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    android:layout_height="0dp"
-                    />
-
+                    android:layout_height="0dp" />
 
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
+
                 <FrameLayout
                     android:layout_marginBottom="2dp"
                     android:layout_width="match_parent"
@@ -216,14 +220,25 @@
                     android:layout_height="100dp"/>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
+
         <Button
-            android:id="@+id/done_button"
+            android:id="@+id/generate_qr_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:layout_gravity="bottom"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/done" />
+            android:text="Generate QR Code" />
+
+            <Button
+                android:id="@+id/export_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Export Configuration" />
     </LinearLayout>
 </layout>

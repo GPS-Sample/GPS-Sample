@@ -36,14 +36,26 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
 
-<!--    <Button-->
-<!--        android:id="@+id/quick_start_button"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="50dp"-->
-<!--        android:layout_margin="20dp"-->
-<!--        android:insetTop="0dp"-->
-<!--        android:insetBottom="0dp"-->
-<!--        android:layout_centerInParent="true"-->
-<!--        android:text="Quick Start" />-->
+    <Button
+        android:id="@+id/scan_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:layout_centerInParent="true"
+        android:text="Scan QR Code" />
+
+    <Button
+        android:id="@+id/import_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="20dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:layout_centerInParent="true"
+        android:text="Import Configuration" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

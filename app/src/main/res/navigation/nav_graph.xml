@@ -45,6 +45,22 @@
             app:destination="@id/ManageConfigurationsFragment" />
 
         <action
+            android:id="@+id/action_navigate_to_EnumeratorFragment"
+            app:destination="@id/EnumeratorFragment" />
+    </fragment>
+
+    <!-- EnumeratorFragment   -->
+
+    <fragment
+        android:id="@+id/EnumeratorFragment"
+        android:name="edu.gtri.gpssample.fragments.enumerator.EnumeratorFragment"
+        tools:layout="@layout/fragment_enumerator">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:destination="@id/ManageConfigurationsFragment" />
+
+        <action
             android:id="@+id/action_navigate_to_SystemStatusFragment"
             app:destination="@id/SystemStatusFragment" />
     </fragment>

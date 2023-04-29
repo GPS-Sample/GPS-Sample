@@ -102,18 +102,17 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 //            })
 //            .addTo( compositeDisposable )
 
-        binding.generateBarcodeButton.setOnClickListener {
+        binding.generateQrButton.setOnClickListener {
             binding.progressBar.visibility = View.VISIBLE
             gpsSamleWifiManager = GPSSampleWifiManager( this )
             gpsSamleWifiManager!!.startHotSpot()
         }
 
-        binding.performEnumerationButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+        binding.exportButton.setOnClickListener {
         }
 
-        binding.finishButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
+        binding.performEnumerationButton.setOnClickListener {
+            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
         }
     }
 
