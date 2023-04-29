@@ -90,6 +90,11 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         }
 
         binding.exportButton.setOnClickListener {
+
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                val packedConfig = config.pack()
+                Log.d( "xxx", packedConfig )
+            }
         }
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -118,8 +123,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         sharedViewModel.currentConfiguration?.value?.let { config ->
             if(config.studies.count() > 0)
             {
-                config.currentStudy = config.studies[0]
-                sharedViewModel.createStudyModel.setStudy(config.currentStudy!!) // ugh!
+                sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
         }
     }
@@ -183,11 +187,8 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
-        sharedViewModel.currentConfiguration?.value?.currentStudy?.let{study ->
-
-            sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
-        }
+        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
     }
 
     override fun onDestroyView()

@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
-@Serializable (with = ConfigSerializer::class)
+@Serializable
 data class Config(
     var id : Int? = null,
     var uuid: String,
@@ -28,16 +28,16 @@ data class Config(
     var timeFormat: TimeFormat,
     var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
-    var currentStudy : Study?,
     var studies : ArrayList<Study>,
     var enumAreas : List<EnumArea>?
-    ) : java.io.Serializable {
+    )
+{
     constructor(uuid: String, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
         minGpsPrecision: Int) : this(null, uuid, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
-                                    null,ArrayList<Study>(), null)
+                                    ArrayList<Study>(), null)
     constructor(id: Int?, uuid: String, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int) : this(id, uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
-                null,ArrayList<Study>(), null)
+                ArrayList<Study>(), null)
 
     var minimumGPSPrecision : String
         get() = minGpsPrecision.toString()
@@ -58,36 +58,5 @@ data class Config(
         {
             return Json.decodeFromString<Config>( message )
         }
-    }
-}
-
-object ConfigSerializer : KSerializer<Config> {
-    private val charset = Charsets.UTF_8
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Config", PrimitiveKind.STRING)
-    override fun serialize(encoder: Encoder, value: Config) {
-
-        encoder.encodeString(serializeToString(value))
-    }
-
-    override fun deserialize(decoder: Decoder): Config {
-
-        return deserializeFromString(decoder.decodeString())
-    }
-
-    private fun serializeToString( config: Config) : String
-    {
-        var baos = ByteArrayOutputStream()
-        var oos = ObjectOutputStream(baos)
-        oos.writeObject(config)
-        oos.close()
-        return baos.toByteArray().toString(charset)
-    }
-
-    private fun deserializeFromString(str : String) : Config
-    {
-        val byteArray = str.toByteArray(charset)
-        var bais = ByteArrayInputStream(byteArray)
-        var ois = ObjectInputStream(bais)
-        return ois.readObject() as Config
     }
 }
