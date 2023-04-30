@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -92,11 +93,12 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                 val packedConfig = config.pack()
                 Log.d( "xxx", packedConfig )
                 val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                val file = File(root, "config.${Date().time}.json")
+                val file = File(root, "${config.name}.${Date().time}.json")
                 val writer = FileWriter(file)
                 writer.append(packedConfig)
                 writer.flush()
                 writer.close()
+                Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
             }
         }
 

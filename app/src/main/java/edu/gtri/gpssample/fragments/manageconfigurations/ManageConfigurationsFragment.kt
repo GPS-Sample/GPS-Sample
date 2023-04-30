@@ -36,8 +36,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        setHasOptionsMenu( true )
-
         _binding = FragmentManageConfigurationsBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -141,31 +139,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             sharedViewModel.deleteConfig(it)
             manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater.inflate(R.menu.menu_manage_configurations, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-//        when (item.itemId) {
-//            R.id.action_create_configuration -> {
-//                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment )
-//                return true
-//            }
-//            R.id.action_quick_start -> {
-//                val bundle = Bundle()
-//                bundle.putBoolean( Key.kQuickStart.toString(), true )
-//                findNavController().navigate( R.id.action_navigate_to_CreateConfigurationFragment, bundle )
-//                return true
-//            }
-//        }
-
-        return false
     }
 
     override fun onDestroyView()
