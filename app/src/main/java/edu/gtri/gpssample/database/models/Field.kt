@@ -10,7 +10,6 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Field(
     var id : Int? = null,
-    var uuid: String,
     var name: String,
     var type: FieldType,
     var pii: Boolean,
@@ -23,9 +22,9 @@ data class Field(
     var option3: String,
     var option4: String )
 {
-    constructor(uuid: String, name: String, type: FieldType, pii: Boolean, required: Boolean,
+    constructor(name: String, type: FieldType, pii: Boolean, required: Boolean,
                 integerOnly: Boolean, date: Boolean, time: Boolean, option1: String, option2: String,
-                option3: String, option4: String ) : this(null, uuid, name, type,
+                option3: String, option4: String ) : this(null, name, type,
                 pii, required, integerOnly, date, time, option1, option2, option3, option4)
 
     fun copy() : Field

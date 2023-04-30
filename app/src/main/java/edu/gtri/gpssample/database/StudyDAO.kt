@@ -68,8 +68,6 @@ class StudyDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun putStudy( study: Study, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, study.uuid )
-        values.put( DAO.COLUMN_STUDY_CONFIG_UUID, study.config_uuid )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
 
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
@@ -81,49 +79,11 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX, index )
     }
 
-    //--------------------------------------------------------------------------
-    fun exists( uuid: String ) : Boolean
-    {
-        return getStudy( uuid ) != null
-    }
-
-    //--------------------------------------------------------------------------
-    fun doesNotExist( uuid: String ) : Boolean
-    {
-        return !exists( uuid )
-    }
-
-    //--------------------------------------------------------------------------
-    fun getStudy( uuid: String ): Study?
-    {
-        var study: Study? = null
-        val db = dao.writableDatabase
-        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = db.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            study = buildStudy( cursor )
-            // now get fields
-            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
-
-            // and filters
-            Log.d("xxxx ", "")
-        }
-
-        cursor.close()
-        db.close()
-
-        return study
-    }
-
     fun getStudy( id: Int ): Study?
     {
         var study: Study? = null
         val db = dao.writableDatabase
-        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_ID} = '$id'"
+        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_ID} = $id"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -151,8 +111,6 @@ class StudyDAO(private var dao: DAO)
     private fun buildStudy(cursor: Cursor ): Study
     {
         val id = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_ID}"))
-        val uuid = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_UUID}"))
-        val config_uuid = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_CONFIG_UUID}"))
         val name = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_NAME}"))
         val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX}"))
         val sampleSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE}"))
@@ -161,7 +119,7 @@ class StudyDAO(private var dao: DAO)
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
-        return Study( id, uuid, config_uuid, name, samplingMethod, sampleSize, sampleType )
+        return Study( id, name, samplingMethod, sampleSize, sampleType )
     }
 
     //--------------------------------------------------------------------------
@@ -209,8 +167,8 @@ class StudyDAO(private var dao: DAO)
             }
 
             val db = dao.writableDatabase
-            val whereClause = "${DAO.COLUMN_UUID} = ?"
-            val args = arrayOf(study.uuid.toString())
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args = arrayOf(study.id.toString())
 
             db.delete(DAO.TABLE_STUDY, whereClause, args)
             db.close()

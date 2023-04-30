@@ -92,7 +92,7 @@ class TeamDAO(private var dao: DAO)
     fun deleteTeam( team: Team )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(team.id.toString())
 
         db.delete(DAO.TABLE_TEAM, whereClause, args)

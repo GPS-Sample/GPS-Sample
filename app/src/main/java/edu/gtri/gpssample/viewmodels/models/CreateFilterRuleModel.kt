@@ -33,7 +33,7 @@ class CreateFilterRuleModel {
 
     fun createNewFilterRule()
     {
-        _currentFilterRule = MutableLiveData(FilterRule(UUID.randomUUID().toString(),-1))
+        _currentFilterRule = MutableLiveData(FilterRule(-1))
         currentFilterRule = _currentFilterRule
     }
 

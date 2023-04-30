@@ -13,7 +13,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableUser = ("CREATE TABLE " +
                 TABLE_USER + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_USER_ROLE + " TEXT" +  "," +
                 COLUMN_USER_NAME + " TEXT" + "," +
                 COLUMN_USER_PIN + " INTEGER" + "," +
@@ -26,7 +25,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
 
                 // this needs to be a look up table
@@ -41,12 +39,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
 
                 COLUMN_CONFIG_ID + " INTEGER" + "," +
-                // REMOVE THIS
-                COLUMN_STUDY_CONFIG_UUID + " TEXT" + "," +
 
                 // this needs to be a look up table
                 COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
@@ -71,7 +66,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FIELD_NAME + " TEXT" + "," +
 
                 COLUMN_STUDY_ID + " INTEGER" + "," +
@@ -94,7 +88,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableRule = ("CREATE TABLE " +
                 TABLE_RULE + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
 
                 // i think we can just use one key here.  if a field is connected to a study and
                 // a rule is connected to a field
@@ -112,7 +105,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableFilter = ("CREATE TABLE " +
                 TABLE_FILTER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                COLUMN_UUID + " TEXT" + "," +
                 // this needs to be a foreign key
                 COLUMN_FILTER_NAME + " TEXT" + "," +
                 COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
@@ -127,7 +119,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
                 COLUMN_FILTER_ID + " INTEGER" + "," +
                 COLUMN_RULE_ID + " INTEGER" + "," +
@@ -136,21 +127,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFilterRule)
-
-        val createTableSample = ("CREATE TABLE " +
-                TABLE_SAMPLE + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
-
-                COLUMN_STUDY_ID + " INTEGER" + "," +
-                // this needs to be a foreign key
-                COLUMN_SAMPLE_STUDY_UUID + " TEXT" + "," +
-
-                COLUMN_SAMPLE_NAME + " TEXT" + "," +
-                COLUMN_SAMPLE_NUM_ENUMERATORS + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableSample)
 
         val createTableEnumArea = ("CREATE TABLE " +
                 TABLE_ENUM_AREA + "(" +
@@ -236,8 +212,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTERRULE")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_NAV_PLAN")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_MEMBER")
@@ -254,7 +228,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         private const val DATABASE_NAME = "GPSSampleDB.db"
 
         const val COLUMN_ID = "id"
-        const val COLUMN_UUID = "uuid"
         const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
 
         // foreign key columns
@@ -294,7 +267,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
 
-        const val COLUMN_STUDY_CONFIG_UUID = "study_config_id"
         const val COLUMN_STUDY_SAMPLING_METHOD_INDEX = "study_sampling_method_index"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
@@ -302,7 +274,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Field Table
         const val TABLE_FIELD = "field"
         const val COLUMN_FIELD_NAME = "field_name"
-        const val COLUMN_FIELD_STUDY_UUID = "field_study_id"
         const val COLUMN_FIELD_TYPE_INDEX = "field_type_index"
         const val COLUMN_FIELD_PII = "field_pii"
         const val COLUMN_FIELD_REQUIRED = "field_required"
@@ -316,50 +287,24 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // Rule Table
         const val TABLE_RULE = "rule"
-        const val COLUMN_RULE_STUDY_UUID = "rule_study_id"
-        const val COLUMN_RULE_FIELD_UUID = "rule_field_id"
         const val COLUMN_RULE_NAME = "rule_name"
 
         const val COLUMN_RULE_VALUE = "rule_value"
 
         // Filter Table
         const val TABLE_FILTER = "filter"
-        const val COLUMN_FILTER_STUDY_UUID = "filter_study_id"
         const val COLUMN_FILTER_NAME = "filter_name"
         const val COLUMN_FILTER_SAMPLE_SIZE = "filter_sample_size"
         const val COLUMN_FILTER_SAMPLE_TYPE_INDEX = "filter_sample_type_index"
 
         // FilterRule Table
         const val TABLE_FILTERRULE = "filterrule"
-//        const val COLUMN_FILTERRULE_STUDY_UUID = "filterrule_study_id"
-//        const val COLUMN_FILTERRULE_FILTER_UUID = "filterrule_filter_id"
-//        const val COLUMN_FILTERRULE_RULE_UUID = "filterrule_rule_id"
         const val COLUMN_FILTERRULE_ORDER = "filterrule_order"
         const val COLUMN_FILTERRULE_CONNECTOR_INDEX = "filterrule_connector_index"
 
-        // Sample Table
-        const val TABLE_SAMPLE = "sample"
-        const val COLUMN_SAMPLE_STUDY_UUID = "sample_study_id"
-        const val COLUMN_SAMPLE_NAME = "sample_name"
-        const val COLUMN_SAMPLE_NUM_ENUMERATORS = "sample_num_enumerators"
-
-        // NavigationPlan Table
-        const val TABLE_NAV_PLAN = "nav_plan"
-        const val COLUMN_NAV_PLAN_SAMPLE_UUID = "nav_plan_sample_id"
-        const val COLUMN_NAV_PLAN_NAME = "nav_plan_name"
-
         // EnumArea Table
         const val TABLE_ENUM_AREA = "enum_area"
-        const val COLUMN_ENUM_AREA_CONFIG_UUID = "enum_area_config_uuid"
         const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
-        const val COLUMN_ENUM_AREA_TL_LAT = "enum_area_tl_lat"
-        const val COLUMN_ENUM_AREA_TL_LON = "enum_area_tl_lon"
-        const val COLUMN_ENUM_AREA_TR_LAT = "enum_area_tr_lat"
-        const val COLUMN_ENUM_AREA_TR_LON = "enum_area_tr_lon"
-        const val COLUMN_ENUM_AREA_BR_LAT = "enum_area_br_lat"
-        const val COLUMN_ENUM_AREA_BR_LON = "enum_area_br_lon"
-        const val COLUMN_ENUM_AREA_BL_LAT = "enum_area_bl_lat"
-        const val COLUMN_ENUM_AREA_BL_LON = "enum_area_bl_lon"
 
         // Team Table
         const val TABLE_TEAM = "team"
@@ -370,8 +315,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
 
         const val TABLE_ENUM_DATA = "enum_data"
-//        const val COLUMN_USER_ID = "user_id"
-//        const val COLUMN_STUDY_ID = "study_id"
         const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
         const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
         const val COLUMN_ENUM_DATA_IS_LOCATION = "enum_data_is_location"
@@ -379,8 +322,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUM_DATA_IMAGE_FILE_NAME = "enum_data_image_file_name"
 
         const val TABLE_FIELD_DATA = "field_data"
-//        const val COLUMN_FIELD_ID = "field_id"
-//        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
         const val COLUMN_FIELD_DATA_TEXT_VALUE = "field_data_text_value"
         const val COLUMN_FIELD_DATA_NUMBER_VALUE = "field_data_number_value"
         const val COLUMN_FIELD_DATA_DATE_VALUE = "field_data_date_value"
@@ -393,7 +334,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_LAT_LON = "lat_lon"
         const val COLUMN_LAT = "lat"
         const val COLUMN_LON = "lon"
-//        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
 
         // DAO's
         lateinit var userDAO: UserDAO
@@ -403,8 +343,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
         lateinit var filterRuleDAO: FilterRuleDAO
-        lateinit var sampleDAO: SampleDAO
-        lateinit var navPlanDAO: NavPlanDAO
         lateinit var enumAreaDAO: EnumAreaDAO
         lateinit var teamDAO: TeamDAO
         lateinit var teamMemberDAO: TeamMemberDAO
@@ -429,8 +367,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 ruleDAO = RuleDAO( instance!! )
                 filterDAO = FilterDAO( instance!! )
                 filterRuleDAO = FilterRuleDAO( instance!! )
-                sampleDAO = SampleDAO( instance!! )
-                navPlanDAO = NavPlanDAO( instance!! )
                 enumAreaDAO = EnumAreaDAO( instance!! )
                 teamDAO = TeamDAO( instance!! )
                 teamMemberDAO = TeamMemberDAO( instance!! )
@@ -442,6 +378,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 102
+        private const val DATABASE_VERSION = 103
     }
 }

@@ -29,12 +29,12 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getConfig( uuid: String ): Config?
+    fun getConfig( id: Int ): Config?
     {
         var config: Config? = null
 
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_ID} = $id"
 
         val cursor = db.rawQuery(query, null)
 
@@ -55,23 +55,10 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun exists( uuid: String ) : Boolean
-    {
-        return getConfig( uuid ) != null
-    }
-
-    //--------------------------------------------------------------------------
-    fun doesNotExist( uuid: String ) : Boolean
-    {
-        return !exists( uuid )
-    }
-
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun buildConfig(cursor: Cursor ) : Config
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
         val distanceFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX))
         val dateFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT_INDEX))
@@ -83,7 +70,7 @@ class ConfigDAO(private var dao: DAO)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( id, uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
+        return Config( id, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
     }
 
     //--------------------------------------------------------------------------
@@ -135,7 +122,6 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putConfig( config: Config, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, config.uuid )
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
 
@@ -155,6 +141,7 @@ class ConfigDAO(private var dao: DAO)
         values.put(DAO.COLUMN_CONFIG_ID, config.id)
         values.put(DAO.COLUMN_STUDY_ID, study.id)
     }
+
     //--------------------------------------------------------------------------
     fun updateConfig( config: Config )
     {
@@ -184,29 +171,11 @@ class ConfigDAO(private var dao: DAO)
 //        }
 
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(config.uuid.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args = arrayOf(config.id.toString())
 
         db.delete(DAO.TABLE_CONFIG, whereClause, args)
         db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteAllConfigs()
-    {
-//        val studies = DAO.studyDAO.getStudies()
-//
-//        for (study in studies)
-//        {
-//            DAO.studyDAO.deleteStudy( study )
-//        }
-//
-//        val configs = DAO.configDAO.getConfigs()
-//
-//        for (config in configs)
-//        {
-//            DAO.configDAO.deleteConfig( config )
-//        }
     }
 
     private fun updateStudies(config : Config)

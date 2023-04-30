@@ -1,13 +1,11 @@
-package edu.gtri.gpssample.fragments.SignIn
+package edu.gtri.gpssample.fragments.sign_in
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -96,9 +94,16 @@ class SignInFragment : Fragment()
                                 R.id.action_navigate_to_ManageConfigurationsFragment,
                                 bundle
                             )
-                        } else {
+                        }
+                        else if (role == Role.Supervisor.toString()) {
                             findNavController().navigate(
-                                R.id.action_navigate_to_SystemStatusFragment,
+                                R.id.action_navigate_to_ManageConfigurationsFragment,
+                                bundle
+                            )
+                        }
+                        else {
+                            findNavController().navigate(
+                                R.id.action_navigate_to_EnumeratorFragment,
                                 bundle
                             )
                         }
@@ -171,7 +176,7 @@ class SignInFragment : Fragment()
                 }
                 else
                 {
-                    findNavController().navigate(R.id.action_navigate_to_SystemStatusFragment, bundle)
+                    findNavController().navigate(R.id.action_navigate_to_EnumeratorFragment, bundle)
                 }
             }
         }

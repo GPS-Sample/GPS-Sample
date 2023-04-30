@@ -23,8 +23,6 @@ class RuleDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun putRule( rule: Rule, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, rule.uuid )
-
         values.put( DAO.COLUMN_RULE_NAME, rule.name )
 
         values.put( DAO.COLUMN_RULE_VALUE, rule.value )
@@ -41,8 +39,8 @@ class RuleDAO(private var dao: DAO)
     fun updateRule( rule: Rule )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(rule.uuid.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(rule.id.toString())
         val values = ContentValues()
 
         putRule( rule, values )
@@ -52,24 +50,10 @@ class RuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun exists( uuid: String ) : Boolean
-    {
-        return false//getRule( uuid ) != null
-    }
-
-    //--------------------------------------------------------------------------
-    fun doesNotExist( uuid: String ) : Boolean
-    {
-        return !exists( uuid )
-    }
-
-
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun  buildRule(cursor: Cursor, field : Field): Rule
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         //val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
 
@@ -78,7 +62,7 @@ class RuleDAO(private var dao: DAO)
         val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
 
         val operator = OperatorConverter.fromIndex(operatorId)
-        return Rule( id, uuid, field, name, operator, value )
+        return Rule( id, field, name, operator, value )
     }
 
     fun getRulesForField(field : Field) : List<Rule>

@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/action_generate_qr_code"
+        android:title="Generate QR Code"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_export_config"
+        android:title="Export Configuration"
+        app:showAsAction="never" />
+</menu>

@@ -22,6 +22,13 @@ class UDPBroadcaster
     private var datagramSocket: DatagramSocket? = null
     private lateinit var delegate: UDPBroadcasterDelegate
 
+    constructor()
+    {
+        datagramSocket = DatagramSocket(port)
+        datagramSocket!!.broadcast = true
+        datagramSocket!!.reuseAddress = true
+    }
+
     //--------------------------------------------------------------------------
     interface UDPBroadcasterDelegate
     {
@@ -33,13 +40,6 @@ class UDPBroadcaster
     {
         val backgroundResult = withContext(Dispatchers.Default)
         {
-            if (datagramSocket == null)
-            {
-                datagramSocket = DatagramSocket(port,myInetAddress)
-                datagramSocket!!.broadcast = true
-                datagramSocket!!.reuseAddress = true
-            }
-
             Log.d( "xxx", "transmitting command on $myInetAddress:$port to ${broadcastInetAddress}:$port" )
 
             datagramSocket!!.send( DatagramPacket( message.toByteArray(), message.length, broadcastInetAddress, port ))
@@ -53,13 +53,6 @@ class UDPBroadcaster
 
         val backgroundResult = withContext(Dispatchers.Default)
         {
-            if (datagramSocket == null)
-            {
-                datagramSocket = DatagramSocket(port)
-                datagramSocket!!.broadcast = true
-                datagramSocket!!.reuseAddress = true
-            }
-
             Log.d( "xxx", "waiting for UDP messages on $myInetAddress:$port..." )
 
             var enabled = true
@@ -107,21 +100,21 @@ class UDPBroadcaster
         {
             NetworkCommand.NetworkConfigRequest -> {
 
-                fragment.lifecycleScope.launch {
-                    DAO.configDAO.getConfig( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkConfigResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress, broadcastInetAddress, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "config<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.configDAO.getConfig( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkConfigResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress, broadcastInetAddress, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "config<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkStudyRequest -> {
-                fragment.lifecycleScope.launch {
-                    DAO.studyDAO.getStudy( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkStudyResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.studyDAO.getStudy( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkStudyResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkFieldsRequest -> {

@@ -29,7 +29,6 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
     private var _binding: FragmentCreateFilterBinding? = null
     private val binding get() = _binding!!
     private lateinit var createFilterAdapter: CreateFilterAdapter
-    private lateinit var study_uuid: String
     private lateinit var filter: Filter
     private var sampleSizeIsVisible = true
     private lateinit var sharedViewModel : ConfigurationViewModel

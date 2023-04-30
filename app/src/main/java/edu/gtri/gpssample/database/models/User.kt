@@ -9,7 +9,6 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class User(
     var id : Int? = null,
-    var uuid: String,
     var name: String,
     var pin: Int,
     var role: String,
@@ -17,9 +16,9 @@ data class User(
     var recoveryAnswer: String,
     var isOnline: Boolean )
 {
-    constructor(uuid: String, name: String, pin: Int, role: String,
+    constructor(name: String, pin: Int, role: String,
                 recoveryQuestion: String, recoveryAnswer: String, isOnline: Boolean) :
-                this(null,uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline)
+                this(null, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline)
     fun pack() : String
     {
         return Json.encodeToString( this )

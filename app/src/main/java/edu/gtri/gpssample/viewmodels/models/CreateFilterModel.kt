@@ -42,8 +42,7 @@ class CreateFilterModel {
     val createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
     fun createNewFilter()
     {
-        val newFilter = Filter(
-            UUID.randomUUID().toString(),"" )
+        val newFilter = Filter("" )
         _currentFilter = MutableLiveData(newFilter)
         currentFilter = _currentFilter
     }

@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.configuration
 
 import android.os.Bundle
+import android.os.Environment
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,21 +19,22 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolygonOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.manage_enumeration_areas.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.io.File
+import java.io.FileWriter
+import java.util.*
 
 class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener, ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var quickStart = false
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -72,12 +74,6 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
             configurationFragment = this@ConfigurationFragment
         }
 
-        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
-
-        quick_start?.let {
-            quickStart = it
-        }
-
         binding.editImageView.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
@@ -88,8 +84,22 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.doneButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+        binding.generateQrButton.setOnClickListener {
+        }
+
+        binding.exportButton.setOnClickListener {
+
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                val packedConfig = config.pack()
+                Log.d( "xxx", packedConfig )
+                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                val file = File(root, "${config.name}.${Date().time}.json")
+                val writer = FileWriter(file)
+                writer.append(packedConfig)
+                writer.flush()
+                writer.close()
+                Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -118,16 +128,9 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         sharedViewModel.currentConfiguration?.value?.let { config ->
             if(config.studies.count() > 0)
             {
-                config.currentStudy = config.studies[0]
-                sharedViewModel.createStudyModel.setStudy(config.currentStudy!!) // ugh!
+                sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
         }
-    }
-    override fun onDestroyView()
-    {
-        super.onDestroyView()
-
-        _binding = null
     }
 
     private fun didSelectStudy(study: Study)
@@ -189,10 +192,14 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
-        sharedViewModel.currentConfiguration?.value?.currentStudy?.let{study ->
+        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
+    }
 
-            sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
-        }
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }
