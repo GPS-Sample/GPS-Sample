@@ -1,10 +1,12 @@
 package edu.gtri.gpssample.fragments.configuration
 
 import android.os.Bundle
+import android.os.Environment
 import android.text.InputType
 import android.util.Log
-import android.view.*
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -16,10 +18,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolygonOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
@@ -27,6 +29,9 @@ import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.fragments.manage_enumeration_areas.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.io.File
+import java.io.FileWriter
+import java.util.*
 
 class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener, ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -94,6 +99,12 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 val packedConfig = config.pack()
                 Log.d( "xxx", packedConfig )
+                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                val file = File(root, "config.${Date().time}.json")
+                val writer = FileWriter(file)
+                writer.append(packedConfig)
+                writer.flush()
+                writer.close()
             }
         }
 
