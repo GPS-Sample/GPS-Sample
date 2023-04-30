@@ -140,7 +140,7 @@ class ConfigurationViewModel : ViewModel()
     }
     fun createNewConfiguration()
     {
-        val newConfig = Config( UUID.randomUUID().toString(), "", DateFormat.None, TimeFormat.None,
+        val newConfig = Config("", DateFormat.None, TimeFormat.None,
                                 DistanceFormat.None, 0 )
         _currentConfiguration = MutableLiveData(newConfig)
         currentConfiguration = _currentConfiguration

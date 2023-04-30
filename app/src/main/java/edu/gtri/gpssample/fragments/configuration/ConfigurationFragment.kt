@@ -27,7 +27,6 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.manage_enumeration_areas.ManageEnumerationAreasAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.io.File
 import java.io.FileWriter
@@ -35,7 +34,6 @@ import java.util.*
 
 class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener, ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var quickStart = false
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -73,12 +71,6 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
             // Assign the fragment
             configurationFragment = this@ConfigurationFragment
-        }
-
-        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
-
-        quick_start?.let {
-            quickStart = it
         }
 
         binding.editImageView.setOnClickListener {

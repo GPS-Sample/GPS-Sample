@@ -28,7 +28,6 @@ class FilterRuleDAO(private var dao: DAO)
     private fun putFilterRule( filterRule: FilterRule, filter: Filter, values: ContentValues )
     {
         // this only works if the rule is set on the filterrule and it's in the database
-        values.put( DAO.COLUMN_UUID, filterRule.uuid )
         values.put( DAO.COLUMN_FILTER_ID, filter.id!! )
         values.put( DAO.COLUMN_RULE_ID, filterRule.rule!!.id!! )
         val cntrIndex = ConnectorConverter.toIndex(filterRule.connector)
@@ -39,8 +38,8 @@ class FilterRuleDAO(private var dao: DAO)
     fun updateFilterRule( filterRule: FilterRule, filter : Filter )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(filterRule.uuid.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(filterRule.id.toString())
         val values = ContentValues()
 
         putFilterRule( filterRule, filter, values )
@@ -50,44 +49,10 @@ class FilterRuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-//    fun exists( uuid: String ) : Boolean
-//    {
-//        return getFilterRule( uuid ) != null
-//    }
-//
-//    //--------------------------------------------------------------------------
-//    fun doesNotExist( uuid: String ) : Boolean
-//    {
-//        return !exists( uuid )
-//    }
-
-    //--------------------------------------------------------------------------
-//    fun getFilterRule( uuid: String ) : FilterRule?
-//    {
-//        var filterRule: FilterRule? = null
-//        val db = dao.writableDatabase
-//        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-//        val cursor = db.rawQuery(query, null)
-//
-//        if (cursor.count > 0)
-//        {
-//            cursor.moveToNext()
-//
-//            filterRule = createFilterRule( cursor )
-//        }
-//
-//        cursor.close()
-//        db.close()
-//
-//        return filterRule
-//    }
-
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun  buildFilterRule(cursor: Cursor, study : Study ): FilterRule
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val rule_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_ID))
 
@@ -115,7 +80,7 @@ class FilterRuleDAO(private var dao: DAO)
         val connector = ConnectorConverter.fromIndex(
             cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX)))
 
-        return FilterRule(id, uuid, -1, rule, connector)
+        return FilterRule(id, -1, rule, connector)
     }
 
     //--------------------------------------------------------------------------
@@ -143,67 +108,15 @@ class FilterRuleDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-//    fun getFilterRules( study_id: Int, filter_uuid: String ): List<FilterRule>
-//    {
-//        val filterRules = ArrayList<FilterRule>()
-//        val db = dao.writableDatabase
-//        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_STUDY_ID} = '$study_id' AND ${DAO.COLUMN_FILTERRULE_FILTER_UUID} = '$filter_uuid'"
-//        val cursor = db.rawQuery(query, null)
-//
-//        while (cursor.moveToNext())
-//        {
-//            filterRules.add( buildFilterRule( cursor ))
-//        }
-//
-//        cursor.close()
-//        db.close()
-//
-//        return filterRules
-//    }
-
-    //--------------------------------------------------------------------------
-//    fun getFilterRules(): List<FilterRule>
-//    {
-//        val filterRules = ArrayList<FilterRule>()
-//        val db = dao.writableDatabase
-//        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE}"
-//        val cursor = db.rawQuery(query, null)
-//
-//        while (cursor.moveToNext())
-//        {
-//            filterRules.add( buildFilterRule( cursor ))
-//        }
-//
-//        cursor.close()
-//        db.close()
-//
-//        return filterRules
-//    }
-
-    //--------------------------------------------------------------------------
     fun deleteFilterRule( filterRule: FilterRule )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(filterRule.uuid.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args = arrayOf(filterRule.id.toString())
 
-        Log.d( "xxx", "Deleting FilterRule with id: ${filterRule.uuid}")
+        Log.d( "xxx", "Deleting FilterRule with id: ${filterRule.id}")
 
         db.delete(DAO.TABLE_FILTERRULE, whereClause, args)
         db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteOrphans()
-    {
-//        val filterRules = getFilterRules()
-//
-//        for (filterRule in filterRules)
-//        {
-//            if (DAO.studyDAO.doesNotExist( filterRule.study_uuid ) or DAO.filterDAO.doesNotExist( filterRule.filter_uuid ))
-//            {
-//                deleteFilterRule( filterRule )
-//            }
-//        }
     }
 }

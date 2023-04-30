@@ -101,8 +101,6 @@ class CreateStudyModel {
     fun createNewStudy()
     {
         val newStudy = Study(
-            UUID.randomUUID().toString(),
-            "",
             "",
             SamplingMethod.None,
             0,

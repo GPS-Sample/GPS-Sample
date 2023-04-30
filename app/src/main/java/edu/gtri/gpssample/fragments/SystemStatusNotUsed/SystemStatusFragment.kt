@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.SystemStatus
+package edu.gtri.gpssample.fragments.SystemStatusNotUsed
 
 import android.content.Context
 import android.content.Context.WIFI_SERVICE
@@ -17,25 +17,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentSystemStatusBinding
 import edu.gtri.gpssample.network.UDPBroadcaster
-import edu.gtri.gpssample.network.models.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.net.DatagramPacket
 import java.net.InetAddress
-import java.net.NetworkInterface
-import java.util.*
-import kotlin.collections.ArrayList
 
 class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 {
@@ -110,128 +102,24 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
         }
 
         binding.requestConfigButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkConfigRequest, user.uuid, config_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            DAO.configDAO.deleteAllConfigs()
-
-            binding.configCheckBox.isChecked = false
-            binding.studyCheckBox.isChecked = false
-            binding.fieldsCheckBox.isChecked = false
-            binding.rulesCheckBox.isChecked = false
-            binding.fieldsCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
         }
 
         binding.requestStudyButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkStudyRequest, user.uuid, study_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            binding.studyCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
         }
 
         binding.requestFieldsButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkFieldsRequest, user.uuid, study_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            binding.fieldsCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
         }
 
         binding.requestRulesButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkRulesRequest, user.uuid, study_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            binding.rulesCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
         }
 
         binding.requestFiltersButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkFiltersRequest, user.uuid, study_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            binding.filtersCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
         }
 
         binding.requestEnumAreaButton.setOnClickListener {
-//            if (!connected())
-//            {
-//                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
-//
-//            val networkCommand = NetworkCommand( NetworkCommand.NetworkEnumAreaRequest, user.uuid, enum_area_id, "", "" )
-//            val networkCommandMessage = Json.encodeToString( networkCommand )
-//
-//            binding.enumAreaCheckBox.isChecked = false
-//
-//            lifecycleScope.launch {
-//                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-//            }
         }
 
         binding.requestTeamButton.setOnClickListener {
-            if (!connected())
-            {
-                Toast.makeText(activity!!.applicationContext, "You are not connected to WiFi.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkTeamRequest, user.uuid, team_uuid, "", "" )
-            val networkCommandMessage = Json.encodeToString( networkCommand )
-
-            binding.teamCheckBox.isChecked = false
-
-            lifecycleScope.launch {
-                udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-            }
         }
 
         binding.nextButton.setOnClickListener {
@@ -243,16 +131,16 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             {
                 val bundle = Bundle()
 //                bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
-                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+//                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
                 bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
                 findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
             }
             else if (enum_area_id > 0)
             {
                 val bundle = Bundle()
-                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
+//                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
                 bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
-                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
+//                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
             }
         }
     }
@@ -336,8 +224,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
                 this.team_uuid = it as String
             }
 
-            study_uuid = jsonObject.getString( Keys.kStudy_uuid.toString() )
-            config_uuid = jsonObject.getString( Keys.kConfig_uuid.toString() )
+//            study_uuid = jsonObject.getString( Keys.kStudy_uuid.toString() )
+//            config_uuid = jsonObject.getString( Keys.kConfig_uuid.toString() )
 //            enum_area_uuid = jsonObject.getString( Keys.kEnumArea_uuid.toString() )
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
@@ -423,9 +311,9 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             binding.wifiCheckBox.isChecked = true
 
             user.isOnline = true
-            val networkCommand = NetworkCommand( NetworkCommand.NetworkUserRequest, user.uuid, "", "", user.pack() )
-
-            udpBroadcaster?.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
+//            val networkCommand = NetworkCommand( NetworkCommand.NetworkUserRequest, user.uuid, "", "", user.pack() )
+//
+//            udpBroadcaster?.beginTransmitting( myInetAddress, broadcastInetAddress, networkCommand.pack())
         }
     }
 
@@ -472,140 +360,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
 
     override fun didReceiveDatagramPacket( datagramPacket: DatagramPacket )
     {
-        val networkCommand = NetworkCommand.unpack( datagramPacket.data, datagramPacket.length )
-
-        if (networkCommand.uuid == user.uuid)
-        {
-            when( networkCommand.command )
-            {
-                NetworkCommand.NetworkConfigResponse ->
-                {
-                    val config = Config.unpack( networkCommand.message )
-
-                    config_uuid = config.uuid
-
-                    DAO.configDAO.createConfig( config )
-
-                    activity!!.runOnUiThread {
-                        binding.configCheckBox.isChecked = true
-                    }
-                }
-
-                NetworkCommand.NetworkStudyResponse ->
-                {
-//                    val study = Study.unpack( networkCommand.message )
-//
-//                    study_uuid = study.uuid
-//
-//                    DAO.studyDAO.createStudy( study )
-//
-//                    activity!!.runOnUiThread {
-//                        binding.studyCheckBox.isChecked = true
-//                    }
-                }
-
-                NetworkCommand.NetworkFieldsResponse ->
-                {
-                    val networkFields = NetworkFields.unpack(networkCommand.message)
-
-//                    for (field in networkFields.fields)
-//                    {
-//                        DAO.fieldDAO.createField( field )
-//                    }
-
-                    activity!!.runOnUiThread {
-                        binding.fieldsCheckBox.isChecked = true
-                    }
-                }
-
-                NetworkCommand.NetworkRulesResponse ->
-                {
-                    val networkRules = NetworkRules.unpack(networkCommand.message)
-
-                    for (rule in networkRules.rules)
-                    {
-                        DAO.ruleDAO.createRule( rule )
-                    }
-
-                    activity!!.runOnUiThread {
-                        binding.rulesCheckBox.isChecked = true
-                    }
-                }
-
-                NetworkCommand.NetworkFiltersResponse ->
-                {
-                    val networkFilters = NetworkFilters.unpack(networkCommand.message)
-
-                    if (networkFilters.filters.isNotEmpty())
-                    {
-//                        for (filter in networkFilters.filters)
-//                        {
-//                            DAO.filterDAO.createFilter( filter )
-//                        }
-
-                        val networkCommand = NetworkCommand( NetworkCommand.NetworkFilterRulesRequest, user.uuid, study_uuid, "", "" )
-                        val networkCommandMessage = Json.encodeToString( networkCommand )
-
-                        lifecycleScope.launch {
-                            udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-                        }
-                    }
-                }
-
-                NetworkCommand.NetworkFilterRulesResponse ->
-                {
-                    val networkFilterRules = NetworkFilterRules.unpack(networkCommand.message)
-
-                    for (filterRule in networkFilterRules.filterRules)
-                    {
-                    //    DAO.filterRuleDAO.createFilterRule( filterRule )
-                    }
-
-                    activity!!.runOnUiThread {
-                        binding.filtersCheckBox.isChecked = true
-                    }
-                }
-
-                NetworkCommand.NetworkEnumAreaResponse ->
-                {
-//                    val enumArea = EnumArea.unpack( networkCommand.message )
-//
-//                    DAO.enumAreaDAO.createEnumArea( enumArea )
-//
-//                    if (enumArea.shape == Shape.Rectangle.toString())
-//                    {
-//                        val networkCommand = NetworkCommand( NetworkCommand.NetworkRectangleRequest, user.uuid, enumArea.shape_uuid, "", "" )
-//                        val networkCommandMessage = Json.encodeToString( networkCommand )
-//
-//                        lifecycleScope.launch {
-//                            udpBroadcaster?.transmit( myInetAddress, broadcastInetAddress, networkCommandMessage )
-//                        }
-//                    }
-                }
-
-                NetworkCommand.NetworkRectangleResponse ->
-                {
-//                    val rectangle = Rectangle.unpack( networkCommand.message )
-//
-//                    DAO.rectangleDAO.createRectangle( rectangle )
-//
-//                    activity!!.runOnUiThread {
-//                        binding.enumAreaCheckBox.isChecked = true
-//                    }
-                }
-
-                NetworkCommand.NetworkTeamResponse ->
-                {
-                    val team = Team.unpack( networkCommand.message )
-
-                    DAO.teamDAO.createTeam( team )
-
-                    activity!!.runOnUiThread {
-                        binding.teamCheckBox.isChecked = true
-                    }
-                }
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)

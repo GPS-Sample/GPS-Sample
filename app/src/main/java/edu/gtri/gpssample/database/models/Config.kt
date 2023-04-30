@@ -22,7 +22,6 @@ import java.io.ObjectOutputStream
 @Serializable
 data class Config(
     var id : Int? = null,
-    var uuid: String,
     var name: String,
     var dateFormat: DateFormat,
     var timeFormat: TimeFormat,
@@ -32,11 +31,11 @@ data class Config(
     var enumAreas : List<EnumArea>?
     )
 {
-    constructor(uuid: String, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-        minGpsPrecision: Int) : this(null, uuid, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
+    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+        minGpsPrecision: Int) : this(null, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
                                     ArrayList<Study>(), null)
-    constructor(id: Int?, uuid: String, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int) : this(id, uuid, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
+    constructor(id: Int?, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+                minGpsPrecision: Int) : this(id, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
                 ArrayList<Study>(), null)
 
     var minimumGPSPrecision : String

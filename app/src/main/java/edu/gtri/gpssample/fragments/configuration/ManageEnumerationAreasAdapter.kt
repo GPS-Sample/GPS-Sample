@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.manage_enumeration_areas
+package edu.gtri.gpssample.fragments.configuration
 
 import android.annotation.SuppressLint
 import android.content.Context

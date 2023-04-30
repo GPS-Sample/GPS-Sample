@@ -40,7 +40,7 @@ class TeamMemberDAO(private var dao: DAO)
     {
         var teamMember: TeamMember? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM_MEMBER} WHERE ${DAO.COLUMN_UUID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM_MEMBER} WHERE ${DAO.COLUMN_ID} = $id"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -79,7 +79,7 @@ class TeamMemberDAO(private var dao: DAO)
     fun deleteTeamMember( teamMember: TeamMember )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(teamMember.id.toString())
 
         db.delete(DAO.TABLE_TEAM_MEMBER, whereClause, args)

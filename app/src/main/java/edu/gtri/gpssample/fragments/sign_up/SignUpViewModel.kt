@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.SignUp
+package edu.gtri.gpssample.fragments.sign_up
 
 import androidx.lifecycle.ViewModel
 

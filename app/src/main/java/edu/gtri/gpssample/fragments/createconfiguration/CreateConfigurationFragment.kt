@@ -32,7 +32,6 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
     ConfirmationDialog.ConfirmationDialogDelegate {
 
-    private var quickStart = false
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
 
@@ -60,7 +59,6 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        val bundle = Bundle()
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -70,12 +68,6 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
             // Assign the fragment
             createConfigurationFragment = this@CreateConfigurationFragment
-        }
-
-        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
-
-        quick_start?.let {
-            quickStart = it
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
@@ -97,8 +89,6 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
             sharedViewModel.currentConfiguration?.value?.let {config ->
 
-                bundle.putBoolean( Keys.kQuickStart.toString(), quickStart )
-                bundle.putString( Keys.kConfig_uuid.toString(), sharedViewModel.currentConfiguration!!.value!!.uuid )
                 if (config.id == null){
                     sharedViewModel.saveNewConfiguration()
 
@@ -109,12 +99,13 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
                 findNavController().popBackStack()
             }
         }
+
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         binding.addStudyButton.setOnClickListener{
             sharedViewModel.createStudyModel.createNewStudy()
-            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+            findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
         }
 
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()

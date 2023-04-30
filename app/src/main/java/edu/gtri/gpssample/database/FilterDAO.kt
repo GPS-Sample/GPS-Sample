@@ -43,8 +43,6 @@ class FilterDAO(private var dao: DAO)
 
     private fun putFilterRule(filterRule: FilterRule, filter_id : Int, values: ContentValues )
     {
-
-        values.put( DAO.COLUMN_UUID, filterRule.uuid )
         filterRule.rule?.let{rule ->
             values.put(DAO.COLUMN_RULE_ID, rule.id)
         }
@@ -57,7 +55,6 @@ class FilterDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun putFilter( filter: Filter, study_id: Int, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, filter.uuid )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
 
@@ -70,8 +67,8 @@ class FilterDAO(private var dao: DAO)
     fun updateFilter( filter: Filter, study_id: Int )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args: Array<String> = arrayOf(filter.uuid.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(filter.id.toString())
         val values = ContentValues()
 
         putFilter( filter, study_id, values )
@@ -94,38 +91,16 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-//    fun getFilter( uuid: String ) : Filter?
-//    {
-//        var filter: Filter? = null
-//        val db = dao.writableDatabase
-//        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-//        val cursor = db.rawQuery(query, null)
-//
-//        if (cursor.count > 0)
-//        {
-//            cursor.moveToNext()
-//
-//            filter = buildFilter( cursor )
-//        }
-//
-//        cursor.close()
-//        db.close()
-//
-//        return filter
-//    }
-
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun  buildFilter(cursor: Cursor ): Filter
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
 
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
 
-        return Filter( id, uuid, name, type, sampleSize )
+        return Filter( id, name, type, sampleSize )
     }
 
     // Pass in the list of rules since they were already pulled from the database
@@ -135,7 +110,6 @@ class FilterDAO(private var dao: DAO)
     private fun  buildFilterRule(cursor: Cursor, rules : ArrayList<Rule> ): FilterRule
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val order = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_ORDER))
         val rule_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_ID))
         val connector_index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX))
@@ -153,7 +127,7 @@ class FilterDAO(private var dao: DAO)
             }
         }
 
-        return FilterRule(id, uuid, order, found_rule, connector) //Filter( id, uuid, name, type, sampleSize )
+        return FilterRule(id, order, found_rule, connector) //Filter( id, uuid, name, type, sampleSize )
     }
 
     fun getFiltersForStudy(study : Study) : ArrayList<Filter>
@@ -202,24 +176,10 @@ class FilterDAO(private var dao: DAO)
     fun deleteFilter( filter: Filter )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(filter.uuid)
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args = arrayOf(filter.id.toString())
 
         db.delete(DAO.TABLE_FILTER, whereClause, args)
         db.close()
-    }
-
-    //--------------------------------------------------------------------------
-    fun deleteOrphans()
-    {
-//        val filters = getFilters()
-//
-//        for (filter in filters)
-//        {
-//            if (DAO.studyDAO.doesNotExist( filter.study_uuid ))
-//            {
-//                deleteFilter( filter )
-//            }
-//        }
     }
 }

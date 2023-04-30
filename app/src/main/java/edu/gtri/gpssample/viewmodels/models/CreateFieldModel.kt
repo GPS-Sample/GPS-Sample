@@ -31,7 +31,7 @@ class CreateFieldModel
 
     fun createNewField()
     {
-        val newField = Field( UUID.randomUUID().toString(), "", FieldType.Text, false, false, false, false, false, "", "", "", "" )
+        val newField = Field("", FieldType.Text, false, false, false, false, false, "", "", "", "" )
         _currentField = MutableLiveData(newField)
         currentField = _currentField
     }

@@ -33,7 +33,6 @@ class FieldDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putField( field: Field, study : Study, values: ContentValues )
     {
-        values.put( DAO.COLUMN_UUID, field.uuid )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_STUDY_ID, study.id )
 
@@ -79,7 +78,6 @@ class FieldDAO(private var dao: DAO)
     private fun  buildField(cursor: Cursor ): Field
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
 
         val type_index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
@@ -95,7 +93,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(type_index)
 
-        return Field(id, uuid,  name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
     //--------------------------------------------------------------------------
@@ -138,8 +136,8 @@ class FieldDAO(private var dao: DAO)
     fun deleteField( field: Field )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(field.uuid.toString())
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args = arrayOf(field.id.toString())
 
         db.delete(DAO.TABLE_FIELD, whereClause, args)
         db.close()

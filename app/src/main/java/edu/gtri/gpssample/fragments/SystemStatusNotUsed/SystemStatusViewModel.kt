@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.SystemStatus
+package edu.gtri.gpssample.fragments.SystemStatusNotUsed
 
 import androidx.lifecycle.ViewModel
 

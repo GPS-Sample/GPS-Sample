@@ -100,21 +100,21 @@ class UDPBroadcaster
         {
             NetworkCommand.NetworkConfigRequest -> {
 
-                fragment.lifecycleScope.launch {
-                    DAO.configDAO.getConfig( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkConfigResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress, broadcastInetAddress, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "config<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.configDAO.getConfig( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkConfigResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress, broadcastInetAddress, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "config<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkStudyRequest -> {
-                fragment.lifecycleScope.launch {
-                    DAO.studyDAO.getStudy( networkCommand.parm1 )?.let {
-                        val networkResponse = NetworkCommand( NetworkCommand.NetworkStudyResponse, networkCommand.uuid, "", "", it.pack())
-                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
-                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
-                }
+//                fragment.lifecycleScope.launch {
+//                    DAO.studyDAO.getStudy( networkCommand.parm1 )?.let {
+//                        val networkResponse = NetworkCommand( NetworkCommand.NetworkStudyResponse, networkCommand.uuid, "", "", it.pack())
+//                        transmit( myInetAddress!!, broadcastInetAddress!!, networkResponse.pack())
+//                    } ?: Toast.makeText( fragment.activity!!.applicationContext, "study<${networkCommand.parm1} not found.>", Toast.LENGTH_SHORT).show()
+//                }
             }
 
             NetworkCommand.NetworkFieldsRequest -> {

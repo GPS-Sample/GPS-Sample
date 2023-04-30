@@ -35,7 +35,6 @@ enum class DeleteMode(val value : Int)
 
 class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var quickStart = false
     private lateinit var study: Study
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
@@ -51,8 +50,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        setHasOptionsMenu( true )
-
         _binding = FragmentCreateStudyBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -86,12 +83,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             // Assign the fragment
             createStudyFragment = this@CreateStudyFragment
         }
-        val quick_start = arguments?.getBoolean( Keys.kQuickStart.toString(), false )
-
-        quick_start?.let {
-            quickStart = it
-        }
-
 
         ArrayAdapter.createFromResource(activity!!, R.array.samling_methods, android.R.layout.simple_spinner_item)
             .also { adapter ->
@@ -195,55 +186,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     private fun didDeleteFilter( filter: Filter )
     {
-        val bundle = Bundle()
-        bundle.putString( Keys.kFilter_uuid.toString(), filter.uuid )
-        bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-        bundle.putString( Keys.kSamplingMethod.toString(), binding.samplingMethodSpinner.selectedItem as String)
-
-        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
-    }
-
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater.inflate(R.menu.menu_create_study, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        when (item.itemId) {
-            android.R.id.home -> // intercept the back button press
-            {
-                sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
-
-                    if (study.name.isNotEmpty() || study.fields.size > 0 || study.rules.size > 0 || study.filters.size > 0)
-                    {
-                        ConfirmationDialog( activity, "Unsaved Changes", "Would you like to save this study?", DeleteMode.saveTag.value, this)
-                        return true
-                    }
-
-                }
-
-            }
-            R.id.action_home -> {
-                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
-            }
-
-            R.id.action_manage_enumeration_areas -> {
-                if (binding.studyNameEditText.text.toString().isEmpty())
-                {
-                    Toast.makeText(activity!!.applicationContext, "Please enter a study name", Toast.LENGTH_SHORT).show()
-                    return true
-                }
-
-                val bundle = Bundle()
-                bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
-                findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreasFragment, bundle )
-            }
-        }
-        return false
+        findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment)
     }
 
     fun manageSamples()

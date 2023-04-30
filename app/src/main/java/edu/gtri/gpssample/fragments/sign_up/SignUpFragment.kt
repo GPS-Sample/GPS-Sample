@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.SignUp
+package edu.gtri.gpssample.fragments.sign_up
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -18,7 +17,6 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
-import java.util.*
 
 class SignUpFragment : Fragment()
 {
@@ -104,8 +102,8 @@ class SignUpFragment : Fragment()
                 editor.putString( Keys.kUserName.toString(), name )
                 editor.commit()
 
-                val user = User( UUID.randomUUID().toString(), name, pin1, role, answer, question, false )
-                DAO.userDAO.createUser( user )
+                val user = User( name, pin1, role, answer, question, false )
+                user.id = DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
                 bundle.putString( Keys.kRole.toString(), role )

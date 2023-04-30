@@ -154,9 +154,7 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         val jsonObject = JSONObject()
         jsonObject.put( Keys.kSSID.toString(), ssid )
         jsonObject.put( Keys.kPass.toString(), pass )
-        jsonObject.put( Keys.kStudy_uuid.toString(), study.uuid )
         jsonObject.put( Keys.kEnumArea_id.toString(), enumArea.id )
-        jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )
 
         val qrgEncoder = QRGEncoder(jsonObject.toString(2),null, QRGContents.Type.TEXT, binding.qrImageView.width )
         qrgEncoder.setColorBlack(Color.WHITE);

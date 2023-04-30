@@ -73,7 +73,7 @@ class CreateRuleModel {
 
     fun createNewRule() : Boolean
     {
-        val newRule = Rule( UUID.randomUUID().toString(), null, "", Operator.None, "" )
+        val newRule = Rule(null, "", Operator.None, "" )
         _currentRule = MutableLiveData(newRule)
         currentRule = _currentRule
 
