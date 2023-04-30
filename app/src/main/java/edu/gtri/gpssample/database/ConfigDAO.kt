@@ -178,6 +178,12 @@ class ConfigDAO(private var dao: DAO)
         db.close()
     }
 
+    fun updateAllLists(config: Config)
+    {
+        updateStudies( config )
+        updateEnumAreas( config )
+    }
+
     private fun updateStudies(config : Config)
     {
         // check the id.  if we get here and the id is null, there's a problem.
@@ -208,6 +214,19 @@ class ConfigDAO(private var dao: DAO)
 
             }
 
+        }
+    }
+
+    private fun updateEnumAreas(config: Config)
+    {
+        config.id?.let { id ->
+
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
+
+            for (enumArea in config.enumAreas)
+            {
+                DAO.enumAreaDAO.updateTeams( enumArea )
+            }
         }
     }
 }

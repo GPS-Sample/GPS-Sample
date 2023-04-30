@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import com.google.android.gms.maps.model.LatLng
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 
 class EnumAreaDAO(private var dao: DAO)
@@ -70,7 +71,7 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getEnumAreas( config_id: Int ): List<EnumArea>
+    fun getEnumAreas( config_id: Int ): ArrayList<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
         val db = dao.writableDatabase
@@ -88,6 +89,14 @@ class EnumAreaDAO(private var dao: DAO)
         db.close()
 
         return enumAreas
+    }
+
+    fun updateTeams(enumArea : EnumArea)
+    {
+        enumArea.id?.let{ id ->
+
+            enumArea.teams = DAO.teamDAO.getTeams( id )
+        }
     }
 
     //--------------------------------------------------------------------------

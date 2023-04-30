@@ -90,14 +90,18 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         binding.exportButton.setOnClickListener {
 
             sharedViewModel.currentConfiguration?.value?.let { config ->
+                DAO.configDAO.updateAllLists( config )
+
                 val packedConfig = config.pack()
                 Log.d( "xxx", packedConfig )
+
                 val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
                 val file = File(root, "${config.name}.${Date().time}.json")
                 val writer = FileWriter(file)
                 writer.append(packedConfig)
                 writer.flush()
                 writer.close()
+
                 Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
             }
         }

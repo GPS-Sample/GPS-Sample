@@ -71,7 +71,7 @@ class TeamDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getTeams( enumArea_id: Int ): List<Team>
+    fun getTeams( enumArea_id: Int ): ArrayList<Team>
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase
