@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 // uuid is either the source or destination, based on whether the command is a command or response
 
 @Serializable
-data class NetworkCommand( var command: Int, var uuid: String, val parm1: String, val parm2: String, var message: String )
+data class NetworkCommand( var command: Int, var id: Int, val parm1: String, val parm2: String, var message: String )
 {
     fun pack() : String
     {

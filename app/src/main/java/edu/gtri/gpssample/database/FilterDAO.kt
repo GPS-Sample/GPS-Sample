@@ -78,19 +78,6 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun exists( uuid: String ) : Boolean
-    {
-        return false
-        //return getFilter( uuid ) != null
-    }
-
-    //--------------------------------------------------------------------------
-    fun doesNotExist( uuid: String ) : Boolean
-    {
-        return !exists( uuid )
-    }
-
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun  buildFilter(cursor: Cursor ): Filter
     {

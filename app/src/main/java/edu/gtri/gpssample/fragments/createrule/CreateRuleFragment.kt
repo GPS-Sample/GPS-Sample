@@ -25,7 +25,6 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var rule: Rule? = null
-    private lateinit var study_uuid: String
 
     private var firstLaunch = true
     private var _binding: FragmentCreateRuleBinding? = null

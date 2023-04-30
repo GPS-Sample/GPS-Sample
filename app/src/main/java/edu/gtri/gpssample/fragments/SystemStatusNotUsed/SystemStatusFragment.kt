@@ -34,12 +34,8 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     private lateinit var user: User
     private lateinit var role: String
     private lateinit var broadcastInetAddress: InetAddress
-    private lateinit var viewModel: SystemStatusViewModel
     private lateinit var myInetAddress: InetAddress
 
-    private var team_uuid = ""
-    private var study_uuid = ""
-    private var config_uuid = ""
     private var enum_area_id = -1
     private var _binding: FragmentSystemStatusBinding? = null
     private val binding get() = _binding!!
@@ -48,7 +44,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SystemStatusViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -127,21 +122,21 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             udpBroadcaster?.closeSocket()
             binding.wifiCheckBox.isChecked = false
 
-            if (team_uuid.isNotEmpty())
-            {
-                val bundle = Bundle()
+//            if (team_uuid.isNotEmpty())
+//            {
+//                val bundle = Bundle()
 //                bundle.putString( Keys.kTeam_uuid.toString(), team_uuid )
 //                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-                bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
-                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
-            }
-            else if (enum_area_id > 0)
-            {
-                val bundle = Bundle()
+//                bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
+//                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment, bundle)
+//            }
+//            else if (enum_area_id > 0)
+//            {
+//                val bundle = Bundle()
 //                bundle.putString( Keys.kStudy_uuid.toString(), study_uuid )
-                bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
+//                bundle.putInt( Keys.kEnumArea_id.toString(), enum_area_id )
 //                findNavController().navigate(R.id.action_navigate_to_ManageEnumerationTeamsFragment, bundle)
-            }
+//            }
         }
     }
 
@@ -219,10 +214,6 @@ class SystemStatusFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate
             val pass = jsonObject.getString( Keys.kPass.toString() )
 
 //            val team_uuid = jsonObject.opt( Keys.kTeam_uuid.toString())
-
-            team_uuid?.let {
-                this.team_uuid = it as String
-            }
 
 //            study_uuid = jsonObject.getString( Keys.kStudy_uuid.toString() )
 //            config_uuid = jsonObject.getString( Keys.kConfig_uuid.toString() )
