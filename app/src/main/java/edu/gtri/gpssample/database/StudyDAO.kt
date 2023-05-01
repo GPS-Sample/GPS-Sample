@@ -82,7 +82,7 @@ class StudyDAO(private var dao: DAO)
     {
         study.id?.let { id ->
             Log.d( "xxx", "existing study id = ${id}")
-            values.put( DAO.COLUMN_ID, study.id )
+            values.put( DAO.COLUMN_ID, id )
         }
 
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
@@ -149,33 +149,37 @@ class StudyDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getStudies( config: Config): ArrayList<Study>
+    fun getStudies( config: Config ): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
         var db = dao.writableDatabase
-        var query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
+
+        config.id?.let { id ->
+            var query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
                     "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_ID} = conn.${DAO.COLUMN_STUDY_ID} and "  +
-                    "conn.${DAO.COLUMN_CONFIG_ID} = ${config.id}"
+                    "conn.${DAO.COLUMN_CONFIG_ID} = ${id}"
 
-        var cursor = db.rawQuery(query, null)
+            var cursor = db.rawQuery(query, null)
 
-        while (cursor.moveToNext())
-        {
-            val study = buildStudy( cursor )
-            studies.add( study )
-            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
-            for( field in study.fields)
+            while (cursor.moveToNext())
             {
-                val rules = DAO.ruleDAO.getRulesForField(field)
-                // Add rules to study
-                study.rules.addAll(rules)
+                val study = buildStudy( cursor )
+                studies.add( study )
+                study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+                for( field in study.fields)
+                {
+                    val rules = DAO.ruleDAO.getRulesForField(field)
+                    // Add rules to study
+                    study.rules.addAll(rules)
+                }
+                // find filters
+
+                study.filters.addAll(DAO.filterDAO.getFiltersForStudy(study))
             }
-            // find filters
 
-            study.filters.addAll(DAO.filterDAO.getFiltersForStudy(study))
-
+            cursor.close()
         }
-        cursor.close()
+
         db.close()
 
         return studies

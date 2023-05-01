@@ -36,6 +36,11 @@ class LatLonDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putLatLon(latLon: LatLon, values: ContentValues)
     {
+        latLon.id?.let { id ->
+            Log.d( "xxx", "existing LatLon id = ${id}")
+            values.put( DAO.COLUMN_ID, id )
+        }
+
         values.put( DAO.COLUMN_LAT, latLon.latitude )
         values.put( DAO.COLUMN_LON, latLon.longitude )
         values.put( DAO.COLUMN_ENUM_AREA_ID, latLon.enumAreaId )

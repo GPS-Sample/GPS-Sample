@@ -203,7 +203,8 @@ class ConfigDAO(private var dao: DAO)
     fun updateAllLists(config: Config)
     {
         config.id?.let { id ->
-            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(id)
+            config.studies = DAO.studyDAO.getStudies(config)
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
         }
     }
 

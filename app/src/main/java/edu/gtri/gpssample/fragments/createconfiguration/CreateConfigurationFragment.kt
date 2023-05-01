@@ -165,30 +165,28 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     {
         map.clear()
 
-        sharedViewModel.currentConfiguration?.value?.let {config ->
-            config.id?.let {id ->
-                val enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
-                for (enumArea in enumAreas)
-                {
-                    val points = ArrayList<LatLng>()
+            for (enumArea in enumAreas)
+            {
+                val points = ArrayList<LatLng>()
 
-                    enumArea.vertices.map {
-                        points.add( it.toLatLng())
-                    }
-
-                    val polygon = PolygonOptions()
-                        .clickable(false)
-                        .addAll(points)
-
-                    map.addPolygon(polygon)
+                enumArea.vertices.map {
+                    points.add( it.toLatLng())
                 }
 
-                // HACK HACK
-                val atl = LatLng( 33.774881, -84.396341 )
-                val srb = LatLng(30.335603,-86.165004 )
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 13.5f))
+                val polygon = PolygonOptions()
+                    .clickable(false)
+                    .addAll(points)
+
+                map.addPolygon(polygon)
             }
+
+            // HACK HACK
+            val atl = LatLng( 33.774881, -84.396341 )
+            val srb = LatLng(30.335603,-86.165004 )
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 13.5f))
         }
     }
 

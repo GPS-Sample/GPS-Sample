@@ -49,6 +49,11 @@ class EnumAreaDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putEnumArea( enumArea: EnumArea, values: ContentValues )
     {
+        enumArea.id?.let { id ->
+            Log.d( "xxx", "existing enumArea id = ${id}")
+            values.put( DAO.COLUMN_ID, id )
+        }
+
         values.put( DAO.COLUMN_CONFIG_ID, enumArea.config_id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
     }
@@ -96,24 +101,28 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getEnumAreas( config_id: Int ): ArrayList<EnumArea>
+    fun getEnumAreas( config: Config ): ArrayList<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_ID} = $config_id"
-        val cursor = db.rawQuery(query, null)
 
-        while (cursor.moveToNext())
-        {
-            val enumArea = createEnumArea( cursor )
-            enumArea.id?.let { id ->
-                enumArea.vertices = DAO.latLonDAO.getLatLons( id )
-                enumArea.teams = DAO.teamDAO.getTeams( id )
-                enumAreas.add( enumArea )
+        config.id?.let { id ->
+            val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_ID} = $id"
+            val cursor = db.rawQuery(query, null)
+
+            while (cursor.moveToNext())
+            {
+                val enumArea = createEnumArea( cursor )
+                enumArea.id?.let { id ->
+                    enumArea.vertices = DAO.latLonDAO.getLatLons( id )
+                    enumArea.teams = DAO.teamDAO.getTeams( id )
+                    enumAreas.add( enumArea )
+                }
             }
+
+            cursor.close()
         }
 
-        cursor.close()
         db.close()
 
         return enumAreas

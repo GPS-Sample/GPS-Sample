@@ -125,7 +125,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            enumerationAreasAdapter.updateEnumAreas(DAO.enumAreaDAO.getEnumAreas(config.id!!))
+            enumerationAreasAdapter.updateEnumAreas(DAO.enumAreaDAO.getEnumAreas(config))
         }
 
         // set the first study as selected.  TODO: save the id of the selected study
@@ -157,7 +157,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
             // put the enums
             sharedViewModel.currentConfiguration?.value?.let {config ->
-                val enumAreas = DAO.enumAreaDAO.getEnumAreas( config.id!! )
+                val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
                 for (enumArea in enumAreas)
                 {
