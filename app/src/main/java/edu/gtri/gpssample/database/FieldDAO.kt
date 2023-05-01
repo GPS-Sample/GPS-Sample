@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.util.Log
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.extensions.toBoolean
@@ -12,27 +13,33 @@ import edu.gtri.gpssample.database.models.Study
 class FieldDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createField( field: Field, study : Study ) : Int
+    fun createOrUpdateField( field: Field, study : Study ) : Field?
     {
-        field.id?.let{id ->
-            updateField(field, study)
-            return id
-        }?: run {
+        if (exists( field ))
+        {
+            updateField( field, study )
+        }
+        else
+        {
             val values = ContentValues()
             putField( field, study, values )
-            val id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
-            if(id > -1)
-            {
-                field.id = id
-            }
-            return id
+            field.id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
+            field.id?.let { id ->
+                Log.d( "xxx", "new field id = ${id}")
+            } ?: return null
         }
 
+        return field
     }
 
     //--------------------------------------------------------------------------
     fun putField( field: Field, study : Study, values: ContentValues )
     {
+        field.id?.let { id ->
+            Log.d( "xxx", "existing field id = ${id}")
+            values.put( DAO.COLUMN_ID, field.id )
+        }
+
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_STUDY_ID, study.id )
 
@@ -57,7 +64,9 @@ class FieldDAO(private var dao: DAO)
     {
         val db = dao.writableDatabase
 
-        field.id?.let{id ->
+        field.id?.let{ id ->
+            Log.d( "xxx", "update field id ${id}")
+
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
@@ -65,12 +74,19 @@ class FieldDAO(private var dao: DAO)
             putField( field, study, values )
 
             db.update(DAO.TABLE_FIELD, values, whereClause, args )
-        }?:run{
-            // this means the field is new so we add it
-            createField(field, study)
         }
 
         db.close()
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( field: Field ): Boolean
+    {
+        field.id?.let { id ->
+            getField( id )?.let { field
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     //--------------------------------------------------------------------------
@@ -97,15 +113,18 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getField( id : Int ): Field
+    fun getField( id : Int ): Field?
     {
-        val fields = ArrayList<Field>()
+        var field: Field? = null
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD} where id=${id}"
         val cursor = db.rawQuery(query, null)
 
-        cursor.moveToNext()
-        val field = buildField( cursor )
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            field = buildField( cursor )
+        }
 
         cursor.close()
         db.close()

@@ -14,6 +14,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -77,6 +78,16 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         }
     }
 
+    override fun onResume()
+    {
+        super.onResume()
+
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
+
+        // get this from the view controller
+        manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         super.onActivityResult(requestCode, resultCode, data)
@@ -91,23 +102,21 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                 inputStream?.let {  inputStream ->
                     val text = inputStream.bufferedReader().readText()
+
                     Log.d( "xxx", text )
 
                     val config = Config.unpack( text )
 
-                    Log.d( "xxx", config.name )
+                    DAO.deleteAll()
+
+                    DAO.configDAO.createConfig( config )
+
+                    sharedViewModel.initializeConfigurations()
+
+                    manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
                 }
             }
         }
-    }
-
-    override fun onResume()
-    {
-        super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
-
-        // get this from the view controller
-         manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
     }
 
     private fun didSelectConfig( config: Config )

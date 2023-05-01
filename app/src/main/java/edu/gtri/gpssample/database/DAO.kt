@@ -354,6 +354,26 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         private var instance: DAO? = null
 
+        fun deleteAll()
+        {
+            instance?.let {
+                val db = it.writableDatabase
+                db.delete(TABLE_CONFIG, null, null )
+                db.delete(TABLE_STUDY, null, null)
+                db.delete(TABLE_CONFIG_STUDY, null, null)
+                db.delete(TABLE_FIELD, null, null)
+                db.delete(TABLE_RULE, null, null)
+                db.delete(TABLE_FILTER, null, null)
+                db.delete(TABLE_FILTERRULE, null, null)
+                db.delete(TABLE_ENUM_AREA, null, null)
+                db.delete(TABLE_TEAM, null, null)
+                db.delete(TABLE_TEAM_MEMBER, null, null)
+                db.delete(TABLE_ENUM_DATA, null, null)
+                db.delete(TABLE_FIELD_DATA, null, null)
+                db.delete(TABLE_LAT_LON, null, null)
+            }
+        }
+
         fun createSharedInstance( context: Context ): DAO
         {
             if (instance == null)

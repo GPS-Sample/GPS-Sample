@@ -12,20 +12,65 @@ import kotlin.math.min
 class ConfigDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createConfig( config: Config ) : Boolean
+    fun createConfig( config: Config ) : Config?
     {
-        val values = ContentValues()
-
-        putConfig( config, values )
-        val id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
-        if (id > -1)
+        if (exists( config ))
         {
-            config.id = id
-            // add studies
-            updateStudies(config)
-            return true
+            // if we need to handle the update case here,
+            // let's change the name to createOrUpdateConfig and do the update here
+            Log.d( "xxx", "Oops! config with id ${config.id!!} already exists")
+            return null
         }
-        return false
+        else
+        {
+            val values = ContentValues()
+            putConfig( config, values )
+            config.id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
+            config.id?.let { id ->
+                Log.d( "xxx", "new config id = ${id}")
+                updateStudies(config)
+                return config
+            } ?: return null
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    fun putConfig( config: Config, values: ContentValues )
+    {
+        config.id?.let { id ->
+            Log.d( "xxx", "existing config id = ${id}")
+            values.put( DAO.COLUMN_ID, config.id )
+        }
+
+        values.put( DAO.COLUMN_CONFIG_NAME, config.name )
+        values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
+
+        // TODO: these should be from lookup tables
+        val dateFormatIndex = DateFormatConverter.toIndex(config.dateFormat)
+        val timeFormatIndex = TimeFormatConverter.toIndex(config.timeFormat)
+        val distanceFormatIndex = DistanceFormatConverter.toIndex(config.distanceFormat)
+
+        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT_INDEX, dateFormatIndex)
+        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX, timeFormatIndex)
+        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX, distanceFormatIndex)
+    }
+
+    //--------------------------------------------------------------------------
+    fun putConfigStudy(config: Config, study: Study, values: ContentValues )
+    {
+
+        values.put(DAO.COLUMN_CONFIG_ID, config.id)
+        values.put(DAO.COLUMN_STUDY_ID, study.id)
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( config: Config ): Boolean
+    {
+        config.id?.let { id ->
+            getConfig( id )?.let { config
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     //--------------------------------------------------------------------------
@@ -120,31 +165,10 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun putConfig( config: Config, values: ContentValues )
-    {
-        values.put( DAO.COLUMN_CONFIG_NAME, config.name )
-        values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
-
-        // TODO: these should be from lookup tables
-        val dateFormatIndex = DateFormatConverter.toIndex(config.dateFormat)
-        val timeFormatIndex = TimeFormatConverter.toIndex(config.timeFormat)
-        val distanceFormatIndex = DistanceFormatConverter.toIndex(config.distanceFormat)
-
-        values.put( DAO.COLUMN_CONFIG_DATE_FORMAT_INDEX, dateFormatIndex)
-        values.put( DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX, timeFormatIndex)
-        values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX, distanceFormatIndex)
-    }
-
-    fun putConfigStudy(config: Config, study: Study, values: ContentValues )
-    {
-
-        values.put(DAO.COLUMN_CONFIG_ID, config.id)
-        values.put(DAO.COLUMN_STUDY_ID, study.id)
-    }
-
-    //--------------------------------------------------------------------------
     fun updateConfig( config: Config )
     {
+        Log.d( "xxx", "update config id ${config.id!!}")
+
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         config.id?.let { id ->
@@ -200,20 +224,13 @@ class ConfigDAO(private var dao: DAO)
             // add studies
             for(study in config.studies)
             {
-                var study_id = -1
                 // study will either be created or updated
-                study_id = DAO.studyDAO.createStudy(study)
-                if(study_id > -1)
-                {
-                    study.id = study_id
+                DAO.studyDAO.createOrUpdateStudy(study)?.let { study
                     val configStudyValues = ContentValues()
                     putConfigStudy(config, study, configStudyValues)
-                    dao.writableDatabase.insert(DAO.TABLE_CONFIG_STUDY, null,
-                        configStudyValues).toInt()
+                    dao.writableDatabase.insert(DAO.TABLE_CONFIG_STUDY, null, configStudyValues).toInt()
                 }
-
             }
-
         }
     }
 

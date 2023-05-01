@@ -16,7 +16,7 @@ import edu.gtri.gpssample.database.models.Study
 class StudyDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createStudy( study: Study ) : Int
+    fun createOrUpdateStudy( study: Study ) : Study?
     {
         // if study exists and is untouched, use it.
         // if study exists and is modified, created a new one.
@@ -26,21 +26,30 @@ class StudyDAO(private var dao: DAO)
 
             if(study.equals( testStudy))
             {
-                return id
+                Log.d( "xxx", "study with id ${id} already exists!")
+                return study
             }
         }
 
-        val values = ContentValues()
-
-        putStudy(study, values)
-        val id = dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
-        study.id = id
+        if (exists( study ))
+        {
+            updateStudy( study )
+        }
+        else
+        {
+            val values = ContentValues()
+            putStudy(study, values)
+            study.id = dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
+            study.id?.let { id ->
+                Log.d( "xxx", "new study id = ${id}")
+            } ?: return null
+        }
 
         // add fields
         for (field in study.fields)
         {
             // add the study id to the field
-            field.id = DAO.fieldDAO.createField(field, study)
+            DAO.fieldDAO.createOrUpdateField(field, study)
         }
 
         // add rules
@@ -59,15 +68,23 @@ class StudyDAO(private var dao: DAO)
             // filter must have a filter rule
             if(filter.filterRules.size > 0)
             {
-                DAO.filterDAO.createFilter(filter, id)
+                study.id?.let { id ->
+                    DAO.filterDAO.createFilter(filter, id)
+                }
             }
         }
-        return id
+
+        return study
     }
 
     //--------------------------------------------------------------------------
     private fun putStudy( study: Study, values: ContentValues )
     {
+        study.id?.let { id ->
+            Log.d( "xxx", "existing study id = ${id}")
+            values.put( DAO.COLUMN_ID, study.id )
+        }
+
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
 
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
@@ -77,6 +94,16 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX, index)
         index = SamplingMethodConverter.toIndex(study.samplingMethod)
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX, index )
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( study: Study ): Boolean
+    {
+        study.id?.let { id ->
+            getStudy( id )?.let { study
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     fun getStudy( id: Int ): Study?
@@ -97,7 +124,6 @@ class StudyDAO(private var dao: DAO)
             // now get rules
 
             // now get filters
-            Log.d("xxxx ", "")
         }
 
         cursor.close()
@@ -155,6 +181,23 @@ class StudyDAO(private var dao: DAO)
         return studies
     }
 
+    fun updateStudy( study: Study )
+    {
+        val db = dao.writableDatabase
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        study.id?.let { id ->
+            Log.d( "xxx", "update study id ${id}")
+
+            val args: Array<String> = arrayOf(id.toString())
+            val values = ContentValues()
+
+            putStudy( study, values )
+
+            db.update(DAO.TABLE_STUDY, values, whereClause, args )
+            db.close()
+        }
+    }
+
     //--------------------------------------------------------------------------
     fun deleteStudy( study: Study )
     {
@@ -175,7 +218,4 @@ class StudyDAO(private var dao: DAO)
         }
 
     }
-
-    //--------------------------------------------------------------------------
-
 }

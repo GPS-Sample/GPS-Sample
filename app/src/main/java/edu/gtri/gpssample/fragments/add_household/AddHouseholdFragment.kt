@@ -136,7 +136,7 @@ class AddHouseholdFragment : Fragment()
                 fieldDataMap[key]?.let {fieldData ->
                     val field = DAO.fieldDAO.getField( fieldData.fieldId )
 
-                    if (field.required)
+                    if (field != null && field!!.required)
                     {
                         when (field.type)
                         {
