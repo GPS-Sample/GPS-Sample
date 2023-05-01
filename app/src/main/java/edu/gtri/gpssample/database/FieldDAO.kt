@@ -83,7 +83,7 @@ class FieldDAO(private var dao: DAO)
     fun exists( field: Field ): Boolean
     {
         field.id?.let { id ->
-            getField( id )?.let { field
+            getField( id )?.let {
                 return true
             } ?: return false
         } ?: return false

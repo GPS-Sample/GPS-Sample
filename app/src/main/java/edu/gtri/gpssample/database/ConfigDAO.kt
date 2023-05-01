@@ -28,7 +28,8 @@ class ConfigDAO(private var dao: DAO)
             config.id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
             config.id?.let { id ->
                 Log.d( "xxx", "new config id = ${id}")
-                updateStudies(config)
+                createOrUpdateStudies(config)
+                createOrUpdateEnumAreas(config)
                 return config
             } ?: return null
         }
@@ -168,18 +169,15 @@ class ConfigDAO(private var dao: DAO)
     fun updateConfig( config: Config )
     {
         Log.d( "xxx", "update config id ${config.id!!}")
-
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         config.id?.let { id ->
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
-
             putConfig( config, values )
-
             db.update(DAO.TABLE_CONFIG, values, whereClause, args )
-            // update studies
-            updateStudies(config)
+            createOrUpdateStudies(config)
+            createOrUpdateEnumAreas(config)
             db.close()
         }
     }
@@ -204,11 +202,12 @@ class ConfigDAO(private var dao: DAO)
 
     fun updateAllLists(config: Config)
     {
-        updateStudies( config )
-        updateEnumAreas( config )
+        config.id?.let { id ->
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(id)
+        }
     }
 
-    private fun updateStudies(config : Config)
+    private fun createOrUpdateStudies(config : Config)
     {
         // check the id.  if we get here and the id is null, there's a problem.
         // TODO: add some error checking
@@ -234,15 +233,13 @@ class ConfigDAO(private var dao: DAO)
         }
     }
 
-    private fun updateEnumAreas(config: Config)
+    private fun createOrUpdateEnumAreas(config: Config)
     {
         config.id?.let { id ->
 
-            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
-
             for (enumArea in config.enumAreas)
             {
-                DAO.enumAreaDAO.updateTeams( enumArea )
+                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
             }
         }
     }

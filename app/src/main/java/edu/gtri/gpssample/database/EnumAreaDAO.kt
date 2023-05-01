@@ -3,32 +3,47 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Field
 
 class EnumAreaDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createEnumArea( enumArea: EnumArea ) : Int
+    fun createOrUpdateEnumArea( enumArea: EnumArea ) : EnumArea?
     {
-        val values = ContentValues()
+        if (exists( enumArea ))
+        {
+            updateEnumArea( enumArea )
+        }
+        else
+        {
+            val values = ContentValues()
+            putEnumArea( enumArea, values )
+            enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
 
-        putEnumArea( enumArea, values )
+            enumArea.id?.let {id ->
+                Log.d( "xxx", "new enumArea id = ${id}")
 
-        enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
+                for (latLon in enumArea.vertices)
+                {
+                    latLon.enumAreaId = id
+                    DAO.latLonDAO.createOrUpdateLatLon(latLon)
+                }
 
-        enumArea.id?.let {enum_area_id ->
-            for (latLon in enumArea.vertices)
-            {
-                latLon.enumAreaId = enum_area_id
-                latLon.id = DAO.latLonDAO.createLatLon(latLon)
-            }
+                for (team in enumArea.teams)
+                {
+                    team.enumAreaId = id
+                    DAO.teamDAO.createOrUpdateTeam(team)
+                }
 
-            return enum_area_id
+                return enumArea
+            } ?: return null
         }
 
-        return -1
+        return enumArea
     }
 
     //--------------------------------------------------------------------------
@@ -47,6 +62,16 @@ class EnumAreaDAO(private var dao: DAO)
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
 
         return EnumArea( id, config_id, name )
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( enumArea: EnumArea ): Boolean
+    {
+        enumArea.id?.let { id ->
+            getEnumArea( id )?.let {
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     //--------------------------------------------------------------------------
@@ -81,8 +106,11 @@ class EnumAreaDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val enumArea = createEnumArea( cursor )
-            enumArea.vertices = DAO.latLonDAO.getLatLons( enumArea.id!! )
-            enumAreas.add( enumArea )
+            enumArea.id?.let { id ->
+                enumArea.vertices = DAO.latLonDAO.getLatLons( id )
+                enumArea.teams = DAO.teamDAO.getTeams( id )
+                enumAreas.add( enumArea )
+            }
         }
 
         cursor.close()
@@ -91,13 +119,34 @@ class EnumAreaDAO(private var dao: DAO)
         return enumAreas
     }
 
-    fun updateTeams(enumArea : EnumArea)
+    //--------------------------------------------------------------------------
+    fun updateEnumArea( enumArea: EnumArea )
     {
-        enumArea.id?.let{ id ->
+        val db = dao.writableDatabase
 
-            enumArea.teams = DAO.teamDAO.getTeams( id )
+        enumArea.id?.let{ id ->
+            Log.d( "xxx", "update enumArea id ${id}")
+
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args: Array<String> = arrayOf(id.toString())
+            val values = ContentValues()
+
+            putEnumArea( enumArea, values )
+
+            db.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
         }
+
+        db.close()
     }
+
+    //--------------------------------------------------------------------------
+//    fun updateTeams(enumArea : EnumArea)
+//    {
+//        enumArea.id?.let{ id ->
+//
+//            enumArea.teams = DAO.teamDAO.getTeams( id )
+//        }
+//    }
 
     //--------------------------------------------------------------------------
     fun delete( enumArea: EnumArea )
