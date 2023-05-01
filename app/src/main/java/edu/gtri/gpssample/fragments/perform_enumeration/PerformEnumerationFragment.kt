@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -21,6 +23,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
+import edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
@@ -29,11 +32,13 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
     private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
     private var userId = 0
     private var enumAreaId = 0
     private var dropMode = false
     private var location: LatLng? = null
+    private var enumDataList = ArrayList<EnumData>()
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
 
@@ -71,6 +76,13 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         user?.id?.let {
             userId = it
         }
+
+        performEnumerationAdapter = PerformEnumerationAdapter( enumDataList )
+        performEnumerationAdapter.didSelectEnumData = this::didSelectEnumData
+
+        binding.recyclerView.itemAnimator = DefaultItemAnimator()
+        binding.recyclerView.adapter = performEnumerationAdapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.titleTextView.text = enumArea.name + " (" + team.name + ")"
 
@@ -135,7 +147,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             location = null
         }
 
-        binding.finishButton.setOnClickListener {
+        binding.exportButton.setOnClickListener {
 
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment)
         }
@@ -147,6 +159,9 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
+        enumDataList = DAO.enumDataDAO.getEnumData(userId, enumAreaId)
+
+        performEnumerationAdapter.updateEnumDataList( enumDataList )
         if (this::map.isInitialized)
         {
             addMapObjects()
@@ -171,8 +186,6 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         val latLng = getCenter()
         map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 15.0f))
-
-        val enumDataList = DAO.enumDataDAO.getEnumData(userId, enumAreaId)
 
         for (enumData in enumDataList)
         {
@@ -228,6 +241,20 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         }
 
         return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
+    }
+
+    private fun didSelectEnumData( enumData: EnumData )
+    {
+        sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+
+        if (enumData.isLocation)
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+        }
+        else
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+        }
     }
 
     override fun onDestroyView()
