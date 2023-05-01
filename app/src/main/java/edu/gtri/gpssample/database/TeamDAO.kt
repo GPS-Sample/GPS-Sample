@@ -3,25 +3,46 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.util.Log
 import edu.gtri.gpssample.database.models.*
 
 class TeamDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createTeam( team: Team) : Int
+    fun createOrUpdateTeam( team: Team) : Team?
     {
-        val values = ContentValues()
+        if (exists( team ))
+        {
+            updateTeam( team )
+        }
+        else
+        {
+            val values = ContentValues()
+            putTeam( team, values )
+            team.id = dao.writableDatabase.insert(DAO.TABLE_TEAM, null, values).toInt()
+            team.id?.let { id ->
+                Log.d( "xxx", "new Team id = ${id}")
+            } ?: return null
+        }
 
-        putTeam( team, values )
-
-        return dao.writableDatabase.insert(DAO.TABLE_TEAM, null, values).toInt()
+        return team
     }
 
     //--------------------------------------------------------------------------
     fun putTeam(team: Team, values: ContentValues )
     {
-        values.put( DAO.COLUMN_ENUM_AREA_ID, team.enumArea_id )
+        values.put( DAO.COLUMN_ENUM_AREA_ID, team.enumAreaId )
         values.put( DAO.COLUMN_TEAM_NAME, team.name )
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( team: Team ): Boolean
+    {
+        team.id?.let { id ->
+            getTeam( id )?.let {
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     //--------------------------------------------------------------------------
@@ -39,13 +60,17 @@ class TeamDAO(private var dao: DAO)
     fun updateTeam( team: Team )
     {
         val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(team.id.toString())
-        val values = ContentValues()
 
-        putTeam( team, values )
+        team.id?.let { id ->
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args: Array<String> = arrayOf(id.toString())
+            val values = ContentValues()
 
-        db.update(DAO.TABLE_TEAM, values, whereClause, args )
+            putTeam( team, values )
+
+            db.update(DAO.TABLE_TEAM, values, whereClause, args )
+        }
+
         db.close()
     }
 
@@ -71,7 +96,7 @@ class TeamDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getTeams( enumArea_id: Int ): List<Team>
+    fun getTeams( enumArea_id: Int ): ArrayList<Team>
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase

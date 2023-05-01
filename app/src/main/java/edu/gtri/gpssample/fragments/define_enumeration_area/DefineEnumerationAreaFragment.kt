@@ -132,7 +132,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
 
         var enumArea = EnumArea( config.id!!, name, vertices )
-        enumArea.id = DAO.enumAreaDAO.createEnumArea( enumArea )
+        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
 
         addPolygon( enumArea )
 

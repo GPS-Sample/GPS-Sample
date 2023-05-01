@@ -205,7 +205,7 @@ class ConfigurationViewModel : ViewModel()
     }
     //endregion
     //region Enumerations
-    fun addEnumerationAreas(enumAreas : List<EnumArea>? )
+    fun addEnumerationAreas(enumAreas : ArrayList<EnumArea> )
     {
         currentConfiguration?.value?.let{config ->
             config.enumAreas = enumAreas

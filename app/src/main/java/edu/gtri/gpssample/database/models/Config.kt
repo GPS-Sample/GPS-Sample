@@ -28,15 +28,14 @@ data class Config(
     var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
     var studies : ArrayList<Study>,
-    var enumAreas : List<EnumArea>?
-    )
+    var enumAreas : ArrayList<EnumArea>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
         minGpsPrecision: Int) : this(null, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
-                                    ArrayList<Study>(), null)
+                                    ArrayList<Study>(), ArrayList<EnumArea>())
     constructor(id: Int?, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int) : this(id, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
-                ArrayList<Study>(), null)
+                ArrayList<Study>(), ArrayList<EnumArea>())
 
     var minimumGPSPrecision : String
         get() = minGpsPrecision.toString()

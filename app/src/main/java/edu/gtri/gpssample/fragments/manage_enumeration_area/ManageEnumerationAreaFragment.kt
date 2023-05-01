@@ -189,10 +189,10 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
     override fun didEnterText( name: String )
     {
-        enumArea.id?.let { enum_area_id ->
-            val team = Team( enum_area_id, name )
-            DAO.teamDAO.createTeam( team )
-            teamsAdapter.updateTeams( DAO.teamDAO.getTeams( enum_area_id ))
+        enumArea.id?.let { id ->
+            val team = Team( id, name )
+            DAO.teamDAO.createOrUpdateTeam( team )
+            teamsAdapter.updateTeams( DAO.teamDAO.getTeams( id ))
         }
     }
 
