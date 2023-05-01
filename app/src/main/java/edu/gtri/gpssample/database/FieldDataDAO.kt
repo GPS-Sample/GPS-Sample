@@ -78,21 +78,6 @@ class FieldDataDAO(private var dao: DAO)
         }
     }
 
-    fun printAllFieldData()
-    {
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA}"
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val fieldData = createFieldData( cursor )
-        }
-
-        cursor.close()
-        db.close()
-    }
-
     //--------------------------------------------------------------------------
     fun getOrCreateFieldData( field_id: Int, enum_data_id: Int ): FieldData
     {
@@ -119,25 +104,29 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFieldDataList( enum_data_id: Int ): ArrayList<FieldData>
+    fun getFieldDataList( enumData: EnumData ): ArrayList<FieldData>
     {
         var fieldDataList = ArrayList<FieldData>()
-
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUM_DATA_ID} = $enum_data_id"
-        val cursor = db.rawQuery(query, null)
 
-        while (cursor.moveToNext())
-        {
-            fieldDataList.add( createFieldData( cursor ))
+        enumData.id?.let { id ->
+            val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUM_DATA_ID} = $id"
+            val cursor = db.rawQuery(query, null)
+
+            while (cursor.moveToNext())
+            {
+                fieldDataList.add( createFieldData( cursor ))
+            }
+
+            cursor.close()
         }
 
-        cursor.close()
         db.close()
 
         return fieldDataList
     }
 
+    //--------------------------------------------------------------------------
     fun delete( fieldData: FieldData )
     {
         fieldData.id?.let {field_data_id ->

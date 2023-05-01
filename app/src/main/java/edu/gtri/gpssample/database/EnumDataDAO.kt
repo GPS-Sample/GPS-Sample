@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
@@ -58,23 +59,28 @@ class EnumDataDAO(private var dao: DAO)
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_DESCRIPTION))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME))
 
-        return EnumData( id, userId, enumAreaId, latitude, longitude, isLocation, description, imageFileName )
+        return EnumData( id, userId, enumAreaId, latitude, longitude, isLocation, description, imageFileName, null )
     }
 
-    fun getEnumData( enumAreaId: Int ) : ArrayList<EnumData>
+    fun getEnumData( enumArea: EnumArea) : ArrayList<EnumData>
     {
         var enumDataList = ArrayList<EnumData>()
-
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
-        val cursor = db.rawQuery(query, null)
 
-        while (cursor.moveToNext())
-        {
-            enumDataList.add( createEnumData( cursor ))
+        enumArea.id?.let { id ->
+            val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $id"
+            val cursor = db.rawQuery(query, null)
+
+            while (cursor.moveToNext())
+            {
+                val enumData = createEnumData( cursor )
+                enumData.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumData )
+                enumDataList.add( enumData )
+            }
+
+            cursor.close()
         }
 
-        cursor.close()
         db.close()
 
         return enumDataList

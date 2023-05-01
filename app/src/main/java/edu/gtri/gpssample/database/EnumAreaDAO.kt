@@ -168,7 +168,7 @@ class EnumAreaDAO(private var dao: DAO)
             }
 
             // enumData's are dependent on EnumAreas
-            DAO.enumDataDAO.getEnumData(enumAreaId).map {
+            DAO.enumDataDAO.getEnumData(enumArea).map {
                 DAO.enumDataDAO.delete( it )
             }
 

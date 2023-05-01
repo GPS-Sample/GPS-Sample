@@ -173,7 +173,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
             }
 
-            val enumDataList = DAO.enumDataDAO.getEnumData(enumArea.id!!)
+            val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
 
             for (enumData in enumDataList)
             {
