@@ -1,12 +1,12 @@
 package edu.gtri.gpssample.fragments.configuration
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,6 +24,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
@@ -55,6 +56,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        setHasOptionsMenu( true )
         _binding = FragmentConfigurationBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -198,6 +200,57 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     {
         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
         findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_import, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId) {
+            R.id.action_import -> {
+                val intent = Intent()
+                    .setType("*/*")
+                    .setAction(Intent.ACTION_GET_CONTENT)
+
+                startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
+                return true
+            }
+        }
+
+        return false
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
+        {
+            val uri = data?.data
+
+            uri?.let { uri ->
+
+                val inputStream = activity!!.getContentResolver().openInputStream(uri)
+
+                inputStream?.let {  inputStream ->
+                    val text = inputStream.bufferedReader().readText()
+
+                    Log.d( "xxx", text )
+
+                    val enumArea = EnumArea.unpack( text )
+
+                    for (enumData in enumArea.enumDataList)
+                    {
+                        DAO.enumDataDAO.createEnumData( enumData )
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView()

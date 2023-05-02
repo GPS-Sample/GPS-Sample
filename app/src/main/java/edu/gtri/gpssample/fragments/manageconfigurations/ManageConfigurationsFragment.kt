@@ -74,7 +74,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
 
-            startActivityForResult(Intent.createChooser(intent, "Select a mission"), 1023)
+            startActivityForResult(Intent.createChooser(intent, "Select a configuration"), 1023)
         }
     }
 

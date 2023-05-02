@@ -181,6 +181,10 @@
         tools:layout="@layout/fragment_manage_enumeration_area">
 
         <action
+            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
+            app:destination="@id/PerformEnumerationFragment" />
+
+        <action
             android:id="@+id/action_navigate_to_ManageEnumerationTeamFragment"
             app:destination="@id/ManageEnumerationTeamFragment" />
 

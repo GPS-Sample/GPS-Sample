@@ -70,7 +70,7 @@ class AddLocationFragment : Fragment()
         if (enumData.id == null)
         {
             createMode = true
-            enumData.id = DAO.enumDataDAO.createEnumData(enumData)
+            DAO.enumDataDAO.createEnumData(enumData)
         }
 
         binding.editText.setText( enumData.description )

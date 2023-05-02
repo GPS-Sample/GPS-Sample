@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.perform_enumeration
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +26,10 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.io.File
+import java.io.FileWriter
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 {
@@ -161,6 +166,15 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
             val packedEnumArea = enumArea.pack()
             Log.d( "xxx", packedEnumArea )
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            val file = File(root, "EnumArea.${enumArea.name}.${Date().time}.json")
+            val writer = FileWriter(file)
+            writer.append(packedEnumArea)
+            writer.flush()
+            writer.close()
+
+            Toast.makeText(activity!!.applicationContext, "Enumeration data has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
         }
     }
 

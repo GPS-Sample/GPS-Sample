@@ -85,11 +85,11 @@ class SignUpFragment : Fragment()
                 return@setOnClickListener
             }
 
-            if (answer.length == 0)
-            {
-                Toast.makeText(activity!!.applicationContext, "Please enter an answer.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+//            if (answer.length == 0)
+//            {
+//                Toast.makeText(activity!!.applicationContext, "Please enter an answer.", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
 
             if (pin1 != pin2)
             {

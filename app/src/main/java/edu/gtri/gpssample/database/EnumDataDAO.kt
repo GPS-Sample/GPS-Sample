@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.util.Log
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.extensions.toBoolean
@@ -11,13 +12,26 @@ import edu.gtri.gpssample.extensions.toInt
 class EnumDataDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createEnumData( enumData: EnumData) : Int
+    fun createEnumData( enumData: EnumData) : EnumData?
     {
         val values = ContentValues()
 
+        enumData.id = null
         putEnumData( enumData, values )
 
-        return dao.writableDatabase.insert(DAO.TABLE_ENUM_DATA, null, values).toInt()
+        enumData.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_DATA, null, values).toInt()
+        enumData.id?.let { id ->
+            Log.d( "xxx", "new enumData id = ${id}")
+            enumData.fieldDataList?.let { fieldDataList ->
+                for (fieldData in fieldDataList)
+                {
+                    fieldData.id = null
+                    DAO.fieldDataDAO.createFieldData( fieldData )
+                }
+            }
+        } ?: return null
+
+        return enumData
     }
 
     //--------------------------------------------------------------------------
@@ -37,6 +51,11 @@ class EnumDataDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putEnumData(enumData: EnumData, values: ContentValues)
     {
+        enumData.id?.let { id ->
+            Log.d( "xxx", "existing enumData id = ${id}")
+            values.put( DAO.COLUMN_ID, id )
+        }
+
         values.put( DAO.COLUMN_USER_ID, enumData.userId )
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
         values.put( DAO.COLUMN_ENUM_DATA_LATITUDE, enumData.latitude )
