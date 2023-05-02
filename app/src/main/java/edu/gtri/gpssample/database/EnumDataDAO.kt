@@ -6,13 +6,42 @@ import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.EnumData
+import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
 
 class EnumDataDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createEnumData( enumData: EnumData) : EnumData?
+    fun createOrUpdateEnumData( enumData: EnumData) : EnumData?
+    {
+        if (exists( enumData ))
+        {
+            updateEnumData( enumData )
+        }
+        else
+        {
+            val values = ContentValues()
+
+            putEnumData( enumData, values )
+
+            enumData.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_DATA, null, values).toInt()
+            enumData.id?.let { id ->
+                Log.d( "xxx", "new enumData id = ${id}")
+                enumData.fieldDataList?.let { fieldDataList ->
+                    for (fieldData in fieldDataList)
+                    {
+                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
+                    }
+                }
+            } ?: return null
+        }
+
+        return enumData
+    }
+
+    //--------------------------------------------------------------------------
+    fun importEnumData( enumData: EnumData) : EnumData?
     {
         val values = ContentValues()
 
@@ -26,12 +55,22 @@ class EnumDataDAO(private var dao: DAO)
                 for (fieldData in fieldDataList)
                 {
                     fieldData.id = null
-                    DAO.fieldDataDAO.createFieldData( fieldData )
+                    DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
                 }
             }
         } ?: return null
 
         return enumData
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( enumData: EnumData ): Boolean
+    {
+        enumData.id?.let { id ->
+            getEnumData( id )?.let {
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     //--------------------------------------------------------------------------
@@ -122,6 +161,26 @@ class EnumDataDAO(private var dao: DAO)
         db.close()
 
         return enumDataList
+    }
+
+    fun getEnumData( id: Int ) : EnumData?
+    {
+        var enumData: EnumData? = null
+
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_ID} = $id"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            enumData = createEnumData( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return enumData
     }
 
     fun delete( enumData: EnumData )

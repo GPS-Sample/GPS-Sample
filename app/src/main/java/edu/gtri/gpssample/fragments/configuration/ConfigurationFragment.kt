@@ -239,7 +239,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                     enumArea?.let { enumArea ->
                         for (enumData in enumArea.enumDataList)
                         {
-                            DAO.enumDataDAO.createEnumData( enumData )
+                            DAO.enumDataDAO.importEnumData( enumData )
                         }
                     } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
                 }

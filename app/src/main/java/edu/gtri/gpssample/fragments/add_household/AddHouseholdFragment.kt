@@ -87,7 +87,7 @@ class AddHouseholdFragment : Fragment()
         if (enumData.id == null)
         {
             createMode = true
-            DAO.enumDataDAO.createEnumData(enumData)
+            DAO.enumDataDAO.createOrUpdateEnumData(enumData)
         }
 
         val fieldDataMap = HashMap<Int, FieldData>()

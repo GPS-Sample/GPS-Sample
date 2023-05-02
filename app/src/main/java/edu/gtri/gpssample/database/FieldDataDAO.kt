@@ -15,13 +15,25 @@ import edu.gtri.gpssample.extensions.toBoolean
 class FieldDataDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createFieldData( fieldData: FieldData ) : Int
+    fun createOrUpdateFieldData( fieldData: FieldData ) : FieldData?
     {
-        val values = ContentValues()
+        if (exists( fieldData ))
+        {
+            updateFieldData( fieldData )
+        }
+        else
+        {
+            val values = ContentValues()
 
-        putFieldData( fieldData, values )
+            putFieldData( fieldData, values )
 
-        return dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
+            fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
+            fieldData.id?.let { id ->
+                Log.d( "xxx", "new fieldData id = ${id}")
+            } ?: return null
+        }
+
+        return fieldData
     }
 
     //--------------------------------------------------------------------------
@@ -41,6 +53,16 @@ class FieldDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX2, fieldData.checkbox2 )
         values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX3, fieldData.checkbox3 )
         values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX4, fieldData.checkbox4 )
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( fieldData: FieldData): Boolean
+    {
+        fieldData.id?.let { id ->
+            getFieldData( id )?.let {
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     //--------------------------------------------------------------------------
@@ -79,6 +101,26 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun getFieldData( id: Int ): FieldData?
+    {
+        var fieldData: FieldData? = null
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ID} = $id"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            fieldData = createFieldData( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return fieldData
+    }
+
+    //--------------------------------------------------------------------------
     fun getOrCreateFieldData( field_id: Int, enum_data_id: Int ): FieldData
     {
         var fieldData: FieldData? = null
@@ -94,7 +136,7 @@ class FieldDataDAO(private var dao: DAO)
         else
         {
             fieldData = FieldData( field_id, enum_data_id )
-            fieldData.id = createFieldData( fieldData )
+            createOrUpdateFieldData( fieldData )
         }
 
         cursor.close()
