@@ -191,6 +191,24 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                     marker.tag = enumData
                     enumDataMarkers.add( marker )
                 }
+
+                map.setOnMarkerClickListener { marker ->
+                    marker.tag?.let {tag ->
+                        val enum_data = tag as EnumData
+                        sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
+
+                        if (enum_data.isLocation)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                        }
+                        else
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                        }
+                    }
+
+                    false
+                }
             }
         }
 
