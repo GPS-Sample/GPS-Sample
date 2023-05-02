@@ -106,7 +106,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         when (item.itemId) {
             R.id.action_delete ->
             {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?", 0, this)
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?", "No", "Yes", 0, this)
                 return true
             }
         }
@@ -114,11 +114,11 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         return false
     }
 
-    override fun didAnswerNo()
+    override fun didSelectLeftButton(tag: Any?)
     {
     }
 
-    override fun didAnswerYes( tag: Any? )
+    override fun didSelectRightButton(tag: Any?)
     {
         rule?.let { rule ->
             DAO.ruleDAO.deleteRule( rule )

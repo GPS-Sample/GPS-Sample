@@ -145,19 +145,19 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
     fun shouldDeleteFilterRule( filterRule: FilterRule )
     {
         selectedFilterRule = filterRule
-        ConfirmationDialog( activity!!, "Please Confirm", "Are you sure you want to delete this Filter Rule?", 0, this )
+        ConfirmationDialog( activity!!, "Please Confirm", "Are you sure you want to delete this Filter Rule?", "No", "Yes", 0, this )
     }
 
-    override fun didAnswerNo()
+    override fun didSelectLeftButton(tag: Any?)
     {
     }
 
-    override fun didAnswerYes( tag: Any? )
+    override fun didSelectRightButton(tag: Any?)
     {
         selectedFilterRule?.let {
             DAO.filterRuleDAO.deleteFilterRule( it )
-           // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-           // createFilterAdapter.updateFilterRules( filterRules )
+            // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
+            // createFilterAdapter.updateFilterRules( filterRules )
         }
     }
 

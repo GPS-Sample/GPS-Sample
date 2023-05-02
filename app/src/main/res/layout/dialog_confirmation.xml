@@ -23,7 +23,7 @@
         android:layout_height="90dp">
 
         <Button
-            android:id="@+id/no_button"
+            android:id="@+id/left_button"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -36,7 +36,7 @@
             android:text="No" />
 
         <Button
-            android:id="@+id/yes_button"
+            android:id="@+id/right_button"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="50dp"

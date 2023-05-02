@@ -43,6 +43,9 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var enumerationAreasAdapter: ManageEnumerationAreasAdapter
 
+    private val kDeleteTag = 1
+    private val kExportTag = 2
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -56,7 +59,6 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        setHasOptionsMenu( true )
         _binding = FragmentConfigurationBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -81,31 +83,21 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", "No", "Yes", kDeleteTag, this)
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.generateQrButton.setOnClickListener {
+        binding.importButton.setOnClickListener {
+            val intent = Intent()
+                .setType("*/*")
+                .setAction(Intent.ACTION_GET_CONTENT)
+
+            startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
         }
 
         binding.exportButton.setOnClickListener {
-
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                DAO.configDAO.updateAllLists( config )
-
-                val packedConfig = config.pack()
-                Log.d( "xxx", packedConfig )
-
-                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                val file = File(root, "${config.name}.${Date().time}.json")
-                val writer = FileWriter(file)
-                writer.append(packedConfig)
-                writer.flush()
-                writer.close()
-
-                Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
-            }
+            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
         }
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -184,15 +176,38 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         }
     }
 
-    override fun didAnswerNo()
+    override fun didSelectLeftButton(tag: Any?)
     {
     }
 
-    override fun didAnswerYes( tag: Any? )
+    override fun didSelectRightButton(tag: Any?)
     {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            sharedViewModel.deleteConfig(config)
-            findNavController().popBackStack()
+        tag?.let { tag ->
+            if (tag == kDeleteTag)
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    sharedViewModel.deleteConfig(config)
+                    findNavController().popBackStack()
+                }
+            }
+            else
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    DAO.configDAO.updateAllLists( config )
+
+                    val packedConfig = config.pack()
+                    Log.d( "xxx", packedConfig )
+
+                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                    val file = File(root, "${config.name}.${Date().time}.json")
+                    val writer = FileWriter(file)
+                    writer.append(packedConfig)
+                    writer.flush()
+                    writer.close()
+
+                    Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -200,29 +215,6 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     {
         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
         findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater.inflate(R.menu.menu_import, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        when (item.itemId) {
-            R.id.action_import -> {
-                val intent = Intent()
-                    .setType("*/*")
-                    .setAction(Intent.ACTION_GET_CONTENT)
-
-                startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
-                return true
-            }
-        }
-
-        return false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -244,10 +236,12 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
                     val enumArea = EnumArea.unpack( text )
 
-                    for (enumData in enumArea.enumDataList)
-                    {
-                        DAO.enumDataDAO.createEnumData( enumData )
-                    }
+                    enumArea?.let { enumArea ->
+                        for (enumData in enumArea.enumDataList)
+                        {
+                            DAO.enumDataDAO.createEnumData( enumData )
+                        }
+                    } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
                 }
             }
         }

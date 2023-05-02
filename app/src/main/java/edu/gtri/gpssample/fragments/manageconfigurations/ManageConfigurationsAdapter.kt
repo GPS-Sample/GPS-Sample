@@ -18,8 +18,7 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectConfig: ((config: Config) -> Unit)
-    lateinit var shouldDeleteConfig: ((config: Config) -> Unit)
-    lateinit var shouldEditConfig: ((config: Config) -> Unit)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.mContext = parent.context
@@ -49,18 +48,10 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
         holder.itemView.setOnClickListener {
             didSelectConfig(config)
         }
-        holder.deleteImageView.setOnClickListener {
-            shouldDeleteConfig(config)
-        }
-        holder.editImageView.setOnClickListener {
-            shouldEditConfig(config)
-        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val editImageView: ImageView = itemView.findViewById<ImageView>(R.id.edit_view)
-        val deleteImageView: ImageView = itemView.findViewById<ImageView>(R.id.image_view)
     }
 }

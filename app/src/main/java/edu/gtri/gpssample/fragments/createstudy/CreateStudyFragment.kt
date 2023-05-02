@@ -173,15 +173,13 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private fun didDeleteField( field: Field )
     {
         sharedViewModel.createFieldModel.setSelectedField(field)
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?",
-            DeleteMode.deleteFieldTag.value, this)
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?", "No", "Yes", DeleteMode.deleteFieldTag.value, this)
     }
 
     private fun didDeleteRule( rule: Rule )
     {
         sharedViewModel.deleteRule(rule)
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?",
-            DeleteMode.deleteRuleTag.value, this)
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?", "No", "Yes", DeleteMode.deleteRuleTag.value, this)
     }
 
     private fun didDeleteFilter( filter: Filter )
@@ -205,12 +203,12 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         findNavController().popBackStack()
     }
 
-    override fun didAnswerNo()
+    override fun didSelectLeftButton(tag: Any?)
     {
         findNavController().popBackStack()
     }
 
-    override fun didAnswerYes( tag: Any? )
+    override fun didSelectRightButton(tag: Any?)
     {
         val t = tag as Int
 

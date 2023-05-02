@@ -236,7 +236,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         polygon.tag = enumArea
 
         map.setOnPolygonClickListener {polygon ->
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this Enumeration Area?", polygon, this)
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this Enumeration Area?", "No", "Yes", polygon, this)
         }
     }
 
@@ -254,10 +254,11 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
-    override fun didAnswerNo() {
+    override fun didSelectLeftButton(tag: Any?)
+    {
     }
 
-    override fun didAnswerYes( tag: Any? )
+    override fun didSelectRightButton(tag: Any?)
     {
         val polygon = tag as Polygon
         val enumArea = polygon.tag as EnumArea

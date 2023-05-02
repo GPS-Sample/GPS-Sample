@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -28,6 +29,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
     private var selectedConfig: Config? = null
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -48,8 +50,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Config>())
         manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
-        manageConfigurationsAdapter.shouldDeleteConfig = this::shouldDeleteConfig
-        manageConfigurationsAdapter.shouldEditConfig = this::shouldEditConfig
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageConfigurationsAdapter
@@ -70,11 +70,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         }
 
         binding.importButton.setOnClickListener {
-            val intent = Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-
-            startActivityForResult(Intent.createChooser(intent, "Select a configuration"), 1023)
+            ConfirmationDialog( activity, "Import Configuration", "Select an import method", "QR Code", "File System", 0, this)
         }
     }
 
@@ -86,6 +82,26 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         // get this from the view controller
         manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+    }
+
+    private fun didSelectConfig( config: Config )
+    {
+        val bundle = Bundle()
+        sharedViewModel.setCurrentConfig(config)
+        findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
+    }
+
+    override fun didSelectLeftButton(tag: Any?)
+    {
+    }
+
+    override fun didSelectRightButton(tag: Any?)
+    {
+        val intent = Intent()
+            .setType("*/*")
+            .setAction(Intent.ACTION_GET_CONTENT)
+
+        startActivityForResult(Intent.createChooser(intent, "Select a configuration"), 1023)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -107,46 +123,17 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                     val config = Config.unpack( text )
 
-                    DAO.deleteAll()
+                    config?.let { config ->
+                        DAO.deleteAll()
 
-                    DAO.configDAO.createConfig( config )
+                        DAO.configDAO.createConfig( config )
 
-                    sharedViewModel.initializeConfigurations()
+                        sharedViewModel.initializeConfigurations()
 
-                    manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
+                        manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
+                    } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-    }
-
-    private fun didSelectConfig( config: Config )
-    {
-        val bundle = Bundle()
-        sharedViewModel.setCurrentConfig(config)
-        findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
-    }
-
-    private fun shouldDeleteConfig( config: Config )
-    {
-        selectedConfig = config
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
-    }
-
-    private fun shouldEditConfig(config: Config)
-    {
-        sharedViewModel.setCurrentConfig(config)
-        findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
-    }
-
-    override fun didAnswerNo()
-    {
-    }
-
-    override fun didAnswerYes( tag: Any? )
-    {
-        selectedConfig?.let {
-            sharedViewModel.deleteConfig(it)
-            manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations)
         }
     }
 

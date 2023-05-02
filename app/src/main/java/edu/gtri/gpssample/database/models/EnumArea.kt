@@ -17,9 +17,13 @@ data class EnumArea (
     constructor(id: Int, config_id: Int, name: String) : this(id, config_id, name, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<EnumData>())
     constructor(config_id: Int, name: String, vertices: ArrayList<LatLon>) : this(null, config_id, name, vertices, ArrayList<Team>(), ArrayList<EnumData>())
 
-    fun copy() : EnumArea
+    fun copy() : EnumArea?
     {
-        return unpack(pack())
+        val _copy = unpack(pack())
+
+        _copy?.let { _copy ->
+            return _copy
+        } ?: return null
     }
 
     fun pack() : String
@@ -29,9 +33,15 @@ data class EnumArea (
 
     companion object
     {
-        fun unpack( string: String ) : EnumArea
+        fun unpack( string: String ) : EnumArea?
         {
-            return Json.decodeFromString<EnumArea>( string )
+            try
+            {
+                return Json.decodeFromString<EnumArea>( string )
+            }
+            catch (e: Exception) {}
+
+            return null;
         }
     }
 }

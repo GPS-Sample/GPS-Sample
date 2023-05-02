@@ -146,7 +146,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     private fun shouldDeleteStudy(study: Study)
     {
         selectedStudy = study
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", 0, this)
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", 0, this)
     }
 
     override fun onMapClick(p0: LatLng) {
@@ -190,10 +190,12 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
         }
     }
 
-    override fun didAnswerNo() {
+    override fun didSelectLeftButton(tag: Any?)
+    {
     }
 
-    override fun didAnswerYes(tag: Any?) {
+    override fun didSelectRightButton(tag: Any?)
+    {
         sharedViewModel.removeStudy(selectedStudy)
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
     }
