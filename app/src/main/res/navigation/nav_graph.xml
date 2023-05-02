@@ -131,6 +131,14 @@
         tools:layout="@layout/fragment_define_enumeration_area">
 
         <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddLocationFragment"
+            app:destination="@id/AddLocationFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_CreateStudyFragment"
             app:destination="@id/CreateStudyFragment"/>
 
@@ -179,6 +187,10 @@
         android:id="@+id/ManageEnumerationAreaFragment"
         android:name="edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationAreaFragment"
         tools:layout="@layout/fragment_manage_enumeration_area">
+
+        <action
+            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
+            app:destination="@id/PerformEnumerationFragment" />
 
         <action
             android:id="@+id/action_navigate_to_ManageEnumerationTeamFragment"

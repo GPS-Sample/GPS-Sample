@@ -31,6 +31,10 @@ class TeamDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun putTeam(team: Team, values: ContentValues )
     {
+        team.id?.let { id ->
+            Log.d( "xxx", "existing team id = ${id}")
+            values.put( DAO.COLUMN_ID, id )
+        }
         values.put( DAO.COLUMN_ENUM_AREA_ID, team.enumAreaId )
         values.put( DAO.COLUMN_TEAM_NAME, team.name )
     }

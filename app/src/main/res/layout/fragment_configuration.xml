@@ -4,9 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".fragments.configuration.ConfigurationFragment">
 
-    tools:context=".fragments.configuration.ConfigurationFragment"
-    >
     <data>
         <variable
             name="viewModel"
@@ -16,35 +15,36 @@
             name="configurationFragment"
             type="edu.gtri.gpssample.fragments.configuration.ConfigurationFragment" />
     </data>
-        <LinearLayout
-            android:orientation="vertical"
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:background="@color/primary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="50dp">
 
-            <FrameLayout
-                android:background="@color/primary"
-                android:layout_width="match_parent"
-                android:layout_height="50dp">
+            <ImageView
+                android:id="@+id/edit_image_view"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="start"
+                app:srcCompat="@drawable/edit_white"/>
 
-                <ImageView
-                    android:id="@+id/edit_image_view"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="start"
-                    app:srcCompat="@drawable/edit_white"/>
+            <ImageView
+                android:id="@+id/delete_image_view"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                app:srcCompat="@drawable/delete_white"/>
+        </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/delete_image_view"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    app:srcCompat="@drawable/delete_white"/>
-
-            </FrameLayout>
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -222,7 +222,7 @@
         </ScrollView>
 
         <Button
-            android:id="@+id/generate_qr_button"
+            android:id="@+id/export_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginStart="20dp"
@@ -230,15 +230,15 @@
             android:layout_marginTop="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Generate QR Code" />
+            android:text="Export Configuration" />
 
-            <Button
-                android:id="@+id/export_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="Export Configuration" />
+        <Button
+            android:id="@+id/import_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Import Enumeration Data" />
     </LinearLayout>
 </layout>

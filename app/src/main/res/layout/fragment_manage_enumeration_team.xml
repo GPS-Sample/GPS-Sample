@@ -50,6 +50,7 @@
             android:layout_height="0dp"/>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/generate_qr_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -61,6 +62,7 @@
             android:text="Generate QR Code" />
 
         <Button
+            android:visibility="gone"
             android:id="@+id/export_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"

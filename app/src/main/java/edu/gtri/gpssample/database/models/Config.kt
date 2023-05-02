@@ -52,9 +52,15 @@ data class Config(
 
     companion object
     {
-        fun unpack( message: String ) : Config
+        fun unpack( message: String ) : Config?
         {
-            return Json.decodeFromString<Config>( message )
+            try
+            {
+                return Json.decodeFromString<Config>( message )
+            }
+            catch( ex: Exception ) {}
+
+            return null
         }
     }
 }

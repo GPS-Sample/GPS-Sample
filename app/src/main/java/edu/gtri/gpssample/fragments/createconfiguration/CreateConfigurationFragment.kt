@@ -146,7 +146,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     private fun shouldDeleteStudy(study: Study)
     {
         selectedStudy = study
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", 0, this)
+        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", 0, this)
     }
 
     override fun onMapClick(p0: LatLng) {
@@ -165,37 +165,37 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     {
         map.clear()
 
-        sharedViewModel.currentConfiguration?.value?.let {config ->
-            config.id?.let {id ->
-                val enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
-                for (enumArea in enumAreas)
-                {
-                    val points = ArrayList<LatLng>()
+            for (enumArea in enumAreas)
+            {
+                val points = ArrayList<LatLng>()
 
-                    enumArea.vertices.map {
-                        points.add( it.toLatLng())
-                    }
-
-                    val polygon = PolygonOptions()
-                        .clickable(false)
-                        .addAll(points)
-
-                    map.addPolygon(polygon)
+                enumArea.vertices.map {
+                    points.add( it.toLatLng())
                 }
 
-                // HACK HACK
-                val atl = LatLng( 33.774881, -84.396341 )
-                val srb = LatLng(30.335603,-86.165004 )
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 13.5f))
+                val polygon = PolygonOptions()
+                    .clickable(false)
+                    .addAll(points)
+
+                map.addPolygon(polygon)
             }
+
+            // HACK HACK
+            val atl = LatLng( 33.774881, -84.396341 )
+            val srb = LatLng(30.335603,-86.165004 )
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 13.5f))
         }
     }
 
-    override fun didAnswerNo() {
+    override fun didSelectLeftButton(tag: Any?)
+    {
     }
 
-    override fun didAnswerYes(tag: Any?) {
+    override fun didSelectRightButton(tag: Any?)
+    {
         sharedViewModel.removeStudy(selectedStudy)
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
     }

@@ -141,7 +141,8 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         sharedViewModel.teamViewModel.setCurrentTeam( team )
 
-        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamFragment )
+        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+//        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamFragment )
     }
 
     override fun didStartHotspot( ssid: String, pass: String )

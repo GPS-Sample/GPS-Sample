@@ -37,7 +37,6 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
     private var createMode = false
     private var notificationShown = false
-    private var enumAreas : List<EnumArea>? = null
     private var vertexMarkers = ArrayList<Marker>()
     private var enumDataMarkers = ArrayList<Marker>()
     private var _binding: FragmentDefineEnumerationAreaBinding? = null
@@ -162,48 +161,62 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         val user = (activity!!.application as? MainApplication)?.user
 
-        config.id?.let {id ->
-            enumAreas = DAO.enumAreaDAO.getEnumAreas( id )
+        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+
+        for (enumArea in enumAreas)
+        {
+            addPolygon( enumArea )
+
+            if (user!!.role == Role.Supervisor.toString())
+            {
+                val latLng = getCenter( enumArea )
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
+            }
+
+            val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+
+            for (enumData in enumDataList)
+            {
+                var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+
+                if (enumData.isLocation)
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+
+                val marker = map.addMarker( MarkerOptions()
+                    .position( LatLng( enumData.latitude, enumData.longitude ))
+                    .icon( icon )
+                )
+
+                marker?.let {marker ->
+                    marker.tag = enumData
+                    enumDataMarkers.add( marker )
+                }
+
+                map.setOnMarkerClickListener { marker ->
+                    marker.tag?.let {tag ->
+                        val enum_data = tag as EnumData
+                        sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
+
+                        if (enum_data.isLocation)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                        }
+                        else
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                        }
+                    }
+
+                    false
+                }
+            }
         }
 
-        enumAreas?.let {enumAreas->
-            for (enumArea in enumAreas)
-            {
-                addPolygon( enumArea )
-
-                if (user!!.role == Role.Supervisor.toString())
-                {
-                    val latLng = getCenter( enumArea )
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
-                }
-
-                val enumDataList = DAO.enumDataDAO.getEnumData(enumArea.id!!)
-
-                for (enumData in enumDataList)
-                {
-                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-
-                    if (enumData.isLocation)
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-
-                    val marker = map.addMarker( MarkerOptions()
-                        .position( LatLng( enumData.latitude, enumData.longitude ))
-                        .icon( icon )
-                    )
-
-                    marker?.let {marker ->
-                        marker.tag = enumData
-                        enumDataMarkers.add( marker )
-                    }
-                }
-            }
-
-            if (user!!.role == Role.Admin.toString())
-            {
-                val atl = LatLng( 33.774881, -84.396341 )
-                val srb = LatLng(30.330603,-86.165004 )
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 15.0f))
-            }
+        if (user!!.role == Role.Admin.toString())
+        {
+            val atl = LatLng( 33.774881, -84.396341 )
+            val srb = LatLng(30.330603,-86.165004 )
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 15.0f))
         }
     }
 
@@ -223,7 +236,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         polygon.tag = enumArea
 
         map.setOnPolygonClickListener {polygon ->
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this Enumeration Area?", polygon, this)
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this Enumeration Area?", "No", "Yes", polygon, this)
         }
     }
 
@@ -241,10 +254,11 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
-    override fun didAnswerNo() {
+    override fun didSelectLeftButton(tag: Any?)
+    {
     }
 
-    override fun didAnswerYes( tag: Any? )
+    override fun didSelectRightButton(tag: Any?)
     {
         val polygon = tag as Polygon
         val enumArea = polygon.tag as EnumArea

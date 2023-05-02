@@ -1,4 +1,5 @@
-package edu.gtri.gpssample.fragments.manageconfigurations
+package edu.gtri.gpssample.fragments.perform_enumeration
+
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,14 +11,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumData
+import edu.gtri.gpssample.database.models.FieldData
 
-class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerView.Adapter<ManageConfigurationsAdapter.ViewHolder>()
+class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerView.Adapter<PerformEnumerationAdapter.ViewHolder>()
 {
-    override fun getItemCount() = configurations!!.size
+    override fun getItemCount() = enumDataList!!.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var didSelectConfig: ((config: Config) -> Unit)
+    lateinit var didSelectEnumData: ((enumData: EnumData) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -31,9 +34,9 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
         return viewHolder
     }
 
-    fun updateConfigurations( configurations: List<Config> )
+    fun updateEnumDataList( enumDataList: List<EnumData> )
     {
-        this.configurations = configurations
+        this.enumDataList = enumDataList
         notifyDataSetChanged()
     }
 
@@ -41,12 +44,12 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
     {
         holder.itemView.isSelected = false
 
-        val config = configurations!!.get(holder.adapterPosition)
+        val enumData = enumDataList!!.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( config.name )
+        holder.nameTextView.setText( enumData.id.toString())
 
         holder.itemView.setOnClickListener {
-            didSelectConfig(config)
+            didSelectEnumData(enumData)
         }
     }
 

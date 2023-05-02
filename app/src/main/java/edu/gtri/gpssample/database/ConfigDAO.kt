@@ -40,7 +40,7 @@ class ConfigDAO(private var dao: DAO)
     {
         config.id?.let { id ->
             Log.d( "xxx", "existing config id = ${id}")
-            values.put( DAO.COLUMN_ID, config.id )
+            values.put( DAO.COLUMN_ID, id )
         }
 
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
@@ -203,7 +203,8 @@ class ConfigDAO(private var dao: DAO)
     fun updateAllLists(config: Config)
     {
         config.id?.let { id ->
-            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(id)
+            config.studies = DAO.studyDAO.getStudies(config)
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
         }
     }
 

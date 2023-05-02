@@ -1,12 +1,12 @@
 package edu.gtri.gpssample.fragments.configuration
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,6 +24,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
@@ -41,6 +42,9 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     private var map : GoogleMap? = null
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var enumerationAreasAdapter: ManageEnumerationAreasAdapter
+
+    private val kDeleteTag = 1
+    private val kExportTag = 2
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -79,31 +83,21 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", 0, this)
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", "No", "Yes", kDeleteTag, this)
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
-        binding.generateQrButton.setOnClickListener {
+        binding.importButton.setOnClickListener {
+            val intent = Intent()
+                .setType("*/*")
+                .setAction(Intent.ACTION_GET_CONTENT)
+
+            startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
         }
 
         binding.exportButton.setOnClickListener {
-
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                DAO.configDAO.updateAllLists( config )
-
-                val packedConfig = config.pack()
-                Log.d( "xxx", packedConfig )
-
-                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                val file = File(root, "${config.name}.${Date().time}.json")
-                val writer = FileWriter(file)
-                writer.append(packedConfig)
-                writer.flush()
-                writer.close()
-
-                Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
-            }
+            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
         }
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -125,7 +119,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            enumerationAreasAdapter.updateEnumAreas(DAO.enumAreaDAO.getEnumAreas(config.id!!))
+            enumerationAreasAdapter.updateEnumAreas(DAO.enumAreaDAO.getEnumAreas(config))
         }
 
         // set the first study as selected.  TODO: save the id of the selected study
@@ -157,7 +151,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
             // put the enums
             sharedViewModel.currentConfiguration?.value?.let {config ->
-                val enumAreas = DAO.enumAreaDAO.getEnumAreas( config.id!! )
+                val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
                 for (enumArea in enumAreas)
                 {
@@ -182,15 +176,38 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         }
     }
 
-    override fun didAnswerNo()
+    override fun didSelectLeftButton(tag: Any?)
     {
     }
 
-    override fun didAnswerYes( tag: Any? )
+    override fun didSelectRightButton(tag: Any?)
     {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            sharedViewModel.deleteConfig(config)
-            findNavController().popBackStack()
+        tag?.let { tag ->
+            if (tag == kDeleteTag)
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    sharedViewModel.deleteConfig(config)
+                    findNavController().popBackStack()
+                }
+            }
+            else
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    DAO.configDAO.updateAllLists( config )
+
+                    val packedConfig = config.pack()
+                    Log.d( "xxx", packedConfig )
+
+                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                    val file = File(root, "${config.name}.${Date().time}.json")
+                    val writer = FileWriter(file)
+                    writer.append(packedConfig)
+                    writer.flush()
+                    writer.close()
+
+                    Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -198,6 +215,36 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     {
         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
         findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
+        {
+            val uri = data?.data
+
+            uri?.let { uri ->
+
+                val inputStream = activity!!.getContentResolver().openInputStream(uri)
+
+                inputStream?.let {  inputStream ->
+                    val text = inputStream.bufferedReader().readText()
+
+                    Log.d( "xxx", text )
+
+                    val enumArea = EnumArea.unpack( text )
+
+                    enumArea?.let { enumArea ->
+                        for (enumData in enumArea.enumDataList)
+                        {
+                            DAO.enumDataDAO.importEnumData( enumData )
+                        }
+                    } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     override fun onDestroyView()
