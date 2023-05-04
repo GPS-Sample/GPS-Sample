@@ -49,7 +49,6 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
         val enumArea = enumAreas!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( enumArea.name )
-        holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.qr_code_white))
 
         holder.itemView.setOnClickListener {
             didSelectEnumArea(enumArea)
@@ -59,6 +58,5 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val imageView: ImageView = itemView.findViewById<ImageView>(R.id.image_view)
     }
 }

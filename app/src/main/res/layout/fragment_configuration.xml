@@ -215,8 +215,8 @@
                     android:id="@+id/studies_recycler"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="0dp"
                     android:layout_height="100dp"/>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>

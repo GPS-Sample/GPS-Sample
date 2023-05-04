@@ -18,10 +18,13 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Serializable
 data class Config(
     var id : Int? = null,
+    var creationDate: Long,
     var name: String,
     var dateFormat: DateFormat,
     var timeFormat: TimeFormat,
@@ -31,10 +34,10 @@ data class Config(
     var enumAreas : ArrayList<EnumArea>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-        minGpsPrecision: Int) : this(null, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
+        minGpsPrecision: Int) : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
                                     ArrayList<Study>(), ArrayList<EnumArea>())
-    constructor(id: Int?, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int) : this(id, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
+    constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+                minGpsPrecision: Int) : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
                 ArrayList<Study>(), ArrayList<EnumArea>())
 
     var minimumGPSPrecision : String

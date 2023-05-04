@@ -51,14 +51,13 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
             didSelectStudy(study)
         }
 
-        holder.deleteImageView.setOnClickListener {
-            shouldDeleteStudy(study)
-        }
+//        holder.deleteImageView.setOnClickListener {
+//            shouldDeleteStudy(study)
+//        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val deleteImageView: ImageView = itemView.findViewById<ImageView>(R.id.image_view)
     }
 }

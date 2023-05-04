@@ -102,16 +102,15 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
             }
         }
 
-        val deleteView = view!!.findViewById<View>(R.id.image_view) as ImageView
-        deleteView.setOnClickListener{
-            when( groupPosition )
-            {
-                0 -> didDeleteField( fields[childPosition] )
-                1 -> didDeleteRule( rules[childPosition] )
-                2 -> didDeleteFilter( filters[childPosition] )
-            }
-        }
-
+//        val deleteView = view!!.findViewById<View>(R.id.image_view) as ImageView
+//        deleteView.setOnClickListener{
+//            when( groupPosition )
+//            {
+//                0 -> didDeleteField( fields[childPosition] )
+//                1 -> didDeleteRule( rules[childPosition] )
+//                2 -> didDeleteFilter( filters[childPosition] )
+//            }
+//        }
 
         return view
     }

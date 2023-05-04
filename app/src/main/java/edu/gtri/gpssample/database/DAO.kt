@@ -25,13 +25,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " REAL" + "," +
                 COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
 
                 // this needs to be a look up table
                 COLUMN_CONFIG_DATE_FORMAT_INDEX + " INTEGER" + "," +
                 COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
                 COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
-
                 COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" +
                 ")")
         db.execSQL(createTableConfig)
@@ -179,7 +179,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
                 COLUMN_FIELD_DATA_TEXT_VALUE + " TEXT" + "," +
-                COLUMN_FIELD_DATA_NUMBER_VALUE + " DOUBLE" + "," +
+                COLUMN_FIELD_DATA_NUMBER_VALUE + " REAL" + "," +
                 COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +
                 COLUMN_FIELD_DATA_DROPDOWN_INDEX + " INTEGER" + "," +
                 COLUMN_FIELD_DATA_CHECKBOX1 + " INTEGER" + "," +
@@ -194,8 +194,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableLatLon = ("CREATE TABLE " +
                 TABLE_LAT_LON + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_LAT + " DOUBLE" + "," +
-                COLUMN_LON + " DOUBLE" + "," +
+                COLUMN_LAT + " REAL" + "," +
+                COLUMN_LON + " REAL" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
@@ -233,6 +233,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
 
         const val COLUMN_UUID = "uuid"
+        const val COLUMN_CREATION_DATE = "creation_date"
 
         // foreign key columns
         const val COLUMN_USER_ID = "user_id"
@@ -402,6 +403,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 114
+        private const val DATABASE_VERSION = 115
     }
 }
