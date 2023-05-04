@@ -126,6 +126,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         sharedViewModel.currentConfiguration?.value?.let { config ->
             if(config.studies.count() > 0)
             {
+                Log.d( "xxx", "selected study with ID ${config.studies[0].id}")
                 sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
         }
@@ -199,7 +200,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                     Log.d( "xxx", packedConfig )
 
                     val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                    val file = File(root, "${config.name}.${Date().time}.json")
+                    val file = File(root, "Config.${config.name}.${Date().time}.json")
                     val writer = FileWriter(file)
                     writer.append(packedConfig)
                     writer.flush()
@@ -239,7 +240,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                     enumArea?.let { enumArea ->
                         for (enumData in enumArea.enumDataList)
                         {
-                            DAO.enumDataDAO.importEnumData( enumData )
+                            val ed = DAO.enumDataDAO.importEnumData( enumData )
                         }
                     } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
                 }

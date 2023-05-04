@@ -43,6 +43,7 @@ class FieldDataDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, it )
         }
 
+        values.put( DAO.COLUMN_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_FIELD_ID, fieldData.fieldId )
         values.put( DAO.COLUMN_ENUM_DATA_ID, fieldData.enumDataId )
         values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
@@ -70,6 +71,7 @@ class FieldDataDAO(private var dao: DAO)
     private fun createFieldData(cursor: Cursor): FieldData
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
         val enum_data_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_ID))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
@@ -81,7 +83,7 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
 
-        return FieldData( id, field_id, enum_data_id, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
+        return FieldData( id, uuid, field_id, enum_data_id, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
     }
 
     //--------------------------------------------------------------------------
@@ -171,10 +173,12 @@ class FieldDataDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun delete( fieldData: FieldData )
     {
-        fieldData.id?.let {field_data_id ->
+        fieldData.id?.let {id ->
+            Log.d( "xxx", "deleting fieldData with id $id" )
+
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args = arrayOf(field_data_id.toString())
+            val args = arrayOf(id.toString())
 
             db.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
             db.close()

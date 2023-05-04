@@ -158,6 +158,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableEnumData = ("CREATE TABLE " +
                 TABLE_ENUM_DATA + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_USER_ID + " INTEGER" + "," +
                 COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
@@ -174,6 +175,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableFieldData = ("CREATE TABLE " +
                 TABLE_FIELD_DATA + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
                 COLUMN_FIELD_DATA_TEXT_VALUE + " TEXT" + "," +
@@ -229,6 +231,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         const val COLUMN_ID = "id"
         const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
+
+        const val COLUMN_UUID = "uuid"
 
         // foreign key columns
         const val COLUMN_USER_ID = "user_id"
@@ -398,6 +402,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 104
+        private const val DATABASE_VERSION = 114
     }
 }
