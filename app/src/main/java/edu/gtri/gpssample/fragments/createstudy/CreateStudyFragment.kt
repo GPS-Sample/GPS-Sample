@@ -95,6 +95,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
 
         binding.expandableListView.setAdapter( createStudyAdapter )
+        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", DeleteMode.deleteStudyTag.value, this)
