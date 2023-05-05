@@ -97,7 +97,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         binding.expandableListView.setAdapter( createStudyAdapter )
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", 0, this)
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", DeleteMode.deleteStudyTag.value, this)
         }
 
         binding.saveButton.setOnClickListener {
@@ -218,37 +218,31 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     override fun didSelectRightButton(tag: Any?)
     {
-        if (this::study.isInitialized)
-        {
-            sharedViewModel.removeStudy(study)
-            findNavController().popBackStack()
-        }
+        val t = tag as Int
 
-//        val t = tag as Int
-//
-//        when( t )
-//        {
-//            DeleteMode.deleteStudyTag.value -> {
-//                sharedViewModel.deleteCurrentStudy()
-//                findNavController().popBackStack()
-//            }
-//            DeleteMode.deleteFieldTag.value -> {
-//
-//                sharedViewModel.deleteSelectedField()
-//                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-//                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
-//                }
-//            }
-//            DeleteMode.deleteRuleTag.value -> {
-//                sharedViewModel.deleteSelectedRule()
-//                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-//                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
-//                }
-//            }
-//            DeleteMode.deleteFilterTag.value -> {
-//
-//            }
-//        }
+        when( t )
+        {
+            DeleteMode.deleteStudyTag.value -> {
+                sharedViewModel.deleteCurrentStudy()
+                findNavController().popBackStack()
+            }
+            DeleteMode.deleteFieldTag.value -> {
+
+                sharedViewModel.deleteSelectedField()
+                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
+                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
+                }
+            }
+            DeleteMode.deleteRuleTag.value -> {
+                sharedViewModel.deleteSelectedRule()
+                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
+                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
+                }
+            }
+            DeleteMode.deleteFilterTag.value -> {
+
+            }
+        }
     }
 
     override fun onDestroyView()

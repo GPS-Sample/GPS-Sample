@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Study
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<ManageStudiesAdapter.ViewHolder>()
 {
@@ -46,6 +48,7 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
         val study = studies!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( study.name )
+        holder.dateTextView.setText( Date( study.creationDate ).toString())
 
         holder.itemView.setOnClickListener {
             didSelectStudy(study)
@@ -59,5 +62,6 @@ class ManageStudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<Man
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
+        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
     }
 }

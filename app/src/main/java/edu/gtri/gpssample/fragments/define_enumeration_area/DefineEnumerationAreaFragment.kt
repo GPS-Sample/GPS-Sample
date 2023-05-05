@@ -101,12 +101,6 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
             else
             {
-                if (!notificationShown)
-                {
-                    notificationShown = true
-                    NotificationDialog( activity, "Note!", "Create a polygon by tapping on the screen to drop markers. Markers will need to be created starting from the top left most vertex and proceeding clockwise.")
-                }
-
                 vertexMarkers.clear()
                 createMode = true
                 binding.createSaveButton.text = "Save Polygon"

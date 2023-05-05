@@ -7,10 +7,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Serializable
 data class Study(
     var id : Int? = null,
+    var creationDate: Long,
     var name: String,
     var samplingMethod: SamplingMethod,
     var sampleSize: Int,
@@ -20,12 +23,12 @@ data class Study(
     var filters : ArrayList<Filter>)
 {
     constructor(name: String, samplingMethod: SamplingMethod,
-                sampleSize: Int, sampleType: SampleType) : this(null,
+                sampleSize: Int, sampleType: SampleType) : this(null, Date().time,
                 name, samplingMethod, sampleSize, sampleType,
                 ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
-    constructor(id: Int, name: String, samplingMethod: SamplingMethod,
+    constructor(id: Int, creationDate: Long, name: String, samplingMethod: SamplingMethod,
                 sampleSize: Int, sampleType: SampleType) : this(id,
-                name, samplingMethod, sampleSize, sampleType,
+                creationDate, name, samplingMethod, sampleSize, sampleType,
                 ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
     fun pack() : String
     {

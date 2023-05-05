@@ -25,7 +25,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " REAL" + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
 
                 // this needs to be a look up table
@@ -39,8 +39,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableStudy = ("CREATE TABLE " +
                 TABLE_STUDY + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_STUDY_NAME + " TEXT" + "," +
-
                 COLUMN_CONFIG_ID + " INTEGER" + "," +
 
                 // this needs to be a look up table
@@ -403,6 +403,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 115
+        private const val DATABASE_VERSION = 116
     }
 }
