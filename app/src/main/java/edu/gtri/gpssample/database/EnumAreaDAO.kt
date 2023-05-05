@@ -54,6 +54,7 @@ class EnumAreaDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
         values.put( DAO.COLUMN_CONFIG_ID, enumArea.config_id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
     }
@@ -63,10 +64,11 @@ class EnumAreaDAO(private var dao: DAO)
     private fun createEnumArea(cursor: Cursor): EnumArea
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val config_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
 
-        return EnumArea( id, config_id, name )
+        return EnumArea( id, creationDate, config_id, name )
     }
 
     //--------------------------------------------------------------------------
