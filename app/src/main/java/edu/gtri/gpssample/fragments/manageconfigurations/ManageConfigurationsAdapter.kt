@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerView.Adapter<ManageConfigurationsAdapter.ViewHolder>()
 {
@@ -44,7 +46,7 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
         val config = configurations!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( config.name )
-
+        holder.dateTextView.setText( Date(config.creationDate).toString())
         holder.itemView.setOnClickListener {
             didSelectConfig(config)
         }
@@ -53,5 +55,6 @@ class ManageConfigurationsAdapter(var configurations: List<Config>?) : RecyclerV
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
+        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
     }
 }

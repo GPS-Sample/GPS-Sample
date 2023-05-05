@@ -4,10 +4,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Serializable
 data class EnumData(
     var id : Int? = null,
+    var uuid : String,
     var userId : Int,
     var enumAreaId : Int,
     var latitude : Double,
@@ -18,7 +21,7 @@ data class EnumData(
     var fieldDataList : ArrayList<FieldData>?)
 {
     constructor( userId: Int, enumAreaId: Int, latitude: Double, longitude: Double) :
-            this( null, userId, enumAreaId, latitude, longitude, false,"", "", null)
+            this( null, UUID.randomUUID().toString(), userId, enumAreaId, latitude, longitude, false,"", "", null)
 
     fun pack() : String
     {

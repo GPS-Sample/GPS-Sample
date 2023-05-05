@@ -155,16 +155,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/enumeration_area"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -179,21 +169,31 @@
                         android:name="com.google.android.gms.maps.SupportMapFragment" />
                 </RelativeLayout>
 
-                <Space
+<!--                <Space-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="10dp" />-->
+
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="10dp" />
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/enumeration_area"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/enum_areas_recycler"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="0dp"
                     android:layout_height="0dp" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp" />
+<!--                <Space-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="10dp" />-->
 
                 <FrameLayout
                     android:layout_marginBottom="2dp"
@@ -209,15 +209,15 @@
                     android:text="@string/studies"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
-
                 </FrameLayout>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/studies_recycler"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_height="100dp"/>
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_height="0dp"/>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
 

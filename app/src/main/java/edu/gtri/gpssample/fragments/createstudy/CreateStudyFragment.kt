@@ -71,8 +71,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         createStudyAdapter.didDeleteRule = this::didDeleteRule
         createStudyAdapter.didDeleteFilter = this::didDeleteFilter
 
-
-
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -90,7 +88,17 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 binding.samplingMethodSpinner.adapter = adapter
             }
 
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+            this.study = study
+        } ?: run {
+            binding.deleteImageView.visibility= View.GONE
+        }
+
         binding.expandableListView.setAdapter( createStudyAdapter )
+
+        binding.deleteImageView.setOnClickListener {
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", DeleteMode.deleteStudyTag.value, this)
+        }
 
         binding.saveButton.setOnClickListener {
             updateStudy()
@@ -205,7 +213,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     override fun didSelectLeftButton(tag: Any?)
     {
-        findNavController().popBackStack()
+//        findNavController().popBackStack()
     }
 
     override fun didSelectRightButton(tag: Any?)

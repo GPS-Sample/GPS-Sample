@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Study
+import java.util.*
+import kotlin.collections.ArrayList
 
 class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAdapter.ViewHolder>()
 {
@@ -24,7 +26,7 @@ class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAd
     {
         this.mContext = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_inuse, parent, false))
+        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -46,6 +48,7 @@ class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAd
         val study = studies!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( study.name )
+        holder.dateTextView.setText( Date( study.creationDate ).toString())
 
         holder.itemView.setOnClickListener {
             didSelectStudy(study)
@@ -56,6 +59,6 @@ class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAd
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-
+        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
     }
 }

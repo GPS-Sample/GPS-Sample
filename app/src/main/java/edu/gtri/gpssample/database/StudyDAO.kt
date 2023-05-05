@@ -85,8 +85,8 @@ class StudyDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_CREATION_DATE, study.creationDate )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
-
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
 
         // convert enum to int.  Maybe not do this and have look up tables?
@@ -137,6 +137,7 @@ class StudyDAO(private var dao: DAO)
     private fun buildStudy(cursor: Cursor ): Study
     {
         val id = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_ID}"))
+        val creationDate = cursor.getLong(cursor.getColumnIndex("${DAO.COLUMN_CREATION_DATE}"))
         val name = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_NAME}"))
         val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX}"))
         val sampleSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE}"))
@@ -145,7 +146,7 @@ class StudyDAO(private var dao: DAO)
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
-        return Study( id, name, samplingMethod, sampleSize, sampleType )
+        return Study( id, creationDate, name, samplingMethod, sampleSize, sampleType )
     }
 
     //--------------------------------------------------------------------------

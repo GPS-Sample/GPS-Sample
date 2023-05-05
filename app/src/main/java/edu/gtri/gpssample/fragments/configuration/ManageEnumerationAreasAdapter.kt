@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.EnumArea
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ManageEnumerationAreasAdapter.ViewHolder>()
 {
@@ -49,7 +51,7 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
         val enumArea = enumAreas!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( enumArea.name )
-        holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.qr_code_white))
+        holder.dateTextView.setText( Date( enumArea.creationDate ).toString())
 
         holder.itemView.setOnClickListener {
             didSelectEnumArea(enumArea)
@@ -59,6 +61,6 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val imageView: ImageView = itemView.findViewById<ImageView>(R.id.image_view)
+        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
     }
 }
