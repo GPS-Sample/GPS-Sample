@@ -31,6 +31,11 @@ class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAd
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
 
+        if (allHolders.isNotEmpty())
+        {
+            allHolders[0].checkImageView.visibility = View.VISIBLE
+        }
+
         return viewHolder
     }
 
@@ -51,14 +56,20 @@ class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAd
         holder.dateTextView.setText( Date( study.creationDate ).toString())
 
         holder.itemView.setOnClickListener {
+            for (holder in allHolders)
+            {
+                holder.checkImageView.visibility = View.GONE
+            }
+
+            holder.checkImageView.visibility = View.VISIBLE
             didSelectStudy(study)
         }
-
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
         val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
+        val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view);
     }
 }
