@@ -85,6 +85,8 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
         }
 
         val nameTextView = view!!.findViewById<View>(R.id.name_text_view) as TextView
+        val dateTextView = view!!.findViewById<View>(R.id.date_text_view) as TextView
+        dateTextView.visibility = View.GONE
 
         when( groupPosition )
         {

@@ -115,6 +115,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     override fun onResume()
     {
         super.onResume()
+
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
         studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
 
@@ -134,8 +135,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     private fun didSelectStudy(study: Study)
     {
-//        sharedViewModel.createStudyModel.setStudy(study)
-//        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
+        sharedViewModel.createStudyModel.setStudy(study)
     }
 
     override fun onMapClick(p0: LatLng) {
