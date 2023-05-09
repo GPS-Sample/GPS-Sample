@@ -44,7 +44,6 @@ class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.V
         val team = teams!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( team.name )
-        holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.qr_code_white))
 
         holder.itemView.setOnClickListener {
             didSelectTeam(team)
@@ -54,6 +53,5 @@ class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.V
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val imageView: ImageView = itemView.findViewById<ImageView>(R.id.image_view)
     }
 }
