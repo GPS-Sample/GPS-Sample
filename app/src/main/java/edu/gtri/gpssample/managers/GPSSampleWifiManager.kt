@@ -1,5 +1,7 @@
 package edu.gtri.gpssample.managers
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.net.wifi.WifiManager
 import android.os.Handler
 import android.util.Log
@@ -17,6 +19,7 @@ class GPSSampleWifiManager( val fragment: Fragment )
 {
     interface GPSSampleWifiManagerDelegate
     {
+        fun didCreateHotspot(success : Boolean, serverIp : InetAddress?)
         fun didStartHotspot( ssid: String, pass: String )
     }
 
@@ -25,13 +28,21 @@ class GPSSampleWifiManager( val fragment: Fragment )
     private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
 
+    private var _activity : Activity? = null
+
+    var activity : Activity?
+    get() = _activity
+    set(value)
+    {
+         _activity = value
+    }
     fun stopHotSpot()
     {
         udpBroadcaster.closeSocket()
 
         localOnlyHotspotReservation?.close()
     }
-
+    @SuppressLint("MissingPermission")
     fun startHotSpot()
     {
         try
@@ -44,6 +55,7 @@ class GPSSampleWifiManager( val fragment: Fragment )
 
             wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
             {
+
                 override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
                 {
                     super.onStarted(reservation)

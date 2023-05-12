@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".dialogs.SelectRuleDialogFragment">
+    <data>
+        <import type="android.view.View" />
+        <import type="edu.gtri.gpssample.constants.NetworkMode" />
+        <import type="edu.gtri.gpssample.constants.NetworkStatus" />
+        <import type="edu.gtri.gpssample.viewmodels.models.NetworkClientModel" />
+        <variable
+            name="viewModel"
+            type="edu.gtri.gpssample.viewmodels.NetworkViewModel" />
+
+        <variable
+            name="networkConnectionDialogFragment"
+            type="edu.gtri.gpssample.dialog.NetworkConnectionDialogFragment" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="@{viewModel.networkMode == NetworkMode.NetworkClient ? View.VISIBLE : View.GONE}">
+
+            <LinearLayout
+                android:id="@+id/hotspot_connect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                app:layout_constraintTop_toTopOf="parent"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/connect_hotspot"
+                    />
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+                <ImageView
+                    android:id="@+id/ok_view"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_ok"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkClientModel.networkConnected == NetworkStatus.NetworkConnected ? View.VISIBLE : View.GONE}"
+                />
+                <ImageView
+                    android:id="@+id/error_view"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_error"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkClientModel.networkConnected == NetworkStatus.NetworkError ? View.VISIBLE : View.GONE}"
+                    />
+                <ProgressBar
+                    android:id="@+id/connect_hotspot_progress_bar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkClientModel.networkConnected == NetworkStatus.None ? View.VISIBLE : View.GONE}"
+                />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/configuration_received"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/hotspot_connect"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/configuration_received"
+                    />
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+                <ImageView
+                    android:id="@+id/config_received_ok_view"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_ok"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkClientModel.configurationReceived == NetworkStatus.DataReceived ? View.VISIBLE : View.GONE}"
+                    />
+                <ImageView
+                    android:id="@+id/config_received_error_view"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_error"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkClientModel.configurationReceived == NetworkStatus.NetworkError ? View.VISIBLE : View.GONE}"
+                    />
+                <ProgressBar
+                    android:id="@+id/config_received_progress_bar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkClientModel.configurationReceived == NetworkStatus.None ? View.VISIBLE : View.GONE}"
+                    />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:visibility="@{viewModel.networkMode == NetworkMode.NetworkHotspot ? View.VISIBLE : View.GONE}">
+            <LinearLayout
+                android:id="@+id/create_hotspot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                app:layout_constraintTop_toTopOf="parent"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/connect_hotspot"
+                    />
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+                <ImageView
+                    android:id="@+id/create_hotspot_ok_view"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_ok"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkHotspotModel.networkCreated == NetworkStatus.NetworkCreated ? View.VISIBLE : View.GONE}"
+                    />
+                <ImageView
+                    android:id="@+id/create_hotspot_error_view"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_error"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkHotspotModel.networkCreated == NetworkStatus.NetworkError ? View.VISIBLE : View.GONE}"
+                    />
+                <ProgressBar
+                    android:id="@+id/create_hotspot_connect_hotspot_progress_bar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{viewModel.networkHotspotModel.networkCreated == NetworkStatus.None ? View.VISIBLE : View.GONE}"
+                    />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</layout>

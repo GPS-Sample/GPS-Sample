@@ -8,6 +8,11 @@ import java.net.Socket
 
 class TCPClient
 {
+    interface TCPCLientDelegate
+    {
+        fun sentData(data : String)
+        fun connectionString(connection : String)
+    }
     var port = 51234
 
     suspend fun write( inetAddress: String, message: String )
