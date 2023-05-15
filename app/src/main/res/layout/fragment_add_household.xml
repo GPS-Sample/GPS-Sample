@@ -14,6 +14,30 @@
         android:layout_height="wrap_content"
         tools:context=".fragments.add_household.AddHouseholdFragment">
 
+        <FrameLayout
+            android:background="@color/primary"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <ImageView
+                android:id="@+id/add_photo_image_view"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="start"
+                app:srcCompat="@drawable/add_photo_white"/>
+
+            <ImageView
+                android:id="@+id/delete_image_view"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                app:srcCompat="@drawable/delete_white"/>
+        </FrameLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_weight="1"
@@ -40,41 +64,13 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
-            android:id="@+id/add_image_button"
+            android:id="@+id/save_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Add Image" />
+            android:text="@string/save" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_gravity="bottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/cancel_button"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="Cancel" />
-
-            <Button
-                android:id="@+id/save_button"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/save" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

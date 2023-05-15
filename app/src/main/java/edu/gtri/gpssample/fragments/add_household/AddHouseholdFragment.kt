@@ -113,63 +113,62 @@ class AddHouseholdFragment : Fragment()
             binding.imageView.setImageBitmap(bitmap)
         }
 
-        binding.addImageButton.setOnClickListener {
+        binding.deleteImageView.setOnClickListener {
+            DAO.enumDataDAO.delete( enumData )
+            findNavController().popBackStack()
+        }
+
+        binding.addPhotoImageView.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "image/*"
             startActivityForResult(intent, OPEN_DOCUMENT_CODE)
         }
 
-        binding.cancelButton.setOnClickListener {
-            if (createMode)
-            {
-                DAO.enumDataDAO.delete( enumData )
-            }
-
-            findNavController().popBackStack()
-        }
-
         binding.saveButton.setOnClickListener {
+
+            enumData.isValid = true
 
             for (key in fieldDataMap.keys)
             {
                 fieldDataMap[key]?.let {fieldData ->
                     val field = DAO.fieldDAO.getField( fieldData.fieldId )
 
-                    if (field != null && field!!.required)
-                    {
-                        when (field.type)
+                    field?.let {
+                        if (field.required)
                         {
-                            FieldType.Text -> {
-                                if (fieldData.textValue.isEmpty()) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
+                            when (field.type)
+                            {
+                                FieldType.Text -> {
+                                    if (fieldData.textValue.isEmpty()) {
+                                        enumData.isValid = false
+                                    }
                                 }
-                            }
-                            FieldType.Number -> {
-                                if (fieldData.numberValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
+                                FieldType.Number -> {
+                                    if (fieldData.numberValue == null) {
+                                        enumData.isValid = false
+                                    }
                                 }
-                            }
-                            FieldType.Date -> {
-                                if (fieldData.dateValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
+                                FieldType.Date -> {
+                                    if (fieldData.dateValue == null) {
+                                        enumData.isValid = false
+                                    }
                                 }
-                            }
-                            FieldType.Checkbox -> {
-                                val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
-                                if (!selection) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
+                                FieldType.Checkbox -> {
+                                    val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
+                                    if (!selection) {
+                                        enumData.isValid = false
+                                    }
                                 }
-                            }
-                            else -> {
+                                else -> {
+                                }
                             }
                         }
                     }
 
+                    Log.d( "xxx", "isValid: ${enumData.isValid}")
+
+                    DAO.enumDataDAO.updateEnumData( enumData )
                     DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }

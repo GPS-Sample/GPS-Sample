@@ -13,6 +13,7 @@ data class EnumData(
     var uuid : String,
     var userId : Int,
     var enumAreaId : Int,
+    var isValid : Boolean,
     var latitude : Double,
     var longitude : Double,
     var isLocation: Boolean,
@@ -20,8 +21,8 @@ data class EnumData(
     var imageFileName: String,
     var fieldDataList : ArrayList<FieldData>?)
 {
-    constructor( userId: Int, enumAreaId: Int, latitude: Double, longitude: Double) :
-            this( null, UUID.randomUUID().toString(), userId, enumAreaId, latitude, longitude, false,"", "", null)
+    constructor( userId: Int, enumAreaId: Int, isValid: Boolean, latitude: Double, longitude: Double) :
+            this( null, UUID.randomUUID().toString(), userId, enumAreaId, isValid, latitude, longitude, false,"", "", null)
 
     fun pack() : String
     {

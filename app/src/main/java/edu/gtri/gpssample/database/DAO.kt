@@ -163,6 +163,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_USER_ID + " INTEGER" + "," +
                 COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_IS_VALID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_IS_LOCATION + " INTEGER" + "," +
@@ -321,6 +322,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
 
         const val TABLE_ENUM_DATA = "enum_data"
+        const val COLUMN_ENUM_DATA_IS_VALID = "enum_data_is_valid"
         const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
         const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
         const val COLUMN_ENUM_DATA_IS_LOCATION = "enum_data_is_location"
@@ -404,6 +406,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 117
+        private const val DATABASE_VERSION = 119
     }
 }

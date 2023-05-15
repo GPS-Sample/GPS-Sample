@@ -89,7 +89,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.recyclerView.adapter = performEnumerationAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.titleTextView.text = enumArea.name + " (" + team.name + ")"
+        binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + team.name + " team)"
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
@@ -126,7 +126,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.addHouseholdButton.setOnClickListener {
 
             location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, location.latitude, location.longitude)
+                var enumData = EnumData(userId, enumAreaId, false, location.latitude, location.longitude)
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
@@ -140,7 +140,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.addLocationButton.setOnClickListener {
 
             location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, location.latitude, location.longitude)
+                var enumData = EnumData(userId, enumAreaId, false, location.latitude, location.longitude)
                 enumData.isLocation = true
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
@@ -214,7 +214,18 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         for (enumData in enumDataList)
         {
+            Log.d( "xxx", "isValid: ${enumData.isValid}")
+
             var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+            if (enumData.isValid)
+            {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+            }
+            else
+            {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+            }
 
             if (enumData.isLocation)
                 icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)

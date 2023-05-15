@@ -28,10 +28,9 @@
             android:id="@+id/fragment_root_layout"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/define_enumeration_area"
-            android:background="@color/secondary_low"
+            android:background="@color/primary"
             android:textColor="@color/white"
             android:textSize="17sp"
             android:textStyle="bold" />

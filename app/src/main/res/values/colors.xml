@@ -22,4 +22,7 @@
     <color name="secondary_mid">#626269</color>
     <color name="secondary_low">#212124</color>
 
+    <color name="highlight_red">#EC0000</color>
+    <color name="highlight_green">#35eb0d</color>
+
 </resources>
