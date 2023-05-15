@@ -210,11 +210,11 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         map.addPolygon(polygon)
 
         val latLng = getCenter()
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 15.0f))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
 
         for (enumData in enumDataList)
         {
-            var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+            var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
             if (enumData.isLocation)
                 icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
