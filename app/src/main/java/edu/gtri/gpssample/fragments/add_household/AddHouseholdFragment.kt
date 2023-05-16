@@ -27,15 +27,18 @@ import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
+import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.UriManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class AddHouseholdFragment : Fragment()
+class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate
 {
     private var createMode = false
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
     private val OPEN_DOCUMENT_CODE = 2
+    private val fieldDataMap = HashMap<Int, FieldData>()
 
     private lateinit var study: Study
     private lateinit var config: Config
@@ -90,8 +93,6 @@ class AddHouseholdFragment : Fragment()
             DAO.enumDataDAO.createOrUpdateEnumData(enumData)
         }
 
-        val fieldDataMap = HashMap<Int, FieldData>()
-
         for (field in study.fields)
         {
             val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
@@ -125,10 +126,37 @@ class AddHouseholdFragment : Fragment()
             startActivityForResult(intent, OPEN_DOCUMENT_CODE)
         }
 
+        binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         binding.saveButton.setOnClickListener {
+            AdditionalInfoDialog( activity,this)
+        }
+    }
 
-            enumData.isValid = true
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
 
+    override fun didSelectCancelButton()
+    {
+    }
+
+    override fun didSelectSaveButton( nobodyHome: Boolean, homeDoesNotExist: Boolean, notes: String )
+    {
+        if (nobodyHome || homeDoesNotExist || notes.length > 0)
+        {
+            enumData.nobodyHome = nobodyHome
+            enumData.homeDoesNotExist = homeDoesNotExist
+            enumData.notes = notes
+            DAO.enumDataDAO.updateEnumData( enumData )
+            findNavController().popBackStack()
+        }
+        else
+        {
             for (key in fieldDataMap.keys)
             {
                 fieldDataMap[key]?.let {fieldData ->
@@ -141,23 +169,27 @@ class AddHouseholdFragment : Fragment()
                             {
                                 FieldType.Text -> {
                                     if (fieldData.textValue.isEmpty()) {
-                                        enumData.isValid = false
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
                                     }
                                 }
                                 FieldType.Number -> {
                                     if (fieldData.numberValue == null) {
-                                        enumData.isValid = false
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
                                     }
                                 }
                                 FieldType.Date -> {
                                     if (fieldData.dateValue == null) {
-                                        enumData.isValid = false
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
                                     }
                                 }
                                 FieldType.Checkbox -> {
                                     val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
                                     if (!selection) {
-                                        enumData.isValid = false
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
                                     }
                                 }
                                 else -> {
@@ -166,8 +198,7 @@ class AddHouseholdFragment : Fragment()
                         }
                     }
 
-                    Log.d( "xxx", "isValid: ${enumData.isValid}")
-
+                    enumData.isValid = true
                     DAO.enumDataDAO.updateEnumData( enumData )
                     DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
@@ -175,12 +206,6 @@ class AddHouseholdFragment : Fragment()
 
             findNavController().popBackStack()
         }
-    }
-
-    override fun onResume()
-    {
-        super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)

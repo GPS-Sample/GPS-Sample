@@ -126,7 +126,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.addHouseholdButton.setOnClickListener {
 
             location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, location.latitude, location.longitude)
+                var enumData = EnumData(userId, enumAreaId, false, false, false, "", location.latitude, location.longitude)
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
@@ -140,7 +140,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.addLocationButton.setOnClickListener {
 
             location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, location.latitude, location.longitude)
+                var enumData = EnumData(userId, enumAreaId, false, false, false, "", location.latitude, location.longitude)
                 enumData.isLocation = true
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
@@ -214,17 +214,15 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         for (enumData in enumDataList)
         {
-            Log.d( "xxx", "isValid: ${enumData.isValid}")
-
             var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-            if (enumData.isValid)
-            {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-            }
-            else
+            if (enumData.nobodyHome || enumData.homeDoesNotExist || enumData.notes.length > 0)
             {
                 icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+            }
+            else if (enumData.isValid)
+            {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
             }
 
             if (enumData.isLocation)
