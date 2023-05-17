@@ -15,12 +15,18 @@ class TCPServer
     interface TCPServerDelegate
     {
         fun didReceiveTCPMessage( message: String )
+        fun clientConnected(client : String)
+
     }
 
-    var port = 51234
+    val serverListening : Boolean
+        get() = _serverListening
+    private var port = 51234
+
     private var enabled = true
     private var serverSocket: ServerSocket? = null
-
+    private var socketStarted : Boolean = false
+    private var _serverListening : Boolean = false
     fun stopReceiving()
     {
         enabled = false
@@ -31,39 +37,70 @@ class TCPServer
         }
     }
 
+    fun  createSocket() : Boolean
+    {
+        try {
+            serverSocket = ServerSocket(port)
+            serverSocket?.let {
+                socketStarted = true
+            } ?: run{
+                socketStarted = false
+            }
+        }catch (ex : Exception)
+        {
+            socketStarted = false
+        }
+        return socketStarted
+    }
     suspend fun beginListening( inetAddress: InetAddress, delegate: TCPServerDelegate )
     {
-        withContext(Dispatchers.IO)
+        if(socketStarted && serverSocket != null)
         {
-            try {
-                serverSocket = ServerSocket( port )
-
-                Log.d( "xxx", "waiting for TCP connections on $inetAddress:$port...")
-
-                while( enabled )
-                {
-                    val socket = serverSocket!!.accept()
-
-                    Log.d( "xxx", "accepted connection from ${socket.inetAddress.toString()}" )
-
-                    Thread {
-                        handleClient(socket,delegate)
-                    }.start()
-                }
-            }
-            catch( ex: Exception )
+            withContext(Dispatchers.IO)
             {
-                Log.d( "xxx", ex.stackTraceToString())
+                try {
+                    Log.d( "xxx", "waiting for TCP connections on $inetAddress:$port...")
+                    _serverListening = true
+                    while( enabled )
+                    {
+                        val socket = serverSocket!!.accept()
+
+                        Log.d( "xxx", "accepted connection from ${socket.inetAddress.toString()}" )
+
+                        Thread {
+
+                            handleClient(socket,delegate)
+                        }.start()
+                    }
+                    _serverListening = false
+                }
+                catch( ex: Exception )
+                {
+                    Log.d( "xxx", ex.stackTraceToString())
+                    _serverListening = false
+                }
+
+                Log.d( "xxx", "stopped waiting for TCP connections")
             }
 
-            Log.d( "xxx", "stopped waiting for TCP connections")
         }
+
     }
 
+    fun shutdown()
+    {
+        enabled = false
+
+        if (serverSocket != null)
+        {
+            serverSocket!!.close()
+        }
+    }
     private fun handleClient(socket: Socket, delegate: TCPServerDelegate)
     {
         try
         {
+            delegate.clientConnected("client")
             Log.d( "xxx", "waiting for TCP messages on ${socket.inetAddress}:$port...")
 
             val message = BufferedReader(InputStreamReader(socket.inputStream)).readLine()

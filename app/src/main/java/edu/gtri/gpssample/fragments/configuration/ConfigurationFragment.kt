@@ -2,12 +2,14 @@ package edu.gtri.gpssample.fragments.configuration
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -22,6 +24,7 @@ import com.google.android.gms.maps.model.PolygonOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
@@ -30,6 +33,7 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
 import java.io.FileWriter
 import java.util.*
@@ -39,6 +43,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var sharedNetworkViewModel : NetworkViewModel
     private var map : GoogleMap? = null
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var enumerationAreasAdapter: ManageEnumerationAreasAdapter
@@ -50,7 +55,14 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
+        val networkVm : NetworkViewModel by activityViewModels()
+
         sharedViewModel = vm
+        sharedNetworkViewModel = networkVm
+
+        sharedNetworkViewModel.navController = findNavController()
+        sharedNetworkViewModel.Activity = activity
+
         studiesAdapter = StudiesAdapter(listOf<Study>())
         studiesAdapter.didSelectStudy = this::didSelectStudy
 
@@ -177,8 +189,15 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
+        // Launch connection screen
+        view?.let{view ->
+            sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Configuration)
+            sharedNetworkViewModel.createHotspot(view)
+        }
+        //findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
     }
 
     override fun didSelectRightButton(tag: Any?)

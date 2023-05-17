@@ -103,6 +103,11 @@
         <action
             android:id="@+id/action_navigate_to_ManageEnumerationAreaFragment"
             app:destination="@id/ManageEnumerationAreaFragment" />
+        <action
+            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
+            app:destination="@id/NetworkConnectionDialogFragment" />
+
+
     </fragment>
 
     <!--CreateConfigurationFragment-->
@@ -299,10 +304,31 @@
         android:name="edu.gtri.gpssample.fragments.add_location.AddLocationFragment"
         tools:layout="@layout/fragment_add_location">
     </fragment>
+    <fragment
+        android:id="@+id/HotspotFragment"
+        android:name="edu.gtri.gpssample.fragments.hotspot.HotspotFragment"
+        tools:layout="@layout/fragment_hotspot">
+    </fragment>
     <dialog
         android:id="@+id/SelectRuleDialogFragment"
         android:name="edu.gtri.gpssample.dialogs.SelectRuleDialogFragment"
         android:label="dialog_select_rule"
         tools:layout="@layout/dialog_select_rule" />
+
+    <dialog
+        android:id="@+id/NetworkConnectionDialogFragment"
+        android:name="edu.gtri.gpssample.dialogs.NetworkConnectionDialogFragment"
+        android:label="dialog_network_connection"
+        tools:layout="@layout/dialog_network_connection" >
+        <action
+            android:id="@+id/action_navigate_to_HotspotFragment"
+            app:destination="@id/HotspotFragment" />
+<!--        <action-->
+<!--            android:id="@+id/action_FirstFragment_to_ClientFragment"-->
+<!--            app:destination="@id/ClientFragment" />-->
+<!--        <action-->
+<!--            android:id="@+id/action_navigate_to_FirstFragment"-->
+<!--            app:destination="@id/FirstFragment" />-->
+    </dialog>
 
 </navigation>

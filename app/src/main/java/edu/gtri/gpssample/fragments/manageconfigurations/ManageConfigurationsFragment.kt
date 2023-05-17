@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -13,13 +14,18 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.ResultCode
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import org.json.JSONObject
 import java.io.InputStream
 
 class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
@@ -28,12 +34,18 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     private val binding get() = _binding!!
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
+    private lateinit var sharedNetworkViewModel: NetworkViewModel
+
     private var selectedConfig: Config? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
+        val networkVm : NetworkViewModel by activityViewModels()
+
+        sharedNetworkViewModel = networkVm
+        sharedNetworkViewModel.Activity = this.activity
         sharedViewModel = vm
     }
 
@@ -91,8 +103,42 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
     }
 
+
+    private val getResult =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == ResultCode.BarcodeScanned.value) {
+                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+
+                val jsonObject = JSONObject(payload);
+
+                Log.d("xxx", jsonObject.toString(2))
+
+                val ssid = jsonObject.getString(Keys.kSSID.toString())
+                val pass = jsonObject.getString(Keys.kPass.toString())
+                val serverIp = jsonObject.getString(Keys.kIpAddress.toString())
+
+                Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
+                sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
+
+                // need to pass this into the network view model
+            }
+
+
+
+//                if(it.resultCode == Activity.RESULT_OK){
+//
+//
+//
+//
+//                val value = it.data?.getStringExtra("input")
+//            }
+        }
+
     override fun didSelectLeftButton(tag: Any?)
     {
+        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+        getResult.launch(intent)
     }
 
     override fun didSelectRightButton(tag: Any?)

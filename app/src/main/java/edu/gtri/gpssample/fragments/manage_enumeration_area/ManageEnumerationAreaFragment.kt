@@ -34,6 +34,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import java.net.DatagramPacket
+import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate, InputDialog.InputDialogDelegate
@@ -122,8 +123,8 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
             if (!this::gpsSampleWifiManager.isInitialized)
             {
                 binding.progressBar.visibility = View.VISIBLE
-                gpsSampleWifiManager = GPSSampleWifiManager( this )
-                gpsSampleWifiManager.startHotSpot()
+//                gpsSampleWifiManager = GPSSampleWifiManager( this )
+//                gpsSampleWifiManager.startHotSpot()
             }
         }
 
@@ -143,6 +144,10 @@ class ManageEnumerationAreaFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
 //        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamFragment )
+    }
+
+    override fun didCreateHotspot(success: Boolean, serverIp: InetAddress?) {
+        TODO("Not yet implemented")
     }
 
     override fun didStartHotspot( ssid: String, pass: String )
