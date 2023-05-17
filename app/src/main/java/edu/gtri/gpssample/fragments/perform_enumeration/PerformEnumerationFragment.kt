@@ -193,6 +193,8 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         }
     }
 
+    var once = true
+
     fun addMapObjects()
     {
         map.clear()
@@ -209,8 +211,12 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         map.addPolygon(polygon)
 
-        val latLng = getCenter()
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
+        if (once)
+        {
+            once = false
+            val latLng = getCenter()
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
+        }
 
         for (enumData in enumDataList)
         {
