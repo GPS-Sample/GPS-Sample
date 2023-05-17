@@ -25,6 +25,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.reactivex.disposables.CompositeDisposable
 import org.json.JSONObject
 import java.net.DatagramPacket
+import java.net.InetAddress
 import kotlin.collections.ArrayList
 
 class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterDelegate, GPSSampleWifiManager.GPSSampleWifiManagerDelegate, InputDialog.InputDialogDelegate
@@ -104,8 +105,8 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         binding.generateQrButton.setOnClickListener {
             binding.progressBar.visibility = View.VISIBLE
-            gpsSamleWifiManager = GPSSampleWifiManager( this )
-            gpsSamleWifiManager!!.startHotSpot()
+          //  gpsSamleWifiManager = GPSSampleWifiManager( this )
+          //  gpsSamleWifiManager!!.startHotSpot()
         }
 
         binding.exportButton.setOnClickListener {
@@ -120,6 +121,10 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    override fun didCreateHotspot(success: Boolean, serverIp: InetAddress?) {
+        TODO("Not yet implemented")
     }
 
     override fun didStartHotspot( ssid: String, pass: String )

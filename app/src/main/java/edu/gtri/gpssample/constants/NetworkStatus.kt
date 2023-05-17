@@ -6,6 +6,10 @@ enum class NetworkStatus(val format : String) {
     NetworkCreated("Network Created"),
     NetworkError("Network Error"),
     DataReceived("Data Received"),
+    ServerCreated("Server Created"),
+    ServerError("Server Error"),
+    QRCodeCreated("QRCode Created"),
+    QRCodeError("QRCode Error"),
 
 }
 

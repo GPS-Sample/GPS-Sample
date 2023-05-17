@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.dialog
+package edu.gtri.gpssample.dialogs
 
 import android.app.AlertDialog
 import androidx.fragment.app.DialogFragment

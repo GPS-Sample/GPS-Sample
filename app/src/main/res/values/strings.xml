@@ -14,6 +14,10 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
+    <string name="connected_clients">Connected Clients</string>
+    <string name="create_hotspot">Create Hotspot</string>
+    <string name="create_server">Create Server</string>
+    <string name="create_qr_code">Create QR Code</string>
     <string name="connect_hotspot">Connect To Hotspot</string>
     <string name="configuration_received">Configuration Received</string>
 
@@ -179,5 +183,7 @@
     <string name="manage_supervisors">Manage Supervisors</string>
     <string name="home">Home</string>
     <string name="manage_enumeration_areas">Manage Enumeration Areas</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -44,7 +44,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
     var _configurationReceived : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
     var configurationReceived : LiveData<NetworkStatus> = _configurationReceived
 
-    val destination = R.id.action_FirstFragment_to_ClientFragment
+   // val destination = R.id.action_FirstFragment_to_ClientFragment
 
     override var Activity : Activity?
         get() = _activity
@@ -99,6 +99,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         return null
     }
 
+    var test : NetworkInfo? = null
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectToWifi(networkInfo: NetworkInfo)
     {
@@ -181,7 +182,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         else
         {
             Log.d("here", "trying to connect ${networkInfo.ssid} ${networkInfo.password}")
-
+            test = networkInfo
 
 //            val suggestion1 = WifiNetworkSuggestion.Builder()
 //                .setSsid("test111111")
@@ -213,9 +214,10 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             Log.d("xxx", "wifiinfo ${wifiInfo}")
 
             val builder = WifiNetworkSpecifier.Builder()
-            //builder.setSsid( networkInfo.ssid );
-            builder.setSsid( "Cypress Guest Wifi" )
-            builder.setWpa2Passphrase("cypresslovesyou")
+            builder.setSsid( networkInfo.ssid );
+            builder.setWpa2Passphrase( networkInfo.password )
+           // builder.setSsid( "Cypress Guest Wifi" )
+            //builder.setWpa2Passphrase("cypresslovesyou")
             //builder.setWpa2Passphrase( networkInfo.password )
             //builder.setWpa2Passphrase("")
             val wifiNetworkSpecifier = builder.build()
@@ -226,7 +228,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             //networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-//            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
             networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
 
             val networkRequest = networkRequestBuilder.build()
@@ -234,9 +236,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.requestNetwork( networkRequest, networkCallback )
 
-//            val job = GlobalScope.launch(Dispatchers.Default) {
-//                client.write("192.168.1.100", "TEST", this@NetworkClientModel)
-//            }
         }
     }
 
@@ -247,7 +246,11 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.bindProcessToNetwork(network)
             val job = GlobalScope.launch(Dispatchers.Default) {
-                client.write("192.168.1.100", "TEST", this@NetworkClientModel)
+
+                test?.let{
+                    client.write(it.serverIP, "TEST", this@NetworkClientModel)
+                }
+
             }
 
         }
@@ -351,6 +354,10 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
     }
 
     override fun didReceiveTCPMessage(message: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun clientConnected(client: String) {
         TODO("Not yet implemented")
     }
 }

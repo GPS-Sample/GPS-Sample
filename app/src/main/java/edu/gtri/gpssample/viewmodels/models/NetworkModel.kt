@@ -1,14 +1,15 @@
 package edu.gtri.gpssample.viewmodels.models
 
 import android.app.Activity
-import edu.gatech.gtri.innc.networktest.constants.NetworkMode
+import edu.gtri.gpssample.constants.NetworkMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class NetworkInfo(
     var ssid: String,
-    var password: String)
+    var password: String,
+    var serverIP: String)
 {
 }
 
