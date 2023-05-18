@@ -15,7 +15,7 @@ class TCPServer
     interface TCPServerDelegate
     {
         fun didReceiveTCPMessage( message: String )
-        fun clientConnected(client : String)
+        fun clientConnected(socket: Socket)
 
     }
 
@@ -100,14 +100,19 @@ class TCPServer
     {
         try
         {
-            delegate.clientConnected("client")
-            Log.d( "xxx", "waiting for TCP messages on ${socket.inetAddress}:$port...")
 
-            val message = BufferedReader(InputStreamReader(socket.inputStream)).readLine()
+            delegate.clientConnected(socket)
+            val bytes : ByteArray = ByteArray(6)
 
-            Log.d( "xxx", "handleClient.received: ${message}")
+            while(socket.isConnected)
+            {
+                socket.inputStream.read(bytes)
+                Log.d("xxxxxx", "the bytes ${String(bytes)}")
+            //    val message = BufferedReader(InputStreamReader(socket.inputStream)).readLine()
 
-            delegate.didReceiveTCPMessage( message )
+                delegate.didReceiveTCPMessage( String(bytes) )
+            }
+
         }
         catch( ex: Exception )
         {

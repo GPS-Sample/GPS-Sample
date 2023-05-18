@@ -60,8 +60,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         sharedViewModel = vm
         sharedNetworkViewModel = networkVm
 
-        sharedNetworkViewModel.navController = findNavController()
-        sharedNetworkViewModel.Activity = activity
+        sharedNetworkViewModel.currentFragment = this
 
         studiesAdapter = StudiesAdapter(listOf<Study>())
         studiesAdapter.didSelectStudy = this::didSelectStudy

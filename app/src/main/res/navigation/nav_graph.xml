@@ -79,6 +79,14 @@
         <action
             android:id="@+id/action_navigate_to_ConfigurationFragment"
             app:destination="@id/ConfigurationFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
+            app:destination="@id/NetworkConnectionDialogFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_ClientFragment"
+            app:destination="@id/ClientFragment" />
     </fragment>
 
     <!--CreateConfigurationFragment-->
@@ -303,6 +311,11 @@
         android:id="@+id/AddLocationFragment"
         android:name="edu.gtri.gpssample.fragments.add_location.AddLocationFragment"
         tools:layout="@layout/fragment_add_location">
+    </fragment>
+    <fragment
+        android:id="@+id/ClientFragment"
+        android:name="edu.gtri.gpssample.fragments.client.ClientFragment"
+        tools:layout="@layout/fragment_client">
     </fragment>
     <fragment
         android:id="@+id/HotspotFragment"

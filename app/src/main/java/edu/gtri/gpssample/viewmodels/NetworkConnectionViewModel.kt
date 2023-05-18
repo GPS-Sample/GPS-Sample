@@ -1,13 +1,25 @@
 package edu.gtri.gpssample.viewmodels
 
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import java.net.Socket
 
-class NetworkConnectionViewModel: ViewModel()  {
-    private var _name : MutableLiveData<String> = MutableLiveData("TEST")
+class NetworkConnectionViewModel(socket : Socket): ViewModel()  {
+    private var _name : MutableLiveData<String> = MutableLiveData("")
     private var _connection : MutableLiveData<String> = MutableLiveData("")
+    private var _socket : Socket? = null
 
+//    val socket : Socket?
+//        get() = _socket
+//
+
+//    constructor(socket: Socket)
+//    {
+//
+//        _socket = socket
+//    }
     val name : LiveData<String>
         get() = _name
 
@@ -27,7 +39,4 @@ class NetworkConnectionViewModel: ViewModel()  {
         _connection.postValue(connection)
     }
 
-    fun areItemsTheSame(other: NetworkConnectionViewModel): Boolean = false
-
-    fun areContentsTheSame(other: NetworkConnectionViewModel): Boolean = false
 }

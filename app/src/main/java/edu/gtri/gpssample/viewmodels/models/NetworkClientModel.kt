@@ -12,27 +12,51 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.NetworkMode
-import edu.gtri.gpssample.constants.NetworkStatus
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.network.TCPClient
 import edu.gtri.gpssample.network.TCPServer
+import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.TCPHeader
+import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.Thread.sleep
 import java.net.InetAddress
+import java.net.Socket
 
 
 class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServer.TCPServerDelegate {
     override val type = NetworkMode.NetworkClient
     private val client : TCPClient = TCPClient()
 
-    private val tcpServer : TCPServer = TCPServer()
-
+    interface NetworkConnectDelegate
+    {
+        fun didConnect(complete: Boolean)
+    }
 
     var _networkConnected : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
-    var networkConnected : LiveData<NetworkStatus> = _networkConnected
+    val networkConnected : LiveData<NetworkStatus>
+        get() = _networkConnected
+
+    var _clientRegistered : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
+    val clientRegistered : LiveData<NetworkStatus>
+        get() = _clientRegistered
+
+    var _commandSent : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
+    val commandSent : LiveData<NetworkStatus>
+        get() = _commandSent
+
+    var _dataReceived : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
+    val dataReceived : LiveData<NetworkStatus>
+        get() = _dataReceived
+
+    private var _clientMode : MutableLiveData<ClientMode> = MutableLiveData(ClientMode.None)
+    val clientMode : LiveData<ClientMode>
+        get() = _clientMode
+
+
 
     // test
     private var _clientConnectMessage : MutableLiveData<String> = MutableLiveData("")
@@ -58,6 +82,46 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 
     }
 
+    fun setClientMode(mode : ClientMode)
+    {
+        _clientMode.postValue(mode)
+    }
+
+    fun fakeConnect()
+    {
+
+        // test the byte array stuff
+        val payload = "THE PAYLOAD@!@@LKJJK@@!!!!!1"
+        val header = TCPHeader(NetworkCommand.NetworkConfigRequest, payload.length )
+        val message = TCPMessage(header, payload)
+
+        val byteArray = message.toByteArray()
+        byteArray?.let{
+            val tcpMessage = message.fromByteArray(it)
+            tcpMessage?.let {
+                Log.d("THE MESSAGE", "payload ${it.payload} ${it.header.command} ")
+            }
+
+        }
+
+
+
+
+        Thread.sleep(300)
+        _networkConnected.postValue(NetworkStatus.NetworkConnected)
+        Thread.sleep(1000)
+        _clientRegistered.postValue(NetworkStatus.ClientRegistered)
+        Thread.sleep(1000)
+        _commandSent.postValue(NetworkStatus.CommandSent)
+        Thread.sleep(1000)
+        _dataReceived.postValue(NetworkStatus.DataReceived)
+        Thread.sleep(1000)
+    }
+
+    fun sendCommand(command : NetworkCommand)
+    {
+
+    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun startNetworking(networkInfo: NetworkInfo?) : Boolean
@@ -247,6 +311,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             connectivityManager.bindProcessToNetwork(network)
             val job = GlobalScope.launch(Dispatchers.Default) {
 
+
                 test?.let{
                     client.write(it.serverIP, "TEST", this@NetworkClientModel)
                 }
@@ -281,7 +346,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 //                beginTransmittingHeartbeat()
 //            }
         }
-        var trycon = true
+
         @RequiresApi(Build.VERSION_CODES.R)
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties)
         {
@@ -290,51 +355,36 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             try {
 
 
-                viewModelScope?.let { viewModelScope ->
-                    viewModelScope.launch(Dispatchers.IO) {
-                        sleep(1000)
-                        if(trycon)
-                        {
-                            val wifiManager =
-                                Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-                            wifiManager?.let{wifiManager ->
-                                val myAddress =
-                                    intToInetAddress(wifiManager.dhcpInfo.ipAddress)!!.toString()
-                                        .substring(1)
-
-                                val myInetAddress = InetAddress.getByName(myAddress)
-                               // tcpServer.beginListening(myInetAddress, this@NetworkClientModel)
-                            }
-
-                            //client.write("192.168.48.183", "TEST", this@NetworkClientModel)
-                            //client.write("142.250.189.110", "TEST", this@NetworkClientModel)
-                            //client.write("192.168.43.1", "TEST", this@NetworkClientModel)
-//                            val job = GlobalScope.launch(Dispatchers.Default) {
-//                                client.write("192.168.1.100", "TEST", this@NetworkClientModel)
+//                viewModelScope?.let { viewModelScope ->
+//                    viewModelScope.launch(Dispatchers.IO) {
+//                        sleep(1000)
+//
+//                            val wifiManager =
+//                                Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+//
+//                            wifiManager?.let{wifiManager ->
+//                                val myAddress =
+//                                    intToInetAddress(wifiManager.dhcpInfo.ipAddress)!!.toString()
+//                                        .substring(1)
+//
+//                                val myInetAddress = InetAddress.getByName(myAddress)
+//                               // tcpServer.beginListening(myInetAddress, this@NetworkClientModel)
 //                            }
-                            //client.write("192.168.1.100", "TEST", this@NetworkClientModel)
-                            trycon = false
-                        }
+//
+//                            //client.write("192.168.48.183", "TEST", this@NetworkClientModel)
+//                            //client.write("142.250.189.110", "TEST", this@NetworkClientModel)
+//                            //client.write("192.168.43.1", "TEST", this@NetworkClientModel)
+////                            val job = GlobalScope.launch(Dispatchers.Default) {
+////                                client.write("192.168.1.100", "TEST", this@NetworkClientModel)
+////                            }
+//                            //client.write("192.168.1.100", "TEST", this@NetworkClientModel)
+//
+//
+//
+//                    }
 
-                    }
 
-//                    val serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
-//                    // linkProperties.linkAddresses[0] is the IPV6 address
-//                    val myAddress = linkProperties.linkAddresses[1].toString()
-//                        .substring(0, linkProperties.linkAddresses[1].toString().length - 3)
-//
-//                    val components = serverAddress.split(".")
-//                    val server_udp_address =
-//                        components[0] + "." + components[1] + "." + components[2] + ".255"
-//
-//                    val myInetAddress = InetAddress.getByName(myAddress)
-//
-//                    Log.d(
-//                        "NETWORK CONNECT ",
-//                        "connected to network!@!!!!!!!!!! ${myInetAddress.hostAddress}"
-//                    )
-                }
+//                }
             }catch(e : Exception)
             {
 
@@ -357,7 +407,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         TODO("Not yet implemented")
     }
 
-    override fun clientConnected(client: String) {
+    override fun clientConnected(socket: Socket) {
         TODO("Not yet implemented")
     }
+
 }

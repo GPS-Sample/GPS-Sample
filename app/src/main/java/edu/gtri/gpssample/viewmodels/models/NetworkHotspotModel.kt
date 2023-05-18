@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.net.InetAddress
+import java.net.Socket
 
 
 class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
@@ -96,20 +97,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
     init
     {
-        val v1 : NetworkConnectionViewModel = NetworkConnectionViewModel()
-        v1.updateName("Brian")
-        v1.updateConnection("nope")
-
-        val v2 : NetworkConnectionViewModel = NetworkConnectionViewModel()
-        v2.updateName("Brian2")
-        v2.updateConnection("nope")
-
-        val v3 : NetworkConnectionViewModel = NetworkConnectionViewModel()
-        v3.updateName("Brian3")
-        v3.updateConnection("nope")
-
-        val list  = mutableListOf<NetworkConnectionViewModel>()
-
 
         _connections.value = clientConenctions
         _connections.postValue(clientConenctions)
@@ -161,9 +148,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
         _message.postValue(message)
     }
 
-    override fun clientConnected(client: String) {
+    override fun clientConnected(socket: Socket) {
 
-        var v1 : NetworkConnectionViewModel = NetworkConnectionViewModel()
+        var v1 : NetworkConnectionViewModel = NetworkConnectionViewModel(socket)
         v1.updateName("TEST")
         v1.updateConnection("TEST")
 
@@ -191,9 +178,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     viewModelScope.launch(Dispatchers.IO) {
                         serverIp?.let{serverIp ->
                             socketCreated = tcpServer.createSocket()
-
-//                            // test for client
-//                            clientConnected("BIG TEST")
 
                             tcpServer.beginListening(serverIp, this@NetworkHotspotModel)
                         }
