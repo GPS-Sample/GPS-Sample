@@ -149,6 +149,12 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         if (nobodyHome || homeDoesNotExist || notes.length > 0)
         {
+            for (key in fieldDataMap.keys) {
+                fieldDataMap[key]?.let { fieldData ->
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
+                }
+            }
+
             enumData.nobodyHome = nobodyHome
             enumData.homeDoesNotExist = homeDoesNotExist
             enumData.notes = notes
