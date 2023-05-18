@@ -55,5 +55,15 @@
             android:textColor="@color/primary"
             android:textSize="17sp"/>
 
+        <TextView
+            android:id="@+id/reset_pin_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="0dp"
+            android:gravity="center"
+            android:text="Reset PIN"
+            android:textColor="@color/primary"
+            android:textSize="17sp"/>
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </FrameLayout>

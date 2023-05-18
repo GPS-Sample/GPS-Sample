@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/title_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="20dp"
+        android:focusable="false"
+        android:text="Reset PIN"
+        android:gravity="center_vertical"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/current_pin_edit_text"
+        android:hint="Enter Current PIN"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <EditText
+        android:id="@+id/pin1_edit_text"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
+        android:hint="Enter New PIN"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <EditText
+        android:id="@+id/pin2_edit_text"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
+        android:hint="Re-Enter New PIN"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="90dp">
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="10dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/save" />
+
+    </LinearLayout>
+
+</LinearLayout>

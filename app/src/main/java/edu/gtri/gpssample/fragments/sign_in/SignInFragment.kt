@@ -20,8 +20,9 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.dialogs.ResetPinDialog
 
-class SignInFragment : Fragment(), InputDialog.InputDialogDelegate
+class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDialog.ResetPinDialogDelegate
 {
     private lateinit var role: String
     private var _binding: FragmentSignInBinding? = null
@@ -74,6 +75,15 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate
                 user?.let {
                     InputDialog( activity!!, it.recoveryQuestion, "", this@SignInFragment )
                 }
+            }
+        }
+
+        binding.resetPinTextView.setOnClickListener {
+            val userName = binding.nameEditText.text.toString()
+            val user = DAO.userDAO.getUser(userName)
+
+            user?.let {
+                ResetPinDialog( activity!!, it.pin.toString(), this@SignInFragment )
             }
         }
 
@@ -215,6 +225,17 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate
             {
                 Toast.makeText(activity!!.applicationContext, "Oops! Incorrect answer.  Please try again.", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    override fun didUpdatePin( pin: String )
+    {
+        val userName = binding.nameEditText.text.toString()
+        val user = DAO.userDAO.getUser(userName)
+
+        user?.let {
+            it.pin = pin.toInt()
+            DAO.userDAO.updateUser( it )
         }
     }
 
