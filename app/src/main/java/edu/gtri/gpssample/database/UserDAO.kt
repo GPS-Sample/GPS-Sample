@@ -67,6 +67,27 @@ class UserDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun getUser( name: String ): User?
+    {
+        var user: User? = null
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_USER_NAME} = '$name'"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            user = createUser( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return user
+    }
+
+    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createUser(cursor: Cursor) : User
     {

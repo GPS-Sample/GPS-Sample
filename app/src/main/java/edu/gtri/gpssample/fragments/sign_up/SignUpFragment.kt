@@ -2,9 +2,11 @@ package edu.gtri.gpssample.fragments.sign_up
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -17,13 +19,15 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.dialogs.InputDialog
 
-class SignUpFragment : Fragment()
+class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
 {
     private lateinit var role: String
+    private lateinit var viewModel: SignUpViewModel
+
     private var _binding: FragmentSignUpBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: SignUpViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -59,12 +63,27 @@ class SignUpFragment : Fragment()
                 binding.questionSpinner.adapter = adapter
             }
 
+        binding.questionSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+            {
+                if (position == 7)
+                {
+                    InputDialog( activity!!, "Enter Other Question", "", this@SignUpFragment )
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>)
+            {
+            }
+        }
+
         binding.nextButton.setOnClickListener {
 
             val name = binding.nameEditText.text.toString()
             val pin1 = binding.pin1EditText.text.toString().toIntOrNull()
             val pin2 = binding.pin2EditText.text.toString().toIntOrNull()
-            val question = binding.questionSpinner.selectedItem as String
+            var question = binding.questionSpinner.selectedItem as String
             val answer = binding.answerEditText.text.toString()
 
             if (name.length == 0)
@@ -85,11 +104,22 @@ class SignUpFragment : Fragment()
                 return@setOnClickListener
             }
 
-//            if (answer.length == 0)
-//            {
-//                Toast.makeText(activity!!.applicationContext, "Please enter an answer.", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
+            if (question == "Other Question")
+            {
+                question = binding.otherQuestionTextView.text.toString()
+
+                if (question.length == 0)
+                {
+                    InputDialog( activity!!, "Enter Other Question", "", this@SignUpFragment )
+                    return@setOnClickListener
+                }
+            }
+
+            if (answer.length == 0)
+            {
+                Toast.makeText(activity!!.applicationContext, "Please enter an answer.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             if (pin1 != pin2)
             {
@@ -102,7 +132,7 @@ class SignUpFragment : Fragment()
                 editor.putString( Keys.kUserName.toString(), name )
                 editor.commit()
 
-                val user = User( name, pin1, role, answer, question, false )
+                val user = User( name, pin1, role, question, answer, false )
                 user.id = DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
@@ -111,6 +141,12 @@ class SignUpFragment : Fragment()
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }
         }
+    }
+
+    override fun didEnterText( name: String )
+    {
+        binding.otherQuestionTextView.text = name
+        binding.otherQuestionTextView.visibility = View.VISIBLE
     }
 
     override fun onResume()

@@ -26,6 +26,10 @@
         <item>"Mother's maiden name"</item>
         <item>"Childhood best friend"</item>
         <item>"Favorite Pet's name"</item>
+        <item>"Last 4 digits of cell phone #"</item>
+        <item>"Favorite Food"</item>
+        <item>"Birth Month"</item>
+        <item>"Other Question"</item>
     </string-array>
 
     <string-array name="distance_format">

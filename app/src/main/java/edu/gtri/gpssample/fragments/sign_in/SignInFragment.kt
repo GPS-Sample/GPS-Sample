@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.sign_in
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +18,10 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
+import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 
-class SignInFragment : Fragment()
+class SignInFragment : Fragment(), InputDialog.InputDialogDelegate
 {
     private lateinit var role: String
     private var _binding: FragmentSignInBinding? = null
@@ -60,6 +63,20 @@ class SignInFragment : Fragment()
             binding.nameEditText.setText( userName )
         }
 
+        binding.forgotPinTextView.setOnClickListener {
+
+            val user_name = binding.nameEditText.text.toString()
+
+            if (user_name.length > 0)
+            {
+                val user = DAO.userDAO.getUser(user_name)
+
+                user?.let {
+                    InputDialog( activity!!, it.recoveryQuestion, "", this@SignInFragment )
+                }
+            }
+        }
+
         binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
             val pin = binding.pinEditText.text.toString()
             val userName = binding.nameEditText.text.toString()
@@ -69,15 +86,17 @@ class SignInFragment : Fragment()
 
                 user?.let {
                     user
-                    if (user.role != role) {
+                    if (user.role != role)
+                    {
                         Toast.makeText(
                             activity!!.applicationContext,
                             "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.",
                             Toast.LENGTH_SHORT
                         ).show()
-                    } else {
-                        val sharedPreferences: SharedPreferences =
-                            activity!!.getSharedPreferences("default", 0)
+                    }
+                    else
+                    {
+                        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                         val editor = sharedPreferences.edit()
                         editor.putString(Keys.kUserName.toString(), userName)
                         editor.commit()
@@ -178,6 +197,23 @@ class SignInFragment : Fragment()
                 {
                     findNavController().navigate(R.id.action_navigate_to_EnumeratorFragment, bundle)
                 }
+            }
+        }
+    }
+
+    override fun didEnterText( text: String )
+    {
+        val userName = binding.nameEditText.text.toString()
+        val user = DAO.userDAO.getUser(userName)
+
+        user?.let {
+            if (text == it.recoveryAnswer)
+            {
+                NotificationDialog( activity!!, "Your PIN is:", it.pin.toString())
+            }
+            else
+            {
+                Toast.makeText(activity!!.applicationContext, "Oops! Incorrect answer.  Please try again.", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -45,5 +45,15 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 
+        <TextView
+            android:id="@+id/forgot_pin_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Fogot PIN?"
+            android:textColor="@color/primary"
+            android:textSize="17sp"/>
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </FrameLayout>
