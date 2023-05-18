@@ -159,6 +159,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             enumData.homeDoesNotExist = homeDoesNotExist
             enumData.notes = notes
             DAO.enumDataDAO.updateEnumData( enumData )
+
             findNavController().popBackStack()
         }
         else
@@ -204,8 +205,12 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                         }
                     }
 
+                    enumData.notes = notes
                     enumData.isValid = true
+                    enumData.nobodyHome = nobodyHome
+                    enumData.homeDoesNotExist = homeDoesNotExist
                     DAO.enumDataDAO.updateEnumData( enumData )
+
                     DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }
