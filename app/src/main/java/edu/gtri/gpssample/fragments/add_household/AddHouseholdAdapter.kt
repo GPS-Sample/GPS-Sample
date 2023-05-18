@@ -151,6 +151,8 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
                 editText.setText( fieldData.textValue )
+                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
                 editText.doAfterTextChanged {
                     fieldData.textValue = it.toString()
                 }
@@ -175,6 +177,9 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                     }
                 }
 
+                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+
                 editText.doAfterTextChanged {
                     if (it.toString().isNotEmpty())
                     {
@@ -194,7 +199,11 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                     displayDate( date, field, fieldData, editText )
                 }
 
+                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+
                 val editView = frameLayout.findViewById<View>(R.id.edit_view)
+
                 editView.setOnClickListener {
 
                     fieldData.dateValue?.let {
@@ -215,6 +224,9 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
             FieldType.Dropdown ->
             {
                 frameLayout = holder.frameLayout.findViewById(R.id.dropdown_layout)
+
+                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
                 var data = ArrayList<String>()
 
@@ -248,6 +260,9 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
             FieldType.Checkbox ->
             {
                 frameLayout = holder.frameLayout.findViewById(R.id.checkbox_layout)
+
+                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
                 var checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox1)
                 checkBox.visibility = View.GONE

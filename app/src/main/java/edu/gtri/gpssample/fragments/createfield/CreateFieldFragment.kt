@@ -77,6 +77,13 @@ class CreateFieldFragment : Fragment()
             this.executePendingBindings()
         }
 
+        binding.deleteImageView.setOnClickListener {
+            sharedViewModel.createStudyModel.currentStudy?.value?.let  { study ->
+                sharedViewModel.createFieldModel.deleteSelectedField( study )
+                findNavController().popBackStack()
+            }
+        }
+
         checkboxLayout = view.findViewById<LinearLayout>(R.id.layout_field_checkbox)
         dropdownLayout = view.findViewById<LinearLayout>(R.id.layout_field_dropdown)
 
