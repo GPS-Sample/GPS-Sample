@@ -104,9 +104,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 
         }
 
-
-
-
         Thread.sleep(300)
         _networkConnected.postValue(NetworkStatus.NetworkConnected)
         Thread.sleep(1000)
