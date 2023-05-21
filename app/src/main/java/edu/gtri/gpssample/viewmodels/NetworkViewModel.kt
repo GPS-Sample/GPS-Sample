@@ -63,6 +63,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         networkHotspotModel.viewModelScope = viewModelScope
         networkHotspotModel.creationDelegate = this
         networkClientModel.viewModelScope = viewModelScope
+        networkClientModel.connectDelegate = this
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -164,6 +165,8 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
     }
 
     override fun didConnect(complete: Boolean) {
-
+        runBlocking(Dispatchers.Main) {
+            navController?.popBackStack()
+        }
     }
 }

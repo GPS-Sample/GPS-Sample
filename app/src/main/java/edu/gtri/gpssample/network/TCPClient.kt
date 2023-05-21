@@ -3,6 +3,7 @@ package edu.gtri.gpssample.network
 import android.util.Log
 import edu.gtri.gpssample.constants.NetworkStatus
 import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
@@ -19,26 +20,43 @@ class TCPClient
     // var port = 80
     var socket : Socket? = null
 
-    fun connect(inetAddress: String, delegate : TCPCLientDelegate)
+    fun connect(inetAddress: String, delegate : TCPCLientDelegate) : Boolean
     {
         try {
             // if you call connect and we're connected, we kill the socket and start over!
             socket?.let{socket ->
                 socket.close()
             }
+            socket = null
             socket = Socket( inetAddress, 51234 )
+            if(socket != null)
+            {
+                return true
+            }
         }catch (ex: Exception)
         {
             Log.d( "xxx", ex.stackTraceToString())
             delegate.connectionString("Connection failed to ${inetAddress}")
         }
+        return false
     }
 
-    fun sendNetworkCommand(command : NetworkCommand) : NetworkStatus
+    fun sendMessage(inetAddress: String, message : TCPMessage, delegate: TCPCLientDelegate) : NetworkStatus
     {
-        socket?.let{socket ->
+        try
+        {
+            socket?.let {socket ->
+                socket.outputStream.write( message.toByteArray())
+                delegate.sentData("TCP message: $message to $inetAddress")
+                socket.outputStream.flush()
+                return NetworkStatus.CommandSent
+            }
+        }
+        catch (ex: Exception)
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            delegate.connectionString("Connection failed to ${inetAddress}")
 
-            return NetworkStatus.CommandSent
         }
         return NetworkStatus.CommandError
     }

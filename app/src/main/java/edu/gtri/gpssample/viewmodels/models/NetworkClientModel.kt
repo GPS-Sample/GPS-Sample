@@ -36,6 +36,14 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         fun didConnect(complete: Boolean)
     }
 
+    private var _connectDelegate : NetworkConnectDelegate? = null
+    var connectDelegate : NetworkConnectDelegate?
+        get() = _connectDelegate
+        set(value) {
+            _connectDelegate = value
+        }
+
+
     var _networkConnected : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
     val networkConnected : LiveData<NetworkStatus>
         get() = _networkConnected
@@ -57,8 +65,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         get() = _clientMode
 
 
+    private var networkInfo : NetworkInfo? = null
 
-    // test
     private var _clientConnectMessage : MutableLiveData<String> = MutableLiveData("")
     private var _clientDataMessage : MutableLiveData<String> = MutableLiveData("")
     var clientConnectMessage : LiveData<String> = _clientConnectMessage
@@ -92,12 +100,11 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 
         // test the byte array stuff
         val payload = "THE PAYLOAD@!@@LKJJK@@!!!!!1"
-        val header = TCPHeader(NetworkCommand.NetworkConfigRequest, payload.length )
-        val message = TCPMessage(header, payload)
+        val message = TCPMessage(NetworkCommand.NetworkConfigRequest, payload)
 
         val byteArray = message.toByteArray()
         byteArray?.let{
-            val tcpMessage = message.fromByteArray(it)
+            val tcpMessage = TCPMessage.fromByteArray(it)
             tcpMessage?.let {
                 Log.d("THE MESSAGE", "payload ${it.payload} ${it.header.command} ")
             }
@@ -118,6 +125,26 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
     fun sendCommand(command : NetworkCommand)
     {
 
+    }
+
+    fun sendRegistration()
+    {
+        Log.d("xxxxxx", "SENDING REGISTRATION")
+        val payload = "TEST FROM NETWORKING"
+        val message = TCPMessage(NetworkCommand.NetworkDeviceRegistrationRequest, payload)
+        networkInfo?.let{networkInfo ->
+            client.sendMessage(networkInfo.serverIP, message, this)
+        }
+    }
+
+    fun sendConfigurationCommand()
+    {
+        Log.d("xxxxxx", "SENDING REGISTRATION")
+
+        val message = TCPMessage(NetworkCommand.NetworkConfigRequest, "")
+        networkInfo?.let{networkInfo ->
+            client.sendMessage(networkInfo.serverIP, message, this)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -160,10 +187,10 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         return null
     }
 
-    var test : NetworkInfo? = null
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectToWifi(networkInfo: NetworkInfo)
     {
+        this.networkInfo = networkInfo
        // if  (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
         if(false)
         {
@@ -243,7 +270,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         else
         {
             Log.d("here", "trying to connect ${networkInfo.ssid} ${networkInfo.password}")
-            test = networkInfo
 
 //            val suggestion1 = WifiNetworkSuggestion.Builder()
 //                .setSsid("test111111")
@@ -308,9 +334,29 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             connectivityManager.bindProcessToNetwork(network)
             val job = GlobalScope.launch(Dispatchers.Default) {
 
+                networkInfo?.let {networkInfo ->
+                    client.connect(networkInfo.serverIP, this@NetworkClientModel)
 
-                test?.let{
-                    client.write(it.serverIP, "TEST", this@NetworkClientModel)
+//
+//                test?.let{
+//                    client.write(it.serverIP, "TEST", this@NetworkClientModel)
+//                }
+                    Thread.sleep(300)
+                    _networkConnected.postValue(NetworkStatus.NetworkConnected)
+
+                    Thread.sleep(1000)
+                    sendRegistration()
+
+
+
+                    _clientRegistered.postValue(NetworkStatus.ClientRegistered)
+                    Thread.sleep(1000)
+                    _commandSent.postValue(NetworkStatus.CommandSent)
+                    Thread.sleep(1000)
+                    _dataReceived.postValue(NetworkStatus.DataReceived)
+                    Thread.sleep(1000)
+
+                    connectDelegate?.didConnect(true)
                 }
 
             }

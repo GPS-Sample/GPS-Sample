@@ -17,29 +17,31 @@ data class NetworkCommand( var command: Int, var id: Int, val parm1: String, val
 
     companion object 
     {
-        const val NetworkUserRequest            = 1001
-        const val NetworkUserResponse           = 2001
+        const val NetworkDeviceRegistrationRequest  = 1000
+        const val NetworkDeviceRegistrationResponse = 2000
+        const val NetworkUserRequest                = 1001
+        const val NetworkUserResponse               = 2001
 
-        const val NetworkConfigRequest          = 1002
-        const val NetworkConfigResponse         = 2002
+        const val NetworkConfigRequest              = 1002
+        const val NetworkConfigResponse             = 2002
 
-        const val NetworkStudyRequest           = 1003
-        const val NetworkStudyResponse          = 2003
+        const val NetworkStudyRequest               = 1003
+        const val NetworkStudyResponse              = 2003
 
-        const val NetworkFieldsRequest          = 1004
-        const val NetworkFieldsResponse         = 2004
+        const val NetworkFieldsRequest              = 1004
+        const val NetworkFieldsResponse             = 2004
 
-        const val NetworkRulesRequest           = 1005
-        const val NetworkRulesResponse          = 2005
+        const val NetworkRulesRequest               = 1005
+        const val NetworkRulesResponse              = 2005
 
-        const val NetworkFiltersRequest         = 1006
-        const val NetworkFiltersResponse        = 2006
+        const val NetworkFiltersRequest             = 1006
+        const val NetworkFiltersResponse            = 2006
 
-        const val NetworkFilterRulesRequest     = 1007
-        const val NetworkFilterRulesResponse    = 2007
+        const val NetworkFilterRulesRequest         = 1007
+        const val NetworkFilterRulesResponse        = 2007
 
-        const val NetworkSampleRequest          = 1008
-        const val NetworkSampleResponse         = 2008
+        const val NetworkSampleRequest              = 1008
+        const val NetworkSampleResponse             = 2008
 
         const val NetworkNavPlansRequest        = 1009
         const val NetworkNavPlansResponse       = 2009

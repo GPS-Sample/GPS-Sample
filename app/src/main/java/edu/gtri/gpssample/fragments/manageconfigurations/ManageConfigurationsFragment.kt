@@ -124,7 +124,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                 sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
 
-                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
+//                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
                 // need to pass this into the network view model
 
             }
@@ -146,12 +146,12 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         // set what client mode we are
         sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-        //getResult.launch(intent)
+        getResult.launch(intent)
 
 
 
         // FAKE
-        sharedNetworkViewModel.connectHotspotFake()
+       // sharedNetworkViewModel.connectHotspotFake()
 
         //findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
     }
