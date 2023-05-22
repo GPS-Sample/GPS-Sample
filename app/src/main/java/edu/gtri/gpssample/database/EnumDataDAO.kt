@@ -105,6 +105,7 @@ class EnumDataDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_CREATION_DATE, enumData.creationDate )
         values.put( DAO.COLUMN_UUID, enumData.uuid )
         values.put( DAO.COLUMN_USER_ID, enumData.userId )
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
@@ -123,6 +124,7 @@ class EnumDataDAO(private var dao: DAO)
     private fun createEnumData(cursor: Cursor): EnumData
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val userId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_ID))
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
@@ -135,7 +137,7 @@ class EnumDataDAO(private var dao: DAO)
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_DESCRIPTION))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME))
 
-        return EnumData( id, uuid, userId, enumAreaId, valid, incomplete, notes, latitude, longitude, isLocation, description, imageFileName, null )
+        return EnumData( id, creationDate, uuid, userId, enumAreaId, valid, incomplete, notes, latitude, longitude, isLocation, description, imageFileName, null )
     }
 
     fun getEnumData( uuid: String ) : EnumData?

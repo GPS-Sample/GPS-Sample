@@ -10,6 +10,7 @@ import kotlin.collections.ArrayList
 @Serializable
 data class EnumData(
     var id : Int? = null,
+    var creationDate: Long,
     var uuid : String,
     var userId : Int,
     var enumAreaId : Int,
@@ -24,7 +25,7 @@ data class EnumData(
     var fieldDataList : ArrayList<FieldData>?)
 {
     constructor( userId: Int, enumAreaId: Int, valid: Boolean, incomplete: Boolean, notes: String, latitude: Double, longitude: Double) :
-            this( null, UUID.randomUUID().toString(), userId, enumAreaId, valid, incomplete, notes, latitude, longitude, false,"", "", null)
+            this( null, Date().time, UUID.randomUUID().toString(), userId, enumAreaId, valid, incomplete, notes, latitude, longitude, false,"", "", null)
 
     fun pack() : String
     {

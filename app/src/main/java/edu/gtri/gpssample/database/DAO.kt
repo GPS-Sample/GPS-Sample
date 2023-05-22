@@ -141,6 +141,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableTeam = ("CREATE TABLE " +
                 TABLE_TEAM + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_TEAM_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
@@ -159,6 +160,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableEnumData = ("CREATE TABLE " +
                 TABLE_ENUM_DATA + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_USER_ID + " INTEGER" + "," +
                 COLUMN_STUDY_ID + " INTEGER" + "," +
@@ -410,6 +412,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 122
+        private const val DATABASE_VERSION = 124
     }
 }
