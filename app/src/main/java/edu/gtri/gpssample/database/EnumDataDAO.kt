@@ -53,9 +53,8 @@ class EnumDataDAO(private var dao: DAO)
 
         enumData.id = null
         enumData.notes = ""
-        enumData.isValid = false
-        enumData.nobodyHome = false
-        enumData.homeDoesNotExist = false
+        enumData.valid = false
+        enumData.incomplete = false
         putEnumData( enumData, values )
 
         enumData.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_DATA, null, values).toInt()
@@ -109,9 +108,8 @@ class EnumDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, enumData.uuid )
         values.put( DAO.COLUMN_USER_ID, enumData.userId )
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
-        values.put( DAO.COLUMN_ENUM_DATA_IS_VALID, enumData.isValid.toInt())
-        values.put( DAO.COLUMN_ENUM_DATA_NOBODY_HOME, enumData.nobodyHome.toInt())
-        values.put( DAO.COLUMN_ENUM_DATA_HOME_DOES_NOT_EXIST, enumData.homeDoesNotExist.toInt())
+        values.put( DAO.COLUMN_ENUM_DATA_VALID, enumData.valid.toInt())
+        values.put( DAO.COLUMN_ENUM_DATA_INCOMPLETE, enumData.incomplete.toInt())
         values.put( DAO.COLUMN_ENUM_DATA_NOTES, enumData.notes )
         values.put( DAO.COLUMN_ENUM_DATA_LATITUDE, enumData.latitude )
         values.put( DAO.COLUMN_ENUM_DATA_LONGITUDE, enumData.longitude )
@@ -128,9 +126,8 @@ class EnumDataDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val userId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_ID))
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
-        val isValid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IS_VALID)).toBoolean()
-        val nobodyHome = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_NOBODY_HOME)).toBoolean()
-        val homeDoesNotExist = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_HOME_DOES_NOT_EXIST)).toBoolean()
+        val valid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_VALID)).toBoolean()
+        val incomplete = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_INCOMPLETE)).toBoolean()
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_NOTES))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LONGITUDE))
@@ -138,7 +135,7 @@ class EnumDataDAO(private var dao: DAO)
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_DESCRIPTION))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME))
 
-        return EnumData( id, uuid, userId, enumAreaId, isValid, nobodyHome, homeDoesNotExist, notes, latitude, longitude, isLocation, description, imageFileName, null )
+        return EnumData( id, uuid, userId, enumAreaId, valid, incomplete, notes, latitude, longitude, isLocation, description, imageFileName, null )
     }
 
     fun getEnumData( uuid: String ) : EnumData?

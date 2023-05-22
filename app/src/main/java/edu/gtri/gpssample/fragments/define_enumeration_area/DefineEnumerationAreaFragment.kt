@@ -185,6 +185,15 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             {
                 var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
+                if (enumData.incomplete)
+                {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                }
+                else if (enumData.valid)
+                {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                }
+
                 if (enumData.isLocation)
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
 

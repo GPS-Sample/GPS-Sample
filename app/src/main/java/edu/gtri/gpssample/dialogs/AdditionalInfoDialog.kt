@@ -14,7 +14,7 @@ class AdditionalInfoDialog
     interface AdditionalInfoDialogDelegate
     {
         fun didSelectCancelButton()
-        fun didSelectSaveButton( nobodyHome: Boolean, homeDoesNotExist: Boolean, notes: String )
+        fun didSelectSaveButton( incomplete: Boolean, notes: String )
     }
 
     constructor()
@@ -45,11 +45,10 @@ class AdditionalInfoDialog
         val saveButton = view.findViewById<Button>(R.id.save_button)
 
         saveButton.setOnClickListener {
-            val nobodyHomeCheckBox = view.findViewById<CheckBox>(R.id.nobody_home_check_box)
-            val homeDoesNotExistCheckBox = view.findViewById<CheckBox>(R.id.home_does_not_exist_check_box)
+            val incompleteCheckBox = view.findViewById<CheckBox>(R.id.incomplete_check_box)
             val notesTextView = view.findViewById<EditText>(R.id.notes_edit_text)
 
-            delegate.didSelectSaveButton( nobodyHomeCheckBox.isChecked, homeDoesNotExistCheckBox.isChecked, notesTextView.text.toString() )
+            delegate.didSelectSaveButton( incompleteCheckBox.isChecked, notesTextView.text.toString() )
             alertDialog.dismiss()
         }
     }
