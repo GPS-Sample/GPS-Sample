@@ -13,6 +13,8 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerView.Adapter<PerformEnumerationAdapter.ViewHolder>()
 {
@@ -47,6 +49,7 @@ class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerVie
         val enumData = enumDataList!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( enumData.id.toString())
+        holder.dateTextView.setText( Date(enumData.creationDate).toString())
 
         holder.itemView.setOnClickListener {
             didSelectEnumData(enumData)
@@ -56,5 +59,6 @@ class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerVie
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
+        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
     }
 }

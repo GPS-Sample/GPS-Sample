@@ -19,7 +19,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolygonOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -179,6 +181,31 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                         .addAll( points )
 
                     googleMap.addPolygon(polygon)
+
+                    val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+
+                    for (enumData in enumDataList)
+                    {
+                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+                        if (enumData.incomplete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                        }
+                        else if (enumData.valid)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                        }
+
+                        if (enumData.isLocation)
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+
+                        val marker = googleMap.addMarker(
+                            MarkerOptions()
+                                .position(LatLng(enumData.latitude, enumData.longitude))
+                                .icon(icon)
+                        )
+                    }
                 }
 
                 // HACK HACK

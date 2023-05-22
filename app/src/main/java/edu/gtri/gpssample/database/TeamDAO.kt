@@ -35,6 +35,8 @@ class TeamDAO(private var dao: DAO)
             Log.d( "xxx", "existing team id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
+
+        values.put( DAO.COLUMN_CREATION_DATE, team.creationDate )
         values.put( DAO.COLUMN_ENUM_AREA_ID, team.enumAreaId )
         values.put( DAO.COLUMN_TEAM_NAME, team.name )
     }
@@ -54,10 +56,11 @@ class TeamDAO(private var dao: DAO)
     private fun createTeam(cursor: Cursor): Team
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val enum_area_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_NAME))
 
-        return Team(id, enum_area_id, name )
+        return Team(id, creationDate, enum_area_id, name )
     }
 
     //--------------------------------------------------------------------------

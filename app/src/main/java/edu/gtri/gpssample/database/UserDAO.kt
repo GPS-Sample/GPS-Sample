@@ -15,13 +15,19 @@ class UserDAO(private var dao: DAO)
     {
         val values = ContentValues()
 
+        putUser( user, values )
+
+        return dao.writableDatabase.insert(DAO.TABLE_USER, null, values).toInt()
+    }
+
+    //--------------------------------------------------------------------------
+    fun putUser( user: User, values: ContentValues )
+    {
         values.put( DAO.COLUMN_USER_ROLE, user.role )
         values.put( DAO.COLUMN_USER_NAME, user.name )
         values.put( DAO.COLUMN_USER_PIN, user.pin )
         values.put( DAO.COLUMN_USER_RECOVERY_QUESTION, user.recoveryQuestion )
         values.put( DAO.COLUMN_USER_RECOVERY_ANSWER, user.recoveryAnswer )
-
-        return dao.writableDatabase.insert(DAO.TABLE_USER, null, values).toInt()
     }
 
     //--------------------------------------------------------------------------
@@ -67,6 +73,27 @@ class UserDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun getUser( name: String ): User?
+    {
+        var user: User? = null
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_USER_NAME} = '$name'"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            user = createUser( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return user
+    }
+
+    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createUser(cursor: Cursor) : User
     {
@@ -79,6 +106,20 @@ class UserDAO(private var dao: DAO)
         val isOnline = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_IS_ONLINE)).toBoolean()
 
         return User(id, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
+    }
+
+    //--------------------------------------------------------------------------
+    fun updateUser( user: User )
+    {
+        val db = dao.writableDatabase
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(user.id!!.toString())
+        val values = ContentValues()
+
+        putUser( user, values )
+
+        db.update(DAO.TABLE_USER, values, whereClause, args )
+        db.close()
     }
 
     //--------------------------------------------------------------------------

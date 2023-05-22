@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Team
+import java.util.*
+import kotlin.collections.ArrayList
 
 class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.ViewHolder>()
 {
@@ -44,6 +46,7 @@ class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.V
         val team = teams!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( team.name )
+        holder.dateTextView.setText( Date(team.creationDate).toString())
 
         holder.itemView.setOnClickListener {
             didSelectTeam(team)
@@ -53,5 +56,6 @@ class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.V
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
+        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
     }
 }

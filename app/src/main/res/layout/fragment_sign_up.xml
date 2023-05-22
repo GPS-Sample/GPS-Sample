@@ -111,6 +111,18 @@
             </FrameLayout>
 
             <TextView
+                android:visibility="gone"
+                android:id="@+id/other_question_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="17sp"/>
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"

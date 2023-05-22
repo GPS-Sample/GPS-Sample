@@ -145,14 +145,21 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
     }
 
-    override fun didSelectSaveButton( nobodyHome: Boolean, homeDoesNotExist: Boolean, notes: String )
+    override fun didSelectSaveButton( incomplete: Boolean, notes: String )
     {
-        if (nobodyHome || homeDoesNotExist || notes.length > 0)
+        if (incomplete)
         {
-            enumData.nobodyHome = nobodyHome
-            enumData.homeDoesNotExist = homeDoesNotExist
+            for (key in fieldDataMap.keys) {
+                fieldDataMap[key]?.let { fieldData ->
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
+                }
+            }
+
             enumData.notes = notes
+            enumData.valid = false
+            enumData.incomplete = true
             DAO.enumDataDAO.updateEnumData( enumData )
+
             findNavController().popBackStack()
         }
         else
@@ -198,8 +205,11 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                         }
                     }
 
-                    enumData.isValid = true
+                    enumData.notes = notes
+                    enumData.valid = true
+                    enumData.incomplete = false
                     DAO.enumDataDAO.updateEnumData( enumData )
+
                     DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }

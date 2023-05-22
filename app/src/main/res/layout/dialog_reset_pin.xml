@@ -6,37 +6,50 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="Additional Info"
-        android:textColor="@color/primary"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:padding="10dp"
+        android:id="@+id/title_text_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <CheckBox
-        android:id="@+id/incomplete_check_box"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Incomplete" />
-
-    <TextView
-        android:text="Notes"
-        android:textColor="@color/primary"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="20dp"
+        android:focusable="false"
+        android:text="Reset PIN"
+        android:gravity="center_vertical"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="16sp" />
 
     <EditText
-        android:id="@+id/notes_edit_text"
+        android:id="@+id/current_pin_edit_text"
+        android:hint="Enter Current PIN"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
-        android:layout_height="40dp"/>
+        android:layout_height="50dp"/>
+
+    <EditText
+        android:id="@+id/pin1_edit_text"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
+        android:hint="Enter New PIN"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <EditText
+        android:id="@+id/pin2_edit_text"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
+        android:hint="Re-Enter New PIN"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -54,7 +67,7 @@
             android:layout_marginEnd="10dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
         <Button
             android:id="@+id/save_button"
@@ -67,6 +80,8 @@
             android:layout_marginEnd="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Save" />
+            android:text="@string/save" />
+
     </LinearLayout>
+
 </LinearLayout>
