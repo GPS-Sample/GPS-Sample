@@ -27,6 +27,9 @@ class NetworkConnectionViewModel(socket : Socket): ViewModel()  {
     val connection : LiveData<String>
         get() = _connection
 
+    var socket : Socket?
+        get() = _socket
+        set(value){_socket = value}
     fun updateName(name : String)
     {
        // _name.value = name

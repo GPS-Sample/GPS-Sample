@@ -1,26 +1,23 @@
 package edu.gtri.gpssample.network
 
 import android.util.Log
-import edu.gtri.gpssample.constants.NetworkStatus
-import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.TCPHeader
 import edu.gtri.gpssample.network.models.TCPMessage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.net.InetSocketAddress
 import java.net.Socket
-
+const val kSocketTimeout = 5000
+const val kTCPPort = 51234
 class TCPClient
 {
-    interface TCPCLientDelegate
+    interface TCPClientDelegate
     {
         fun sentData(data : String)
         fun connectionString(connection : String)
     }
-    var port = 51234
+    //var port = kTCPPort
     // var port = 80
     var socket : Socket? = null
 
-    fun connect(inetAddress: String, delegate : TCPCLientDelegate) : Boolean
+    fun connect(inetAddress: String, delegate : TCPClientDelegate) : Boolean
     {
         try {
             // if you call connect and we're connected, we kill the socket and start over!
@@ -28,9 +25,10 @@ class TCPClient
                 socket.close()
             }
             socket = null
-            socket = Socket( inetAddress, 51234 )
+            socket = Socket( inetAddress, kTCPPort )
             if(socket != null)
             {
+                socket!!.soTimeout = kSocketTimeout
                 return true
             }
         }catch (ex: Exception)
@@ -41,7 +39,7 @@ class TCPClient
         return false
     }
 
-    fun sendMessage(inetAddress: String, message : TCPMessage, delegate: TCPCLientDelegate) : NetworkStatus
+    fun sendMessage(inetAddress: String, message : TCPMessage, delegate: TCPClientDelegate) : TCPMessage?
     {
         try
         {
@@ -49,19 +47,32 @@ class TCPClient
                 socket.outputStream.write( message.toByteArray())
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()
-                return NetworkStatus.CommandSent
+
+                // build the response from the server
+
+                val headerArray : ByteArray = ByteArray(TCPHeader.size)
+                socket.inputStream.read(headerArray)
+                val header = TCPHeader.fromByteArray(headerArray)
+                header?.let { header ->
+                    // if we get here, the key is valid
+                    val payloadArray = ByteArray(header.payloadSize)
+                    socket.inputStream.read(payloadArray)
+
+                    val payload = String(payloadArray)
+                    return TCPMessage(header, payload)
+                }
+                return null
             }
         }
         catch (ex: Exception)
         {
             Log.d( "xxx", ex.stackTraceToString())
             delegate.connectionString("Connection failed to ${inetAddress}")
-
         }
-        return NetworkStatus.CommandError
+        return null
     }
 
-    fun write( inetAddress: String, message: String, delegate : TCPCLientDelegate )
+    fun write( inetAddress: String, message: String, delegate : TCPClientDelegate )
     {
         try
         {
@@ -77,7 +88,6 @@ class TCPClient
                 Log.d( "xxx", "write TCP message: $message to $inetAddress" )
 
                 socket.outputStream.write( message.toByteArray())
-
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()
                 //socket.close()
@@ -88,6 +98,13 @@ class TCPClient
         {
             Log.d( "xxx", ex.stackTraceToString())
             delegate.connectionString("Connection failed to ${inetAddress}")
+        }
+    }
+
+    fun shutdown()
+    {
+        socket?.let {
+            it.close()
         }
     }
 //    suspend fun write( inetAddress: String, message: String )

@@ -6,14 +6,33 @@ data class TCPHeader(val command : Int, val payloadSize : Int)
 {
     companion object
     {
-        val key : String = "PUT HASH HERE"
+        const val key : String = "PUT HASH HERE"
+        const val size = 4 + key.length + 4
+
+        fun fromByteArray(byteArray : ByteArray) : TCPHeader? {
+            val byteBuffer = ByteBuffer.wrap(byteArray)
+            byteBuffer.position(0)
+            val command = byteBuffer.int
+            byteBuffer.position(Int.SIZE_BYTES)
+            val keyBytes: ByteArray = ByteArray(TCPHeader.key.length)
+            byteBuffer.get(keyBytes)
+            val key = String(keyBytes)
+            byteBuffer.position(Int.SIZE_BYTES + TCPHeader.key.length)
+            val payloadSize = byteBuffer.int
+            if(key == TCPHeader.key) {
+                return TCPHeader(command, payloadSize)
+            }
+            return null;
+        }
     }
 }
 
 
 data class TCPMessage(val command : Int, val payload : String?) {
 
-    val header : TCPHeader = TCPHeader(command, payload?.length ?: 0)
+    constructor(header : TCPHeader, payload : String) : this(header.command, payload)
+
+    var header : TCPHeader = TCPHeader(command, payload?.length ?: 0)
     fun toByteArray(): ByteArray? {
         val size: Int = 4 + 4 + TCPHeader.key.length + (payload?.length ?: 0)
 

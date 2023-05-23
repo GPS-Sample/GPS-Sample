@@ -24,10 +24,14 @@ import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.io.InputStream
 
-class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate,
+        NetworkClientModel.ConfigurationDelegate
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
@@ -45,6 +49,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
+        sharedNetworkViewModel.networkClientModel.configurationDelegate = this
         sharedViewModel = vm
     }
 
@@ -203,5 +208,14 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         super.onDestroyView()
 
         _binding = null
+    }
+
+    override fun configurationReceived(config: Config) {
+        runBlocking(Dispatchers.Main) {
+            DAO.configDAO.createConfig(config)
+            sharedViewModel.configurations.add(config)
+            manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+
+        }
     }
 }

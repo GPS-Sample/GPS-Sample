@@ -7,12 +7,16 @@ import android.net.*
 import android.net.wifi.*
 import android.os.Build
 import android.os.Handler
+import android.security.NetworkSecurityPolicy
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.activities.MainActivity
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.network.TCPClient
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
@@ -27,14 +31,21 @@ import java.net.InetAddress
 import java.net.Socket
 
 
-class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServer.TCPServerDelegate {
+class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     override val type = NetworkMode.NetworkClient
     private val client : TCPClient = TCPClient()
+
+    interface ConfigurationDelegate
+    {
+        fun configurationReceived(config : Config)
+    }
 
     interface NetworkConnectDelegate
     {
         fun didConnect(complete: Boolean)
     }
+
+    var configurationDelegate : ConfigurationDelegate? = null
 
     private var _connectDelegate : NetworkConnectDelegate? = null
     var connectDelegate : NetworkConnectDelegate?
@@ -113,13 +124,13 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 
         Thread.sleep(300)
         _networkConnected.postValue(NetworkStatus.NetworkConnected)
-        Thread.sleep(1000)
-        _clientRegistered.postValue(NetworkStatus.ClientRegistered)
-        Thread.sleep(1000)
-        _commandSent.postValue(NetworkStatus.CommandSent)
-        Thread.sleep(1000)
-        _dataReceived.postValue(NetworkStatus.DataReceived)
-        Thread.sleep(1000)
+        //Thread.sleep(1000)
+        //_clientRegistered.postValue(NetworkStatus.ClientRegistered)
+//        Thread.sleep(1000)
+//        _commandSent.postValue(NetworkStatus.CommandSent)
+//        Thread.sleep(1000)
+//        _dataReceived.postValue(NetworkStatus.DataReceived)
+//        Thread.sleep(1000)
     }
 
     fun sendCommand(command : NetworkCommand)
@@ -130,20 +141,57 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
     fun sendRegistration()
     {
         Log.d("xxxxxx", "SENDING REGISTRATION")
-        val payload = "TEST FROM NETWORKING"
-        val message = TCPMessage(NetworkCommand.NetworkDeviceRegistrationRequest, payload)
-        networkInfo?.let{networkInfo ->
-            client.sendMessage(networkInfo.serverIP, message, this)
+        _activity?.let { activity ->
+            val app = (activity.application as MainApplication?)
+            app?.user?.let { user ->
+
+                val payload = user.name
+                val message = TCPMessage(NetworkCommand.NetworkDeviceRegistrationRequest, payload)
+                networkInfo?.let{networkInfo ->
+                    val response = client.sendMessage(networkInfo.serverIP, message, this@NetworkClientModel)
+                    // validate response
+                    response?.let{response ->
+                        if(response.command == NetworkCommand.NetworkDeviceRegistrationResponse)
+                        {
+                            Thread.sleep(500)
+                            _clientRegistered.postValue(NetworkStatus.ClientRegistered)
+                            // TODO:  change this to be more generic
+                            sendConfigurationCommand()
+                        }
+                    }
+                }
+            }
+
         }
+
     }
 
     fun sendConfigurationCommand()
     {
-        Log.d("xxxxxx", "SENDING REGISTRATION")
+        Log.d("xxxxxx", "SENDING Configuration command")
 
         val message = TCPMessage(NetworkCommand.NetworkConfigRequest, "")
         networkInfo?.let{networkInfo ->
-            client.sendMessage(networkInfo.serverIP, message, this)
+            val response = client.sendMessage(networkInfo.serverIP, message, this)
+            response?.let {
+
+                _commandSent.postValue(NetworkStatus.CommandSent)
+                if(response.command == NetworkCommand.NetworkConfigResponse)
+                {
+                    response.payload?.let {payload ->
+                        val config = Config.unpack(payload)
+                        Log.d("xxxxxx", "this is test  ${config?.name}")
+
+                        // TODO: put the config in the list of current configs.....
+                        config?.let{config ->
+                            configurationDelegate?.configurationReceived(config)
+                            _dataReceived.postValue(NetworkStatus.DataReceived)
+                        }
+
+                    }
+
+                }
+            }
         }
     }
 
@@ -335,28 +383,24 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             val job = GlobalScope.launch(Dispatchers.Default) {
 
                 networkInfo?.let {networkInfo ->
-                    client.connect(networkInfo.serverIP, this@NetworkClientModel)
-
-//
-//                test?.let{
-//                    client.write(it.serverIP, "TEST", this@NetworkClientModel)
-//                }
-                    Thread.sleep(300)
-                    _networkConnected.postValue(NetworkStatus.NetworkConnected)
-
-                    Thread.sleep(1000)
-                    sendRegistration()
+                    if(client.connect(networkInfo.serverIP, this@NetworkClientModel))
+                    {
+                        _networkConnected.postValue(NetworkStatus.NetworkConnected)
+                        sendRegistration()
 
 
 
-                    _clientRegistered.postValue(NetworkStatus.ClientRegistered)
-                    Thread.sleep(1000)
-                    _commandSent.postValue(NetworkStatus.CommandSent)
-                    Thread.sleep(1000)
-                    _dataReceived.postValue(NetworkStatus.DataReceived)
-                    Thread.sleep(1000)
+                        _clientRegistered.postValue(NetworkStatus.ClientRegistered)
+                        Thread.sleep(1000)
+                        _commandSent.postValue(NetworkStatus.CommandSent)
+                        Thread.sleep(1000)
+                        _dataReceived.postValue(NetworkStatus.DataReceived)
+                        Thread.sleep(1000)
 
-                    connectDelegate?.didConnect(true)
+                        connectDelegate?.didConnect(true)
+                    }
+
+
                 }
 
             }
@@ -395,45 +439,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         {
             Log.d("xxxxx", "connected 2")
             super.onLinkPropertiesChanged(network, linkProperties)
-            try {
 
-
-//                viewModelScope?.let { viewModelScope ->
-//                    viewModelScope.launch(Dispatchers.IO) {
-//                        sleep(1000)
-//
-//                            val wifiManager =
-//                                Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-//
-//                            wifiManager?.let{wifiManager ->
-//                                val myAddress =
-//                                    intToInetAddress(wifiManager.dhcpInfo.ipAddress)!!.toString()
-//                                        .substring(1)
-//
-//                                val myInetAddress = InetAddress.getByName(myAddress)
-//                               // tcpServer.beginListening(myInetAddress, this@NetworkClientModel)
-//                            }
-//
-//                            //client.write("192.168.48.183", "TEST", this@NetworkClientModel)
-//                            //client.write("142.250.189.110", "TEST", this@NetworkClientModel)
-//                            //client.write("192.168.43.1", "TEST", this@NetworkClientModel)
-////                            val job = GlobalScope.launch(Dispatchers.Default) {
-////                                client.write("192.168.1.100", "TEST", this@NetworkClientModel)
-////                            }
-//                            //client.write("192.168.1.100", "TEST", this@NetworkClientModel)
-//
-//
-//
-//                    }
-
-
-//                }
-            }catch(e : Exception)
-            {
-
-            }
-
-//            broadcastInetAddress = InetAddress.getByName( server_udp_address )
         }
     }
 
@@ -446,12 +452,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         _clientConnectMessage.postValue(connection)
     }
 
-    override fun didReceiveTCPMessage(message: String) {
-        TODO("Not yet implemented")
+    fun shutdown()
+    {
+        client.shutdown()
     }
-
-    override fun clientConnected(socket: Socket) {
-        TODO("Not yet implemented")
-    }
-
 }

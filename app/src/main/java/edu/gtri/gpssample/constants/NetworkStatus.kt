@@ -16,6 +16,7 @@ enum class NetworkStatus(val format : String) {
     CommandSent("Command Sent"),
     CommandError("Command Error"),
 
+
 }
 
 object NetworkStatusConverter {

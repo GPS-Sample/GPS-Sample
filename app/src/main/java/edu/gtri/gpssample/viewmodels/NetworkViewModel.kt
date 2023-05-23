@@ -23,6 +23,7 @@ import kotlinx.coroutines.*
 import java.util.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.database.models.Config
 
 class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegate,
     NetworkClientModel.NetworkConnectDelegate{
@@ -121,20 +122,22 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
                 NetworkMode.NetworkHotspot ->
                 {
                     complete = networkHotspotModel.startNetworking()
-
                     destination = networkHotspotModel.destination
                 }
                 NetworkMode.NetworkClient  ->
                 {
                     val networkInfo = NetworkInfo(ssid, password, serverIpAddress)
                     networkClientModel.connectToWifi(networkInfo)
-
                 }
                 else -> {complete = false}
             }
         }
     }
 
+    fun setCurrentConfig(config : Config)
+    {
+        networkHotspotModel.config = config
+    }
 
     fun stopConnection(v : View) {
         when (networkMode.value) {
@@ -168,5 +171,11 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         runBlocking(Dispatchers.Main) {
             navController?.popBackStack()
         }
+    }
+
+    fun shutdown()
+    {
+        networkClientModel.shutdown()
+        networkHotspotModel.shutdown()
     }
 }
