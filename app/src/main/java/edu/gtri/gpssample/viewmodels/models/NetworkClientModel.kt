@@ -7,34 +7,77 @@ import android.net.*
 import android.net.wifi.*
 import android.os.Build
 import android.os.Handler
+import android.security.NetworkSecurityPolicy
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.NetworkMode
-import edu.gtri.gpssample.constants.NetworkStatus
+import edu.gtri.gpssample.activities.MainActivity
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.network.TCPClient
 import edu.gtri.gpssample.network.TCPServer
+import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.TCPHeader
+import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.Thread.sleep
 import java.net.InetAddress
+import java.net.Socket
 
 
-class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServer.TCPServerDelegate {
+class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     override val type = NetworkMode.NetworkClient
     private val client : TCPClient = TCPClient()
 
-    private val tcpServer : TCPServer = TCPServer()
+    interface ConfigurationDelegate
+    {
+        fun configurationReceived(config : Config)
+    }
+
+    interface NetworkConnectDelegate
+    {
+        fun didConnect(complete: Boolean)
+    }
+
+    var configurationDelegate : ConfigurationDelegate? = null
+
+    private var _connectDelegate : NetworkConnectDelegate? = null
+    var connectDelegate : NetworkConnectDelegate?
+        get() = _connectDelegate
+        set(value) {
+            _connectDelegate = value
+        }
 
 
     var _networkConnected : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
-    var networkConnected : LiveData<NetworkStatus> = _networkConnected
+    val networkConnected : LiveData<NetworkStatus>
+        get() = _networkConnected
 
-    // test
+    var _clientRegistered : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
+    val clientRegistered : LiveData<NetworkStatus>
+        get() = _clientRegistered
+
+    var _commandSent : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
+    val commandSent : LiveData<NetworkStatus>
+        get() = _commandSent
+
+    var _dataReceived : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
+    val dataReceived : LiveData<NetworkStatus>
+        get() = _dataReceived
+
+    private var _clientMode : MutableLiveData<ClientMode> = MutableLiveData(ClientMode.None)
+    val clientMode : LiveData<ClientMode>
+        get() = _clientMode
+
+
+    private var networkInfo : NetworkInfo? = null
+
     private var _clientConnectMessage : MutableLiveData<String> = MutableLiveData("")
     private var _clientDataMessage : MutableLiveData<String> = MutableLiveData("")
     var clientConnectMessage : LiveData<String> = _clientConnectMessage
@@ -58,6 +101,102 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 
     }
 
+    fun setClientMode(mode : ClientMode)
+    {
+        _clientMode.postValue(mode)
+    }
+
+    fun fakeConnect()
+    {
+
+        // test the byte array stuff
+        val payload = "THE PAYLOAD@!@@LKJJK@@!!!!!1"
+        val message = TCPMessage(NetworkCommand.NetworkConfigRequest, payload)
+
+        val byteArray = message.toByteArray()
+        byteArray?.let{
+            val tcpMessage = TCPMessage.fromByteArray(it)
+            tcpMessage?.let {
+                Log.d("THE MESSAGE", "payload ${it.payload} ${it.header.command} ")
+            }
+
+        }
+
+        Thread.sleep(300)
+        _networkConnected.postValue(NetworkStatus.NetworkConnected)
+        //Thread.sleep(1000)
+        //_clientRegistered.postValue(NetworkStatus.ClientRegistered)
+//        Thread.sleep(1000)
+//        _commandSent.postValue(NetworkStatus.CommandSent)
+//        Thread.sleep(1000)
+//        _dataReceived.postValue(NetworkStatus.DataReceived)
+//        Thread.sleep(1000)
+    }
+
+    fun sendCommand(command : NetworkCommand)
+    {
+
+    }
+
+    fun sendRegistration()
+    {
+        Log.d("xxxxxx", "SENDING REGISTRATION")
+        _activity?.let { activity ->
+            val app = (activity.application as MainApplication?)
+            app?.user?.let { user ->
+
+                val payload = user.name
+                val message = TCPMessage(NetworkCommand.NetworkDeviceRegistrationRequest, payload)
+                networkInfo?.let{networkInfo ->
+                    val response = client.sendMessage(networkInfo.serverIP, message, this@NetworkClientModel)
+                    // validate response
+                    response?.let{response ->
+                        if(response.command == NetworkCommand.NetworkDeviceRegistrationResponse)
+                        {
+                            Thread.sleep(500)
+                            _clientRegistered.postValue(NetworkStatus.ClientRegistered)
+                            // TODO:  change this to be more generic
+                            sendConfigurationCommand()
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    fun sendConfigurationCommand()
+    {
+        Log.d("xxxxxx", "SENDING Configuration command")
+
+        val message = TCPMessage(NetworkCommand.NetworkConfigRequest, "")
+        networkInfo?.let{networkInfo ->
+            val response = client.sendMessage(networkInfo.serverIP, message, this)
+            response?.let {
+
+                _commandSent.postValue(NetworkStatus.CommandSent)
+                if(response.command == NetworkCommand.NetworkConfigResponse)
+                {
+                    response.payload?.let {payload ->
+                        val config = Config.unpack(payload)
+                        Log.d("xxxxxx", "this is test  ${config?.name}")
+
+                        // TODO: put the config in the list of current configs.....
+                        config?.let{config ->
+                            configurationDelegate?.configurationReceived(config)
+                            _dataReceived.postValue(NetworkStatus.DataReceived)
+
+                            sleep(400)
+                            connectDelegate?.didConnect(true)
+                        }
+
+                    }
+
+                }
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun startNetworking(networkInfo: NetworkInfo?) : Boolean
@@ -99,90 +238,91 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         return null
     }
 
-    var test : NetworkInfo? = null
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectToWifi(networkInfo: NetworkInfo)
     {
+        this.networkInfo = networkInfo
        // if  (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-        if(false)
+        if(client.socket == null)
         {
-            try {
-                val wifiConfig = WifiConfiguration()
+            if(false)
+            {
+                try {
+                    val wifiConfig = WifiConfiguration()
 
-                wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
-                wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
-                wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.OPEN);
-                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.SHARED);
+                    wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
+                    wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
+                    wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.OPEN);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.SHARED);
 
-                var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-                wifiManager!!.setWifiEnabled(true)
+                    var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                    wifiManager!!.setWifiEnabled(true)
 
-                val suggestionWpa2 = WifiNetworkSuggestion.Builder()
-                    .setSsid("Cypress Guest Wifi") //SSID name
-                    .setWpa2Passphrase("cypresslovesyou") //password
-                    .build()
-                val networkSuggestions: ArrayList<WifiNetworkSuggestion> = ArrayList()
-                networkSuggestions.add(suggestionWpa2)
+                    val suggestionWpa2 = WifiNetworkSuggestion.Builder()
+                        .setSsid("Cypress Guest Wifi") //SSID name
+                        .setWpa2Passphrase("cypresslovesyou") //password
+                        .build()
+                    val networkSuggestions: ArrayList<WifiNetworkSuggestion> = ArrayList()
+                    networkSuggestions.add(suggestionWpa2)
 
-                wifiManager!!.startScan()
+                    wifiManager!!.startScan()
 
 
-                if(wifiManager!!.isWifiEnabled)
-                {
-                    Log.d("xxxxxx", "WIFI ENABLED")
-                }
-                var netId = wifiManager!! .addNetwork(wifiConfig)
-                if (netId == -1){
-                    //Try it again with no quotes in case of hex password
-                    wifiConfig.wepKeys[0] = networkInfo.password;
-                    netId = wifiManager.addNetwork(wifiConfig);
-                }
+                    if(wifiManager!!.isWifiEnabled)
+                    {
+                        Log.d("xxxxxx", "WIFI ENABLED")
+                    }
+                    var netId = wifiManager!! .addNetwork(wifiConfig)
+                    if (netId == -1){
+                        //Try it again with no quotes in case of hex password
+                        wifiConfig.wepKeys[0] = networkInfo.password;
+                        netId = wifiManager.addNetwork(wifiConfig);
+                    }
 
-                if(netId == -1)
-                {
+                    if(netId == -1)
+                    {
 
-                    netId = wifiManager!!.addNetworkSuggestions(networkSuggestions)
-                }
-                val disconnect = wifiManager.disconnect()
-                wifiManager.enableNetwork(netId, true)
-                val a = wifiManager.reconnect()
-                runBlocking(Dispatchers.Main) {
-                    Handler().postDelayed({
-                        wifiManager =
-                            Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                        netId = wifiManager!!.addNetworkSuggestions(networkSuggestions)
+                    }
+                    val disconnect = wifiManager.disconnect()
+                    wifiManager.enableNetwork(netId, true)
+                    val a = wifiManager.reconnect()
+                    runBlocking(Dispatchers.Main) {
+                        Handler().postDelayed({
+                            wifiManager =
+                                Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
 
-                        val serverAddress =
-                            intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
-                                .substring(1)
-                        val myAddress =
-                            intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
-                                .substring(1)
-                        val components = serverAddress.split(".")
-                        val broadcast_address =
-                            components[0] + "." + components[1] + "." + components[2] + ".255"
+                            val serverAddress =
+                                intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
+                                    .substring(1)
+                            val myAddress =
+                                intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
+                                    .substring(1)
+                            val components = serverAddress.split(".")
+                            val broadcast_address =
+                                components[0] + "." + components[1] + "." + components[2] + ".255"
 
-                        val myInetAddress = InetAddress.getByName(myAddress)
-                        val broadcastInetAddress = InetAddress.getByName(broadcast_address)
-                        Log.d("here", "xxx  IP ADDRESS ${myInetAddress.hostAddress}")
+                            val myInetAddress = InetAddress.getByName(myAddress)
+                            val broadcastInetAddress = InetAddress.getByName(broadcast_address)
+                            Log.d("here", "xxx  IP ADDRESS ${myInetAddress.hostAddress}")
 
-                        // tryto connect to server
-                        viewModelScope?.let { viewModelScope ->
-                            viewModelScope.launch(Dispatchers.IO) {
-                                sleep(5000)
-                                client.write("192.168.227.232", "TEST", this@NetworkClientModel)
+                            // tryto connect to server
+                            viewModelScope?.let { viewModelScope ->
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    sleep(5000)
+                                    client.write("192.168.227.232", "TEST", this@NetworkClientModel)
+                                }
                             }
-                        }
-                    }, 1000)
+                        }, 1000)
+                    }
+                } catch (e: Exception) {
+                    Log.d( "xxx", e.stackTraceToString())
                 }
-            } catch (e: Exception) {
-                Log.d( "xxx", e.stackTraceToString())
             }
-        }
-        else
-        {
-            Log.d("here", "trying to connect ${networkInfo.ssid} ${networkInfo.password}")
-            test = networkInfo
+            else
+            {
+                Log.d("here", "trying to connect ${networkInfo.ssid} ${networkInfo.password}")
 
 //            val suggestion1 = WifiNetworkSuggestion.Builder()
 //                .setSsid("test111111")
@@ -209,34 +349,40 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 //                }
 //            };
 //            context.registerReceiver(broadcastReceiver, intentFilter);
-            var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-            val wifiInfo: WifiInfo = wifiManager!!.getConnectionInfo()
-            Log.d("xxx", "wifiinfo ${wifiInfo}")
+                var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                val wifiInfo: WifiInfo = wifiManager!!.getConnectionInfo()
+                Log.d("xxx", "wifiinfo ${wifiInfo}")
 
-            val builder = WifiNetworkSpecifier.Builder()
-            builder.setSsid( networkInfo.ssid );
-            builder.setWpa2Passphrase( networkInfo.password )
-           // builder.setSsid( "Cypress Guest Wifi" )
-            //builder.setWpa2Passphrase("cypresslovesyou")
-            //builder.setWpa2Passphrase( networkInfo.password )
-            //builder.setWpa2Passphrase("")
-            val wifiNetworkSpecifier = builder.build()
+                val builder = WifiNetworkSpecifier.Builder()
+                builder.setSsid( networkInfo.ssid );
+                builder.setWpa2Passphrase( networkInfo.password )
+                // builder.setSsid( "Cypress Guest Wifi" )
+                //builder.setWpa2Passphrase("cypresslovesyou")
+                //builder.setWpa2Passphrase( networkInfo.password )
+                //builder.setWpa2Passphrase("")
+                val wifiNetworkSpecifier = builder.build()
 
 
-            val networkRequestBuilder = NetworkRequest.Builder()
+                val networkRequestBuilder = NetworkRequest.Builder()
 
-            networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            //networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-            networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
+                networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                //networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
 
-            val networkRequest = networkRequestBuilder.build()
+                val networkRequest = networkRequestBuilder.build()
 
-            val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectivityManager.requestNetwork( networkRequest, networkCallback )
+                val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                connectivityManager.requestNetwork( networkRequest, networkCallback )
 
+            }
+        }else
+        {
+            _networkConnected.postValue(NetworkStatus.NetworkConnected)
+            sendRegistration()
         }
+
     }
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback()
@@ -247,8 +393,15 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
             connectivityManager.bindProcessToNetwork(network)
             val job = GlobalScope.launch(Dispatchers.Default) {
 
-                test?.let{
-                    client.write(it.serverIP, "TEST", this@NetworkClientModel)
+                networkInfo?.let {networkInfo ->
+                    if(client.connect(networkInfo.serverIP, this@NetworkClientModel))
+                    {
+                        _networkConnected.postValue(NetworkStatus.NetworkConnected)
+                        sendRegistration()
+
+                    }
+
+
                 }
 
             }
@@ -257,11 +410,24 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         override fun onLost(network: Network) {
             super.onLost(network)
             Log.d("xxxx", "FAILED!!!!! HERE" )
+            _networkConnected.postValue(NetworkStatus.NetworkError)
+            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
+            _commandSent.postValue(NetworkStatus.CommandError)
+            _dataReceived.postValue(NetworkStatus.DataReceivedError)
+            sleep(400)
+            connectDelegate?.didConnect(false)
+
         }
         override fun onUnavailable() {
             super.onUnavailable()
             Log.d("xxxx", "FAILED!!!!! NO NETWORK" )
             _networkConnected.postValue(NetworkStatus.NetworkError)
+            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
+            _commandSent.postValue(NetworkStatus.CommandError)
+            _dataReceived.postValue(NetworkStatus.DataReceivedError)
+            sleep(400)
+            connectDelegate?.didConnect(false)
+
         }
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities)
         {
@@ -281,66 +447,13 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
 //                beginTransmittingHeartbeat()
 //            }
         }
-        var trycon = true
+
         @RequiresApi(Build.VERSION_CODES.R)
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties)
         {
             Log.d("xxxxx", "connected 2")
             super.onLinkPropertiesChanged(network, linkProperties)
-            try {
 
-
-                viewModelScope?.let { viewModelScope ->
-                    viewModelScope.launch(Dispatchers.IO) {
-                        sleep(1000)
-                        if(trycon)
-                        {
-                            val wifiManager =
-                                Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-                            wifiManager?.let{wifiManager ->
-                                val myAddress =
-                                    intToInetAddress(wifiManager.dhcpInfo.ipAddress)!!.toString()
-                                        .substring(1)
-
-                                val myInetAddress = InetAddress.getByName(myAddress)
-                               // tcpServer.beginListening(myInetAddress, this@NetworkClientModel)
-                            }
-
-                            //client.write("192.168.48.183", "TEST", this@NetworkClientModel)
-                            //client.write("142.250.189.110", "TEST", this@NetworkClientModel)
-                            //client.write("192.168.43.1", "TEST", this@NetworkClientModel)
-//                            val job = GlobalScope.launch(Dispatchers.Default) {
-//                                client.write("192.168.1.100", "TEST", this@NetworkClientModel)
-//                            }
-                            //client.write("192.168.1.100", "TEST", this@NetworkClientModel)
-                            trycon = false
-                        }
-
-                    }
-
-//                    val serverAddress = linkProperties.dhcpServerAddress.toString().substring(1)
-//                    // linkProperties.linkAddresses[0] is the IPV6 address
-//                    val myAddress = linkProperties.linkAddresses[1].toString()
-//                        .substring(0, linkProperties.linkAddresses[1].toString().length - 3)
-//
-//                    val components = serverAddress.split(".")
-//                    val server_udp_address =
-//                        components[0] + "." + components[1] + "." + components[2] + ".255"
-//
-//                    val myInetAddress = InetAddress.getByName(myAddress)
-//
-//                    Log.d(
-//                        "NETWORK CONNECT ",
-//                        "connected to network!@!!!!!!!!!! ${myInetAddress.hostAddress}"
-//                    )
-                }
-            }catch(e : Exception)
-            {
-
-            }
-
-//            broadcastInetAddress = InetAddress.getByName( server_udp_address )
         }
     }
 
@@ -353,11 +466,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPCLientDelegate, TCPServe
         _clientConnectMessage.postValue(connection)
     }
 
-    override fun didReceiveTCPMessage(message: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun clientConnected(client: String) {
-        TODO("Not yet implemented")
+    fun shutdown()
+    {
+        client.shutdown()
     }
 }

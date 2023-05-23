@@ -1,6 +1,8 @@
 package edu.gtri.gpssample.network
 
 import android.util.Log
+import edu.gtri.gpssample.network.models.TCPHeader
+import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
@@ -14,11 +16,13 @@ class TCPServer
 {
     interface TCPServerDelegate
     {
-        fun didReceiveTCPMessage( message: String )
-        fun clientConnected(client : String)
+        fun didReceiveTCPMessage( message: TCPMessage, socket: Socket )
+
+        fun didDisconnect(socket : Socket)
+        fun clientConnected(socket: Socket)
 
     }
-
+    private var clientSockets : ArrayList<Socket> = ArrayList()
     val serverListening : Boolean
         get() = _serverListening
     private var port = 51234
@@ -100,14 +104,37 @@ class TCPServer
     {
         try
         {
-            delegate.clientConnected("client")
-            Log.d( "xxx", "waiting for TCP messages on ${socket.inetAddress}:$port...")
+           // clientSockets.add(socket)
+            delegate.clientConnected(socket)
+            val headerArray : ByteArray = ByteArray(TCPHeader.size)
 
-            val message = BufferedReader(InputStreamReader(socket.inputStream)).readLine()
+            while(socket.isConnected)
+            {
 
-            Log.d( "xxx", "handleClient.received: ${message}")
+                val success = socket.inputStream.read(headerArray)
+                if(success == -1)
+                {
+                    break
+                }
+                val header = TCPHeader.fromByteArray(headerArray)
+                header?.let {header ->
 
-            delegate.didReceiveTCPMessage( message )
+                    // if we get here, the key is valid
+                    val payloadArray = ByteArray(header.payloadSize)
+                    socket.inputStream.read(payloadArray)
+
+                    val payload = String(payloadArray)
+                    val tcpMessage = TCPMessage(header, payload)
+
+
+                    Log.d("xxxxx", "the tcp message ${tcpMessage.header.command} ${tcpMessage.payload}")
+                    delegate.didReceiveTCPMessage( tcpMessage, socket )
+                }
+            }
+            socket.close()
+            Log.d("XXXXX", "DISCONNECTED")
+            delegate.didDisconnect(socket)
+
         }
         catch( ex: Exception )
         {
@@ -117,4 +144,6 @@ class TCPServer
 
         Log.d( "xxx", "stopped waiting for TCP messages")
     }
+
+
 }

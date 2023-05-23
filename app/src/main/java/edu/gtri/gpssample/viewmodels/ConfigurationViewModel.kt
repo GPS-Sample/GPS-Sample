@@ -25,9 +25,6 @@ class ConfigurationViewModel : ViewModel()
     private var _timeFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _dateFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
 
-
-
-
     // live data for each screen being controlled by the view model
     private var _currentConfiguration : MutableLiveData<Config>? = null
 

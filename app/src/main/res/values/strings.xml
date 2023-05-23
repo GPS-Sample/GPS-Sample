@@ -19,6 +19,9 @@
     <string name="create_server">Create Server</string>
     <string name="create_qr_code">Create QR Code</string>
     <string name="connect_hotspot">Connect To Hotspot</string>
+    <string name="registering_device">Registering Device</string>
+    <string name="sending_command">Sending Command</string>
+    <string name="receiving_data">Receiving Data</string>
     <string name="configuration_received">Configuration Received</string>
 
     <string-array name="forgot_pin_questions">

@@ -62,8 +62,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         sharedViewModel = vm
         sharedNetworkViewModel = networkVm
 
-        sharedNetworkViewModel.navController = findNavController()
-        sharedNetworkViewModel.Activity = activity
+        sharedNetworkViewModel.currentFragment = this
 
         studiesAdapter = StudiesAdapter(listOf<Study>())
         studiesAdapter.didSelectStudy = this::didSelectStudy
@@ -223,6 +222,10 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         // Launch connection screen
         view?.let{view ->
             sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Configuration)
+            sharedViewModel?.currentConfiguration?.value?.let{
+                sharedNetworkViewModel.setCurrentConfig(it)
+            }
+
             sharedNetworkViewModel.createHotspot(view)
         }
         //findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)

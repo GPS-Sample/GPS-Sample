@@ -2,11 +2,13 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -15,20 +17,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
-import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.ResultCode
-import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.io.InputStream
 
-class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate,
+        NetworkClientModel.ConfigurationDelegate
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
@@ -45,7 +48,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         val networkVm : NetworkViewModel by activityViewModels()
 
         sharedNetworkViewModel = networkVm
-        sharedNetworkViewModel.Activity = this.activity
+        sharedNetworkViewModel.currentFragment = this
+        sharedNetworkViewModel.networkClientModel.configurationDelegate = this
         sharedViewModel = vm
     }
 
@@ -104,6 +108,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private val getResult =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
@@ -118,10 +123,15 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 val pass = jsonObject.getString(Keys.kPass.toString())
                 val serverIp = jsonObject.getString(Keys.kIpAddress.toString())
 
+
+
                 Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
+
                 sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
 
+//                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
                 // need to pass this into the network view model
+
             }
 
 
@@ -135,10 +145,20 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 //            }
         }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
+        // set what client mode we are
+        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
         getResult.launch(intent)
+
+
+
+        // FAKE
+       // sharedNetworkViewModel.connectHotspotFake()
+
+        //findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
     }
 
     override fun didSelectRightButton(tag: Any?)
@@ -188,5 +208,17 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         super.onDestroyView()
 
         _binding = null
+    }
+
+    override fun configurationReceived(config: Config) {
+        runBlocking(Dispatchers.Main) {
+            val saved = DAO.configDAO.createConfig(config)
+            saved?.let { config ->
+                sharedViewModel.configurations.add(config)
+                manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+            }
+
+
+        }
     }
 }

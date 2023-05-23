@@ -14,6 +14,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import edu.gtri.gpssample.BuildConfig
@@ -23,6 +24,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity()
@@ -31,7 +33,7 @@ class MainActivity : AppCompatActivity()
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var udpBroadcastReceiverService: UDPBroadcastReceiverService
     private lateinit var configurationViewModel : ConfigurationViewModel
-
+    private lateinit var networkViewModel : NetworkViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -40,6 +42,8 @@ class MainActivity : AppCompatActivity()
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
         configurationViewModel = viewModel
+        val networkVm : NetworkViewModel by viewModels()
+        networkViewModel = networkVm
 
         if (savedInstanceState == null)
         {
@@ -97,5 +101,12 @@ class MainActivity : AppCompatActivity()
     {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("xx", "DESTROY")
+
+        networkViewModel.shutdown()
     }
 }

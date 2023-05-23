@@ -33,7 +33,7 @@ class GPSSampleWifiManager//( val fragment: Fragment )
     }
     private var serverInetAddress: InetAddress? = null
     private var broadcastInetAddress: InetAddress? = null
-    private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
+//    private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
     private var localOnlyHotspotReservation: WifiManager.LocalOnlyHotspotReservation? = null
     private var _hotspotSSID : MutableLiveData<String> = MutableLiveData("TEST")
     private var _hotspotSSIDPassword : MutableLiveData<String> = MutableLiveData("")
@@ -55,7 +55,7 @@ class GPSSampleWifiManager//( val fragment: Fragment )
 
     fun stopHotSpot()
     {
-        udpBroadcaster.closeSocket()
+       // udpBroadcaster.closeSocket()
 
         localOnlyHotspotReservation?.close()
     }

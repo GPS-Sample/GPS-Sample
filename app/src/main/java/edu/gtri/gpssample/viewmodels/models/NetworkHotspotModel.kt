@@ -17,14 +17,18 @@ import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.NetworkMode
 import edu.gtri.gpssample.constants.NetworkStatus
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.TCPServer
+import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.TCPMessage
 import edu.gtri.gpssample.viewmodels.NetworkConnectionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.net.InetAddress
+import java.net.Socket
 
 
 class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
@@ -35,6 +39,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     {
         fun didComplete(complete: Boolean)
     }
+
+    var config : Config? = null
 
     private var _creationDelegate : NetworkCreationDelegate? = null
     var creationDelegate : NetworkCreationDelegate?
@@ -96,20 +102,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
     init
     {
-        val v1 : NetworkConnectionViewModel = NetworkConnectionViewModel()
-        v1.updateName("Brian")
-        v1.updateConnection("nope")
-
-        val v2 : NetworkConnectionViewModel = NetworkConnectionViewModel()
-        v2.updateName("Brian2")
-        v2.updateConnection("nope")
-
-        val v3 : NetworkConnectionViewModel = NetworkConnectionViewModel()
-        v3.updateName("Brian3")
-        v3.updateConnection("nope")
-
-        val list  = mutableListOf<NetworkConnectionViewModel>()
-
 
         _connections.value = clientConenctions
         _connections.postValue(clientConenctions)
@@ -157,18 +149,81 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
         _hotspotMode.postValue(mode)
     }
 
-    override fun didReceiveTCPMessage(message: String) {
-        _message.postValue(message)
+    override fun didReceiveTCPMessage(message: TCPMessage, socket: Socket) {
+        // if we are here the key was authenticated
+        when (message.header.command)
+        {
+
+            NetworkCommand.NetworkDeviceRegistrationRequest ->
+            {
+                message.payload?.let { payload ->
+
+                    // send response
+                    val retMessage = TCPMessage(NetworkCommand.NetworkDeviceRegistrationResponse, "")
+
+                    socket.outputStream.write( retMessage.toByteArray())
+                    socket.outputStream.flush()
+
+                    //TODO: figure out if the element is already in the list.
+
+                    var v1 : NetworkConnectionViewModel = NetworkConnectionViewModel(socket)
+
+                    v1.updateName(payload)
+                    v1.updateConnection("Connected")
+                    v1.socket = socket
+                    var check : NetworkConnectionViewModel? = null
+                    for(client in clientConenctions)
+                    {
+                        if(client.name.value == v1.name.value)
+                        {
+                            check = client
+                            break
+                        }
+                    }
+                    clientConenctions.remove(check)
+                    clientConenctions.add(v1)
+                    _connections.postValue(clientConenctions)
+                    // create a new entry in the list
+                    // send an ack
+                }
+
+            }
+            NetworkCommand.NetworkConfigRequest ->
+            {
+                config?.let {
+                    Log.d("dxxxxx", "DID WE GET HERE ${it.name}")
+                    Log.d("xxxx", "TEST")
+
+                    // create the config message
+                    val response = TCPMessage(NetworkCommand.NetworkConfigResponse, it.pack())
+                    socket.outputStream.write(response.toByteArray())
+                }
+
+            }
+        }
+        // _message.postValue(payload)
+
+
+
     }
 
-    override fun clientConnected(client: String) {
-
-        var v1 : NetworkConnectionViewModel = NetworkConnectionViewModel()
-        v1.updateName("TEST")
-        v1.updateConnection("TEST")
-
-        clientConenctions.add(v1)
+    override fun didDisconnect(socket: Socket) {
+        var check : NetworkConnectionViewModel? = null
+        for(client in clientConenctions)
+        {
+            if(client.socket == socket)
+            {
+                check = client
+                break
+            }
+        }
+        clientConenctions.remove(check)
         _connections.postValue(clientConenctions)
+    }
+
+    override fun clientConnected(socket: Socket) {
+
+
     }
 
     override fun didCreateHotspot(success : Boolean, serverIp : InetAddress?)
@@ -191,9 +246,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     viewModelScope.launch(Dispatchers.IO) {
                         serverIp?.let{serverIp ->
                             socketCreated = tcpServer.createSocket()
-
-//                            // test for client
-//                            clientConnected("BIG TEST")
 
                             tcpServer.beginListening(serverIp, this@NetworkHotspotModel)
                         }
@@ -274,7 +326,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             _creationDelegate?.didComplete(false)
         }
     }
-
+    fun shutdown()
+    {
+        hotspot.stopHotSpot()
+        tcpServer.shutdown()
+    }
 
     companion object
     {
