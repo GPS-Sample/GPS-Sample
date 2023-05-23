@@ -68,35 +68,9 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun connectHotspot(v : View)
-    {
-        //networkMode = NetworkMode.NetworkHotspot
-        _networkMode?.value = NetworkMode.NetworkClient
-       // startConnection()
-      //  navController?.navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
-
-        Log.d("xxxxxx","WE GET CLICKED connect")
-    }
-
-//    fun connectHotspotFake()
-//    {
-//        _networkMode?.value = NetworkMode.NetworkClient
-//
-//        viewModelScope.launch(Dispatchers.IO) {
-//            Thread.sleep(300)
-//            networkClientModel.fakeConnect()
-//            runBlocking(Dispatchers.Main) {
-//                navController?.popBackStack()
-//            }
-//        }
-//        navController?.navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
-//    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
     fun connectHotspot(ssid : String, password : String, serverIpAddress : String)
     {
         _networkMode?.value = NetworkMode.NetworkClient
-        Log.d("xxxxx", "ssid ${ssid}, password ${password}, serverIp ${serverIpAddress}")
         startConnection(ssid, password, serverIpAddress)
         navController?.navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
     }
@@ -107,7 +81,6 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         _networkMode?.value = NetworkMode.NetworkHotspot
         startConnection("","","")
         navController?.navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
-        Log.d("xxxxxx","WE GET CLICKED create")
     }
 
 
@@ -116,7 +89,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
     {
         viewModelScope.launch(Dispatchers.IO) {
             var complete : Boolean = false
-            var destination = -1 //R.id.action_navigate_to_FirstFragment
+            var destination = -1
 
             when (networkMode.value) {
                 NetworkMode.NetworkHotspot ->
