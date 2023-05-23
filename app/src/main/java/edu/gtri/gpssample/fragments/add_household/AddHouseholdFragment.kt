@@ -27,15 +27,18 @@ import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
+import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.UriManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class AddHouseholdFragment : Fragment()
+class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate
 {
     private var createMode = false
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
     private val OPEN_DOCUMENT_CODE = 2
+    private val fieldDataMap = HashMap<Int, FieldData>()
 
     private lateinit var study: Study
     private lateinit var config: Config
@@ -90,8 +93,6 @@ class AddHouseholdFragment : Fragment()
             DAO.enumDataDAO.createOrUpdateEnumData(enumData)
         }
 
-        val fieldDataMap = HashMap<Int, FieldData>()
-
         for (field in study.fields)
         {
             val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
@@ -113,7 +114,12 @@ class AddHouseholdFragment : Fragment()
             binding.imageView.setImageBitmap(bitmap)
         }
 
-        binding.addImageButton.setOnClickListener {
+        binding.deleteImageView.setOnClickListener {
+            DAO.enumDataDAO.delete( enumData )
+            findNavController().popBackStack()
+        }
+
+        binding.addPhotoImageView.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "image/*"
@@ -121,60 +127,11 @@ class AddHouseholdFragment : Fragment()
         }
 
         binding.cancelButton.setOnClickListener {
-            if (createMode)
-            {
-                DAO.enumDataDAO.delete( enumData )
-            }
-
             findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
-
-            for (key in fieldDataMap.keys)
-            {
-                fieldDataMap[key]?.let {fieldData ->
-                    val field = DAO.fieldDAO.getField( fieldData.fieldId )
-
-                    if (field != null && field!!.required)
-                    {
-                        when (field.type)
-                        {
-                            FieldType.Text -> {
-                                if (fieldData.textValue.isEmpty()) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
-                                }
-                            }
-                            FieldType.Number -> {
-                                if (fieldData.numberValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
-                                }
-                            }
-                            FieldType.Date -> {
-                                if (fieldData.dateValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
-                                }
-                            }
-                            FieldType.Checkbox -> {
-                                val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
-                                if (!selection) {
-                                    Toast.makeText(activity!!.applicationContext, "${field.name} field is REQUIRED", Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
-                                }
-                            }
-                            else -> {
-                            }
-                        }
-                    }
-
-                    DAO.fieldDataDAO.updateFieldData( fieldData )
-                }
-            }
-
-            findNavController().popBackStack()
+            AdditionalInfoDialog( activity,this)
         }
     }
 
@@ -182,6 +139,83 @@ class AddHouseholdFragment : Fragment()
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    override fun didSelectCancelButton()
+    {
+    }
+
+    override fun didSelectSaveButton( incomplete: Boolean, notes: String )
+    {
+        if (incomplete)
+        {
+            for (key in fieldDataMap.keys) {
+                fieldDataMap[key]?.let { fieldData ->
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
+                }
+            }
+
+            enumData.notes = notes
+            enumData.valid = false
+            enumData.incomplete = true
+            DAO.enumDataDAO.updateEnumData( enumData )
+
+            findNavController().popBackStack()
+        }
+        else
+        {
+            for (key in fieldDataMap.keys)
+            {
+                fieldDataMap[key]?.let {fieldData ->
+                    val field = DAO.fieldDAO.getField( fieldData.fieldId )
+
+                    field?.let {
+                        if (field.required)
+                        {
+                            when (field.type)
+                            {
+                                FieldType.Text -> {
+                                    if (fieldData.textValue.isEmpty()) {
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
+                                    }
+                                }
+                                FieldType.Number -> {
+                                    if (fieldData.numberValue == null) {
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
+                                    }
+                                }
+                                FieldType.Date -> {
+                                    if (fieldData.dateValue == null) {
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
+                                    }
+                                }
+                                FieldType.Checkbox -> {
+                                    val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
+                                    if (!selection) {
+                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
+                                        return
+                                    }
+                                }
+                                else -> {
+                                }
+                            }
+                        }
+                    }
+
+                    enumData.notes = notes
+                    enumData.valid = true
+                    enumData.incomplete = false
+                    DAO.enumDataDAO.updateEnumData( enumData )
+
+                    DAO.fieldDataDAO.updateFieldData( fieldData )
+                }
+            }
+
+            findNavController().popBackStack()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)

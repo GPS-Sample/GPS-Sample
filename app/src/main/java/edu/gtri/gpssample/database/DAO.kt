@@ -141,6 +141,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableTeam = ("CREATE TABLE " +
                 TABLE_TEAM + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_TEAM_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
@@ -159,10 +160,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableEnumData = ("CREATE TABLE " +
                 TABLE_ENUM_DATA + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_USER_ID + " INTEGER" + "," +
                 COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_VALID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_INCOMPLETE + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_NOTES + " TEXT" + "," +
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_IS_LOCATION + " INTEGER" + "," +
@@ -321,6 +326,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
 
         const val TABLE_ENUM_DATA = "enum_data"
+        const val COLUMN_ENUM_DATA_VALID = "enum_data_valid"
+        const val COLUMN_ENUM_DATA_INCOMPLETE = "enum_data_incomplete"
+        const val COLUMN_ENUM_DATA_NOTES = "enum_data_notes"
         const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
         const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
         const val COLUMN_ENUM_DATA_IS_LOCATION = "enum_data_is_location"
@@ -404,6 +412,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 117
+        private const val DATABASE_VERSION = 124
     }
 }

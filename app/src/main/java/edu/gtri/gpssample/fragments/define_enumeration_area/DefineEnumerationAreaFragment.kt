@@ -1,5 +1,7 @@
 package edu.gtri.gpssample.fragments.define_enumeration_area
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -82,7 +84,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         arguments?.let {
             if (!it.getBoolean( Keys.kEditMode.toString(), true))
             {
-                binding.createSaveButton.visibility = View.GONE
+//                binding.createSaveButton.visibility = View.GONE
             }
         }
 
@@ -90,20 +92,30 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         mapFragment!!.getMapAsync(this)
 
-        binding.createSaveButton.setOnClickListener {
+        binding.imortButton.setOnClickListener {
+            val intent = Intent()
+                .setType("*/*")
+                .setAction(Intent.ACTION_GET_CONTENT)
+
+            startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
+        }
+
+        binding.createButton.setOnClickListener {
 
             if (createMode)
             {
                 if (vertexMarkers.size > 2)
                 {
+                    createMode = false
                     InputDialog( activity!!, "Enter Enumeration Area Name", null, this )
+                    binding.createButton.setBackgroundResource( R.drawable.edit_blue )
                 }
             }
             else
             {
                 vertexMarkers.clear()
                 createMode = true
-                binding.createSaveButton.text = "Save Polygon"
+                binding.createButton.setBackgroundResource( R.drawable.save_blue )
             }
         }
     }
@@ -116,7 +128,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     fun createEnumArea( name: String )
     {
         createMode = false
-        binding.createSaveButton.text = "Create Polygon"
+//        binding.createSaveButton.text = "Create Polygon"
 
         var vertices = ArrayList<LatLon>()
 
@@ -171,7 +183,16 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
             for (enumData in enumDataList)
             {
-                var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+                if (enumData.incomplete)
+                {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                }
+                else if (enumData.valid)
+                {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                }
 
                 if (enumData.isLocation)
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
@@ -210,7 +231,8 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         {
             val atl = LatLng( 33.774881, -84.396341 )
             val srb = LatLng(30.330603,-86.165004 )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 15.0f))
+            val demo = LatLng( 33.982973122594785, -84.31252665817738 )
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( demo, 14.0f))
         }
     }
 
@@ -261,6 +283,40 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         enumDataMarkers.map {
             it.remove()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
+        {
+            val uri = data?.data
+
+            uri?.let { uri ->
+
+                val inputStream = activity!!.getContentResolver().openInputStream(uri)
+
+                inputStream?.let {  inputStream ->
+                    val text = inputStream.bufferedReader().readText()
+
+                    Log.d( "xxx", text )
+
+                    val enumArea = EnumArea.unpack( text )
+
+                    enumArea?.let { enumArea ->
+                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                        for (enumData in enumArea.enumDataList)
+                        {
+                            DAO.enumDataDAO.importEnumData( enumData )
+                        }
+
+                        onMapReady(map)
+
+                    } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

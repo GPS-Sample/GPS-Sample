@@ -29,6 +29,10 @@
         <item>"Mother's maiden name"</item>
         <item>"Childhood best friend"</item>
         <item>"Favorite Pet's name"</item>
+        <item>"Last 4 digits of cell phone #"</item>
+        <item>"Favorite Food"</item>
+        <item>"Birth Month"</item>
+        <item>"Other Question"</item>
     </string-array>
 
     <string-array name="distance_format">
@@ -137,8 +141,8 @@
     <string name="generate_sample">Generate Sample</string>
     <string name="collect_samples">Collect Samples</string>
 
-    <string name="min_gps_precision">Minimum GPS Precision</string>
-    <string name="enter_min_gps_precision">Enter Minimum GPS Precision</string>
+    <string name="min_gps_precision">Desired GPS Precision</string>
+    <string name="enter_min_gps_precision">Enter Desired GPS Precision</string>
     <string name="define_enumeration_fields">Define Enumeration Fields</string>
     <string name="define_enumeration_area">Define Enumeration Area</string>
     <string name="define_sampling_method">Define Sampling Method</string>
