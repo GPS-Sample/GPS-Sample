@@ -164,9 +164,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     socket.outputStream.write( retMessage.toByteArray())
                     socket.outputStream.flush()
 
-                    //TODO: figure out if the element is already in the list.
-
-                    var v1 : NetworkConnectionViewModel = NetworkConnectionViewModel(socket)
+                    val v1 : NetworkConnectionViewModel = NetworkConnectionViewModel(socket)
 
                     v1.updateName(payload)
                     v1.updateConnection("Connected")
@@ -191,20 +189,12 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             NetworkCommand.NetworkConfigRequest ->
             {
                 config?.let {
-                    Log.d("dxxxxx", "DID WE GET HERE ${it.name}")
-                    Log.d("xxxx", "TEST")
-
                     // create the config message
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, it.pack())
                     socket.outputStream.write(response.toByteArray())
                 }
-
             }
         }
-        // _message.postValue(payload)
-
-
-
     }
 
     override fun didDisconnect(socket: Socket) {

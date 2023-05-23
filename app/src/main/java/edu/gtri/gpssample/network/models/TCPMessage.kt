@@ -38,7 +38,8 @@ data class TCPMessage(val command : Int, val payload : String?) {
     var header : TCPHeader = TCPHeader(command, payload?.length ?: 0)
     fun toByteArray(): ByteArray? {
         val size: Int = 4 + 4 + TCPHeader.key.length + (payload?.length ?: 0)
-
+        val adjusted  = size - (payload?.length ?: 0)
+        Log.d("XXXXXXXX ", "SIZE ${size} and adjusted ${adjusted}")
         val byteBuffer = ByteBuffer.allocate(size)
             .putInt(header.command)
             .put(TCPHeader.key.toByteArray())

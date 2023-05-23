@@ -4,6 +4,8 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.net.Socket
 
 class NetworkConnectionViewModel(socket : Socket): ViewModel()  {
@@ -32,7 +34,9 @@ class NetworkConnectionViewModel(socket : Socket): ViewModel()  {
         set(value){_socket = value}
     fun updateName(name : String)
     {
-       // _name.value = name
+        runBlocking(Dispatchers.Main) {
+            _name.value = name
+        }
         _name.postValue(name)
     }
 
