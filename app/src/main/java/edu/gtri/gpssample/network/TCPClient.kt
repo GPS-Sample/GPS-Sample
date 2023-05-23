@@ -13,8 +13,6 @@ class TCPClient
         fun sentData(data : String)
         fun connectionString(connection : String)
     }
-    //var port = kTCPPort
-    // var port = 80
     var socket : Socket? = null
 
     fun connect(inetAddress: String, delegate : TCPClientDelegate) : Boolean
@@ -44,6 +42,8 @@ class TCPClient
         try
         {
             socket?.let {socket ->
+
+
                 socket.outputStream.write( message.toByteArray())
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()
@@ -51,13 +51,12 @@ class TCPClient
                 // build the response from the server
 
                 val headerArray : ByteArray = ByteArray(TCPHeader.size)
-                socket.inputStream.read(headerArray)
+                socket.inputStream.read(headerArray,0,TCPHeader.size)
                 val header = TCPHeader.fromByteArray(headerArray)
                 header?.let { header ->
                     // if we get here, the key is valid
                     val payloadArray = ByteArray(header.payloadSize)
-                    socket.inputStream.read(payloadArray)
-
+                    socket.inputStream.read(payloadArray,0,header.payloadSize)
                     val payload = String(payloadArray)
 
                     return TCPMessage(header, payload)

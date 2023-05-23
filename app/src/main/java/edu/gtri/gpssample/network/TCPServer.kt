@@ -110,8 +110,7 @@ class TCPServer
 
             while(socket.isConnected)
             {
-
-                val success = socket.inputStream.read(headerArray)
+                val success = socket.inputStream.read(headerArray,0, TCPHeader.size)
                 if(success == -1)
                 {
                     break
@@ -121,11 +120,10 @@ class TCPServer
 
                     // if we get here, the key is valid
                     val payloadArray = ByteArray(header.payloadSize)
-                    socket.inputStream.read(payloadArray)
+                    socket.inputStream.read(payloadArray, 0, header.payloadSize)
 
                     val payload = String(payloadArray)
                     val tcpMessage = TCPMessage(header, payload)
-
 
                     Log.d("xxxxx", "the tcp message ${tcpMessage.header.command} ${tcpMessage.payload}")
                     delegate.didReceiveTCPMessage( tcpMessage, socket )

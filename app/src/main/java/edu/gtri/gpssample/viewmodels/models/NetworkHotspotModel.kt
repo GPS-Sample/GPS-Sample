@@ -127,15 +127,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
             }catch (ex : Exception)
             {
-                Log.d("ERROR", " ${ex.toString()}")
                 status = NetworkStatus.NetworkError
-            // _networkCreated.postValue(NetworkStatus.NetworkError)
-
             }
         }
-
-        //_networkCreated.postValue(status)
-        //Thread.sleep(5000L)
         return (status == NetworkStatus.NetworkCreated)
     }
 
@@ -164,9 +158,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     socket.outputStream.write( retMessage.toByteArray())
                     socket.outputStream.flush()
 
-                    //TODO: figure out if the element is already in the list.
-
-                    var v1 : NetworkConnectionViewModel = NetworkConnectionViewModel(socket)
+                    val v1 = NetworkConnectionViewModel(socket)
 
                     v1.updateName(payload)
                     v1.updateConnection("Connected")
@@ -191,20 +183,12 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             NetworkCommand.NetworkConfigRequest ->
             {
                 config?.let {
-                    Log.d("dxxxxx", "DID WE GET HERE ${it.name}")
-                    Log.d("xxxx", "TEST")
-
                     // create the config message
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, it.pack())
                     socket.outputStream.write(response.toByteArray())
                 }
-
             }
         }
-        // _message.postValue(payload)
-
-
-
     }
 
     override fun didDisconnect(socket: Socket) {
@@ -286,8 +270,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
         }
 
         _serverCreated.postValue(NetworkStatus.ServerCreated)
-        Log.d("XXXXX", hotspot.hotspotIP.value!!)
-        Log.d("XXXXX", hotspot.hotspotSSID.value!!)
 
         // if the qrCode isn't generated
         if(generatedQRCode == null) {
@@ -295,11 +277,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             jsonObject.put(Keys.kSSID.toString(), hotspot.hotspotSSID.value)
             jsonObject.put(Keys.kPass.toString(), hotspot.hotspotSSIDPassword.value)
             jsonObject.put(Keys.kIpAddress.toString(), hotspot.hotspotIP.value)
-//        jsonObject.put( Keys.kTeam_id.toString(), team.id )
-////        jsonObject.put( Keys.kStudy_uuid.toString(), study.uuid )
-//        jsonObject.put( Keys.kEnumArea_id.toString(), enumArea.id )
-////        jsonObject.put( Keys.kConfig_uuid.toString(), study.config_uuid )
-//
+
             val qrgEncoder =
                 QRGEncoder(jsonObject.toString(2), null, QRGContents.Type.TEXT, qrCodeWidth.toInt())
             qrgEncoder.colorBlack = Color.WHITE;
