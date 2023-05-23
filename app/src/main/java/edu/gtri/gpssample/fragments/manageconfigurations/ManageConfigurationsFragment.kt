@@ -212,9 +212,12 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     override fun configurationReceived(config: Config) {
         runBlocking(Dispatchers.Main) {
-            DAO.configDAO.createConfig(config)
-            sharedViewModel.configurations.add(config)
-            manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+            val saved = DAO.configDAO.createConfig(config)
+            saved?.let { config ->
+                sharedViewModel.configurations.add(config)
+                manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+            }
+
 
         }
     }

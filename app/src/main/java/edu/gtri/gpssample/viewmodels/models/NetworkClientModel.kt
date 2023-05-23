@@ -186,6 +186,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                         config?.let{config ->
                             configurationDelegate?.configurationReceived(config)
                             _dataReceived.postValue(NetworkStatus.DataReceived)
+
+                            sleep(400)
+                            connectDelegate?.didConnect(true)
                         }
 
                     }
@@ -390,14 +393,14 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
 
 
-                        _clientRegistered.postValue(NetworkStatus.ClientRegistered)
-                        Thread.sleep(1000)
-                        _commandSent.postValue(NetworkStatus.CommandSent)
-                        Thread.sleep(1000)
-                        _dataReceived.postValue(NetworkStatus.DataReceived)
-                        Thread.sleep(1000)
+//                        _clientRegistered.postValue(NetworkStatus.ClientRegistered)
+//                        Thread.sleep(1000)
+//                        _commandSent.postValue(NetworkStatus.CommandSent)
+//                        Thread.sleep(1000)
+//                        _dataReceived.postValue(NetworkStatus.DataReceived)
+//                        Thread.sleep(1000)
 
-                        connectDelegate?.didConnect(true)
+
                     }
 
 
