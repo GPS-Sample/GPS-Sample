@@ -78,19 +78,19 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         Log.d("xxxxxx","WE GET CLICKED connect")
     }
 
-    fun connectHotspotFake()
-    {
-        _networkMode?.value = NetworkMode.NetworkClient
-
-        viewModelScope.launch(Dispatchers.IO) {
-            Thread.sleep(300)
-            networkClientModel.fakeConnect()
-            runBlocking(Dispatchers.Main) {
-                navController?.popBackStack()
-            }
-        }
-        navController?.navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
-    }
+//    fun connectHotspotFake()
+//    {
+//        _networkMode?.value = NetworkMode.NetworkClient
+//
+//        viewModelScope.launch(Dispatchers.IO) {
+//            Thread.sleep(300)
+//            networkClientModel.fakeConnect()
+//            runBlocking(Dispatchers.Main) {
+//                navController?.popBackStack()
+//            }
+//        }
+//        navController?.navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
+//    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectHotspot(ssid : String, password : String, serverIpAddress : String)
@@ -169,6 +169,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
 
     override fun didConnect(complete: Boolean) {
         runBlocking(Dispatchers.Main) {
+            networkClientModel.resetState()
             navController?.popBackStack()
         }
     }

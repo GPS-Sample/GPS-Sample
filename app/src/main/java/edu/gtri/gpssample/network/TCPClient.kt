@@ -13,8 +13,6 @@ class TCPClient
         fun sentData(data : String)
         fun connectionString(connection : String)
     }
-    //var port = kTCPPort
-    // var port = 80
     var socket : Socket? = null
 
     fun connect(inetAddress: String, delegate : TCPClientDelegate) : Boolean
@@ -59,7 +57,6 @@ class TCPClient
                     // if we get here, the key is valid
                     val payloadArray = ByteArray(header.payloadSize)
                     socket.inputStream.read(payloadArray,0,header.payloadSize)
-
                     val payload = String(payloadArray)
 
                     return TCPMessage(header, payload)

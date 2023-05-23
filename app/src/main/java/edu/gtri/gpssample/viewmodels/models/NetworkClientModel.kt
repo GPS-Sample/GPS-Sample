@@ -87,8 +87,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     var _configurationReceived : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
     var configurationReceived : LiveData<NetworkStatus> = _configurationReceived
 
-   // val destination = R.id.action_FirstFragment_to_ClientFragment
-
     override var Activity : Activity?
         get() = _activity
         set(value)
@@ -106,38 +104,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         _clientMode.postValue(mode)
     }
 
-    fun fakeConnect()
-    {
-
-        // test the byte array stuff
-        val payload = "THE PAYLOAD@!@@LKJJK@@!!!!!1"
-        val message = TCPMessage(NetworkCommand.NetworkConfigRequest, payload)
-
-        val byteArray = message.toByteArray()
-        byteArray?.let{
-            val tcpMessage = TCPMessage.fromByteArray(it)
-            tcpMessage?.let {
-                Log.d("THE MESSAGE", "payload ${it.payload} ${it.header.command} ")
-            }
-
-        }
-
-        Thread.sleep(300)
-        _networkConnected.postValue(NetworkStatus.NetworkConnected)
-        //Thread.sleep(1000)
-        //_clientRegistered.postValue(NetworkStatus.ClientRegistered)
-//        Thread.sleep(1000)
-//        _commandSent.postValue(NetworkStatus.CommandSent)
-//        Thread.sleep(1000)
-//        _dataReceived.postValue(NetworkStatus.DataReceived)
-//        Thread.sleep(1000)
-    }
-
-    fun sendCommand(command : NetworkCommand)
-    {
-
-    }
-
     fun sendRegistration()
     {
         Log.d("xxxxxx", "SENDING REGISTRATION")
@@ -153,7 +119,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     response?.let{response ->
                         if(response.command == NetworkCommand.NetworkDeviceRegistrationResponse)
                         {
-                            Thread.sleep(500)
+                            sleep(500)
                             _clientRegistered.postValue(NetworkStatus.ClientRegistered)
                             // TODO:  change this to be more generic
                             sendConfigurationCommand()
@@ -166,7 +132,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     }
 
-    fun sendConfigurationCommand()
+    private fun sendConfigurationCommand()
     {
         Log.d("xxxxxx", "SENDING Configuration command")
 
@@ -464,6 +430,16 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     override fun connectionString(connection: String) {
         _clientConnectMessage.postValue(connection)
+    }
+
+    fun resetState()
+    {
+        _networkConnected.postValue( NetworkStatus.None )
+        _clientRegistered.postValue( NetworkStatus.None )
+        _commandSent.postValue( NetworkStatus.None )
+        _dataReceived.postValue( NetworkStatus.None )
+
+
     }
 
     fun shutdown()
