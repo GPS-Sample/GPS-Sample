@@ -161,7 +161,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         {
             // TODO: figure out destination
             runBlocking(Dispatchers.Main) {
-
+                Log.d("xxx", "here")
                 //   navController?.navigate(R.id.action_navigate_to_FirstFragment)
             }
         }

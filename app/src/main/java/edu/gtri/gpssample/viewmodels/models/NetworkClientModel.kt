@@ -391,16 +391,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
 
-
-
-//                        _clientRegistered.postValue(NetworkStatus.ClientRegistered)
-//                        Thread.sleep(1000)
-//                        _commandSent.postValue(NetworkStatus.CommandSent)
-//                        Thread.sleep(1000)
-//                        _dataReceived.postValue(NetworkStatus.DataReceived)
-//                        Thread.sleep(1000)
-
-
                     }
 
 
@@ -412,11 +402,24 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         override fun onLost(network: Network) {
             super.onLost(network)
             Log.d("xxxx", "FAILED!!!!! HERE" )
+            _networkConnected.postValue(NetworkStatus.NetworkError)
+            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
+            _commandSent.postValue(NetworkStatus.CommandError)
+            _dataReceived.postValue(NetworkStatus.DataReceivedError)
+            sleep(400)
+            connectDelegate?.didConnect(false)
+
         }
         override fun onUnavailable() {
             super.onUnavailable()
             Log.d("xxxx", "FAILED!!!!! NO NETWORK" )
             _networkConnected.postValue(NetworkStatus.NetworkError)
+            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
+            _commandSent.postValue(NetworkStatus.CommandError)
+            _dataReceived.postValue(NetworkStatus.DataReceivedError)
+            sleep(400)
+            connectDelegate?.didConnect(false)
+
         }
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities)
         {
