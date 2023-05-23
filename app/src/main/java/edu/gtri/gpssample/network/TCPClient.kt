@@ -59,6 +59,7 @@ class TCPClient
                     socket.inputStream.read(payloadArray)
 
                     val payload = String(payloadArray)
+
                     return TCPMessage(header, payload)
                 }
                 return null

@@ -1,4 +1,7 @@
 package edu.gtri.gpssample.network.models
+import android.util.Log
+import java.math.BigInteger
+import java.security.MessageDigest
 
 import java.nio.ByteBuffer
 
@@ -46,6 +49,11 @@ data class TCPMessage(val command : Int, val payload : String?) {
     }
     companion object
     {
+        fun createMD5(input:String): String {
+            val md = MessageDigest.getInstance("MD5")
+            return BigInteger(1, md.digest(input.toByteArray())).toString(16).padStart(32, '0')
+        }
+
         fun fromByteArray(byteArray : ByteArray) : TCPMessage?
         {
             val byteBuffer = ByteBuffer.wrap(byteArray)

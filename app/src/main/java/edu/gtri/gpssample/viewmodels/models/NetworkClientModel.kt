@@ -243,84 +243,86 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     {
         this.networkInfo = networkInfo
        // if  (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-        if(false)
+        if(client.socket == null)
         {
-            try {
-                val wifiConfig = WifiConfiguration()
+            if(false)
+            {
+                try {
+                    val wifiConfig = WifiConfiguration()
 
-                wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
-                wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
-                wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.OPEN);
-                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.SHARED);
+                    wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
+                    wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
+                    wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.OPEN);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.SHARED);
 
-                var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-                wifiManager!!.setWifiEnabled(true)
+                    var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                    wifiManager!!.setWifiEnabled(true)
 
-                val suggestionWpa2 = WifiNetworkSuggestion.Builder()
-                    .setSsid("Cypress Guest Wifi") //SSID name
-                    .setWpa2Passphrase("cypresslovesyou") //password
-                    .build()
-                val networkSuggestions: ArrayList<WifiNetworkSuggestion> = ArrayList()
-                networkSuggestions.add(suggestionWpa2)
+                    val suggestionWpa2 = WifiNetworkSuggestion.Builder()
+                        .setSsid("Cypress Guest Wifi") //SSID name
+                        .setWpa2Passphrase("cypresslovesyou") //password
+                        .build()
+                    val networkSuggestions: ArrayList<WifiNetworkSuggestion> = ArrayList()
+                    networkSuggestions.add(suggestionWpa2)
 
-                wifiManager!!.startScan()
+                    wifiManager!!.startScan()
 
 
-                if(wifiManager!!.isWifiEnabled)
-                {
-                    Log.d("xxxxxx", "WIFI ENABLED")
-                }
-                var netId = wifiManager!! .addNetwork(wifiConfig)
-                if (netId == -1){
-                    //Try it again with no quotes in case of hex password
-                    wifiConfig.wepKeys[0] = networkInfo.password;
-                    netId = wifiManager.addNetwork(wifiConfig);
-                }
+                    if(wifiManager!!.isWifiEnabled)
+                    {
+                        Log.d("xxxxxx", "WIFI ENABLED")
+                    }
+                    var netId = wifiManager!! .addNetwork(wifiConfig)
+                    if (netId == -1){
+                        //Try it again with no quotes in case of hex password
+                        wifiConfig.wepKeys[0] = networkInfo.password;
+                        netId = wifiManager.addNetwork(wifiConfig);
+                    }
 
-                if(netId == -1)
-                {
+                    if(netId == -1)
+                    {
 
-                    netId = wifiManager!!.addNetworkSuggestions(networkSuggestions)
-                }
-                val disconnect = wifiManager.disconnect()
-                wifiManager.enableNetwork(netId, true)
-                val a = wifiManager.reconnect()
-                runBlocking(Dispatchers.Main) {
-                    Handler().postDelayed({
-                        wifiManager =
-                            Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                        netId = wifiManager!!.addNetworkSuggestions(networkSuggestions)
+                    }
+                    val disconnect = wifiManager.disconnect()
+                    wifiManager.enableNetwork(netId, true)
+                    val a = wifiManager.reconnect()
+                    runBlocking(Dispatchers.Main) {
+                        Handler().postDelayed({
+                            wifiManager =
+                                Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
 
-                        val serverAddress =
-                            intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
-                                .substring(1)
-                        val myAddress =
-                            intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
-                                .substring(1)
-                        val components = serverAddress.split(".")
-                        val broadcast_address =
-                            components[0] + "." + components[1] + "." + components[2] + ".255"
+                            val serverAddress =
+                                intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
+                                    .substring(1)
+                            val myAddress =
+                                intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
+                                    .substring(1)
+                            val components = serverAddress.split(".")
+                            val broadcast_address =
+                                components[0] + "." + components[1] + "." + components[2] + ".255"
 
-                        val myInetAddress = InetAddress.getByName(myAddress)
-                        val broadcastInetAddress = InetAddress.getByName(broadcast_address)
-                        Log.d("here", "xxx  IP ADDRESS ${myInetAddress.hostAddress}")
+                            val myInetAddress = InetAddress.getByName(myAddress)
+                            val broadcastInetAddress = InetAddress.getByName(broadcast_address)
+                            Log.d("here", "xxx  IP ADDRESS ${myInetAddress.hostAddress}")
 
-                        // tryto connect to server
-                        viewModelScope?.let { viewModelScope ->
-                            viewModelScope.launch(Dispatchers.IO) {
-                                sleep(5000)
-                                client.write("192.168.227.232", "TEST", this@NetworkClientModel)
+                            // tryto connect to server
+                            viewModelScope?.let { viewModelScope ->
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    sleep(5000)
+                                    client.write("192.168.227.232", "TEST", this@NetworkClientModel)
+                                }
                             }
-                        }
-                    }, 1000)
+                        }, 1000)
+                    }
+                } catch (e: Exception) {
+                    Log.d( "xxx", e.stackTraceToString())
                 }
-            } catch (e: Exception) {
-                Log.d( "xxx", e.stackTraceToString())
             }
-        }
-        else
-        {
-            Log.d("here", "trying to connect ${networkInfo.ssid} ${networkInfo.password}")
+            else
+            {
+                Log.d("here", "trying to connect ${networkInfo.ssid} ${networkInfo.password}")
 
 //            val suggestion1 = WifiNetworkSuggestion.Builder()
 //                .setSsid("test111111")
@@ -347,34 +349,40 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 //                }
 //            };
 //            context.registerReceiver(broadcastReceiver, intentFilter);
-            var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-            val wifiInfo: WifiInfo = wifiManager!!.getConnectionInfo()
-            Log.d("xxx", "wifiinfo ${wifiInfo}")
+                var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                val wifiInfo: WifiInfo = wifiManager!!.getConnectionInfo()
+                Log.d("xxx", "wifiinfo ${wifiInfo}")
 
-            val builder = WifiNetworkSpecifier.Builder()
-            builder.setSsid( networkInfo.ssid );
-            builder.setWpa2Passphrase( networkInfo.password )
-           // builder.setSsid( "Cypress Guest Wifi" )
-            //builder.setWpa2Passphrase("cypresslovesyou")
-            //builder.setWpa2Passphrase( networkInfo.password )
-            //builder.setWpa2Passphrase("")
-            val wifiNetworkSpecifier = builder.build()
+                val builder = WifiNetworkSpecifier.Builder()
+                builder.setSsid( networkInfo.ssid );
+                builder.setWpa2Passphrase( networkInfo.password )
+                // builder.setSsid( "Cypress Guest Wifi" )
+                //builder.setWpa2Passphrase("cypresslovesyou")
+                //builder.setWpa2Passphrase( networkInfo.password )
+                //builder.setWpa2Passphrase("")
+                val wifiNetworkSpecifier = builder.build()
 
 
-            val networkRequestBuilder = NetworkRequest.Builder()
+                val networkRequestBuilder = NetworkRequest.Builder()
 
-            networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            //networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-            networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-            networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
+                networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                //networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
 
-            val networkRequest = networkRequestBuilder.build()
+                val networkRequest = networkRequestBuilder.build()
 
-            val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectivityManager.requestNetwork( networkRequest, networkCallback )
+                val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                connectivityManager.requestNetwork( networkRequest, networkCallback )
 
+            }
+        }else
+        {
+            _networkConnected.postValue(NetworkStatus.NetworkConnected)
+            sendRegistration()
         }
+
     }
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback()
