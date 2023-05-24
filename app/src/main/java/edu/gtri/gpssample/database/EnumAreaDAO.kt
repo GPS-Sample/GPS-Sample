@@ -39,6 +39,12 @@ class EnumAreaDAO(private var dao: DAO)
                     DAO.teamDAO.createOrUpdateTeam(team)
                 }
 
+                for (enumData in enumArea.enumDataList)
+                {
+                    enumData.enumAreaId = id
+                    DAO.enumDataDAO.createOrUpdateEnumData(enumData)
+                }
+
                 return enumArea
             } ?: return null
         }
@@ -118,6 +124,7 @@ class EnumAreaDAO(private var dao: DAO)
                 enumArea.id?.let { id ->
                     enumArea.vertices = DAO.latLonDAO.getLatLons( id )
                     enumArea.teams = DAO.teamDAO.getTeams( id )
+                    enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
                     enumAreas.add( enumArea )
                 }
             }

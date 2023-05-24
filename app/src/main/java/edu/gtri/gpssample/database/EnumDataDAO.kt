@@ -52,9 +52,9 @@ class EnumDataDAO(private var dao: DAO)
         val values = ContentValues()
 
         enumData.id = null
-        enumData.notes = ""
-        enumData.valid = false
-        enumData.incomplete = false
+//        enumData.notes = ""
+//        enumData.valid = false
+//        enumData.incomplete = false
         putEnumData( enumData, values )
 
         enumData.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_DATA, null, values).toInt()
