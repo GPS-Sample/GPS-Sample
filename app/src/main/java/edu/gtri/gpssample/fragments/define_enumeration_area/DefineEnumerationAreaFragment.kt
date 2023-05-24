@@ -167,9 +167,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         val user = (activity!!.application as? MainApplication)?.user
 
-        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
-        for (enumArea in enumAreas)
+        for (enumArea in config.enumAreas)
         {
             addPolygon( enumArea )
 
@@ -179,9 +179,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
             }
 
-            val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
 
-            for (enumData in enumDataList)
+            for (enumData in enumArea.enumDataList)
             {
                 var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
@@ -306,6 +306,9 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                     val enumArea = EnumArea.unpack( text )
 
                     enumArea?.let { enumArea ->
+                        config.id?.let { id ->
+                            enumArea.config_id = id
+                        }
                         DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
                         for (enumData in enumArea.enumDataList)
                         {
