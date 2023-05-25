@@ -130,14 +130,15 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
-        studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
 
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            enumerationAreasAdapter.updateEnumAreas(DAO.enumAreaDAO.getEnumAreas(config))
-        }
+        studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
 
         // set the first study as selected.  TODO: save the id of the selected study
         sharedViewModel.currentConfiguration?.value?.let { config ->
+
+            val enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+            enumerationAreasAdapter.updateEnumAreas(enumAreas)
+
             if(config.studies.count() > 0)
             {
                 Log.d( "xxx", "selected study with ID ${config.studies[0].id}")
@@ -160,6 +161,7 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
     override fun onMapReady(p0: GoogleMap) {
         map = p0
         map?.let{googleMap ->
+            googleMap.clear()
             googleMap.setOnMapClickListener(this)
             googleMap.uiSettings.isScrollGesturesEnabled = false
 
@@ -290,9 +292,13 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
                     enumArea?.let { enumArea ->
                         for (enumData in enumArea.enumDataList)
                         {
-                            val ed = DAO.enumDataDAO.importEnumData( enumData )
+                            DAO.enumDataDAO.importEnumData( enumData )
                         }
                     } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
+
+                    map?.let { map ->
+                        onMapReady(map)
+                    }
                 }
             }
         }
