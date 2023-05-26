@@ -89,6 +89,9 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         if (enumData.id == null)
         {
             createMode = true
+            sharedViewModel.teamViewModel.currentTeam?.value?.let { team ->
+                enumData.teamId = team.id!!
+            }
             DAO.enumDataDAO.createOrUpdateEnumData(enumData)
         }
 
