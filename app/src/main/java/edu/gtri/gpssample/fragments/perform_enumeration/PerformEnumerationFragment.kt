@@ -126,7 +126,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.addHouseholdButton.setOnClickListener {
 
             location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, false, "", location.latitude, location.longitude)
+                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
@@ -140,7 +140,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
         binding.addLocationButton.setOnClickListener {
 
             location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, false, "", location.latitude, location.longitude)
+                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
                 enumData.isLocation = true
                 sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 

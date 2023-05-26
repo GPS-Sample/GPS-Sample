@@ -111,6 +111,7 @@ class EnumDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
         values.put( DAO.COLUMN_ENUM_DATA_VALID, enumData.valid.toInt())
         values.put( DAO.COLUMN_ENUM_DATA_INCOMPLETE, enumData.incomplete.toInt())
+        values.put( DAO.COLUMN_ENUM_DATA_INCOMPLETE_REASON, enumData.incompleteReason)
         values.put( DAO.COLUMN_ENUM_DATA_NOTES, enumData.notes )
         values.put( DAO.COLUMN_ENUM_DATA_LATITUDE, enumData.latitude )
         values.put( DAO.COLUMN_ENUM_DATA_LONGITUDE, enumData.longitude )
@@ -130,6 +131,7 @@ class EnumDataDAO(private var dao: DAO)
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val valid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_VALID)).toBoolean()
         val incomplete = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_INCOMPLETE)).toBoolean()
+        val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_INCOMPLETE_REASON))
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_NOTES))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_LONGITUDE))
@@ -137,7 +139,7 @@ class EnumDataDAO(private var dao: DAO)
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_DESCRIPTION))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME))
 
-        return EnumData( id, creationDate, uuid, userId, enumAreaId, valid, incomplete, notes, latitude, longitude, isLocation, description, imageFileName, null )
+        return EnumData( id, creationDate, uuid, userId, enumAreaId, valid, incomplete, incompleteReason, notes, latitude, longitude, isLocation, description, imageFileName, null )
     }
 
     fun getEnumData( uuid: String ) : EnumData?
@@ -179,6 +181,27 @@ class EnumDataDAO(private var dao: DAO)
 
             cursor.close()
         }
+
+        db.close()
+
+        return enumDataList
+    }
+
+    fun getEnumData() : ArrayList<EnumData>
+    {
+        var enumDataList = ArrayList<EnumData>()
+        val db = dao.writableDatabase
+
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val enumData = createEnumData( cursor )
+            enumDataList.add( enumData )
+        }
+
+        cursor.close()
 
         db.close()
 
@@ -229,7 +252,7 @@ class EnumDataDAO(private var dao: DAO)
         enumData.id?.let { id ->
             Log.d( "xxx", "deleting enumData with ID $id" )
 
-            DAO.fieldDataDAO.deleteAllFields( id )
+            DAO.fieldDataDAO.deleteAllFields( enumData )
 
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"

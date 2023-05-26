@@ -20,12 +20,13 @@ class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.V
     private lateinit var context: Context
     private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectTeam: ((team: Team) -> Unit)
+    lateinit var shouldDeleteTeam: ((team: Team) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.context = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_team, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -46,7 +47,12 @@ class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.V
         val team = teams!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( team.name )
+        holder.imageView.visibility = View.VISIBLE
         holder.dateTextView.setText( Date(team.creationDate).toString())
+
+        holder.imageView.setOnClickListener {
+            shouldDeleteTeam(team)
+        }
 
         holder.itemView.setOnClickListener {
             didSelectTeam(team)
@@ -55,7 +61,8 @@ class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.V
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
-        val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
+        val nameTextView: TextView = itemView.findViewById(R.id.name_text_view)
+        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view)
+        val imageView: ImageView = itemView.findViewById(R.id.check_image_view)
     }
 }

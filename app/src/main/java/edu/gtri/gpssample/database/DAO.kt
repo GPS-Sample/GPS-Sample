@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
@@ -167,6 +168,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_VALID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_INCOMPLETE + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_INCOMPLETE_REASON + " TEXT" + "," +
                 COLUMN_ENUM_DATA_NOTES + " TEXT" + "," +
                 COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
                 COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
@@ -328,6 +330,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_ENUM_DATA = "enum_data"
         const val COLUMN_ENUM_DATA_VALID = "enum_data_valid"
         const val COLUMN_ENUM_DATA_INCOMPLETE = "enum_data_incomplete"
+        const val COLUMN_ENUM_DATA_INCOMPLETE_REASON = "enum_data_incomplete_reason"
         const val COLUMN_ENUM_DATA_NOTES = "enum_data_notes"
         const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
         const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
@@ -368,6 +371,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         private var instance: DAO? = null
 
+        fun showAll()
+        {
+            Log.d( "xxx", "configs: ${DAO.configDAO.getConfigs()}")
+            Log.d( "xxx", "studies: ${DAO.studyDAO.getStudies()}")
+            Log.d( "xxx", "fields: ${DAO.fieldDAO.getFields()}")
+            Log.d( "xxx", "fieldData: ${DAO.fieldDataDAO.getFieldData()}")
+            Log.d( "xxx", "enumAreas: ${DAO.enumAreaDAO.getEnumAreas()}")
+            Log.d( "xxx", "enumData: ${DAO.enumDataDAO.getEnumData()}")
+            Log.d( "xxx", "teams: ${DAO.teamDAO.getTeams()}")
+            Log.d( "xxx", "latLons: ${DAO.latLonDAO.getLatLons()}")
+        }
+
         fun deleteAll()
         {
             instance?.let {
@@ -376,14 +391,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_STUDY, null, null)
                 db.delete(TABLE_CONFIG_STUDY, null, null)
                 db.delete(TABLE_FIELD, null, null)
+                db.delete(TABLE_FIELD_DATA, null, null)
                 db.delete(TABLE_RULE, null, null)
                 db.delete(TABLE_FILTER, null, null)
                 db.delete(TABLE_FILTERRULE, null, null)
                 db.delete(TABLE_ENUM_AREA, null, null)
+                db.delete(TABLE_ENUM_DATA, null, null)
                 db.delete(TABLE_TEAM, null, null)
                 db.delete(TABLE_TEAM_MEMBER, null, null)
-                db.delete(TABLE_ENUM_DATA, null, null)
-                db.delete(TABLE_FIELD_DATA, null, null)
                 db.delete(TABLE_LAT_LON, null, null)
             }
         }
@@ -412,6 +427,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 124
+        private const val DATABASE_VERSION = 125
     }
 }

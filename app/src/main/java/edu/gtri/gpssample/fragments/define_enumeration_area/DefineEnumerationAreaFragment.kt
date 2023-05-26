@@ -310,10 +310,11 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                             enumArea.config_id = id
                         }
                         DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-                        for (enumData in enumArea.enumDataList)
-                        {
-                            DAO.enumDataDAO.importEnumData( enumData )
-                        }
+
+//                        for (enumData in enumArea.enumDataList)
+//                        {
+//                            DAO.enumDataDAO.importEnumData( enumData )
+//                        }
 
                         onMapReady(map)
 

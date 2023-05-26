@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
 
 class MainFragment : Fragment()
@@ -125,6 +127,9 @@ class MainFragment : Fragment()
         {
             getRuntimePermissions()
         }
+
+//        DAO.deleteAll()
+        DAO.showAll()
     }
 
     override fun onResume()
