@@ -26,6 +26,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableConfig = ("CREATE TABLE " +
                 TABLE_CONFIG + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_TEAM_ID + " INTEGER" + "," +
                 COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
 
@@ -33,7 +34,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_CONFIG_DATE_FORMAT_INDEX + " INTEGER" + "," +
                 COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
                 COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
-                COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" +
+                COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableConfig)
 
@@ -166,6 +168,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_USER_ID + " INTEGER" + "," +
                 COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                COLUMN_TEAM_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_VALID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_INCOMPLETE + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_INCOMPLETE_REASON + " TEXT" + "," +
@@ -176,7 +179,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ENUM_DATA_DESCRIPTION + " TEXT" + "," +
                 COLUMN_ENUM_DATA_IMAGE_FILE_NAME + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumData)
 
@@ -427,6 +432,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 125
+        private const val DATABASE_VERSION = 128
     }
 }

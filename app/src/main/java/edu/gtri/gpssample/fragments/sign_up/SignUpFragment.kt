@@ -69,7 +69,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             {
                 if (position == 7)
                 {
-                    InputDialog( activity!!, "Enter Other Question", "", this@SignUpFragment )
+                    InputDialog( activity!!, "Enter Other Question", "", null, this@SignUpFragment )
                 }
             }
 
@@ -110,7 +110,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
 
                 if (question.length == 0)
                 {
-                    InputDialog( activity!!, "Enter Other Question", "", this@SignUpFragment )
+                    InputDialog( activity!!, "Enter Other Question", "", null, this@SignUpFragment )
                     return@setOnClickListener
                 }
             }
@@ -143,7 +143,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
         }
     }
 
-    override fun didEnterText( name: String )
+    override fun didEnterText( name: String, tag: Any? )
     {
         binding.otherQuestionTextView.text = name
         binding.otherQuestionTextView.visibility = View.VISIBLE

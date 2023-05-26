@@ -73,7 +73,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                 val user = DAO.userDAO.getUser(user_name)
 
                 user?.let {
-                    InputDialog( activity!!, it.recoveryQuestion, "", this@SignInFragment )
+                    InputDialog( activity!!, it.recoveryQuestion, "", null, this@SignInFragment )
                 }
             }
         }
@@ -211,7 +211,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         }
     }
 
-    override fun didEnterText( text: String )
+    override fun didEnterText( text: String, tag: Any? )
     {
         val userName = binding.nameEditText.text.toString()
         val user = DAO.userDAO.getUser(userName)

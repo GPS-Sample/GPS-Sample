@@ -39,7 +39,7 @@ import java.net.InetAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-class ManageEnumerationAreaFragment : Fragment(), InputDialog.InputDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
+class ManageEnumerationAreaFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
@@ -76,9 +76,24 @@ class ManageEnumerationAreaFragment : Fragment(), InputDialog.InputDialogDelegat
             enumArea = it
         }
 
-        enumArea.id?.let {
-            val teams = DAO.teamDAO.getTeams( it )
-            teamsAdapter = TeamsAdapter( teams )
+        enumArea.id?.let { enumAreaId ->
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                var teams = ArrayList<Team>()
+
+                if (config.teamId > 0) // if teamId is valid, then filter out all teams except this one
+                {
+                    val team = DAO.teamDAO.getTeam( config.teamId )
+                    team?.let {
+                        teams.add( it )
+                    }
+                }
+                else  // otherwise show all teams
+                {
+                    teams = DAO.teamDAO.getTeams( enumAreaId )
+                }
+
+                teamsAdapter = TeamsAdapter( teams )
+            }
         }
 
         teamsAdapter.didSelectTeam = this::didSelectTeam
@@ -91,7 +106,7 @@ class ManageEnumerationAreaFragment : Fragment(), InputDialog.InputDialogDelegat
         binding.titleTextView.text = enumArea.name + " Teams"
 
         binding.addButton.setOnClickListener {
-            InputDialog( activity!!, "Enter Team Name", null, this )
+            findNavController().navigate(R.id.action_navigate_to_CreateTeamFragment)
         }
 
         usersAdapter = UsersAdapter(users)
@@ -107,6 +122,7 @@ class ManageEnumerationAreaFragment : Fragment(), InputDialog.InputDialogDelegat
     override fun onResume()
     {
         super.onResume()
+
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
@@ -120,15 +136,6 @@ class ManageEnumerationAreaFragment : Fragment(), InputDialog.InputDialogDelegat
     fun shouldDeleteTeam( team: Team)
     {
         ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this team?", "No", "Yes", team, this)
-    }
-
-    override fun didEnterText( name: String )
-    {
-        enumArea.id?.let { id ->
-            val team = Team( id, name )
-            DAO.teamDAO.createOrUpdateTeam( team )
-            teamsAdapter.updateTeams( DAO.teamDAO.getTeams( id ))
-        }
     }
 
     override fun didSelectLeftButton(tag: Any?)

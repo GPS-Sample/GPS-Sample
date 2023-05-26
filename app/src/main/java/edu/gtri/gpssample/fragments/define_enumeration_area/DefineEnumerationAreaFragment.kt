@@ -107,7 +107,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 if (vertexMarkers.size > 2)
                 {
                     createMode = false
-                    InputDialog( activity!!, "Enter Enumeration Area Name", null, this )
+                    InputDialog( activity!!, "Enter Enumeration Area Name", "", null, this )
                     binding.createButton.setBackgroundResource( R.drawable.edit_blue )
                 }
             }
@@ -120,7 +120,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
     }
 
-    override fun didEnterText( name: String )
+    override fun didEnterText( name: String, tag: Any? )
     {
         createEnumArea( name )
     }

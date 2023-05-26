@@ -7,6 +7,7 @@ import android.util.Log
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
 
@@ -109,6 +110,7 @@ class EnumDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, enumData.uuid )
         values.put( DAO.COLUMN_USER_ID, enumData.userId )
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumData.enumAreaId )
+        values.put( DAO.COLUMN_TEAM_ID, enumData.teamId )
         values.put( DAO.COLUMN_ENUM_DATA_VALID, enumData.valid.toInt())
         values.put( DAO.COLUMN_ENUM_DATA_INCOMPLETE, enumData.incomplete.toInt())
         values.put( DAO.COLUMN_ENUM_DATA_INCOMPLETE_REASON, enumData.incompleteReason)
@@ -129,6 +131,7 @@ class EnumDataDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val userId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_ID))
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
+        val teamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
         val valid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_VALID)).toBoolean()
         val incomplete = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_INCOMPLETE)).toBoolean()
         val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_INCOMPLETE_REASON))
@@ -139,7 +142,7 @@ class EnumDataDAO(private var dao: DAO)
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_DESCRIPTION))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_IMAGE_FILE_NAME))
 
-        return EnumData( id, creationDate, uuid, userId, enumAreaId, valid, incomplete, incompleteReason, notes, latitude, longitude, isLocation, description, imageFileName, null )
+        return EnumData( id, creationDate, uuid, userId, enumAreaId, teamId, valid, incomplete, incompleteReason, notes, latitude, longitude, isLocation, description, imageFileName, null )
     }
 
     fun getEnumData( uuid: String ) : EnumData?
@@ -163,7 +166,7 @@ class EnumDataDAO(private var dao: DAO)
         return enumData
     }
 
-    fun getEnumData( enumArea: EnumArea) : ArrayList<EnumData>
+    fun getEnumData( enumArea: EnumArea ) : ArrayList<EnumData>
     {
         var enumDataList = ArrayList<EnumData>()
         val db = dao.writableDatabase
@@ -180,6 +183,32 @@ class EnumDataDAO(private var dao: DAO)
             }
 
             cursor.close()
+        }
+
+        db.close()
+
+        return enumDataList
+    }
+
+    fun getEnumData( enumArea: EnumArea, team: Team ) : ArrayList<EnumData>
+    {
+        var enumDataList = ArrayList<EnumData>()
+        val db = dao.writableDatabase
+
+        enumArea.id?.let { enumAreaId ->
+            team.id?.let { teamId ->
+                val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_TEAM_ID} = $teamId"
+                val cursor = db.rawQuery(query, null)
+
+                while (cursor.moveToNext())
+                {
+                    val enumData = createEnumData( cursor )
+                    enumData.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumData )
+                    enumDataList.add( enumData )
+                }
+
+                cursor.close()
+            }
         }
 
         db.close()
