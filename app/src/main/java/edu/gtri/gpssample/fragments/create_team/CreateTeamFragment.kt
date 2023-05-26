@@ -37,7 +37,6 @@ import kotlin.collections.ArrayList
 
 class CreateTeamFragment : Fragment(), OnMapReadyCallback
 {
-    private lateinit var team: Team
     private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -68,10 +67,6 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
             enumArea = enum_area
         }
 
-        sharedViewModel.teamViewModel.currentTeam?.value?.let {
-            team = it
-        }
-
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
@@ -81,11 +76,11 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
         }
 
         binding.saveButton.setOnClickListener {
-            if (selectedEnumDataList.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, "You have not selected any households", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+//            if (selectedEnumDataList.isEmpty())
+//            {
+//                Toast.makeText(activity!!.applicationContext, "You have not selected any households", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
 
             if (binding.teamNameEditText.text.toString().length == 0)
             {
@@ -94,12 +89,18 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
             }
 
             enumArea.id?.let { enumAreaId ->
-                Log.d( "xxx", selectedEnumDataList.toString())
-                val team = Team( enumAreaId, binding.teamNameEditText.text.toString() )
-                DAO.teamDAO.createOrUpdateTeam( team )
-            }
+                val team = DAO.teamDAO.createOrUpdateTeam( Team( enumAreaId, binding.teamNameEditText.text.toString()))
 
-            findNavController().popBackStack()
+                team?.id?.let { team_id ->
+                    for (enumData in selectedEnumDataList)
+                    {
+                        enumData.teamId = team_id
+                        DAO.enumDataDAO.updateEnumData( enumData )
+                    }
+                }
+
+                findNavController().popBackStack()
+            }
         }
     }
 
@@ -107,7 +108,7 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     var once = true
@@ -139,37 +140,28 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
 
         for (enumData in enumDataList)
         {
-            var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-            if (enumData.incomplete)
+            if (!enumData.isLocation)
             {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-            }
-            else if (enumData.valid)
-            {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-            }
+                val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-            if (enumData.isLocation)
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+                val marker = map.addMarker( MarkerOptions()
+                    .position( LatLng( enumData.latitude, enumData.longitude ))
+                    .icon( icon )
+                )
 
-            val marker = map.addMarker( MarkerOptions()
-                .position( LatLng( enumData.latitude, enumData.longitude ))
-                .icon( icon )
-            )
-
-            marker?.let {marker ->
-                marker.tag = enumData
-            }
-
-            map.setOnMarkerClickListener { marker ->
-                marker.tag?.let {tag ->
-                    val enum_data = tag as EnumData
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.home_green))
-                    selectedEnumDataList.add( enum_data )
+                marker?.let {marker ->
+                    marker.tag = enumData
                 }
 
-                false
+                map.setOnMarkerClickListener { marker ->
+                    marker.tag?.let {tag ->
+                        val enum_data = tag as EnumData
+                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.home_green))
+                        selectedEnumDataList.add( enum_data )
+                    }
+
+                    false
+                }
             }
         }
     }

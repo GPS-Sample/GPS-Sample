@@ -163,7 +163,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
             // during the import to accommodate uploads from multiple enumerators.
             // We'll also need to handle duplicate updates from the same enumerator.
 
-            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
             val packedEnumArea = enumArea.pack()
             Log.d( "xxx", packedEnumArea )
 
@@ -184,7 +184,7 @@ class PerformEnumerationFragment : Fragment(), OnMapReadyCallback
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        enumDataList = DAO.enumDataDAO.getEnumData(userId, enumAreaId)
+        enumDataList = DAO.enumDataDAO.getEnumData(enumArea, team)
 
         performEnumerationAdapter.updateEnumDataList( enumDataList )
         if (this::map.isInitialized)

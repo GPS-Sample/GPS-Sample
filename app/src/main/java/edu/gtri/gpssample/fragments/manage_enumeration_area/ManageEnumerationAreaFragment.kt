@@ -91,7 +91,7 @@ class ManageEnumerationAreaFragment : Fragment(), InputDialog.InputDialogDelegat
         binding.titleTextView.text = enumArea.name + " Teams"
 
         binding.addButton.setOnClickListener {
-            InputDialog( activity!!, "Enter Team Name", null, this )
+            findNavController().navigate(R.id.action_navigate_to_CreateTeamFragment)
         }
 
         usersAdapter = UsersAdapter(users)
@@ -107,6 +107,7 @@ class ManageEnumerationAreaFragment : Fragment(), InputDialog.InputDialogDelegat
     override fun onResume()
     {
         super.onResume()
+
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 

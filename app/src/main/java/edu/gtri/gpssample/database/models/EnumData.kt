@@ -14,6 +14,7 @@ data class EnumData(
     var uuid : String,
     var userId : Int,
     var enumAreaId : Int,
+    var teamId : Int,
     var valid : Boolean,
     var incomplete : Boolean,
     var incompleteReason : String,
@@ -26,7 +27,7 @@ data class EnumData(
     var fieldDataList : ArrayList<FieldData>?)
 {
     constructor( userId: Int, enumAreaId: Int, valid: Boolean, incomplete: Boolean, reasonIncomplete: String, notes: String, latitude: Double, longitude: Double) :
-            this( null, Date().time, UUID.randomUUID().toString(), userId, enumAreaId, valid, incomplete, reasonIncomplete, notes, latitude, longitude, false,"", "", null)
+            this( null, Date().time, UUID.randomUUID().toString(), userId, enumAreaId, 0, valid, incomplete, reasonIncomplete, notes, latitude, longitude, false,"", "", null)
 
     fun pack() : String
     {
