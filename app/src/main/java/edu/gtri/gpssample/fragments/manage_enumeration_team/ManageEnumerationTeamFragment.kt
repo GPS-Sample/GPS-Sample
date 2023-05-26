@@ -161,7 +161,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
 
         when (item.itemId) {
             R.id.action_edit_team -> {
-                InputDialog( activity!!, "Team Name", team.name, this )
+                InputDialog( activity!!, "Team Name", team.name, null, this )
             }
 
             R.id.action_delete_team -> {
@@ -174,7 +174,7 @@ class ManageEnumerationTeamFragment : Fragment(), UDPBroadcaster.UDPBroadcasterD
         return false
     }
 
-    override fun didEnterText( name: String )
+    override fun didEnterText( name: String, tag: Any? )
     {
         team.name = name
         DAO.teamDAO.updateTeam( team )

@@ -11,14 +11,14 @@ class InputDialog
 {
     interface InputDialogDelegate
     {
-        fun didEnterText( text: String )
+        fun didEnterText( text: String, tag: Any? )
     }
 
     constructor()
     {
     }
 
-    constructor( context: Context, title: String, text: String?, delegate: InputDialogDelegate )
+    constructor( context: Context, title: String, text: String?, tag: Any?, delegate: InputDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -54,7 +54,7 @@ class InputDialog
             {
                 alertDialog.dismiss()
 
-                delegate.didEnterText( editText.text.toString())
+                delegate.didEnterText( editText.text.toString(), tag )
             }
         }
     }

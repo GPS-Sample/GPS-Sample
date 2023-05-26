@@ -34,13 +34,18 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
 import java.io.FileWriter
 import java.util.*
 
-class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener, ConfirmationDialog.ConfirmationDialogDelegate
+class ConfigurationFragment : Fragment(),
+    OnMapReadyCallback,
+    GoogleMap.OnMapClickListener,
+    InputDialog.InputDialogDelegate,
+    ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -245,22 +250,27 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
             }
             else
             {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.updateAllLists( config )
-
-                    val packedConfig = config.pack()
-                    Log.d( "xxx", packedConfig )
-
-                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                    val file = File(root, "Config.${config.name}.${Date().time}.json")
-                    val writer = FileWriter(file)
-                    writer.append(packedConfig)
-                    writer.flush()
-                    writer.close()
-
-                    Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
-                }
+                InputDialog( activity!!, "Enter a file name for the export", "", null, this@ConfigurationFragment )
             }
+        }
+    }
+
+    override fun didEnterText( name: String, tag: Any? )
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            DAO.configDAO.updateAllLists( config )
+
+            val packedConfig = config.pack()
+            Log.d( "xxx", packedConfig )
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            val file = File(root, "$name.${Date().time}.json")
+            val writer = FileWriter(file)
+            writer.append(packedConfig)
+            writer.flush()
+            writer.close()
+
+            Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
         }
     }
 
