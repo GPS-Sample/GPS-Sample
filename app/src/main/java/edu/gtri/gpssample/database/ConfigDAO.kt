@@ -129,7 +129,6 @@ class ConfigDAO(private var dao: DAO)
         var query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
 
         var cursor = db.rawQuery(query, null)
-        Log.d("xxx","Cursor count ${cursor.count}")
         while (cursor.moveToNext())
         {
             val config = buildConfig( cursor )
@@ -187,12 +186,17 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteConfig( config: Config )
     {
-//        val studies = DAO.studyDAO.getStudies( config.uuid )
-//
-//        for (study in studies)
-//        {
-//            DAO.studyDAO.deleteStudy( study )
-//        }
+        val studies = DAO.studyDAO.getStudies( config )
+        for (study in studies)
+        {
+            DAO.studyDAO.deleteStudy( study )
+        }
+
+        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        for (enumArea in enumAreas)
+        {
+            DAO.enumAreaDAO.delete( enumArea )
+        }
 
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"

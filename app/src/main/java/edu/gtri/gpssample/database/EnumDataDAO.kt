@@ -187,6 +187,27 @@ class EnumDataDAO(private var dao: DAO)
         return enumDataList
     }
 
+    fun getEnumData() : ArrayList<EnumData>
+    {
+        var enumDataList = ArrayList<EnumData>()
+        val db = dao.writableDatabase
+
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_DATA}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val enumData = createEnumData( cursor )
+            enumDataList.add( enumData )
+        }
+
+        cursor.close()
+
+        db.close()
+
+        return enumDataList
+    }
+
     fun getEnumData( userId: Int, enumAreaId: Int ) : ArrayList<EnumData>
     {
         var enumDataList = ArrayList<EnumData>()
@@ -231,7 +252,7 @@ class EnumDataDAO(private var dao: DAO)
         enumData.id?.let { id ->
             Log.d( "xxx", "deleting enumData with ID $id" )
 
-            DAO.fieldDataDAO.deleteAllFields( id )
+            DAO.fieldDataDAO.deleteAllFields( enumData )
 
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"

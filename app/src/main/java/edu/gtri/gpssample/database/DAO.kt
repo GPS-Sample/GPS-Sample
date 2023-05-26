@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
@@ -370,6 +371,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         private var instance: DAO? = null
 
+        fun showAll()
+        {
+            Log.d( "xxx", "configs: ${DAO.configDAO.getConfigs()}")
+            Log.d( "xxx", "studies: ${DAO.studyDAO.getStudies()}")
+            Log.d( "xxx", "fields: ${DAO.fieldDAO.getFields()}")
+            Log.d( "xxx", "fieldData: ${DAO.fieldDataDAO.getFieldData()}")
+            Log.d( "xxx", "enumAreas: ${DAO.enumAreaDAO.getEnumAreas()}")
+            Log.d( "xxx", "enumData: ${DAO.enumDataDAO.getEnumData()}")
+            Log.d( "xxx", "teams: ${DAO.teamDAO.getTeams()}")
+            Log.d( "xxx", "latLons: ${DAO.latLonDAO.getLatLons()}")
+        }
+
         fun deleteAll()
         {
             instance?.let {
@@ -378,14 +391,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_STUDY, null, null)
                 db.delete(TABLE_CONFIG_STUDY, null, null)
                 db.delete(TABLE_FIELD, null, null)
+                db.delete(TABLE_FIELD_DATA, null, null)
                 db.delete(TABLE_RULE, null, null)
                 db.delete(TABLE_FILTER, null, null)
                 db.delete(TABLE_FILTERRULE, null, null)
                 db.delete(TABLE_ENUM_AREA, null, null)
+                db.delete(TABLE_ENUM_DATA, null, null)
                 db.delete(TABLE_TEAM, null, null)
                 db.delete(TABLE_TEAM_MEMBER, null, null)
-                db.delete(TABLE_ENUM_DATA, null, null)
-                db.delete(TABLE_FIELD_DATA, null, null)
                 db.delete(TABLE_LAT_LON, null, null)
             }
         }

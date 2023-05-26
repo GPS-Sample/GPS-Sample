@@ -120,6 +120,25 @@ class TeamDAO(private var dao: DAO)
 
         return teams
     }
+
+    fun getTeams(): ArrayList<Team>
+    {
+        val teams = ArrayList<Team>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            teams.add( createTeam( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return teams
+    }
+
     //--------------------------------------------------------------------------
     fun deleteTeam( team: Team )
     {

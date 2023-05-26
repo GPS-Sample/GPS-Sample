@@ -152,6 +152,25 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun getFields(): List<Field>
+    {
+        val fields = ArrayList<Field>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            fields.add( buildField( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return fields
+    }
+
+    //--------------------------------------------------------------------------
     fun deleteField( field: Field )
     {
         val db = dao.writableDatabase
