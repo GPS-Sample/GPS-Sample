@@ -1,11 +1,7 @@
 package edu.gtri.gpssample.fragments.ManageEnumerationArea
 
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import androidmads.library.qrgenearator.QRGContents
-import androidmads.library.qrgenearator.QRGEncoder
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -22,22 +18,8 @@ import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.fragments.manage_enumeration_area.UsersAdapter
-import edu.gtri.gpssample.managers.GPSSampleWifiManager
-import edu.gtri.gpssample.network.UDPBroadcaster
-import edu.gtri.gpssample.network.models.*
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
-import org.json.JSONObject
-import java.net.DatagramPacket
-import java.net.InetAddress
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 class ManageEnumerationAreaFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {

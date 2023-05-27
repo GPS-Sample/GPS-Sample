@@ -240,17 +240,17 @@ class ConfigurationFragment : Fragment(),
 
     override fun didSelectRightButton(tag: Any?)
     {
-        tag?.let { tag ->
-            if (tag == kDeleteTag)
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            tag?.let { tag ->
+                if (tag == kDeleteTag)
+                {
                     sharedViewModel.deleteConfig(config)
                     findNavController().popBackStack()
                 }
-            }
-            else
-            {
-                InputDialog( activity!!, "Enter a file name for the export", "", null, this@ConfigurationFragment )
+                else
+                {
+                    InputDialog( activity!!, "Enter a file name for the export", config.name, null, this@ConfigurationFragment )
+                }
             }
         }
     }
