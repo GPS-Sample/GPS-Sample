@@ -290,25 +290,32 @@ class ConfigurationFragment : Fragment(),
 
             uri?.let { uri ->
 
-                val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                try
+                {
+                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
 
-                inputStream?.let {  inputStream ->
-                    val text = inputStream.bufferedReader().readText()
+                    inputStream?.let {  inputStream ->
+                        val text = inputStream.bufferedReader().readText()
 
-                    Log.d( "xxx", text )
+                        Log.d( "xxx", text )
 
-                    val enumArea = EnumArea.unpack( text )
+                        val enumArea = EnumArea.unpack( text )
 
-                    enumArea?.let { enumArea ->
-                        for (enumData in enumArea.enumDataList)
-                        {
-                            DAO.enumDataDAO.importEnumData( enumData )
+                        enumArea?.let { enumArea ->
+                            for (enumData in enumArea.enumDataList)
+                            {
+                                DAO.enumDataDAO.importEnumData( enumData )
+                            }
+                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+
+                        map?.let { map ->
+                            onMapReady(map)
                         }
-                    } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
-
-                    map?.let { map ->
-                        onMapReady(map)
                     }
+                }
+                catch( ex: java.lang.Exception )
+                {
+                    Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
