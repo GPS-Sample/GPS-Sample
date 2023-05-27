@@ -180,24 +180,31 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
             uri?.let { uri ->
 
-                val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                try
+                {
+                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
 
-                inputStream?.let {  inputStream ->
-                    val text = inputStream.bufferedReader().readText()
+                    inputStream?.let {  inputStream ->
+                        val text = inputStream.bufferedReader().readText()
 
-                    Log.d( "xxx", text )
+                        Log.d( "xxx", text )
 
-                    val config = Config.unpack( text )
+                        val config = Config.unpack( text )
 
-                    config?.let { config ->
-                        DAO.deleteAll()
+                        config?.let { config ->
+                            DAO.deleteAll()
 
-                        DAO.configDAO.createConfig( config )
+                            DAO.configDAO.createConfig( config )
 
-                        sharedViewModel.initializeConfigurations()
+                            sharedViewModel.initializeConfigurations()
 
-                        manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
-                    } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
+                            manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
+                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                catch( ex: Exception )
+                {
+                    Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
                 }
             }
         }

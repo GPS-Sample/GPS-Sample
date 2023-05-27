@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:focusable="false"
+        android:text="Select Export Content"
+        android:gravity="center_vertical"
+        android:textStyle="bold"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="18sp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/config_button"
+            android:checked="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Configuration"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <RadioButton
+            android:id="@+id/enum_button"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Enumeration Data"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/title_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_vertical"
+        android:text="File Name"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/file_name_edit_text"
+        android:hint="Enter the File Name"
+        android:inputType="textCapWords"
+        android:imeOptions="actionDone"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="20dp"
+        android:focusable="false"
+        android:text="Select Export Method"
+        android:gravity="center_vertical"
+        android:textStyle="bold"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="18sp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/qr_button"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:checked="true"
+            android:text="QR Code"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <RadioButton
+            android:id="@+id/file_system_button"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="File System"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+    </RadioGroup>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="90dp">
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="10dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Cancel" />
+
+        <Button
+            android:id="@+id/export_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Export" />
+
+    </LinearLayout>
+
+</LinearLayout>
