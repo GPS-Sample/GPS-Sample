@@ -52,6 +52,61 @@
         android:layout_weight="1"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
 
+    <View
+        android:background="@color/primary"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/drop_pin_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:background="@drawable/pin_drop_blue" />
+
+        <Button
+            android:id="@+id/draw_polygon_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:background="@drawable/draw" />
+
+        <Button
+            android:id="@+id/assign_households_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:background="@drawable/assign" />
+
+        <Button
+            android:id="@+id/clear_selections_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:background="@drawable/clear" />
+    </LinearLayout>
+
+    <View
+        android:background="@color/primary"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_gravity="bottom"

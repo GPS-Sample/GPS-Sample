@@ -27,6 +27,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateTeamBinding
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsAdapter
 import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -35,13 +36,18 @@ import java.io.FileWriter
 import java.util.*
 import kotlin.collections.ArrayList
 
-class CreateTeamFragment : Fragment(), OnMapReadyCallback
+class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
+    private lateinit var defaultColorList: ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
 
-    private var selectedEnumDataList = ArrayList<EnumData>()
+    private var createMode = false
+    private var selectionPolygon: Polygon? = null
+    private var householdMarkers = ArrayList<Marker>()
+    private var selectedHouseholdMarkers = ArrayList<Marker>()
+    private var vertexMarkers = java.util.ArrayList<Marker>()
     private var _binding: FragmentCreateTeamBinding? = null
     private val binding get() = _binding!!
 
@@ -71,17 +77,94 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
 
         mapFragment!!.getMapAsync(this)
 
+        binding.dropPinButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
+        binding.dropPinButton.setOnClickListener {
+
+            if (createMode)
+            {
+                createMode = false
+                clearSelections()
+            }
+            else
+            {
+                if (selectedHouseholdMarkers.isNotEmpty())
+                {
+                    Toast.makeText(activity!!.applicationContext, "You must clear the current selections before you can assign new households", Toast.LENGTH_SHORT).show()
+                }
+                else
+                {
+                    clearSelections()
+                    createMode = true
+                    binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                }
+            }
+        }
+
+        binding.drawPolygonButton.setOnClickListener {
+
+            if (createMode && vertexMarkers.size > 2)
+            {
+                createMode = false
+                binding.dropPinButton.setBackgroundTintList(defaultColorList);
+
+                val vertices = java.util.ArrayList<LatLng>()
+
+                vertexMarkers.map {
+                    vertices.add( it.position )
+                }
+
+                val polygonOptions = PolygonOptions()
+                    .strokeColor(0xffff0000.toInt())
+                    .clickable(false)
+                    .addAll( vertices )
+
+                selectionPolygon = map.addPolygon( polygonOptions )
+            }
+        }
+
+        binding.assignHouseholdsButton.setOnClickListener {
+
+            selectionPolygon?.let {
+
+                it.remove()
+                selectionPolygon = null
+
+                val vertices = java.util.ArrayList<LatLng>()
+
+                vertexMarkers.map {
+                    vertices.add( it.position )
+                    it.remove()
+                }
+
+                val latLngBounds = vertices.fold ( LatLngBounds.builder(), { builder, it -> builder.include(it) } ).build()
+
+                householdMarkers.map { marker ->
+
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+                    if (latLngBounds.contains( marker.position ))
+                    {
+                        selectedHouseholdMarkers.add( marker )
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                    }
+
+                    marker.setIcon( icon )
+                }
+            }
+        }
+
+        binding.clearSelectionsButton.setOnClickListener {
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want clear all selections?", "No", "Yes", null, this)
+        }
+
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
-//            if (selectedEnumDataList.isEmpty())
-//            {
-//                Toast.makeText(activity!!.applicationContext, "You have not selected any households", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
-
             if (binding.teamNameEditText.text.toString().length == 0)
             {
                 Toast.makeText(activity!!.applicationContext, "You must enter a team name", Toast.LENGTH_SHORT).show()
@@ -92,8 +175,9 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
                 val team = DAO.teamDAO.createOrUpdateTeam( Team( enumAreaId, binding.teamNameEditText.text.toString()))
 
                 team?.id?.let { team_id ->
-                    for (enumData in selectedEnumDataList)
-                    {
+
+                    selectedHouseholdMarkers.map { marker ->
+                        val enumData = marker.tag as EnumData
                         enumData.teamId = team_id
                         DAO.enumDataDAO.updateEnumData( enumData )
                     }
@@ -111,11 +195,55 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
+    fun clearSelections()
+    {
+        createMode = false
+
+        householdMarkers.map { marker ->
+            marker.setIcon( BitmapDescriptorFactory.fromResource(R.drawable.home_black) )
+        }
+
+        selectedHouseholdMarkers.clear()
+
+        selectionPolygon?.let {
+            it.remove()
+            selectionPolygon = null
+        }
+
+        vertexMarkers.map {
+            it.remove()
+        }
+
+        vertexMarkers.clear()
+
+        binding.dropPinButton.setBackgroundTintList(defaultColorList);
+    }
+
+    override fun didSelectLeftButton(tag: Any?)
+    {
+    }
+
+    override fun didSelectRightButton(tag: Any?)
+    {
+        clearSelections()
+    }
+
     var once = true
 
-    fun addMapObjects()
-    {
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+
         map.clear()
+
+        map.setOnMapClickListener {
+            if (createMode)
+            {
+                val marker = map.addMarker( MarkerOptions().position(it))
+                marker?.let {
+                    vertexMarkers.add( marker )
+                }
+            }
+        }
 
         val points = ArrayList<LatLng>()
 
@@ -138,6 +266,8 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
+        householdMarkers.clear()
+
         for (enumData in enumDataList)
         {
             if (!enumData.isLocation)
@@ -151,25 +281,10 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback
 
                 marker?.let {marker ->
                     marker.tag = enumData
-                }
-
-                map.setOnMarkerClickListener { marker ->
-                    marker.tag?.let {tag ->
-                        val enum_data = tag as EnumData
-                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.home_green))
-                        selectedEnumDataList.add( enum_data )
-                    }
-
-                    false
+                    householdMarkers.add( marker)
                 }
             }
         }
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-
-        addMapObjects()
     }
 
     fun getCenter() : LatLng
