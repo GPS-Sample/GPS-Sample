@@ -186,6 +186,27 @@ class StudyDAO(private var dao: DAO)
         return studies
     }
 
+    fun getStudies(): ArrayList<Study>
+    {
+        val studies = ArrayList<Study>()
+        var db = dao.writableDatabase
+
+        val query = "SELECT * FROM ${DAO.TABLE_STUDY}"
+
+        var cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val study = buildStudy( cursor )
+            studies.add( study )
+        }
+
+        cursor.close()
+        db.close()
+
+        return studies
+    }
+
     fun updateStudy( study: Study )
     {
         val db = dao.writableDatabase

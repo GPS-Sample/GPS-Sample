@@ -202,6 +202,10 @@
         tools:layout="@layout/fragment_manage_enumeration_area">
 
         <action
+            android:id="@+id/action_navigate_to_CreateTeamFragment"
+            app:destination="@id/CreateTeamFragment" />
+
+        <action
             android:id="@+id/action_navigate_to_PerformEnumerationFragment"
             app:destination="@id/PerformEnumerationFragment" />
 
@@ -212,6 +216,14 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
+    </fragment>
+
+    <!--CreateTeamFragment-->
+
+    <fragment
+        android:id="@+id/CreateTeamFragment"
+        android:name="edu.gtri.gpssample.fragments.create_team.CreateTeamFragment"
+        tools:layout="@layout/fragment_create_field">
     </fragment>
 
     <!--CreateFieldFragment-->

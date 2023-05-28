@@ -37,9 +37,10 @@ data class Field(
         return Json.encodeToString( this )
     }
 
-    override fun toString(): String {
-        return name
-    }
+//    override fun toString(): String {
+//        return name
+//    }
+
     companion object
     {
         fun unpack( string: String ) : Field

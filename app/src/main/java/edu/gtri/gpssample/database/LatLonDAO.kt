@@ -107,6 +107,24 @@ class LatLonDAO(private var dao: DAO)
         return latLons
     }
 
+    fun getLatLons(): ArrayList<LatLon>
+    {
+        var latLons = ArrayList<LatLon>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            latLons.add( createLatLon( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return latLons
+    }
+
     //--------------------------------------------------------------------------
     fun updateLatLon( latLon: LatLon )
     {

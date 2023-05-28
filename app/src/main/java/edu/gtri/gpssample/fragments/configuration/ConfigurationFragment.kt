@@ -34,13 +34,18 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
 import java.io.FileWriter
 import java.util.*
 
-class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener, ConfirmationDialog.ConfirmationDialogDelegate
+class ConfigurationFragment : Fragment(),
+    OnMapReadyCallback,
+    GoogleMap.OnMapClickListener,
+    InputDialog.InputDialogDelegate,
+    ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -235,32 +240,37 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     override fun didSelectRightButton(tag: Any?)
     {
-        tag?.let { tag ->
-            if (tag == kDeleteTag)
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            tag?.let { tag ->
+                if (tag == kDeleteTag)
+                {
                     sharedViewModel.deleteConfig(config)
                     findNavController().popBackStack()
                 }
-            }
-            else
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.updateAllLists( config )
-
-                    val packedConfig = config.pack()
-                    Log.d( "xxx", packedConfig )
-
-                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                    val file = File(root, "Config.${config.name}.${Date().time}.json")
-                    val writer = FileWriter(file)
-                    writer.append(packedConfig)
-                    writer.flush()
-                    writer.close()
-
-                    Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                else
+                {
+                    InputDialog( activity!!, "Enter a file name for the export", config.name, null, this@ConfigurationFragment )
                 }
             }
+        }
+    }
+
+    override fun didEnterText( name: String, tag: Any? )
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            DAO.configDAO.updateAllLists( config )
+
+            val packedConfig = config.pack()
+            Log.d( "xxx", packedConfig )
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            val file = File(root, "$name.${Date().time}.json")
+            val writer = FileWriter(file)
+            writer.append(packedConfig)
+            writer.flush()
+            writer.close()
+
+            Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -280,25 +290,32 @@ class ConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapCli
 
             uri?.let { uri ->
 
-                val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                try
+                {
+                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
 
-                inputStream?.let {  inputStream ->
-                    val text = inputStream.bufferedReader().readText()
+                    inputStream?.let {  inputStream ->
+                        val text = inputStream.bufferedReader().readText()
 
-                    Log.d( "xxx", text )
+                        Log.d( "xxx", text )
 
-                    val enumArea = EnumArea.unpack( text )
+                        val enumArea = EnumArea.unpack( text )
 
-                    enumArea?.let { enumArea ->
-                        for (enumData in enumArea.enumDataList)
-                        {
-                            DAO.enumDataDAO.importEnumData( enumData )
+                        enumArea?.let { enumArea ->
+                            for (enumData in enumArea.enumDataList)
+                            {
+                                DAO.enumDataDAO.importEnumData( enumData )
+                            }
+                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+
+                        map?.let { map ->
+                            onMapReady(map)
                         }
-                    } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.", Toast.LENGTH_SHORT).show()
-
-                    map?.let { map ->
-                        onMapReady(map)
                     }
+                }
+                catch( ex: java.lang.Exception )
+                {
+                    Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
                 }
             }
         }

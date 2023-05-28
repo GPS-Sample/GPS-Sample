@@ -24,6 +24,7 @@ import kotlin.collections.ArrayList
 @Serializable
 data class Config(
     var id : Int? = null,
+    var teamId : Int,
     var creationDate: Long,
     var name: String,
     var dateFormat: DateFormat,
@@ -34,10 +35,10 @@ data class Config(
     var enumAreas : ArrayList<EnumArea>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-        minGpsPrecision: Int) : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
+        minGpsPrecision: Int) : this(null, 0, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
                                     ArrayList<Study>(), ArrayList<EnumArea>())
-    constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int) : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
+    constructor(id: Int?, teamId: Int, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+                minGpsPrecision: Int) : this(id, teamId, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
                 ArrayList<Study>(), ArrayList<EnumArea>())
 
     var minimumGPSPrecision : String

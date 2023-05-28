@@ -138,6 +138,33 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
+    fun getEnumAreas(): ArrayList<EnumArea>
+    {
+        val enumAreas = ArrayList<EnumArea>()
+        val db = dao.writableDatabase
+
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val enumArea = createEnumArea( cursor )
+            enumArea.id?.let { id ->
+                enumArea.vertices = DAO.latLonDAO.getLatLons( id )
+                enumArea.teams = DAO.teamDAO.getTeams( id )
+                enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
+                enumAreas.add( enumArea )
+            }
+        }
+
+        cursor.close()
+
+        db.close()
+
+        return enumAreas
+    }
+
+    //--------------------------------------------------------------------------
     fun updateEnumArea( enumArea: EnumArea )
     {
         val db = dao.writableDatabase
@@ -179,6 +206,11 @@ class EnumAreaDAO(private var dao: DAO)
             // enumData's are dependent on EnumAreas
             DAO.enumDataDAO.getEnumData(enumArea).map {
                 DAO.enumDataDAO.delete( it )
+            }
+
+            // teams are dependent on EnumAreas
+            DAO.teamDAO.getTeams( enumAreaId ).map {
+                DAO.teamDAO.deleteTeam( it )
             }
 
             val db = dao.writableDatabase

@@ -43,6 +43,7 @@ class ConfigDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_TEAM_ID, config.teamId )
         values.put( DAO.COLUMN_CREATION_DATE, config.creationDate )
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
@@ -106,6 +107,7 @@ class ConfigDAO(private var dao: DAO)
     private fun buildConfig(cursor: Cursor ) : Config
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val teamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
         val distanceFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX))
@@ -118,7 +120,7 @@ class ConfigDAO(private var dao: DAO)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
+        return Config( id, teamId, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
     }
 
     //--------------------------------------------------------------------------
@@ -129,7 +131,6 @@ class ConfigDAO(private var dao: DAO)
         var query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
 
         var cursor = db.rawQuery(query, null)
-        Log.d("xxx","Cursor count ${cursor.count}")
         while (cursor.moveToNext())
         {
             val config = buildConfig( cursor )
@@ -187,12 +188,17 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteConfig( config: Config )
     {
-//        val studies = DAO.studyDAO.getStudies( config.uuid )
-//
-//        for (study in studies)
-//        {
-//            DAO.studyDAO.deleteStudy( study )
-//        }
+        val studies = DAO.studyDAO.getStudies( config )
+        for (study in studies)
+        {
+            DAO.studyDAO.deleteStudy( study )
+        }
+
+        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        for (enumArea in enumAreas)
+        {
+            DAO.enumAreaDAO.delete( enumArea )
+        }
 
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"

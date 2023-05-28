@@ -14,8 +14,10 @@ data class EnumData(
     var uuid : String,
     var userId : Int,
     var enumAreaId : Int,
+    var teamId : Int,
     var valid : Boolean,
     var incomplete : Boolean,
+    var incompleteReason : String,
     var notes : String,
     var latitude : Double,
     var longitude : Double,
@@ -24,8 +26,8 @@ data class EnumData(
     var imageFileName: String,
     var fieldDataList : ArrayList<FieldData>?)
 {
-    constructor( userId: Int, enumAreaId: Int, valid: Boolean, incomplete: Boolean, notes: String, latitude: Double, longitude: Double) :
-            this( null, Date().time, UUID.randomUUID().toString(), userId, enumAreaId, valid, incomplete, notes, latitude, longitude, false,"", "", null)
+    constructor( userId: Int, enumAreaId: Int, valid: Boolean, incomplete: Boolean, reasonIncomplete: String, notes: String, latitude: Double, longitude: Double) :
+            this( null, Date().time, UUID.randomUUID().toString(), userId, enumAreaId, 0, valid, incomplete, reasonIncomplete, notes, latitude, longitude, false,"", "", null)
 
     fun pack() : String
     {
