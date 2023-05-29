@@ -30,7 +30,7 @@ import java.lang.Thread.sleep
 import java.net.InetAddress
 import java.net.Socket
 
-
+private const val kDialogTimeout : Long = 400
 class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     override val type = NetworkMode.NetworkClient
     private val client : TCPClient = TCPClient()
@@ -53,7 +53,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         set(value) {
             _connectDelegate = value
         }
-
 
     var _networkConnected : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
     val networkConnected : LiveData<NetworkStatus>
@@ -106,7 +105,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     fun sendRegistration()
     {
-        Log.d("xxxxxx", "SENDING REGISTRATION")
         _activity?.let { activity ->
             val app = (activity.application as MainApplication?)
             app?.user?.let { user ->
@@ -119,7 +117,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     response?.let{response ->
                         if(response.command == NetworkCommand.NetworkDeviceRegistrationResponse)
                         {
-                            sleep(500)
+                            sleep(kDialogTimeout)
                             _clientRegistered.postValue(NetworkStatus.ClientRegistered)
                             // TODO:  change this to be more generic
                             sendConfigurationCommand()
@@ -134,8 +132,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     private fun sendConfigurationCommand()
     {
-        Log.d("xxxxxx", "SENDING Configuration command")
-
         val message = TCPMessage(NetworkCommand.NetworkConfigRequest, "")
         networkInfo?.let{networkInfo ->
             val response = client.sendMessage(networkInfo.serverIP, message, this)
@@ -146,14 +142,12 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 {
                     response.payload?.let {payload ->
                         val config = Config.unpack(payload)
-                        Log.d("xxxxxx", "this is test  ${config?.name}")
-
                         // TODO: put the config in the list of current configs.....
                         config?.let{config ->
                             configurationDelegate?.configurationReceived(config)
                             _dataReceived.postValue(NetworkStatus.DataReceived)
 
-                            sleep(400)
+                            sleep(kDialogTimeout)
                             connectDelegate?.didConnect(true)
                         }
 
@@ -288,33 +282,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
             }
             else
             {
-                Log.d("here", "trying to connect ${networkInfo.ssid} ${networkInfo.password}")
-
-//            val suggestion1 = WifiNetworkSuggestion.Builder()
-//                .setSsid("test111111")
-//                .setIsAppInteractionRequired(true) // Optional (Needs location permission)
-//                .build();
-//
-//            val suggestionsList = listOf(suggestion1)
-//
-//            var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-//            val status = wifiManager.addNetworkSuggestions(suggestionsList);
-//            if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) {
-//                // do error handling here
-//            }
-//
-//// Optional (Wait for post connection broadcast to one of your suggestions)
-//            val intentFilter = IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
-//
-//            val broadcastReceiver = object : BroadcastReceiver() {
-//                override fun onReceive(context: Context, intent: Intent) {
-//                    if (!intent.action.equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
-//                        return;
-//                    }
-//                    // do post connect processing here
-//                }
-//            };
-//            context.registerReceiver(broadcastReceiver, intentFilter);
                 var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
                 val wifiInfo: WifiInfo = wifiManager!!.getConnectionInfo()
                 Log.d("xxx", "wifiinfo ${wifiInfo}")
@@ -322,13 +289,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 val builder = WifiNetworkSpecifier.Builder()
                 builder.setSsid( networkInfo.ssid );
                 builder.setWpa2Passphrase( networkInfo.password )
-                // builder.setSsid( "Cypress Guest Wifi" )
-                //builder.setWpa2Passphrase("cypresslovesyou")
-                //builder.setWpa2Passphrase( networkInfo.password )
-                //builder.setWpa2Passphrase("")
                 val wifiNetworkSpecifier = builder.build()
-
-
                 val networkRequestBuilder = NetworkRequest.Builder()
 
                 networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
@@ -364,46 +325,39 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     {
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
-
                     }
-
-
                 }
-
             }
 
         }
         override fun onLost(network: Network) {
             super.onLost(network)
-            Log.d("xxxx", "FAILED!!!!! HERE" )
             _networkConnected.postValue(NetworkStatus.NetworkError)
             _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
             _commandSent.postValue(NetworkStatus.CommandError)
             _dataReceived.postValue(NetworkStatus.DataReceivedError)
-            sleep(400)
+            sleep(kDialogTimeout)
             connectDelegate?.didConnect(false)
 
         }
         override fun onUnavailable() {
             super.onUnavailable()
-            Log.d("xxxx", "FAILED!!!!! NO NETWORK" )
             _networkConnected.postValue(NetworkStatus.NetworkError)
             _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
             _commandSent.postValue(NetworkStatus.CommandError)
             _dataReceived.postValue(NetworkStatus.DataReceivedError)
-            sleep(400)
+            sleep(kDialogTimeout)
             connectDelegate?.didConnect(false)
 
         }
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities)
         {
-            Log.d("xxxxx", "connected 1")
             super.onCapabilitiesChanged(network, networkCapabilities)
 
-            val not_suspended = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
-            val validated = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-            val trusted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-            val not_restricted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+//            val not_suspended = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
+//            val validated = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+//            val trusted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+//            val not_restricted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
 
 //            if (udpBroadcaster == null && networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED))
 //            {
@@ -417,7 +371,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         @RequiresApi(Build.VERSION_CODES.R)
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties)
         {
-            Log.d("xxxxx", "connected 2")
             super.onLinkPropertiesChanged(network, linkProperties)
 
         }
