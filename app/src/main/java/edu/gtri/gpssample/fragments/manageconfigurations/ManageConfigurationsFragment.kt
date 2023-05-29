@@ -223,10 +223,14 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                                 val team = DAO.teamDAO.getTeam( config.teamId )
                                 team?.let { _team ->
                                     sharedViewModel.teamViewModel.setCurrentTeam( _team )
-                                    val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
-                                    enumArea?.let { _enumArea ->
-                                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
-                                        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                                    val study = DAO.studyDAO.getStudy( _team.studyId )
+                                    study?.let { _study ->
+                                        sharedViewModel.createStudyModel.setStudy( _study )
+                                        val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
+                                        enumArea?.let { _enumArea ->
+                                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
+                                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                                        }
                                     }
                                 }
                             }

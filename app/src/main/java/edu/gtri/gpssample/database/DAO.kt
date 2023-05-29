@@ -145,8 +145,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 TABLE_TEAM + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_CREATION_DATE + " INTEGER" + "," +
+                COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_TEAM_NAME + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableTeam)
