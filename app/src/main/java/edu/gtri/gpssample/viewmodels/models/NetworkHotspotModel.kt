@@ -17,7 +17,9 @@ import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.NetworkMode
 import edu.gtri.gpssample.constants.NetworkStatus
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
@@ -188,6 +190,21 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     socket.outputStream.write(response.toByteArray())
                 }
             }
+            NetworkCommand.NetworkEnumerationDataResponse ->
+            {
+                message.payload?.let { payload ->
+                    val enumArea = EnumArea.unpack( payload )
+
+                    enumArea?.let { enumArea ->
+                        for (enumData in enumArea.enumDataList)
+                        {
+                            DAO.enumDataDAO.importEnumData( enumData )
+                        }
+                    }
+
+                }
+
+            }
         }
     }
 
@@ -303,6 +320,10 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
         {
             _creationDelegate?.didComplete(false)
         }
+    }
+    fun done(v : View)
+    {
+
     }
     fun shutdown()
     {

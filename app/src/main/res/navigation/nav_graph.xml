@@ -303,7 +303,9 @@
         android:id="@+id/PerformEnumerationFragment"
         android:name="edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationFragment"
         tools:layout="@layout/fragment_perform_enumeration">
-
+        <action
+            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
+            app:destination="@id/NetworkConnectionDialogFragment" />
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>

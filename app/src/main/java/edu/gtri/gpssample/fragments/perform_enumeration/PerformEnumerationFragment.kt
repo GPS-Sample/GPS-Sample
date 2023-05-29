@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.perform_enumeration
 
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -21,11 +23,16 @@ import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.HotspotMode
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.ExportDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
 import java.io.FileWriter
 import java.util.*
@@ -33,7 +40,8 @@ import kotlin.collections.ArrayList
 
 class PerformEnumerationFragment : Fragment(),
     OnMapReadyCallback,
-    ExportDialog.ExportDialogDelegate
+    ExportDialog.ExportDialogDelegate,
+    ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var team: Team
     private lateinit var map: GoogleMap
@@ -47,14 +55,19 @@ class PerformEnumerationFragment : Fragment(),
     private var location: LatLng? = null
     private var enumDataList = ArrayList<EnumData>()
     private var _binding: FragmentPerformEnumerationBinding? = null
+    private lateinit var sharedNetworkViewModel : NetworkViewModel
     private val binding get() = _binding!!
 
+    private val kExportTag = 2
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
         val vm : ConfigurationViewModel by activityViewModels()
+        val networkVm : NetworkViewModel by activityViewModels()
         sharedViewModel = vm
+        sharedNetworkViewModel = networkVm
+        sharedNetworkViewModel.currentFragment = this
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -157,7 +170,10 @@ class PerformEnumerationFragment : Fragment(),
         binding.exportButton.setOnClickListener {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                ExportDialog( activity, "${config.name}-${team.name}", "${enumArea.name}-${team.name}", this )
+
+                ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+
+                //ExportDialog( activity, "${config.name}-${team.name}", "${enumArea.name}-${team.name}", this )
             }
         }
     }
@@ -350,5 +366,52 @@ class PerformEnumerationFragment : Fragment(),
         super.onDestroyView()
 
         _binding = null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun didSelectLeftButton(tag: Any?)
+    {
+        // Launch connection screen
+        view?.let{view ->
+            val user = (activity!!.application as MainApplication).user
+            user?.let { user ->
+
+                //TODO: fix this! compare should be the enum
+                when(user.role)
+                {
+                    Role.Supervisor.toString() ->
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                    }
+                    Role.Admin.toString() ->
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                    }
+                }
+            }
+            sharedViewModel?.currentConfiguration?.value?.let{
+                sharedNetworkViewModel.setCurrentConfig(it)
+            }
+
+            sharedNetworkViewModel.createHotspot(view)
+        }
+
+    }
+
+    override fun didSelectRightButton(tag: Any?)
+    {
+//        sharedViewModel.currentConfiguration?.value?.let { config ->
+//            tag?.let { tag ->
+//                if (tag == kDeleteTag)
+//                {
+//                    sharedViewModel.deleteConfig(config)
+//                    findNavController().popBackStack()
+//                }
+//                else
+//                {
+//                    InputDialog( activity!!, "Enter a file name for the export", config.name, null, this@ConfigurationFragment )
+//                }
+//            }
+//        }
     }
 }

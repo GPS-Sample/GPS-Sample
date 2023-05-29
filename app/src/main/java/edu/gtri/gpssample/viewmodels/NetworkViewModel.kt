@@ -140,6 +140,13 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         }
     }
 
+    fun donePopBack(v: View)
+    {
+        //runBlocking(Dispatchers.Main) {
+            navController?.popBackStack()
+       // }
+    }
+
     override fun didConnect(complete: Boolean) {
         runBlocking(Dispatchers.Main) {
             networkClientModel.resetState()

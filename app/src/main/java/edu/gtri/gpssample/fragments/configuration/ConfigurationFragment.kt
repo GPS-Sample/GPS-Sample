@@ -28,6 +28,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
@@ -150,6 +151,9 @@ class ConfigurationFragment : Fragment(),
                 sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
         }
+        map?.let { map ->
+            onMapReady(map)
+        }
     }
 
     private fun didSelectStudy(study: Study)
@@ -228,7 +232,23 @@ class ConfigurationFragment : Fragment(),
     {
         // Launch connection screen
         view?.let{view ->
-            sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Configuration)
+            val user = (activity!!.application as MainApplication).user
+            user?.let { user ->
+
+                //TODO: fix this! compare should be the enum
+                when(user.role)
+                {
+                    Role.Supervisor.toString() ->
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                    }
+                    Role.Admin.toString() ->
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                    }
+                }
+            }
+
             sharedViewModel?.currentConfiguration?.value?.let{
                 sharedNetworkViewModel.setCurrentConfig(it)
             }

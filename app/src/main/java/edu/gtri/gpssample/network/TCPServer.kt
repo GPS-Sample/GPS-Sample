@@ -70,9 +70,7 @@ class TCPServer
                         val socket = serverSocket!!.accept()
 
                         Log.d( "xxx", "accepted connection from ${socket.inetAddress.toString()}" )
-
                         Thread {
-
                             handleClient(socket,delegate)
                         }.start()
                     }
