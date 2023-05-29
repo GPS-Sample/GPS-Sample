@@ -100,6 +100,10 @@ class EnumAreaDAO(private var dao: DAO)
             cursor.moveToNext()
 
             enumArea = createEnumArea( cursor )
+
+            enumArea.id?.let { _id ->
+                enumArea.vertices = DAO.latLonDAO.getLatLons( _id )
+            }
         }
 
         cursor.close()

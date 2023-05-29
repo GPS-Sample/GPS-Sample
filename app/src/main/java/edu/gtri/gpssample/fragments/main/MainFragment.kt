@@ -47,25 +47,25 @@ class MainFragment : Fragment()
 
         binding.versionTextView.text = BuildConfig.VERSION_NAME
 
-        binding.signInButton.isEnabled = false
-
-        binding.adminButton.setOnClickListener {
-            binding.signInButton.isEnabled = true
-            binding.signUpTextView.isEnabled = true
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
-        }
-
-        binding.supervisorButton.setOnClickListener {
-            binding.signInButton.isEnabled = true
-            binding.signUpTextView.isEnabled = true
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
-        }
-
-        binding.dataCollectorButton.setOnClickListener {
-            binding.signInButton.isEnabled = true
-            binding.signUpTextView.isFocusable = false
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
-        }
+//        binding.signInButton.isEnabled = false
+//
+//        binding.adminButton.setOnClickListener {
+//            binding.signInButton.isEnabled = true
+//            binding.signUpTextView.isEnabled = true
+//            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
+//        }
+//
+//        binding.supervisorButton.setOnClickListener {
+//            binding.signInButton.isEnabled = true
+//            binding.signUpTextView.isEnabled = true
+//            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
+//        }
+//
+//        binding.dataCollectorButton.setOnClickListener {
+//            binding.signInButton.isEnabled = true
+//            binding.signUpTextView.isFocusable = false
+//            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
+//        }
 
         binding.signInButton.setOnClickListener {
             val bundle = Bundle()
@@ -76,16 +76,19 @@ class MainFragment : Fragment()
             else if (binding.supervisorButton.isChecked) {
                 bundle.putString( Keys.kRole.toString(), Role.Supervisor.toString())
             }
+            else if (binding.enumeratorButton.isChecked) {
+                bundle.putString( Keys.kRole.toString(), Role.Enumerator.toString())
+            }
             else if (binding.dataCollectorButton.isChecked) {
                 bundle.putString( Keys.kRole.toString(), Role.DataCollector.toString())
             }
 
-            binding.adminButton.isChecked = false
-            binding.supervisorButton.isChecked = false
-            binding.dataCollectorButton.isChecked = false
-
-            binding.signInButton.isEnabled = false
-            binding.signUpTextView.isEnabled = false
+//            binding.adminButton.isChecked = false
+//            binding.supervisorButton.isChecked = false
+//            binding.dataCollectorButton.isChecked = false
+//
+//            binding.signInButton.isEnabled = false
+//            binding.signUpTextView.isEnabled = false
 
             binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
 
@@ -102,6 +105,10 @@ class MainFragment : Fragment()
             else if (binding.supervisorButton.isChecked) {
                 bundle = Bundle()
                 bundle.putString( Keys.kRole.toString(), Role.Supervisor.toString())
+            }
+            else if (binding.enumeratorButton.isChecked) {
+                bundle = Bundle()
+                bundle.putString( Keys.kRole.toString(), Role.Enumerator.toString())
             }
             else if (binding.dataCollectorButton.isChecked) {
                 bundle = Bundle()

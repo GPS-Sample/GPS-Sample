@@ -9,10 +9,11 @@ import java.util.*
 data class Team(
     var id : Int? = null,
     var creationDate: Long,
+    var studyId: Int,
     var enumAreaId: Int,
     var name: String)
 {
-    constructor(enumAreaId: Int, name: String) : this(null, Date().time, enumAreaId, name)
+    constructor(studyId: Int, enumAreaId: Int, name: String) : this(null, Date().time, studyId, enumAreaId, name)
 
     fun pack() : String
     {

@@ -20,6 +20,7 @@ import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -35,6 +36,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
@@ -71,10 +74,12 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         binding.recyclerView.adapter = manageConfigurationsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        val user = (activity!!.application as MainApplication).user
+        val _user = (activity!!.application as MainApplication).user
 
-        user?.let { user ->
-            if (user.role == Role.Supervisor.toString())
+        _user?.let { user ->
+            this.user = user
+
+            if (user.role != Role.Admin.toString())
             {
                 binding.addButton.visibility = View.GONE
             }
@@ -86,6 +91,16 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         }
 
         binding.importButton.setOnClickListener {
+
+            if (user.role == Role.Enumerator.toString())
+            {
+                for (config in sharedViewModel.configurations)
+                {
+                    sharedViewModel.deleteConfig( config )
+                    manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+                }
+            }
+
             ConfirmationDialog( activity, "Import Configuration", "Select an import method", "QR Code", "File System", 0, this)
         }
     }
@@ -191,6 +206,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                         val config = Config.unpack( text )
 
+                        Log.d( "xxx", config.toString() )
+
                         config?.let { config ->
                             DAO.deleteAll()
 
@@ -199,6 +216,24 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                             sharedViewModel.initializeConfigurations()
 
                             manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
+
+                            if (user.role == Role.Enumerator.toString())
+                            {
+                                sharedViewModel.setCurrentConfig(config)
+                                val team = DAO.teamDAO.getTeam( config.teamId )
+                                team?.let { _team ->
+                                    sharedViewModel.teamViewModel.setCurrentTeam( _team )
+                                    val study = DAO.studyDAO.getStudy( _team.studyId )
+                                    study?.let { _study ->
+                                        sharedViewModel.createStudyModel.setStudy( _study )
+                                        val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
+                                        enumArea?.let { _enumArea ->
+                                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
+                                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                                        }
+                                    }
+                                }
+                            }
                         } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 }

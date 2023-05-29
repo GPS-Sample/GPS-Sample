@@ -39,6 +39,7 @@ import kotlin.collections.ArrayList
 class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var map: GoogleMap
+    private lateinit var study: Study
     private lateinit var enumArea: EnumArea
     private lateinit var defaultColorList: ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -69,8 +70,12 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
     {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
-            enumArea = enum_area
+        sharedViewModel.createStudyModel.currentStudy?.value?.let {_study ->
+            study = _study
+        }
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { _enumArea ->
+            enumArea = _enumArea
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
@@ -171,19 +176,21 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
                 return@setOnClickListener
             }
 
-            enumArea.id?.let { enumAreaId ->
-                val team = DAO.teamDAO.createOrUpdateTeam( Team( enumAreaId, binding.teamNameEditText.text.toString()))
+            study.id?.let { studyId ->
+                enumArea.id?.let { enumAreaId ->
+                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString()))
 
-                team?.id?.let { team_id ->
+                    team?.id?.let { team_id ->
 
-                    selectedHouseholdMarkers.map { marker ->
-                        val enumData = marker.tag as EnumData
-                        enumData.teamId = team_id
-                        DAO.enumDataDAO.updateEnumData( enumData )
+                        selectedHouseholdMarkers.map { marker ->
+                            val enumData = marker.tag as EnumData
+                            enumData.teamId = team_id
+                            DAO.enumDataDAO.updateEnumData( enumData )
+                        }
                     }
-                }
 
-                findNavController().popBackStack()
+                    findNavController().popBackStack()
+                }
             }
         }
     }

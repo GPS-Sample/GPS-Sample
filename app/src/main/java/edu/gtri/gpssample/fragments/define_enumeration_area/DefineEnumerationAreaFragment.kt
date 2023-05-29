@@ -173,11 +173,11 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         {
             addPolygon( enumArea )
 
-            if (user!!.role == Role.Supervisor.toString())
-            {
-                val latLng = getCenter( enumArea )
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
-            }
+//            if (user!!.role == Role.Supervisor.toString())
+//            {
+//                val latLng = getCenter( enumArea )
+//                map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
+//            }
 
             enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
 
@@ -227,13 +227,13 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
         }
 
-        if (user!!.role == Role.Admin.toString())
-        {
+//        if (user!!.role == Role.Admin.toString())
+//        {
             val atl = LatLng( 33.774881, -84.396341 )
             val srb = LatLng(30.330603,-86.165004 )
             val demo = LatLng( 33.982973122594785, -84.31252665817738 )
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( demo, 14.0f))
-        }
+//        }
     }
 
     fun addPolygon( enumArea: EnumArea )

@@ -37,6 +37,7 @@ class TeamDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_CREATION_DATE, team.creationDate )
+        values.put( DAO.COLUMN_STUDY_ID, team.studyId )
         values.put( DAO.COLUMN_ENUM_AREA_ID, team.enumAreaId )
         values.put( DAO.COLUMN_TEAM_NAME, team.name )
     }
@@ -57,10 +58,11 @@ class TeamDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val enum_area_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_NAME))
 
-        return Team(id, creationDate, enum_area_id, name )
+        return Team(id, creationDate, study_id, enum_area_id, name )
     }
 
     //--------------------------------------------------------------------------
