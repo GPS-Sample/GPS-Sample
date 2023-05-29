@@ -62,6 +62,7 @@
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:visibility="gone"
             android:id="@+id/users_recycler_view"
             android:layout_margin="20dp"
             android:layout_weight="1"

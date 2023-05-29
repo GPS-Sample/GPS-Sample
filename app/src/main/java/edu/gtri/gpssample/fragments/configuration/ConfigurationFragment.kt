@@ -206,7 +206,7 @@ class ConfigurationFragment : Fragment(),
                         if (enumData.isLocation)
                             icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
 
-                        val marker = googleMap.addMarker(
+                        googleMap.addMarker(
                             MarkerOptions()
                                 .position(LatLng(enumData.latitude, enumData.longitude))
                                 .icon(icon)
