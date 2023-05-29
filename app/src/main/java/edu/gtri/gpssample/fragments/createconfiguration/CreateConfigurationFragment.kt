@@ -15,9 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PolygonOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -181,12 +179,38 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
                     .addAll(points)
 
                 map.addPolygon(polygon)
+
+                val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+
+                for (enumData in enumDataList)
+                {
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+                    if (enumData.incomplete)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                    }
+                    else if (enumData.valid)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                    }
+
+                    if (enumData.isLocation)
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+
+                    map.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(enumData.latitude, enumData.longitude))
+                            .icon(icon)
+                    )
+                }
             }
 
             // HACK HACK
             val atl = LatLng( 33.774881, -84.396341 )
             val srb = LatLng(30.335603,-86.165004 )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( atl, 13.5f))
+            val demo = LatLng( 33.982973122594785, -84.31252665817738 )
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( demo, 13.5f))
         }
     }
 
