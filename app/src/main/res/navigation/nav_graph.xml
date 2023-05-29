@@ -81,6 +81,10 @@
             app:destination="@id/ConfigurationFragment" />
 
         <action
+            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
+            app:destination="@id/PerformEnumerationFragment" />
+
+        <action
             android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
             app:destination="@id/NetworkConnectionDialogFragment" />
 

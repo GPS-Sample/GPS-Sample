@@ -118,97 +118,22 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                         val bundle = Bundle()
                         bundle.putString(Keys.kRole.toString(), role.toString())
 
-                        if (role == Role.Admin.toString()) {
-                            findNavController().navigate(
-                                R.id.action_navigate_to_ManageConfigurationsFragment,
-                                bundle
-                            )
-                        }
-                        else if (role == Role.Supervisor.toString()) {
-                            findNavController().navigate(
-                                R.id.action_navigate_to_ManageConfigurationsFragment,
-                                bundle
-                            )
-                        }
-                        else {
-                            findNavController().navigate(
-                                R.id.action_navigate_to_EnumeratorFragment,
-                                bundle
-                            )
-                        }
+                        findNavController().navigate(
+                            R.id.action_navigate_to_ManageConfigurationsFragment,
+                            bundle
+                        )
                     }
                 }
             }
 
             false
         })
-
-        binding.pinEditText.setOnEditorActionListener { v, actionId, event ->
-            when(actionId){
-                EditorInfo.IME_ACTION_NEXT -> {
-                    handleNextButtonPress()
-                    false
-                }
-                else -> false
-            }
-        }
     }
 
     override fun onResume()
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SignInFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    fun handleNextButtonPress()
-    {
-        val pin = binding.pinEditText.text.toString()
-        val userName = binding.nameEditText.text.toString()
-
-        if (userName.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Please enter your User Name.", Toast.LENGTH_SHORT).show()
-        }
-        else if (pin.isEmpty())
-        {
-            Toast.makeText(activity!!.applicationContext, "Please enter your PIN.", Toast.LENGTH_SHORT).show()
-        }
-        else
-        {
-            val user = DAO.userDAO.getUser( userName, pin )
-
-            if (user == null)
-            {
-                Toast.makeText(activity!!.applicationContext, "Invalid Username or PIN", Toast.LENGTH_SHORT).show()
-            }
-            else if (user!!.role != role)
-            {
-                Toast.makeText(activity!!.applicationContext, "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.", Toast.LENGTH_SHORT).show()
-            }
-            else
-            {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                val editor = sharedPreferences.edit()
-                editor.putString( Keys.kUserName.toString(), userName )
-                editor.commit()
-
-                (activity!!.application as? MainApplication)?.user = user
-
-                binding.pinEditText.setText("")
-
-                val bundle = Bundle()
-                bundle.putString( Keys.kRole.toString(), role.toString())
-
-                if (role == Role.Admin.toString())
-                {
-                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-                }
-                else
-                {
-                    findNavController().navigate(R.id.action_navigate_to_EnumeratorFragment, bundle)
-                }
-            }
-        }
     }
 
     override fun didEnterText( text: String, tag: Any? )

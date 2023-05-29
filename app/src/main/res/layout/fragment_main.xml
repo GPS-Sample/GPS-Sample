@@ -65,6 +65,13 @@
                 android:text="@string/supervisor"
                 android:textSize="20sp" />
 
+                <RadioButton
+                    android:id="@+id/enumerator_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enumerator"
+                    android:textSize="20sp" />
+
             <RadioButton
                 android:id="@+id/data_collector_button"
                 android:layout_width="match_parent"

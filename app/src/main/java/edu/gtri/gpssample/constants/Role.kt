@@ -4,5 +4,6 @@ enum class Role {
     Undefined,
     Admin,
     Supervisor,
+    Enumerator,
     DataCollector
 }
