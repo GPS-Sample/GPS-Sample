@@ -91,6 +91,7 @@
     <string name="data_collector">Data Collector</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="or">or</string>
+
     <string name="continue_with_existing_study">Continue with existing Study</string>
     <string name="admin_sign_in">Admin Sign In</string>
     <string name="supervisor_sign_in">Supervisor Sign In</string>

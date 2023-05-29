@@ -151,6 +151,9 @@ class ConfigurationFragment : Fragment(),
                 sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
         }
+        map?.let { map ->
+            onMapReady(map)
+        }
     }
 
     private fun didSelectStudy(study: Study)
