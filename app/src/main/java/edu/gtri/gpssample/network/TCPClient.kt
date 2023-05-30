@@ -42,8 +42,6 @@ class TCPClient
         try
         {
             socket?.let {socket ->
-
-
                 socket.outputStream.write( message.toByteArray())
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()

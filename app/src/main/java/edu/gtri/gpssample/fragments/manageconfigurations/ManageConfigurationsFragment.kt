@@ -32,8 +32,12 @@ import org.json.JSONObject
 import java.io.InputStream
 
 class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate,
-        NetworkClientModel.ConfigurationDelegate
+        NetworkClientModel.ConfigurationDelegate,
+        NetworkViewModel.ManageConfigurationNetworkDelegate
 {
+
+
+
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
 
@@ -53,6 +57,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
         sharedNetworkViewModel.networkClientModel.configurationDelegate = this
+        sharedNetworkViewModel.manageConfigurationNetworkDelegate = this
+
         sharedViewModel = vm
     }
 
@@ -113,6 +119,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         // get this from the view controller
         manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+
+
     }
 
     private fun didSelectConfig( config: Config )
@@ -259,6 +267,37 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 sharedViewModel.configurations.add(config)
                 manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
             }
+
+
+        }
+    }
+
+    override fun didReceiveConfiguration(complete: Boolean) {
+
+        if (user.role == Role.Enumerator.toString())
+        {
+            Log.d("xxx", "WTF")
+           // runBlocking (Dispatchers.Main){
+                if(sharedViewModel.configurations.size > 0)
+                {
+
+                    val config = sharedViewModel.configurations[0]
+                    sharedViewModel.setCurrentConfig(config)
+                    val team = DAO.teamDAO.getTeam( config.teamId )
+                    team?.let { _team ->
+                        sharedViewModel.teamViewModel.setCurrentTeam( _team )
+                        val study = DAO.studyDAO.getStudy( _team.studyId )
+                        study?.let { _study ->
+                            sharedViewModel.createStudyModel.setStudy( _study )
+                            val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
+                            enumArea?.let { _enumArea ->
+                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
+                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                            }
+                        }
+                    }
+                }
+          //  }
 
 
         }

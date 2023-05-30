@@ -28,6 +28,12 @@ import edu.gtri.gpssample.database.models.Config
 class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegate,
     NetworkClientModel.NetworkConnectDelegate{
 
+    interface ManageConfigurationNetworkDelegate
+    {
+        fun didReceiveConfiguration(complete: Boolean)
+    }
+
+    var manageConfigurationNetworkDelegate : ManageConfigurationNetworkDelegate? = null
 
     private var _activity : Activity? = null
 
@@ -144,10 +150,20 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
     {
         //runBlocking(Dispatchers.Main) {
             navController?.popBackStack()
+
        // }
     }
 
     override fun didConnect(complete: Boolean) {
+        runBlocking(Dispatchers.Main) {
+            networkClientModel.resetState()
+            navController?.popBackStack()
+            manageConfigurationNetworkDelegate?.didReceiveConfiguration(true)
+        }
+    }
+
+    override fun didSendData(complete: Boolean)
+    {
         runBlocking(Dispatchers.Main) {
             networkClientModel.resetState()
             navController?.popBackStack()

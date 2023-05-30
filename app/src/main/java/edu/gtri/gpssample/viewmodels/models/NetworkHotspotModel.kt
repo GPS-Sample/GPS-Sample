@@ -93,6 +93,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     private var generatedQRCode : Bitmap? = null
 
 
+    // this is a hack
+    var currentTeamId : Int? = null
+
 
     override var Activity : Activity?
         get() = _activity
@@ -184,13 +187,21 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             }
             NetworkCommand.NetworkConfigRequest ->
             {
-                config?.let {
+
+                config?.let {config->
+
+                    // this a hack
+                    DAO.configDAO.updateAllLists(config)
                     // create the config message
-                    val response = TCPMessage(NetworkCommand.NetworkConfigResponse, it.pack())
+                    currentTeamId?.let { teamId ->
+                        config.teamId = teamId
+                    }
+                    Log.d("xxx", "${config}")
+                    val response = TCPMessage(NetworkCommand.NetworkConfigResponse, config.pack() )
                     socket.outputStream.write(response.toByteArray())
                 }
             }
-            NetworkCommand.NetworkEnumerationDataResponse ->
+            NetworkCommand.NetworkEnumAreaExport ->
             {
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload )

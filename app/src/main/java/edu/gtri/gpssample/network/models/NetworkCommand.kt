@@ -48,6 +48,7 @@ data class NetworkCommand( var command: Int, var id: Int, val parm1: String, val
 
         const val NetworkEnumAreaRequest        = 1010
         const val NetworkEnumAreaResponse       = 2010
+        const val NetworkEnumAreaExport         = 3010
 
         const val NetworkRectangleRequest       = 1011
         const val NetworkRectangleResponse      = 2011

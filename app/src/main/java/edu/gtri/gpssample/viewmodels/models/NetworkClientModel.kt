@@ -17,6 +17,7 @@ import edu.gtri.gpssample.activities.MainActivity
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.network.TCPClient
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
@@ -35,6 +36,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     override val type = NetworkMode.NetworkClient
     private val client : TCPClient = TCPClient()
 
+
     interface ConfigurationDelegate
     {
         fun configurationReceived(config : Config)
@@ -43,7 +45,11 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     interface NetworkConnectDelegate
     {
         fun didConnect(complete: Boolean)
+        fun didSendData(complete: Boolean)
     }
+
+    // maybe a better way
+    var currentEnumArea : EnumArea? = null
 
     var configurationDelegate : ConfigurationDelegate? = null
 
@@ -100,6 +106,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     fun setClientMode(mode : ClientMode)
     {
+        _clientMode.value = mode
         _clientMode.postValue(mode)
     }
 
@@ -119,8 +126,21 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                         {
                             sleep(kDialogTimeout)
                             _clientRegistered.postValue(NetworkStatus.ClientRegistered)
+
+                            when (clientMode.value)
+                            {
+                                ClientMode.Configuration ->
+                                {
+                                    sendConfigurationCommand()
+                                }
+                                ClientMode.EnumerationTeam ->
+                                {
+                                    sendEnumerationData()
+                                }
+                                else -> {}
+                            }
                             // TODO:  change this to be more generic
-                            sendConfigurationCommand()
+
                         }
                     }
                 }
@@ -142,6 +162,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 {
                     response.payload?.let {payload ->
                         val config = Config.unpack(payload)
+
                         // TODO: put the config in the list of current configs.....
                         config?.let{config ->
                             configurationDelegate?.configurationReceived(config)
@@ -149,6 +170,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                             sleep(kDialogTimeout)
                             connectDelegate?.didConnect(true)
+
+
                         }
 
                     }
@@ -158,6 +181,18 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         }
     }
 
+    fun sendEnumerationData()
+    {
+        currentEnumArea?.let{enumArea ->
+            networkInfo?.let{networkInfo ->
+                val payload = enumArea.pack()
+                val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload)
+                val response = client.sendMessage(networkInfo.serverIP, message, this)
+                connectDelegate?.didSendData(true)
+            }
+
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun startNetworking(networkInfo: NetworkInfo?) : Boolean
     {
@@ -325,6 +360,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     {
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
+
                     }
                 }
             }

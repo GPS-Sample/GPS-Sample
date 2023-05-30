@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.fragments.perform_enumeration
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -22,9 +24,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.HotspotMode
-import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
@@ -33,6 +34,7 @@ import edu.gtri.gpssample.dialogs.ExportDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
 import java.util.*
@@ -376,28 +378,81 @@ class PerformEnumerationFragment : Fragment(),
             val user = (activity!!.application as MainApplication).user
             user?.let { user ->
 
+                sharedViewModel?.currentConfiguration?.value?.let{
+                    sharedNetworkViewModel.setCurrentConfig(it)
+                }
                 //TODO: fix this! compare should be the enum
                 when(user.role)
                 {
                     Role.Supervisor.toString() ->
                     {
+                        sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+
+                        startHotspot(view)
                     }
                     Role.Admin.toString() ->
                     {
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                        startHotspot(view)
+                    }
+                    Role.Enumerator.toString() ->
+                    {
+                        // start camera
+                        // set what client mode we are
+                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
+
+                        // I don't know why this should be necessary.
+                        enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+
+                        sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                        getResult.launch(intent)
+
                     }
                 }
             }
-            sharedViewModel?.currentConfiguration?.value?.let{
-                sharedNetworkViewModel.setCurrentConfig(it)
-            }
 
-            sharedNetworkViewModel.createHotspot(view)
+
+
         }
 
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private val getResult =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == ResultCode.BarcodeScanned.value) {
+                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+
+                val jsonObject = JSONObject(payload);
+
+                Log.d("xxx", jsonObject.toString(2))
+
+                val ssid = jsonObject.getString(Keys.kSSID.toString())
+                val pass = jsonObject.getString(Keys.kPass.toString())
+                val serverIp = jsonObject.getString(Keys.kIpAddress.toString())
+
+
+
+                Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
+
+                sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
+
+//                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
+                // need to pass this into the network view model
+
+            }
+
+        }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun startHotspot(view : View)
+    {
+        sharedNetworkViewModel.createHotspot(view)
+    }
     override fun didSelectRightButton(tag: Any?)
     {
 //        sharedViewModel.currentConfiguration?.value?.let { config ->
