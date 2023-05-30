@@ -31,6 +31,8 @@ class TCPServer
     private var serverSocket: ServerSocket? = null
     private var socketStarted : Boolean = false
     private var _serverListening : Boolean = false
+    private var _sockets : ArrayList<Socket> = ArrayList()
+
     fun stopReceiving()
     {
         enabled = false
@@ -65,10 +67,11 @@ class TCPServer
                 try {
                     Log.d( "xxx", "waiting for TCP connections on $inetAddress:$port...")
                     _serverListening = true
+                    enabled = true
                     while( enabled )
                     {
                         val socket = serverSocket!!.accept()
-
+                        _sockets.add(socket)
                         Log.d( "xxx", "accepted connection from ${socket.inetAddress.toString()}" )
                         Thread {
                             handleClient(socket,delegate)
@@ -95,7 +98,15 @@ class TCPServer
 
         if (serverSocket != null)
         {
+            for(socket in _sockets)
+            {
+                socket.close()
+            }
+            _sockets.clear()
             serverSocket!!.close()
+            serverSocket = null
+            _serverListening = false
+
         }
     }
     private fun handleClient(socket: Socket, delegate: TCPServerDelegate)

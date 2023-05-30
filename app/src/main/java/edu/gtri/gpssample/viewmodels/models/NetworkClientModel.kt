@@ -423,6 +423,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     fun resetState()
     {
+//        _networkConnected.value = NetworkStatus.None
+//        _clientRegistered.value = networkStatus.None
+//
         _networkConnected.postValue( NetworkStatus.None )
         _clientRegistered.postValue( NetworkStatus.None )
         _commandSent.postValue( NetworkStatus.None )
@@ -433,6 +436,10 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     fun shutdown()
     {
+        resetState()
         client.shutdown()
+
+        val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.unregisterNetworkCallback(networkCallback )
     }
 }

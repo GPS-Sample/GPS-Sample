@@ -281,8 +281,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
         var timeout = 0
 
         // maybe better way thread safety.  observable?
-        while(!socketCreated && timeout != kNetworkTimeout)
+        while(!tcpServer.serverListening && timeout != kNetworkTimeout)
         {
+            Log.d("xxx", "time out ${timeout}")
             Thread.sleep(1000)
             timeout += 1
         }
@@ -290,10 +291,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
         // if the server isn't listening, kill everything, throw errors
         if(!tcpServer.serverListening)
         {
-            tcpServer.shutdown()
-            _serverCreated.postValue(NetworkStatus.ServerError)
-            _qrCreated.postValue(NetworkStatus.QRCodeError)
-            _creationDelegate?.didComplete(false)
+            shutdown()
+ //           tcpServer.shutdown()
+//            _serverCreated.postValue(NetworkStatus.ServerError)
+//            _qrCreated.postValue(NetworkStatus.QRCodeError)
+//            _creationDelegate?.didComplete(false)
             return
         }
 
@@ -340,6 +342,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     {
         hotspot.stopHotSpot()
         tcpServer.shutdown()
+
+        _serverCreated.value = NetworkStatus.None
+        _networkCreated.value = NetworkStatus.None
+        _qrCreated.value = NetworkStatus.None
+
     }
 
     companion object

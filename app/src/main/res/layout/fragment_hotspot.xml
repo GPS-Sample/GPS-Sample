@@ -105,7 +105,7 @@
                 android:layout_centerInParent="true"
                 android:text="@string/done"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:onClick="@{viewModel.donePopBack}"
+                android:onClick="@{viewModel.hotspotDonePopBack}"
                 />
 <!--            <LinearLayout-->
 <!--                android:id="@+id/bottom"-->

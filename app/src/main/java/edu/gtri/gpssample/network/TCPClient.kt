@@ -103,7 +103,9 @@ class TCPClient
     {
         socket?.let {
             it.close()
+
         }
+        socket =  null
     }
 //    suspend fun write( inetAddress: String, message: String )
 //    {

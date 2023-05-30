@@ -179,7 +179,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:gravity="center_vertical"
-                    android:text="@string/enumeration_area"
+                    android:text="Perform Enumeration"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
