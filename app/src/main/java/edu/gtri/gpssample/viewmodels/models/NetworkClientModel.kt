@@ -172,6 +172,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                             connectDelegate?.didConnect(true)
 
 
+                        }?:run {
+                            _dataReceived.postValue(NetworkStatus.DataReceivedError)
+                            connectDelegate?.didConnect(false)
                         }
 
                     }

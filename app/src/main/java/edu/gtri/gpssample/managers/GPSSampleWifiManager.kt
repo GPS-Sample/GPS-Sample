@@ -147,7 +147,7 @@ class GPSSampleWifiManager//( val fragment: Fragment )
                     Handler())
 
             } catch(e: Exception) {
-                Log.d( "xxx", e.stackTraceToString())
+                Log.d( "xxTHE ERROR x", e.message!!)
                 delegate.didCreateHotspot(false, null)
                 throw(e)
             }

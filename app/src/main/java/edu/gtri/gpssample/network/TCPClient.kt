@@ -49,12 +49,31 @@ class TCPClient
                 // build the response from the server
 
                 val headerArray : ByteArray = ByteArray(TCPHeader.size)
-                socket.inputStream.read(headerArray,0,TCPHeader.size)
+
+                val read = socket.inputStream.read(headerArray,0,TCPHeader.size)
+                Log.d("xxxx", "Reading header ${TCPHeader.size} read ${read}")
                 val header = TCPHeader.fromByteArray(headerArray)
                 header?.let { header ->
                     // if we get here, the key is valid
                     val payloadArray = ByteArray(header.payloadSize)
-                    socket.inputStream.read(payloadArray,0,header.payloadSize)
+
+                    // should be reading
+                    if(header.payloadSize > 0)
+                    {
+                        val read = socket.inputStream.read(payloadArray,0,header.payloadSize)
+                        val left = header.payloadSize - read
+                        val leftover = ByteArray(left)
+                        if(read < header.payloadSize)
+                        {
+                            val read = socket.inputStream.read(leftover, 0,left)
+                            for ( i in (header.payloadSize - left) until header.payloadSize)
+                            {
+                                payloadArray[i] = leftover[i - (header.payloadSize - left)]
+                            }
+
+                        }
+                    }
+
                     val payload = String(payloadArray)
 
                     return TCPMessage(header, payload)
