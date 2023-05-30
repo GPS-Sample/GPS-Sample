@@ -196,9 +196,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     currentTeamId?.let { teamId ->
                         config.teamId = teamId
                     }
-                    Log.d("xxx", "${config}")
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, config.pack() )
                     socket.outputStream.write(response.toByteArray())
+                    socket.outputStream.flush()
+                    Log.d("sent messge", "${config}")
+
                 }
             }
             NetworkCommand.NetworkEnumAreaExport ->
