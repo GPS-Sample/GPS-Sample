@@ -45,27 +45,9 @@ class MainFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.versionTextView.text = BuildConfig.VERSION_NAME
+        activity!!.setTitle( "GPSSample" )
 
-//        binding.signInButton.isEnabled = false
-//
-//        binding.adminButton.setOnClickListener {
-//            binding.signInButton.isEnabled = true
-//            binding.signUpTextView.isEnabled = true
-//            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
-//        }
-//
-//        binding.supervisorButton.setOnClickListener {
-//            binding.signInButton.isEnabled = true
-//            binding.signUpTextView.isEnabled = true
-//            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
-//        }
-//
-//        binding.dataCollectorButton.setOnClickListener {
-//            binding.signInButton.isEnabled = true
-//            binding.signUpTextView.isFocusable = false
-//            binding.signUpTextView.setTextColor( resources.getColor( R.color.primary_textcolor, null))
-//        }
+        binding.versionTextView.text = BuildConfig.VERSION_NAME
 
         binding.signInButton.setOnClickListener {
             val bundle = Bundle()
@@ -82,13 +64,6 @@ class MainFragment : Fragment()
             else if (binding.dataCollectorButton.isChecked) {
                 bundle.putString( Keys.kRole.toString(), Role.DataCollector.toString())
             }
-
-//            binding.adminButton.isChecked = false
-//            binding.supervisorButton.isChecked = false
-//            binding.dataCollectorButton.isChecked = false
-//
-//            binding.signInButton.isEnabled = false
-//            binding.signUpTextView.isEnabled = false
 
             binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
 
@@ -135,7 +110,6 @@ class MainFragment : Fragment()
             getRuntimePermissions()
         }
 
-//        DAO.deleteAll()
         DAO.showAll()
     }
 
