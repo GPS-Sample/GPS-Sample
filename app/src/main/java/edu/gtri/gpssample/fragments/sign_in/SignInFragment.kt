@@ -94,8 +94,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             if (userName.isNotEmpty() && pin.isNotEmpty()) {
                 val user = DAO.userDAO.getUser(userName, pin)
 
-                user?.let {
-                    user
+                user?.let { user ->
                     if (user.role != role)
                     {
                         Toast.makeText(
@@ -115,13 +114,12 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
                         binding.pinEditText.setText("")
 
+                        activity!!.setTitle( "GPSSample - ${user.role}" )
+
                         val bundle = Bundle()
                         bundle.putString(Keys.kRole.toString(), role.toString())
 
-                        findNavController().navigate(
-                            R.id.action_navigate_to_ManageConfigurationsFragment,
-                            bundle
-                        )
+                        findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                     }
                 }
             }
