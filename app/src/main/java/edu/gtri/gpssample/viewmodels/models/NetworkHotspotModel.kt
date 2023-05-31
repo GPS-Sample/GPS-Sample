@@ -32,11 +32,13 @@ import org.json.JSONObject
 import java.net.InetAddress
 import java.net.Socket
 
-
+const val hotspotMessageTemplate = "SSID:"
+const val kNetworkTimeout = 5 //seconds
 class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     GPSSampleWifiManager.HotspotDelegate {
     override val type = NetworkMode.NetworkHotspot
-    private val kNetworkTimeout = 5 //seconds
+
+
     interface NetworkCreationDelegate
     {
         fun didComplete(complete: Boolean)
@@ -261,8 +263,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                 }
 
                 // debug message
-                val mess = " ${hotspot.SSID}"
-                _message.postValue(mess)
+                val message = "${hotspotMessageTemplate} ${hotspot.hotspotSSID.value}"
+                _message.postValue(message)
 
 
                 // if the server isn't started already
@@ -362,6 +364,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                 hotspotStarted = false
 
                 generatedQRCode = null
+
+                clientConenctions.clear()
+                _connections.postValue(clientConenctions)
             }
         }catch (exception : Exception)
         {

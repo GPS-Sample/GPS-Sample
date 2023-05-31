@@ -317,6 +317,9 @@
         <action
             android:id="@+id/action_navigate_to_AddLocationFragment"
             app:destination="@id/AddLocationFragment"/>
+        <action
+            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
+            app:destination="@id/PerformEnumerationFragment" />
     </fragment>
 
     <fragment

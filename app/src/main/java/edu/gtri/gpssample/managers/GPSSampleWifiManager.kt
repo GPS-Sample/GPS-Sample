@@ -29,9 +29,6 @@ class GPSSampleWifiManager//( val fragment: Fragment )
 
     }
 
-    // hack
-    var SSID :String = ""
-
     private var serverInetAddress: InetAddress? = null
     private var broadcastInetAddress: InetAddress? = null
 //    private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
@@ -84,8 +81,6 @@ class GPSSampleWifiManager//( val fragment: Fragment )
                         val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
                         val pass = wifiConfiguration!!.preSharedKey //reservation.softApConfiguration.passphrase
                         //_hotspotSSID = MutableLiveData(ssid)
-
-                        SSID = ssid
 
                         _hotspotSSID.value = ssid //.postValue(ssid)
                         _hotspotSSIDPassword.value = pass
