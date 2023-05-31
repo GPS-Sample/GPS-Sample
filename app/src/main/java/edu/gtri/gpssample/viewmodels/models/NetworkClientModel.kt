@@ -18,8 +18,10 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.network.Multicast
 import edu.gtri.gpssample.network.TCPClient
 import edu.gtri.gpssample.network.TCPServer
+import edu.gtri.gpssample.network.UDPBroadcaster
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPHeader
 import edu.gtri.gpssample.network.models.TCPMessage
@@ -35,6 +37,7 @@ private const val kDialogTimeout : Long = 400
 class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     override val type = NetworkMode.NetworkClient
     private val client : TCPClient = TCPClient()
+    private var heartbeatBroadcasting : Boolean = false
 
 
     interface ConfigurationDelegate
@@ -91,6 +94,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     var _configurationReceived : MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
     var configurationReceived : LiveData<NetworkStatus> = _configurationReceived
+
 
     override var Activity : Activity?
         get() = _activity
@@ -361,6 +365,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 networkInfo?.let {networkInfo ->
                     if(client.connect(networkInfo.serverIP, this@NetworkClientModel))
                     {
+                        // start heartbeat
+                        startHeartbeat()
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
 
@@ -424,17 +430,29 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         _clientConnectMessage.postValue(connection)
     }
 
+    private fun startHeartbeat()
+    {
+        viewModelScope?.let { viewModelScope ->
+            viewModelScope.launch(Dispatchers.IO) {
+                //join multicast
+                Multicast.join()
+
+
+                heartbeatBroadcasting = true
+                while(heartbeatBroadcasting)
+                {
+
+                }
+            }
+
+        }
+    }
     fun resetState()
     {
-//        _networkConnected.value = NetworkStatus.None
-//        _clientRegistered.value = networkStatus.None
-//
         _networkConnected.postValue( NetworkStatus.None )
         _clientRegistered.postValue( NetworkStatus.None )
         _commandSent.postValue( NetworkStatus.None )
         _dataReceived.postValue( NetworkStatus.None )
-
-
     }
 
     fun shutdown()

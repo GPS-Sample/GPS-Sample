@@ -37,6 +37,7 @@ class TCPClient
         return false
     }
 
+
     fun sendMessage(inetAddress: String, message : TCPMessage, delegate: TCPClientDelegate) : TCPMessage?
     {
         try
@@ -48,10 +49,13 @@ class TCPClient
 
                 // build the response from the server
 
-                val headerArray : ByteArray = ByteArray(TCPHeader.size)
+                val headerArray : ByteArray = ByteArray(TCPHeader.size )
 
-                val read = socket.inputStream.read(headerArray,0,TCPHeader.size)
-                Log.d("xxxx", "Reading header ${TCPHeader.size} read ${read}")
+                val read = socket.inputStream.read(headerArray,0,TCPHeader.size - 3)
+                if(read < TCPHeader.size)
+                {
+                    NetworkUtils.readToEnd(TCPHeader.size, read, socket, headerArray)
+                }
                 val header = TCPHeader.fromByteArray(headerArray)
                 header?.let { header ->
                     // if we get here, the key is valid
@@ -60,23 +64,11 @@ class TCPClient
                     // should be reading
                     if(header.payloadSize > 0)
                     {
-                        val read = socket.inputStream.read(payloadArray,0,header.payloadSize)
+                        val read = socket.inputStream.read(payloadArray,0,header.payloadSize -3 )
 
                         if(read < header.payloadSize)
                         {
-                            val left = header.payloadSize - read
-                            val leftover = ByteArray(left)
-                            val read = socket.inputStream.read(leftover, 0,left)
-                            if(read > 0)
-                            {
-                                for ( i in (header.payloadSize - left) until header.payloadSize)
-                                {
-                                    payloadArray[i] = leftover[i - (header.payloadSize - left)]
-                                }
-                            }else
-                            {
-                                // throw read error, give up
-                            }
+                            NetworkUtils.readToEnd(header.payloadSize, read, socket, payloadArray)
 
                         }
                     }

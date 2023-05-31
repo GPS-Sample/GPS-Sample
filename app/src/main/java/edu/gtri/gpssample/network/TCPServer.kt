@@ -119,10 +119,13 @@ class TCPServer
 
             while(socket.isConnected)
             {
-                val success = socket.inputStream.read(headerArray,0, TCPHeader.size)
+                val success = socket.inputStream.read(headerArray,0, TCPHeader.size )
                 if(success == -1)
                 {
                     break
+                }else if(success < TCPHeader.size)
+                {
+                    NetworkUtils.readToEnd(TCPHeader.size, success, socket, headerArray)
                 }
                 val header = TCPHeader.fromByteArray(headerArray)
                 header?.let {header ->
@@ -135,19 +138,7 @@ class TCPServer
                     // handle if not
                     if(read < header.payloadSize)
                     {
-                        val left = header.payloadSize - read
-                        val leftover = ByteArray(left)
-                        val read = socket.inputStream.read(leftover, 0,left)
-                        if(read > 0)
-                        {
-                            for ( i in (header.payloadSize - left) until header.payloadSize)
-                            {
-                                payloadArray[i] = leftover[i - (header.payloadSize - left)]
-                            }
-                        }else
-                        {
-                            // throw read error, give up
-                        }
+                        NetworkUtils.readToEnd(header.payloadSize, read, socket, payloadArray)
 
                     }
                     val payload = String(payloadArray)
