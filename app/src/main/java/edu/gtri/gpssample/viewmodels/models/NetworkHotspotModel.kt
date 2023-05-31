@@ -294,10 +294,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
         if(!tcpServer.serverListening)
         {
             shutdown()
- //           tcpServer.shutdown()
-//            _serverCreated.postValue(NetworkStatus.ServerError)
-//            _qrCreated.postValue(NetworkStatus.QRCodeError)
-//            _creationDelegate?.didComplete(false)
             return
         }
 

@@ -129,17 +129,33 @@ class TCPServer
 
                     // if we get here, the key is valid
                     val payloadArray = ByteArray(header.payloadSize)
-                    socket.inputStream.read(payloadArray, 0, header.payloadSize)
+                    val read = socket.inputStream.read(payloadArray, 0, header.payloadSize)
 
+                    // TCP read may not read the requested bytes.
+                    // handle if not
+                    if(read < header.payloadSize)
+                    {
+                        val left = header.payloadSize - read
+                        val leftover = ByteArray(left)
+                        val read = socket.inputStream.read(leftover, 0,left)
+                        if(read > 0)
+                        {
+                            for ( i in (header.payloadSize - left) until header.payloadSize)
+                            {
+                                payloadArray[i] = leftover[i - (header.payloadSize - left)]
+                            }
+                        }else
+                        {
+                            // throw read error, give up
+                        }
+
+                    }
                     val payload = String(payloadArray)
                     val tcpMessage = TCPMessage(header, payload)
-
-                    Log.d("xxxxx", "the tcp message ${tcpMessage.header.command} ${tcpMessage.payload}")
                     delegate.didReceiveTCPMessage( tcpMessage, socket )
                 }
             }
             socket.close()
-            Log.d("XXXXX", "DISCONNECTED")
             delegate.didDisconnect(socket)
 
         }

@@ -8,12 +8,8 @@ import android.os.Handler
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
-import edu.gtri.gpssample.network.UDPBroadcaster
-import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.util.*
@@ -68,8 +64,6 @@ class GPSSampleWifiManager//( val fragment: Fragment )
         {
             try
             {
-                Log.d( "xxx", "startLocalOnlyHotspot" )
-
                 val oldWifiAdresses = getWifiApIpAddresses()
                 val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
 
@@ -78,10 +72,7 @@ class GPSSampleWifiManager//( val fragment: Fragment )
                     override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
                     {
                         super.onStarted(reservation)
-
                         localOnlyHotspotReservation = reservation
-
-
                         val wifiConfiguration = reservation.wifiConfiguration
 
                         val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
@@ -89,13 +80,6 @@ class GPSSampleWifiManager//( val fragment: Fragment )
                         //_hotspotSSID = MutableLiveData(ssid)
                         _hotspotSSID.value = ssid //.postValue(ssid)
                         _hotspotSSIDPassword.value = pass
-
-
-                        Log.d( "xxx", "ssid = " + hotspotSSID.value );
-                        Log.d( "xxx", "pass = " + hotspotSSIDPassword.value );
-//                    val delegate = fragment as GPSSampleWifiManagerDelegate
-//                    delegate.didStartHotspot( ssid, pass )
-
                         val newWifiAddresses = getWifiApIpAddresses()
 
                         if (oldWifiAdresses.isEmpty())
@@ -129,17 +113,11 @@ class GPSSampleWifiManager//( val fragment: Fragment )
                             val components = serverInetAddress!!.hostAddress.split(".")
                             val broadcast_address = components[0] + "." + components[1] + "." + components[2] + ".255"
                             broadcastInetAddress = InetAddress.getByName( broadcast_address )
-
-                            Log.d( "xxx", broadcast_address )
-                            Log.d("xxx", "my ip ${serverInetAddress!!.hostAddress}")
                             _hotspotIP.value = serverInetAddress!!.hostAddress
                             _hotspotIP.postValue(serverInetAddress!!.hostAddress)
                             _hotspotStarted = true
                             delegate.didCreateHotspot(true, serverInetAddress!!)
-//                        fragment.lifecycleScope.launch {
-//                            val delegate = fragment as UDPBroadcaster.UDPBroadcasterDelegate
-//                            udpBroadcaster.beginReceiving( serverInetAddress!!, broadcastInetAddress!!, delegate )
-//                        }
+
                         }
 
                     }

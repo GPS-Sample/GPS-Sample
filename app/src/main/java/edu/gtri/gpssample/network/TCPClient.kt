@@ -61,14 +61,21 @@ class TCPClient
                     if(header.payloadSize > 0)
                     {
                         val read = socket.inputStream.read(payloadArray,0,header.payloadSize)
-                        val left = header.payloadSize - read
-                        val leftover = ByteArray(left)
+
                         if(read < header.payloadSize)
                         {
+                            val left = header.payloadSize - read
+                            val leftover = ByteArray(left)
                             val read = socket.inputStream.read(leftover, 0,left)
-                            for ( i in (header.payloadSize - left) until header.payloadSize)
+                            if(read > 0)
                             {
-                                payloadArray[i] = leftover[i - (header.payloadSize - left)]
+                                for ( i in (header.payloadSize - left) until header.payloadSize)
+                                {
+                                    payloadArray[i] = leftover[i - (header.payloadSize - left)]
+                                }
+                            }else
+                            {
+                                // throw read error, give up
                             }
 
                         }

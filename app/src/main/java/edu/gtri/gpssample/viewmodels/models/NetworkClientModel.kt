@@ -444,5 +444,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
         val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.unregisterNetworkCallback(networkCallback )
+        connectivityManager.bindProcessToNetwork(null)
     }
 }
