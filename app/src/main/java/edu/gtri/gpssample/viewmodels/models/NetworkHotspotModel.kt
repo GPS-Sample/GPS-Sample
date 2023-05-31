@@ -44,6 +44,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
     var config : Config? = null
 
+    var hotspotStarted = false
+
     private var _creationDelegate : NetworkCreationDelegate? = null
     var creationDelegate : NetworkCreationDelegate?
         get() = _creationDelegate
@@ -135,6 +137,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                 status = NetworkStatus.NetworkError
             }
         }
+        hotspotStarted = true
         return (status == NetworkStatus.NetworkCreated)
     }
 
@@ -338,12 +341,22 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     }
     fun shutdown()
     {
-        hotspot.stopHotSpot()
-        tcpServer.shutdown()
+        try{
+            if(hotspotStarted)
+            {
+                hotspot.stopHotSpot()
+                tcpServer.shutdown()
 
-        _serverCreated.value = NetworkStatus.None
-        _networkCreated.value = NetworkStatus.None
-        _qrCreated.value = NetworkStatus.None
+                _serverCreated.value = NetworkStatus.None
+                _networkCreated.value = NetworkStatus.None
+                _qrCreated.value = NetworkStatus.None
+                hotspotStarted = false
+            }
+        }catch (exception : Exception)
+        {
+            Log.d("Shutdown Exception", exception.stackTraceToString())
+        }
+
 
     }
 

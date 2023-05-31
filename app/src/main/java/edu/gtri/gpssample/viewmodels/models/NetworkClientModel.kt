@@ -51,6 +51,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         fun didSendData(complete: Boolean)
     }
 
+    var clientStarted = false
     // maybe a better way
     var currentEnumArea : EnumArea? = null
 
@@ -204,7 +205,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     override fun startNetworking(networkInfo: NetworkInfo?) : Boolean
     {
         // connect to wifi
-
+        clientStarted = true
         _networkConnected.postValue(NetworkStatus.None)
         _configurationReceived.postValue(NetworkStatus.None)
 
@@ -243,6 +244,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectToWifi(networkInfo: NetworkInfo)
     {
+        clientStarted = true
         this.networkInfo = networkInfo
        // if  (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
         if(client.socket == null)
@@ -457,11 +459,22 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     fun shutdown()
     {
-        resetState()
-        client.shutdown()
+        try {
+            if(clientStarted)
+            {
+                resetState()
+                client.shutdown()
 
-        val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager.unregisterNetworkCallback(networkCallback )
-        connectivityManager.bindProcessToNetwork(null)
+                val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                connectivityManager.bindProcessToNetwork(null)
+                connectivityManager.unregisterNetworkCallback(networkCallback )
+                clientStarted = false
+            }
+
+        }catch (ex : Exception)
+        {
+            Log.d("shutdown Exception " ,ex.stackTraceToString())
+        }
+
     }
 }
