@@ -7,6 +7,8 @@
     tools:context=".fragments.configuration.ConfigurationFragment">
 
     <data>
+        <import type="android.view.View" />
+        <import type="edu.gtri.gpssample.constants.Role" />
         <variable
             name="viewModel"
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
@@ -230,6 +232,7 @@
             android:layout_marginTop="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:visibility="@{viewModel.currentUserRole == Role.Admin ? View.VISIBLE : View.GONE}"
             android:text="Export Configuration" />
 
         <Button
@@ -239,6 +242,7 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:visibility="@{(viewModel.currentUserRole != Role.Enumerator)  ? View.VISIBLE : View.GONE}"
             android:text="Import Enumeration Data" />
     </LinearLayout>
 </layout>

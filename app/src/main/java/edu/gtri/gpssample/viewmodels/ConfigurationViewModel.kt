@@ -1,12 +1,16 @@
 package edu.gtri.gpssample.viewmodels
 
+import android.app.Activity
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.CompoundButton
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 
 import java.util.*
@@ -89,8 +93,32 @@ class ConfigurationViewModel : ViewModel()
             }
             return unavailable
         }
+    private var _currentFragment : Fragment? = null
+    private var activity : Activity? = null
+    var currentFragment : Fragment?
+        get() = _currentFragment
+        set(value){
+            _currentFragment = value
+            _currentFragment?.let {fragment ->
 
+                activity = fragment.activity
+            }
+        }
 
+    val currentUserRole : Role
+        get(){
+            activity?.let{activity ->
+                val _user = (activity.application as MainApplication).user
+                _user?.let{
+
+                    Log.d("XXXX  ROLE", "the ROLE ${it.role}")
+                    return RoleConverter.getRole(it.role)
+                }
+
+            }
+            return Role.Undefined
+
+        }
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < distanceFormats.size)

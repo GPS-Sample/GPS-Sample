@@ -69,6 +69,7 @@ class ConfigurationFragment : Fragment(),
         sharedNetworkViewModel = networkVm
 
         sharedNetworkViewModel.currentFragment = this
+        sharedViewModel.currentFragment = this
 
         studiesAdapter = StudiesAdapter(listOf<Study>())
         studiesAdapter.didSelectStudy = this::didSelectStudy
@@ -86,6 +87,8 @@ class ConfigurationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
         val bundle = Bundle()
+
+
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -111,8 +114,8 @@ class ConfigurationFragment : Fragment(),
             val intent = Intent()
                 .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
-
-            startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
+            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+           // startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
         }
 
         binding.exportButton.setOnClickListener {
