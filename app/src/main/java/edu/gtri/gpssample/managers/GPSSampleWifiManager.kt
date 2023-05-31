@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import edu.gtri.gpssample.network.NetworkUtils
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.util.*
@@ -27,6 +28,10 @@ class GPSSampleWifiManager//( val fragment: Fragment )
         fun didCreateHotspot(success : Boolean, serverIp : InetAddress?)
 
     }
+
+    // hack
+    var SSID :String = ""
+
     private var serverInetAddress: InetAddress? = null
     private var broadcastInetAddress: InetAddress? = null
 //    private val udpBroadcaster: UDPBroadcaster = UDPBroadcaster()
@@ -54,6 +59,7 @@ class GPSSampleWifiManager//( val fragment: Fragment )
        // udpBroadcaster.closeSocket()
 
         localOnlyHotspotReservation?.close()
+        _hotspotStarted = false
     }
 
     @SuppressLint("MissingPermission")
@@ -64,7 +70,7 @@ class GPSSampleWifiManager//( val fragment: Fragment )
         {
             try
             {
-                val oldWifiAdresses = getWifiApIpAddresses()
+                val oldWifiAdresses = NetworkUtils.getWifiApIpAddresses()
                 val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
 
                 wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
@@ -78,9 +84,12 @@ class GPSSampleWifiManager//( val fragment: Fragment )
                         val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
                         val pass = wifiConfiguration!!.preSharedKey //reservation.softApConfiguration.passphrase
                         //_hotspotSSID = MutableLiveData(ssid)
+
+                        SSID = ssid
+
                         _hotspotSSID.value = ssid //.postValue(ssid)
                         _hotspotSSIDPassword.value = pass
-                        val newWifiAddresses = getWifiApIpAddresses()
+                        val newWifiAddresses = NetworkUtils.getWifiApIpAddresses()
 
                         if (oldWifiAdresses.isEmpty())
                         {
@@ -143,7 +152,7 @@ class GPSSampleWifiManager//( val fragment: Fragment )
 
     }
 
-    fun getWifiApIpAddresses(): ArrayList<InetAddress> {
+    fun getWifiApIpAddresses2(): ArrayList<InetAddress> {
         val list = ArrayList<InetAddress>()
         try {
             val en: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()

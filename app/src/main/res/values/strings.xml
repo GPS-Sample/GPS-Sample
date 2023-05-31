@@ -21,6 +21,7 @@
     <string name="connect_hotspot">Connect To Hotspot</string>
     <string name="registering_device">Registering Device</string>
     <string name="sending_command">Sending Command</string>
+    <string name="sending_enum_data">Sending Enumeration Data</string>
     <string name="receiving_data">Receiving Data</string>
     <string name="configuration_received">Configuration Received</string>
 

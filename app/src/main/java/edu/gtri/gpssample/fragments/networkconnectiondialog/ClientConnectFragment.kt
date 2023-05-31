@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.client
+package edu.gtri.gpssample.fragments.networkconnectiondialog
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,18 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
-import edu.gtri.gpssample.R
-import edu.gtri.gpssample.databinding.FragmentClientBinding
+import edu.gtri.gpssample.databinding.FragmentClientConnectBinding
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 
 /**
  * A simple [Fragment] subclass.
- * Use the [ClientFragment.newInstance] factory method to
+ * Use the [ClientConnectFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ClientFragment : Fragment() {
-    private var _binding: FragmentClientBinding? = null
+class ClientConnectFragment : Fragment() {
+    private var _binding: FragmentClientConnectBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var sharedNetworkViewModel : NetworkViewModel
@@ -36,7 +34,7 @@ class ClientFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentClientBinding.inflate(inflater, container, false)
+        _binding = FragmentClientConnectBinding.inflate(inflater, container, false)
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,7 +49,7 @@ class ClientFragment : Fragment() {
             viewModel = sharedNetworkViewModel
 
             // Assign the fragment
-            clientFragment = this@ClientFragment
+            clientFragment = this@ClientConnectFragment
         }
     }
 
@@ -67,7 +65,7 @@ class ClientFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            ClientFragment().apply {
+            ClientConnectFragment().apply {
 
             }
     }

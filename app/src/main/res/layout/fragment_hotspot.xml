@@ -34,7 +34,7 @@
                 android:gravity="center"
                 android:textColor="@color/primary_textcolor"
                 android:textSize="20sp"
-                android:text="@{viewModel.networkHotspotModel.hotspotMode.format}"
+                android:text="@{viewModel.networkHotspotModel.message}"
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent"/>
             <LinearLayout

@@ -73,6 +73,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     private var _hotspotMode : MutableLiveData<HotspotMode> = MutableLiveData(HotspotMode.None)
     var hotspotMode : LiveData<HotspotMode> = _hotspotMode
 
+
+
     val connections: LiveData<List<NetworkConnectionViewModel>>
         get() = _connections
     private val _connections = MutableLiveData<List<NetworkConnectionViewModel>>(emptyList())
@@ -257,6 +259,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     startNetworkServices()
                 }
 
+                // debug message
+                val mess = " ${hotspot.SSID}"
+                _message.postValue(mess)
+
+
                 // if the server isn't started already
                 if(!tcpServer.serverListening)
                 {
@@ -309,6 +316,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             jsonObject.put(Keys.kPass.toString(), hotspot.hotspotSSIDPassword.value)
             jsonObject.put(Keys.kIpAddress.toString(), hotspot.hotspotIP.value)
 
+
             val qrgEncoder =
                 QRGEncoder(jsonObject.toString(2), null, QRGContents.Type.TEXT, qrCodeWidth.toInt())
             qrgEncoder.colorBlack = Color.WHITE;
@@ -351,6 +359,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                 _networkCreated.value = NetworkStatus.None
                 _qrCreated.value = NetworkStatus.None
                 hotspotStarted = false
+
+                generatedQRCode = null
             }
         }catch (exception : Exception)
         {
