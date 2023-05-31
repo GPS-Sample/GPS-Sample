@@ -332,8 +332,8 @@
     </fragment>
     <fragment
         android:id="@+id/ClientFragment"
-        android:name="edu.gtri.gpssample.fragments.client.ClientFragment"
-        tools:layout="@layout/fragment_client">
+        android:name="edu.gtri.gpssample.fragments.networkconnectiondialog.ClientConnectFragment"
+        tools:layout="@layout/fragment_client_connect">
     </fragment>
     <fragment
         android:id="@+id/HotspotFragment"

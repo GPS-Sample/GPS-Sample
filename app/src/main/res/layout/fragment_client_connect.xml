@@ -17,7 +17,7 @@
 
         <variable
             name="clientFragment"
-            type="edu.gtri.gpssample.fragments.client.ClientFragment" />
+            type="edu.gtri.gpssample.fragments.networkconnectiondialog.ClientConnectFragment" />
     </data>
     <FrameLayout
         android:layout_width="match_parent"

@@ -4,6 +4,7 @@ enum class NetworkMode(val format : String) {
     None("None"),
     NetworkHotspot("Network Hotspot"),
     NetworkClient("Network CLient"),
+    NetworkClientEnumData("Network Client"),
     NetworkServer("Network Server"),
 
 }

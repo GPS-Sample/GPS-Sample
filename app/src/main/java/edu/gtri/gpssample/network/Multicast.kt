@@ -3,7 +3,9 @@ package edu.gtri.gpssample.network
 import android.util.Log
 import java.net.DatagramPacket
 import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.MulticastSocket
+import java.net.NetworkInterface
 
 const val kMulticastAddress = "228.5.6.7"
 const val kMulticastPort = 6789
@@ -13,26 +15,33 @@ object Multicast {
     private var mcastSocket : MulticastSocket? = null
     private var mcastGroup : InetAddress? = null
 
-    fun join()
+    private var mcastJoined = false
+    fun join(networkInterface: NetworkInterface)
     {
         try {
+            mcastSocket?.close()
             mcastGroup = InetAddress.getByName(kMulticastAddress)
             mcastSocket = MulticastSocket(kMulticastPort)
-            mcastSocket?.joinGroup(mcastGroup);
+            mcastSocket?.networkInterface = networkInterface
+            mcastSocket?.joinGroup(InetSocketAddress(mcastGroup, kMulticastPort),networkInterface)
+            mcastJoined = true
         }catch(e : Exception)
         {
-            Log.d("Exception", e.toString())
+            Log.d("Exception", e.stackTraceToString())
         }
 
     }
 
     fun broadcast(message : ByteArray)
     {
-        mcastGroup?.let{mcastGroup ->
-            val datagram : DatagramPacket = DatagramPacket(message, message.size,
-                mcastGroup, kMulticastPort)
-            mcastSocket?.let{socket ->
-                socket.send(datagram)
+        if(mcastJoined)
+        {
+            mcastGroup?.let{mcastGroup ->
+                val datagram : DatagramPacket = DatagramPacket(message, message.size,
+                    mcastGroup, kMulticastPort)
+                mcastSocket?.let{socket ->
+                    socket.send(datagram)
+                }
             }
         }
 
@@ -47,6 +56,9 @@ object Multicast {
     {
         mcastGroup?.let{
             mcastSocket?.leaveGroup(it)
+            mcastSocket?.close()
+            mcastSocket = null
+            mcastJoined = false
         }
 
     }

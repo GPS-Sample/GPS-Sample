@@ -7,23 +7,16 @@ import android.net.*
 import android.net.wifi.*
 import android.os.Build
 import android.os.Handler
-import android.security.NetworkSecurityPolicy
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import edu.gtri.gpssample.R
-import edu.gtri.gpssample.activities.MainActivity
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.network.Multicast
-import edu.gtri.gpssample.network.TCPClient
-import edu.gtri.gpssample.network.TCPServer
-import edu.gtri.gpssample.network.UDPBroadcaster
+import edu.gtri.gpssample.network.*
 import edu.gtri.gpssample.network.models.NetworkCommand
-import edu.gtri.gpssample.network.models.TCPHeader
 import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.Thread.sleep
 import java.net.InetAddress
-import java.net.Socket
+
 
 private const val kDialogTimeout : Long = 400
 class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
@@ -368,10 +361,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     if(client.connect(networkInfo.serverIP, this@NetworkClientModel))
                     {
                         // start heartbeat
-                        startHeartbeat()
+                        //startHeartbeat()
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
-
                     }
                 }
             }
@@ -437,13 +429,22 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         viewModelScope?.let { viewModelScope ->
             viewModelScope.launch(Dispatchers.IO) {
                 //join multicast
-                Multicast.join()
-
-
+                val newWifiInterfaces = NetworkUtils.getWifiApInterfaces()
+                if(newWifiInterfaces.size > 0)
+                {
+                    /* Acquire MultiCast Lock */
+//                    val wifi = Activity!!.getSystemService(Context.WIFI_SERVICE) as WifiManager
+//                    val multicastLock = wifi.createMulticastLock("multicastLock")
+//                    multicastLock.setReferenceCounted(true)
+//                    multicastLock.acquire()
+                    Multicast.join(newWifiInterfaces[0])
+                }
                 heartbeatBroadcasting = true
                 while(heartbeatBroadcasting)
                 {
-
+                    val heartbeat = "HEARTBEAT"
+                    Multicast.broadcast(heartbeat.toByteArray())
+                    sleep(NetworkUtils.kHeartbeatInterval)
                 }
             }
 
@@ -464,10 +465,12 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
             {
                 resetState()
                 client.shutdown()
+                heartbeatBroadcasting = false
 
                 val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 connectivityManager.bindProcessToNetwork(null)
                 connectivityManager.unregisterNetworkCallback(networkCallback )
+
                 clientStarted = false
             }
 
