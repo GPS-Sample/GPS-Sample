@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.databinding.FragmentHotspotBinding
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -60,6 +62,14 @@ class HotspotFragment : Fragment() {
             hotspotFragment = this@HotspotFragment
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        (activity!!.application as? MainApplication)?.currentFragment =
+            FragmentNumber.HotspotFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of

@@ -202,6 +202,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                         config.teamId = teamId
                     }
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, config.pack() )
+                    config.teamId = 0
                     socket.outputStream.write(response.toByteArray())
                     socket.outputStream.flush()
                     Log.d("sent messge", "${config}")
