@@ -3,10 +3,12 @@ package edu.gtri.gpssample.fragments.sign_in
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -15,12 +17,12 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.ResetPinDialog
+
 
 class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDialog.ResetPinDialogDelegate
 {
@@ -88,44 +90,56 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         }
 
         binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
-            val pin = binding.pinEditText.text.toString()
-            val userName = binding.nameEditText.text.toString()
-
-            if (userName.isNotEmpty() && pin.isNotEmpty()) {
-                val user = DAO.userDAO.getUser(userName, pin)
-
-                user?.let { user ->
-                    if (user.role != role)
-                    {
-                        Toast.makeText(
-                            activity!!.applicationContext,
-                            "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    else
-                    {
-                        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                        val editor = sharedPreferences.edit()
-                        editor.putString(Keys.kUserName.toString(), userName)
-                        editor.commit()
-
-                        (activity!!.application as? MainApplication)?.user = user
-
-                        binding.pinEditText.setText("")
-
-                        activity!!.setTitle( "GPSSample - ${user.role}" )
-
-                        val bundle = Bundle()
-                        bundle.putString(Keys.kRole.toString(), role.toString())
-
-                        findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-                    }
-                }
-            }
-
+            checkPassword()
             false
         })
+
+        binding.pinEditText.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                checkPassword()
+            }
+            false
+        })
+    }
+
+    fun checkPassword()
+    {
+        val pin = binding.pinEditText.text.toString()
+        val userName = binding.nameEditText.text.toString()
+
+        if (userName.isNotEmpty() && pin.isNotEmpty())
+        {
+            val user = DAO.userDAO.getUser(userName, pin)
+
+            user?.let { user ->
+                if (user.role != role)
+                {
+                    Toast.makeText(
+                        activity!!.applicationContext,
+                        "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else
+                {
+                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                    val editor = sharedPreferences.edit()
+                    editor.putString(Keys.kUserName.toString(), userName)
+                    editor.commit()
+
+                    (activity!!.application as? MainApplication)?.user = user
+
+                    binding.pinEditText.setText("")
+
+                    activity!!.setTitle( "GPSSample - ${user.role}" )
+
+                    val bundle = Bundle()
+                    bundle.putString(Keys.kRole.toString(), role.toString())
+
+                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                }
+            }
+        }
     }
 
     override fun onResume()
