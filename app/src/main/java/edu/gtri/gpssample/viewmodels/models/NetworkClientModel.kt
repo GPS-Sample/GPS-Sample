@@ -192,6 +192,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 val response = client.sendMessage(networkInfo.serverIP, message, this)
 
                 _commandSent.postValue(NetworkStatus.CommandSent)
+                // quick sleep to make the UI look better
                 sleep(kDialogTimeout)
                 connectDelegate?.didSendData(true)
             }
