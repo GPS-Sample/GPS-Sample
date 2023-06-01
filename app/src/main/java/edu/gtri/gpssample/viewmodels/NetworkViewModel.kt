@@ -161,8 +161,8 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
             navController?.popBackStack()
 
             manageConfigurationNetworkDelegate?.didReceiveConfiguration(complete)
-            networkClientModel.shutdown()
-            networkHotspotModel.shutdown()
+            // tear down conenctions
+            shutdown()
         }
     }
 
@@ -170,9 +170,9 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
     {
         runBlocking(Dispatchers.Main) {
             networkClientModel.resetState()
-            networkClientModel.shutdown()
-            networkHotspotModel.shutdown()
             navController?.popBackStack()
+            // tear down connection
+            shutdown()
         }
     }
 

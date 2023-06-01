@@ -173,7 +173,7 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
 
-                ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+                ConfirmationDialog( activity, "Export Enumeration Data", "Select an export method", "QR Code", "File System", kExportTag, this)
 
                 //ExportDialog( activity, "${config.name}-${team.name}", "${enumArea.name}-${team.name}", this )
             }
