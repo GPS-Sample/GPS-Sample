@@ -31,7 +31,7 @@ class ConfigurationViewModel : ViewModel()
 
     // live data for each screen being controlled by the view model
     private var _currentConfiguration : MutableLiveData<Config>? = null
-
+    private var _actualConfig : Config? = null
     // Since we are utilizing a main view model per "section" of the app, i.e. the set up of a
     // configuration with enumerations, studies, fields, rules and filters, each with its own
     // fragment, we employ what we call "fragment models" that control each fragment data, but
@@ -47,7 +47,8 @@ class ConfigurationViewModel : ViewModel()
     val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
 
     // Exposed LiveData each screen being controlled by the view model
-    var currentConfiguration : LiveData<Config>? =_currentConfiguration
+    val currentConfiguration : LiveData<Config>?
+        get() = _currentConfiguration
 
     val configurations : ArrayList<Config>
         get() = _configurations
@@ -168,7 +169,7 @@ class ConfigurationViewModel : ViewModel()
         val newConfig = Config("", DateFormat.None, TimeFormat.None,
                                 DistanceFormat.None, 0 )
         _currentConfiguration = MutableLiveData(newConfig)
-        currentConfiguration = _currentConfiguration
+
     }
 
     fun saveNewConfiguration()
@@ -191,8 +192,14 @@ class ConfigurationViewModel : ViewModel()
 
     fun setCurrentConfig(config : Config)
     {
-        _currentConfiguration = MutableLiveData(config)
-        currentConfiguration = _currentConfiguration
+        _actualConfig = config
+        _currentConfiguration?.let {
+            it.value = _actualConfig!!
+        }?: run{
+            _currentConfiguration = MutableLiveData(_actualConfig!!)
+        }
+
+
     }
 
     fun deleteConfig(config : Config)

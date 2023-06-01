@@ -273,11 +273,12 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     }
 
     override fun didReceiveConfiguration(complete: Boolean) {
-
-        if (user.role == Role.Enumerator.toString())
+        if(complete)
         {
-            Log.d("xxx", "WTF")
-           // runBlocking (Dispatchers.Main){
+            if (user.role == Role.Enumerator.toString())
+            {
+                Log.d("xxx", "WTF")
+                // runBlocking (Dispatchers.Main){
                 if(sharedViewModel.configurations.size > 0)
                 {
 
@@ -297,9 +298,11 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         }
                     }
                 }
-          //  }
+                //  }
 
 
+            }
         }
+
     }
 }
