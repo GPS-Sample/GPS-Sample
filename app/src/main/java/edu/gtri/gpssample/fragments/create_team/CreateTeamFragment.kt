@@ -1,10 +1,7 @@
 package edu.gtri.gpssample.fragments.create_team
 
-import android.content.ContentValues
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +9,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -25,16 +20,12 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateTeamBinding
-import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsAdapter
-import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.io.File
-import java.io.FileWriter
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
-import kotlin.collections.ArrayList
 
 class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -115,18 +106,47 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
                 createMode = false
                 binding.dropPinButton.setBackgroundTintList(defaultColorList);
 
-                val vertices = java.util.ArrayList<LatLng>()
+                val points1 = ArrayList<Coordinate>()
+                val points2 = ArrayList<Coordinate>()
 
-                vertexMarkers.map {
-                    vertices.add( it.position )
+                enumArea.vertices.map {
+                    points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
                 }
 
-                val polygonOptions = PolygonOptions()
-                    .strokeColor(0xffff0000.toInt())
-                    .clickable(false)
-                    .addAll( vertices )
+                // close the poly
+                points1.add( points1[0] )
 
-                selectionPolygon = map.addPolygon( polygonOptions )
+                vertexMarkers.map { marker ->
+                    points2.add( Coordinate(marker.position.longitude, marker.position.latitude))
+                    marker.remove()
+                }
+
+                vertexMarkers.clear()
+
+                // close the poly
+                points2.add( points2[0] )
+
+                val geometryFactory = GeometryFactory()
+                val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
+                val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
+
+                geometry1.intersection(geometry2)?.let { geometry ->
+                    val vertices = ArrayList<LatLng>()
+
+                    geometry.boundary?.coordinates?.map {
+                        vertices.add( LatLng( it.y, it.x ))
+                    }
+
+                    if (vertices.isNotEmpty())
+                    {
+                        val polygonOptions = PolygonOptions()
+                            .fillColor(0x40ff0000.toInt())
+                            .clickable(false)
+                            .addAll( vertices )
+
+                        selectionPolygon = map.addPolygon( polygonOptions )
+                    }
+                }
             }
         }
 
