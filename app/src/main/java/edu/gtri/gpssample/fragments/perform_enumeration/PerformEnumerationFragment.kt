@@ -206,11 +206,14 @@ class PerformEnumerationFragment : Fragment(),
             points.add( it.toLatLng())
         }
 
-        val polygon = PolygonOptions()
-            .clickable(false)
-            .addAll( points )
+        if (points.isNotEmpty())
+        {
+            val polygon = PolygonOptions()
+                .clickable(false)
+                .addAll( points )
 
-        map.addPolygon(polygon)
+            map.addPolygon(polygon)
+        }
 
         if (once)
         {
