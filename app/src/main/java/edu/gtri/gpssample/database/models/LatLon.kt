@@ -8,9 +8,10 @@ data class LatLon (
     var id: Int?,
     var latitude: Double,
     var longitude: Double,
-    var enumAreaId: Int)
+    var enumAreaId: Int,
+    var teamId: Int)
 {
-    constructor( latitude: Double, longitude: Double ) : this( null, latitude, longitude, -1 )
+    constructor( latitude: Double, longitude: Double ) : this( null, latitude, longitude, -1, -1 )
 
     fun toLatLng() : LatLng
     {

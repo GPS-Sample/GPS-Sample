@@ -102,7 +102,7 @@ class EnumAreaDAO(private var dao: DAO)
             enumArea = createEnumArea( cursor )
 
             enumArea.id?.let { _id ->
-                enumArea.vertices = DAO.latLonDAO.getLatLons( _id )
+                enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( _id )
             }
         }
 
@@ -126,7 +126,7 @@ class EnumAreaDAO(private var dao: DAO)
             {
                 val enumArea = createEnumArea( cursor )
                 enumArea.id?.let { id ->
-                    enumArea.vertices = DAO.latLonDAO.getLatLons( id )
+                    enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                     enumArea.teams = DAO.teamDAO.getTeams( id )
                     enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
                     enumAreas.add( enumArea )
@@ -154,7 +154,7 @@ class EnumAreaDAO(private var dao: DAO)
         {
             val enumArea = createEnumArea( cursor )
             enumArea.id?.let { id ->
-                enumArea.vertices = DAO.latLonDAO.getLatLons( id )
+                enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                 enumArea.teams = DAO.teamDAO.getTeams( id )
                 enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
                 enumAreas.add( enumArea )
@@ -203,7 +203,7 @@ class EnumAreaDAO(private var dao: DAO)
         enumArea.id?.let {enumAreaId ->
 
             // latLon's are dependent on EnumAreas
-            DAO.latLonDAO.getLatLons(enumAreaId).map {
+            DAO.latLonDAO.getLatLonsWithEnumAreaId(enumAreaId).map {
                 DAO.latLonDAO.delete( it )
             }
 

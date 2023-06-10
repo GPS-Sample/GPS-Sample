@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.create_team
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,10 +37,10 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var createMode = false
+    private var selectionGeometry: Geometry? = null
     private var selectionPolygon: Polygon? = null
     private var householdMarkers = ArrayList<Marker>()
-    private var selectedHouseholdMarkers = ArrayList<Marker>()
-    private var vertexMarkers = java.util.ArrayList<Marker>()
+    private var selectionMarkers = ArrayList<Marker>()
     private var _binding: FragmentCreateTeamBinding? = null
     private val binding get() = _binding!!
 
@@ -86,22 +87,15 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
             }
             else
             {
-                if (selectedHouseholdMarkers.isNotEmpty())
-                {
-                    Toast.makeText(activity!!.applicationContext, "You must clear the current selections before you can assign new households", Toast.LENGTH_SHORT).show()
-                }
-                else
-                {
-                    clearSelections()
-                    createMode = true
-                    binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                }
+                clearSelections()
+                createMode = true
+                binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
         }
 
         binding.drawPolygonButton.setOnClickListener {
 
-            if (createMode && vertexMarkers.size > 2)
+            if (createMode && selectionMarkers.size > 2)
             {
                 createMode = false
                 binding.dropPinButton.setBackgroundTintList(defaultColorList);
@@ -116,12 +110,12 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
                 // close the poly
                 points1.add( points1[0] )
 
-                vertexMarkers.map { marker ->
+                selectionMarkers.map { marker ->
                     points2.add( Coordinate(marker.position.longitude, marker.position.latitude))
                     marker.remove()
                 }
 
-                vertexMarkers.clear()
+                selectionMarkers.clear()
 
                 // close the poly
                 points2.add( points2[0] )
@@ -130,11 +124,13 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
                 val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
                 val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
 
-                geometry1.intersection(geometry2)?.let { geometry ->
+                geometry1.intersection(geometry2)?.let { polygon ->
                     val vertices = ArrayList<LatLng>()
 
-                    geometry.boundary?.coordinates?.map {
-                        vertices.add( LatLng( it.y, it.x ))
+                    selectionGeometry = polygon
+
+                    polygon.boundary?.coordinates?.map {
+                        vertices.add( LatLng( it.y, it.x ))  // latitude is th Y axis in JTS
                     }
 
                     if (vertices.isNotEmpty())
@@ -146,37 +142,6 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
 
                         selectionPolygon = map.addPolygon( polygonOptions )
                     }
-                }
-            }
-        }
-
-        binding.assignHouseholdsButton.setOnClickListener {
-
-            selectionPolygon?.let {
-
-                it.remove()
-                selectionPolygon = null
-
-                val vertices = java.util.ArrayList<LatLng>()
-
-                vertexMarkers.map {
-                    vertices.add( it.position )
-                    it.remove()
-                }
-
-                val latLngBounds = vertices.fold ( LatLngBounds.builder(), { builder, it -> builder.include(it) } ).build()
-
-                householdMarkers.map { marker ->
-
-                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                    if (latLngBounds.contains( marker.position ))
-                    {
-                        selectedHouseholdMarkers.add( marker )
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                    }
-
-                    marker.setIcon( icon )
                 }
             }
         }
@@ -198,14 +163,27 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
 
             study.id?.let { studyId ->
                 enumArea.id?.let { enumAreaId ->
-                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString()))
 
-                    team?.id?.let { team_id ->
+                    val polygon = ArrayList<LatLon>()
 
-                        selectedHouseholdMarkers.map { marker ->
-                            val enumData = marker.tag as EnumData
-                            enumData.teamId = team_id
-                            DAO.enumDataDAO.updateEnumData( enumData )
+                    selectionPolygon?.points?.map {
+                        polygon.add( LatLon( it.latitude, it.longitude ))
+                    }
+
+                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString(), polygon ))
+
+                    team?.id?.let { teamId ->
+
+                        enumArea.enumDataList.map { enumData ->
+                            selectionGeometry?.let {
+                                val point = GeometryFactory().createPoint( Coordinate( enumData.longitude, enumData.latitude ))
+                                if (it.contains( point ))
+                                {
+                                    Log.d( "xxx", "found household" )
+                                    enumData.teamId = teamId
+                                    DAO.enumDataDAO.updateEnumData( enumData )
+                                }
+                            }
                         }
                     }
 
@@ -230,18 +208,16 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
             marker.setIcon( BitmapDescriptorFactory.fromResource(R.drawable.home_black) )
         }
 
-        selectedHouseholdMarkers.clear()
-
         selectionPolygon?.let {
             it.remove()
             selectionPolygon = null
         }
 
-        vertexMarkers.map {
+        selectionMarkers.map {
             it.remove()
         }
 
-        vertexMarkers.clear()
+        selectionMarkers.clear()
 
         binding.dropPinButton.setBackgroundTintList(defaultColorList);
     }
@@ -267,7 +243,7 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
             {
                 val marker = map.addMarker( MarkerOptions().position(it))
                 marker?.let {
-                    vertexMarkers.add( marker )
+                    selectionMarkers.add( marker )
                 }
             }
         }
