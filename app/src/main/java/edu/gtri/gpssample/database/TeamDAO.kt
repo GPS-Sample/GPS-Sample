@@ -9,7 +9,7 @@ import edu.gtri.gpssample.database.models.*
 class TeamDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createOrUpdateTeam( team: Team) : Team?
+    fun createOrUpdateTeam( team: Team ) : Team?
     {
         if (exists( team ))
         {
@@ -23,6 +23,14 @@ class TeamDAO(private var dao: DAO)
             team.id?.let { id ->
                 Log.d( "xxx", "new Team id = ${id}")
             } ?: return null
+        }
+
+        team.id?.let { teamId ->
+            for (latLon in team.polygon)
+            {
+                latLon.teamId = teamId
+                DAO.latLonDAO.createOrUpdateLatLon(latLon)
+            }
         }
 
         return team
@@ -62,7 +70,7 @@ class TeamDAO(private var dao: DAO)
         val enum_area_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_NAME))
 
-        return Team(id, creationDate, study_id, enum_area_id, name )
+        return Team(id, creationDate, study_id, enum_area_id, name, DAO.latLonDAO.getLatLonsWithTeamId( id ))
     }
 
     //--------------------------------------------------------------------------

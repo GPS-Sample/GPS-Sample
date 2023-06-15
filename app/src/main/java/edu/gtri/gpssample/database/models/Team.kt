@@ -11,9 +11,10 @@ data class Team(
     var creationDate: Long,
     var studyId: Int,
     var enumAreaId: Int,
-    var name: String)
+    var name: String,
+    var polygon: ArrayList<LatLon>)
 {
-    constructor(studyId: Int, enumAreaId: Int, name: String) : this(null, Date().time, studyId, enumAreaId, name)
+    constructor( studyId: Int, enumAreaId: Int, name: String, polygon: ArrayList<LatLon> ) : this(null, Date().time, studyId, enumAreaId, name, polygon )
 
     fun pack() : String
     {

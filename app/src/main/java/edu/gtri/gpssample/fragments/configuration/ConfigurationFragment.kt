@@ -230,32 +230,36 @@ class ConfigurationFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
-        // Launch connection screen
-        view?.let{view ->
-            val user = (activity!!.application as MainApplication).user
-            user?.let { user ->
+        tag?.let {
+            if (tag == kExportTag)
+            {
+                // Launch connection screen
+                view?.let{view ->
+                    val user = (activity!!.application as MainApplication).user
+                    user?.let { user ->
 
-                //TODO: fix this! compare should be the enum
-                when(user.role)
-                {
-                    Role.Supervisor.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                        //TODO: fix this! compare should be the enum
+                        when(user.role)
+                        {
+                            Role.Supervisor.toString() ->
+                            {
+                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                            }
+                            Role.Admin.toString() ->
+                            {
+                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                            }
+                        }
                     }
-                    Role.Admin.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+
+                    sharedViewModel?.currentConfiguration?.value?.let{
+                        sharedNetworkViewModel.setCurrentConfig(it)
                     }
+
+                    sharedNetworkViewModel.createHotspot(view)
                 }
             }
-
-            sharedViewModel?.currentConfiguration?.value?.let{
-                sharedNetworkViewModel.setCurrentConfig(it)
-            }
-
-            sharedNetworkViewModel.createHotspot(view)
         }
-        //findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
     }
 
     override fun didSelectRightButton(tag: Any?)
