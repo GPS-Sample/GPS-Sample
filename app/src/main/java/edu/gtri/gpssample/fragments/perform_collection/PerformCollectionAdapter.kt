@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.perform_enumeration
+package edu.gtri.gpssample.fragments.perform_collection
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,7 +15,7 @@ import edu.gtri.gpssample.database.models.FieldData
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerView.Adapter<PerformEnumerationAdapter.ViewHolder>()
+class PerformCollectionAdapter(var enumDataList: List<EnumData>?) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
 {
     override fun getItemCount() = enumDataList!!.size
 
