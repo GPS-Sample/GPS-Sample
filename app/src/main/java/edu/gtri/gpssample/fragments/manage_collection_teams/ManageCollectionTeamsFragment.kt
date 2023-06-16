@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationArea
+package edu.gtri.gpssample.fragments.manage_collection_teams
 
 import android.os.Bundle
 import android.view.*
@@ -10,26 +10,24 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.Team
 import edu.gtri.gpssample.database.models.User
-import edu.gtri.gpssample.databinding.FragmentManageEnumerationAreaBinding
+import edu.gtri.gpssample.databinding.FragmentManageCollectionTeamsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.manage_enumeration_area.UsersAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlin.collections.ArrayList
-class ManageEnumerationAreaFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+
+class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
-    private lateinit var usersAdapter: UsersAdapter
-    private lateinit var teamsAdapter: TeamsAdapter
+    private lateinit var manageCollectionTeamsAdapter: ManageCollectionTeamsAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
 
-    private var _binding: FragmentManageEnumerationAreaBinding? = null
+    private var _binding: FragmentManageCollectionTeamsBinding? = null
     private val binding get() = _binding!!
     private var users = ArrayList<User>()
     override fun onCreate(savedInstanceState: Bundle?)
@@ -41,7 +39,7 @@ class ManageEnumerationAreaFragment : Fragment(), ConfirmationDialog.Confirmatio
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentManageEnumerationAreaBinding.inflate(inflater, container, false)
+        _binding = FragmentManageCollectionTeamsBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -74,30 +72,21 @@ class ManageEnumerationAreaFragment : Fragment(), ConfirmationDialog.Confirmatio
                     teams = DAO.teamDAO.getTeams( enumAreaId )
                 }
 
-                teamsAdapter = TeamsAdapter( teams )
+                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( teams )
             }
         }
 
-        teamsAdapter.didSelectTeam = this::didSelectTeam
-        teamsAdapter.shouldDeleteTeam = this::shouldDeleteTeam
+        manageCollectionTeamsAdapter.didSelectTeam = this::didSelectTeam
+        manageCollectionTeamsAdapter.shouldDeleteTeam = this::shouldDeleteTeam
 
         binding.teamRecyclerView.itemAnimator = DefaultItemAnimator()
-        binding.teamRecyclerView.adapter = teamsAdapter
+        binding.teamRecyclerView.adapter = manageCollectionTeamsAdapter
         binding.teamRecyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.titleTextView.text = enumArea.name + " Teams"
 
         binding.addButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateTeamFragment)
-        }
-
-        usersAdapter = UsersAdapter(users)
-
-        binding.usersRecyclerView.itemAnimator = DefaultItemAnimator()
-        binding.usersRecyclerView.adapter = usersAdapter
-        binding.usersRecyclerView.layoutManager = LinearLayoutManager(activity!!)
-
-        binding.exportButton.setOnClickListener {
         }
     }
 
@@ -112,7 +101,7 @@ class ManageEnumerationAreaFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         sharedViewModel.teamViewModel.setCurrentTeam( team )
 
-        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+        findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }
 
     fun shouldDeleteTeam( team: Team)
@@ -131,7 +120,7 @@ class ManageEnumerationAreaFragment : Fragment(), ConfirmationDialog.Confirmatio
         DAO.teamDAO.deleteTeam( team )
 
         enumArea.id?.let {
-            teamsAdapter.updateTeams( DAO.teamDAO.getTeams( it ))
+            manageCollectionTeamsAdapter.updateTeams( DAO.teamDAO.getTeams( it ))
         }
     }
 

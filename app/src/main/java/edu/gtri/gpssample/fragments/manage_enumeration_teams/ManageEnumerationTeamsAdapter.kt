@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.ManageEnumerationArea
+package edu.gtri.gpssample.fragments.manage_enumeration_teams
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,7 +13,7 @@ import edu.gtri.gpssample.database.models.Team
 import java.util.*
 import kotlin.collections.ArrayList
 
-class TeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<TeamsAdapter.ViewHolder>()
+class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<ManageEnumerationTeamsAdapter.ViewHolder>()
 {
     override fun getItemCount() = teams!!.size
 

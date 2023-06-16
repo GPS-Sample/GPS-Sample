@@ -58,6 +58,7 @@ class ConfigurationFragment : Fragment(),
 
     private val kDeleteTag = 1
     private val kExportTag = 2
+    private val kTaskTag = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -108,11 +109,7 @@ class ConfigurationFragment : Fragment(),
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            val intent = Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
             ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
-           // startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
         }
 
         binding.exportButton.setOnClickListener {
@@ -231,33 +228,40 @@ class ConfigurationFragment : Fragment(),
     override fun didSelectLeftButton(tag: Any?)
     {
         tag?.let {
-            if (tag == kExportTag)
+            when(tag)
             {
-                // Launch connection screen
-                view?.let{view ->
-                    val user = (activity!!.application as MainApplication).user
-                    user?.let { user ->
+                kExportTag -> {
+                    // Launch connection screen
+                    view?.let{view ->
+                        val user = (activity!!.application as MainApplication).user
+                        user?.let { user ->
 
-                        //TODO: fix this! compare should be the enum
-                        when(user.role)
-                        {
-                            Role.Supervisor.toString() ->
+                            //TODO: fix this! compare should be the enum
+                            when(user.role)
                             {
-                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-                            }
-                            Role.Admin.toString() ->
-                            {
-                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                                Role.Supervisor.toString() ->
+                                {
+                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                                }
+                                Role.Admin.toString() ->
+                                {
+                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                                }
                             }
                         }
-                    }
 
-                    sharedViewModel?.currentConfiguration?.value?.let{
-                        sharedNetworkViewModel.setCurrentConfig(it)
-                    }
+                        sharedViewModel?.currentConfiguration?.value?.let{
+                            sharedNetworkViewModel.setCurrentConfig(it)
+                        }
 
-                    sharedNetworkViewModel.createHotspot(view)
+                        sharedNetworkViewModel.createHotspot(view)
+                    }
                 }
+
+                kTaskTag -> {
+                    findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
+                }
+                else -> {}
             }
         }
     }
@@ -266,14 +270,22 @@ class ConfigurationFragment : Fragment(),
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
             tag?.let { tag ->
-                if (tag == kDeleteTag)
+
+                when(tag)
                 {
-                    sharedViewModel.deleteConfig(config)
-                    findNavController().popBackStack()
-                }
-                else
-                {
-                    InputDialog( activity!!, "Enter a file name for the export", config.name, null, this@ConfigurationFragment )
+                    kDeleteTag -> {
+                        sharedViewModel.deleteConfig(config)
+                        findNavController().popBackStack()
+                    }
+
+                    kExportTag -> {
+                        InputDialog( activity!!, "Enter a file name for the export", config.name, null, this@ConfigurationFragment )
+                    }
+
+                    kTaskTag -> {
+                        findNavController().navigate( R.id.action_navigate_to_ManageCollectionTeamsFragment )
+                    }
+                    else -> {}
                 }
             }
         }
@@ -301,7 +313,7 @@ class ConfigurationFragment : Fragment(),
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-        findNavController().navigate( R.id.action_navigate_to_ManageEnumerationAreaFragment )
+        ConfirmationDialog( activity, "Select a task", "", "Enumeration", "Collection", kTaskTag, this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
