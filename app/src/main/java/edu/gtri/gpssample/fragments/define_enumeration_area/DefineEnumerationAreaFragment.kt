@@ -316,11 +316,11 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                         {
                             val jsonArray = jsonObject.getJSONArray("features" )
 
-                            val enumArea = getPolygon( jsonArray )
+                            val enumArea = getGeoJsonPolygon( jsonArray )
 
                             enumArea?.let { enumArea ->
                                 enumArea.id?.let {  enumAreaId ->
-                                    enumArea.enumDataList = getPoints( jsonArray, enumAreaId )
+                                    enumArea.enumDataList = getGeoJsonPoints( jsonArray, enumAreaId )
                                 }
                             }
 
@@ -336,7 +336,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
     }
 
-    fun getPolygon( jsonArray: JSONArray ) : EnumArea?
+    fun getGeoJsonPolygon( jsonArray: JSONArray ) : EnumArea?
     {
         var enumArea : EnumArea? = null
 
@@ -382,7 +382,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         return enumArea
     }
 
-    fun getPoints( jsonArray: JSONArray, enumAreaId: Int ) : ArrayList<EnumData>
+    fun getGeoJsonPoints( jsonArray: JSONArray, enumAreaId: Int ) : ArrayList<EnumData>
     {
         var enumDataList = ArrayList<EnumData>()
 
