@@ -29,6 +29,8 @@ import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.fragments.createstudy.DeleteMode
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.*
 
 class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate, InputDialog.InputDialogDelegate
@@ -37,8 +39,8 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     private lateinit var map: GoogleMap
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var configId: Int = 0
     private var createMode = false
-    private var notificationShown = false
     private var vertexMarkers = ArrayList<Marker>()
     private var enumDataMarkers = ArrayList<Marker>()
     private var _binding: FragmentDefineEnumerationAreaBinding? = null
@@ -71,8 +73,11 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             defineEnumerationAreaFragment = this@DefineEnumerationAreaFragment
         }
 
-        sharedViewModel.currentConfiguration?.value.let {
-            this.config = it!!
+        sharedViewModel.currentConfiguration?.value.let { config ->
+            this.config = config!!
+            this.config.id?.let {
+                configId = it
+            }
         }
 
         if (!this::config.isInitialized)
@@ -305,20 +310,22 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                         Log.d( "xxx", text )
 
-                        val enumArea = EnumArea.unpack( text )
+                        val jsonObject = JSONObject(text)
 
+                        if (jsonObject.getString("type" ) == "FeatureCollection")
+                        {
+                            val jsonArray = jsonObject.getJSONArray("features" )
 
-                        enumArea?.let { enumArea ->
-                            enumArea.teams = ArrayList<Team>()
-                            config.id?.let { id ->
-                                enumArea.config_id = id
+                            val enumArea = getPolygon( jsonArray )
+
+                            enumArea?.let { enumArea ->
+                                enumArea.id?.let {  enumAreaId ->
+                                    enumArea.enumDataList = getPoints( jsonArray, enumAreaId )
+                                }
                             }
 
-                            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-
                             onMapReady(map)
-
-                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
                 catch( ex: java.lang.Exception )
@@ -327,6 +334,81 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 }
             }
         }
+    }
+
+    fun getPolygon( jsonArray: JSONArray ) : EnumArea?
+    {
+        var enumArea : EnumArea? = null
+
+        for (i in 0..jsonArray.length()-1)
+        {
+            val jsonObject = jsonArray.getJSONObject(i)
+            val featureType = jsonObject.getString("type")
+
+            if (featureType == "Feature")
+            {
+                val geometry = jsonObject.getJSONObject("geometry")
+
+                if (geometry.getString("type") == "Polygon")
+                {
+                    var name: String = "undefined"
+
+                    try {
+                        val properties = jsonObject.getJSONObject("properties" )
+                        name = properties.getString("name" )
+                    }
+                    catch( ex: java.lang.Exception) {
+                    }
+
+                    enumArea = EnumArea( configId, name, ArrayList<LatLon>())
+
+                    val coordinates = geometry.getJSONArray("coordinates")
+                    val coordinateArray = coordinates.getJSONArray(0 )
+
+                    for (j in 0..coordinateArray.length()-1)
+                    {
+                        val coordinate = coordinateArray.getJSONArray(j)
+                        val lat = coordinate[0] as Double
+                        val lon = coordinate[1] as Double
+                        val latLon = LatLon(lat, lon)
+                        enumArea.vertices.add( latLon )
+                    }
+
+                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                }
+            }
+        }
+
+        return enumArea
+    }
+
+    fun getPoints( jsonArray: JSONArray, enumAreaId: Int ) : ArrayList<EnumData>
+    {
+        var enumDataList = ArrayList<EnumData>()
+
+        for (i in 0..jsonArray.length()-1)
+        {
+            val jsonObject = jsonArray.getJSONObject(i)
+            val featureType = jsonObject.getString("type")
+
+            if (featureType == "Feature")
+            {
+                val geometry = jsonObject.getJSONObject("geometry")
+
+                if (geometry.getString("type") == "Point")
+                {
+                    val coordinates = geometry.getJSONArray("coordinates")
+                    val lat = coordinates[0] as Double
+                    val lon = coordinates[1] as Double
+
+                    val enumData = EnumData( -1, enumAreaId, false, false, "", "", lat, lon )
+                    DAO.enumDataDAO.createOrUpdateEnumData( enumData )
+                    enumDataList.add( enumData )
+                }
+            }
+        }
+
+        return enumDataList
     }
 
     override fun onDestroyView()
