@@ -120,8 +120,8 @@
             android:id="@+id/action_navigate_to_ManageEnumerationTeamsFragment"
             app:destination="@id/ManageEnumerationTeamsFragment" />
         <action
-            android:id="@+id/action_navigate_to_ManageCollectionTeamsFragment"
-            app:destination="@id/ManageCollectionTeamsFragment" />
+            android:id="@+id/action_navigate_to_CreateSampleFragment"
+            app:destination="@id/CreateSampleFragment" />
         <action
             android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
             app:destination="@id/NetworkConnectionDialogFragment" />
@@ -253,6 +253,18 @@
         android:id="@+id/CreateFieldFragment"
         android:name="edu.gtri.gpssample.fragments.createfield.CreateFieldFragment"
         tools:layout="@layout/fragment_create_field">
+    </fragment>
+
+    <!--CreateSampleFragment-->
+
+    <fragment
+        android:id="@+id/CreateSampleFragment"
+        android:name="edu.gtri.gpssample.fragments.createsample.CreateSampleFragment"
+        tools:layout="@layout/fragment_create_sample">
+
+        <action
+            android:id="@+id/action_navigate_to_ManageCollectionTeamsFragment"
+            app:destination="@id/ManageCollectionTeamsFragment" />
     </fragment>
 
     <!--CreateRuleFragment-->
