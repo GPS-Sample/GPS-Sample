@@ -283,7 +283,7 @@ class ConfigurationFragment : Fragment(),
                     }
 
                     kTaskTag -> {
-                        findNavController().navigate( R.id.action_navigate_to_ManageCollectionTeamsFragment )
+                        findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
                     }
                     else -> {}
                 }
