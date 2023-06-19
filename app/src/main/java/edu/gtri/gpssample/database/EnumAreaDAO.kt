@@ -33,9 +33,17 @@ class EnumAreaDAO(private var dao: DAO)
                     DAO.latLonDAO.createOrUpdateLatLon(latLon)
                 }
 
-                for (team in enumArea.teams)
+                for (team in enumArea.enumerationTeams)
                 {
                     team.enumAreaId = id
+                    team.isEnumerationTeam = true
+                    DAO.teamDAO.createOrUpdateTeam(team)
+                }
+
+                for (team in enumArea.collectionTeams)
+                {
+                    team.enumAreaId = id
+                    team.isEnumerationTeam = true
                     DAO.teamDAO.createOrUpdateTeam(team)
                 }
 
@@ -127,7 +135,8 @@ class EnumAreaDAO(private var dao: DAO)
                 val enumArea = createEnumArea( cursor )
                 enumArea.id?.let { id ->
                     enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
-                    enumArea.teams = DAO.teamDAO.getTeams( id )
+                    enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
+                    enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
                     enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
                     enumAreas.add( enumArea )
                 }
@@ -155,7 +164,8 @@ class EnumAreaDAO(private var dao: DAO)
             val enumArea = createEnumArea( cursor )
             enumArea.id?.let { id ->
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
-                enumArea.teams = DAO.teamDAO.getTeams( id )
+                enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
+                enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
                 enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
                 enumAreas.add( enumArea )
             }
@@ -213,7 +223,10 @@ class EnumAreaDAO(private var dao: DAO)
             }
 
             // teams are dependent on EnumAreas
-            DAO.teamDAO.getTeams( enumAreaId ).map {
+            DAO.teamDAO.getEnumerationTeams( enumAreaId ).map {
+                DAO.teamDAO.deleteTeam( it )
+            }
+            DAO.teamDAO.getCollectionTeams( enumAreaId ).map {
                 DAO.teamDAO.deleteTeam( it )
             }
 

@@ -5,6 +5,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.database.models.*
+import edu.gtri.gpssample.extensions.toBoolean
+import edu.gtri.gpssample.extensions.toInt
 
 class TeamDAO(private var dao: DAO)
 {
@@ -48,6 +50,7 @@ class TeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_ID, team.studyId )
         values.put( DAO.COLUMN_ENUM_AREA_ID, team.enumAreaId )
         values.put( DAO.COLUMN_TEAM_NAME, team.name )
+        values.put( DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM, team.isEnumerationTeam.toInt())
     }
 
     //--------------------------------------------------------------------------
@@ -69,8 +72,9 @@ class TeamDAO(private var dao: DAO)
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val enum_area_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_NAME))
+        val isEnumerationTeam = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM)).toBoolean()
 
-        return Team(id, creationDate, study_id, enum_area_id, name, DAO.latLonDAO.getLatLonsWithTeamId( id ))
+        return Team(id, creationDate, study_id, enum_area_id, name, isEnumerationTeam, DAO.latLonDAO.getLatLonsWithTeamId( id ))
     }
 
     //--------------------------------------------------------------------------
@@ -113,11 +117,30 @@ class TeamDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getTeams( enumArea_id: Int ): ArrayList<Team>
+    fun getEnumerationTeams( enumArea_id: Int ): ArrayList<Team>
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumArea_id"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumArea_id AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 1"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            teams.add( createTeam( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return teams
+    }
+
+    //--------------------------------------------------------------------------
+    fun getCollectionTeams( enumArea_id: Int ): ArrayList<Team>
+    {
+        val teams = ArrayList<Team>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumArea_id AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 0"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())

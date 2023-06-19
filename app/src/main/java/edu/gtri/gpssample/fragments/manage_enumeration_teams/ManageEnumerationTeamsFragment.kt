@@ -68,7 +68,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
                 }
                 else  // otherwise show all teams
                 {
-                    teams = DAO.teamDAO.getTeams( enumAreaId )
+                    teams = DAO.teamDAO.getEnumerationTeams( enumAreaId )
                 }
 
                 manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( teams )
@@ -85,7 +85,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         binding.titleTextView.text = enumArea.name + " Teams"
 
         binding.addButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_CreateTeamFragment)
+            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationTeamFragment)
         }
     }
 
@@ -96,7 +96,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun didSelectTeam( team: Team)
+    fun didSelectTeam( team: Team )
     {
         sharedViewModel.teamViewModel.setCurrentTeam( team )
 
@@ -119,7 +119,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         DAO.teamDAO.deleteTeam( team )
 
         enumArea.id?.let {
-            manageEnumerationTeamsAdapter.updateTeams( DAO.teamDAO.getTeams( it ))
+            manageEnumerationTeamsAdapter.updateTeams( DAO.teamDAO.getEnumerationTeams( it ))
         }
     }
 

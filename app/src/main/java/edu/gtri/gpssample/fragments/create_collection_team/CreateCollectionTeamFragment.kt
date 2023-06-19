@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.create_team
+package edu.gtri.gpssample.fragments.create_collection_team
 
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -20,7 +20,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.databinding.FragmentCreateTeamBinding
+import edu.gtri.gpssample.databinding.FragmentCreateCollectionTeamBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.locationtech.jts.geom.Coordinate
@@ -28,7 +28,7 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
-class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
+class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var map: GoogleMap
     private lateinit var study: Study
@@ -41,7 +41,7 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
     private var selectionPolygon: Polygon? = null
     private var householdMarkers = ArrayList<Marker>()
     private var selectionMarkers = ArrayList<Marker>()
-    private var _binding: FragmentCreateTeamBinding? = null
+    private var _binding: FragmentCreateCollectionTeamBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -54,7 +54,7 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentCreateTeamBinding.inflate(inflater, container, false)
+        _binding = FragmentCreateCollectionTeamBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -170,7 +170,7 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
                         polygon.add( LatLon( it.latitude, it.longitude ))
                     }
 
-                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString(), polygon ))
+                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString(), false, polygon ))
 
                     team?.id?.let { teamId ->
 
@@ -197,7 +197,7 @@ class CreateTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.Co
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateTeamFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateCollectionTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun clearSelections()

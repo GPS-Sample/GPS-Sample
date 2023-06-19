@@ -211,8 +211,8 @@
         tools:layout="@layout/fragment_manage_enumeration_teams">
 
         <action
-            android:id="@+id/action_navigate_to_CreateTeamFragment"
-            app:destination="@id/CreateTeamFragment" />
+            android:id="@+id/action_navigate_to_CreateEnumerationTeamFragment"
+            app:destination="@id/CreateEnumerationTeamFragment" />
 
         <action
             android:id="@+id/action_navigate_to_PerformEnumerationFragment"
@@ -235,16 +235,28 @@
         tools:layout="@layout/fragment_manage_collection_teams">
 
         <action
+            android:id="@+id/action_navigate_to_CreateCollectionTeamFragment"
+            app:destination="@id/CreateCollectionTeamFragment" />
+
+        <action
             android:id="@+id/action_navigate_to_PerformCollectionFragment"
             app:destination="@id/PerformCollectionFragment" />
     </fragment>
 
-    <!--CreateTeamFragment-->
+    <!--CreateEnumerationTeamFragment-->
 
     <fragment
-        android:id="@+id/CreateTeamFragment"
-        android:name="edu.gtri.gpssample.fragments.create_team.CreateTeamFragment"
-        tools:layout="@layout/fragment_create_field">
+        android:id="@+id/CreateEnumerationTeamFragment"
+        android:name="edu.gtri.gpssample.fragments.create_enumeration_team.CreateEnumerationTeamFragment"
+        tools:layout="@layout/fragment_create_enumeration_team">
+    </fragment>
+
+    <!--CreateCollectionTeamFragment-->
+
+    <fragment
+        android:id="@+id/CreateCollectionTeamFragment"
+        android:name="edu.gtri.gpssample.fragments.create_collection_team.CreateCollectionTeamFragment"
+        tools:layout="@layout/fragment_create_collection_team">
     </fragment>
 
     <!--CreateFieldFragment-->

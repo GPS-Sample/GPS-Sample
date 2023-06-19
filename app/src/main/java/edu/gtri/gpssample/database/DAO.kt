@@ -148,6 +148,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_TEAM_NAME + " TEXT" + "," +
+                COLUMN_TEAM_IS_ENUMERATION_TEAM + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
@@ -331,6 +332,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Team Table
         const val TABLE_TEAM = "team"
         const val COLUMN_TEAM_NAME = "team_name"
+        const val COLUMN_TEAM_IS_ENUMERATION_TEAM = "is_enumeration_team"
 
         // Team Member Table
         const val TABLE_TEAM_MEMBER = "team_member"
@@ -436,6 +438,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 129
+        private const val DATABASE_VERSION = 131
     }
 }
