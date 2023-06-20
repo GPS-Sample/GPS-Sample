@@ -161,7 +161,7 @@ class ConfigurationFragment : Fragment(),
     override fun onMapClick(p0: LatLng) {
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.toString(), false )
-        findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
+        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
     }
 
     override fun onMapReady(p0: GoogleMap) {

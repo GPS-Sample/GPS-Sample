@@ -87,6 +87,7 @@ class EnumDataDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun updateEnumData( enumData: EnumData)
     {
+        Log.d( "xxx", "teamId = ${enumData.teamId}")
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(enumData.id!!.toString())

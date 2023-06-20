@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.define_enumeration_area
+package edu.gtri.gpssample.fragments.create_enumeration_area
 
 import android.app.Activity
 import android.content.Intent
@@ -20,20 +20,17 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.databinding.FragmentDefineEnumerationAreaBinding
+import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
-import edu.gtri.gpssample.fragments.createstudy.DeleteMode
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate, InputDialog.InputDialogDelegate
+class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate, InputDialog.InputDialogDelegate
 {
     private lateinit var config: Config
     private lateinit var map: GoogleMap
@@ -43,7 +40,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     private var createMode = false
     private var vertexMarkers = ArrayList<Marker>()
     private var enumDataMarkers = ArrayList<Marker>()
-    private var _binding: FragmentDefineEnumerationAreaBinding? = null
+    private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -55,7 +52,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentDefineEnumerationAreaBinding.inflate(inflater, container, false)
+        _binding = FragmentCreateEnumerationAreaBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -70,7 +67,7 @@ class DefineEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             viewModel = this.viewModel
 
             // Assign the fragment
-            defineEnumerationAreaFragment = this@DefineEnumerationAreaFragment
+            createEnumerationAreaFragment = this@CreateEnumerationAreaFragment
         }
 
         sharedViewModel.currentConfiguration?.value.let { config ->
