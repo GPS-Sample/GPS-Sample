@@ -14,11 +14,12 @@ data class EnumArea (
     var config_id: Int,
     var name: String,
     var vertices: ArrayList<LatLon>,
-    var teams: ArrayList<Team>,
+    var enumerationTeams: ArrayList<Team>,
+    var collectionTeams: ArrayList<Team>,
     var enumDataList: ArrayList<EnumData>)
 {
-    constructor(id: Int, creationDate: Long, config_id: Int, name: String) : this(id, creationDate, config_id, name, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<EnumData>())
-    constructor(config_id: Int, name: String, vertices: ArrayList<LatLon>) : this(null, Date().time, config_id, name, vertices, ArrayList<Team>(), ArrayList<EnumData>())
+    constructor(id: Int, creationDate: Long, config_id: Int, name: String) : this(id, creationDate, config_id, name, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Team>(), ArrayList<EnumData>())
+    constructor(config_id: Int, name: String, vertices: ArrayList<LatLon>) : this(null, Date().time, config_id, name, vertices, ArrayList<Team>(), ArrayList<Team>(), ArrayList<EnumData>())
 
     fun copy() : EnumArea?
     {

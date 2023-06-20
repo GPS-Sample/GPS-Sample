@@ -148,6 +148,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                 COLUMN_TEAM_NAME + " TEXT" + "," +
+                COLUMN_TEAM_IS_ENUMERATION_TEAM + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                 ")")
@@ -170,7 +171,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_USER_ID + " INTEGER" + "," +
                 COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                COLUMN_TEAM_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_ENUMERATION_TEAM_ID + " INTEGER" + "," +
+                COLUMN_ENUM_DATA_COLLECTION_TEAM_ID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_VALID + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_INCOMPLETE + " INTEGER" + "," +
                 COLUMN_ENUM_DATA_INCOMPLETE_REASON + " TEXT" + "," +
@@ -183,7 +185,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                "FOREIGN KEY($COLUMN_ENUM_DATA_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_DATA_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableEnumData)
 
@@ -331,12 +334,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Team Table
         const val TABLE_TEAM = "team"
         const val COLUMN_TEAM_NAME = "team_name"
+        const val COLUMN_TEAM_IS_ENUMERATION_TEAM = "is_enumeration_team"
 
         // Team Member Table
         const val TABLE_TEAM_MEMBER = "team_member"
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
 
         const val TABLE_ENUM_DATA = "enum_data"
+        const val COLUMN_ENUM_DATA_ENUMERATION_TEAM_ID = "enum_data_enumeration_team_id"
+        const val COLUMN_ENUM_DATA_COLLECTION_TEAM_ID = "enum_data_collection_team_id"
         const val COLUMN_ENUM_DATA_VALID = "enum_data_valid"
         const val COLUMN_ENUM_DATA_INCOMPLETE = "enum_data_incomplete"
         const val COLUMN_ENUM_DATA_INCOMPLETE_REASON = "enum_data_incomplete_reason"
@@ -436,6 +442,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 129
+        private const val DATABASE_VERSION = 132
     }
 }

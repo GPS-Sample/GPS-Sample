@@ -8,14 +8,14 @@
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
 
         <variable
-            name="defineEnumerationAreaFragment"
-            type="edu.gtri.gpssample.fragments.define_enumeration_area.DefineEnumerationAreaFragment" />
+            name="createEnumerationAreaFragment"
+            type="edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment" />
     </data>
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragments.define_enumeration_area.DefineEnumerationAreaFragment">
+        tools:context=".fragments.create_enumeration_area.DefineEnumerationAreaFragment">
 
         <fragment
             android:id="@+id/map_fragment"

@@ -161,7 +161,7 @@ class ConfigurationFragment : Fragment(),
     override fun onMapClick(p0: LatLng) {
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.toString(), false )
-        findNavController().navigate(R.id.action_navigate_to_DefineEnumerationAreaFragment, bundle)
+        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
     }
 
     override fun onMapReady(p0: GoogleMap) {
@@ -313,7 +313,7 @@ class ConfigurationFragment : Fragment(),
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-        ConfirmationDialog( activity, "Select a task", "", "Enumeration", "Collection", kTaskTag, this)
+        ConfirmationDialog( activity, "Enumeration Area ${enumArea.name}", "Select a task", "Enumeration", "Collection", kTaskTag, this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)

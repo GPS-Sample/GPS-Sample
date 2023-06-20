@@ -69,7 +69,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
                 }
                 else  // otherwise show all teams
                 {
-                    teams = DAO.teamDAO.getTeams( enumAreaId )
+                    teams = DAO.teamDAO.getCollectionTeams( enumAreaId )
                 }
 
                 manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( teams )
@@ -86,7 +86,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
         binding.titleTextView.text = enumArea.name + " Teams"
 
         binding.addButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_CreateTeamFragment)
+            findNavController().navigate(R.id.action_navigate_to_CreateCollectionTeamFragment)
         }
     }
 
@@ -120,7 +120,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
         DAO.teamDAO.deleteTeam( team )
 
         enumArea.id?.let {
-            manageCollectionTeamsAdapter.updateTeams( DAO.teamDAO.getTeams( it ))
+            manageCollectionTeamsAdapter.updateTeams( DAO.teamDAO.getEnumerationTeams( it ))
         }
     }
 

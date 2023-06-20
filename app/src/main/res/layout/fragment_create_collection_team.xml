@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.create_team.CreateTeamFragment">
+    tools:context=".fragments.create_collection_team.CreateCollectionTeamFragment">
 
     <TextView
         android:layout_width="match_parent"
@@ -39,11 +39,11 @@
         android:textSize="17sp"
         android:textStyle="bold" />
 
-<!--    <View-->
-<!--        android:background="@color/primary"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:layout_weight="1"/>-->
+    <!--    <View-->
+    <!--        android:background="@color/primary"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:layout_weight="1"/>-->
 
     <fragment
         android:id="@+id/map_fragment"

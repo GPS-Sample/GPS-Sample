@@ -43,26 +43,6 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
-
-        <action
-            android:id="@+id/action_navigate_to_EnumeratorFragment"
-            app:destination="@id/EnumeratorFragment" />
-    </fragment>
-
-    <!-- EnumeratorFragment   -->
-
-    <fragment
-        android:id="@+id/EnumeratorFragment"
-        android:name="edu.gtri.gpssample.fragments.enumerator.EnumeratorFragment"
-        tools:layout="@layout/fragment_enumerator">
-
-        <action
-            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
-            app:destination="@id/ManageConfigurationsFragment" />
-
-        <action
-            android:id="@+id/action_navigate_to_SystemStatusFragment"
-            app:destination="@id/SystemStatusFragment" />
     </fragment>
 
     <!--ManageConfigurationsFragment-->
@@ -108,8 +88,8 @@
             android:id="@+id/action_navigate_to_CreateConfigurationFragment"
             app:destination="@id/CreateConfigurationFragment"/>
         <action
-            android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
-            app:destination="@id/DefineEnumerationAreaFragment"/>
+            android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
+            app:destination="@id/CreateEnumerationAreaFragment"/>
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
@@ -135,8 +115,8 @@
         tools:layout="@layout/fragment_create_configuration">
 
         <action
-            android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
-            app:destination="@id/DefineEnumerationAreaFragment"/>
+            android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
+            app:destination="@id/CreateEnumerationAreaFragment"/>
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
@@ -145,12 +125,12 @@
             app:destination="@id/CreateStudyFragment" />
     </fragment>
 
-    <!--DefineEnumerationAreaFragment-->
+    <!--CreateEnumerationAreaFragment-->
 
     <fragment
-        android:id="@+id/DefineEnumerationAreaFragment"
-        android:name="edu.gtri.gpssample.fragments.define_enumeration_area.DefineEnumerationAreaFragment"
-        tools:layout="@layout/fragment_define_enumeration_area">
+        android:id="@+id/CreateEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment"
+        tools:layout="@layout/fragment_create_enumeration_area">
 
         <action
             android:id="@+id/action_navigate_to_AddHouseholdFragment"
@@ -192,8 +172,8 @@
             app:destination="@id/CreateFilterFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_DefineEnumerationAreaFragment"
-            app:destination="@id/DefineEnumerationAreaFragment"/>
+            android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
+            app:destination="@id/CreateEnumerationAreaFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
@@ -211,16 +191,12 @@
         tools:layout="@layout/fragment_manage_enumeration_teams">
 
         <action
-            android:id="@+id/action_navigate_to_CreateTeamFragment"
-            app:destination="@id/CreateTeamFragment" />
+            android:id="@+id/action_navigate_to_CreateEnumerationTeamFragment"
+            app:destination="@id/CreateEnumerationTeamFragment" />
 
         <action
             android:id="@+id/action_navigate_to_PerformEnumerationFragment"
             app:destination="@id/PerformEnumerationFragment" />
-
-        <action
-            android:id="@+id/action_navigate_to_ManageEnumerationTeamFragment"
-            app:destination="@id/ManageEnumerationTeamFragment" />
 
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
@@ -235,16 +211,28 @@
         tools:layout="@layout/fragment_manage_collection_teams">
 
         <action
+            android:id="@+id/action_navigate_to_CreateCollectionTeamFragment"
+            app:destination="@id/CreateCollectionTeamFragment" />
+
+        <action
             android:id="@+id/action_navigate_to_PerformCollectionFragment"
             app:destination="@id/PerformCollectionFragment" />
     </fragment>
 
-    <!--CreateTeamFragment-->
+    <!--CreateEnumerationTeamFragment-->
 
     <fragment
-        android:id="@+id/CreateTeamFragment"
-        android:name="edu.gtri.gpssample.fragments.create_team.CreateTeamFragment"
-        tools:layout="@layout/fragment_create_field">
+        android:id="@+id/CreateEnumerationTeamFragment"
+        android:name="edu.gtri.gpssample.fragments.create_enumeration_team.CreateEnumerationTeamFragment"
+        tools:layout="@layout/fragment_create_enumeration_team">
+    </fragment>
+
+    <!--CreateCollectionTeamFragment-->
+
+    <fragment
+        android:id="@+id/CreateCollectionTeamFragment"
+        android:name="edu.gtri.gpssample.fragments.create_collection_team.CreateCollectionTeamFragment"
+        tools:layout="@layout/fragment_create_collection_team">
     </fragment>
 
     <!--CreateFieldFragment-->
@@ -284,48 +272,6 @@
         <action
             android:id="@+id/action_navigate_to_SelectRuleDialogFragment"
             app:destination="@id/SelectRuleDialogFragment" />
-    </fragment>
-
-    <!--ManageSampleFragment-->
-
-<!--    <fragment-->
-<!--        android:id="@+id/ManageSampleFragment"-->
-<!--        android:name="edu.gtri.gpssample.fragments.ManageEnumerationArea.ManageEnumerationTeamsFragment"-->
-<!--        tools:layout="@layout/fragment_manage_enumeration_teams">-->
-
-<!--        <action-->
-<!--            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"-->
-<!--            app:popUpTo="@id/ManageConfigurationsFragment"/>-->
-<!--    </fragment>-->
-
-    <!--SystemStatusFragment-->
-
-    <fragment
-        android:id="@+id/SystemStatusFragment"
-        android:name="edu.gtri.gpssample.fragments.SystemStatusNotUsed.SystemStatusFragment"
-        tools:layout="@layout/fragment_system_status">
-
-        <action
-            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
-            app:destination="@id/ManageConfigurationsFragment" />
-
-        <action
-            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
-            app:destination="@id/PerformEnumerationFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/ManageEnumerationTeamFragment"
-        android:name="edu.gtri.gpssample.fragments.manage_enumeration_team.ManageEnumerationTeamFragment"
-        tools:layout="@layout/fragment_manage_enumeration_team">
-
-        <action
-            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
-            app:destination="@id/PerformEnumerationFragment" />
-
-        <action
-            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
-            app:popUpTo="@id/ManageConfigurationsFragment"/>
     </fragment>
 
     <fragment
