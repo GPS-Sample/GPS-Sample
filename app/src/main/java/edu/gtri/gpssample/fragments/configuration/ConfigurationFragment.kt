@@ -313,7 +313,7 @@ class ConfigurationFragment : Fragment(),
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-        ConfirmationDialog( activity, "Select a task", "", "Enumeration", "Collection", kTaskTag, this)
+        ConfirmationDialog( activity, "Enumeration Area ${enumArea.name}", "Select a task", "Enumeration", "Collection", kTaskTag, this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)

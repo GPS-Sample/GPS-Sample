@@ -180,7 +180,7 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
                                 if (it.contains( point ))
                                 {
                                     Log.d( "xxx", "found household" )
-                                    enumData.teamId = teamId
+                                    enumData.collectionTeamId = teamId
                                     DAO.enumDataDAO.updateEnumData( enumData )
                                 }
                             }
