@@ -29,21 +29,22 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
+import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.ExportDialog
-import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionAdapter
+import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
 import java.util.*
-import kotlin.collections.ArrayList
 
 class PerformCollectionFragment : Fragment(),
     OnMapReadyCallback,
     ExportDialog.ExportDialogDelegate,
+    AdditionalInfoDialog.AdditionalInfoDialogDelegate,
+    LaunchSurveyDialog.LaunchSurveyDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var team: Team
@@ -253,14 +254,7 @@ class PerformCollectionFragment : Fragment(),
                     val enum_data = tag as EnumData
                     sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
 
-                    if (enum_data.isLocation)
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-                    }
-                    else
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-                    }
+                    LaunchSurveyDialog( activity, this)
                 }
 
                 false
@@ -448,6 +442,26 @@ class PerformCollectionFragment : Fragment(),
     fun startHotspot(view : View)
     {
         sharedNetworkViewModel.createHotspot(view)
+    }
+
+    override fun launchSurveyButtonPressed()
+    {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "vnd.android.cursor.dir/vnd.odk.form"
+        startActivity(intent)
+    }
+
+    override fun markAsIncompleteButtonPressed()
+    {
+        AdditionalInfoDialog( activity, true, "", "", this)
+    }
+
+    override fun didSelectCancelButton()
+    {
+    }
+
+    override fun didSelectSaveButton( incomplete: Boolean, incompleteReason: String, notes: String )
+    {
     }
 
     override fun didSelectRightButton(tag: Any?)
