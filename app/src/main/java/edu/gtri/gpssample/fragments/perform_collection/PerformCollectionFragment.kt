@@ -444,11 +444,17 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun launchSurveyButtonPressed()
     {
-        val intent = Intent(Intent.ACTION_PICK)
+        val intent = Intent(Intent.ACTION_VIEW)
         intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-        startActivity(intent)
+        odk_result.launch(intent)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private val odk_result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        AdditionalInfoDialog( activity, false, "", "", this)
     }
 
     override fun markAsIncompleteButtonPressed()
