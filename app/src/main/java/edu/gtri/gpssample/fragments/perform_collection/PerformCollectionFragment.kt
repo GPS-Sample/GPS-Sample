@@ -27,6 +27,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.DAO.Companion.collectionDataDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
@@ -468,6 +469,15 @@ class PerformCollectionFragment : Fragment(),
 
     override fun didSelectSaveButton( incomplete: Boolean, incompleteReason: String, notes: String )
     {
+        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let { enumData ->
+            enumData.id?.let { enumDataId ->
+                val collectionData = collectionDataDAO.createOrUpdateCollectionData( CollectionData( enumDataId, incomplete, incompleteReason, notes ))
+                collectionData?.id?.let {
+                    enumData.collectionDataId = it
+                    DAO.enumDataDAO.updateEnumData( enumData )
+                }
+            }
+        }
     }
 
     override fun didSelectRightButton(tag: Any?)
