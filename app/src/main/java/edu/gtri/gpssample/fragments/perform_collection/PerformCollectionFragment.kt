@@ -448,9 +448,13 @@ class PerformCollectionFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun launchSurveyButtonPressed()
     {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-        odk_result.launch(intent)
+        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let { enumData ->
+
+            (this.activity!!.application as? MainApplication)?.currentEnumDataUUID = enumData.uuid
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.type = "vnd.android.cursor.dir/vnd.odk.form"
+            odk_result.launch(intent)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

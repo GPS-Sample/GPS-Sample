@@ -56,8 +56,18 @@
         </activity>
 
         <activity
+            android:name=".activities.ODKLaunchedActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="edu.gtri.gpssample.odk"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".barcode_scanner.CameraXLivePreviewActivity"
             android:screenOrientation="portrait">
+
         </activity>
     </application>
 </manifest>
