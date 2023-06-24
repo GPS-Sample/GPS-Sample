@@ -48,7 +48,7 @@ class PerformCollectionAdapter(var enumDataList: List<EnumData>?) : RecyclerView
         val enumData = enumDataList!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( enumData.id.toString())
-        holder.dateTextView.setText( Date(enumData.creationDate).toString())
+        holder.dateTextView.setText( enumData.uuid )
 
         holder.itemView.setOnClickListener {
             didSelectEnumData(enumData)
