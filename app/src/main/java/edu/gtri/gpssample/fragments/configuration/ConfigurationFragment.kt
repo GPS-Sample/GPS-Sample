@@ -308,8 +308,10 @@ class ConfigurationFragment : Fragment(),
 
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
-        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-        ConfirmationDialog( activity, "Enumeration Area ${enumArea.name}", "Select a task", "Enumeration", "Collection", kTaskTag, this)
+        sharedViewModel.createStudyModel.currentStudy?.value?.let {
+            sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+            ConfirmationDialog( activity, "Enumeration Area ${enumArea.name}", "Select a task", "Enumeration", "Collection", kTaskTag, this)
+        } ?: Toast.makeText(activity!!.applicationContext, "You do not have a study associated with this EA.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
