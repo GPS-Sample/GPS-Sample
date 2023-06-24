@@ -287,14 +287,7 @@ class PerformCollectionFragment : Fragment(),
     {
         sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
 
-        if (enumData.isLocation)
-        {
-            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-        }
-        else
-        {
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-        }
+        LaunchSurveyDialog( activity, this)
     }
 
     override fun shouldExport( fileName: String, configuration: Boolean, qrCode: Boolean )
