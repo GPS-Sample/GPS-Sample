@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -26,8 +27,15 @@ import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import io.github.dellisd.spatialk.geojson.FeatureCollection
+import io.github.dellisd.spatialk.geojson.MultiPolygon
+import io.github.dellisd.spatialk.geojson.Point
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
 class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate, InputDialog.InputDialogDelegate
@@ -83,13 +91,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             return
         }
 
-        arguments?.let {
-            if (!it.getBoolean( Keys.kEditMode.toString(), true))
-            {
-//                binding.createSaveButton.visibility = View.GONE
-            }
-        }
-
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
@@ -130,7 +131,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     fun createEnumArea( name: String )
     {
         createMode = false
-//        binding.createSaveButton.text = "Create Polygon"
 
         var vertices = ArrayList<LatLon>()
 
@@ -167,19 +167,13 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
         }
 
-        val user = (activity!!.application as? MainApplication)?.user
-
         config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
         for (enumArea in config.enumAreas)
         {
             addPolygon( enumArea )
 
-//            if (user!!.role == Role.Supervisor.toString())
-//            {
-//                val latLng = getCenter( enumArea )
-//                map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 17.0f))
-//            }
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
 
             enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
 
@@ -197,7 +191,9 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 }
 
                 if (enumData.isLocation)
+                {
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+                }
 
                 val marker = map.addMarker( MarkerOptions()
                     .position( LatLng( enumData.latitude, enumData.longitude ))
@@ -208,34 +204,8 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                     marker.tag = enumData
                     enumDataMarkers.add( marker )
                 }
-
-                map.setOnMarkerClickListener { marker ->
-                    marker.tag?.let {tag ->
-                        val enum_data = tag as EnumData
-                        sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
-
-                        if (enum_data.isLocation)
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-                        }
-                        else
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-                        }
-                    }
-
-                    false
-                }
             }
         }
-
-//        if (user!!.role == Role.Admin.toString())
-//        {
-            val atl = LatLng( 33.774881, -84.396341 )
-            val srb = LatLng(30.330603,-86.165004 )
-            val demo = LatLng( 33.982973122594785, -84.31252665817738 )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( demo, 14.0f))
-//        }
     }
 
     fun addPolygon( enumArea: EnumArea )
@@ -254,22 +224,9 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         polygon.tag = enumArea
 
         map.setOnPolygonClickListener {polygon ->
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this Enumeration Area?", "No", "Yes", polygon, this)
+            val ea = polygon.tag as EnumArea
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete Enumeration Area ${ea.name}?", "No", "Yes", polygon, this)
         }
-    }
-
-    fun getCenter( enumArea: EnumArea ) : LatLng
-    {
-        var sumLat: Double = 0.0
-        var sumLon: Double = 0.0
-
-        for (latLon in enumArea.vertices)
-        {
-            sumLat += latLon.latitude
-            sumLon += latLon.longitude
-        }
-
-        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
     override fun didSelectLeftButton(tag: Any?)
@@ -307,22 +264,9 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                         Log.d( "xxx", text )
 
-                        val jsonObject = JSONObject(text)
-
-                        if (jsonObject.getString("type" ) == "FeatureCollection")
-                        {
-                            val jsonArray = jsonObject.getJSONArray("features" )
-
-                            val enumArea = getGeoJsonPolygon( jsonArray )
-
-                            enumArea?.let { enumArea ->
-                                enumArea.id?.let {  enumAreaId ->
-                                    enumArea.enumDataList = getGeoJsonPoints( jsonArray, enumAreaId )
-                                }
-                            }
-
-                            onMapReady(map)
-                        }
+                        Thread {
+                            parseGeoJson(text)
+                        }.start()
                     }
                 }
                 catch( ex: java.lang.Exception )
@@ -333,79 +277,73 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
     }
 
-    fun getGeoJsonPolygon( jsonArray: JSONArray ) : EnumArea?
+    fun parseGeoJson( text: String )
     {
-        var enumArea : EnumArea? = null
+        var points = ArrayList<Point>()
+        val featureCollection = FeatureCollection.fromJson( text )
 
-        for (i in 0..jsonArray.length()-1)
-        {
-            val jsonObject = jsonArray.getJSONObject(i)
-            val featureType = jsonObject.getString("type")
+        featureCollection.forEach { feature ->
 
-            if (featureType == "Feature")
-            {
-                val geometry = jsonObject.getJSONObject("geometry")
+            var name = "Undefined"
 
-                if (geometry.getString("type") == "Polygon")
-                {
-                    var name: String = "undefined"
+            feature.getStringProperty("ClusterL")?.let {
+                name = it
+            }
 
-                    try {
-                        val properties = jsonObject.getJSONObject("properties" )
-                        name = properties.getString("name" )
+            feature.geometry?.let { geometry ->
+                when( geometry ) {
+                    is MultiPolygon -> {
+                        val enumArea = EnumArea( configId, name, ArrayList<LatLon>())
+                        val multiPolygon = geometry as MultiPolygon
+
+                        multiPolygon.coordinates[0][0].forEach { position ->
+                            enumArea.vertices.add( LatLon( position.latitude, position.longitude ))
+                        }
+
+                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
                     }
-                    catch( ex: java.lang.Exception) {
+                    is Point -> {
+                        val point = geometry as Point
+                        points.add( point )
                     }
-
-                    enumArea = EnumArea( configId, name, ArrayList<LatLon>())
-
-                    val coordinates = geometry.getJSONArray("coordinates")
-                    val coordinateArray = coordinates.getJSONArray(0 )
-
-                    for (j in 0..coordinateArray.length()-1)
-                    {
-                        val coordinate = coordinateArray.getJSONArray(j)
-                        val lat = coordinate[0] as Double
-                        val lon = coordinate[1] as Double
-                        val latLon = LatLon(lat, lon)
-                        enumArea.vertices.add( latLon )
-                    }
-
-                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                    else -> {}
                 }
             }
         }
 
-        return enumArea
-    }
+        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
-    fun getGeoJsonPoints( jsonArray: JSONArray, enumAreaId: Int ) : ArrayList<EnumData>
-    {
-        var enumDataList = ArrayList<EnumData>()
+        // figure out which enumArea contains each point
 
-        for (i in 0..jsonArray.length()-1)
+        for (point in points)
         {
-            val jsonObject = jsonArray.getJSONObject(i)
-            val featureType = jsonObject.getString("type")
-
-            if (featureType == "Feature")
+            for (enumArea in enumAreas)
             {
-                val geometry = jsonObject.getJSONObject("geometry")
+                val points1 = ArrayList<Coordinate>()
 
-                if (geometry.getString("type") == "Point")
+                enumArea.vertices.map {
+                    points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                }
+
+                val geometryFactory = GeometryFactory()
+                val geometry: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
+
+                val coordinate = Coordinate( point.coordinates.longitude, point.coordinates.latitude )
+                val geometry1 = geometryFactory.createPoint( coordinate )
+                if (geometry.contains( geometry1 ))
                 {
-                    val coordinates = geometry.getJSONArray("coordinates")
-                    val lat = coordinates[0] as Double
-                    val lon = coordinates[1] as Double
-
-                    val enumData = EnumData( -1, enumAreaId, false, false, "", "", lat, lon )
+                    val enumData = EnumData( -1, enumArea.id!!, false, false, "", "", point.coordinates.latitude, point.coordinates.longitude )
                     DAO.enumDataDAO.createOrUpdateEnumData( enumData )
-                    enumDataList.add( enumData )
+                    enumArea.enumDataList.add( enumData )
+                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                    break // found! assuming that it can only exist in a single EA
                 }
             }
         }
 
-        return enumDataList
+        lifecycleScope.launch {
+            onMapReady( map )
+        }
     }
 
     override fun onDestroyView()

@@ -189,37 +189,33 @@ class ConfigurationFragment : Fragment(),
 
                     googleMap.addPolygon(polygon)
 
-                    val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
 
-                    for (enumData in enumDataList)
-                    {
-                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                        if (enumData.incomplete)
-                        {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                        }
-                        else if (enumData.valid)
-                        {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                        }
-
-                        if (enumData.isLocation)
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-
-                        googleMap.addMarker(
-                            MarkerOptions()
-                                .position(LatLng(enumData.latitude, enumData.longitude))
-                                .icon(icon)
-                        )
-                    }
+//                    val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+//
+//                    for (enumData in enumDataList)
+//                    {
+//                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+//
+//                        if (enumData.incomplete)
+//                        {
+//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+//                        }
+//                        else if (enumData.valid)
+//                        {
+//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+//                        }
+//
+//                        if (enumData.isLocation)
+//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+//
+//                        googleMap.addMarker(
+//                            MarkerOptions()
+//                                .position(LatLng(enumData.latitude, enumData.longitude))
+//                                .icon(icon)
+//                        )
+//                    }
                 }
-
-                // HACK HACK
-                val atl = LatLng( 33.774881, -84.396341 )
-                val srb = LatLng(30.335603,-86.165004 )
-                val demo = LatLng( 33.982973122594785, -84.31252665817738 )
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( demo, 13.5f))
             }
         }
     }
