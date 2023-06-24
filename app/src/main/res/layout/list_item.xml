@@ -53,7 +53,7 @@
                     android:src="@drawable/check_blue" />
             </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/date_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -62,9 +62,8 @@
                 android:gravity="center_vertical"
                 android:text="Created on May 4, 2023 @ 3:13pm"
                 android:textColor="@color/black"
-                android:textSize="17dp"
                 android:textStyle="italic"
-                app:autoSizeTextType="uniform" />
+                android:textSize="15sp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
