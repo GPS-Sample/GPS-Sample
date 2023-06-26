@@ -26,7 +26,7 @@ class LatLonDAO(private var dao: DAO)
 
             latLon.id = dao.writableDatabase.insert(DAO.TABLE_LAT_LON, null, values).toInt()
             latLon.id?.let { id ->
-                Log.d( "xxx", "new LatLon id = ${id}")
+//                Log.d( "xxx", "new LatLon id = ${id}")
             } ?: return null
         }
 
@@ -37,7 +37,6 @@ class LatLonDAO(private var dao: DAO)
     fun putLatLon(latLon: LatLon, values: ContentValues)
     {
         latLon.id?.let { id ->
-            Log.d( "xxx", "existing LatLon id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
 
