@@ -111,6 +111,8 @@ class PerformCollectionFragment : Fragment(),
 
         binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + team.name + " team)"
 
+        binding.toolbarLayout.visibility = View.GONE
+        
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
