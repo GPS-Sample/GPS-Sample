@@ -197,6 +197,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_COLLECTION_DATA_ENUM_DATA_ID + " INTEGER" + "," +
+                COLUMN_COLLECTION_DATA_VALID + " INTEGER" + "," +
                 COLUMN_COLLECTION_DATA_INCOMPLETE + " INTEGER" + "," +
                 COLUMN_COLLECTION_DATA_INCOMPLETE_REASON + " TEXT" + "," +
                 COLUMN_COLLECTION_DATA_NOTES + " TEXT" + "," +
@@ -373,6 +374,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // CollectionData Table
         const val TABLE_COLLECTION_DATA = "collection_data"
         const val COLUMN_COLLECTION_DATA_ENUM_DATA_ID = "collection_data_enum_data_id"
+        const val COLUMN_COLLECTION_DATA_VALID = "collection_data_valid"
         const val COLUMN_COLLECTION_DATA_INCOMPLETE = "collection_data_incomplete"
         const val COLUMN_COLLECTION_DATA_INCOMPLETE_REASON = "collection_data_incomplete_reason"
         const val COLUMN_COLLECTION_DATA_NOTES = "collection_data_notes"
@@ -470,6 +472,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 136
+        private const val DATABASE_VERSION = 150
+
     }
 }
