@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.create_enumeration_area
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -47,7 +48,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     private var configId: Int = 0
     private var createMode = false
     private var vertexMarkers = ArrayList<Marker>()
-    private var enumDataMarkers = ArrayList<Marker>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private val binding get() = _binding!!
 
@@ -154,8 +154,11 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.DefineEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
+    override fun onMapReady(googleMap: GoogleMap)
+    {
         map = googleMap
+
+        map.clear()
 
         map.setOnMapClickListener {
             if (createMode)
@@ -199,11 +202,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                     .position( LatLng( enumData.latitude, enumData.longitude ))
                     .icon( icon )
                 )
-
-                marker?.let {marker ->
-                    marker.tag = enumData
-                    enumDataMarkers.add( marker )
-                }
             }
         }
     }
@@ -240,9 +238,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         DAO.enumAreaDAO.delete( enumArea )
         polygon.remove()
 
-        enumDataMarkers.map {
-            it.remove()
-        }
+        onMapReady(map)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -257,17 +253,13 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                 try
                 {
-                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                    Thread {
+                        val inputStream = activity!!.getContentResolver().openInputStream(uri)
 
-                    inputStream?.let {  inputStream ->
-                        val text = inputStream.bufferedReader().readText()
-
-                        Log.d( "xxx", text )
-
-                        Thread {
-                            parseGeoJson(text)
-                        }.start()
-                    }
+                        inputStream?.let { inputStream ->
+                            parseGeoJson( inputStream.bufferedReader().readText())
+                        }
+                    }.start()
                 }
                 catch( ex: java.lang.Exception )
                 {
@@ -279,6 +271,8 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
     fun parseGeoJson( text: String )
     {
+        Log.d( "xxx", text )
+
         var points = ArrayList<Point>()
         val featureCollection = FeatureCollection.fromJson( text )
 

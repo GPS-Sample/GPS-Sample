@@ -12,12 +12,13 @@ data class CollectionData(
     var id : Int? = null,
     var creationDate: Long,
     var enumDataId : Int,
+    var valid : Boolean,
     var incomplete : Boolean,
     var incompleteReason : String,
     var notes : String)
 {
-    constructor( enumDataId: Int, incomplete: Boolean, incompleteReason: String, notes: String ) :
-            this( null, Date().time, enumDataId, incomplete, incompleteReason, notes)
+    constructor( enumDataId: Int, valid: Boolean, incomplete: Boolean, incompleteReason: String, notes: String ) :
+            this( null, Date().time, enumDataId, valid, incomplete, incompleteReason, notes)
 
     fun pack() : String
     {

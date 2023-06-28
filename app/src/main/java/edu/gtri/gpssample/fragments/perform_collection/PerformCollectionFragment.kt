@@ -40,6 +40,7 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
 import java.util.*
+import kotlin.collections.HashMap
 
 class PerformCollectionFragment : Fragment(),
     OnMapReadyCallback,
@@ -56,9 +57,6 @@ class PerformCollectionFragment : Fragment(),
 
     private var userId = 0
     private var enumAreaId = 0
-    private var dropMode = false
-    private var location: LatLng? = null
-    private var enumDataList = ArrayList<EnumData>()
     private var _binding: FragmentPerformCollectionBinding? = null
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private val binding get() = _binding!!
@@ -102,6 +100,8 @@ class PerformCollectionFragment : Fragment(),
             userId = it
         }
 
+        val enumDataList = DAO.enumDataDAO.getEnumData(enumArea, team)
+
         performCollectionAdapter = PerformCollectionAdapter( enumDataList )
         performCollectionAdapter.didSelectEnumData = this::didSelectEnumData
 
@@ -111,66 +111,11 @@ class PerformCollectionFragment : Fragment(),
 
         binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + team.name + " team)"
 
+        binding.toolbarLayout.visibility = View.GONE
+        
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
-
-        val defaultColorList = binding.dropPinButton.backgroundTintList
-
-        binding.dropPinButton.setOnClickListener {
-
-            if (!dropMode)
-            {
-                dropMode = true
-                location = null
-                addMapObjects()
-                binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-
-                map.setOnMapClickListener {
-                    if (dropMode)
-                    {
-                        location = it
-                        map.addMarker(MarkerOptions().position(it))
-                        dropMode = false
-                        binding.dropPinButton.setBackgroundTintList(defaultColorList);
-                    }
-                }
-            }
-            else
-            {
-                dropMode = false
-                binding.dropPinButton.setBackgroundTintList(defaultColorList);
-            }
-        }
-
-        binding.addHouseholdButton.setOnClickListener {
-
-            location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
-                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
-
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-            } ?: kotlin.run {
-                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
-            }
-
-            location = null
-        }
-
-        binding.addLocationButton.setOnClickListener {
-
-            location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
-                enumData.isLocation = true
-                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
-
-                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-            } ?: kotlin.run {
-                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
-            }
-
-            location = null
-        }
 
         binding.exportButton.setOnClickListener {
             sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -187,20 +132,14 @@ class PerformCollectionFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
-
-        enumDataList = DAO.enumDataDAO.getEnumData(enumArea, team)
-
-        performCollectionAdapter.updateEnumDataList( enumDataList )
-        if (this::map.isInitialized)
-        {
-            addMapObjects()
-        }
     }
 
     var once = true
 
-    fun addMapObjects()
+    override fun onMapReady(googleMap: GoogleMap)
     {
+        map = googleMap
+
         map.clear()
 
         val points = ArrayList<LatLng>()
@@ -225,21 +164,11 @@ class PerformCollectionFragment : Fragment(),
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
+        val enumDataList = DAO.enumDataDAO.getEnumData(enumArea, team)
+
         for (enumData in enumDataList)
         {
             var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-            if (enumData.incomplete)
-            {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-            }
-            else if (enumData.valid)
-            {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-            }
-
-            if (enumData.isLocation)
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
 
             val marker = map.addMarker( MarkerOptions()
                 .position( LatLng( enumData.latitude, enumData.longitude ))
@@ -248,6 +177,24 @@ class PerformCollectionFragment : Fragment(),
 
             marker?.let {marker ->
                 marker.tag = enumData
+
+                val collectionData = DAO.collectionDataDAO.getCollectionData( enumData.collectionDataId )
+
+                collectionData?.let { collectionData ->
+
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+                    if (collectionData.incomplete)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                    }
+                    else if (collectionData.valid)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                    }
+
+                    marker.setIcon( icon )
+                }
             }
 
             map.setOnMarkerClickListener { marker ->
@@ -261,12 +208,6 @@ class PerformCollectionFragment : Fragment(),
                 false
             }
         }
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-
-        addMapObjects()
     }
 
     fun getCenter() : LatLng
@@ -424,12 +365,7 @@ class PerformCollectionFragment : Fragment(),
                 Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
 
                 sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
-
-//                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
-                // need to pass this into the network view model
-
             }
-
         }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -468,10 +404,12 @@ class PerformCollectionFragment : Fragment(),
     {
         sharedViewModel.enumDataViewModel.currentEnumData?.value?.let { enumData ->
             enumData.id?.let { enumDataId ->
-                val collectionData = collectionDataDAO.createOrUpdateCollectionData( CollectionData( enumDataId, incomplete, incompleteReason, notes ))
+                val valid = !incomplete
+                val collectionData = collectionDataDAO.createOrUpdateCollectionData( CollectionData( enumDataId, valid, incomplete, incompleteReason, notes ))
                 collectionData?.id?.let {
                     enumData.collectionDataId = it
                     DAO.enumDataDAO.updateEnumData( enumData )
+                    onMapReady(map)
                 }
             }
         }

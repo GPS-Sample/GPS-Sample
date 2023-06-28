@@ -295,6 +295,12 @@ class EnumDataDAO(private var dao: DAO)
         enumData.id?.let { id ->
             Log.d( "xxx", "deleting enumData with ID $id" )
 
+            val collectionData = DAO.collectionDataDAO.getCollectionData( enumData.collectionDataId )
+
+            collectionData?.let {
+                DAO.collectionDataDAO.delete( collectionData )
+            }
+
             DAO.fieldDataDAO.deleteAllFields( enumData )
 
             val db = dao.writableDatabase

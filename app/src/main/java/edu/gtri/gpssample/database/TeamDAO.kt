@@ -31,6 +31,7 @@ class TeamDAO(private var dao: DAO)
             for (latLon in team.polygon)
             {
                 latLon.teamId = teamId
+                latLon.enumAreaId = team.enumAreaId
                 DAO.latLonDAO.createOrUpdateLatLon(latLon)
             }
         }

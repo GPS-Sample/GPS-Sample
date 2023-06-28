@@ -64,6 +64,7 @@ class CollectionDataDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_CREATION_DATE, collectionData.creationDate )
         values.put( DAO.COLUMN_COLLECTION_DATA_ENUM_DATA_ID, collectionData.enumDataId )
+        values.put( DAO.COLUMN_COLLECTION_DATA_VALID, collectionData.valid.toInt())
         values.put( DAO.COLUMN_COLLECTION_DATA_INCOMPLETE, collectionData.incomplete.toInt())
         values.put( DAO.COLUMN_COLLECTION_DATA_INCOMPLETE_REASON, collectionData.incompleteReason)
         values.put( DAO.COLUMN_COLLECTION_DATA_NOTES, collectionData.notes )
@@ -75,11 +76,12 @@ class CollectionDataDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val enumDataId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_DATA_ENUM_DATA_ID))
+        val valid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_DATA_VALID)).toBoolean()
         val incomplete = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_DATA_INCOMPLETE)).toBoolean()
         val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_DATA_INCOMPLETE_REASON))
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_DATA_NOTES))
 
-        return CollectionData( id, creationDate, enumDataId, incomplete, incompleteReason, notes )
+        return CollectionData( id, creationDate, enumDataId, valid, incomplete, incompleteReason, notes )
     }
 
     fun getCollectionData( id: Int ) : CollectionData?
