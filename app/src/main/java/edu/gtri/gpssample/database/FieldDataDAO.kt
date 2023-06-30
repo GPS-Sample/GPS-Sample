@@ -7,8 +7,7 @@ import android.util.Log
 import androidx.core.database.getDoubleOrNull
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumData
+import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.extensions.toBoolean
 
@@ -148,13 +147,13 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFieldDataList( enumData: EnumData ): ArrayList<FieldData>
+    fun getFieldDataList( enumerationItem: EnumerationItem ): ArrayList<FieldData>
     {
         var fieldDataList = ArrayList<FieldData>()
         val db = dao.writableDatabase
 
-        enumData.id?.let { id ->
-            val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUM_DATA_ID} = $id"
+        enumerationItem.id?.let { id ->
+            val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
             while (cursor.moveToNext())
@@ -206,9 +205,9 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun deleteAllFields( enumData: EnumData )
+    fun deleteAllFields( enumerationItem: EnumerationItem )
     {
-        val fieldDataList = getFieldDataList( enumData )
+        val fieldDataList = getFieldDataList( enumerationItem )
 
         for (fieldData in fieldDataList)
         {
