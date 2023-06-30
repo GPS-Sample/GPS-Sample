@@ -163,6 +163,54 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 ")")
         db.execSQL(createTableTeamMember)
 
+        val createTableLocation = ("CREATE TABLE " +
+                TABLE_LOCATION + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
+                COLUMN_UUID + " TEXT" + "," +
+                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
+                COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
+                COLUMN_LOCATION_LATITUDE + " REAL" + "," +
+                COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
+                COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
+                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                ")")
+        db.execSQL(createTableLocation)
+
+        val createTableEnumerationItem = ("CREATE TABLE " +
+                TABLE_ENUMERATION_ITEM + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
+                COLUMN_UUID + " TEXT" + "," +
+                COLUMN_LOCATION_ID + " INTEGER" + "," +
+                COLUMN_COLLECTION_ITEM_ID + " INTEGER" + "," +
+                COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
+                COLUMN_ENUMERATION_ITEM_VALID + " INTEGER" + "," +
+                COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
+                COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
+                "FOREIGN KEY($COLUMN_COLLECTION_ITEM_ID) REFERENCES $TABLE_COLLECTION_ITEM($COLUMN_ID)" +
+                ")")
+        db.execSQL(createTableEnumerationItem)
+
+        val createTableCollectionItem = ("CREATE TABLE " +
+                TABLE_COLLECTION_ITEM + "(" +
+                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                COLUMN_CREATION_DATE + " INTEGER" + "," +
+                COLUMN_UUID + " TEXT" + "," +
+                COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
+                COLUMN_ENUMERATION_ITEM_VALID + " INTEGER" + "," +
+                COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
+                COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
+                ")")
+        db.execSQL(createTableCollectionItem)
+
+
+
         val createTableEnumData = ("CREATE TABLE " +
                 TABLE_ENUM_DATA + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -256,6 +304,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_DATA")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_ITEM")
 
         onCreate(db)
     }
@@ -282,6 +333,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_TEAM_ID = "team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
         const val COLUMN_ENUM_DATA_ID = "enum_data_id"
+        const val COLUMN_LOCATION_ID = "location_id"
+        const val COLUMN_ENUMERATION_ITEM_ID = "enumeration_item_id"
+        const val COLUMN_COLLECTION_ITEM_ID = "collection_item_id"
+        const val COLUMN_ENUMERATION_TEAM_ID = "enumeration_team_id"
+        const val COLUMN_COLLECTION_TEAM_ID = "collection_team_id"
         const val COLUMN_LAT_LON_ID = "lat_lon_id"
 
         // Connector Tables
@@ -371,6 +427,40 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUM_DATA_DESCRIPTION = "enum_data_description"
         const val COLUMN_ENUM_DATA_IMAGE_FILE_NAME = "enum_data_image_file_name"
 
+        // Location Table
+        const val TABLE_LOCATION = "location"
+//        const val COLUMN_ID = "id"
+//        const val COLUMN_CREATION_DATE = "creation_date"
+//        const val COLUMN_UUID = "uuid"
+//        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
+//        const val COLUMN_ENUMERATION_TEAM_ID = "enumeration_team_id"
+//        const val COLUMN_COLLECTION_TEAM_ID = "collection_team_id"
+        const val COLUMN_LOCATION_LATITUDE = "location_latitude"
+        const val COLUMN_LOCATION_LONGITUDE = "location_longitude"
+        const val COLUMN_LOCATION_IS_LANDMARK = "location_is_landmark"
+
+        // EnumerationItem Table
+        const val TABLE_ENUMERATION_ITEM = "enumeration_item"
+//        const val COLUMN_ID = "id"
+//        const val COLUMN_CREATION_DATE = "creation_date"
+//        const val COLUMN_UUID = "uuid"
+//        const val COLUMN_LOCATION_ID = "location_id"
+//        const val COLUMN_COLLECTION_ITEM_ID = "collection_item_id"
+        const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
+        const val COLUMN_ENUMERATION_ITEM_VALID = "enumeration_item_valid"
+        const val COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON = "enumeration_item_incomplete_reason"
+        const val COLUMN_ENUMERATION_ITEM_NOTES = "enumeration_item_notes"
+
+        // CollectionItem Table
+        const val TABLE_COLLECTION_ITEM = "collection_item"
+//        const val COLUMN_ID = "id"
+//        const val COLUMN_CREATION_DATE = "creation_date"
+//        const val COLUMN_UUID = "uuid"
+//        const val COLUMN_ENUMERATION_ITEM_ID = "enumeration_item_id"
+        const val COLUMN_COLLECTION_ITEM_VALID = "collection_item_valid"
+        const val COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON = "collection_item_incomplete_reason"
+        const val COLUMN_COLLECTION_ITEM_NOTES = "collection_item_notes"
+
         // CollectionData Table
         const val TABLE_COLLECTION_DATA = "collection_data"
         const val COLUMN_COLLECTION_DATA_ENUM_DATA_ID = "collection_data_enum_data_id"
@@ -408,6 +498,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var fieldDataDAO: FieldDataDAO
         lateinit var latLonDAO: LatLonDAO
         lateinit var collectionDataDAO: CollectionDataDAO
+        lateinit var locationDAO: LocationDAO
+        lateinit var enumerationItemDAO: EnumerationItemDAO
+        lateinit var collectionItemDAO: CollectionItemDAO
 
         // creation/access methods
 
@@ -424,6 +517,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             Log.d( "xxx", "teams: ${DAO.teamDAO.getTeams()}")
             Log.d( "xxx", "latLons: ${DAO.latLonDAO.getLatLons()}")
             Log.d( "xxx", "collectionData: ${DAO.collectionDataDAO.getCollectionData()}")
+//            Log.d( "xxx", "locations: ${DAO.locationDAO.getLocations()}")
+//            Log.d( "xxx", "enumerationItems: ${DAO.enumerationItemDAO.getEnumerationItems()}")
+//            Log.d( "xxx", "collectionItems: ${DAO.collectionItemDAO.getCollectionItems()}")
         }
 
         fun deleteAll()
@@ -444,6 +540,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_TEAM_MEMBER, null, null)
                 db.delete(TABLE_LAT_LON, null, null)
                 db.delete(TABLE_COLLECTION_DATA, null, null)
+                db.delete(TABLE_LOCATION, null, null)
+                db.delete(TABLE_ENUMERATION_ITEM, null, null)
+                db.delete(TABLE_COLLECTION_ITEM, null, null)
             }
         }
 
@@ -467,6 +566,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 fieldDataDAO = FieldDataDAO( instance!! )
                 latLonDAO = LatLonDAO( instance!!)
                 collectionDataDAO = CollectionDataDAO( instance!!)
+                locationDAO = LocationDAO( instance!!)
+                enumerationItemDAO = EnumerationItemDAO( instance!!)
+                collectionItemDAO = CollectionItemDAO( instance!!)
             }
 
             return instance!!
