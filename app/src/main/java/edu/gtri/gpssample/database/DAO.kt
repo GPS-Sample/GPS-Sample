@@ -258,7 +258,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_FIELD_ID + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_ID + " INTEGER" + "," +
+                COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
                 COLUMN_FIELD_DATA_TEXT_VALUE + " TEXT" + "," +
                 COLUMN_FIELD_DATA_NUMBER_VALUE + " REAL" + "," +
                 COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +

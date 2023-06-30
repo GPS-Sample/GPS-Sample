@@ -45,7 +45,7 @@ class FieldDataDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_FIELD_ID, fieldData.fieldId )
-        values.put( DAO.COLUMN_ENUM_DATA_ID, fieldData.enumDataId )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, fieldData.enumerationItemId )
         values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
         values.put( DAO.COLUMN_FIELD_DATA_NUMBER_VALUE, fieldData.numberValue )
         values.put( DAO.COLUMN_FIELD_DATA_DATE_VALUE, fieldData.dateValue )
@@ -73,7 +73,7 @@ class FieldDataDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
-        val enum_data_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_ID))
+        val enumerationItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ID))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
         val numberValue = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_NUMBER_VALUE))
         val dateValue = cursor.getLongOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DATE_VALUE))
@@ -83,7 +83,7 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
 
-        return FieldData( id, uuid, field_id, enum_data_id, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
+        return FieldData( id, uuid, field_id, enumerationItemId, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
     }
 
     //--------------------------------------------------------------------------
