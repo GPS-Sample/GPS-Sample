@@ -27,12 +27,13 @@ class LocationDAO(private var dao: DAO)
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
             location.id?.let { id ->
                 Log.d( "xxx", "new location id = ${id}")
-//                enumData.fieldDataList?.let { fieldDataList ->
-//                    for (fieldData in fieldDataList)
-//                    {
-//                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
-//                    }
-//                }
+                for (enumerationItem in location.enumerationItems)
+                {
+                    for (fieldData in enumerationItem.fieldDataList)
+                    {
+                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
+                    }
+                }
             } ?: return null
         }
 
@@ -56,14 +57,18 @@ class LocationDAO(private var dao: DAO)
         location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
         location.id?.let { id ->
             Log.d( "xxx", "new location id = ${id}")
-//            enumData.fieldDataList?.let { fieldDataList ->
-//                for (fieldData in fieldDataList)
-//                {
-//                    fieldData.id = null
-//                    fieldData.enumDataId = id
-//                    DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
-//                }
-//            }
+
+            for (enumerationItem in location.enumerationItems)
+            {
+                enumerationItem.fieldDataList?.let { fieldDataList ->
+                    for (fieldData in fieldDataList)
+                    {
+                        fieldData.id = null
+                        fieldData.enumerationItemId = id
+                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
+                    }
+                }
+            }
         } ?: return null
 
         return location

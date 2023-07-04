@@ -366,16 +366,17 @@ class PerformEnumerationFragment : Fragment(),
                 // during the import to accommodate uploads from multiple enumerators.
                 // We'll also need to handle duplicate updates from the same enumerator.
 
-//                enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
-//                val packedEnumArea = enumArea.pack()
-//                Log.d( "xxx", packedEnumArea )
-//
-//                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-//                val file = File(root, "$fileName.${Date().time}.json")
-//                val writer = FileWriter(file)
-//                writer.append(packedEnumArea)
-//                writer.flush()
-//                writer.close()
+//                enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+
+                val packedEnumArea = enumArea.pack()
+                Log.d( "xxx", packedEnumArea )
+
+                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                val file = File(root, "$fileName.${Date().time}.json")
+                val writer = FileWriter(file)
+                writer.append(packedEnumArea)
+                writer.flush()
+                writer.close()
 
                 Toast.makeText(activity!!.applicationContext, "Enumeration data has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
             }
@@ -422,7 +423,7 @@ class PerformEnumerationFragment : Fragment(),
                         sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
 
                         // I don't know why this should be necessary.
-//                        enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+                        enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
 
                         sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
                         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -455,9 +456,7 @@ class PerformEnumerationFragment : Fragment(),
 
 //                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
                 // need to pass this into the network view model
-
             }
-
         }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -479,16 +478,17 @@ class PerformEnumerationFragment : Fragment(),
             // during the import to accommodate uploads from multiple enumerators.
             // We'll also need to handle duplicate updates from the same enumerator.
 
-//            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
-//            val packedEnumArea = enumArea.pack()
-//            Log.d( "xxx", packedEnumArea )
-//
-//            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-//            val file = File(root, "EnumArea.${Date().time}.json")
-//            val writer = FileWriter(file)
-//            writer.append(packedEnumArea)
-//            writer.flush()
-//            writer.close()
+            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+
+            val packedEnumArea = enumArea.pack()
+            Log.d( "xxx", packedEnumArea )
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            val file = File(root, "EnumArea.${Date().time}.json")
+            val writer = FileWriter(file)
+            writer.append(packedEnumArea)
+            writer.flush()
+            writer.close()
 
             Toast.makeText(activity!!.applicationContext, "Enumeration data has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
         }

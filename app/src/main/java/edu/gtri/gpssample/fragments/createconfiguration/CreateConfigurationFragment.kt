@@ -134,12 +134,8 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
     private fun didSelectStudy(study: Study)
     {
-        val bundle = Bundle()
-
-        //bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
-        //bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
         sharedViewModel.createStudyModel.setStudy(study)
-        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
     }
     private fun shouldDeleteStudy(study: Study)
     {

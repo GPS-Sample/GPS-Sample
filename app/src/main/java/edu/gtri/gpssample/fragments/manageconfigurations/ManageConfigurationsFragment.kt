@@ -35,9 +35,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         NetworkClientModel.ConfigurationDelegate,
         NetworkViewModel.ManageConfigurationNetworkDelegate
 {
-
-
-
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
 
@@ -119,8 +116,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         // get this from the view controller
         manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
-
-
     }
 
     private fun didSelectConfig( config: Config )
@@ -129,7 +124,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         sharedViewModel.setCurrentConfig(config)
         findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
     }
-
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private val getResult =
@@ -146,26 +140,13 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 val pass = jsonObject.getString(Keys.kPass.toString())
                 val serverIp = jsonObject.getString(Keys.kIpAddress.toString())
 
-
-
                 Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
 
                 sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
 
 //                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
                 // need to pass this into the network view model
-
             }
-
-
-
-//                if(it.resultCode == Activity.RESULT_OK){
-//
-//
-//
-//
-//                val value = it.data?.getStringExtra("input")
-//            }
         }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -175,8 +156,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
         getResult.launch(intent)
-
-
 
         // FAKE
        // sharedNetworkViewModel.connectHotspotFake()
@@ -298,11 +277,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         }
                     }
                 }
-                //  }
-
-
             }
         }
-
     }
 }

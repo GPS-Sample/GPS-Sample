@@ -19,7 +19,7 @@ data class EnumerationItem(
     var state : EnumerationState,
     var incompleteReason : String,
     var notes : String,
-    var fieldDataList : ArrayList<FieldData>?)
+    var fieldDataList : ArrayList<FieldData>)
 {
     constructor( locationId: Int ) :
             this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, "", EnumerationState.Defined, "", "", ArrayList<FieldData>())

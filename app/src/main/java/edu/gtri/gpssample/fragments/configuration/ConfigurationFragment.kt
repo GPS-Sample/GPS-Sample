@@ -190,31 +190,6 @@ class ConfigurationFragment : Fragment(),
                     googleMap.addPolygon(polygon)
 
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
-
-//                    val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
-//
-//                    for (enumData in enumDataList)
-//                    {
-//                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-//
-//                        if (enumData.incomplete)
-//                        {
-//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-//                        }
-//                        else if (enumData.valid)
-//                        {
-//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-//                        }
-//
-//                        if (enumData.isLocation)
-//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-//
-//                        googleMap.addMarker(
-//                            MarkerOptions()
-//                                .position(LatLng(enumData.latitude, enumData.longitude))
-//                                .icon(icon)
-//                        )
-//                    }
                 }
             }
         }
@@ -335,12 +310,12 @@ class ConfigurationFragment : Fragment(),
 
                         val enumArea = EnumArea.unpack( text )
 
-//                        enumArea?.let { enumArea ->
-//                            for (enumData in enumArea.enumDataList)
-//                            {
-//                                DAO.enumDataDAO.importEnumData( enumData )
-//                            }
-//                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                        enumArea?.let { enumArea ->
+                            for (location in enumArea.locations)
+                            {
+                                DAO.locationDAO.importLocation( location )
+                            }
+                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
 
                         map?.let { map ->
                             onMapReady(map)
