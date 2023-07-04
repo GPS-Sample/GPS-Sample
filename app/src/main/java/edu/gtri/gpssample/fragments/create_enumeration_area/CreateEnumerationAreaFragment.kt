@@ -178,30 +178,48 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
 
-            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
 
-            for (enumData in enumArea.enumDataList)
+            for (location in enumArea.locations)
             {
-                var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                if (enumData.incomplete)
+                if (location.isLandmark)
                 {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                }
-                else if (enumData.valid)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                }
+                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
 
-                if (enumData.isLocation)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+                    map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
                 }
+                else
+                {
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                val marker = map.addMarker( MarkerOptions()
-                    .position( LatLng( enumData.latitude, enumData.longitude ))
-                    .icon( icon )
-                )
+                    var numValid = 0
+
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        if (enumerationItem.incompleteReason.isNotEmpty())
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                            break
+                        }
+                        else if (enumerationItem.valid)
+                        {
+                            numValid++
+                        }
+                    }
+
+                    if (numValid > 0 && numValid == location.enumerationItems.size)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                    }
+
+                    map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
+                }
             }
         }
     }
@@ -326,11 +344,12 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 val geometry1 = geometryFactory.createPoint( coordinate )
                 if (geometry.contains( geometry1 ))
                 {
-                    val enumData = EnumData( -1, enumArea.id!!, false, false, "", "", point.coordinates.latitude, point.coordinates.longitude )
-                    DAO.enumDataDAO.createOrUpdateEnumData( enumData )
-                    enumArea.enumDataList.add( enumData )
+                    val location = Location( enumArea.id!!, point.coordinates.latitude, point.coordinates.longitude, false )
+                    DAO.locationDAO.createOrUpdateLocation( location )
+
+                    enumArea.locations.add( location )
                     DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-                    break // found! assuming that it can only exist in a single EA
+                    break // found! assuming that it can only exist in a single EA, for now!
                 }
             }
         }

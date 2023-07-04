@@ -253,6 +253,19 @@ class EnumerationItemDAO(private var dao: DAO)
         enumerationItem.id?.let { id ->
             Log.d( "xxx", "deleting EnumerationItem with ID $id" )
 
+            val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
+
+            collectionItem?.let {
+                DAO.collectionItemDAO.delete( it )
+            }
+
+            val fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
+
+            for (fieldData in fieldDataList)
+            {
+                DAO.fieldDataDAO.delete( fieldData)
+            }
+
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(id.toString())

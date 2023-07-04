@@ -20,6 +20,9 @@ data class EnumerationItem(
     var notes : String,
     var fieldDataList : ArrayList<FieldData>?)
 {
+    constructor( locationId: Int ) :
+            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, "", false, "", "", ArrayList<FieldData>())
+
     constructor( locationId: Int, subAddress: String, valid: Boolean, incompleteReason: String, notes: String ) :
             this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, subAddress, valid, incompleteReason, notes, ArrayList<FieldData>())
 
@@ -30,9 +33,9 @@ data class EnumerationItem(
 
     companion object
     {
-        fun unpack( string: String ) : EnumData
+        fun unpack( string: String ) : EnumerationItem
         {
-            return Json.decodeFromString<EnumData>( string )
+            return Json.decodeFromString<EnumerationItem>( string )
         }
     }
 }

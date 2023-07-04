@@ -30,9 +30,9 @@ data class Location(
 
     companion object
     {
-        fun unpack( string: String ) : EnumData
+        fun unpack( string: String ) : Location
         {
-            return Json.decodeFromString<EnumData>( string )
+            return Json.decodeFromString<Location>( string )
         }
     }
 }

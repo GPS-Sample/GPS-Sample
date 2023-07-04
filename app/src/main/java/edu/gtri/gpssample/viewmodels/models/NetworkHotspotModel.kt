@@ -216,12 +216,12 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload )
 
-                    enumArea?.let { enumArea ->
-                        for (enumData in enumArea.enumDataList)
-                        {
-                            DAO.enumDataDAO.importEnumData( enumData )
-                        }
-                    }
+//                    enumArea?.let { enumArea ->
+//                        for (enumData in enumArea.enumDataList)
+//                        {
+//                            DAO.enumDataDAO.importEnumData( enumData )
+//                        }
+//                    }
 
                 }
 

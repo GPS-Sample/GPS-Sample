@@ -161,6 +161,7 @@ class LocationDAO(private var dao: DAO)
             while (cursor.moveToNext())
             {
                 val location = createLocation( cursor )
+                location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
                 locations.add( location )
             }
 
@@ -172,7 +173,7 @@ class LocationDAO(private var dao: DAO)
         return locations
     }
 
-    fun getLocation( enumArea: EnumArea, team: Team ) : ArrayList<Location>
+    fun getLocations( enumArea: EnumArea, team: Team ) : ArrayList<Location>
     {
         var locations = ArrayList<Location>()
         val db = dao.writableDatabase
@@ -195,6 +196,7 @@ class LocationDAO(private var dao: DAO)
                 while (cursor.moveToNext())
                 {
                     val location = createLocation( cursor )
+                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
                     locations.add( location )
                 }
 
@@ -218,6 +220,7 @@ class LocationDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val location = createLocation( cursor )
+            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
 
@@ -240,6 +243,7 @@ class LocationDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             location = createLocation( cursor )
+            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
         }
 
         cursor.close()
@@ -252,6 +256,11 @@ class LocationDAO(private var dao: DAO)
     {
         location.id?.let { id ->
             Log.d( "xxx", "deleting location with ID $id" )
+
+            for (enumerationItem in location.enumerationItems)
+            {
+                DAO.enumerationItemDAO.delete( enumerationItem )
+            }
 
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"

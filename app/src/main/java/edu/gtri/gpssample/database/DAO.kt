@@ -202,56 +202,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
-                COLUMN_ENUMERATION_ITEM_VALID + " INTEGER" + "," +
-                COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
-                COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
+                COLUMN_COLLECTION_ITEM_VALID + " INTEGER" + "," +
+                COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
+                COLUMN_COLLECTION_ITEM_NOTES + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableCollectionItem)
-
-
-
-        val createTableEnumData = ("CREATE TABLE " +
-                TABLE_ENUM_DATA + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_UUID + " TEXT" + "," +
-                COLUMN_USER_ID + " INTEGER" + "," +
-                COLUMN_STUDY_ID + " INTEGER" + "," +
-                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_ENUMERATION_TEAM_ID + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_COLLECTION_TEAM_ID + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_COLLECTION_DATA_ID + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_VALID + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_INCOMPLETE + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_INCOMPLETE_REASON + " TEXT" + "," +
-                COLUMN_ENUM_DATA_NOTES + " TEXT" + "," +
-                COLUMN_ENUM_DATA_LATITUDE + " REAL" + "," +
-                COLUMN_ENUM_DATA_LONGITUDE + " REAL" + "," +
-                COLUMN_ENUM_DATA_IS_LOCATION + " INTEGER" + "," +
-                COLUMN_ENUM_DATA_DESCRIPTION + " TEXT" + "," +
-                COLUMN_ENUM_DATA_IMAGE_FILE_NAME + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_USER_ID) REFERENCES $TABLE_USER($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_DATA_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_DATA_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_DATA_COLLECTION_DATA_ID) REFERENCES $TABLE_COLLECTION_DATA($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableEnumData)
-
-        val createTableCollectionData = ("CREATE TABLE " +
-                TABLE_COLLECTION_DATA + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_COLLECTION_DATA_ENUM_DATA_ID + " INTEGER" + "," +
-                COLUMN_COLLECTION_DATA_VALID + " INTEGER" + "," +
-                COLUMN_COLLECTION_DATA_INCOMPLETE + " INTEGER" + "," +
-                COLUMN_COLLECTION_DATA_INCOMPLETE_REASON + " TEXT" + "," +
-                COLUMN_COLLECTION_DATA_NOTES + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_COLLECTION_DATA_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableCollectionData)
 
         val createTableFieldData = ("CREATE TABLE " +
                 TABLE_FIELD_DATA + "(" +
@@ -268,7 +224,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
                 COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_DATA_ID) REFERENCES $TABLE_ENUM_DATA($COLUMN_ID)" +
+                "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFieldData)
 
@@ -300,10 +256,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_MEMBER")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_DATA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_DATA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_ITEM")
@@ -412,21 +366,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_TEAM_MEMBER = "team_member"
         const val COLUMN_TEAM_MEMBER_NAME = "team_member_name"
 
-        // EnumData Table
-        const val TABLE_ENUM_DATA = "enum_data"
-        const val COLUMN_ENUM_DATA_ENUMERATION_TEAM_ID = "enum_data_enumeration_team_id"
-        const val COLUMN_ENUM_DATA_COLLECTION_TEAM_ID = "enum_data_collection_team_id"
-        const val COLUMN_ENUM_DATA_COLLECTION_DATA_ID = "enum_data_collection_data_id"
-        const val COLUMN_ENUM_DATA_VALID = "enum_data_valid"
-        const val COLUMN_ENUM_DATA_INCOMPLETE = "enum_data_incomplete"
-        const val COLUMN_ENUM_DATA_INCOMPLETE_REASON = "enum_data_incomplete_reason"
-        const val COLUMN_ENUM_DATA_NOTES = "enum_data_notes"
-        const val COLUMN_ENUM_DATA_LATITUDE = "enum_data_latitude"
-        const val COLUMN_ENUM_DATA_LONGITUDE = "enum_data_longitude"
-        const val COLUMN_ENUM_DATA_IS_LOCATION = "enum_data_is_location"
-        const val COLUMN_ENUM_DATA_DESCRIPTION = "enum_data_description"
-        const val COLUMN_ENUM_DATA_IMAGE_FILE_NAME = "enum_data_image_file_name"
-
         // Location Table
         const val TABLE_LOCATION = "location"
 //        const val COLUMN_ID = "id"
@@ -461,14 +400,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON = "collection_item_incomplete_reason"
         const val COLUMN_COLLECTION_ITEM_NOTES = "collection_item_notes"
 
-        // CollectionData Table
-        const val TABLE_COLLECTION_DATA = "collection_data"
-        const val COLUMN_COLLECTION_DATA_ENUM_DATA_ID = "collection_data_enum_data_id"
-        const val COLUMN_COLLECTION_DATA_VALID = "collection_data_valid"
-        const val COLUMN_COLLECTION_DATA_INCOMPLETE = "collection_data_incomplete"
-        const val COLUMN_COLLECTION_DATA_INCOMPLETE_REASON = "collection_data_incomplete_reason"
-        const val COLUMN_COLLECTION_DATA_NOTES = "collection_data_notes"
-
         const val TABLE_FIELD_DATA = "field_data"
         const val COLUMN_FIELD_DATA_TEXT_VALUE = "field_data_text_value"
         const val COLUMN_FIELD_DATA_NUMBER_VALUE = "field_data_number_value"
@@ -494,10 +425,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var enumAreaDAO: EnumAreaDAO
         lateinit var teamDAO: TeamDAO
         lateinit var teamMemberDAO: TeamMemberDAO
-        lateinit var enumDataDAO: EnumDataDAO
         lateinit var fieldDataDAO: FieldDataDAO
         lateinit var latLonDAO: LatLonDAO
-        lateinit var collectionDataDAO: CollectionDataDAO
         lateinit var locationDAO: LocationDAO
         lateinit var enumerationItemDAO: EnumerationItemDAO
         lateinit var collectionItemDAO: CollectionItemDAO
@@ -513,13 +442,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             Log.d( "xxx", "fields: ${DAO.fieldDAO.getFields()}")
             Log.d( "xxx", "fieldData: ${DAO.fieldDataDAO.getFieldData()}")
             Log.d( "xxx", "enumAreas: ${DAO.enumAreaDAO.getEnumAreas()}")
-            Log.d( "xxx", "enumData: ${DAO.enumDataDAO.getEnumData()}")
             Log.d( "xxx", "teams: ${DAO.teamDAO.getTeams()}")
             Log.d( "xxx", "latLons: ${DAO.latLonDAO.getLatLons()}")
-            Log.d( "xxx", "collectionData: ${DAO.collectionDataDAO.getCollectionData()}")
-//            Log.d( "xxx", "locations: ${DAO.locationDAO.getLocations()}")
-//            Log.d( "xxx", "enumerationItems: ${DAO.enumerationItemDAO.getEnumerationItems()}")
-//            Log.d( "xxx", "collectionItems: ${DAO.collectionItemDAO.getCollectionItems()}")
+            Log.d( "xxx", "locations: ${DAO.locationDAO.getLocations()}")
+            Log.d( "xxx", "enumerationItems: ${DAO.enumerationItemDAO.getEnumerationItems()}")
+            Log.d( "xxx", "collectionItems: ${DAO.collectionItemDAO.getCollectionItems()}")
         }
 
         fun deleteAll()
@@ -535,11 +462,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_FILTER, null, null)
                 db.delete(TABLE_FILTERRULE, null, null)
                 db.delete(TABLE_ENUM_AREA, null, null)
-                db.delete(TABLE_ENUM_DATA, null, null)
                 db.delete(TABLE_TEAM, null, null)
                 db.delete(TABLE_TEAM_MEMBER, null, null)
                 db.delete(TABLE_LAT_LON, null, null)
-                db.delete(TABLE_COLLECTION_DATA, null, null)
                 db.delete(TABLE_LOCATION, null, null)
                 db.delete(TABLE_ENUMERATION_ITEM, null, null)
                 db.delete(TABLE_COLLECTION_ITEM, null, null)
@@ -562,10 +487,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 enumAreaDAO = EnumAreaDAO( instance!! )
                 teamDAO = TeamDAO( instance!! )
                 teamMemberDAO = TeamMemberDAO( instance!! )
-                enumDataDAO = EnumDataDAO( instance!! )
                 fieldDataDAO = FieldDataDAO( instance!! )
                 latLonDAO = LatLonDAO( instance!!)
-                collectionDataDAO = CollectionDataDAO( instance!!)
                 locationDAO = LocationDAO( instance!!)
                 enumerationItemDAO = EnumerationItemDAO( instance!!)
                 collectionItemDAO = CollectionItemDAO( instance!!)
@@ -574,7 +497,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 150
+        private const val DATABASE_VERSION = 168
 
     }
 }

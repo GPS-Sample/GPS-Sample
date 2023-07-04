@@ -102,9 +102,9 @@ class CollectionItemDAO(private var dao: DAO)
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val enumerationItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ID))
-        val valid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_VALID)).toBoolean()
-        val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
-        val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_NOTES))
+        val valid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_VALID)).toBoolean()
+        val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON))
+        val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_NOTES))
 
         return CollectionItem( id, creationDate, uuid, enumerationItemId, valid, incompleteReason, notes )
     }

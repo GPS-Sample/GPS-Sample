@@ -5,23 +5,21 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumData
-import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.database.models.EnumerationItem
+import edu.gtri.gpssample.database.models.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerView.Adapter<PerformEnumerationAdapter.ViewHolder>()
+class PerformEnumerationAdapter(var locations: List<Location>) : RecyclerView.Adapter<PerformEnumerationAdapter.ViewHolder>()
 {
-    override fun getItemCount() = enumDataList!!.size
+    override fun getItemCount() = locations.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var didSelectEnumData: ((enumData: EnumData) -> Unit)
+    lateinit var didSelectLocation: ((location: Location) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -35,9 +33,9 @@ class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerVie
         return viewHolder
     }
 
-    fun updateEnumDataList( enumDataList: List<EnumData> )
+    fun updateLocations( locations: List<Location> )
     {
-        this.enumDataList = enumDataList
+        this.locations = locations
         notifyDataSetChanged()
     }
 
@@ -45,13 +43,13 @@ class PerformEnumerationAdapter(var enumDataList: List<EnumData>?) : RecyclerVie
     {
         holder.itemView.isSelected = false
 
-        val enumData = enumDataList!!.get(holder.adapterPosition)
+        val location = locations.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( enumData.id.toString())
-        holder.dateTextView.setText( Date(enumData.creationDate).toString())
+        holder.nameTextView.setText( location.id.toString())
+        holder.dateTextView.setText( Date(location.creationDate).toString())
 
         holder.itemView.setOnClickListener {
-            didSelectEnumData(enumData)
+            didSelectLocation(location)
         }
     }
 

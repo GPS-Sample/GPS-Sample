@@ -122,11 +122,11 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getOrCreateFieldData( field_id: Int, enum_data_id: Int ): FieldData
+    fun getOrCreateFieldData( field_id: Int, enumerationItemId: Int ): FieldData
     {
         var fieldData: FieldData? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUM_DATA_ID} = $enum_data_id"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $enumerationItemId"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -136,7 +136,7 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
-            fieldData = FieldData( field_id, enum_data_id )
+            fieldData = FieldData( field_id, enumerationItemId )
             createOrUpdateFieldData( fieldData )
         }
 

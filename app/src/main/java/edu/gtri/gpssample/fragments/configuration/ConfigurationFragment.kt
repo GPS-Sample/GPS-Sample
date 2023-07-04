@@ -335,12 +335,12 @@ class ConfigurationFragment : Fragment(),
 
                         val enumArea = EnumArea.unpack( text )
 
-                        enumArea?.let { enumArea ->
-                            for (enumData in enumArea.enumDataList)
-                            {
-                                DAO.enumDataDAO.importEnumData( enumData )
-                            }
-                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+//                        enumArea?.let { enumArea ->
+//                            for (enumData in enumArea.enumDataList)
+//                            {
+//                                DAO.enumDataDAO.importEnumData( enumData )
+//                            }
+//                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
 
                         map?.let { map ->
                             onMapReady(map)

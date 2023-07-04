@@ -27,9 +27,9 @@ data class CollectionItem(
 
     companion object
     {
-        fun unpack( string: String ) : EnumData
+        fun unpack( string: String ) : CollectionItem
         {
-            return Json.decodeFromString<EnumData>( string )
+            return Json.decodeFromString<CollectionItem>( string )
         }
     }
 }
