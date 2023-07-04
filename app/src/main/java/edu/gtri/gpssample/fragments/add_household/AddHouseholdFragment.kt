@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
@@ -200,7 +201,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 }
             }
 
-            enumerationItem.valid = false
+            enumerationItem.state = EnumerationState.Incomplete
             enumerationItem.notes = notes
             enumerationItem.incompleteReason = incompleteReason
             DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
@@ -253,7 +254,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
 
             enumerationItem.notes = notes
-            enumerationItem.valid = true
+            enumerationItem.state = EnumerationState.Complete
             enumerationItem.incompleteReason = ""
             DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
         }

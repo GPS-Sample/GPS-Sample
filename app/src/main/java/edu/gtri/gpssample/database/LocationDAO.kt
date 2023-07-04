@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
@@ -198,6 +199,49 @@ class LocationDAO(private var dao: DAO)
                     val location = createLocation( cursor )
                     location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
                     locations.add( location )
+                }
+
+                cursor.close()
+            }
+        }
+
+        db.close()
+
+        return locations
+    }
+
+    fun getEnumeratedLocations( enumArea: EnumArea, team: Team ) : ArrayList<Location>
+    {
+        var locations = ArrayList<Location>()
+        val db = dao.writableDatabase
+
+        enumArea.id?.let { enumAreaId ->
+            team.id?.let { teamId ->
+                var query = ""
+
+                if (team.isEnumerationTeam)
+                {
+                    query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_ENUMERATION_TEAM_ID} = $teamId"
+                }
+                else
+                {
+                    query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_COLLECTION_TEAM_ID} = $teamId"
+                }
+
+                val cursor = db.rawQuery(query, null)
+
+                while (cursor.moveToNext())
+                {
+                    val location = createLocation( cursor )
+                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        if (enumerationItem.state == EnumerationState.Complete)
+                        {
+                            locations.add( location )
+                            break
+                        }
+                    }
                 }
 
                 cursor.close()

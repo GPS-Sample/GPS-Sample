@@ -20,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
@@ -195,22 +196,22 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 {
                     var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                    var numValid = 0
+                    var numComplete = 0
 
                     for (enumerationItem in location.enumerationItems)
                     {
-                        if (enumerationItem.incompleteReason.isNotEmpty())
+                        if (enumerationItem.state == EnumerationState.Incomplete)
                         {
                             icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
                             break
                         }
-                        else if (enumerationItem.valid)
+                        else if (enumerationItem.state == EnumerationState.Complete)
                         {
-                            numValid++
+                            numComplete++
                         }
                     }
 
-                    if (numValid > 0 && numValid == location.enumerationItems.size)
+                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
                         icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
                     }

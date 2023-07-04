@@ -132,7 +132,7 @@ class PerformCollectionFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        locations = DAO.locationDAO.getLocations(enumArea, team)
+        locations = DAO.locationDAO.getEnumeratedLocations(enumArea, team)
         performCollectionAdapter.updateLocations( locations )
     }
 
@@ -180,40 +180,43 @@ class PerformCollectionFragment : Fragment(),
             {
                 val enumerationItem = location.enumerationItems[0]
 
-                val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
+                if (enumerationItem.state == EnumerationState.Complete)
+                {
+                    val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
 
-                var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                collectionItem?.let { collectionItem ->
+                    collectionItem?.let { collectionItem ->
 
-                    if (collectionItem.incompleteReason.isNotEmpty())
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                    }
-                    else
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                    }
-                }
-
-                val marker = map.addMarker( MarkerOptions()
-                    .position( LatLng( location.latitude, location.longitude ))
-                    .icon( icon )
-                )
-
-                marker?.let {marker ->
-                    marker.tag = location
-
-                    map.setOnMarkerClickListener { marker ->
-                        marker.tag?.let { tag ->
-
-                            val location = tag as Location
-                            sharedViewModel.locationViewModel.setCurrentLocation(location)
-
-                            LaunchSurveyDialog( activity, this)
+                        if (collectionItem.state == CollectionState.Incomplete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
                         }
+                        else if (collectionItem.state == CollectionState.Complete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                        }
+                    }
 
-                        false
+                    val marker = map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
+
+                    marker?.let {marker ->
+                        marker.tag = location
+
+                        map.setOnMarkerClickListener { marker ->
+                            marker.tag?.let { tag ->
+
+                                val location = tag as Location
+                                sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+                                LaunchSurveyDialog( activity, this)
+                            }
+
+                            false
+                        }
                     }
                 }
             }
@@ -416,10 +419,17 @@ class PerformCollectionFragment : Fragment(),
             val enumerationItem = location.enumerationItems[0]
             var collectionItem = DAO.collectionItemDAO.getCollectionItem(enumerationItem.collectionItemId)
 
+            var state = CollectionState.Complete
+
+            if (incompleteReason.isNotEmpty())
+            {
+                state = CollectionState.Incomplete
+            }
+
             if (collectionItem == null)
             {
                 val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
-                    CollectionItem( enumerationItem.id!!, incompleteReason.isEmpty(), incompleteReason, notes )
+                    CollectionItem( enumerationItem.id!!, state, incompleteReason, notes )
                 )
 
                 collectionItem?.id?.let {
@@ -430,7 +440,7 @@ class PerformCollectionFragment : Fragment(),
             }
             else
             {
-                collectionItem.valid = incompleteReason.isEmpty()
+                collectionItem.state = state
                 collectionItem.incompleteReason = incompleteReason
                 collectionItem.notes = notes
                 DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )

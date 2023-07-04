@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.constants.CollectionState
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
@@ -89,7 +91,7 @@ class CollectionItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, collectionItem.creationDate )
         values.put( DAO.COLUMN_UUID, collectionItem.uuid )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, collectionItem.enumerationItemId )
-        values.put( DAO.COLUMN_COLLECTION_ITEM_VALID, collectionItem.valid )
+        values.put( DAO.COLUMN_COLLECTION_ITEM_STATE, collectionItem.state.format )
         values.put( DAO.COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON, collectionItem.incompleteReason )
         values.put( DAO.COLUMN_COLLECTION_ITEM_NOTES, collectionItem.notes )
     }
@@ -102,11 +104,11 @@ class CollectionItemDAO(private var dao: DAO)
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val enumerationItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ID))
-        val valid = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_VALID)).toBoolean()
+        val state = CollectionState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_STATE)))
         val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON))
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_NOTES))
 
-        return CollectionItem( id, creationDate, uuid, enumerationItemId, valid, incompleteReason, notes )
+        return CollectionItem( id, creationDate, uuid, enumerationItemId, state, incompleteReason, notes )
     }
 
     fun getCollectionItem( uuid: String ) : CollectionItem?

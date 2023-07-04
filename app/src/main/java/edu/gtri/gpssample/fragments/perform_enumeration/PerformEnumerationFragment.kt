@@ -234,22 +234,22 @@ class PerformEnumerationFragment : Fragment(),
             }
             else
             {
-                var numValid = 0
+                var numComplete = 0
 
                 for (enumerationItem in location.enumerationItems)
                 {
-                    if (enumerationItem.incompleteReason.isNotEmpty())
+                    if (enumerationItem.state == EnumerationState.Incomplete)
                     {
                         icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
                         break
                     }
-                    else if (enumerationItem.valid)
+                    else if (enumerationItem.state == EnumerationState.Complete)
                     {
-                        numValid++
+                        numComplete++
                     }
                 }
 
-                if (numValid > 0 && numValid == location.enumerationItems.size)
+                if (numComplete > 0 && numComplete == location.enumerationItems.size)
                 {
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
                 }

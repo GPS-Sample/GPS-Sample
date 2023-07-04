@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.constants.CollectionState
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -13,12 +14,12 @@ data class CollectionItem(
     var creationDate: Long,
     var uuid : String,
     var enumerationItemId : Int,
-    var valid : Boolean,
+    var state : CollectionState,
     var incompleteReason : String,
     var notes : String)
 {
-    constructor( enumerationItemId: Int, valid: Boolean, incompleteReason: String, notes: String) :
-            this( null, Date().time, UUID.randomUUID().toString(), enumerationItemId, valid, incompleteReason, notes )
+    constructor( enumerationItemId: Int, state: CollectionState, incompleteReason: String, notes: String) :
+            this( null, Date().time, UUID.randomUUID().toString(), enumerationItemId, state, incompleteReason, notes )
 
     fun pack() : String
     {

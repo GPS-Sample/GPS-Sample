@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.constants.EnumerationState
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -15,16 +16,16 @@ data class EnumerationItem(
     var locationId : Int,
     var collectionItemId: Int,
     var subAddress : String,
-    var valid : Boolean,
+    var state : EnumerationState,
     var incompleteReason : String,
     var notes : String,
     var fieldDataList : ArrayList<FieldData>?)
 {
     constructor( locationId: Int ) :
-            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, "", false, "", "", ArrayList<FieldData>())
+            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, "", EnumerationState.Defined, "", "", ArrayList<FieldData>())
 
-    constructor( locationId: Int, subAddress: String, valid: Boolean, incompleteReason: String, notes: String ) :
-            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, subAddress, valid, incompleteReason, notes, ArrayList<FieldData>())
+    constructor( locationId: Int, subAddress: String, state: EnumerationState, incompleteReason: String, notes: String ) :
+            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, subAddress, state, incompleteReason, notes, ArrayList<FieldData>())
 
     fun pack() : String
     {

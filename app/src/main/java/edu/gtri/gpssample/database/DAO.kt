@@ -188,7 +188,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_LOCATION_ID + " INTEGER" + "," +
                 COLUMN_COLLECTION_ITEM_ID + " INTEGER" + "," +
                 COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
-                COLUMN_ENUMERATION_ITEM_VALID + " INTEGER" + "," +
+                COLUMN_ENUMERATION_ITEM_STATE + " TEXT" + "," +
                 COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
                 COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
@@ -202,7 +202,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_CREATION_DATE + " INTEGER" + "," +
                 COLUMN_UUID + " TEXT" + "," +
                 COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
-                COLUMN_COLLECTION_ITEM_VALID + " INTEGER" + "," +
+                COLUMN_COLLECTION_ITEM_STATE + " TEXT" + "," +
                 COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
                 COLUMN_COLLECTION_ITEM_NOTES + " TEXT" + "," +
                 "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
@@ -286,7 +286,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
         const val COLUMN_TEAM_ID = "team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
-        const val COLUMN_ENUM_DATA_ID = "enum_data_id"
         const val COLUMN_LOCATION_ID = "location_id"
         const val COLUMN_ENUMERATION_ITEM_ID = "enumeration_item_id"
         const val COLUMN_COLLECTION_ITEM_ID = "collection_item_id"
@@ -386,7 +385,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_LOCATION_ID = "location_id"
 //        const val COLUMN_COLLECTION_ITEM_ID = "collection_item_id"
         const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
-        const val COLUMN_ENUMERATION_ITEM_VALID = "enumeration_item_valid"
+        const val COLUMN_ENUMERATION_ITEM_STATE = "enumeration_item_state"
         const val COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON = "enumeration_item_incomplete_reason"
         const val COLUMN_ENUMERATION_ITEM_NOTES = "enumeration_item_notes"
 
@@ -396,7 +395,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_CREATION_DATE = "creation_date"
 //        const val COLUMN_UUID = "uuid"
 //        const val COLUMN_ENUMERATION_ITEM_ID = "enumeration_item_id"
-        const val COLUMN_COLLECTION_ITEM_VALID = "collection_item_valid"
+        const val COLUMN_COLLECTION_ITEM_STATE = "collection_item_state"
         const val COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON = "collection_item_incomplete_reason"
         const val COLUMN_COLLECTION_ITEM_NOTES = "collection_item_notes"
 
@@ -497,7 +496,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 168
+        private const val DATABASE_VERSION = 169
 
     }
 }
