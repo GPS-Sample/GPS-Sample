@@ -35,7 +35,7 @@ data class Config(
     var enumAreas : ArrayList<EnumArea>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-        minGpsPrecision: Int) : this(null, 0, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
+        minGpsPrecision: Int) : this(null, -1, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
                                     ArrayList<Study>(), ArrayList<EnumArea>())
     constructor(id: Int?, teamId: Int, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int) : this(id, teamId, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
