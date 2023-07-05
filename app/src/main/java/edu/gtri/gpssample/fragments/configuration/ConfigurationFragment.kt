@@ -109,7 +109,7 @@ class ConfigurationFragment : Fragment(),
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+            ConfirmationDialog( activity, "Import Configuration", "Select an import method", "QR Code", "File System", kExportTag, this)
         }
 
         binding.exportButton.setOnClickListener {

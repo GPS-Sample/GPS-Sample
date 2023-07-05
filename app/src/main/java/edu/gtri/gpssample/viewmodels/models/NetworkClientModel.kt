@@ -168,15 +168,11 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                             sleep(kDialogTimeout)
                             connectDelegate?.didConnect(true)
-
-
                         }?:run {
                             _dataReceived.postValue(NetworkStatus.DataReceivedError)
                             connectDelegate?.didConnect(false)
                         }
-
                     }
-
                 }
             }
         }
