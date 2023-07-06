@@ -27,7 +27,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.DAO.Companion.collectionDataDAO
+//import edu.gtri.gpssample.database.DAO.Companion.collectionDataDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
@@ -100,10 +100,8 @@ class PerformCollectionFragment : Fragment(),
             userId = it
         }
 
-        val enumDataList = DAO.enumDataDAO.getEnumData(enumArea, team)
-
-        performCollectionAdapter = PerformCollectionAdapter( enumDataList )
-        performCollectionAdapter.didSelectEnumData = this::didSelectEnumData
+        performCollectionAdapter = PerformCollectionAdapter( ArrayList<Location>() )
+        performCollectionAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
@@ -132,6 +130,9 @@ class PerformCollectionFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+
+        enumArea.locations = DAO.locationDAO.getEnumeratedLocations(enumArea, team)
+        performCollectionAdapter.updateLocations( enumArea.locations )
     }
 
     var once = true
@@ -164,48 +165,59 @@ class PerformCollectionFragment : Fragment(),
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        val enumDataList = DAO.enumDataDAO.getEnumData(enumArea, team)
-
-        for (enumData in enumDataList)
+        for (location in enumArea.locations)
         {
-            var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+            if (location.isLandmark)
+            {
+                val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+                map.addMarker( MarkerOptions()
+                    .position( LatLng( location.latitude, location.longitude ))
+                    .icon( icon )
+                )
+            }
+            else if (location.enumerationItems.isNotEmpty())
+            {
+                val enumerationItem = location.enumerationItems[0]
 
-            val marker = map.addMarker( MarkerOptions()
-                .position( LatLng( enumData.latitude, enumData.longitude ))
-                .icon( icon )
-            )
-
-            marker?.let {marker ->
-                marker.tag = enumData
-
-                val collectionData = DAO.collectionDataDAO.getCollectionData( enumData.collectionDataId )
-
-                collectionData?.let { collectionData ->
+                if (enumerationItem.state == EnumerationState.Complete)
+                {
+                    val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
 
                     var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                    if (collectionData.incomplete)
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                    collectionItem?.let { collectionItem ->
+
+                        if (collectionItem.state == CollectionState.Incomplete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                        }
+                        else if (collectionItem.state == CollectionState.Complete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                        }
                     }
-                    else if (collectionData.valid)
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+
+                    val marker = map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
+
+                    marker?.let {marker ->
+                        marker.tag = location
+
+                        map.setOnMarkerClickListener { marker ->
+                            marker.tag?.let { tag ->
+
+                                val location = tag as Location
+                                sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+                                LaunchSurveyDialog( activity, this)
+                            }
+
+                            false
+                        }
                     }
-
-                    marker.setIcon( icon )
                 }
-            }
-
-            map.setOnMarkerClickListener { marker ->
-                marker.tag?.let {tag ->
-                    val enum_data = tag as EnumData
-                    sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
-
-                    LaunchSurveyDialog( activity, this)
-                }
-
-                false
             }
         }
     }
@@ -224,9 +236,9 @@ class PerformCollectionFragment : Fragment(),
         return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
-    private fun didSelectEnumData( enumData: EnumData )
+    private fun didSelectLocation( location: Location )
     {
-        sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+        sharedViewModel.locationViewModel.setCurrentLocation(location)
 
         LaunchSurveyDialog( activity, this)
     }
@@ -247,7 +259,8 @@ class PerformCollectionFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.updateAllLists( config )
+                    // this is a hack
+//                    DAO.configDAO.updateAllLists( config )
 
                     team.id?.let {
                         config.teamId = it
@@ -279,7 +292,8 @@ class PerformCollectionFragment : Fragment(),
                 // during the import to accommodate uploads from multiple enumerators.
                 // We'll also need to handle duplicate updates from the same enumerator.
 
-                enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+//                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+
                 val packedEnumArea = enumArea.pack()
                 Log.d( "xxx", packedEnumArea )
 
@@ -335,12 +349,11 @@ class PerformCollectionFragment : Fragment(),
                         sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
 
                         // I don't know why this should be necessary.
-                        enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+//                        enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
 
                         sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
                         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                         getResult.launch(intent)
-
                     }
                 }
             }
@@ -377,9 +390,8 @@ class PerformCollectionFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun launchSurveyButtonPressed()
     {
-        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let { enumData ->
-
-            (this.activity!!.application as? MainApplication)?.currentEnumDataUUID = enumData.uuid
+        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+            (this.activity!!.application as? MainApplication)?.currentLocationUUID = location.uuid
             val intent = Intent(Intent.ACTION_VIEW)
             intent.type = "vnd.android.cursor.dir/vnd.odk.form"
             odk_result.launch(intent)
@@ -388,30 +400,53 @@ class PerformCollectionFragment : Fragment(),
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private val odk_result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        AdditionalInfoDialog( activity, false, "", "", this)
+        AdditionalInfoDialog( activity, "", "", this)
     }
 
     override fun markAsIncompleteButtonPressed()
     {
-        AdditionalInfoDialog( activity, true, "", "", this)
+        AdditionalInfoDialog( activity, "", "", this)
     }
 
     override fun didSelectCancelButton()
     {
     }
 
-    override fun didSelectSaveButton( incomplete: Boolean, incompleteReason: String, notes: String )
+    override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
-        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let { enumData ->
-            enumData.id?.let { enumDataId ->
-                val valid = !incomplete
-                val collectionData = collectionDataDAO.createOrUpdateCollectionData( CollectionData( enumDataId, valid, incomplete, incompleteReason, notes ))
-                collectionData?.id?.let {
-                    enumData.collectionDataId = it
-                    DAO.enumDataDAO.updateEnumData( enumData )
-                    onMapReady(map)
-                }
+        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+
+            val enumerationItem = location.enumerationItems[0]
+            var collectionItem = DAO.collectionItemDAO.getCollectionItem(enumerationItem.collectionItemId)
+
+            var state = CollectionState.Complete
+
+            if (incompleteReason.isNotEmpty())
+            {
+                state = CollectionState.Incomplete
             }
+
+            if (collectionItem == null)
+            {
+                val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
+                    CollectionItem( enumerationItem.id!!, state, incompleteReason, notes )
+                )
+
+                collectionItem?.id?.let {
+                    enumerationItem.collectionItemId = it
+                }
+
+                DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
+            }
+            else
+            {
+                collectionItem.state = state
+                collectionItem.incompleteReason = incompleteReason
+                collectionItem.notes = notes
+                DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
+            }
+
+            onMapReady(map)
         }
     }
 
@@ -428,7 +463,8 @@ class PerformCollectionFragment : Fragment(),
             // during the import to accommodate uploads from multiple enumerators.
             // We'll also need to handle duplicate updates from the same enumerator.
 
-            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+//            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+
             val packedEnumArea = enumArea.pack()
             Log.d( "xxx", packedEnumArea )
 

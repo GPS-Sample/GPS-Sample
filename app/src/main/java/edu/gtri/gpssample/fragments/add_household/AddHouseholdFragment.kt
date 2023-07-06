@@ -19,13 +19,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumData
-import edu.gtri.gpssample.database.models.FieldData
-import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -42,7 +40,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     private lateinit var study: Study
     private lateinit var config: Config
-    private lateinit var enumData: EnumData
+    private lateinit var location: Location
+    private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
 
@@ -57,7 +56,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             override fun handleOnBackPressed() {
                 if (createMode)
                 {
-                    DAO.enumDataDAO.delete( enumData )
+                    DAO.locationDAO.delete( location )
                 }
                 findNavController().popBackStack()
             }
@@ -82,32 +81,47 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             study = it
         }
 
-        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let {
-            enumData = it
+        sharedViewModel.locationViewModel.currentLocation?.value?.let {
+            location = it
         }
 
-        if (enumData.id == null)
+        if (location.id == null)
         {
             createMode = true
+
             sharedViewModel.teamViewModel.currentTeam?.value?.let { team ->
-                enumData.enumerationTeamId = team.id!!
+                location.enumerationTeamId = team.id!!
             }
-            DAO.enumDataDAO.createOrUpdateEnumData(enumData)
+
+            DAO.locationDAO.createOrUpdateLocation(location)
+        }
+
+        location.id?.let { locationId ->
+            if (location.enumerationItems.isEmpty())
+            {
+                enumerationItem = EnumerationItem( locationId )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
+                location.enumerationItems.add( enumerationItem )
+            }
+            else
+            {
+                enumerationItem = location.enumerationItems[0]
+            }
         }
 
         for (field in study.fields)
         {
-            val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumData.id!!)
+            val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumerationItem.id!!)
             fieldDataMap[field.id!!] = fieldData
             fieldDataMap[field.id!!] = fieldData.copy()
         }
 
-        if (enumData.incomplete || enumData.notes.length > 0)
+        if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
         {
             binding.cardView.visibility = View.VISIBLE
-            binding.incompleteCheckBox.isChecked = enumData.incomplete
-            binding.notesEditText.setText( enumData.notes )
-            when (enumData.incompleteReason)
+            binding.incompleteCheckBox.isChecked = enumerationItem.incompleteReason.isNotEmpty()
+            binding.notesEditText.setText( enumerationItem.notes )
+            when (enumerationItem.incompleteReason)
             {
                 "Nobody home" -> binding.nobodyHomeButton.isChecked = true
                 "Home does not exist" -> binding.doesNotExistButton.isChecked = true
@@ -124,14 +138,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        if (enumData.imageFileName.isNotEmpty())
-        {
-            val uri = Uri.parse(enumData.imageFileName )
-            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
-            binding.imageView.setImageBitmap(bitmap)
-        }
+//        if (enumData.imageFileName.isNotEmpty())
+//        {
+//            val uri = Uri.parse(enumData.imageFileName )
+//            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+//            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+//            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
+//            binding.imageView.setImageBitmap(bitmap)
+//        }
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this household?", "No", "Yes", 0, this)
@@ -145,11 +159,15 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.cancelButton.setOnClickListener {
+            if (createMode)
+            {
+                DAO.locationDAO.delete( location )
+            }
             findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
-            AdditionalInfoDialog( activity, enumData.incomplete, enumData.incompleteReason, enumData.notes, this)
+            AdditionalInfoDialog( activity, enumerationItem.incompleteReason, enumerationItem.notes, this)
         }
     }
 
@@ -165,7 +183,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectRightButton(tag: Any?)
     {
-        DAO.enumDataDAO.delete( enumData )
+        DAO.locationDAO.delete( location )
         findNavController().popBackStack()
     }
 
@@ -173,9 +191,9 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
     }
 
-    override fun didSelectSaveButton( incomplete: Boolean, incompleteReason: String, notes: String )
+    override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
-        if (incomplete)
+        if (incompleteReason.isNotEmpty())
         {
             for (key in fieldDataMap.keys) {
                 fieldDataMap[key]?.let { fieldData ->
@@ -183,13 +201,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 }
             }
 
-            enumData.notes = notes
-            enumData.valid = false
-            enumData.incomplete = true
-            enumData.incompleteReason = incompleteReason
-            DAO.enumDataDAO.updateEnumData( enumData )
-
-            findNavController().popBackStack()
+            enumerationItem.state = EnumerationState.Incomplete
+            enumerationItem.notes = notes
+            enumerationItem.incompleteReason = incompleteReason
+            DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
         }
         else
         {
@@ -234,18 +249,18 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                         }
                     }
 
-                    enumData.notes = notes
-                    enumData.valid = true
-                    enumData.incomplete = false
-                    enumData.incompleteReason = ""
-                    DAO.enumDataDAO.updateEnumData( enumData )
-
                     DAO.fieldDataDAO.updateFieldData( fieldData )
                 }
             }
 
-            findNavController().popBackStack()
+            enumerationItem.notes = notes
+            enumerationItem.state = EnumerationState.Complete
+            enumerationItem.incompleteReason = ""
+            enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
+            DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
         }
+
+        findNavController().popBackStack()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -259,8 +274,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                     val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
                     (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
                     binding.imageView.setImageBitmap(bitmap)
-                    enumData.imageFileName = uri.toString()
-                    DAO.enumDataDAO.updateEnumData( enumData )
+//                    enumData.imageFileName = uri.toString()
+//                    DAO.enumDataDAO.updateEnumData( enumData )
                 }
             }
         }

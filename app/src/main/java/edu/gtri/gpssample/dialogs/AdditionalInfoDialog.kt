@@ -13,14 +13,14 @@ class AdditionalInfoDialog
     interface AdditionalInfoDialogDelegate
     {
         fun didSelectCancelButton()
-        fun didSelectSaveButton( incomplete: Boolean, incompleteReason: String, notes: String )
+        fun didSelectSaveButton( incompleteReason: String, notes: String )
     }
 
     constructor()
     {
     }
 
-    constructor( context: Context?, incomplete: Boolean, incompleteReason: String, notes: String, delegate: AdditionalInfoDialogDelegate )
+    constructor( context: Context?, incompleteReason: String, notes: String, delegate: AdditionalInfoDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -60,7 +60,7 @@ class AdditionalInfoDialog
             }
         })
 
-        incompleteCheckBox.isChecked = incomplete
+        incompleteCheckBox.isChecked = incompleteReason.isNotEmpty()
         notesTextView.setText( notes )
 
         when (incompleteReason)
@@ -97,7 +97,7 @@ class AdditionalInfoDialog
                 }
             }
 
-            delegate.didSelectSaveButton( incompleteCheckBox.isChecked, incompleteReason, notesTextView.text.toString() )
+            delegate.didSelectSaveButton( incompleteReason, notesTextView.text.toString() )
             alertDialog.dismiss()
         }
     }

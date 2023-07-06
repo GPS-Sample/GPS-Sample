@@ -54,8 +54,7 @@ class PerformEnumerationFragment : Fragment(),
     private var userId = 0
     private var enumAreaId = 0
     private var dropMode = false
-    private var location: LatLng? = null
-    private var enumDataList = ArrayList<EnumData>()
+    private var addLocation: LatLng? = null
     private var _binding: FragmentPerformEnumerationBinding? = null
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private val binding get() = _binding!!
@@ -89,6 +88,8 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
+        Log.d( "xxx", enumArea.toString())
+
         sharedViewModel.teamViewModel.currentTeam?.value?.let {
             team = it
         }
@@ -99,8 +100,8 @@ class PerformEnumerationFragment : Fragment(),
             userId = it
         }
 
-        performEnumerationAdapter = PerformEnumerationAdapter( enumDataList )
-        performEnumerationAdapter.didSelectEnumData = this::didSelectEnumData
+        performEnumerationAdapter = PerformEnumerationAdapter( ArrayList<Location>() )
+        performEnumerationAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performEnumerationAdapter
@@ -119,14 +120,14 @@ class PerformEnumerationFragment : Fragment(),
             if (!dropMode)
             {
                 dropMode = true
-                location = null
+                addLocation = null
                 addMapObjects()
                 binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
                 map.setOnMapClickListener {
                     if (dropMode)
                     {
-                        location = it
+                        addLocation = it
                         map.addMarker(MarkerOptions().position(it))
                         dropMode = false
                         binding.dropPinButton.setBackgroundTintList(defaultColorList);
@@ -142,39 +143,52 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.addHouseholdButton.setOnClickListener {
 
-            location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
-                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+            addLocation?.let { location ->
+                val location = Location(enumAreaId, location.latitude, location.longitude, false)
+                location.enumerationTeamId = team.id!!
+                sharedViewModel.locationViewModel.setCurrentLocation(location)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
             } ?: kotlin.run {
                 Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
             }
 
-            location = null
+            addLocation = null
         }
 
-        binding.addLocationButton.setOnClickListener {
+        binding.addLandmarkButton.setOnClickListener {
 
-            location?.let { location ->
-                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
-                enumData.isLocation = true
-                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+//            location?.let { location ->
+//                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
+//                enumData.isLocation = true
+//                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+//
+//                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+//            } ?: kotlin.run {
+//                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
+//            }
 
-                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-            } ?: kotlin.run {
-                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
-            }
-
-            location = null
+            addLocation = null
         }
 
         binding.exportButton.setOnClickListener {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                ConfirmationDialog( activity, "Export Enumeration Data", "Select an export method", "QR Code", "File System", kExportTag, this)
+                val user = (activity!!.application as MainApplication).user
 
-                //ExportDialog( activity, "${config.name}-${team.name}", "${enumArea.name}-${team.name}", this )
+                user?.let { user ->
+                    when(user.role)
+                    {
+                        Role.Supervisor.toString(), Role.Admin.toString() ->
+                        {
+                            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+                        }
+                        Role.Enumerator.toString() ->
+                        {
+                            ConfirmationDialog( activity, "Export Enumeration Data", "Select an export method", "QR Code", "File System", kExportTag, this)
+                        }
+                    }
+                }
             }
         }
     }
@@ -185,9 +199,9 @@ class PerformEnumerationFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        enumDataList = DAO.enumDataDAO.getEnumData(enumArea, team)
+        enumArea.locations = DAO.locationDAO.getLocations(enumArea, team)
+        performEnumerationAdapter.updateLocations( enumArea.locations )
 
-        performEnumerationAdapter.updateEnumDataList( enumDataList )
         if (this::map.isInitialized)
         {
             addMapObjects()
@@ -222,47 +236,63 @@ class PerformEnumerationFragment : Fragment(),
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        for (enumData in enumDataList)
+        for (location in enumArea.locations)
         {
+            var marker: Marker? = null
             var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-            if (enumData.incomplete)
+            if (location.isLandmark)
             {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-            }
-            else if (enumData.valid)
-            {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-            }
-
-            if (enumData.isLocation)
                 icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+            }
+            else
+            {
+                var numComplete = 0
 
-            val marker = map.addMarker( MarkerOptions()
-                .position( LatLng( enumData.latitude, enumData.longitude ))
+                for (enumerationItem in location.enumerationItems)
+                {
+                    if (enumerationItem.state == EnumerationState.Incomplete)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                        break
+                    }
+                    else if (enumerationItem.state == EnumerationState.Complete)
+                    {
+                        numComplete++
+                    }
+                }
+
+                if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                }
+            }
+
+            marker = map.addMarker( MarkerOptions()
+                .position( LatLng( location.latitude, location.longitude ))
                 .icon( icon )
             )
 
             marker?.let {marker ->
-                marker.tag = enumData
-            }
+                marker.tag = location
 
-            map.setOnMarkerClickListener { marker ->
-                marker.tag?.let {tag ->
-                    val enum_data = tag as EnumData
-                    sharedViewModel.enumDataViewModel.setCurrentEnumData(enum_data)
+                map.setOnMarkerClickListener { marker ->
+                    marker.tag?.let { tag ->
+                        val location = tag as Location
+                        sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-                    if (enum_data.isLocation)
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                        if (location.isLandmark)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                        }
+                        else
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                        }
                     }
-                    else
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-                    }
+
+                    false
                 }
-
-                false
             }
         }
     }
@@ -287,11 +317,11 @@ class PerformEnumerationFragment : Fragment(),
         return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
-    private fun didSelectEnumData( enumData: EnumData )
+    private fun didSelectLocation( location: Location )
     {
-        sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
+        sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-        if (enumData.isLocation)
+        if (location.isLandmark)
         {
             findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
         }
@@ -317,7 +347,8 @@ class PerformEnumerationFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.updateAllLists( config )
+                    // this is a hack
+//                    DAO.configDAO.updateAllLists( config )
 
                     team.id?.let {
                         config.teamId = it
@@ -349,7 +380,8 @@ class PerformEnumerationFragment : Fragment(),
                 // during the import to accommodate uploads from multiple enumerators.
                 // We'll also need to handle duplicate updates from the same enumerator.
 
-                enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+//                enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+
                 val packedEnumArea = enumArea.pack()
                 Log.d( "xxx", packedEnumArea )
 
@@ -393,11 +425,13 @@ class PerformEnumerationFragment : Fragment(),
 
                         startHotspot(view)
                     }
+
                     Role.Admin.toString() ->
                     {
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
                         startHotspot(view)
                     }
+
                     Role.Enumerator.toString() ->
                     {
                         // start camera
@@ -405,12 +439,11 @@ class PerformEnumerationFragment : Fragment(),
                         sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
 
                         // I don't know why this should be necessary.
-                        enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+//                        enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
 
                         sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
                         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                         getResult.launch(intent)
-
                     }
                 }
             }
@@ -438,9 +471,7 @@ class PerformEnumerationFragment : Fragment(),
 
 //                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
                 // need to pass this into the network view model
-
             }
-
         }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -462,7 +493,8 @@ class PerformEnumerationFragment : Fragment(),
             // during the import to accommodate uploads from multiple enumerators.
             // We'll also need to handle duplicate updates from the same enumerator.
 
-            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea,team)
+//            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+
             val packedEnumArea = enumArea.pack()
             Log.d( "xxx", packedEnumArea )
 

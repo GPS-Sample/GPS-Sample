@@ -25,13 +25,13 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogDelegate
 {
-
     private var _binding: FragmentCreateFilterBinding? = null
     private val binding get() = _binding!!
     private lateinit var createFilterAdapter: CreateFilterAdapter
     private lateinit var filter: Filter
     private var sampleSizeIsVisible = true
     private lateinit var sharedViewModel : ConfigurationViewModel
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)

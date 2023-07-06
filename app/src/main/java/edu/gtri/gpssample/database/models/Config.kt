@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import android.util.Log
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
@@ -35,7 +36,7 @@ data class Config(
     var enumAreas : ArrayList<EnumArea>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-        minGpsPrecision: Int) : this(null, 0, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
+        minGpsPrecision: Int) : this(null, -1, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
                                     ArrayList<Study>(), ArrayList<EnumArea>())
     constructor(id: Int?, teamId: Int, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int) : this(id, teamId, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
@@ -62,7 +63,10 @@ data class Config(
             {
                 return Json.decodeFromString<Config>( message )
             }
-            catch( ex: Exception ) {}
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTrace.toString())
+            }
 
             return null
         }

@@ -134,12 +134,8 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
     private fun didSelectStudy(study: Study)
     {
-        val bundle = Bundle()
-
-        //bundle.putString( Keys.kConfig_uuid.toString(), config.uuid )
-        //bundle.putString( Keys.kStudy_uuid.toString(), study.uuid )
         sharedViewModel.createStudyModel.setStudy(study)
-        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment, bundle)
+        findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
     }
     private fun shouldDeleteStudy(study: Study)
     {
@@ -179,31 +175,6 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
                     .addAll(points)
 
                 map.addPolygon(polygon)
-
-                val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
-
-                for (enumData in enumDataList)
-                {
-                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                    if (enumData.incomplete)
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                    }
-                    else if (enumData.valid)
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                    }
-
-                    if (enumData.isLocation)
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-
-                    map.addMarker(
-                        MarkerOptions()
-                            .position(LatLng(enumData.latitude, enumData.longitude))
-                            .icon(icon)
-                    )
-                }
             }
 
             // HACK HACK
