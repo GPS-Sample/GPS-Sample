@@ -90,6 +90,12 @@ class ConfigDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             config = buildConfig( cursor )
+
+            config.id?.let{id ->
+                config.studies = DAO.studyDAO.getStudies(config)
+                config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+            }
+
 //            // find studies
 //            val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
 //
@@ -135,15 +141,13 @@ class ConfigDAO(private var dao: DAO)
         {
             val config = buildConfig( cursor )
 
-            // find studies
             config.id?.let{id ->
                 config.studies = DAO.studyDAO.getStudies(config)
-                Log.d("DAO", "")
+                config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
             }
 
             configs.add( config)
         }
-
 
         db = dao.writableDatabase
         for(config in configs)
@@ -208,13 +212,13 @@ class ConfigDAO(private var dao: DAO)
         db.close()
     }
 
-    fun updateAllLists(config: Config)
-    {
-        config.id?.let { id ->
-            config.studies = DAO.studyDAO.getStudies(config)
-            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-        }
-    }
+//    fun updateAllLists(config: Config)
+//    {
+//        config.id?.let { id ->
+//            config.studies = DAO.studyDAO.getStudies(config)
+//            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+//        }
+//    }
 
     private fun createOrUpdateStudies(config : Config)
     {

@@ -69,7 +69,7 @@ class EnumAreaDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
-        values.put( DAO.COLUMN_CONFIG_ID, enumArea.config_id )
+        values.put( DAO.COLUMN_CONFIG_ID, enumArea.configId )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
     }
 
@@ -111,6 +111,9 @@ class EnumAreaDAO(private var dao: DAO)
 
             enumArea.id?.let { _id ->
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( _id )
+                enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
+                enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
+                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             }
         }
 

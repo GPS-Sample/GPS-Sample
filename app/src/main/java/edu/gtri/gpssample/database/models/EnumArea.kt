@@ -11,7 +11,7 @@ import kotlin.collections.ArrayList
 data class EnumArea (
     var id : Int? = null,
     var creationDate: Long,
-    var config_id: Int,
+    var configId: Int,
     var name: String,
     var vertices: ArrayList<LatLon>,
     var enumerationTeams: ArrayList<Team>,

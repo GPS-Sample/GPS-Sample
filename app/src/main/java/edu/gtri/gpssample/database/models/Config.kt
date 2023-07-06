@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import android.util.Log
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
@@ -62,7 +63,10 @@ data class Config(
             {
                 return Json.decodeFromString<Config>( message )
             }
-            catch( ex: Exception ) {}
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTrace.toString())
+            }
 
             return null
         }

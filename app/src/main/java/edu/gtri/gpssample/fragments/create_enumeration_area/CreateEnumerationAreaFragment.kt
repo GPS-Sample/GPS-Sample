@@ -79,8 +79,8 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             createEnumerationAreaFragment = this@CreateEnumerationAreaFragment
         }
 
-        sharedViewModel.currentConfiguration?.value.let { config ->
-            this.config = config!!
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            this.config = config
             this.config.id?.let {
                 configId = it
             }
@@ -141,6 +141,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         var enumArea = EnumArea( config.id!!, name, vertices )
         DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
         addPolygon( enumArea )
 
@@ -324,13 +325,13 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
         }
 
-        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
         // figure out which enumArea contains each point
 
         for (point in points)
         {
-            for (enumArea in enumAreas)
+            for (enumArea in config.enumAreas)
             {
                 val points1 = ArrayList<Coordinate>()
 

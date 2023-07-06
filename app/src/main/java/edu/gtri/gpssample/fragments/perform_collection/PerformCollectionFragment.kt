@@ -52,7 +52,6 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var team: Team
     private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
-    private var locations = ArrayList<Location>()
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
@@ -132,8 +131,8 @@ class PerformCollectionFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        locations = DAO.locationDAO.getEnumeratedLocations(enumArea, team)
-        performCollectionAdapter.updateLocations( locations )
+        enumArea.locations = DAO.locationDAO.getEnumeratedLocations(enumArea, team)
+        performCollectionAdapter.updateLocations( enumArea.locations )
     }
 
     var once = true
@@ -166,7 +165,7 @@ class PerformCollectionFragment : Fragment(),
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        for (location in locations)
+        for (location in enumArea.locations)
         {
             if (location.isLandmark)
             {
@@ -260,7 +259,8 @@ class PerformCollectionFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.updateAllLists( config )
+                    // this is a hack
+//                    DAO.configDAO.updateAllLists( config )
 
                     team.id?.let {
                         config.teamId = it
@@ -292,7 +292,7 @@ class PerformCollectionFragment : Fragment(),
                 // during the import to accommodate uploads from multiple enumerators.
                 // We'll also need to handle duplicate updates from the same enumerator.
 
-                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+//                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
 
                 val packedEnumArea = enumArea.pack()
                 Log.d( "xxx", packedEnumArea )

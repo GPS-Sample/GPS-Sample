@@ -60,14 +60,18 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
+                enumerationItem.locationId = id
+
                 enumerationItem.fieldDataList?.let { fieldDataList ->
                     for (fieldData in fieldDataList)
                     {
-                        fieldData.id = null
-                        fieldData.enumerationItemId = id
+//                        fieldData.id = null
+                        fieldData.enumerationItemId = enumerationItem.id!!
                         DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
                     }
                 }
+
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
             }
         } ?: return null
 

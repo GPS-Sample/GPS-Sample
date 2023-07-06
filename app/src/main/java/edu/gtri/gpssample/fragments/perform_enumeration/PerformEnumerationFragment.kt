@@ -55,7 +55,6 @@ class PerformEnumerationFragment : Fragment(),
     private var enumAreaId = 0
     private var dropMode = false
     private var addLocation: LatLng? = null
-    private var locations = ArrayList<Location>()
     private var _binding: FragmentPerformEnumerationBinding? = null
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private val binding get() = _binding!!
@@ -88,6 +87,8 @@ class PerformEnumerationFragment : Fragment(),
                 enumAreaId = id
             }
         }
+
+        Log.d( "xxx", enumArea.toString())
 
         sharedViewModel.teamViewModel.currentTeam?.value?.let {
             team = it
@@ -173,9 +174,21 @@ class PerformEnumerationFragment : Fragment(),
         binding.exportButton.setOnClickListener {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                ConfirmationDialog( activity, "Export Enumeration Data", "Select an export method", "QR Code", "File System", kExportTag, this)
+                val user = (activity!!.application as MainApplication).user
 
-                //ExportDialog( activity, "${config.name}-${team.name}", "${enumArea.name}-${team.name}", this )
+                user?.let { user ->
+                    when(user.role)
+                    {
+                        Role.Supervisor.toString(), Role.Admin.toString() ->
+                        {
+                            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+                        }
+                        Role.Enumerator.toString() ->
+                        {
+                            ConfirmationDialog( activity, "Export Enumeration Data", "Select an export method", "QR Code", "File System", kExportTag, this)
+                        }
+                    }
+                }
             }
         }
     }
@@ -186,8 +199,8 @@ class PerformEnumerationFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        locations = DAO.locationDAO.getLocations(enumArea, team)
-        performEnumerationAdapter.updateLocations( locations )
+        enumArea.locations = DAO.locationDAO.getLocations(enumArea, team)
+        performEnumerationAdapter.updateLocations( enumArea.locations )
 
         if (this::map.isInitialized)
         {
@@ -223,7 +236,7 @@ class PerformEnumerationFragment : Fragment(),
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        for (location in locations)
+        for (location in enumArea.locations)
         {
             var marker: Marker? = null
             var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
@@ -334,7 +347,8 @@ class PerformEnumerationFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.updateAllLists( config )
+                    // this is a hack
+//                    DAO.configDAO.updateAllLists( config )
 
                     team.id?.let {
                         config.teamId = it
@@ -411,11 +425,13 @@ class PerformEnumerationFragment : Fragment(),
 
                         startHotspot(view)
                     }
+
                     Role.Admin.toString() ->
                     {
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
                         startHotspot(view)
                     }
+
                     Role.Enumerator.toString() ->
                     {
                         // start camera
@@ -423,12 +439,11 @@ class PerformEnumerationFragment : Fragment(),
                         sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
 
                         // I don't know why this should be necessary.
-                        enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+//                        enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
 
                         sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
                         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                         getResult.launch(intent)
-
                     }
                 }
             }
@@ -478,7 +493,7 @@ class PerformEnumerationFragment : Fragment(),
             // during the import to accommodate uploads from multiple enumerators.
             // We'll also need to handle duplicate updates from the same enumerator.
 
-            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+//            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
 
             val packedEnumArea = enumArea.pack()
             Log.d( "xxx", packedEnumArea )

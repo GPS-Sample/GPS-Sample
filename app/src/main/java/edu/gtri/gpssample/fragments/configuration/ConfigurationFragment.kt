@@ -109,7 +109,7 @@ class ConfigurationFragment : Fragment(),
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+            ConfirmationDialog( activity, "Import Enumeration Data", "Select an import method", "QR Code", "File System", kExportTag, this)
         }
 
         binding.exportButton.setOnClickListener {
@@ -214,6 +214,7 @@ class ConfigurationFragment : Fragment(),
                                 {
                                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
                                 }
+
                                 Role.Admin.toString() ->
                                 {
                                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
@@ -265,7 +266,8 @@ class ConfigurationFragment : Fragment(),
     override fun didEnterText( name: String, tag: Any? )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            DAO.configDAO.updateAllLists( config )
+            // this is a hack
+//            DAO.configDAO.updateAllLists( config )
 
             val packedConfig = config.pack()
             Log.d( "xxx", packedConfig )

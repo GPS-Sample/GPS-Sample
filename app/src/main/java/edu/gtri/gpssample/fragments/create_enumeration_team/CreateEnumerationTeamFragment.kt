@@ -184,6 +184,12 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
                                 }
                             }
                         }
+
+                        // refresh the shared config
+                        val config = DAO.configDAO.getConfig( enumArea.configId )
+                        config?.let {
+                            sharedViewModel.setCurrentConfig( it )
+                        }
                     }
 
                     findNavController().popBackStack()

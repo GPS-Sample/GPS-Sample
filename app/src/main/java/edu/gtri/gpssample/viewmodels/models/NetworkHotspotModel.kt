@@ -194,21 +194,20 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             }
             NetworkCommand.NetworkConfigRequest ->
             {
-
                 config?.let {config->
-
-                    // this a hack
-                    DAO.configDAO.updateAllLists(config)
-                    // create the config message
                     currentTeamId?.let { teamId ->
                         config.teamId = teamId
                     }
-                    val response = TCPMessage(NetworkCommand.NetworkConfigResponse, config.pack() )
-                    config.teamId = 0
+
+                    val packedConfig = config.pack()
+
+                    Log.d( "xxx", packedConfig )
+
+                    config.teamId = -1
+
+                    val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
                     socket.outputStream.write(response.toByteArray())
                     socket.outputStream.flush()
-                    Log.d("sent messge", "${config}")
-
                 }
             }
             NetworkCommand.NetworkEnumAreaExport ->
@@ -216,15 +215,17 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload )
 
-//                    enumArea?.let { enumArea ->
-//                        for (enumData in enumArea.enumDataList)
-//                        {
-//                            DAO.enumDataDAO.importEnumData( enumData )
-//                        }
-//                    }
+                    Log.d( "xxx", payload )
 
+                    enumArea?.let { enumArea ->
+                        for (location in enumArea.locations)
+                        {
+                            DAO.locationDAO.importLocation( location )
+                        }
+                        val ea = DAO.enumAreaDAO.getEnumArea(enumArea.id!!)
+                        Log.d( "xxx", ea.toString())
+                    }
                 }
-
             }
         }
     }

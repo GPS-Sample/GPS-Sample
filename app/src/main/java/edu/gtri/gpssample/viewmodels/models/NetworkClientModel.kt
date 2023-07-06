@@ -161,6 +161,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     response.payload?.let {payload ->
                         val config = Config.unpack(payload)
 
+                        Log.d( "xxx", payload )
+
                         // TODO: put the config in the list of current configs.....
                         config?.let{config ->
                             configurationDelegate?.configurationReceived(config)
@@ -187,6 +189,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         currentEnumArea?.let{enumArea ->
             networkInfo?.let{networkInfo ->
                 val payload = enumArea.pack()
+
+                Log.d( "xxx", payload )
 
                 val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload)
                 val response = client.sendMessage(networkInfo.serverIP, message, this)

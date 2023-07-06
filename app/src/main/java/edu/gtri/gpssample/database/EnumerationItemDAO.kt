@@ -162,6 +162,7 @@ class EnumerationItemDAO(private var dao: DAO)
             while (cursor.moveToNext())
             {
                 val enumerationItem = createEnumerationItem( cursor )
+                enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
                 enumerationItems.add( enumerationItem )
             }
 

@@ -260,7 +260,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 // runBlocking (Dispatchers.Main){
                 if(sharedViewModel.configurations.size > 0)
                 {
-
                     val config = sharedViewModel.configurations[0]
                     sharedViewModel.setCurrentConfig(config)
                     val team = DAO.teamDAO.getTeam( config.teamId )

@@ -256,6 +256,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             enumerationItem.notes = notes
             enumerationItem.state = EnumerationState.Complete
             enumerationItem.incompleteReason = ""
+            enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
             DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
         }
 
