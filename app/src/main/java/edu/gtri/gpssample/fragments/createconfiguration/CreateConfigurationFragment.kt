@@ -70,6 +70,13 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
+        binding.cancelButton.setOnClickListener {
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                sharedViewModel.deleteConfig( config )
+            }
+            findNavController().popBackStack()
+        }
+
         binding.saveButton.setOnClickListener {
 
             if (binding.configNameEditText.text.toString().isEmpty())
@@ -86,14 +93,7 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
 
             sharedViewModel.currentConfiguration?.value?.let {config ->
-
-                if (config.id == null){
-                    sharedViewModel.saveNewConfiguration()
-
-                } else{
-                    sharedViewModel.updateConfiguration()
-                }
-
+                sharedViewModel.updateConfiguration()
                 findNavController().popBackStack()
             }
         }

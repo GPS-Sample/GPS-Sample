@@ -165,6 +165,7 @@
                     android:text="@string/enumeration_area"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
+
                 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -214,14 +215,37 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
 
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:layout_gravity="bottom"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/save" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_gravity="bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/cancel" />
+
+                <Button
+                    android:id="@+id/save_button"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/save" />
+            </LinearLayout>
     </LinearLayout>
 </layout>

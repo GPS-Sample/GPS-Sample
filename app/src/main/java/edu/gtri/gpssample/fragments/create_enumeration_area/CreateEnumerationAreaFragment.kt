@@ -46,7 +46,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     private lateinit var map: GoogleMap
     private lateinit var sharedViewModel : ConfigurationViewModel
 
-    private var configId: Int = 0
     private var createMode = false
     private var vertexMarkers = ArrayList<Marker>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
@@ -81,9 +80,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             this.config = config
-            this.config.id?.let {
-                configId = it
-            }
         }
 
         if (!this::config.isInitialized)
@@ -307,7 +303,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             feature.geometry?.let { geometry ->
                 when( geometry ) {
                     is MultiPolygon -> {
-                        val enumArea = EnumArea( configId, name, ArrayList<LatLon>())
+                        val enumArea = EnumArea( config.id!!, name, ArrayList<LatLon>())
                         val multiPolygon = geometry as MultiPolygon
 
                         multiPolygon.coordinates[0][0].forEach { position ->

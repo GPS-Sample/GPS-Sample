@@ -163,6 +163,11 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                         Log.d( "xxx", payload )
 
+                        if (config == null)
+                        {
+                            Log.d( "xxx", "failed to receive config" )
+                        }
+
                         // TODO: put the config in the list of current configs.....
                         config?.let{config ->
                             configurationDelegate?.configurationReceived(config)
@@ -170,15 +175,11 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                             sleep(kDialogTimeout)
                             connectDelegate?.didConnect(true)
-
-
                         }?:run {
                             _dataReceived.postValue(NetworkStatus.DataReceivedError)
                             connectDelegate?.didConnect(false)
                         }
-
                     }
-
                 }
             }
         }
