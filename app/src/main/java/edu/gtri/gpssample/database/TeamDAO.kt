@@ -118,11 +118,11 @@ class TeamDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getEnumerationTeams( enumArea_id: Int ): ArrayList<Team>
+    fun getEnumerationTeams( enumAreaId: Int ): ArrayList<Team>
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumArea_id AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 1"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 1"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -179,6 +179,10 @@ class TeamDAO(private var dao: DAO)
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(team.id.toString())
+
+//        team.polygon.map{
+//            DAO.latLonDAO.delete(it)
+//        }
 
         db.delete(DAO.TABLE_TEAM, whereClause, args)
         db.close()

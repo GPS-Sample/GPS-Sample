@@ -20,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
@@ -45,7 +46,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     private lateinit var map: GoogleMap
     private lateinit var sharedViewModel : ConfigurationViewModel
 
-    private var configId: Int = 0
     private var createMode = false
     private var vertexMarkers = ArrayList<Marker>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
@@ -78,11 +78,8 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             createEnumerationAreaFragment = this@CreateEnumerationAreaFragment
         }
 
-        sharedViewModel.currentConfiguration?.value.let { config ->
-            this.config = config!!
-            this.config.id?.let {
-                configId = it
-            }
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            this.config = config
         }
 
         if (!this::config.isInitialized)
@@ -140,6 +137,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         var enumArea = EnumArea( config.id!!, name, vertices )
         DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
         addPolygon( enumArea )
 
@@ -178,30 +176,48 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
 
-            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
 
-            for (enumData in enumArea.enumDataList)
+            for (location in enumArea.locations)
             {
-                var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                if (enumData.incomplete)
+                if (location.isLandmark)
                 {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                }
-                else if (enumData.valid)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                }
+                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
 
-                if (enumData.isLocation)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+                    map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
                 }
+                else
+                {
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                val marker = map.addMarker( MarkerOptions()
-                    .position( LatLng( enumData.latitude, enumData.longitude ))
-                    .icon( icon )
-                )
+                    var numComplete = 0
+
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                            break
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            numComplete++
+                        }
+                    }
+
+                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                    }
+
+                    map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
+                }
             }
         }
     }
@@ -287,7 +303,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             feature.geometry?.let { geometry ->
                 when( geometry ) {
                     is MultiPolygon -> {
-                        val enumArea = EnumArea( configId, name, ArrayList<LatLon>())
+                        val enumArea = EnumArea( config.id!!, name, ArrayList<LatLon>())
                         val multiPolygon = geometry as MultiPolygon
 
                         multiPolygon.coordinates[0][0].forEach { position ->
@@ -305,13 +321,13 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
         }
 
-        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
         // figure out which enumArea contains each point
 
         for (point in points)
         {
-            for (enumArea in enumAreas)
+            for (enumArea in config.enumAreas)
             {
                 val points1 = ArrayList<Coordinate>()
 
@@ -326,11 +342,12 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 val geometry1 = geometryFactory.createPoint( coordinate )
                 if (geometry.contains( geometry1 ))
                 {
-                    val enumData = EnumData( -1, enumArea.id!!, false, false, "", "", point.coordinates.latitude, point.coordinates.longitude )
-                    DAO.enumDataDAO.createOrUpdateEnumData( enumData )
-                    enumArea.enumDataList.add( enumData )
+                    val location = Location( enumArea.id!!, point.coordinates.latitude, point.coordinates.longitude, false )
+                    DAO.locationDAO.createOrUpdateLocation( location )
+
+                    enumArea.locations.add( location )
                     DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-                    break // found! assuming that it can only exist in a single EA
+                    break // found! assuming that it can only exist in a single EA, for now!
                 }
             }
         }

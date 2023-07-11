@@ -39,7 +39,6 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
     private var createMode = false
     private var selectionGeometry: Geometry? = null
     private var selectionPolygon: Polygon? = null
-    private var householdMarkers = ArrayList<Marker>()
     private var selectionMarkers = ArrayList<Marker>()
     private var _binding: FragmentCreateCollectionTeamBinding? = null
     private val binding get() = _binding!!
@@ -174,16 +173,22 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
 
                     team?.id?.let { teamId ->
 
-                        enumArea.enumDataList.map { enumData ->
+                        for (location in enumArea.locations)
+                        {
                             selectionGeometry?.let {
-                                val point = GeometryFactory().createPoint( Coordinate( enumData.longitude, enumData.latitude ))
+                                val point = GeometryFactory().createPoint( Coordinate( location.longitude, location.latitude ))
                                 if (it.contains( point ))
                                 {
-                                    Log.d( "xxx", "found household" )
-                                    enumData.collectionTeamId = teamId
-                                    DAO.enumDataDAO.updateEnumData( enumData )
+                                    location.collectionTeamId = teamId
+                                    DAO.locationDAO.updateLocation( location )
                                 }
                             }
+                        }
+
+                        // refresh the shared config
+                        val config = DAO.configDAO.getConfig( enumArea.configId )
+                        config?.let {
+                            sharedViewModel.setCurrentConfig( it )
                         }
                     }
 
@@ -203,10 +208,6 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
     fun clearSelections()
     {
         createMode = false
-
-        householdMarkers.map { marker ->
-            marker.setIcon( BitmapDescriptorFactory.fromResource(R.drawable.home_black) )
-        }
 
         selectionPolygon?.let {
             it.remove()
@@ -260,8 +261,6 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
 
         map.addPolygon(polygon)
 
-        val enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
-
         if (once)
         {
             once = false
@@ -269,23 +268,18 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        householdMarkers.clear()
+        val locations = DAO.locationDAO.getLocations( enumArea )
 
-        for (enumData in enumDataList)
+        for (location in locations)
         {
-            if (!enumData.isLocation)
+            if (!location.isLandmark)
             {
                 val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                val marker = map.addMarker( MarkerOptions()
-                    .position( LatLng( enumData.latitude, enumData.longitude ))
+                map.addMarker( MarkerOptions()
+                    .position( LatLng( location.latitude, location.longitude ))
                     .icon( icon )
                 )
-
-                marker?.let {marker ->
-                    marker.tag = enumData
-                    householdMarkers.add( marker)
-                }
             }
         }
     }

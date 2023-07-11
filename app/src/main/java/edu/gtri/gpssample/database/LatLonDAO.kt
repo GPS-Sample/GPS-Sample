@@ -89,11 +89,29 @@ class LatLonDAO(private var dao: DAO)
         return latLon
     }
 
-    fun getLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>
+    fun getAllLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>
     {
         var latLons = ArrayList<LatLon>()
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            latLons.add( createLatLon( cursor ))
+        }
+
+        cursor.close()
+        db.close()
+
+        return latLons
+    }
+
+    fun getLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>
+    {
+        var latLons = ArrayList<LatLon>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_TEAM_ID} = -1"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())

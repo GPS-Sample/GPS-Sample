@@ -109,7 +109,7 @@ class ConfigurationFragment : Fragment(),
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            ConfirmationDialog( activity, "Import Configuration", "Select an import method", "QR Code", "File System", kExportTag, this)
+            ConfirmationDialog( activity, "Import Enumeration Data", "Select an import method", "QR Code", "File System", kExportTag, this)
         }
 
         binding.exportButton.setOnClickListener {
@@ -190,31 +190,6 @@ class ConfigurationFragment : Fragment(),
                     googleMap.addPolygon(polygon)
 
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
-
-//                    val enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
-//
-//                    for (enumData in enumDataList)
-//                    {
-//                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-//
-//                        if (enumData.incomplete)
-//                        {
-//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-//                        }
-//                        else if (enumData.valid)
-//                        {
-//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-//                        }
-//
-//                        if (enumData.isLocation)
-//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-//
-//                        googleMap.addMarker(
-//                            MarkerOptions()
-//                                .position(LatLng(enumData.latitude, enumData.longitude))
-//                                .icon(icon)
-//                        )
-//                    }
                 }
             }
         }
@@ -239,6 +214,7 @@ class ConfigurationFragment : Fragment(),
                                 {
                                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
                                 }
+
                                 Role.Admin.toString() ->
                                 {
                                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
@@ -290,7 +266,8 @@ class ConfigurationFragment : Fragment(),
     override fun didEnterText( name: String, tag: Any? )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            DAO.configDAO.updateAllLists( config )
+            // this is a hack
+//            DAO.configDAO.updateAllLists( config )
 
             val packedConfig = config.pack()
             Log.d( "xxx", packedConfig )
@@ -336,9 +313,9 @@ class ConfigurationFragment : Fragment(),
                         val enumArea = EnumArea.unpack( text )
 
                         enumArea?.let { enumArea ->
-                            for (enumData in enumArea.enumDataList)
+                            for (location in enumArea.locations)
                             {
-                                DAO.enumDataDAO.importEnumData( enumData )
+                                DAO.locationDAO.importLocation( location )
                             }
                         } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
 

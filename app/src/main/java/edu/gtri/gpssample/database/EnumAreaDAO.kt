@@ -47,10 +47,10 @@ class EnumAreaDAO(private var dao: DAO)
                     DAO.teamDAO.createOrUpdateTeam(team)
                 }
 
-                for (enumData in enumArea.enumDataList)
+                for (location in enumArea.locations)
                 {
-                    enumData.enumAreaId = id
-                    DAO.enumDataDAO.createOrUpdateEnumData(enumData)
+                    location.enumAreaId = id
+                    DAO.locationDAO.createOrUpdateLocation(location)
                 }
 
                 return enumArea
@@ -69,7 +69,7 @@ class EnumAreaDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
-        values.put( DAO.COLUMN_CONFIG_ID, enumArea.config_id )
+        values.put( DAO.COLUMN_CONFIG_ID, enumArea.configId )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
     }
 
@@ -111,6 +111,9 @@ class EnumAreaDAO(private var dao: DAO)
 
             enumArea.id?.let { _id ->
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( _id )
+                enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
+                enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
+                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             }
         }
 
@@ -137,7 +140,7 @@ class EnumAreaDAO(private var dao: DAO)
                     enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                     enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
                     enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
-                    enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
+                    enumArea.locations = DAO.locationDAO.getLocations( enumArea )
                     enumAreas.add( enumArea )
                 }
             }
@@ -166,7 +169,7 @@ class EnumAreaDAO(private var dao: DAO)
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                 enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
                 enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
-                enumArea.enumDataList = DAO.enumDataDAO.getEnumData( enumArea )
+                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
                 enumAreas.add( enumArea )
             }
         }
@@ -213,19 +216,21 @@ class EnumAreaDAO(private var dao: DAO)
         enumArea.id?.let {enumAreaId ->
 
             // latLon's are dependent on EnumAreas
-            DAO.latLonDAO.getLatLonsWithEnumAreaId(enumAreaId).map {
+            DAO.latLonDAO.getAllLatLonsWithEnumAreaId(enumAreaId).map {
                 DAO.latLonDAO.delete( it )
             }
 
-            // enumData's are dependent on EnumAreas
-            DAO.enumDataDAO.getEnumData(enumArea).map {
-                DAO.enumDataDAO.delete( it )
+            // locations's are dependent on EnumAreas
+            DAO.locationDAO.getLocations(enumArea).map {
+                DAO.locationDAO.delete( it )
             }
 
-            // teams are dependent on EnumAreas
+            // enumeration teams are dependent on EnumAreas
             DAO.teamDAO.getEnumerationTeams( enumAreaId ).map {
                 DAO.teamDAO.deleteTeam( it )
             }
+
+            // collection teams are dependent on EnumAreas
             DAO.teamDAO.getCollectionTeams( enumAreaId ).map {
                 DAO.teamDAO.deleteTeam( it )
             }

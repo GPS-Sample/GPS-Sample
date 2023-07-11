@@ -4,16 +4,13 @@ import android.app.Activity
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
-import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 
-import java.util.*
 import kotlin.collections.ArrayList
 
 import edu.gtri.gpssample.constants.*
@@ -42,7 +39,7 @@ class ConfigurationViewModel : ViewModel()
     val createFieldModel : CreateFieldModel = CreateFieldModel()
     val createRuleModel : CreateRuleModel = CreateRuleModel()
     val enumAreaViewModel : EnumAreaViewModel = EnumAreaViewModel()
-    val enumDataViewModel : EnumDataViewModel = EnumDataViewModel()
+    val locationViewModel : LocationViewModel = LocationViewModel()
     var teamViewModel : TeamViewModel = TeamViewModel()
     val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
 
@@ -166,10 +163,9 @@ class ConfigurationViewModel : ViewModel()
     }
     fun createNewConfiguration()
     {
-        val newConfig = Config("", DateFormat.None, TimeFormat.None,
-                                DistanceFormat.None, 0 )
+        val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 0 )
         _currentConfiguration = MutableLiveData(newConfig)
-
+        saveNewConfiguration()
     }
 
     fun saveNewConfiguration()

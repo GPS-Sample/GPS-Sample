@@ -7,8 +7,7 @@ import android.util.Log
 import androidx.core.database.getDoubleOrNull
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumData
+import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.extensions.toBoolean
 
@@ -45,7 +44,7 @@ class FieldDataDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_FIELD_ID, fieldData.fieldId )
-        values.put( DAO.COLUMN_ENUM_DATA_ID, fieldData.enumDataId )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, fieldData.enumerationItemId )
         values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
         values.put( DAO.COLUMN_FIELD_DATA_NUMBER_VALUE, fieldData.numberValue )
         values.put( DAO.COLUMN_FIELD_DATA_DATE_VALUE, fieldData.dateValue )
@@ -73,7 +72,7 @@ class FieldDataDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
-        val enum_data_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_DATA_ID))
+        val enumerationItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ID))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
         val numberValue = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_NUMBER_VALUE))
         val dateValue = cursor.getLongOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DATE_VALUE))
@@ -83,7 +82,7 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
 
-        return FieldData( id, uuid, field_id, enum_data_id, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
+        return FieldData( id, uuid, field_id, enumerationItemId, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
     }
 
     //--------------------------------------------------------------------------
@@ -123,11 +122,11 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getOrCreateFieldData( field_id: Int, enum_data_id: Int ): FieldData
+    fun getOrCreateFieldData( field_id: Int, enumerationItemId: Int ): FieldData
     {
         var fieldData: FieldData? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUM_DATA_ID} = $enum_data_id"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $enumerationItemId"
         val cursor = db.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -137,7 +136,7 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
-            fieldData = FieldData( field_id, enum_data_id )
+            fieldData = FieldData( field_id, enumerationItemId )
             createOrUpdateFieldData( fieldData )
         }
 
@@ -148,13 +147,13 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getFieldDataList( enumData: EnumData ): ArrayList<FieldData>
+    fun getFieldDataList( enumerationItem: EnumerationItem ): ArrayList<FieldData>
     {
         var fieldDataList = ArrayList<FieldData>()
         val db = dao.writableDatabase
 
-        enumData.id?.let { id ->
-            val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUM_DATA_ID} = $id"
+        enumerationItem.id?.let { id ->
+            val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
             while (cursor.moveToNext())
@@ -206,9 +205,9 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun deleteAllFields( enumData: EnumData )
+    fun deleteAllFields( enumerationItem: EnumerationItem )
     {
-        val fieldDataList = getFieldDataList( enumData )
+        val fieldDataList = getFieldDataList( enumerationItem )
 
         for (fieldData in fieldDataList)
         {

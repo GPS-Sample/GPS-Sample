@@ -6,20 +6,16 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
-import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.EnumData
 import edu.gtri.gpssample.databinding.FragmentAddLocationBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
@@ -30,7 +26,7 @@ class AddLocationFragment : Fragment()
     private val binding get() = _binding!!
     private val OPEN_DOCUMENT_CODE = 2
 
-    private lateinit var enumData: EnumData
+//    private lateinit var enumData: EnumData
 
     private lateinit var sharedViewModel : ConfigurationViewModel
 
@@ -45,7 +41,7 @@ class AddLocationFragment : Fragment()
             override fun handleOnBackPressed() {
                 if (createMode)
                 {
-                    DAO.enumDataDAO.delete( enumData )
+//                    DAO.enumDataDAO.delete( enumData )
                 }
                 findNavController().popBackStack()
             }
@@ -63,26 +59,26 @@ class AddLocationFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let {
-            enumData = it
-        }
-
-        if (enumData.id == null)
-        {
-            createMode = true
-            DAO.enumDataDAO.createOrUpdateEnumData(enumData)
-        }
-
-        binding.editText.setText( enumData.description )
-
-        if (enumData.imageFileName.isNotEmpty())
-        {
-            val uri = Uri.parse(enumData.imageFileName )
-            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
-            binding.imageView.setImageBitmap(bitmap)
-        }
+//        sharedViewModel.enumDataViewModel.currentEnumData?.value?.let {
+//            enumData = it
+//        }
+//
+//        if (enumData.id == null)
+//        {
+//            createMode = true
+//            DAO.enumDataDAO.createOrUpdateEnumData(enumData)
+//        }
+//
+//        binding.editText.setText( enumData.description )
+//
+//        if (enumData.imageFileName.isNotEmpty())
+//        {
+//            val uri = Uri.parse(enumData.imageFileName )
+//            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+//            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
+//            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
+//            binding.imageView.setImageBitmap(bitmap)
+//        }
 
         binding.addImageButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -94,7 +90,7 @@ class AddLocationFragment : Fragment()
         binding.cancelButton.setOnClickListener {
             if (createMode)
             {
-                DAO.enumDataDAO.delete( enumData )
+//                DAO.enumDataDAO.delete( enumData )
             }
 
             findNavController().popBackStack()
@@ -102,8 +98,8 @@ class AddLocationFragment : Fragment()
 
         binding.saveButton.setOnClickListener {
 
-            enumData.description = binding.editText.text.toString()
-            DAO.enumDataDAO.updateEnumData( enumData )
+//            enumData.description = binding.editText.text.toString()
+//            DAO.enumDataDAO.updateEnumData( enumData )
 
             findNavController().popBackStack()
         }
@@ -128,11 +124,11 @@ class AddLocationFragment : Fragment()
             android.R.id.home -> {
                 if (createMode)
                 {
-                    DAO.enumDataDAO.delete( enumData )
+//                    DAO.enumDataDAO.delete( enumData )
                 }
             }
             R.id.action_delete -> {
-                DAO.enumDataDAO.delete( enumData )
+//                DAO.enumDataDAO.delete( enumData )
                 findNavController().popBackStack()
                 return true
             }
@@ -152,8 +148,8 @@ class AddLocationFragment : Fragment()
                     val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
                     (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
                     binding.imageView.setImageBitmap(bitmap)
-                    enumData.imageFileName = uri.toString()
-                    DAO.enumDataDAO.updateEnumData( enumData )
+//                    enumData.imageFileName = uri.toString()
+//                    DAO.enumDataDAO.updateEnumData( enumData )
                 }
             }
         }

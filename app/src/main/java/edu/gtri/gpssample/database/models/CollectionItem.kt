@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.constants.CollectionState
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -8,17 +9,17 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @Serializable
-data class CollectionData(
+data class CollectionItem(
     var id : Int? = null,
     var creationDate: Long,
-    var enumDataId : Int,
-    var valid : Boolean,
-    var incomplete : Boolean,
+    var uuid : String,
+    var enumerationItemId : Int,
+    var state : CollectionState,
     var incompleteReason : String,
     var notes : String)
 {
-    constructor( enumDataId: Int, valid: Boolean, incomplete: Boolean, incompleteReason: String, notes: String ) :
-            this( null, Date().time, enumDataId, valid, incomplete, incompleteReason, notes)
+    constructor( enumerationItemId: Int, state: CollectionState, incompleteReason: String, notes: String) :
+            this( null, Date().time, UUID.randomUUID().toString(), enumerationItemId, state, incompleteReason, notes )
 
     fun pack() : String
     {
@@ -27,9 +28,9 @@ data class CollectionData(
 
     companion object
     {
-        fun unpack( string: String ) : EnumData
+        fun unpack( string: String ) : CollectionItem
         {
-            return Json.decodeFromString<EnumData>( string )
+            return Json.decodeFromString<CollectionItem>( string )
         }
     }
 }

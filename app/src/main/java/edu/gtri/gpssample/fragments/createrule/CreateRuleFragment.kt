@@ -26,7 +26,6 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
 {
     private var rule: Rule? = null
 
-    private var firstLaunch = true
     private var _binding: FragmentCreateRuleBinding? = null
     private val binding get() = _binding!!
     private lateinit var sharedViewModel : ConfigurationViewModel

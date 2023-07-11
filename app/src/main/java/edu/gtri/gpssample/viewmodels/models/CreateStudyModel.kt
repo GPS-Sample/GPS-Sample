@@ -58,6 +58,10 @@ class CreateStudyModel {
             }
         }
 
+
+
+    constructor(){}
+
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < samplingMethods.size)

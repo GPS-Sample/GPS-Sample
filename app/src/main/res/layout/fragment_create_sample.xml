@@ -8,11 +8,12 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="edu.gtri.gpssample.constants.Role" />
         <variable
             name="viewModel"
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
-
+        <variable
+            name="samplingViewModel"
+            type="edu.gtri.gpssample.viewmodels.SamplingViewModel" />
         <variable
             name="createSampleFragment"
             type="edu.gtri.gpssample.fragments.createsample.CreateSampleFragment" />
@@ -28,7 +29,6 @@
 
             <TextView
                 android:id="@+id/title"
-
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginBottom="15dp"
@@ -40,26 +40,37 @@
                 android:textStyle="bold"
                 android:layout_alignParentTop="true" />
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/map_fragment"
-                    android:background="@color/black"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="20dp"
-                    android:layout_above="@+id/sample_button"
-                    android:layout_below="@+id/title"
+            <TextView
+                android:id="@+id/sampling_method"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="15dp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                android:text="@{samplingViewModel.test}"
+                android:textColor="@color/highlight_red"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_below="@+id/title" />
 
-                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/map_fragment"
+                android:background="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_above="@+id/sample_button"
+                android:layout_below="@+id/sampling_method"
+                android:name="com.google.android.gms.maps.SupportMapFragment" />
             <Button
                 android:id="@+id/sample_button"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="bottom"
-
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:insetTop="0dp"

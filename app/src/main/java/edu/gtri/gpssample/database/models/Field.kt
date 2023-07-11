@@ -7,6 +7,9 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+// NOTE!!
+// This class defines the Field questions and is a part of the study
+
 @Serializable
 data class Field(
     var id : Int? = null,

@@ -57,7 +57,7 @@
             android:background="@drawable/add_house_blue" />
 
         <Button
-            android:id="@+id/add_location_button"
+            android:id="@+id/add_landmark_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="5dp"
