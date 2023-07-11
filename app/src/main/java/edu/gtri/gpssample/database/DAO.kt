@@ -188,6 +188,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 COLUMN_LOCATION_ID + " INTEGER" + "," +
                 COLUMN_COLLECTION_ITEM_ID + " INTEGER" + "," +
                 COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
+                COLUMN_ENUMERATION_ITEM_SAMPLE_STATE + " TEXT" + "," +
                 COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
                 COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
                 COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
@@ -385,6 +386,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_LOCATION_ID = "location_id"
 //        const val COLUMN_COLLECTION_ITEM_ID = "collection_item_id"
         const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
+        const val COLUMN_ENUMERATION_ITEM_SAMPLE_STATE = "enumeration_item_sample_state"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE = "enumeration_item_enumeration_state"
         const val COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON = "enumeration_item_incomplete_reason"
         const val COLUMN_ENUMERATION_ITEM_NOTES = "enumeration_item_notes"
@@ -496,7 +498,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 181
+        private const val DATABASE_VERSION = 182
 
     }
 }

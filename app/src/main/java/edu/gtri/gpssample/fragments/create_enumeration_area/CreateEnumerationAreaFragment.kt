@@ -197,12 +197,12 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                     for (enumerationItem in location.enumerationItems)
                     {
-                        if (enumerationItem.state == EnumerationState.Incomplete)
+                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                         {
                             icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
                             break
                         }
-                        else if (enumerationItem.state == EnumerationState.Complete)
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                         {
                             numComplete++
                         }
