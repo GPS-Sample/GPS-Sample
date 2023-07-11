@@ -48,13 +48,10 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         sharedViewModel = vm
         sharedViewModel.currentFragment = this
 
-<<<<<<< Updated upstream
-=======
         samplingViewModel = samplingVm
         samplingViewModel.currentFragment = this
 
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
->>>>>>> Stashed changes
     }
 
 
