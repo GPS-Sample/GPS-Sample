@@ -179,7 +179,7 @@ class PerformCollectionFragment : Fragment(),
             {
                 val enumerationItem = location.enumerationItems[0]
 
-                if (enumerationItem.state == EnumerationState.Complete)
+                if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                 {
                     val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
 
