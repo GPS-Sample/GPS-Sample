@@ -245,7 +245,7 @@ class LocationDAO(private var dao: DAO)
                     location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
                     for (enumerationItem in location.enumerationItems)
                     {
-                        if (enumerationItem.state == EnumerationState.Complete)
+                        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                         {
                             locations.add( location )
                             break

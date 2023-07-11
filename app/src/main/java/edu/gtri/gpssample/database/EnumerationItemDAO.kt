@@ -106,7 +106,7 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_LOCATION_ID, enumerationItem.locationId )
         values.put( DAO.COLUMN_COLLECTION_ITEM_ID, enumerationItem.collectionItemId )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
-        values.put( DAO.COLUMN_ENUMERATION_ITEM_STATE, enumerationItem.state.format )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE, enumerationItem.enumerationState.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON, enumerationItem.incompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_NOTES, enumerationItem.notes )
     }
@@ -121,13 +121,13 @@ class EnumerationItemDAO(private var dao: DAO)
         val locationId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_ID))
         val collectionItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_ID))
         val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
-        val state = EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_STATE)))
+        val enumerationState = EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE)))
         val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_NOTES))
 
         val fieldDataList = ArrayList<FieldData>()
 
-        return EnumerationItem( id, creationDate, uuid, locationId, collectionItemId, subAddress, state, incompleteReason, notes, fieldDataList )
+        return EnumerationItem( id, creationDate, uuid, locationId, collectionItemId, subAddress, enumerationState, incompleteReason, notes, fieldDataList )
     }
 
     fun getEnumerationItem( uuid: String ) : EnumerationItem?

@@ -201,7 +201,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 }
             }
 
-            enumerationItem.state = EnumerationState.Incomplete
+            enumerationItem.enumerationState = EnumerationState.Incomplete
             enumerationItem.notes = notes
             enumerationItem.incompleteReason = incompleteReason
             DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
@@ -254,7 +254,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
 
             enumerationItem.notes = notes
-            enumerationItem.state = EnumerationState.Complete
+            enumerationItem.enumerationState = EnumerationState.Enumerated
             enumerationItem.incompleteReason = ""
             enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
             DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
