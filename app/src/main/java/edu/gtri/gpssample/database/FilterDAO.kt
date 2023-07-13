@@ -78,7 +78,7 @@ class FilterDAO(private var dao: DAO)
         return Filter( id, studyId, name, type, sampleSize )
     }
 
-    fun getFiltersForStudy(study : Study) : ArrayList<Filter>
+    fun getFilters(study : Study) : ArrayList<Filter>
     {
         val filters = ArrayList<Filter>()
         val db = dao.writableDatabase

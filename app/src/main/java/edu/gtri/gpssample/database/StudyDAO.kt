@@ -168,9 +168,7 @@ class StudyDAO(private var dao: DAO)
                 study.fields = DAO.fieldDAO.getFields(study)
                 study.rules = DAO.ruleDAO.getRules(study)
 
-                // find filters
-
-                study.filters.addAll(DAO.filterDAO.getFiltersForStudy(study))
+                study.filters.addAll(DAO.filterDAO.getFilters(study))
             }
 
             cursor.close()
@@ -223,6 +221,21 @@ class StudyDAO(private var dao: DAO)
     fun deleteStudy( study: Study )
     {
         study.id?.let{ id ->
+
+            val filters = DAO.filterDAO.getFilters( study )
+
+            for (filter in filters)
+            {
+                DAO.filterDAO.deleteFilter( filter )
+            }
+
+            val rules = DAO.ruleDAO.getRules( study )
+
+            for (rule in rules)
+            {
+                DAO.ruleDAO.deleteRule( rule )
+            }
+
             val fields = DAO.fieldDAO.getFields( study )
 
             for (field in fields)
