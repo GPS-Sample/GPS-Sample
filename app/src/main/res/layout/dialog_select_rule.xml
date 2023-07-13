@@ -42,7 +42,7 @@
                 android:id="@+id/rule_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:entries="@{viewModel.createStudyModel.currentStudy.rules}"
+                android:entries="@{viewModel.createStudyModel.ruleList}"
                 android:selectedItemPosition="@={viewModel.createFilterRuleModel.ruleFieldPosition}"
                 android:onItemSelected="@{viewModel::onFilterRuleFieldSelected}"/>
         </FrameLayout>

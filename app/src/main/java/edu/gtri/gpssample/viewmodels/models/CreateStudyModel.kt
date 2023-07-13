@@ -43,6 +43,9 @@ class CreateStudyModel {
     val fieldList : Array<String>
         get() = getFields()
 
+    val ruleList : Array<String>
+        get() = getRules()
+
     var currentStudy : LiveData<Study>? = _currentStudy
 
     var currentSampleSize : String
@@ -73,6 +76,20 @@ class CreateStudyModel {
         }
 
         return fieldList.toTypedArray()
+    }
+
+    fun getRules() : Array<String>
+    {
+        val ruleList = ArrayList<String>()
+
+        _currentStudy?.value?.rules?.let { rules ->
+            for (rule in rules)
+            {
+                ruleList.add( rule.name )
+            }
+        }
+
+        return ruleList.toTypedArray()
     }
 
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)

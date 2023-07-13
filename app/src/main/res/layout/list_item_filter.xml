@@ -19,11 +19,11 @@
             android:layout_width="0dp"
             android:layout_height="50dp">
 
-            <ImageView
-                android:id="@+id/edit_image_view"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/edit_blue" />
+<!--            <ImageView-->
+<!--                android:id="@+id/edit_image_view"-->
+<!--                android:layout_width="50dp"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:src="@drawable/edit_blue" />-->
 
             <TextView
                 android:id="@+id/title_text_view"
