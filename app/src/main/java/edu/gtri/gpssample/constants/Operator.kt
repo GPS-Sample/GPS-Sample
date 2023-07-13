@@ -30,12 +30,12 @@ object OperatorConverter
     {
         return when(operator)
         {
-            Operator.Equal -> 1
-            Operator.NotEqual -> 2
-            Operator.LessThan -> 3
-            Operator.GreaterThan -> 4
-            Operator.LessThanOrEqual -> 5
-            Operator.GreaterThanOrEqual -> 6
+            Operator.Equal -> 0
+            Operator.NotEqual -> 1
+            Operator.LessThan -> 2
+            Operator.GreaterThan -> 3
+            Operator.LessThanOrEqual -> 4
+            Operator.GreaterThanOrEqual -> 5
             else -> 0
         }
     }

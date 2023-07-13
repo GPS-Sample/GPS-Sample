@@ -116,13 +116,16 @@ class CreateStudyModel {
 
     fun createNewStudy()
     {
-        val newStudy = Study(
+        val study = Study(
             "",
             SamplingMethod.None,
             0,
             SampleType.None
         )
-        _currentStudy = MutableLiveData(newStudy)
+
+        DAO.studyDAO.createOrUpdateStudy( study )
+
+        _currentStudy = MutableLiveData(study)
         currentStudy = _currentStudy
     }
 

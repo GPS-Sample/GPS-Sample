@@ -9,17 +9,15 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Rule(
     var id : Int? = null,
-    var field: Field?,
+    var studyId : Int,
+    var fieldId: Int,
     var name: String,
     var operator: Operator,
     var value: String)
 {
-    constructor(field: Field?, name: String, operator: Operator,
-                value: String) : this(null, field, name, operator, value)
+    constructor(studyId: Int, fieldId: Int, name: String, operator: Operator, value: String)
+            : this(null, studyId, fieldId, name, operator, value)
 
-    override fun toString(): String {
-        return name
-    }
     fun pack() : String
     {
         return Json.encodeToString( this )
