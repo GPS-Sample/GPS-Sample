@@ -71,9 +71,9 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.cancelButton.setOnClickListener {
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                sharedViewModel.deleteConfig( config )
-            }
+//            sharedViewModel.currentConfiguration?.value?.let { config ->
+//                sharedViewModel.deleteConfig( config )
+//            }
             findNavController().popBackStack()
         }
 
