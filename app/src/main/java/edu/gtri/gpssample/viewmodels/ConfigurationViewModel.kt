@@ -202,7 +202,6 @@ class ConfigurationViewModel : ViewModel()
     {
         DAO.configDAO.deleteConfig( config )
         configurations.remove(config)
-
     }
 
     // Study
