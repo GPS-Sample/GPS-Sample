@@ -32,6 +32,7 @@ class CreateRuleModel {
     fun addRule(study : Study)
     {
         currentRule?.value?.let { rule ->
+            DAO.ruleDAO.createRule( rule )
             study.rules.add(rule)
 
         }
@@ -82,20 +83,17 @@ class CreateRuleModel {
 
     fun onRuleFieldSelected(study : Study, position: Int,)
     {
-        currentRule?.value?.let{rule ->
-                rule.field = study.fields[position]
-            }
-
-        Log.d("HERE", "HERE")
+        currentRule?.value?.let{ rule ->
+            val field = study.fields[position]
+            rule.field = field
+        }
     }
+
     fun onRuleOperatorSelected(study : Study, position: Int,)
     {
         currentRule?.value?.let{rule ->
             val operator = OperatorConverter.array[position]
             rule.operator = OperatorConverter.fromString(operator)
         }
-
-
-        Log.d("HERE", "HERE")
     }
 }

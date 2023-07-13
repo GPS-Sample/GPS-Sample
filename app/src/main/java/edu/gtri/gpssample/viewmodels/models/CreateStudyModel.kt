@@ -40,6 +40,9 @@ class CreateStudyModel {
     val sampleTypes : Array<String>
         get() = SampleTypeConverter.array
 
+    val fieldList : Array<String>
+        get() = getFields()
+
     var currentStudy : LiveData<Study>? = _currentStudy
 
     var currentSampleSize : String
@@ -58,12 +61,25 @@ class CreateStudyModel {
             }
         }
 
+    fun getFields() : Array<String>
+    {
+        val fieldList = ArrayList<String>()
+
+        _currentStudy?.value?.fields?.let { fields ->
+            for (field in fields)
+            {
+                fieldList.add( field.name )
+            }
+        }
+
+        return fieldList.toTypedArray()
+    }
+
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < samplingMethods.size)
         {
             val samplingMethod : String = samplingMethods[position]
-
 
             _currentStudy?.value?.let {study ->
                 study.samplingMethod = SamplingMethodConverter.fromString(samplingMethod)

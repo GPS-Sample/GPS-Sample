@@ -138,6 +138,26 @@ class FilterDAO(private var dao: DAO)
         return filters
     }
 
+    fun getFilters() : ArrayList<Filter>
+    {
+        val filters = ArrayList<Filter>()
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val filter = buildFilter(cursor)
+
+            filters.add( filter)
+        }
+
+        cursor.close()
+        db.close()
+
+        return filters
+    }
+
     private fun getFilterRulesForFilter(filter : Filter, rules : ArrayList<Rule>) : ArrayList<FilterRule>
     {
         val filterRules = ArrayList<FilterRule>()

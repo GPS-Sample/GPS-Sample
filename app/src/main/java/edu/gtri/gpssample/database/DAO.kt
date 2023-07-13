@@ -441,6 +441,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             Log.d( "xxx", "configs: ${DAO.configDAO.getConfigs()}")
             Log.d( "xxx", "studies: ${DAO.studyDAO.getStudies()}")
             Log.d( "xxx", "fields: ${DAO.fieldDAO.getFields()}")
+//            Log.d( "xxx", "rules: ${DAO.ruleDAO.getRules()}")
+            Log.d( "xxx", "filters: ${DAO.filterDAO.getFilters()}")
             Log.d( "xxx", "fieldData: ${DAO.fieldDataDAO.getFieldData()}")
             Log.d( "xxx", "enumAreas: ${DAO.enumAreaDAO.getEnumAreas()}")
             Log.d( "xxx", "teams: ${DAO.teamDAO.getTeams()}")
