@@ -42,7 +42,6 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         var titleTextView: TextView = itemView.findViewById(R.id.title_text_view);
-        val editButton: ImageView = itemView.findViewById(R.id.edit_image_view);
         val deleteButton: ImageView = itemView.findViewById(R.id.image_view);
     }
 
@@ -51,19 +50,16 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
         holder.itemView.isSelected = false
 
         val filterRule = filterRules!!.get(holder.adapterPosition)
-        if (position == 0)
-        {
-            holder.titleTextView.text = filterRule!!.connector.format
-       //     holder.titleTextView.setText( rule!!.name )
-        }
-        else
-        {
-            holder.titleTextView.text = filterRule!!.connector.format
-       //     holder.titleTextView.setText( filterRule!!.connector + " " + rule!!.name )
-        }
 
-        holder.editButton.setOnClickListener {
-            shouldEditFilterRule( filterRule )
+        filterRule.rule?.let { rule ->
+            if (position == 0)
+            {
+                holder.titleTextView.text = rule.name
+            }
+            else
+            {
+                holder.titleTextView.text = filterRule!!.connector.format + " " + rule.name
+            }
         }
 
         holder.deleteButton.setOnClickListener {

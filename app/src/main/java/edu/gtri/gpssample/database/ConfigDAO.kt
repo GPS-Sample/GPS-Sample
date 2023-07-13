@@ -189,37 +189,6 @@ class ConfigDAO(private var dao: DAO)
         }
     }
 
-    //--------------------------------------------------------------------------
-    fun deleteConfig( config: Config )
-    {
-        val studies = DAO.studyDAO.getStudies( config )
-        for (study in studies)
-        {
-            DAO.studyDAO.deleteStudy( study )
-        }
-
-        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-        for (enumArea in enumAreas)
-        {
-            DAO.enumAreaDAO.delete( enumArea )
-        }
-
-        val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(config.id.toString())
-
-        db.delete(DAO.TABLE_CONFIG, whereClause, args)
-        db.close()
-    }
-
-//    fun updateAllLists(config: Config)
-//    {
-//        config.id?.let { id ->
-//            config.studies = DAO.studyDAO.getStudies(config)
-//            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-//        }
-//    }
-
     private fun createOrUpdateStudies(config : Config)
     {
         // check the id.  if we get here and the id is null, there's a problem.
@@ -255,5 +224,27 @@ class ConfigDAO(private var dao: DAO)
                 DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
             }
         }
+    }
+
+    fun deleteConfig( config: Config )
+    {
+        val studies = DAO.studyDAO.getStudies( config )
+        for (study in studies)
+        {
+            DAO.studyDAO.deleteStudy( study )
+        }
+
+        val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        for (enumArea in enumAreas)
+        {
+            DAO.enumAreaDAO.delete( enumArea )
+        }
+
+        val db = dao.writableDatabase
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args = arrayOf(config.id.toString())
+
+        db.delete(DAO.TABLE_CONFIG, whereClause, args)
+        db.close()
     }
 }

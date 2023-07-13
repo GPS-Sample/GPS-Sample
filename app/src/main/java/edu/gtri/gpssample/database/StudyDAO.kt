@@ -45,31 +45,30 @@ class StudyDAO(private var dao: DAO)
             } ?: return null
         }
 
-        // add fields
-        for (field in study.fields)
-        {
-            // add the study id to the field
-            DAO.fieldDAO.createOrUpdateField(field, study)
-        }
-
-        // add rules
-        for (rule in study.rules)
-        {
-            // add rules
-            rule.field?.let { field ->
-                Log.d("RULE", "${field.id}")
-                rule.id = DAO.ruleDAO.createRule(rule)
-            }
-        }
-
-        // add filters
-        for(filter in study.filters)
-        {
-            // filter must have a filter rule
-            if(filter.filterRules.size > 0)
+        study.id?.let { id ->
+            // add fields
+            for (field in study.fields)
             {
-                study.id?.let { id ->
-                    DAO.filterDAO.createFilter(filter, id)
+                field.studyId = id
+                DAO.fieldDAO.createOrUpdateField( field )
+            }
+
+            // add rules
+            for (rule in study.rules)
+            {
+                rule.studyId = id
+                DAO.ruleDAO.createOrUpdateRule( rule )
+            }
+
+            // add filters
+            for(filter in study.filters)
+            {
+                // filter must have a filter rule
+                if(filter.filterRules.size > 0)
+                {
+                    study.id?.let { id ->
+                        DAO.filterDAO.createFilter(filter, id)
+                    }
                 }
             }
         }
@@ -166,16 +165,10 @@ class StudyDAO(private var dao: DAO)
             {
                 val study = buildStudy( cursor )
                 studies.add( study )
-                study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
-                for( field in study.fields)
-                {
-                    val rules = DAO.ruleDAO.getRulesForField(field)
-                    // Add rules to study
-                    study.rules.addAll(rules)
-                }
-                // find filters
+                study.fields = DAO.fieldDAO.getFields(study)
+                study.rules = DAO.ruleDAO.getRules(study)
 
-                study.filters.addAll(DAO.filterDAO.getFiltersForStudy(study))
+                study.filters.addAll(DAO.filterDAO.getFilters(study))
             }
 
             cursor.close()
@@ -228,6 +221,21 @@ class StudyDAO(private var dao: DAO)
     fun deleteStudy( study: Study )
     {
         study.id?.let{ id ->
+
+            val filters = DAO.filterDAO.getFilters( study )
+
+            for (filter in filters)
+            {
+                DAO.filterDAO.deleteFilter( filter )
+            }
+
+            val rules = DAO.ruleDAO.getRules( study )
+
+            for (rule in rules)
+            {
+                DAO.ruleDAO.deleteRule( rule )
+            }
+
             val fields = DAO.fieldDAO.getFields( study )
 
             for (field in fields)
