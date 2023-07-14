@@ -96,14 +96,14 @@ class FilterDAO(private var dao: DAO)
 
     fun getFilter(id : Int) : Filter?
     {
-        val filter: Filter? = null
+        var filter: Filter? = null
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_ID} = '${id}'"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_ID} = ${id}"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            val filter = buildFilter(cursor)
+            filter = buildFilter(cursor)
             filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
         }
 
