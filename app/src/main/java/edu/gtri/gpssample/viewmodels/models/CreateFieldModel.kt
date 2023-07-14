@@ -35,10 +35,12 @@ class CreateFieldModel
         _currentField = MutableLiveData(newField)
         currentField = _currentField
     }
-    fun addField(currentStudy : Study)
+    fun addField(study : Study)
     {
-        currentStudy?.let{study ->
+        study.id?.let { id ->
             currentField?.value?.let { field ->
+                field.studyId = id
+                DAO.fieldDAO.createOrUpdateField( field )
                 if(!study.fields.contains(field))
                 {
                     study.fields.add(field)

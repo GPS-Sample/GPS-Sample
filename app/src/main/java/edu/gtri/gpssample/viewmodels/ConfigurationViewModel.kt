@@ -202,7 +202,6 @@ class ConfigurationViewModel : ViewModel()
     {
         DAO.configDAO.deleteConfig( config )
         configurations.remove(config)
-
     }
 
     // Study
@@ -266,10 +265,7 @@ class ConfigurationViewModel : ViewModel()
     }
     fun setSelectedRule(rule : Rule)
     {
-        createStudyModel.currentStudy?.value?.let { study ->
-            createRuleModel.setSelectedRule(rule, study)
-
-        }
+        createRuleModel.setSelectedRule(rule)
     }
 
     fun deleteRule(rule:Rule)

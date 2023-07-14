@@ -31,28 +31,22 @@ class CreateRuleModel {
 
     fun addRule(study : Study)
     {
-        currentRule?.value?.let { rule ->
-            study.rules.add(rule)
-
+        study.id?.let { id ->
+            currentRule?.value?.let { rule ->
+                rule.studyId = id
+                DAO.ruleDAO.createOrUpdateRule( rule )
+                if(!study.rules.contains(rule))
+                {
+                    study.rules.add(rule)
+                }
+            }
         }
     }
-    fun setSelectedRule(rule : Rule, study : Study)
+    fun setSelectedRule(rule : Rule)
     {
         _currentRule = MutableLiveData(rule)
         currentRule = _currentRule
         _ruleOperatorPosition.value =  OperatorConverter.toArrayPosition(rule.operator)
-
-        var index : Int = 0
-        for(field in study.fields)
-        {
-            if(rule.field == field)
-            {
-                break;
-            }
-            index += 1;
-        }
-
-        //_ruleFieldPosition.value =
     }
 
     fun deleteSelectedRule(study : Study)
@@ -73,7 +67,7 @@ class CreateRuleModel {
 
     fun createNewRule() : Boolean
     {
-        val newRule = Rule(null, "", Operator.None, "" )
+        val newRule = Rule(null, -1, -1, "", Operator.None, "" )
         _currentRule = MutableLiveData(newRule)
         currentRule = _currentRule
 
@@ -82,20 +76,19 @@ class CreateRuleModel {
 
     fun onRuleFieldSelected(study : Study, position: Int,)
     {
-        currentRule?.value?.let{rule ->
-                rule.field = study.fields[position]
+        currentRule?.value?.let{ rule ->
+            val field = study.fields[position]
+            field.id?.let { id ->
+                rule.fieldId = id
             }
-
-        Log.d("HERE", "HERE")
+        }
     }
+
     fun onRuleOperatorSelected(study : Study, position: Int,)
     {
         currentRule?.value?.let{rule ->
             val operator = OperatorConverter.array[position]
             rule.operator = OperatorConverter.fromString(operator)
         }
-
-
-        Log.d("HERE", "HERE")
     }
 }

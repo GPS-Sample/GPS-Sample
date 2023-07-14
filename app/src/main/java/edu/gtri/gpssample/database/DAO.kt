@@ -69,9 +69,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableField = ("CREATE TABLE " +
                 TABLE_FIELD + "(" +
                 COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_FIELD_NAME + " TEXT" + "," +
-
                 COLUMN_STUDY_ID + " INTEGER" + "," +
+                COLUMN_FIELD_NAME + " TEXT" + "," +
 
                 // should be look up table
                 COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
@@ -95,12 +94,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 // i think we can just use one key here.  if a field is connected to a study and
                 // a rule is connected to a field
                 // this needs to be a foreign key
+                COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_FIELD_ID + " INTEGER" + "," +
                 COLUMN_RULE_NAME + " TEXT" + "," +
 
                 // TODO:  this should be a look up table
                 COLUMN_OPERATOR_ID + " INTEGER" + "," +
                 COLUMN_RULE_VALUE + " TEXT" + "," +
+                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableRule)
@@ -108,11 +109,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableFilter = ("CREATE TABLE " +
                 TABLE_FILTER + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                // this needs to be a foreign key
+                COLUMN_STUDY_ID + " INTEGER" + "," +
                 COLUMN_FILTER_NAME + " TEXT" + "," +
                 COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
                 COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
-                COLUMN_STUDY_ID + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
                 ")")
         db.execSQL(createTableFilter)
@@ -122,9 +122,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val createTableFilterRule = ("CREATE TABLE " +
                 TABLE_FILTERRULE + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
                 COLUMN_FILTER_ID + " INTEGER" + "," +
                 COLUMN_RULE_ID + " INTEGER" + "," +
+                COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
                 COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
                 "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
                 "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
@@ -438,9 +438,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         fun showAll()
         {
+//            deleteAll()
             Log.d( "xxx", "configs: ${DAO.configDAO.getConfigs()}")
             Log.d( "xxx", "studies: ${DAO.studyDAO.getStudies()}")
             Log.d( "xxx", "fields: ${DAO.fieldDAO.getFields()}")
+            Log.d( "xxx", "rules: ${DAO.ruleDAO.getRules()}")
+            Log.d( "xxx", "filters: ${DAO.filterDAO.getFilters()}")
             Log.d( "xxx", "fieldData: ${DAO.fieldDataDAO.getFieldData()}")
             Log.d( "xxx", "enumAreas: ${DAO.enumAreaDAO.getEnumAreas()}")
             Log.d( "xxx", "teams: ${DAO.teamDAO.getTeams()}")
@@ -498,7 +501,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 182
+        private const val DATABASE_VERSION = 186
 
     }
 }

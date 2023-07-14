@@ -193,8 +193,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                         val config = Config.unpack( text )
 
-                        Log.d( "xxx", config.toString() )
-
                         config?.let { config ->
                             DAO.deleteAll()
 

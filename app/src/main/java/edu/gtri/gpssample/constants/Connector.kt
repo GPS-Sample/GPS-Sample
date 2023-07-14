@@ -2,10 +2,10 @@ package edu.gtri.gpssample.constants
 
 enum class Connector(val format : String) {
 
-    None("None"),
-    AND("And"),
-    OR("Or"),
-    NOT("Not"),
+    None("none"),
+    AND("AND"),
+    OR("OR"),
+    NOT("NOT"),
 }
 
 object ConnectorConverter

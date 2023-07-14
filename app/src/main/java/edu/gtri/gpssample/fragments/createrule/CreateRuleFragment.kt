@@ -2,19 +2,19 @@ package edu.gtri.gpssample.fragments.createrule
 
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
@@ -35,6 +35,22 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                for (i in 0..study.fields.size-1)
+                {
+                    if (study.fields[i].id == rule.fieldId)
+                    {
+                        sharedViewModel.createRuleModel.ruleFieldPosition.value = i
+                    }
+                }
+            }
+        }
+
+        sharedViewModel.createRuleModel.currentRule?.value?.operator?.let { operator ->
+            sharedViewModel.createRuleModel.ruleOperationPosition?.value = OperatorConverter.toIndex( operator )
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -55,9 +71,17 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             viewModel = sharedViewModel
 
             // Assign the fragment
-            createFieldFragment = this@CreateRuleFragment
+            createRuleFragment = this@CreateRuleFragment
             this.executePendingBindings()
         }
+
+        binding.deleteImageView.setOnClickListener {
+            sharedViewModel.createStudyModel.currentStudy?.value?.let  { study ->
+                sharedViewModel.createRuleModel.deleteSelectedRule( study )
+                findNavController().popBackStack()
+            }
+        }
+
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }

@@ -29,6 +29,8 @@ class LocationDAO(private var dao: DAO)
                 Log.d( "xxx", "new location id = ${id}")
                 for (enumerationItem in location.enumerationItems)
                 {
+                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
+
                     for (fieldData in enumerationItem.fieldDataList)
                     {
                         DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )

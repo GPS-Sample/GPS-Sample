@@ -40,6 +40,12 @@ class CreateStudyModel {
     val sampleTypes : Array<String>
         get() = SampleTypeConverter.array
 
+    val fieldList : Array<String>
+        get() = getFields()
+
+    val ruleList : Array<String>
+        get() = getRules()
+
     var currentStudy : LiveData<Study>? = _currentStudy
 
     var currentSampleSize : String
@@ -58,16 +64,42 @@ class CreateStudyModel {
             }
         }
 
-
-
     constructor(){}
+
+    fun getFields() : Array<String>
+    {
+        val fieldList = ArrayList<String>()
+
+        _currentStudy?.value?.fields?.let { fields ->
+            for (field in fields)
+            {
+                fieldList.add( field.name )
+            }
+        }
+
+        return fieldList.toTypedArray()
+    }
+
+    fun getRules() : Array<String>
+    {
+        val ruleList = ArrayList<String>()
+
+        _currentStudy?.value?.rules?.let { rules ->
+            for (rule in rules)
+            {
+                ruleList.add( rule.name )
+            }
+        }
+
+        return ruleList.toTypedArray()
+    }
+
 
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < samplingMethods.size)
         {
             val samplingMethod : String = samplingMethods[position]
-
 
             _currentStudy?.value?.let {study ->
                 study.samplingMethod = SamplingMethodConverter.fromString(samplingMethod)
@@ -104,13 +136,16 @@ class CreateStudyModel {
 
     fun createNewStudy()
     {
-        val newStudy = Study(
+        val study = Study(
             "",
             SamplingMethod.None,
             0,
             SampleType.None
         )
-        _currentStudy = MutableLiveData(newStudy)
+
+        DAO.studyDAO.createOrUpdateStudy( study )
+
+        _currentStudy = MutableLiveData(study)
         currentStudy = _currentStudy
     }
 
