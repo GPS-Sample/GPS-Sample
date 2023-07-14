@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.constants.Connector
 import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.SampleTypeConverter
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.database.models.Rule
@@ -50,8 +51,10 @@ class CreateFilterModel {
     fun addFilter(study : Study)
     {
         currentFilter?.value?.let { filter ->
-            study.filters.add(filter)
-
+            if (!study.filters.contains( filter ))
+            {
+                study.filters.add(filter)
+            }
         }
     }
 

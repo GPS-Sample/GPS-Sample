@@ -10,11 +10,11 @@ import kotlinx.serialization.json.Json
 data class FilterRule(
     var id : Int? = null,
     var filterId : Int,
+    var ruleId : Int,
     var order : Int,
-    var rule : Rule?,
     var connector: Connector)
 {
-    constructor(order : Int) : this(null, -1, order,null, Connector.None)
+    constructor(order : Int) : this(null, -1, -1, order, Connector.None)
     fun pack() : String
     {
         return Json.encodeToString( this )

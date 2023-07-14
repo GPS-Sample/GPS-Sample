@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.constants.Connector
 import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.OperatorConverter
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.database.models.Rule
@@ -40,10 +41,11 @@ class CreateFilterRuleModel {
     fun addFilterRule(filter : Filter)
     {
         currentFilterRule?.value?.let { filterRule ->
-            filterRule.rule?.let { rule ->
-                if (filterRule.connector != Connector.None) {
+            val rule = DAO.ruleDAO.getRule( filterRule.ruleId )
+            rule?.let { rule ->
+                if (filterRule.connector != Connector.None)
+                {
                     filter.filterRules.add(filterRule)
-
                 }
             }
         }
@@ -52,7 +54,9 @@ class CreateFilterRuleModel {
     fun onFilterRuleFieldSelected (study : Study, position : Int)
     {
         currentFilterRule?.value?.let{filterRule ->
-            filterRule.rule = study.rules[position]
+            study.rules[position].id?.let { id ->
+                filterRule.ruleId = id
+            }
         }
     }
 

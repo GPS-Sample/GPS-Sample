@@ -14,14 +14,33 @@ import edu.gtri.gpssample.database.models.Study
 class FilterRuleDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createFilterRule( filterRule: FilterRule ) : Int
+    fun createOrUpdateFilterRule( filterRule: FilterRule ) : FilterRule?
     {
-        filterRule.rule?.let { rule ->
+        if (exists( filterRule ))
+        {
+            updateFilterRule( filterRule )
+        }
+        else
+        {
             val values = ContentValues()
             putFilterRule(filterRule, values)
-            return dao.writableDatabase.insert(DAO.TABLE_FILTERRULE, null, values).toInt()
+            filterRule.id = dao.writableDatabase.insert(DAO.TABLE_FILTERRULE, null, values).toInt()
+            filterRule.id?.let { id ->
+                Log.d( "xxx", "created new FilterRule with id: ${id}")
+            } ?: return null
         }
-        return -1
+
+        return filterRule
+    }
+
+    //--------------------------------------------------------------------------
+    fun exists( filterRule: FilterRule ): Boolean
+    {
+        filterRule.id?.let { id ->
+            getFilterRule( id )?.let {
+                return true
+            } ?: return false
+        } ?: return false
     }
 
     //--------------------------------------------------------------------------
@@ -33,7 +52,7 @@ class FilterRuleDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_FILTER_ID, filterRule.filterId )
-        values.put( DAO.COLUMN_RULE_ID, filterRule.rule!!.id!! )
+        values.put( DAO.COLUMN_RULE_ID, filterRule.ruleId )
         val cntrIndex = ConnectorConverter.toIndex(filterRule.connector)
         values.put( DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX, cntrIndex )
     }
@@ -58,13 +77,31 @@ class FilterRuleDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val filterId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_ID))
+        val ruleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_ID))
         val order = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_ORDER))
         val connector = ConnectorConverter.fromIndex(cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTERRULE_CONNECTOR_INDEX)))
 
-        val ruleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_ID))
-        val rule = DAO.ruleDAO.getRule( ruleId )
+        return FilterRule(id, filterId, ruleId, order, connector)
+    }
 
-        return FilterRule(id, filterId, order, rule, connector)
+    //--------------------------------------------------------------------------
+    fun getFilterRule( id: Int ): FilterRule?
+    {
+        var filterRule: FilterRule? = null
+
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_FILTER_ID} = $id"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            filterRule = buildFilterRule( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return filterRule
     }
 
     //--------------------------------------------------------------------------
@@ -74,10 +111,9 @@ class FilterRuleDAO(private var dao: DAO)
 
         filter.id?.let{id ->
             val db = dao.writableDatabase
-            val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_FILTER_ID} = '$id'"
+            val query = "SELECT * FROM ${DAO.TABLE_FILTERRULE} WHERE ${DAO.COLUMN_FILTER_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
-            // pass in the list of rules for a given study
             while (cursor.moveToNext())
             {
                 filterRules.add( buildFilterRule( cursor ))
