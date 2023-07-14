@@ -130,6 +130,7 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
 
                 return@setOnClickListener
             }
+
             sharedViewModel.addFilter()
             findNavController().popBackStack()
         }
