@@ -67,7 +67,8 @@ class StudyDAO(private var dao: DAO)
                 if(filter.filterRules.size > 0)
                 {
                     study.id?.let { id ->
-                        DAO.filterDAO.createFilter(filter, id)
+                        filter.studyId = id
+                        DAO.filterDAO.createOrUpdateFilter(filter)
                     }
                 }
             }

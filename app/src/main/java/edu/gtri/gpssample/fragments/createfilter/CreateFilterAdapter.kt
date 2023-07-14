@@ -51,7 +51,9 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
 
         val filterRule = filterRules!!.get(holder.adapterPosition)
 
-        filterRule.rule?.let { rule ->
+        val rule = DAO.ruleDAO.getRule( filterRule.ruleId )
+
+        rule?.let { rule ->
             if (position == 0)
             {
                 holder.titleTextView.text = rule.name
