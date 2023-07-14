@@ -222,14 +222,14 @@ class ConfigurationViewModel : ViewModel()
     {
         _currentConfiguration?.value?.let { configuration ->
             createStudyModel.currentStudy?.value?.let{study ->
+                createFilterModel.deleteSelectedFilter(study)
+                createRuleModel.deleteSelectedRule(study)
                 createFieldModel.deleteSelectedField(study)
             }
             createStudyModel.deleteCurrentStudy(configuration)
-            // TODO: remove rules and filters and fields
         }
-
-        createFilterModel.deleteCurrentFilter()
     }
+
     //endregion
     //region Enumerations
     fun addEnumerationAreas(enumAreas : ArrayList<EnumArea> )

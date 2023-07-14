@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.createfilter
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -109,6 +110,13 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
 //            binding.sampleSize1EditText.setText("")
 //            binding.sampleSize2EditText.setText("")
 //        }
+
+        binding.deleteImageView.setOnClickListener {
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                sharedViewModel.createFilterModel.deleteSelectedFilter( study )
+                findNavController().popBackStack()
+            }
+        }
 
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()

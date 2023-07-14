@@ -47,6 +47,11 @@ class RuleDAO(private var dao: DAO)
     {
         val operatorId = OperatorConverter.toIndex(rule.operator)
 
+        rule.id?.let { id ->
+            Log.d( "xxx", "existing filter id = ${id}")
+            values.put( DAO.COLUMN_ID, id )
+        }
+
         values.put( DAO.COLUMN_STUDY_ID, rule.studyId )
         values.put( DAO.COLUMN_FIELD_ID, rule.fieldId )
         values.put( DAO.COLUMN_RULE_NAME, rule.name )
@@ -68,22 +73,6 @@ class RuleDAO(private var dao: DAO)
         db.close()
     }
 
-//    @SuppressLint("Range")
-//    private fun  buildRule(cursor: Cursor, field : Field): Rule
-//    {
-//        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-//        val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
-//        val fieldId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
-//        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
-//
-//        // TODO:  this should be a lookup table
-//        val operatorId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_OPERATOR_ID))
-//        val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
-//
-//        val operator = OperatorConverter.fromIndex(operatorId)
-//        return Rule( id, studyId, fieldId, name, operator, value )
-//    }
-
     @SuppressLint("Range")
     private fun  buildRule(cursor: Cursor): Rule
     {
@@ -104,7 +93,7 @@ class RuleDAO(private var dao: DAO)
     fun getRule( id: Int ) : Rule?
     {
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_ID} = '${id}'"
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_ID} = ${id}"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -157,24 +146,6 @@ class RuleDAO(private var dao: DAO)
 
         return rules
     }
-
-//    fun getRulesForField(field : Field) : List<Rule>
-//    {
-//        val rules = ArrayList<Rule>()
-//        val db = dao.writableDatabase
-//        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_FIELD_ID} = '${field.id}'"
-//        val cursor = db.rawQuery(query, null)
-//
-//        while (cursor.moveToNext())
-//        {
-//            rules.add( buildRule( cursor, field ))
-//        }
-//
-//        cursor.close()
-//        db.close()
-//
-//        return rules
-//    }
 
     //--------------------------------------------------------------------------
     fun deleteRule( rule: Rule )

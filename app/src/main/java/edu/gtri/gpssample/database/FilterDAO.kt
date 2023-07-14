@@ -16,26 +16,42 @@ import edu.gtri.gpssample.extensions.toBoolean
 class FilterDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createFilter( filter: Filter, study_id: Int ) : Filter?
+    fun createOrUpdateFilter( filter: Filter ) : Filter?
     {
-        val values = ContentValues()
+        if (exists( filter ))
+        {
+            updateFilter( filter )
+        }
+        else
+        {
+            val values = ContentValues()
 
-        putFilter( filter, study_id, values )
-        filter.id = dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values).toInt()
-
-        filter.id?.let { id ->
-            for (filterRule in filter.filterRules)
-            {
-                filterRule.filterId = id
-                DAO.filterRuleDAO.createFilterRule(filterRule)
-            }
-        } ?: return null
+            putFilter( filter, values )
+            filter.id = dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values).toInt()
+            filter.id?.let { id ->
+                for (filterRule in filter.filterRules)
+                {
+                    filterRule.filterId = id
+                    DAO.filterRuleDAO.createOrUpdateFilterRule(filterRule)
+                }
+            } ?: return null
+        }
 
         return filter
     }
 
     //--------------------------------------------------------------------------
-    private fun putFilter( filter: Filter, study_id: Int, values: ContentValues )
+    fun exists( filter: Filter ): Boolean
+    {
+        filter.id?.let { id ->
+            getFilter( id )?.let {
+                return true
+            } ?: return false
+        } ?: return false
+    }
+
+    //--------------------------------------------------------------------------
+    private fun putFilter( filter: Filter, values: ContentValues )
     {
         val index = SampleTypeConverter.toIndex(filter.samplingType)
 
@@ -44,21 +60,21 @@ class FilterDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
-        values.put( DAO.COLUMN_STUDY_ID, study_id )
+        values.put( DAO.COLUMN_STUDY_ID, filter.studyId )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
         values.put( DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX, index )
     }
 
     //--------------------------------------------------------------------------
-    fun updateFilter( filter: Filter, study_id: Int )
+    fun updateFilter( filter: Filter )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(filter.id.toString())
         val values = ContentValues()
 
-        putFilter( filter, study_id, values )
+        putFilter( filter, values )
 
         db.update(DAO.TABLE_FILTER, values, whereClause, args )
         db.close()
@@ -76,6 +92,25 @@ class FilterDAO(private var dao: DAO)
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
 
         return Filter( id, studyId, name, type, sampleSize )
+    }
+
+    fun getFilter(id : Int) : Filter?
+    {
+        val filter: Filter? = null
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_ID} = '${id}'"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val filter = buildFilter(cursor)
+            filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
+        }
+
+        cursor.close()
+        db.close()
+
+        return filter
     }
 
     fun getFilters(study : Study) : ArrayList<Filter>
