@@ -71,16 +71,19 @@ class CreateFilterModel {
         _currentFilter?.value?.let{filter ->
             //val count
         }
-
-
     }
 
-    fun deleteCurrentFilter()
+    fun deleteSelectedFilter( study: Study )
     {
-        _currentFilter = null
+        _currentFilter?.value?.let { filter ->
+
+            study.filters.remove(filter)
+            DAO.filterDAO.deleteFilter(filter)
+            _currentFilter = null
+        }
     }
 
-    fun onSampleTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+fun onSampleTypeSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position > SampleTypeConverter.array.size)
         {

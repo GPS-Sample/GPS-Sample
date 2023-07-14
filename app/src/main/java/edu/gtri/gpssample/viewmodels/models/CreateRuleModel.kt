@@ -55,9 +55,8 @@ class CreateRuleModel {
             study.rules.remove(rule)
             DAO.ruleDAO.deleteRule(rule)
         }
-
-
     }
+
     fun deleteRule(rule:Rule, study : Study)
     {
 
