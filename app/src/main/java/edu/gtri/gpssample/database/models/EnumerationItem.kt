@@ -21,13 +21,18 @@ data class EnumerationItem(
     var enumerationState : EnumerationState,
     var incompleteReason : String,
     var notes : String,
-    var fieldDataList : ArrayList<FieldData>)
+    var fieldDataList : ArrayList<FieldData> )
 {
     constructor( locationId: Int ) :
-            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, "", SampleState.Undefined, EnumerationState.Undefined, "", "", ArrayList<FieldData>())
+            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1,
+                "", SampleState.Undefined, EnumerationState.Undefined, "", "",
+                ArrayList<FieldData>())
 
-    constructor( locationId: Int, subAddress: String, sampleState: SampleState, enumerationState: EnumerationState, incompleteReason: String, notes: String ) :
-            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1, subAddress, sampleState, enumerationState, incompleteReason, notes, ArrayList<FieldData>())
+    constructor( locationId: Int, subAddress: String, sampleState: SampleState,
+                 enumerationState: EnumerationState, incompleteReason: String, notes: String ) :
+            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1,
+                subAddress, sampleState, enumerationState, incompleteReason, notes,
+                ArrayList<FieldData>())
 
     fun pack() : String
     {

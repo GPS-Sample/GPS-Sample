@@ -137,14 +137,17 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     override fun onMapReady(p0: GoogleMap) {
         map = p0
+
+
+        // re think this
         map.setOnMapClickListener(this)
-        map.uiSettings.isScrollGesturesEnabled = true
+
 
         // Need to build enum area that is to be sampled.  there can be clusters and they don't
         // need to be near each other.  how do we find a centroid (maybe?) for viewing purposes or
         // more importantly, are we doing ONE EA at a time?  or are we sampling using the sampling
         // method for ALL EAs?
-        map.clear()
+
 
         map.setOnMapClickListener {
 //            if (createMode)
@@ -156,59 +159,9 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 //            }
         }
 
-
+        samplingViewModel.setEnumAreasForMap(p0)
 
         //for (enumArea in config.enumAreas)
-        samplingViewModel.currentEnumArea?.value?.let{ enumArea->
-
-            addPolygon( enumArea )
-
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
-
-            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
-
-            for (location in enumArea.locations)
-            {
-                if (location.isLandmark)
-                {
-                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-
-                    map.addMarker( MarkerOptions()
-                        .position( LatLng( location.latitude, location.longitude ))
-                        .icon( icon )
-                    )
-                }
-                else
-                {
-                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                    var numComplete = 0
-
-                    for (enumerationItem in location.enumerationItems)
-                    {
-                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                            break
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            numComplete++
-                        }
-                    }
-
-                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                    }
-
-                    map.addMarker( MarkerOptions()
-                        .position( LatLng( location.latitude, location.longitude ))
-                        .icon( icon )
-                    )
-                }
-            }
-        }
     }
 
     override fun onMapClick(p0: LatLng) {
