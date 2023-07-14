@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolygonOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
@@ -39,6 +40,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
     private var _binding: FragmentCreateSampleBinding? = null
     private val binding get() = _binding!!
 
+    private var curEnumArea : EnumArea? = null
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -65,7 +67,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 
             // Assign the view model to a property in the binding class
             viewModel = sharedViewModel
-            samplingViewModel = this.samplingViewModel
+            this.sampleViewModel = samplingViewModel
 
             // Assign the fragment
             createSampleFragment = this@CreateSampleFragment
@@ -81,20 +83,28 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         binding.nextButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
         }
+
         sharedViewModel.currentConfiguration?.value.let { config ->
             this.config = config!!
             this.config.id?.let {
                // configId = it
             }
         }
+        samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        binding.infoButton.setOnClickListener{
+            // pop up dialog fragment
+            findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
+        }
     }
 
     override fun onResume()
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateSampleFragment.value.toString() + ": " + this.javaClass.simpleName
+
     }
 
     override fun onDestroyView()
@@ -146,38 +156,57 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 //            }
         }
 
-        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
-        for (enumArea in config.enumAreas)
-        {
+
+        //for (enumArea in config.enumAreas)
+        samplingViewModel.currentEnumArea?.value?.let{ enumArea->
+
             addPolygon( enumArea )
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
 
-            enumArea.enumDataList = DAO.enumDataDAO.getEnumData(enumArea)
+            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
 
-            for (enumData in enumArea.enumDataList)
+            for (location in enumArea.locations)
             {
-                var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                if (enumData.incomplete)
+                if (location.isLandmark)
                 {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                }
-                else if (enumData.valid)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                }
+                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
 
-                if (enumData.isLocation)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+                    map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
                 }
+                else
+                {
+                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                val marker = map.addMarker( MarkerOptions()
-                    .position( LatLng( enumData.latitude, enumData.longitude ))
-                    .icon( icon )
-                )
+                    var numComplete = 0
+
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                            break
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            numComplete++
+                        }
+                    }
+
+                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                    }
+
+                    map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
+                }
             }
         }
     }
