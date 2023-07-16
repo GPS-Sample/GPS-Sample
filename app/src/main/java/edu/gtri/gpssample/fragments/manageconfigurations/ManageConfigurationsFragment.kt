@@ -219,7 +219,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                                     }
                                 }
                             }
-                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                        } ?: Toast.makeText(activity!!.applicationContext, "2Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 catch( ex: Exception )

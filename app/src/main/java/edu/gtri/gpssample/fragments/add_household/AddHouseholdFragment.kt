@@ -112,6 +112,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         for (field in study.fields)
         {
             val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumerationItem.id!!)
+
             fieldDataMap[field.id!!] = fieldData
             fieldDataMap[field.id!!] = fieldData.copy()
         }

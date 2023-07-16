@@ -13,7 +13,7 @@ data class SampledItem(
     var samplingState : SamplingState = SamplingState.NotSampled
      )
 {
-    constructor( enumerationItem: EnumerationItem ) :
+    constructor(  enumerationItem: EnumerationItem ) :
             this( null, enumerationItem, SamplingState.NotSampled)
 
 

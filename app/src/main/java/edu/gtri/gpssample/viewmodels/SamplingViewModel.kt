@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -25,9 +26,10 @@ import java.util.ArrayList
 class SamplingViewModel : ViewModel() {
     private var _currentFragment : Fragment? = null
     private var activity : Activity? = null
-
+    private var _map : GoogleMap? =  null
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentEnumerationArea : MutableLiveData<EnumArea>? = null
+    private var _currentEnumItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
     var currentFragment : Fragment?
         get() = _currentFragment
@@ -53,14 +55,16 @@ class SamplingViewModel : ViewModel() {
             return _currentEnumerationArea
         }
         set(value){
-
             value?.let{enumArea ->
                 _currentEnumerationArea = MutableLiveData(enumArea.value)
-               // _currentEnumerationArea?.postValue(value?.value)
+                _currentStudy?.value?.let{study->
+                    enumArea.value?.let{ea->
+                        study.sampleAreas.add(ea)
+                    }
+                }
             }
-
-
         }
+
 
     fun addPolygon( enumArea: EnumArea, map: GoogleMap)
     {
@@ -78,14 +82,22 @@ class SamplingViewModel : ViewModel() {
         polygon.tag = enumArea
 
     }
-
+    fun getEnumAreaLocations()
+    {
+        currentEnumArea?.value?.let { enumArea ->
+            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
+        }
+    }
     fun setEnumAreasForMap(map: GoogleMap) : SamplingState
     {
+
         var minLat = 999999.0
         var minLon = 999999.0
         var maxLat = -999999.0
         var maxLon = -999999.0
 
+        _map = map
+       // _currentEnumItemsForSampling.clear()
         map.clear()
         map.uiSettings.isScrollGesturesEnabled = true
 
@@ -104,7 +116,7 @@ class SamplingViewModel : ViewModel() {
             val latLngBounds = LatLngBounds(LatLng(minLat, minLon), LatLng(maxLat,maxLon))
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
 
-            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
+
             for (location in enumArea.locations)
             {
                 if (location.isLandmark)
@@ -118,15 +130,33 @@ class SamplingViewModel : ViewModel() {
                 }
                 else
                 {
-                    for (enumItem in location.enumerationItems) {
-                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                    var icon : BitmapDescriptor? = null
+                    currentStudy?.value?.let{study->
+                        for (enumItem in location.enumerationItems) {
 
-                        map.addMarker(
-                            MarkerOptions()
-                                .position(LatLng(location.latitude, location.longitude))
-                                .icon(icon)
-                        )
+                            // add item for sampling
+
+                            if(!_currentEnumItemsForSampling.contains(enumItem))
+                            {
+                                _currentEnumItemsForSampling.add(enumItem)
+                            }
+
+                            icon = when(enumItem.samplingState)
+                            {
+                                SamplingState.None -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                                SamplingState.NotSampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_grey)
+                                SamplingState.Sampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                                SamplingState.Resampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                            }
+                            map.addMarker(
+                                MarkerOptions()
+                                    .position(LatLng(location.latitude, location.longitude))
+                                    .icon(icon)
+                            )
+
+                        }
                     }
+
                 }
             }
         }
@@ -134,14 +164,84 @@ class SamplingViewModel : ViewModel() {
     }
     fun beginSampling(view : View) : SamplingState
     {
+        fixEnumData()
+        // reset list
+        val removeList : ArrayList<EnumerationItem> = ArrayList()
+
         currentStudy?.value?.let { study ->
-           print("study.samplingMethod.name()  ${study.samplingMethod.name}")
+
+
+            for(filter in study.filters)
+            {
+                Log.d("XXXXXX", filter.name )
+                for(rule in filter.filterRules)
+                {
+
+                    Log.d("XXXX", "THE NAME  CONNECTOR ${rule.connector.format}")
+                }
+
+            }
+
+            for(enumItem in _currentEnumItemsForSampling)
+            {
+                enumItem.samplingState = SamplingState.None
+                // find and remove items that are not valid
+                if(enumItem.enumerationState == EnumerationState.Incomplete)
+                {
+                    removeList.add(enumItem)
+                }
+                if(enumItem.enumerationState == EnumerationState.Enumerated)
+                {
+                   // for(filter in )
+                        for(fieldData in enumItem.fieldDataList)
+                        {
+                            Log.d("XXX", "field data name ${fieldData.name}")
+
+                            // fieldData.
+                        }
+                }
+
+            }
+
+            // just do random sampling as a test
+            currentEnumArea?.value?.let { enumArea ->
+                val sampledIndices: ArrayList<Int> = ArrayList()
+                for (i in 0 until study.sampleSize) {
+
+                    var rnds = (0 until _currentEnumItemsForSampling.size).random()
+                    while(sampledIndices.contains(rnds))
+                    {
+                        rnds = (0 until _currentEnumItemsForSampling.size).random()
+                    }
+                    sampledIndices.add(rnds)
+                    _currentEnumItemsForSampling[rnds]?.samplingState = SamplingState.Sampled
+                }
+
+
+            }
+
         }
-        print("begin sampling")
 
-
-
+        _map?.let{map->
+            setEnumAreasForMap(map)
+        }
         return SamplingState.None
+    }
+
+    fun fixEnumData()
+    {
+        currentStudy?.value?.let{study->
+
+            for(i in 0 until _currentEnumItemsForSampling.size)
+            {
+                val enumItem = _currentEnumItemsForSampling[i]
+                enumItem.fieldDataList[0].name = study.fields[0].name
+                enumItem.fieldDataList[0].type = study.fields[0].type
+                enumItem.fieldDataList[1].name = study.fields[1].name
+                enumItem.fieldDataList[1].type = study.fields[1].type
+            }
+        }
+
     }
 
 //    fun samplingInfo(view : View)

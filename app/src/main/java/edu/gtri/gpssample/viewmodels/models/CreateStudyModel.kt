@@ -104,7 +104,6 @@ class CreateStudyModel {
             _currentStudy?.value?.let {study ->
                 study.samplingMethod = SamplingMethodConverter.fromString(samplingMethod)
 
-
                 _samplingTypes.clear()
                 when(samplingMethod)
                 {
@@ -131,7 +130,6 @@ class CreateStudyModel {
                 it.sampleType = SampleTypeConverter.fromString(sampleType)
             }
         }
-
     }
 
     fun createNewStudy()

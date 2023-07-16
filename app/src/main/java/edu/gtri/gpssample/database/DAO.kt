@@ -11,235 +11,252 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     //--------------------------------------------------------------------------
     override fun onCreate( db: SQLiteDatabase )
     {
-        val createTableUser = ("CREATE TABLE " +
-                TABLE_USER + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_USER_ROLE + " TEXT" +  "," +
-                COLUMN_USER_NAME + " TEXT" + "," +
-                COLUMN_USER_PIN + " INTEGER" + "," +
-                COLUMN_USER_RECOVERY_QUESTION + " TEXT" + "," +
-                COLUMN_USER_RECOVERY_ANSWER + " TEXT" + "," +
-                COLUMN_USER_IS_ONLINE + " BOOLEAN" +
-                ")")
-        db.execSQL(createTableUser)
+        try {
+            val createTableUser = ("CREATE TABLE " +
+                    TABLE_USER + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_USER_ROLE + " TEXT" + "," +
+                    COLUMN_USER_NAME + " TEXT" + "," +
+                    COLUMN_USER_PIN + " INTEGER" + "," +
+                    COLUMN_USER_RECOVERY_QUESTION + " TEXT" + "," +
+                    COLUMN_USER_RECOVERY_ANSWER + " TEXT" + "," +
+                    COLUMN_USER_IS_ONLINE + " BOOLEAN" +
+                    ")")
+            db.execSQL(createTableUser)
 
-        val createTableConfig = ("CREATE TABLE " +
-                TABLE_CONFIG + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_TEAM_ID + " INTEGER" + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
+            val createTableConfig = ("CREATE TABLE " +
+                    TABLE_CONFIG + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_TEAM_ID + " INTEGER" + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
 
-                // this needs to be a look up table
-                COLUMN_CONFIG_DATE_FORMAT_INDEX + " INTEGER" + "," +
-                COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
-                COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
-                COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableConfig)
+                    // this needs to be a look up table
+                    COLUMN_CONFIG_DATE_FORMAT_INDEX + " INTEGER" + "," +
+                    COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
+                    COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
+                    COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableConfig)
 
-        val createTableStudy = ("CREATE TABLE " +
-                TABLE_STUDY + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_STUDY_NAME + " TEXT" + "," +
-                COLUMN_CONFIG_ID + " INTEGER" + "," +
+            val createTableStudy = ("CREATE TABLE " +
+                    TABLE_STUDY + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_STUDY_NAME + " TEXT" + "," +
+                    COLUMN_CONFIG_ID + " INTEGER" + "," +
 
-                // this needs to be a look up table
-                COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
-                COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
+                    // this needs to be a look up table
+                    COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
+                    COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
 
-                // this needs to be a look up table
-                COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableStudy)
+                    // this needs to be a look up table
+                    COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableStudy)
 
-        val createTableConfigStudy = ("CREATE TABLE " +
-                TABLE_CONFIG_STUDY + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CONFIG_ID + " INTEGER NOT NULL" + "," +
-                COLUMN_STUDY_ID + " INTEGER NOT NULL" + "," +
-                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableConfigStudy)
+            val createTableStudyEnumArea = ("CREATE TABLE " +
+                    TABLE_STUDY_ENUM_AREA + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_STUDY_ID + " INTEGER NOT NULL" + "," +
+                    COLUMN_ENUM_AREA_ID + " INTEGER NOT NULL" + "," +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableStudyEnumArea)
 
-        val createTableField = ("CREATE TABLE " +
-                TABLE_FIELD + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FIELD_NAME + " TEXT" + "," +
+            val createTableConfigStudy = ("CREATE TABLE " +
+                    TABLE_CONFIG_STUDY + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CONFIG_ID + " INTEGER NOT NULL" + "," +
+                    COLUMN_STUDY_ID + " INTEGER NOT NULL" + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableConfigStudy)
 
-                // should be look up table
-                COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
-                COLUMN_FIELD_PII + " BOOLEAN" + "," +
-                COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
-                COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN" + "," +
-                COLUMN_FIELD_DATE + " BOOLEAN" + "," +
-                COLUMN_FIELD_TIME + " BOOLEAN" + "," +
-                COLUMN_FIELD_OPTION_1 + " TEXT" + "," +
-                COLUMN_FIELD_OPTION_2 + " TEXT" + "," +
-                COLUMN_FIELD_OPTION_3 + " TEXT" + "," +
-                COLUMN_FIELD_OPTION_4 + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableField)
+            val createTableField = ("CREATE TABLE " +
+                    TABLE_FIELD + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_STUDY_ID + " INTEGER" + "," +
+                    COLUMN_FIELD_NAME + " TEXT" + "," +
 
-        val createTableRule = ("CREATE TABLE " +
-                TABLE_RULE + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    // should be look up table
+                    COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
+                    COLUMN_FIELD_PII + " BOOLEAN" + "," +
+                    COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
+                    COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN" + "," +
+                    COLUMN_FIELD_DATE + " BOOLEAN" + "," +
+                    COLUMN_FIELD_TIME + " BOOLEAN" + "," +
+                    COLUMN_FIELD_OPTION_1 + " TEXT" + "," +
+                    COLUMN_FIELD_OPTION_2 + " TEXT" + "," +
+                    COLUMN_FIELD_OPTION_3 + " TEXT" + "," +
+                    COLUMN_FIELD_OPTION_4 + " TEXT" + "," +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableField)
 
-                // i think we can just use one key here.  if a field is connected to a study and
-                // a rule is connected to a field
-                // this needs to be a foreign key
-                COLUMN_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FIELD_ID + " INTEGER" + "," +
-                COLUMN_RULE_NAME + " TEXT" + "," +
+            val createTableRule = ("CREATE TABLE " +
+                    TABLE_RULE + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
 
-                // TODO:  this should be a look up table
-                COLUMN_OPERATOR_ID + " INTEGER" + "," +
-                COLUMN_RULE_VALUE + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableRule)
+                    // i think we can just use one key here.  if a field is connected to a study and
+                    // a rule is connected to a field
+                    // this needs to be a foreign key
+                    COLUMN_STUDY_ID + " INTEGER" + "," +
+                    COLUMN_FIELD_ID + " INTEGER" + "," +
+                    COLUMN_RULE_NAME + " TEXT" + "," +
 
-        val createTableFilter = ("CREATE TABLE " +
-                TABLE_FILTER + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                COLUMN_STUDY_ID + " INTEGER" + "," +
-                COLUMN_FILTER_NAME + " TEXT" + "," +
-                COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
-                COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableFilter)
+                    // TODO:  this should be a look up table
+                    COLUMN_OPERATOR_ID + " INTEGER" + "," +
+                    COLUMN_RULE_VALUE + " TEXT" + "," +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableRule)
 
-        // connector table
-        // this is a logic chain
-        val createTableFilterRule = ("CREATE TABLE " +
-                TABLE_FILTERRULE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                COLUMN_FILTER_ID + " INTEGER" + "," +
-                COLUMN_RULE_ID + " INTEGER" + "," +
-                COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
-                COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableFilterRule)
+            val createTableFilter = ("CREATE TABLE " +
+                    TABLE_FILTER + "(" +
+                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
+                    COLUMN_STUDY_ID + " INTEGER" + "," +
+                    COLUMN_FILTER_NAME + " TEXT" + "," +
+                    COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
+                    COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableFilter)
 
-        val createTableEnumArea = ("CREATE TABLE " +
-                TABLE_ENUM_AREA + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_CONFIG_ID + " INTEGER" + "," +
-                COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableEnumArea)
+            // connector table
+            // this is a logic chain
+            val createTableFilterRule = ("CREATE TABLE " +
+                    TABLE_FILTERRULE + "(" +
+                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
+                    COLUMN_FILTER_ID + " INTEGER" + "," +
+                    COLUMN_RULE_ID + " INTEGER" + "," +
+                    COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
+                    COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableFilterRule)
 
-        val createTableTeam = ("CREATE TABLE " +
-                TABLE_TEAM + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_STUDY_ID + " INTEGER" + "," +
-                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                COLUMN_TEAM_NAME + " TEXT" + "," +
-                COLUMN_TEAM_IS_ENUMERATION_TEAM + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableTeam)
+            val createTableEnumArea = ("CREATE TABLE " +
+                    TABLE_ENUM_AREA + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_CONFIG_ID + " INTEGER" + "," +
+                    COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableEnumArea)
 
-        val createTableTeamMember = ("CREATE TABLE " +
-                TABLE_TEAM_MEMBER + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_TEAM_ID + " INTEGER" + "," +
-                COLUMN_TEAM_MEMBER_NAME + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableTeamMember)
+            val createTableTeam = ("CREATE TABLE " +
+                    TABLE_TEAM + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_STUDY_ID + " INTEGER" + "," +
+                    COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                    COLUMN_TEAM_NAME + " TEXT" + "," +
+                    COLUMN_TEAM_IS_ENUMERATION_TEAM + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableTeam)
 
-        val createTableLocation = ("CREATE TABLE " +
-                TABLE_LOCATION + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_UUID + " TEXT" + "," +
-                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
-                COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
-                COLUMN_LOCATION_LATITUDE + " REAL" + "," +
-                COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
-                COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableLocation)
+            val createTableTeamMember = ("CREATE TABLE " +
+                    TABLE_TEAM_MEMBER + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_TEAM_ID + " INTEGER" + "," +
+                    COLUMN_TEAM_MEMBER_NAME + " TEXT" + "," +
+                    "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableTeamMember)
 
-        val createTableEnumerationItem = ("CREATE TABLE " +
-                TABLE_ENUMERATION_ITEM + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_UUID + " TEXT" + "," +
-                COLUMN_LOCATION_ID + " INTEGER" + "," +
-                COLUMN_COLLECTION_ITEM_ID + " INTEGER" + "," +
-                COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
-                COLUMN_ENUMERATION_ITEM_SAMPLE_STATE + " TEXT" + "," +
-                COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
-                COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
-                COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_COLLECTION_ITEM_ID) REFERENCES $TABLE_COLLECTION_ITEM($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableEnumerationItem)
+            val createTableLocation = ("CREATE TABLE " +
+                    TABLE_LOCATION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_UUID + " TEXT" + "," +
+                    COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                    COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
+                    COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
+                    COLUMN_LOCATION_LATITUDE + " REAL" + "," +
+                    COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
+                    COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableLocation)
 
-        val createTableCollectionItem = ("CREATE TABLE " +
-                TABLE_COLLECTION_ITEM + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_CREATION_DATE + " INTEGER" + "," +
-                COLUMN_UUID + " TEXT" + "," +
-                COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
-                COLUMN_COLLECTION_ITEM_STATE + " TEXT" + "," +
-                COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
-                COLUMN_COLLECTION_ITEM_NOTES + " TEXT" + "," +
-                "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableCollectionItem)
+            val createTableEnumerationItem = ("CREATE TABLE " +
+                    TABLE_ENUMERATION_ITEM + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_UUID + " TEXT" + "," +
+                    COLUMN_LOCATION_ID + " INTEGER" + "," +
+                    COLUMN_COLLECTION_ITEM_ID + " INTEGER" + "," +
+                    COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_SAMPLE_STATE + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
+                    "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_COLLECTION_ITEM_ID) REFERENCES $TABLE_COLLECTION_ITEM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableEnumerationItem)
 
-        val createTableFieldData = ("CREATE TABLE " +
-                TABLE_FIELD_DATA + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_UUID + " TEXT" + "," +
-                COLUMN_FIELD_ID + " INTEGER" + "," +
-                COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_TEXT_VALUE + " TEXT" + "," +
-                COLUMN_FIELD_DATA_NUMBER_VALUE + " REAL" + "," +
-                COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_DROPDOWN_INDEX + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_CHECKBOX1 + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_CHECKBOX2 + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
-                COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableFieldData)
+            val createTableCollectionItem = ("CREATE TABLE " +
+                    TABLE_COLLECTION_ITEM + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_UUID + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
+                    COLUMN_COLLECTION_ITEM_STATE + " TEXT" + "," +
+                    COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
+                    COLUMN_COLLECTION_ITEM_NOTES + " TEXT" + "," +
+                    "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableCollectionItem)
 
-        val createTableLatLon = ("CREATE TABLE " +
-                TABLE_LAT_LON + "(" +
-                COLUMN_ID + COLUMN_ID_TYPE + "," +
-                COLUMN_LAT + " REAL" + "," +
-                COLUMN_LON + " REAL" + "," +
-                COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                COLUMN_TEAM_ID + " INTEGER" + "," +
-                "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
-                ")")
-        db.execSQL(createTableLatLon)
+            val createTableFieldData = ("CREATE TABLE " +
+                    TABLE_FIELD_DATA + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_UUID + " TEXT" + "," +
+                    COLUMN_FIELD_ID + " INTEGER" + "," +
+                    COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
+                    COLUMN_FIELD_NAME + " TEXT" + "," +
+                    COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_TEXT_VALUE + " TEXT" + "," +
+                    COLUMN_FIELD_DATA_NUMBER_VALUE + " REAL" + "," +
+                    COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_DROPDOWN_INDEX + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_CHECKBOX1 + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_CHECKBOX2 + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableFieldData)
+
+            val createTableLatLon = ("CREATE TABLE " +
+                    TABLE_LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_LAT + " REAL" + "," +
+                    COLUMN_LON + " REAL" + "," +
+                    COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
+                    COLUMN_TEAM_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableLatLon)
+        }catch(ex: Exception)
+        {
+            Log.d("xxxxxxxx", "the problem ${ex.toString()}")
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -250,6 +267,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG_STUDY")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY_ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
@@ -314,10 +332,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
         const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
 
+        // Study EnumArea connector table
+        const val TABLE_STUDY_ENUM_AREA = "study_enum_area"
+        // columns are defined in foreign key area
+
         // Study Table
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
-
         const val COLUMN_STUDY_SAMPLING_METHOD_INDEX = "study_sampling_method_index"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
@@ -460,6 +481,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_CONFIG, null, null )
                 db.delete(TABLE_STUDY, null, null)
                 db.delete(TABLE_CONFIG_STUDY, null, null)
+                db.delete(TABLE_STUDY_ENUM_AREA, null, null)
                 db.delete(TABLE_FIELD, null, null)
                 db.delete(TABLE_FIELD_DATA, null, null)
                 db.delete(TABLE_RULE, null, null)
@@ -501,7 +523,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 186
+        private const val DATABASE_VERSION = 189
 
     }
 }

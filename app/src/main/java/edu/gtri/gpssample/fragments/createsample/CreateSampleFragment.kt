@@ -141,7 +141,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         // re think this
         map.setOnMapClickListener(this)
-
+        samplingViewModel.getEnumAreaLocations()
 
         // Need to build enum area that is to be sampled.  there can be clusters and they don't
         // need to be near each other.  how do we find a centroid (maybe?) for viewing purposes or
