@@ -1,4 +1,5 @@
 package edu.gtri.gpssample.constants
+import android.util.Log
 import java.util.*
 import android.view.View
 import android.widget.AdapterView
@@ -60,6 +61,7 @@ object FieldTypeConverter
 
     fun fromString( type : String) : FieldType
     {
+        Log.d("XXXXX", "from string")
         return when(type)
         {
             FieldType.Text.format -> FieldType.Text

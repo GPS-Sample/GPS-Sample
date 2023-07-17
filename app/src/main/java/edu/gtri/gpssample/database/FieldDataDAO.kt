@@ -23,6 +23,7 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
+            Log.d("XXXXX", "the field name ${fieldData.name}")
             val values = ContentValues()
 
             putFieldData( fieldData, values )
@@ -127,7 +128,7 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getOrCreateFieldData( field_id: Int, enumerationItemId: Int ): FieldData
+    fun getOrCreateFieldData( field_id: Int, enumerationItemId: Int,  ): FieldData
     {
         var fieldData: FieldData? = null
         val db = dao.writableDatabase

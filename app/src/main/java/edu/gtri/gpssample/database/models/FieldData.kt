@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import android.util.Log
 import edu.gtri.gpssample.constants.FieldType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString

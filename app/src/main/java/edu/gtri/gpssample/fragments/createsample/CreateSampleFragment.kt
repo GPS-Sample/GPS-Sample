@@ -54,6 +54,8 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         samplingViewModel.currentFragment = this
 
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+        samplingViewModel.config = sharedViewModel.currentConfiguration?.value
     }
 
 

@@ -73,6 +73,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onViewCreated(view, savedInstanceState)
 
+
+        Log.d("XXXXXXXX", "IN ADD HOUSEHOLD?")
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
         }
@@ -111,6 +113,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         for (field in study.fields)
         {
+
             val fieldData = DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumerationItem.id!!)
 
             fieldDataMap[field.id!!] = fieldData

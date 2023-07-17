@@ -31,6 +31,9 @@ class SamplingViewModel : ViewModel() {
     private var _currentEnumerationArea : MutableLiveData<EnumArea>? = null
     private var _currentEnumItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
+
+    var config : Config? = null
+
     var currentFragment : Fragment?
         get() = _currentFragment
         set(value){
@@ -143,10 +146,11 @@ class SamplingViewModel : ViewModel() {
 
                             icon = when(enumItem.samplingState)
                             {
-                                SamplingState.None -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                                SamplingState.None       -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
                                 SamplingState.NotSampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_grey)
-                                SamplingState.Sampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                                SamplingState.Resampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                                SamplingState.Sampled    -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                                SamplingState.Resampled  -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                                SamplingState.Invalid    -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
                             }
                             map.addMarker(
                                 MarkerOptions()
@@ -170,7 +174,7 @@ class SamplingViewModel : ViewModel() {
 
         currentStudy?.value?.let { study ->
 
-
+/// TEST
             for(filter in study.filters)
             {
                 Log.d("XXXXXX", filter.name )
@@ -182,12 +186,14 @@ class SamplingViewModel : ViewModel() {
 
             }
 
+
             for(enumItem in _currentEnumItemsForSampling)
             {
-                enumItem.samplingState = SamplingState.None
+                enumItem.samplingState = SamplingState.NotSampled
                 // find and remove items that are not valid
                 if(enumItem.enumerationState == EnumerationState.Incomplete)
                 {
+                    enumItem.samplingState = SamplingState.Invalid
                     removeList.add(enumItem)
                 }
                 if(enumItem.enumerationState == EnumerationState.Enumerated)
@@ -195,13 +201,16 @@ class SamplingViewModel : ViewModel() {
                    // for(filter in )
                         for(fieldData in enumItem.fieldDataList)
                         {
-                            Log.d("XXX", "field data name ${fieldData.name}")
+                           // Log.d("XXX", "field data name ${fieldData.name}  value ${fieldData.numberValue}")
 
                             // fieldData.
                         }
                 }
 
             }
+
+            // remove invalid houses as part of sampling
+            _currentEnumItemsForSampling.removeAll(removeList.toSet())
 
             // just do random sampling as a test
             currentEnumArea?.value?.let { enumArea ->
@@ -230,18 +239,65 @@ class SamplingViewModel : ViewModel() {
 
     fun fixEnumData()
     {
-        currentStudy?.value?.let{study->
-
-            for(i in 0 until _currentEnumItemsForSampling.size)
+        currentStudy?.value?.let{study ->
+            for(enumItem in _currentEnumItemsForSampling)
             {
-                val enumItem = _currentEnumItemsForSampling[i]
                 enumItem.fieldDataList[0].name = study.fields[0].name
                 enumItem.fieldDataList[0].type = study.fields[0].type
+
                 enumItem.fieldDataList[1].name = study.fields[1].name
                 enumItem.fieldDataList[1].type = study.fields[1].type
             }
-        }
 
+            // CHECK
+            for(enumAreaa in study.sampleAreas)
+            {
+                for(location in enumAreaa.locations)
+                {
+                    for(enumItem in location.enumerationItems)
+                    {
+                        for(fieldData in enumItem.fieldDataList)
+                        {
+
+                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+                        }
+                    }
+                }
+            }
+
+            Log.d("XXXXXXX", "---------------- enumAreas")
+            currentEnumArea?.value?.let{enumArea ->
+                for(location in enumArea.locations)
+                {
+                    for(enumItem in location.enumerationItems)
+                    {
+                        for(fieldData in enumItem.fieldDataList)
+                        {
+
+                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+                        }
+                    }
+                }
+            }
+
+            Log.d("XXXXXXXXXXX", "------------------- Config enum areas")
+            config?.let{config->
+                for(enumAreaa in config.enumAreas) {
+                    for (location in enumAreaa.locations) {
+                        for (enumItem in location.enumerationItems) {
+                            for (fieldData in enumItem.fieldDataList) {
+                                Log.d(
+                                    "XXXXXX",
+                                    "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}"
+                                )
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        Log.d("XXXXXXXXXXX", "-------------------------------")
     }
 
 //    fun samplingInfo(view : View)
