@@ -34,6 +34,10 @@ class StudiesAdapter(var studies: List<Study>?) : RecyclerView.Adapter<StudiesAd
         if (allHolders.isNotEmpty())
         {
             allHolders[0].checkImageView.visibility = View.VISIBLE
+
+
+            val study = studies!![0]
+            didSelectStudy(study)
         }
 
         return viewHolder

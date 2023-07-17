@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.database.getDoubleOrNull
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
+import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.extensions.toBoolean
@@ -22,6 +23,7 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
+            Log.d("XXXXX", "the field name ${fieldData.name}")
             val values = ContentValues()
 
             putFieldData( fieldData, values )
@@ -45,6 +47,8 @@ class FieldDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_FIELD_ID, fieldData.fieldId )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, fieldData.enumerationItemId )
+        values.put(DAO.COLUMN_FIELD_NAME, fieldData.name)
+        values.put(DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(fieldData.type))
         values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
         values.put( DAO.COLUMN_FIELD_DATA_NUMBER_VALUE, fieldData.numberValue )
         values.put( DAO.COLUMN_FIELD_DATA_DATE_VALUE, fieldData.dateValue )
@@ -73,6 +77,8 @@ class FieldDataDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
         val enumerationItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ID))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
+        val type = FieldTypeConverter.fromIndex(cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX)))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
         val numberValue = cursor.getDoubleOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_NUMBER_VALUE))
         val dateValue = cursor.getLongOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DATE_VALUE))
@@ -82,7 +88,7 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
 
-        return FieldData( id, uuid, field_id, enumerationItemId, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
+        return FieldData( id, uuid, field_id, enumerationItemId,name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
     }
 
     //--------------------------------------------------------------------------
@@ -122,7 +128,7 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getOrCreateFieldData( field_id: Int, enumerationItemId: Int ): FieldData
+    fun getOrCreateFieldData( field_id: Int, enumerationItemId: Int,  ): FieldData
     {
         var fieldData: FieldData? = null
         val db = dao.writableDatabase

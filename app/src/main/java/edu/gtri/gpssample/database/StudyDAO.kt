@@ -214,6 +214,7 @@ class StudyDAO(private var dao: DAO)
             putStudy( study, values )
 
             db.update(DAO.TABLE_STUDY, values, whereClause, args )
+            // TODO: ADD in abilty to save study areas
             db.close()
         }
     }

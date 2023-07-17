@@ -64,6 +64,8 @@ class CreateStudyModel {
             }
         }
 
+    constructor(){}
+
     fun getFields() : Array<String>
     {
         val fieldList = ArrayList<String>()
@@ -92,6 +94,7 @@ class CreateStudyModel {
         return ruleList.toTypedArray()
     }
 
+
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < samplingMethods.size)
@@ -100,7 +103,6 @@ class CreateStudyModel {
 
             _currentStudy?.value?.let {study ->
                 study.samplingMethod = SamplingMethodConverter.fromString(samplingMethod)
-
 
                 _samplingTypes.clear()
                 when(samplingMethod)
@@ -128,7 +130,6 @@ class CreateStudyModel {
                 it.sampleType = SampleTypeConverter.fromString(sampleType)
             }
         }
-
     }
 
     fun createNewStudy()

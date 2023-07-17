@@ -253,6 +253,11 @@
         <action
             android:id="@+id/action_navigate_to_ManageCollectionTeamsFragment"
             app:destination="@id/ManageCollectionTeamsFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_SamplingInfoDialogFragment"
+            app:destination="@id/SamplingInfoDialogFragment" />
+
     </fragment>
 
     <!--CreateRuleFragment-->
@@ -355,6 +360,16 @@
 <!--        <action-->
 <!--            android:id="@+id/action_navigate_to_FirstFragment"-->
 <!--            app:destination="@id/FirstFragment" />-->
+    </dialog>
+
+    <dialog
+        android:id="@+id/SamplingInfoDialogFragment"
+        android:name="edu.gtri.gpssample.dialogs.SamplingInfoDialogFragment"
+        android:label="dialog_sampling_info"
+        tools:layout="@layout/dialog_sampling_info" >
+        <action
+            android:id="@+id/action_navigate_to_CreateSampleFragment"
+            app:destination="@id/CreateSampleFragment" />
     </dialog>
 
 </navigation>

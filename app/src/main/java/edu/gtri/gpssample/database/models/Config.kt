@@ -61,11 +61,12 @@ data class Config(
         {
             try
             {
+                Log.d("XXXXXXXXX", "ABOUT TO UNPACK")
                 return Json.decodeFromString<Config>( message )
             }
             catch( ex: Exception )
             {
-                Log.d( "xxx", ex.stackTrace.toString())
+                Log.d( "xxXXx", ex.stackTrace.toString())
             }
 
             return null
