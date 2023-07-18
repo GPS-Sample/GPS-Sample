@@ -131,8 +131,22 @@ class PerformCollectionFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        enumArea.locations = DAO.locationDAO.getEnumeratedLocations(enumArea, team)
-        performCollectionAdapter.updateLocations( enumArea.locations )
+        var locations = ArrayList<Location>()
+
+        for (location in enumArea.locations)
+        {
+            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+            {
+                // assuming only 1 enumerationItem per location, for now...
+                val enumerationItem = location.enumerationItems[0]
+                if (enumerationItem.samplingState == SamplingState.Sampled)
+                {
+                    locations.add( location )
+                }
+            }
+        }
+
+        performCollectionAdapter.updateLocations( locations )
     }
 
     var once = true
@@ -177,9 +191,10 @@ class PerformCollectionFragment : Fragment(),
             }
             else if (location.enumerationItems.isNotEmpty())
             {
+                // assuming only 1 enumerationItem per location, for now...
                 val enumerationItem = location.enumerationItems[0]
 
-                if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                if (enumerationItem.samplingState == SamplingState.Sampled)
                 {
                     val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
 
@@ -428,22 +443,22 @@ class PerformCollectionFragment : Fragment(),
 
             if (collectionItem == null)
             {
-                val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
-                    CollectionItem( enumerationItem.id!!, state, incompleteReason, notes )
-                )
-
-                collectionItem?.id?.let {
-                    enumerationItem.collectionItemId = it
-                }
-
-                DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
+//                val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
+//                    CollectionItem( enumerationItem.id!!, state, incompleteReason, notes )
+//                )
+//
+//                collectionItem?.id?.let {
+//                    enumerationItem.collectionItemId = it
+//                }
+//
+//                DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
             }
             else
             {
-                collectionItem.state = state
-                collectionItem.incompleteReason = incompleteReason
-                collectionItem.notes = notes
-                DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
+//                collectionItem.state = state
+//                collectionItem.incompleteReason = incompleteReason
+//                collectionItem.notes = notes
+//                DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
             }
 
             onMapReady(map)

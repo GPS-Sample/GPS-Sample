@@ -18,11 +18,13 @@ import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateCollectionTeamBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
@@ -35,6 +37,7 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
     private lateinit var enumArea: EnumArea
     private lateinit var defaultColorList: ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var samplingViewModel: SamplingViewModel
 
     private var createMode = false
     private var selectionGeometry: Geometry? = null
@@ -49,6 +52,9 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        val samplingVm : SamplingViewModel by activityViewModels()
+        samplingViewModel = samplingVm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -163,24 +169,42 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
             study.id?.let { studyId ->
                 enumArea.id?.let { enumAreaId ->
 
-                    val polygon = ArrayList<LatLon>()
+                    var polygon = ArrayList<LatLon>()
 
                     selectionPolygon?.points?.map {
                         polygon.add( LatLon( it.latitude, it.longitude ))
+                    }
+
+                    if (polygon.isEmpty())
+                    {
+                        enumArea.vertices.map {
+                            polygon.add( LatLon( it.latitude, it.longitude ))
+                        }
                     }
 
                     val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString(), false, polygon ))
 
                     team?.id?.let { teamId ->
 
-                        for (location in enumArea.locations)
+                        if (selectionGeometry == null)
                         {
-                            selectionGeometry?.let {
-                                val point = GeometryFactory().createPoint( Coordinate( location.longitude, location.latitude ))
-                                if (it.contains( point ))
-                                {
-                                    location.collectionTeamId = teamId
-                                    DAO.locationDAO.updateLocation( location )
+                            for (location in enumArea.locations)
+                            {
+                                location.collectionTeamId = teamId
+                                DAO.locationDAO.updateLocation( location )
+                            }
+                        }
+                        else
+                        {
+                            for (location in enumArea.locations)
+                            {
+                                selectionGeometry?.let {
+                                    val point = GeometryFactory().createPoint( Coordinate( location.longitude, location.latitude ))
+                                    if (it.contains( point ))
+                                    {
+                                        location.collectionTeamId = teamId
+                                        DAO.locationDAO.updateLocation( location )
+                                    }
                                 }
                             }
                         }
@@ -268,18 +292,22 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        val locations = DAO.locationDAO.getLocations( enumArea )
-
-        for (location in locations)
+        for (location in enumArea.locations)
         {
-            if (!location.isLandmark)
+            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
             {
-                val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                // assuming only 1 enumeration item per location, for now...
+                val enumerationItem = location.enumerationItems[0]
 
-                map.addMarker( MarkerOptions()
-                    .position( LatLng( location.latitude, location.longitude ))
-                    .icon( icon )
-                )
+                if (enumerationItem.samplingState == SamplingState.Sampled)
+                {
+                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+                    map.addMarker( MarkerOptions()
+                        .position( LatLng( location.latitude, location.longitude ))
+                        .icon( icon )
+                    )
+                }
             }
         }
     }
