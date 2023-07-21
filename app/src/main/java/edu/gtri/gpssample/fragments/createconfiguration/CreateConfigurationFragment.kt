@@ -160,9 +160,8 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
         map.clear()
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
-            for (enumArea in enumAreas)
+            for (enumArea in config.enumAreas)
             {
                 val points = ArrayList<LatLng>()
 

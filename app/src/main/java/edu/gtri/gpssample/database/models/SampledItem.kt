@@ -7,15 +7,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class SampledItem(
-    var id : Int? = null,
-    var enumerationItem: EnumerationItem,
+data class SampledItem (
+    override var id: Int?,
+    var enumItem : EnumerationItem,
     var samplingState : SamplingState = SamplingState.NotSampled
-     )
+     ): GeoItem()
 {
-    constructor(  enumerationItem: EnumerationItem ) :
-            this( null, enumerationItem, SamplingState.NotSampled)
-
+    constructor(enumItem : EnumerationItem) :
+            this(null, enumItem, SamplingState.None)
 
     fun pack() : String
     {

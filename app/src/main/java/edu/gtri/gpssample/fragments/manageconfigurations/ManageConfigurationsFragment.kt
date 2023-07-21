@@ -192,42 +192,42 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         Log.d( "xxx FROMCONFIG", text )
 
                         val config = Config.unpack( text )
-                        var count = 0
+                        //var count = 0
                         config?.let { config ->
 
-                            for(enumAreaa in config.enumAreas)
-                            {
-                                for(location in enumAreaa.locations)
-                                {
-                                    for(enumItem in location.enumerationItems)
-                                    {
-                                        for(fieldData in enumItem.fieldDataList)
-                                        {
-                                            count += 1
-                                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-                                        }
-                                    }
-                                }
-                            }
-                            for(study in config.studies)
-                            {
-                                for(enumAreaa in study.sampleAreas)
-                                {
-                                    for(location in enumAreaa.locations)
-                                    {
-                                        for(enumItem in location.enumerationItems)
-                                        {
-                                            for(fieldData in enumItem.fieldDataList)
-                                            {
-                                                count += 1
-                                                Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+//                            for(enumAreaa in config.enumAreas)
+//                            {
+//                                for(location in enumAreaa.locations)
+//                                {
+//                                    for(item in location.items)
+//                                    {
+//                                        for(fieldData in enumItem.fieldDataList)
+//                                        {
+//                                            count += 1
+//                                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            for(study in config.studies)
+//                            {
+//                                for(enumAreaa in study.sampleAreas)
+//                                {
+//                                    for(location in enumAreaa.locations)
+//                                    {
+//                                        for(enumItem in location.enumerationItems)
+//                                        {
+//                                            for(fieldData in enumItem.fieldDataList)
+//                                            {
+//                                                count += 1
+//                                                Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
 
-                            Log.d("XXXXX", "THE COUNT $count")
+//                            Log.d("XXXXX", "THE COUNT $count")
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK

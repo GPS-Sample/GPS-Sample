@@ -190,7 +190,7 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
                         {
                             for (location in enumArea.locations)
                             {
-                                location.collectionTeamId = teamId
+                               // location.collectionTeamId = teamId
                                 DAO.locationDAO.updateLocation( location )
                             }
                         }
@@ -202,7 +202,7 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
                                     val point = GeometryFactory().createPoint( Coordinate( location.longitude, location.latitude ))
                                     if (it.contains( point ))
                                     {
-                                        location.collectionTeamId = teamId
+                                       // location.collectionTeamId = teamId
                                         DAO.locationDAO.updateLocation( location )
                                     }
                                 }
@@ -210,10 +210,10 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
                         }
 
                         // refresh the shared config
-                        val config = DAO.configDAO.getConfig( enumArea.configId )
-                        config?.let {
-                            sharedViewModel.setCurrentConfig( it )
-                        }
+//                        val config = DAO.configDAO.getConfig( enumArea.configId )
+//                        config?.let {
+//                            sharedViewModel.setCurrentConfig( it )
+//                        }
                     }
 
                     findNavController().popBackStack()
@@ -294,21 +294,21 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
 
         for (location in enumArea.locations)
         {
-            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
-            {
-                // assuming only 1 enumeration item per location, for now...
-                val enumerationItem = location.enumerationItems[0]
-
-                if (enumerationItem.samplingState == SamplingState.Sampled)
-                {
-                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                    map.addMarker( MarkerOptions()
-                        .position( LatLng( location.latitude, location.longitude ))
-                        .icon( icon )
-                    )
-                }
-            }
+//            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+//            {
+//                // assuming only 1 enumeration item per location, for now...
+//                val enumerationItem = location.enumerationItems[0]
+//
+//                if (enumerationItem.samplingState == SamplingState.Sampled)
+//                {
+//                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+//
+//                    map.addMarker( MarkerOptions()
+//                        .position( LatLng( location.latitude, location.longitude ))
+//                        .icon( icon )
+//                    )
+//                }
+//            }
         }
     }
 

@@ -12,16 +12,16 @@ import edu.gtri.gpssample.database.models.Field
 class EnumAreaDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createOrUpdateEnumArea( enumArea: EnumArea ) : EnumArea?
+    fun createOrUpdateEnumArea( enumArea: EnumArea, config : Config ) : EnumArea?
     {
         if (exists( enumArea ))
         {
-            updateEnumArea( enumArea )
+            updateEnumArea( enumArea, config )
         }
         else
         {
             val values = ContentValues()
-            putEnumArea( enumArea, values )
+            putEnumArea( enumArea, config, values )
             enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
 
             enumArea.id?.let {id ->
@@ -29,8 +29,8 @@ class EnumAreaDAO(private var dao: DAO)
 
                 for (latLon in enumArea.vertices)
                 {
-                    latLon.enumAreaId = id
-                    DAO.latLonDAO.createOrUpdateLatLon(latLon)
+
+                    DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea,null)
                 }
 
                 for (team in enumArea.enumerationTeams)
@@ -40,16 +40,10 @@ class EnumAreaDAO(private var dao: DAO)
                     DAO.teamDAO.createOrUpdateTeam(team)
                 }
 
-                for (team in enumArea.collectionTeams)
-                {
-                    team.enumAreaId = id
-                    team.isEnumerationTeam = true
-                    DAO.teamDAO.createOrUpdateTeam(team)
-                }
 
                 for (location in enumArea.locations)
                 {
-                    location.enumAreaId = id
+                    //location. = id
                     DAO.locationDAO.createOrUpdateLocation(location)
                 }
 
@@ -61,7 +55,7 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun putEnumArea( enumArea: EnumArea, values: ContentValues )
+    fun putEnumArea( enumArea: EnumArea, config : Config, values: ContentValues )
     {
         enumArea.id?.let { id ->
             Log.d( "xxx", "existing enumArea id = ${id}")
@@ -69,7 +63,7 @@ class EnumAreaDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
-        values.put( DAO.COLUMN_CONFIG_ID, enumArea.configId )
+        values.put( DAO.COLUMN_CONFIG_ID, config.id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
     }
 
@@ -79,10 +73,9 @@ class EnumAreaDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
-        val config_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
 
-        return EnumArea( id, creationDate, config_id, name )
+        return EnumArea( id, creationDate, name )
     }
 
     //--------------------------------------------------------------------------
@@ -112,7 +105,6 @@ class EnumAreaDAO(private var dao: DAO)
             enumArea.id?.let { _id ->
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( _id )
                 enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
-                enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
                 enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             }
         }
@@ -139,7 +131,6 @@ class EnumAreaDAO(private var dao: DAO)
                 enumArea.id?.let { id ->
                     enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                     enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
-                    enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
                     enumArea.locations = DAO.locationDAO.getLocations( enumArea )
                     enumAreas.add( enumArea )
                 }
@@ -168,7 +159,6 @@ class EnumAreaDAO(private var dao: DAO)
             enumArea.id?.let { id ->
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                 enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
-                enumArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
                 enumArea.locations = DAO.locationDAO.getLocations( enumArea )
                 enumAreas.add( enumArea )
             }
@@ -182,7 +172,7 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun updateEnumArea( enumArea: EnumArea )
+    fun updateEnumArea( enumArea: EnumArea, config : Config )
     {
         val db = dao.writableDatabase
 
@@ -193,7 +183,7 @@ class EnumAreaDAO(private var dao: DAO)
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
 
-            putEnumArea( enumArea, values )
+            putEnumArea( enumArea, config, values )
 
             db.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
         }

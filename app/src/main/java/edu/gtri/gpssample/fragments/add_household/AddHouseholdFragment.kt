@@ -92,23 +92,23 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             createMode = true
 
             sharedViewModel.teamViewModel.currentTeam?.value?.let { team ->
-                location.enumerationTeamId = team.id!!
+            //    location.enumerationTeamId = team.id!!
             }
 
             DAO.locationDAO.createOrUpdateLocation(location)
         }
 
         location.id?.let { locationId ->
-            if (location.enumerationItems.isEmpty())
-            {
-                enumerationItem = EnumerationItem( locationId )
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
-                location.enumerationItems.add( enumerationItem )
-            }
-            else
-            {
-                enumerationItem = location.enumerationItems[0]
-            }
+//            if (location.enumerationItems.isEmpty())
+//            {
+//                enumerationItem = EnumerationItem( locationId )
+//                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
+//                location.enumerationItems.add( enumerationItem )
+//            }
+//            else
+//            {
+//                enumerationItem = location.enumerationItems[0]
+//            }
         }
 
         for (field in study.fields)

@@ -139,8 +139,8 @@ class ConfigurationFragment : Fragment(),
         // set the first study as selected.  TODO: save the id of the selected study
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
-            val enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-            enumerationAreasAdapter.updateEnumAreas(enumAreas)
+
+            enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
 
             if(config.studies.count() > 0)
             {
@@ -173,9 +173,8 @@ class ConfigurationFragment : Fragment(),
 
             // put the enums
             sharedViewModel.currentConfiguration?.value?.let {config ->
-                val enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
 
-                for (enumArea in enumAreas)
+                for (enumArea in config.enumAreas)
                 {
                     val points = ArrayList<LatLng>()
 
@@ -279,7 +278,8 @@ class ConfigurationFragment : Fragment(),
             writer.flush()
             writer.close()
 
-            Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.",
+                Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -288,8 +288,10 @@ class ConfigurationFragment : Fragment(),
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
 
             sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-            ConfirmationDialog( activity, "Enumeration Area ${enumArea.name}", "Select a task", "Enumeration", "Collection", kTaskTag, this)
-        } ?: Toast.makeText(activity!!.applicationContext, "You do not have a study associated with this EA.", Toast.LENGTH_SHORT).show()
+            ConfirmationDialog( activity, "Enumeration Area ${enumArea.name}", "Select a task",
+                        "Enumeration", "Survey", kTaskTag, this)
+        } ?: Toast.makeText(activity!!.applicationContext,
+                        "You do not have a study associated with this EA.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -318,7 +320,8 @@ class ConfigurationFragment : Fragment(),
                             {
                                 DAO.locationDAO.importLocation( location )
                             }
-                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.",
+                            Toast.LENGTH_SHORT).show()
 
                         map?.let { map ->
                             onMapReady(map)
@@ -327,7 +330,8 @@ class ConfigurationFragment : Fragment(),
                 }
                 catch( ex: java.lang.Exception )
                 {
-                    Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
         }

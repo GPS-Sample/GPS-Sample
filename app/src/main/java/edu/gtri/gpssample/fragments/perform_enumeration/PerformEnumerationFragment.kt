@@ -144,9 +144,9 @@ class PerformEnumerationFragment : Fragment(),
         binding.addHouseholdButton.setOnClickListener {
 
             addLocation?.let { location ->
-                val location = Location(enumAreaId, location.latitude, location.longitude, false)
-                location.enumerationTeamId = team.id!!
-                sharedViewModel.locationViewModel.setCurrentLocation(location)
+//                val location = Location(enumAreaId, location.latitude, location.longitude, false)
+//                location.enumerationTeamId = team.id!!
+//                sharedViewModel.locationViewModel.setCurrentLocation(location)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
             } ?: kotlin.run {
@@ -217,11 +217,13 @@ class PerformEnumerationFragment : Fragment(),
         val points = ArrayList<LatLng>()
 
         team.polygon.map {
-            points.add( it.toLatLng())
+            val pt = it.toLatLng()
+            points.add( pt)
         }
 
         if (points.isNotEmpty())
         {
+
             val polygon = PolygonOptions()
                 .clickable(false)
                 .addAll( points )
@@ -249,23 +251,23 @@ class PerformEnumerationFragment : Fragment(),
             {
                 var numComplete = 0
 
-                for (enumerationItem in location.enumerationItems)
-                {
-                    if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                        break
-                    }
-                    else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                    {
-                        numComplete++
-                    }
-                }
-
-                if (numComplete > 0 && numComplete == location.enumerationItems.size)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                }
+//                for (enumerationItem in location.enumerationItems)
+//                {
+//                    if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+//                    {
+//                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+//                        break
+//                    }
+//                    else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+//                    {
+//                        numComplete++
+//                    }
+//                }
+//
+//                if (numComplete > 0 && numComplete == location.enumerationItems.size)
+//                {
+//                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+//                }
             }
 
             marker = map.addMarker( MarkerOptions()

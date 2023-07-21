@@ -55,23 +55,10 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
             enumArea = it
         }
 
-        enumArea.id?.let { enumAreaId ->
+        enumArea?.let { enumArea ->
             sharedViewModel.currentConfiguration?.value?.let { config ->
-                var teams = ArrayList<Team>()
 
-                if (config.teamId > 0) // if teamId is valid, then filter out all teams except this one
-                {
-                    val team = DAO.teamDAO.getTeam( config.teamId )
-                    team?.let {
-                        teams.add( it )
-                    }
-                }
-                else  // otherwise show all teams
-                {
-                    teams = DAO.teamDAO.getEnumerationTeams( enumAreaId )
-                }
-
-                manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( teams )
+                manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( enumArea.enumerationTeams )
             }
         }
 

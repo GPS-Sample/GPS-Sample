@@ -108,7 +108,6 @@ class MainFragment : Fragment()
             getRuntimePermissions()
         }
 
-        DAO.showAll()
     }
 
     override fun onResume()

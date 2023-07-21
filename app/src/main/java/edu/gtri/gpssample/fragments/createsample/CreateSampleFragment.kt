@@ -92,7 +92,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
                // configId = it
             }
         }
-        samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
+       // samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -143,7 +143,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         // re think this
         map.setOnMapClickListener(this)
-        samplingViewModel.getEnumAreaLocations()
+        samplingViewModel.getSampleAreaLocations()
 
         // Need to build enum area that is to be sampled.  there can be clusters and they don't
         // need to be near each other.  how do we find a centroid (maybe?) for viewing purposes or

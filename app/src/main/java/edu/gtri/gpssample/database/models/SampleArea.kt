@@ -7,12 +7,14 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class SampleArea(
-    var id : Int? = null,
+    override var id : Int? = null,
     var creationDate: Long,
-    var enumAreaId : Int,
-    var vertices : LatLon
+    var vertices : ArrayList<LatLon>,
+    var collectionTeams: ArrayList<Team>,
+    var locations : ArrayList<Location>
 
-) {
+) : GeoArea()
+{
 
 
     fun copy() : SampleArea?

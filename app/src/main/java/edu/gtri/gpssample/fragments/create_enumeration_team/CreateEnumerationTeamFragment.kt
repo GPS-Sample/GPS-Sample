@@ -179,17 +179,17 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
                                 val point = GeometryFactory().createPoint( Coordinate( location.longitude, location.latitude ))
                                 if (it.contains( point ))
                                 {
-                                    location.enumerationTeamId = teamId
-                                    DAO.locationDAO.updateLocation( location )
+//                                    location.enumerationTeamId = teamId
+//                                    DAO.locationDAO.updateLocation( location )
                                 }
                             }
                         }
 
                         // refresh the shared config
-                        val config = DAO.configDAO.getConfig( enumArea.configId )
-                        config?.let {
-                            sharedViewModel.setCurrentConfig( it )
-                        }
+//                        val config = DAO.configDAO.getConfig( enumArea.configId )
+//                        config?.let {
+//                            sharedViewModel.setCurrentConfig( it )
+//                        }
                     }
 
                     findNavController().popBackStack()

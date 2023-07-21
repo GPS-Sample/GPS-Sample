@@ -135,14 +135,17 @@ class PerformCollectionFragment : Fragment(),
 
         for (location in enumArea.locations)
         {
-            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+            if (!location.isLandmark && location.items.isNotEmpty())
             {
                 // assuming only 1 enumerationItem per location, for now...
-                val enumerationItem = location.enumerationItems[0]
-                if (enumerationItem.samplingState == SamplingState.Sampled)
-                {
-                    locations.add( location )
+                val sampledItem = location.items[0] as? SampledItem
+                sampledItem?.let{sampledItem ->
+                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    {
+                        locations.add( location )
+                    }
                 }
+
             }
         }
 
@@ -189,50 +192,53 @@ class PerformCollectionFragment : Fragment(),
                     .icon( icon )
                 )
             }
-            else if (location.enumerationItems.isNotEmpty())
+            else if (location.items.isNotEmpty())
             {
                 // assuming only 1 enumerationItem per location, for now...
-                val enumerationItem = location.enumerationItems[0]
 
-                if (enumerationItem.samplingState == SamplingState.Sampled)
-                {
-                    val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
+                val sampledItem = location.items[0] as? SampledItem
+                sampledItem?.let{sampledItem ->
+                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    {
+                        val collectionItem = DAO.collectionItemDAO.getCollectionItem( sampledItem.enumItem!!.collectionItemId )
 
-                    var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 
-                    collectionItem?.let { collectionItem ->
+                        collectionItem?.let { collectionItem ->
 
-                        if (collectionItem.state == CollectionState.Incomplete)
-                        {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                        }
-                        else if (collectionItem.state == CollectionState.Complete)
-                        {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                        }
-                    }
-
-                    val marker = map.addMarker( MarkerOptions()
-                        .position( LatLng( location.latitude, location.longitude ))
-                        .icon( icon )
-                    )
-
-                    marker?.let {marker ->
-                        marker.tag = location
-
-                        map.setOnMarkerClickListener { marker ->
-                            marker.tag?.let { tag ->
-
-                                val location = tag as Location
-                                sharedViewModel.locationViewModel.setCurrentLocation(location)
-
-                                LaunchSurveyDialog( activity, this)
+                            if (collectionItem.state == CollectionState.Incomplete)
+                            {
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
                             }
+                            else if (collectionItem.state == CollectionState.Complete)
+                            {
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                            }
+                        }
 
-                            false
+                        val marker = map.addMarker( MarkerOptions()
+                            .position( LatLng( location.latitude, location.longitude ))
+                            .icon( icon )
+                        )
+
+                        marker?.let {marker ->
+                            marker.tag = location
+
+                            map.setOnMarkerClickListener { marker ->
+                                marker.tag?.let { tag ->
+
+                                    val location = tag as Location
+                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+                                    LaunchSurveyDialog( activity, this)
+                                }
+
+                                false
+                            }
                         }
                     }
                 }
+
             }
         }
     }
@@ -431,37 +437,40 @@ class PerformCollectionFragment : Fragment(),
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
-            val enumerationItem = location.enumerationItems[0]
-            var collectionItem = DAO.collectionItemDAO.getCollectionItem(enumerationItem.collectionItemId)
+            val sampledItem = location.items[0] as? SampledItem
+            sampledItem?.let{sampledItem ->
+                var collectionItem = DAO.collectionItemDAO.getCollectionItem(sampledItem.enumItem!!.collectionItemId)
 
-            var state = CollectionState.Complete
+                var state = CollectionState.Complete
 
-            if (incompleteReason.isNotEmpty())
-            {
-                state = CollectionState.Incomplete
+                if (incompleteReason.isNotEmpty())
+                {
+                    state = CollectionState.Incomplete
+                }
+
+                if (collectionItem == null)
+                {
+                    val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
+                        CollectionItem( sampledItem.enumItem!!.id!!, state, incompleteReason, notes )
+                    )
+
+                    collectionItem?.id?.let {
+                        sampledItem.enumItem!!.collectionItemId = it
+                    }
+
+                    DAO.enumerationItemDAO.updateEnumerationItem( sampledItem.enumItem!! )
+                }
+                else
+                {
+                    collectionItem.state = state
+                    collectionItem.incompleteReason = incompleteReason
+                    collectionItem.notes = notes
+                    DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
+                }
+
+                onMapReady(map)
             }
 
-            if (collectionItem == null)
-            {
-//                val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
-//                    CollectionItem( enumerationItem.id!!, state, incompleteReason, notes )
-//                )
-//
-//                collectionItem?.id?.let {
-//                    enumerationItem.collectionItemId = it
-//                }
-//
-//                DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
-            }
-            else
-            {
-//                collectionItem.state = state
-//                collectionItem.incompleteReason = incompleteReason
-//                collectionItem.notes = notes
-//                DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
-            }
-
-            onMapReady(map)
         }
     }
 

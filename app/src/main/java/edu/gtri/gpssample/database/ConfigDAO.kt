@@ -221,7 +221,7 @@ class ConfigDAO(private var dao: DAO)
 
             for (enumArea in config.enumAreas)
             {
-                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
             }
         }
     }
