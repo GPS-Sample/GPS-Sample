@@ -28,7 +28,6 @@ class LocationDAO(private var dao: DAO)
         else
         {
             val values = ContentValues()
-
             putLocation( location, values )
 
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
@@ -41,7 +40,7 @@ class LocationDAO(private var dao: DAO)
                         DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
 
                         for (fieldData in enumerationItem.fieldDataList) {
-                            DAO.fieldDataDAO.createOrUpdateFieldData(fieldData)
+                            DAO.fieldDataDAO.createOrUpdateFieldData(fieldData, enumerationItem)
                         }
                     }
                 }

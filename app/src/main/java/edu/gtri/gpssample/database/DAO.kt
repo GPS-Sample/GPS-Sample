@@ -202,8 +202,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
-                    "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_COLLECTION_ITEM_ID) REFERENCES $TABLE_COLLECTION_ITEM($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableEnumerationItem)
 
@@ -562,7 +561,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 208
+        private const val DATABASE_VERSION = 209
 
     }
 }

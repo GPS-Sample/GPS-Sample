@@ -67,7 +67,6 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { _enumArea ->
-            Log.d("XXXX", "size of locations ${enumArea.locations.size}")
             enumArea = _enumArea
         }
 

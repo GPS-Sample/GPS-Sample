@@ -17,6 +17,7 @@ class EnumAreaDAO(private var dao: DAO)
         if (exists( enumArea ))
         {
             updateEnumArea( enumArea, config )
+            updateEnumAreaElements(enumArea)
         }
         else
         {
@@ -24,34 +25,37 @@ class EnumAreaDAO(private var dao: DAO)
             putEnumArea( enumArea, config, values )
             enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
 
-            enumArea.id?.let {id ->
-                Log.d( "xxx", "new enumArea id = ${id}")
-
-                for (latLon in enumArea.vertices)
-                {
-                    DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea,null)
-                }
-
-                for (team in enumArea.enumerationTeams)
-                {
-                    team.enumAreaId = id
-                    team.isEnumerationTeam = true
-                    DAO.teamDAO.createOrUpdateTeam(team)
-                }
-
-                for (location in enumArea.locations)
-                {
-                    //location. = id
-                    DAO.locationDAO.createOrUpdateLocation(location)
-                }
-
-                return enumArea
-            } ?: return null
+            updateEnumAreaElements(enumArea)
         }
 
         return enumArea
     }
 
+    private fun updateEnumAreaElements(enumArea : EnumArea) : EnumArea?
+    {
+        enumArea.id?.let {id ->
+            Log.d( "xxx", "new enumArea id = ${id}")
+
+            for (latLon in enumArea.vertices)
+            {
+                DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea,null)
+            }
+
+            for (team in enumArea.enumerationTeams)
+            {
+                team.enumAreaId = id
+                team.isEnumerationTeam = true
+                DAO.teamDAO.createOrUpdateTeam(team)
+            }
+
+            for (location in enumArea.locations)
+            {
+                DAO.locationDAO.createOrUpdateLocation(location)
+            }
+
+            return enumArea
+        } ?: return null
+    }
     //--------------------------------------------------------------------------
     fun putEnumArea( enumArea: EnumArea, config : Config, values: ContentValues )
     {
