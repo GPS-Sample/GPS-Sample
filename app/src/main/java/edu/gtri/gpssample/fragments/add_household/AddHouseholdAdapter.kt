@@ -21,12 +21,12 @@ import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fieldDataMap: HashMap<Int, FieldData>) :
+class AddHouseholdAdapter( var config: Config, var fieldData: List< FieldData>) :
     RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
 {
-    override fun getItemCount() = fields.size
+    override fun getItemCount() = fieldData.size
 
     private var context: Context? = null
 
@@ -130,16 +130,14 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
         var frameLayout: FrameLayout? = null
-        val field = fields.get(holder.adapterPosition)
+        val curFieldData = fieldData.get(holder.adapterPosition)
+        val field = curFieldData.field
 
         if (field.id == null)
         {
             return
         }
-
-        val fieldData = fieldDataMap[field.id!!]
-
-        if (fieldData == null)
+        if (curFieldData == null)
         {
             return
         }
@@ -150,11 +148,11 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
             FieldType.Text -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                editText.setText( fieldData.textValue )
+                editText.setText( curFieldData.textValue )
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
                 editText.doAfterTextChanged {
-                    fieldData.textValue = it.toString()
+                    curFieldData.textValue = it.toString()
                 }
             }
 
@@ -165,14 +163,14 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 if (field.integerOnly)
                 {
                     editText.inputType = InputType.TYPE_CLASS_NUMBER
-                    fieldData.numberValue?.let {
+                    curFieldData.numberValue?.let {
                         editText.setText( it.toInt().toString())
                     }
                 }
                 else
                 {
                     editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-                    fieldData.numberValue?.let {
+                    curFieldData.numberValue?.let {
                         editText.setText( String.format( "%.2f", it ))
                     }
                 }
@@ -183,7 +181,7 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 editText.doAfterTextChanged {
                     if (it.toString().isNotEmpty())
                     {
-                        fieldData.numberValue = it.toString().toDouble()
+                        curFieldData.numberValue = it.toString().toDouble()
                     }
                 }
             }
@@ -194,9 +192,9 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 var date = Date()
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
 
-                fieldData.dateValue?.let {
+                curFieldData.dateValue?.let {
                     date = Date( it )
-                    displayDate( date, field, fieldData, editText )
+                    displayDate( date, field, curFieldData, editText )
                 }
 
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
@@ -206,17 +204,17 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
 
                 editView.setOnClickListener {
 
-                    fieldData.dateValue?.let {
+                    curFieldData.dateValue?.let {
                         date = Date( it )
                     }
 
                     if (!field.date && field.time)
                     {
-                        TimePickerDialog( context!!, "Select Time", date, field, fieldData, editText,this )
+                        TimePickerDialog( context!!, "Select Time", date, field, curFieldData, editText,this )
                     }
                     else
                     {
-                        DatePickerDialog( context!!, "Select Date", date, field, fieldData, editText,this )
+                        DatePickerDialog( context!!, "Select Date", date, field, curFieldData, editText,this )
                     }
                 }
             }
@@ -238,7 +236,7 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
                 spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
 
-                fieldData.dropdownIndex?.let {
+                curFieldData.dropdownIndex?.let {
                     spinner.setSelection( it )
                 } ?: run {
                     spinner.setSelection( data.size-1 )
@@ -248,7 +246,7 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 {
                     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
                     {
-                        fieldData.dropdownIndex = position
+                        curFieldData.dropdownIndex = position
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>)
@@ -270,10 +268,10 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 {
                     checkBox.text = field.option1
                     checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox1
+                    checkBox.isChecked = curFieldData.checkbox1
 
                     checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox1 = isChecked
+                        curFieldData.checkbox1 = isChecked
                     }
                 }
 
@@ -283,10 +281,10 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 {
                     checkBox.text = field.option2
                     checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox2
+                    checkBox.isChecked = curFieldData.checkbox2
 
                     checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox2 = isChecked
+                        curFieldData.checkbox2 = isChecked
                     }
                 }
 
@@ -296,10 +294,10 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 {
                     checkBox.text = field.option3
                     checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox3
+                    checkBox.isChecked = curFieldData.checkbox3
 
                     checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox3 = isChecked
+                        curFieldData.checkbox3 = isChecked
                     }
                 }
 
@@ -309,10 +307,10 @@ class AddHouseholdAdapter( var config: Config, var fields : List<Field>, var fie
                 {
                     checkBox.text = field.option4
                     checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox4
+                    checkBox.isChecked = curFieldData.checkbox4
 
                     checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox4 = isChecked
+                        curFieldData.checkbox4 = isChecked
                     }
                 }
             }

@@ -29,7 +29,6 @@ class EnumAreaDAO(private var dao: DAO)
 
                 for (latLon in enumArea.vertices)
                 {
-
                     DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea,null)
                 }
 
@@ -39,7 +38,6 @@ class EnumAreaDAO(private var dao: DAO)
                     team.isEnumerationTeam = true
                     DAO.teamDAO.createOrUpdateTeam(team)
                 }
-
 
                 for (location in enumArea.locations)
                 {

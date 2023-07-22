@@ -22,6 +22,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
@@ -66,6 +67,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { _enumArea ->
+            Log.d("XXXX", "size of locations ${enumArea.locations.size}")
             enumArea = _enumArea
         }
 
@@ -171,28 +173,34 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                     val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString(), true, polygon ))
 
-                    team?.id?.let { teamId ->
+                    team?.let { team ->
+                        enumArea.enumerationTeams.add(team)
+                        team.id?.let { teamId ->
 
-                        for (location in enumArea.locations)
-                        {
-                            selectionGeometry?.let {
-                                val point = GeometryFactory().createPoint( Coordinate( location.longitude, location.latitude ))
-                                if (it.contains( point ))
-                                {
+                            for (location in enumArea.locations) {
+                                selectionGeometry?.let {
+                                    val point = GeometryFactory().createPoint(
+                                        Coordinate(
+                                            location.longitude,
+                                            location.latitude
+                                        )
+                                    )
+                                    if (it.contains(point)) {
 //                                    location.enumerationTeamId = teamId
 //                                    DAO.locationDAO.updateLocation( location )
+                                    }
                                 }
                             }
-                        }
 
-                        // refresh the shared config
+                            // refresh the shared config
 //                        val config = DAO.configDAO.getConfig( enumArea.configId )
 //                        config?.let {
 //                            sharedViewModel.setCurrentConfig( it )
 //                        }
-                    }
+                        }
 
-                    findNavController().popBackStack()
+                        findNavController().popBackStack()
+                    }
                 }
             }
         }
@@ -262,16 +270,10 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         map.addPolygon(polygon)
 
-        if (once)
-        {
-            once = false
-            val latLng = getCenter()
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
-        }
+        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
 
-        val locations = DAO.locationDAO.getLocations( enumArea )
-
-        for (location in locations)
+        for (location in enumArea.locations)
         {
             if (!location.isLandmark)
             {
@@ -283,20 +285,6 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
                 )
             }
         }
-    }
-
-    fun getCenter() : LatLng
-    {
-        var sumLat: Double = 0.0
-        var sumLon: Double = 0.0
-
-        for (latLon in enumArea.vertices)
-        {
-            sumLat += latLon.latitude
-            sumLon += latLon.longitude
-        }
-
-        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
     override fun onDestroyView()

@@ -17,6 +17,13 @@ class LocationDAO(private var dao: DAO)
         if (exists( location ))
         {
             updateLocation( location )
+            for (item in location.items)
+            {
+                val enumerationItem = item as? EnumerationItem
+                enumerationItem?.let { enumerationItem ->
+                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
+                }
+            }
         }
         else
         {
@@ -31,7 +38,7 @@ class LocationDAO(private var dao: DAO)
                 {
                     val enumerationItem = item as? EnumerationItem
                     enumerationItem?.let { enumerationItem ->
-                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem)
+                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
 
                         for (fieldData in enumerationItem.fieldDataList) {
                             DAO.fieldDataDAO.createOrUpdateFieldData(fieldData)

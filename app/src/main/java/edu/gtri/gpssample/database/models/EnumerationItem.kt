@@ -15,8 +15,6 @@ data class EnumerationItem(
     override var id : Int? = null,
     var creationDate: Long,
     var uuid : String,
-    var locationId : Int,
-    var collectionItemId: Int,
     var subAddress : String,
 
     var enumerationState : EnumerationState,
@@ -24,14 +22,14 @@ data class EnumerationItem(
     var notes : String,
     var fieldDataList : ArrayList<FieldData> ) : GeoItem()
 {
-    constructor( locationId: Int ) :
-            this(null,  Date().time, UUID.randomUUID().toString(), locationId, -1,
+    constructor(  ) :
+            this(null,  Date().time, UUID.randomUUID().toString(),
                 "", EnumerationState.Undefined, "", "",
                 ArrayList<FieldData>())
 
-    constructor(id: Int, locationId: Int, subAddress: String, samplingState: SamplingState,
+    constructor(id: Int, subAddress: String,
                  enumerationState: EnumerationState, incompleteReason: String, notes: String ) :
-            this( id,  Date().time, UUID.randomUUID().toString(), locationId, -1,
+            this( id,  Date().time, UUID.randomUUID().toString(),
                 subAddress, enumerationState, incompleteReason, notes,
                 ArrayList<FieldData>())
 

@@ -30,7 +30,6 @@ class TeamDAO(private var dao: DAO)
         team.id?.let {
             for (latLon in team.polygon)
             {
-                Log.d("xxxx", "")
                 DAO.latLonDAO.createOrUpdateLatLon(latLon,null, team)
             }
         }
@@ -74,7 +73,9 @@ class TeamDAO(private var dao: DAO)
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_NAME))
         val isEnumerationTeam = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM)).toBoolean()
 
-        return Team(id, creationDate, study_id, enum_area_id, name, isEnumerationTeam, DAO.latLonDAO.getLatLonsWithTeamId( id ))
+        val latlngs = DAO.latLonDAO.getLatLonsWithTeamId( id )
+
+        return Team(id, creationDate, study_id, enum_area_id, name, isEnumerationTeam,latlngs)
     }
 
     //--------------------------------------------------------------------------

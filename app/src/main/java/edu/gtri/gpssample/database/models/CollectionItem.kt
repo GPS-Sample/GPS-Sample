@@ -13,13 +13,12 @@ data class CollectionItem(
     var id : Int? = null,
     var creationDate: Long,
     var uuid : String,
-    var enumerationItemId : Int,
     var state : CollectionState,
     var incompleteReason : String,
     var notes : String)
 {
-    constructor( enumerationItemId: Int, state: CollectionState, incompleteReason: String, notes: String) :
-            this( null, Date().time, UUID.randomUUID().toString(), enumerationItemId, state, incompleteReason, notes )
+    constructor( state: CollectionState, incompleteReason: String, notes: String) :
+            this( null, Date().time, UUID.randomUUID().toString(), state, incompleteReason, notes )
 
     fun pack() : String
     {

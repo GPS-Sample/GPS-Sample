@@ -45,8 +45,8 @@ class FieldDataDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
-        values.put( DAO.COLUMN_FIELD_ID, fieldData.fieldId )
-        values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, fieldData.enumerationItemId )
+        values.put( DAO.COLUMN_FIELD_ID, fieldData.field.id )
+
         values.put(DAO.COLUMN_FIELD_NAME, fieldData.name)
         values.put(DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(fieldData.type))
         values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
@@ -76,7 +76,8 @@ class FieldDataDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
-        val enumerationItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ID))
+
+        val field = DAO.fieldDAO.getField(field_id)
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val type = FieldTypeConverter.fromIndex(cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX)))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
@@ -88,7 +89,7 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
 
-        return FieldData( id, uuid, field_id, enumerationItemId,name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
+        return FieldData( id, uuid, field!!, name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
     }
 
     //--------------------------------------------------------------------------
@@ -142,7 +143,8 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
-            fieldData = FieldData( field_id, enumerationItemId )
+            val field = DAO.fieldDAO.getField(field_id)
+            fieldData = FieldData( field!! )
             createOrUpdateFieldData( fieldData )
         }
 

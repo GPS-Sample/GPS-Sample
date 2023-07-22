@@ -10,27 +10,27 @@ import edu.gtri.gpssample.database.models.*
 class EnumerationItemDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem) : EnumerationItem?
+    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location) : EnumerationItem?
     {
         if (exists( enumerationItem ))
         {
-            updateEnumerationItem( enumerationItem )
+            updateEnumerationItem( enumerationItem, location)
         }
         else
         {
             val values = ContentValues()
 
-            putEnumerationItem( enumerationItem, values )
+            putEnumerationItem( enumerationItem, location, values )
 
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
             enumerationItem.id?.let { id ->
                 Log.d( "xxx", "new location id = ${id}")
-//                enumData.fieldDataList?.let { fieldDataList ->
-//                    for (fieldData in fieldDataList)
-//                    {
-//                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
-//                    }
-//                }
+                enumerationItem.fieldDataList?.let { fieldDataList ->
+                    for (fieldData in fieldDataList)
+                    {
+                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
+                    }
+                }
             } ?: return null
         }
 
@@ -38,7 +38,7 @@ class EnumerationItemDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun importEnumerationItem( enumerationItem: EnumerationItem ) : EnumerationItem?
+    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 
@@ -49,7 +49,7 @@ class EnumerationItemDAO(private var dao: DAO)
         val values = ContentValues()
 
         enumerationItem.id = null
-        putEnumerationItem( enumerationItem, values )
+        putEnumerationItem( enumerationItem, location, values )
 
         enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
         enumerationItem.id?.let { id ->
@@ -78,21 +78,21 @@ class EnumerationItemDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun updateEnumerationItem( enumerationItem: EnumerationItem )
+    fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(enumerationItem.id!!.toString())
         val values = ContentValues()
 
-        putEnumerationItem( enumerationItem, values )
+        putEnumerationItem( enumerationItem, location, values )
 
         db.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
         db.close()
     }
 
     //--------------------------------------------------------------------------
-    fun putEnumerationItem( enumerationItem: EnumerationItem, values: ContentValues )
+    fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
     {
         enumerationItem.id?.let { id ->
             Log.d( "xxx", "existing EnumerationItem id = ${id}")
@@ -101,12 +101,11 @@ class EnumerationItemDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
-        values.put( DAO.COLUMN_LOCATION_ID, enumerationItem.locationId )
-        values.put( DAO.COLUMN_COLLECTION_ITEM_ID, enumerationItem.collectionItemId )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE, enumerationItem.enumerationState.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON, enumerationItem.incompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_NOTES, enumerationItem.notes )
+        values.put(DAO.COLUMN_LOCATION_ID, location.id)
     }
 
     //--------------------------------------------------------------------------
@@ -115,8 +114,6 @@ class EnumerationItemDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val locationId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_ID))
-        val collectionItemId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_ITEM_ID))
         val subAddress =
             cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
         val enumerationState =
@@ -131,8 +128,6 @@ class EnumerationItemDAO(private var dao: DAO)
             id,
             creationDate,
             uuid,
-            locationId,
-            collectionItemId,
             subAddress,
             enumerationState,
             incompleteReason,
@@ -265,12 +260,6 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         enumerationItem.id?.let { id ->
             Log.d( "xxx", "deleting EnumerationItem with ID $id" )
-
-            val collectionItem = DAO.collectionItemDAO.getCollectionItem( enumerationItem.collectionItemId )
-
-            collectionItem?.let {
-                DAO.collectionItemDAO.delete( it )
-            }
 
             val fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
 

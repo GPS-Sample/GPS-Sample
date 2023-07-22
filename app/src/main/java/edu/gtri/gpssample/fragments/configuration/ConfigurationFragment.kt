@@ -32,10 +32,12 @@ import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
@@ -174,11 +176,13 @@ class ConfigurationFragment : Fragment(),
             // put the enums
             sharedViewModel.currentConfiguration?.value?.let {config ->
 
+                val enumVerts = ArrayList<LatLon>()
                 for (enumArea in config.enumAreas)
                 {
                     val points = ArrayList<LatLng>()
 
                     enumArea.vertices.map {
+                        enumVerts.add(it)
                         points.add( it.toLatLng())
                     }
 
@@ -188,8 +192,12 @@ class ConfigurationFragment : Fragment(),
 
                     googleMap.addPolygon(polygon)
 
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
+
                 }
+
+                val latLngBounds = GeoUtils.findGeobounds(enumVerts)
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
+
             }
         }
     }

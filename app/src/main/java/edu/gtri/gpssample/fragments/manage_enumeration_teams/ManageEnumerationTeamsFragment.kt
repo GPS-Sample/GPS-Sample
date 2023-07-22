@@ -103,11 +103,10 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
     {
         val team = tag as Team
 
+        enumArea.enumerationTeams.remove(team)
+        manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
         DAO.teamDAO.deleteTeam( team )
 
-        enumArea.id?.let {
-            manageEnumerationTeamsAdapter.updateTeams( DAO.teamDAO.getEnumerationTeams( it ))
-        }
     }
 
     override fun onDestroyView()

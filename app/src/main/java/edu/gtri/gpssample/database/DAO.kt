@@ -197,7 +197,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_UUID + " TEXT" + "," +
                     COLUMN_LOCATION_ID + " INTEGER" + "," +
-                    COLUMN_COLLECTION_ITEM_ID + " INTEGER" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SAMPLE_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
@@ -563,7 +562,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 203
+        private const val DATABASE_VERSION = 208
 
     }
 }
