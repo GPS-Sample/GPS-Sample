@@ -241,22 +241,22 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                             if (user.role == Role.Enumerator.toString())
                             {
-                                sharedViewModel.setCurrentConfig(config)
-                                val team = DAO.teamDAO.getTeam( config.teamId )
-                                team?.let { _team ->
-                                    sharedViewModel.teamViewModel.setCurrentTeam( _team )
-                                    val study = DAO.studyDAO.getStudy( _team.studyId )
-                                    study?.let { _study ->
-                                        sharedViewModel.createStudyModel.setStudy( _study )
-                                        val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
-                                        enumArea?.let { _enumArea ->
-                                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
-                                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
-                                        }
-                                    }
-                                }
+//                                sharedViewModel.setCurrentConfig(config)
+//                                val team = DAO.teamDAO.getTeam( config.teamId )
+//                                team?.let { _team ->
+//                                    sharedViewModel.teamViewModel.setCurrentTeam( _team )
+//                                    val study = DAO.studyDAO.getStudy( _team.studyId )
+//                                    study?.let { _study ->
+//                                        sharedViewModel.createStudyModel.setStudy( _study )
+//                                        val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
+//                                        enumArea?.let { _enumArea ->
+//                                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
+//                                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+//                                        }
+//                                    }
+//                                }
                             }
-                        } ?: Toast.makeText(activity!!.applicationContext, "2Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 catch( ex: Exception )
@@ -291,26 +291,26 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         {
             if (user.role == Role.Enumerator.toString())
             {
-                Log.d("xxx", "WTF")
-                // runBlocking (Dispatchers.Main){
-                if(sharedViewModel.configurations.size > 0)
-                {
-                    val config = sharedViewModel.configurations[0]
-                    sharedViewModel.setCurrentConfig(config)
-                    val team = DAO.teamDAO.getTeam( config.teamId )
-                    team?.let { _team ->
-                        sharedViewModel.teamViewModel.setCurrentTeam( _team )
-                        val study = DAO.studyDAO.getStudy( _team.studyId )
-                        study?.let { _study ->
-                            sharedViewModel.createStudyModel.setStudy( _study )
-                            val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
-                            enumArea?.let { _enumArea ->
-                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
-                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
-                            }
-                        }
-                    }
-                }
+//                Log.d("xxx", "WTF")
+//                // runBlocking (Dispatchers.Main){
+//                if(sharedViewModel.configurations.size > 0)
+//                {
+//                    val config = sharedViewModel.configurations[0]
+//                    sharedViewModel.setCurrentConfig(config)
+//                    val team = DAO.teamDAO.getTeam( config.teamId )
+//                    team?.let { _team ->
+//                        sharedViewModel.teamViewModel.setCurrentTeam( _team )
+//                        val study = DAO.studyDAO.getStudy( _team.studyId )
+//                        study?.let { _study ->
+//                            sharedViewModel.createStudyModel.setStudy( _study )
+//                            val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
+//                            enumArea?.let { _enumArea ->
+//                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
+//                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }

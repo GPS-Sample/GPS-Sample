@@ -43,9 +43,8 @@ class EnumAreaDAO(private var dao: DAO)
 
             for (team in enumArea.enumerationTeams)
             {
-                team.enumAreaId = id
                 team.isEnumerationTeam = true
-                DAO.teamDAO.createOrUpdateTeam(team)
+                DAO.teamDAO.createOrUpdateTeam(team, enumArea)
             }
 
             for (location in enumArea.locations)

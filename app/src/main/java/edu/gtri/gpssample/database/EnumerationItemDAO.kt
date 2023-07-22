@@ -156,9 +156,9 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    fun getEnumerationItems( location: Location ) : ArrayList<EnumerationItem>
+    fun getEnumerationItems( location: Location ) : ArrayList<GeoItem>
     {
-        var enumerationItems = ArrayList<EnumerationItem>()
+        var enumerationItems = ArrayList<GeoItem>()
         val db = dao.writableDatabase
 
         location.id?.let { id ->

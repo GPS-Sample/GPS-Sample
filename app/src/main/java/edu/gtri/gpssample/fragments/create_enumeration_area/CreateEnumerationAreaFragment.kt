@@ -170,10 +170,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         for (enumArea in config.enumAreas)
         {
             addPolygon( enumArea )
-
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
-
-            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
 
             for (location in enumArea.locations)
             {

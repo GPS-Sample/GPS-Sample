@@ -170,7 +170,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
                         polygon.add( LatLon( it.latitude, it.longitude ))
                     }
 
-                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, enumAreaId, binding.teamNameEditText.text.toString(), true, polygon ))
+                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), true, polygon ), enumArea)
 
                     team?.let { team ->
                         enumArea.enumerationTeams.add(team)
