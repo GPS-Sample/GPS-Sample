@@ -140,7 +140,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.addHouseholdButton.setOnClickListener {
 
             addLocation?.let { location ->
-                val location = Location( location.latitude, location.longitude, false)
+                val location = Location( LocationType.Enumeration, location.latitude, location.longitude, false)
                 enumArea.locations.add(location)
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
 
@@ -339,9 +339,6 @@ class PerformEnumerationFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    // this is a hack
-//                    DAO.configDAO.updateAllLists( config )
-
                     team.id?.let {
                         config.teamId = it
                     }

@@ -217,14 +217,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
                     Log.d( "xxx", payload )
 
-                    enumArea?.let { enumArea ->
-                        for (location in enumArea.locations)
-                        {
-                            DAO.locationDAO.importLocation( location )
-                        }
-                        val ea = DAO.enumAreaDAO.getEnumArea(enumArea.id!!)
-                        Log.d( "xxx", ea.toString())
-                    }
+//                    enumArea?.let { enumArea ->
+//                        for (location in enumArea.locations)
+//                        {
+//                            DAO.locationDAO.importLocation( location )
+//                        }
+//                        val ea = DAO.enumAreaDAO.getEnumArea(enumArea.id!!)
+//                        Log.d( "xxx", ea.toString())
+//                    }
                 }
             }
         }

@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.LocationTypeConverter
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
@@ -12,11 +13,11 @@ import edu.gtri.gpssample.extensions.toInt
 class LocationDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createOrUpdateLocation( location: Location) : Location?
+    fun createOrUpdateLocation( location: Location, enumArea : EnumArea) : Location?
     {
         if (exists( location ))
         {
-            updateLocation( location )
+            updateLocation( location, enumArea )
             for (item in location.items)
             {
                 val enumerationItem = item as? EnumerationItem
@@ -28,7 +29,7 @@ class LocationDAO(private var dao: DAO)
         else
         {
             val values = ContentValues()
-            putLocation( location, values )
+            putLocation( location, enumArea, values )
 
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
             location.id?.let { id ->
@@ -51,7 +52,7 @@ class LocationDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun importLocation( location: Location ) : Location?
+    fun importLocation( location: Location, enumArea : EnumArea ) : Location?
     {
         val existingLocation = getLocation( location.uuid )
 
@@ -62,7 +63,7 @@ class LocationDAO(private var dao: DAO)
         val values = ContentValues()
 
         location.id = null
-        putLocation( location, values )
+        putLocation( location, enumArea,  values )
 
         location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
         location.id?.let { id ->
@@ -100,21 +101,21 @@ class LocationDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun updateLocation( location: Location )
+    fun updateLocation( location: Location, enumArea: EnumArea )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(location.id!!.toString())
         val values = ContentValues()
 
-        putLocation( location, values )
+        putLocation( location, enumArea, values )
 
         db.update(DAO.TABLE_LOCATION, values, whereClause, args )
         db.close()
     }
 
     //--------------------------------------------------------------------------
-    fun putLocation( location: Location, values: ContentValues)
+    fun putLocation( location: Location, enumArea : EnumArea, values: ContentValues)
     {
         location.id?.let { id ->
             Log.d( "xxx", "existing Location id = ${id}")
@@ -123,7 +124,8 @@ class LocationDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
         values.put( DAO.COLUMN_UUID, location.uuid )
-//        values.put( DAO.COLUMN_ENUM_AREA_ID, location.enumAreaId )
+        values.put( DAO.COLUMN_ENUM_AREA_ID, enumArea.id )
+        values.put( DAO.COLUMN_LOCATION_TYPE_ID, LocationTypeConverter.toIndex(location.type) )
 //        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, location.enumerationTeamId )
 //        values.put( DAO.COLUMN_COLLECTION_TEAM_ID, location.collectionTeamId )
         values.put( DAO.COLUMN_LOCATION_LATITUDE, location.latitude )
@@ -138,16 +140,14 @@ class LocationDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
-        val enumerationTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_ID))
-        val collectionTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_ID))
+        val locationTypeId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_TYPE_ID))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LONGITUDE))
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
 
         val items = ArrayList<GeoItem>()
 
-        return Location( id, creationDate, uuid,false, latitude, longitude, isLandmark, items )
+        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, items )
     }
 
     fun getLocation( uuid: String ) : Location?
@@ -185,10 +185,8 @@ class LocationDAO(private var dao: DAO)
                 location.items = DAO.enumerationItemDAO.getEnumerationItems( location )
                 locations.add( location )
             }
-
             cursor.close()
         }
-
         db.close()
 
         return locations

@@ -69,6 +69,11 @@ class SamplingViewModel : ViewModel() {
         }
 
 
+    fun createSampleArea(fromEnumArea: EnumArea)
+    {
+        val sampleArea = SampleArea(fromEnumArea)
+        _currentSampleArea = MutableLiveData(sampleArea)
+    }
     fun addPolygon( sampleArea: SampleArea, map: GoogleMap)
     {
         val points = ArrayList<LatLng>()
@@ -87,6 +92,7 @@ class SamplingViewModel : ViewModel() {
     }
     fun getSampleAreaLocations()
     {
+        // TODO:  build sample locations from enum locations.  they're different
         currentSampleArea?.value?.let { sampleArea ->
             sampleArea.locations = DAO.locationDAO.getLocations(sampleArea)
         }

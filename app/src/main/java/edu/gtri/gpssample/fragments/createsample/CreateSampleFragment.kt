@@ -92,6 +92,11 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
                // configId = it
             }
         }
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{enumArea->
+            samplingViewModel.createSampleArea(enumArea)
+        }
+
+
        // samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)

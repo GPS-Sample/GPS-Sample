@@ -179,15 +179,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_UUID + " TEXT" + "," +
+                    COLUMN_LOCATION_TYPE_ID + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                    COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
-                    COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
+
                     COLUMN_LOCATION_LATITUDE + " REAL" + "," +
                     COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
                     COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
+//                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
+//                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableLocation)
 
@@ -427,6 +427,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
 //        const val COLUMN_ENUMERATION_TEAM_ID = "enumeration_team_id"
 //        const val COLUMN_COLLECTION_TEAM_ID = "collection_team_id"
+        const val COLUMN_LOCATION_TYPE_ID = "location_type_id"
         const val COLUMN_LOCATION_LATITUDE = "location_latitude"
         const val COLUMN_LOCATION_LONGITUDE = "location_longitude"
         const val COLUMN_LOCATION_IS_LANDMARK = "location_is_landmark"
@@ -561,7 +562,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 209
+        private const val DATABASE_VERSION = 211
 
     }
 }

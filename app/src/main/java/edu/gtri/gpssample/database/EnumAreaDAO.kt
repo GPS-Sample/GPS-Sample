@@ -49,7 +49,7 @@ class EnumAreaDAO(private var dao: DAO)
 
             for (location in enumArea.locations)
             {
-                DAO.locationDAO.createOrUpdateLocation(location)
+                DAO.locationDAO.createOrUpdateLocation(location, enumArea)
             }
 
             return enumArea
@@ -90,7 +90,7 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getEnumArea( id: Int ): EnumArea?
+    private fun getEnumArea( id: Int ): EnumArea?
     {
         var enumArea: EnumArea? = null
         val db = dao.writableDatabase
@@ -100,14 +100,7 @@ class EnumAreaDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-
             enumArea = createEnumArea( cursor )
-
-            enumArea.id?.let { _id ->
-                enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( _id )
-                enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
-                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
-            }
         }
 
         cursor.close()
