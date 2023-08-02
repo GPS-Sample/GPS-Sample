@@ -21,6 +21,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.models.*
+import java.lang.Integer.min
 import java.util.ArrayList
 
 class SamplingViewModel : ViewModel() {
@@ -179,7 +180,7 @@ class SamplingViewModel : ViewModel() {
     {
         fixEnumData()
         // reset list
-        val removeList : ArrayList<EnumerationItem> = ArrayList()
+        val validSamples : ArrayList<SampledItem> = ArrayList()
 
         currentStudy?.value?.let { study ->
 
@@ -199,6 +200,11 @@ class SamplingViewModel : ViewModel() {
             for(sampleItem in _currentSampledItemsForSampling)
             {
                 sampleItem.samplingState = SamplingState.NotSampled
+
+                if(sampleItem.enumItem.enumerationState == EnumerationState.Enumerated)
+                {
+                    validSamples.add(sampleItem)
+                }
                 // find and remove items that are not valid
 //                if(sampleItem.enumerationState == EnumerationState.Incomplete)
 //                {
@@ -224,15 +230,16 @@ class SamplingViewModel : ViewModel() {
             // just do random sampling as a test
             currentSampleArea?.value?.let { sampleArea ->
                 val sampledIndices: ArrayList<Int> = ArrayList()
-                for (i in 0 until study.sampleSize) {
+                val sampleSize =  min(study.sampleSize,validSamples.size)
+                for (i in 0 until sampleSize) {
 
-                    var rnds = (0 until _currentSampledItemsForSampling.size).random()
+                    var rnds = (0 until validSamples.size).random()
                     while(sampledIndices.contains(rnds))
                     {
-                        rnds = (0 until _currentSampledItemsForSampling.size).random()
+                        rnds = (0 until validSamples.size).random()
                     }
                     sampledIndices.add(rnds)
-                    _currentSampledItemsForSampling[rnds]?.samplingState = SamplingState.Sampled
+                    validSamples[rnds]?.samplingState = SamplingState.Sampled
                 }
             }
 
