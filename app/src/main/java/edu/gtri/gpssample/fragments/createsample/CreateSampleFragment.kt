@@ -97,7 +97,6 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         }
 
 
-       // samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -166,7 +165,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 //            }
         }
 
-        samplingViewModel.setEnumAreasForMap(p0)
+        samplingViewModel.setSampleAreasForMap(p0)
 
         //for (enumArea in config.enumAreas)
     }

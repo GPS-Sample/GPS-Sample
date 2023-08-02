@@ -175,17 +175,22 @@ class ConfigDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun updateConfig( config: Config )
     {
-        Log.d( "xxx", "update config id ${config.id!!}")
-        val db = dao.writableDatabase
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        config.id?.let { id ->
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
-            putConfig( config, values )
-            db.update(DAO.TABLE_CONFIG, values, whereClause, args )
-            createOrUpdateStudies(config)
-            createOrUpdateEnumAreas(config)
-            db.close()
+        if (!exists( config ))
+        {
+            createConfig(config)
+        }else
+        {
+            val db = dao.writableDatabase
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            config.id?.let { id ->
+                val args: Array<String> = arrayOf(id.toString())
+                val values = ContentValues()
+                putConfig( config, values )
+                db.update(DAO.TABLE_CONFIG, values, whereClause, args )
+                createOrUpdateStudies(config)
+                createOrUpdateEnumAreas(config)
+                db.close()
+            }
         }
     }
 

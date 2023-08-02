@@ -93,11 +93,11 @@ class SamplingViewModel : ViewModel() {
     fun getSampleAreaLocations()
     {
         // TODO:  build sample locations from enum locations.  they're different
-        currentSampleArea?.value?.let { sampleArea ->
-            sampleArea.locations = DAO.locationDAO.getLocations(sampleArea)
-        }
+//        currentSampleArea?.value?.let { sampleArea ->
+//            sampleArea.locations = DAO.locationDAO.getLocations(sampleArea)
+//        }
     }
-    fun setEnumAreasForMap(map: GoogleMap) : SamplingState
+    fun setSampleAreasForMap(map: GoogleMap) : SamplingState
     {
 
         var minLat = 999999.0
@@ -234,14 +234,12 @@ class SamplingViewModel : ViewModel() {
                     sampledIndices.add(rnds)
                     _currentSampledItemsForSampling[rnds]?.samplingState = SamplingState.Sampled
                 }
-
-
             }
 
         }
 
         _map?.let{map->
-            setEnumAreasForMap(map)
+            setSampleAreasForMap(map)
         }
         return SamplingState.None
     }

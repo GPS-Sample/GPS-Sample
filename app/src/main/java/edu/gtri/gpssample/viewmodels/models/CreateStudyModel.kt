@@ -23,7 +23,6 @@ class CreateStudyModel {
     private var _samplingMethodPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _samplingTypePosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _currentStudy : MutableLiveData<Study>? = null
-
     private var _samplingTypes : ObservableArrayList<String> = ObservableArrayList()
     private var _samplingTypesVisible : Boolean = false
 
@@ -48,7 +47,26 @@ class CreateStudyModel {
 
     var currentStudy : LiveData<Study>? = _currentStudy
 
-    var currentSampleSize : String
+//    var currentSampleSize : MutableLiveData<String> = MutableLiveData("")
+//        set(value)
+//        {
+//            currentStudy?.value?.let{study ->
+//
+//                value.value?.toIntOrNull()?.let {size ->
+//                    if(size > 0)
+//                    {
+//                        study.sampleSize = size
+//                        field = value
+//                    }else
+//                    {
+//                        currentSampleSize.postValue("1")
+//                    }
+//                } ?: run{ study.sampleSize = 0
+//                }
+//            }
+//
+//        }
+    var  currentSampleSize : String
         get(){
             currentStudy?.value?.let{study ->
                 return study.sampleSize.toString()
@@ -57,14 +75,22 @@ class CreateStudyModel {
         }
         set(value){
             currentStudy?.value?.let{study ->
+
                 value.toIntOrNull()?.let {size ->
-                    study.sampleSize = size
+                    if(size > 0)
+                    {
+                        study.sampleSize = size
+                    }else
+                    {
+
+                    }
+
                 } ?: run{ study.sampleSize = 0
                 }
             }
         }
 
-    constructor(){}
+    constructor()
 
     fun getFields() : Array<String>
     {
@@ -83,7 +109,6 @@ class CreateStudyModel {
     fun getRules() : Array<String>
     {
         val ruleList = ArrayList<String>()
-
         _currentStudy?.value?.rules?.let { rules ->
             for (rule in rules)
             {
@@ -93,7 +118,6 @@ class CreateStudyModel {
 
         return ruleList.toTypedArray()
     }
-
 
     fun onSamplingMethodSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
@@ -157,12 +181,14 @@ class CreateStudyModel {
 
     fun addStudy(configuration : Config?)
     {
-        currentStudy?.value?.let{study ->
+        currentStudy?.value?.let{ study ->
             configuration?.let { config ->
                 if(!config.studies.contains(study))
                 {
                     config.studies.add(study)
+
                 }
+                DAO.studyDAO.createOrUpdateStudy(study)
             }
         }
     }

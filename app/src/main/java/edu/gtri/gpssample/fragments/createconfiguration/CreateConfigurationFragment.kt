@@ -19,13 +19,13 @@ import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.fragments.createstudy.CreateStudyAdapter
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.ArrayList
 
 class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
     ConfirmationDialog.ConfirmationDialogDelegate {
@@ -90,7 +90,6 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
                 Toast.makeText(activity!!.applicationContext, "Please enter the minimum desired GPS precision", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
 
             sharedViewModel.currentConfiguration?.value?.let {config ->
                 sharedViewModel.updateConfiguration()
@@ -158,29 +157,27 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     fun addPolygons()
     {
         map.clear()
-
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
+            val enumVerts = ArrayList<LatLon>()
             for (enumArea in config.enumAreas)
             {
                 val points = ArrayList<LatLng>()
 
                 enumArea.vertices.map {
+                    enumVerts.add(it)
                     points.add( it.toLatLng())
                 }
 
                 val polygon = PolygonOptions()
                     .clickable(false)
-                    .addAll(points)
+                    .addAll( points )
 
                 map.addPolygon(polygon)
             }
 
-            // HACK HACK
-            val atl = LatLng( 33.774881, -84.396341 )
-            val srb = LatLng(30.335603,-86.165004 )
-            val demo = LatLng( 33.982973122594785, -84.31252665817738 )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( demo, 13.5f))
+            val latLngBounds = GeoUtils.findGeobounds(enumVerts)
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
         }
     }
 

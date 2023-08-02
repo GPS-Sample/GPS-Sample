@@ -165,7 +165,7 @@ class ConfigurationViewModel : ViewModel()
     {
         val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 0 )
         _currentConfiguration = MutableLiveData(newConfig)
-        saveNewConfiguration()
+        //saveNewConfiguration()
     }
 
     fun saveNewConfiguration()
@@ -183,6 +183,10 @@ class ConfigurationViewModel : ViewModel()
         _currentConfiguration?.value?.let{configuration ->
             // write to database
             DAO.configDAO.updateConfig(configuration)
+            if(!configurations.contains(configuration))
+            {
+                configurations.add(configuration)
+            }
         }
     }
 
@@ -194,8 +198,6 @@ class ConfigurationViewModel : ViewModel()
         }?: run{
             _currentConfiguration = MutableLiveData(_actualConfig!!)
         }
-
-
     }
 
     fun deleteConfig(config : Config)
