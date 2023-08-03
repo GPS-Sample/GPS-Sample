@@ -38,16 +38,16 @@ class CreateFilterRuleModel {
         currentFilterRule = _currentFilterRule
     }
 
-    fun addFilterRule(filter : Filter)
+    fun addFilterRule(filter : Filter, rule:Rule)
     {
         currentFilterRule?.value?.let { filterRule ->
-            val rule = DAO.ruleDAO.getRule( filterRule.ruleId )
-            rule?.let { rule ->
-                if (filterRule.connector != Connector.None)
-                {
-                    filter.filterRules.add(filterRule)
-                }
+            //val rule = DAO.ruleDAO.getRule( filterRule.ruleId )
+            //rule?.let { rule ->
+            if (filterRule.connector != Connector.None)
+            {
+                filter.filterRules.add(filterRule)
             }
+           // }
         }
     }
 

@@ -51,7 +51,7 @@ class CreateFilterModel {
     fun addFilter(study : Study)
     {
         currentFilter?.value?.let { filter ->
-            DAO.filterDAO.createOrUpdateFilter(filter)
+           // DAO.filterDAO.createOrUpdateFilter(filter)
             if (!study.filters.contains( filter ))
             {
                 study.filters.add(filter)

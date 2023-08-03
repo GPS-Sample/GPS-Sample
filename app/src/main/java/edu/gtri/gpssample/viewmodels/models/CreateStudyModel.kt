@@ -164,9 +164,6 @@ class CreateStudyModel {
             0,
             SampleType.None
         )
-
-        DAO.studyDAO.createOrUpdateStudy( study )
-
         _currentStudy = MutableLiveData(study)
         currentStudy = _currentStudy
     }

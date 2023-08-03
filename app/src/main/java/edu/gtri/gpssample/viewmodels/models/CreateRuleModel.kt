@@ -31,16 +31,16 @@ class CreateRuleModel {
 
     fun addRule(study : Study)
     {
-        study.id?.let { id ->
+        //study.id?.let { id ->
             currentRule?.value?.let { rule ->
-                rule.studyId = id
-                DAO.ruleDAO.createOrUpdateRule( rule )
+               // rule.studyId = id
+               // DAO.ruleDAO.createOrUpdateRule( rule )
                 if(!study.rules.contains(rule))
                 {
                     study.rules.add(rule)
                 }
             }
-        }
+       // }
     }
     fun setSelectedRule(rule : Rule)
     {

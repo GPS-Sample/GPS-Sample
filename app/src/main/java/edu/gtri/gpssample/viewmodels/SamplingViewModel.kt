@@ -200,12 +200,14 @@ class SamplingViewModel : ViewModel() {
             for(sampleItem in _currentSampledItemsForSampling)
             {
                 sampleItem.samplingState = SamplingState.NotSampled
-
+                // find and remove items that are not valid
                 if(sampleItem.enumItem.enumerationState == EnumerationState.Enumerated)
                 {
                     validSamples.add(sampleItem)
                 }
-                // find and remove items that are not valid
+
+                // TODO: run through rules and filters, etc..
+
 //                if(sampleItem.enumerationState == EnumerationState.Incomplete)
 //                {
 //                    enumItem.samplingState = SamplingState.Invalid
