@@ -1,58 +1,144 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <string name="app_name">GPSSample</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_sign_out">Sign Out</string>
-
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-
-    <string name="previous">Previous</string>
-    <string name="manager">Manager</string>
-    <string name="client">Enumeration</string>
-    <string name="gps_sample">GPS Sample</string>
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-
-    <string name="connected_clients">Connected Clients</string>
-    <string name="create_hotspot">Create Hotspot</string>
-    <string name="create_server">Create Server</string>
-    <string name="create_qr_code">Create QR Code</string>
-    <string name="connect_hotspot">Connect To Hotspot</string>
-    <string name="registering_device">Registering Device</string>
-    <string name="sending_command">Sending Command</string>
-    <string name="sending_enum_data">Sending Enumeration Data</string>
-    <string name="receiving_data">Receiving Data</string>
-    <string name="configuration_received">Configuration Received</string>
-
+    <string name="action_settings">"Settings"</string>
+    <string name="action_sign_out">"Sign Out"</string>
+    <string name="next">"Next"</string>
+    <string name="previous">"Previous"</string>
+    <string name="manager">"Manager"</string>
+    <string name="client">"Enumeration"</string>
+    <string name="connected_clients">"Connected Clients"</string>
+    <string name="create_hotspot">"Create Hotspot"</string>
+    <string name="create_server">"Create Server"</string>
+    <string name="create_qr_code">"Create QR Code"</string>
+    <string name="connect_hotspot">"Connect To Hotspot"</string>
+    <string name="registering_device">"Registering Device"</string>
+    <string name="sending_command">"Sending Command"</string>
+    <string name="sending_enum_data">"Sending Enumeration Data"</string>
+    <string name="receiving_data">"Receiving Data"</string>
+    <string name="configuration_received">"Configuration Received"</string>
+    <string name="admin">"Admin"</string>
+    <string name="supervisor">"Supervisor"</string>
+    <string name="enumerator">"Enumerator"</string>
+    <string name="surveyor">"Surveyor"</string>
+    <string name="configurations">"Configurations"</string>
+    <string name="no_configurations">"You don't have any configurations"</string>
+    <string name="no_studies">"You don't have any studies for this configuration"</string>
+    <string name="data_collector">"Data Collector"</string>
+    <string name="scan_qr_code">"Scan QR Code"</string>
+    <string name="continue_with_existing_study">"Continue with existing Study"</string>
+    <string name="admin_sign_in">"Admin Sign In"</string>
+    <string name="supervisor_sign_in">"Supervisor Sign In"</string>
+    <string name="data_collector_sign_in">"Data Collector Sign In"</string>
+    <string name="admin_sign_up">"Admin Sign Up"</string>
+    <string name="supervisor_sign_up">"Supervisor Sign Up"</string>
+    <string name="data_collector_sign_up">"Data Collector Sign Up"</string>
+    <string name="enter_your_pin">"Enter your PIN"</string>
+    <string name="reenter_your_pin">"Re-enter your PIN"</string>
+    <string name="back">"Back"</string>
+    <string name="cancel">"Cancel"</string>
+    <string name="finish">"Finish"</string>
+    <string name="save">"Save"</string>
+    <string name="done">"Done"</string>
+    <string name="select_role">"Select your Role"</string>
+    <string name="admin_select_role">"Admin Select Role"</string>
+    <string name="supervisor_select_role">"Supervisor Select Role"</string>
+    <string name="sign_in">"Sign In"</string>
+    <string name="sign_up">"Sign Up"</string>
+    <string name="sign_out">"Sign Out"</string>
+    <string name="not_registered">"Not registered?  Sign Up!"</string>
+    <string name="name">"Name"</string>
+    <string name="enter_your_name">"Enter your name"</string>
+    <string name="pin">"PIN"</string>
+    <string name="forgot_pin_question">"Forgot PIN question"</string>
+    <string name="forgot_pin_answer">"Forgot PIN answer"</string>
+    <string name="enter_your_answer">"Enter your answer"</string>
+    <string name="create_config">"Create Configuration"</string>
+    <string name="delete_config">"Delete Configuration"</string>
+    <string name="edit_config">"Edit Configuration"</string>
+    <string name="create_study">"Create Study"</string>
+    <string name="edit_study">"Edit Study"</string>
+    <string name="delete_study">"Delete Study"</string>
+    <string name="create_field">"Create Field"</string>
+    <string name="config_name">"Configuration Name"</string>
+    <string name="study_name">"Study Name"</string>
+    <string name="field_name">"Field Name"</string>
+    <string name="enumeration_fields">"Enumeration Fields"</string>
+    <string name="enter_config_name">"Enter Configuration Name"</string>
+    <string name="enter_study_name">"Enter Study Name"</string>
+    <string name="enter_field_name">"Enter Field Name"</string>
+    <string name="preferred_units">"Preferred Units"</string>
+    <string name="date_format">"Date Format"</string>
+    <string name="time_format">"Time Format"</string>
+    <string name="manage_enumerators">"Manage Enumerators"</string>
+    <string name="collect_enumerations">"Collect Enumerations"</string>
+    <string name="generate_sample">"Generate Sample"</string>
+    <string name="collect_samples">"Collect Samples"</string>
+    <string name="min_gps_precision">"Desired GPS Precision"</string>
+    <string name="enter_min_gps_precision">"Enter Desired GPS Precision"</string>
+    <string name="define_enumeration_fields">"Define Enumeration Fields"</string>
+    <string name="define_enumeration_area">"Define Enumeration Area"</string>
+    <string name="define_sampling_method">"Define Sampling Method"</string>
+    <string name="studies">"Studies"</string>
+    <string name="enumeration_area">"Enumeration Areas"</string>
+    <string name="barcode_result">"Barcode detected"</string>
+    <string name="error_scanner_cancelled">"Code scanner is cancelled."</string>
+    <string name="error_camera_permission_not_granted">"Camera permission is not granted."</string>
+    <string name="error_app_name_unavailable">"App name is not set."</string>
+    <string name="error_default_message">"Failed to scan code:"</string>
+    <string name="menu_item_settings">"Settings"</string>
+    <string name="change_role">"Change Role"</string>
+    <string name="enter_your_user_name">"Enter your User Name"</string>
+    <string name="field_type">"Field Type"</string>
+    <string name="enter_checkbox_text">"Enter checkbox item text"</string>
+    <string name="enter_dropdown_item_text">"Enter dropdown item text"</string>
+    <string name="add_another">"ADD ANOTHER"</string>
+    <string name="delete_field">"Delete Field"</string>
+    <string name="manage_this_study">"Manage this Study"</string>
+    <string name="manage_study">"Manage Study"</string>
+    <string name="manage_configuration">"Manage Configuration"</string>
+    <string name="manage_configurations">"Manage Configurations"</string>
+    <string name="generate_qr_code">"Generate QR Code"</string>
+    <string name="create_filter">"Create Filter"</string>
+    <string name="create_rule">"Create Rule"</string>
+    <string name="enter_rule_name">"Enter Rule Name"</string>
+    <string name="field">"Field"</string>
+    <string name="operator">"Operator"</string>
+    <string name="enter_value">"Enter Value"</string>
+    <string name="value">"Value"</string>
+    <string name="filters">"Filters"</string>
+    <string name="rule">"Rule"</string>
+    <string name="connector">"Connector"</string>
+    <string name="sampling_method">"Sampling Method"</string>
+    <string name="enter_filter_name">"Enter Filter Name"</string>
+    <string name="sample_size">"Sample Size"</string>
+    <string name="filter_name">"Filter Name"</string>
+    <string name="rule_name">"Rule Name"</string>
+    <string name="total_sample_size">"Total Sample Size Across All Clusters"</string>
+    <string name="manage_studies">"Manage Studies"</string>
+    <string name="manage_samples">"Manage Samples"</string>
+    <string name="create_sample">"Create Sample"</string>
+    <string name="delete_sample">"Delete Sample"</string>
+    <string name="manage_supervisors">"Manage Supervisors"</string>
+    <string name="home">"Home"</string>
+    <string name="manage_enumeration_areas">"Manage Enumeration Areas"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
-        <item>"Childhood best friend"</item>
         <item>"Favorite Pet's name"</item>
         <item>"Last 4 digits of cell phone #"</item>
         <item>"Favorite Food"</item>
         <item>"Birth Month"</item>
         <item>"Other Question"</item>
     </string-array>
-
-    <string-array name="distance_format">
+    <string-array name="distance_formats">
         <item>"Meters / KiloMeters"</item>
         <item>"Feet / Miles"</item>
     </string-array>
-
-    <string-array name="date_format">
-        <item>"dd/mm/yyyy"</item>
-        <item>"mm/dd/yyyy"</item>
-        <item>"yyyy/mm/dd"</item>
-    </string-array>
-
-    <string-array name="time_format">
+    <string-array name="time_formats">
         <item>"12 hour (AM/PM)"</item>
         <item>"24 hour"</item>
     </string-array>
-
     <string-array name="field_types">
         <item>"Text"</item>
         <item>"Number"</item>
@@ -60,140 +146,22 @@
         <item>"Checkbox"</item>
         <item>"Dropdown"</item>
     </string-array>
-
     <string-array name="operators">
         <item>"Equal"</item>
         <item>"NotEqual"</item>
         <item>"LessThan"</item>
         <item>"GreaterThan"</item>
-        <item>"LessThanOrEqual"</item>
         <item>"GreaterThanOrEqual"</item>
     </string-array>
-
     <string-array name="connectors">
         <item>"AND"</item>
         <item>"OR"</item>
         <item>"NOT"</item>
     </string-array>
-
     <string-array name="samling_methods">
         <item>"Simple Random Sampling"</item>
         <item>"Cluster Sampling"</item>
         <item>"Subsets: May Overlap"</item>
         <item>"Strata: Mutually Exclusive"</item>
     </string-array>
-
-    <string name="admin">Admin</string>
-    <string name="supervisor">Supervisor</string>
-    <string name="enumerator">Enumerator</string>
-    <string name="surveyor">Surveyor</string>
-    <string name="configurations">Configurations</string>
-    <string name="no_configurations">"You don't have any configurations"</string>
-    <string name="no_studies">"You don't have any studies for this configuration"</string>
-    <string name="data_collector">Data Collector</string>
-    <string name="scan_qr_code">Scan QR Code</string>
-    <string name="or">or</string>
-
-    <string name="continue_with_existing_study">Continue with existing Study</string>
-    <string name="admin_sign_in">Admin Sign In</string>
-    <string name="supervisor_sign_in">Supervisor Sign In</string>
-    <string name="data_collector_sign_in">Data Collector Sign In</string>
-    <string name="admin_sign_up">Admin Sign Up</string>
-    <string name="supervisor_sign_up">Supervisor Sign Up</string>
-    <string name="data_collector_sign_up">Data Collector Sign Up</string>
-    <string name="enter_your_pin">Enter your PIN</string>
-    <string name="reenter_your_pin">Re-enter your PIN</string>
-    <string name="back">Back</string>
-    <string name="cancel">Cancel</string>
-    <string name="finish">Finish</string>
-    <string name="save">Save</string>
-    <string name="done">Done</string>
-    <string name="select_role">Select your Role</string>
-    <string name="admin_select_role">Admin Select Role</string>
-    <string name="supervisor_select_role">Supervisor Select Role</string>
-    <string name="sign_in">Sign In</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="sign_out">Sign Out</string>
-    <string name="not_registered">Not registered?  Sign Up!</string>
-    <string name="name">Name</string>
-    <string name="enter_your_name">Enter your name</string>
-    <string name="pin">PIN</string>
-    <string name="forgot_pin_question">Forgot PIN question</string>
-    <string name="forgot_pin_answer">Forgot PIN answer</string>
-    <string name="enter_your_answer">Enter your answer</string>
-    <string name="create_config">Create Configuration</string>
-    <string name="delete_config">Delete Configuration</string>
-    <string name="edit_config">Edit Configuration</string>
-    <string name="create_study">Create Study</string>
-    <string name="edit_study">Edit Study</string>
-    <string name="delete_study">Delete Study</string>
-    <string name="create_field">Create Field</string>
-    <string name="config_name">Configuration Name</string>
-    <string name="study_name">Study Name</string>
-    <string name="field_name">Field Name</string>
-    <string name="enumeration_fields">Enumeration Fields</string>
-    <string name="enter_config_name">Enter Configuration Name</string>
-    <string name="enter_study_name">Enter Study Name</string>
-    <string name="enter_field_name">Enter Field Name</string>
-    <string name="preferred_units">Preferred Units</string>
-    <string name="date_format">Date Format</string>
-    <string name="time_format">Time Format</string>
-
-    <string name="manage_enumerators">Manage Enumerators</string>
-    <string name="collect_enumerations">Collect Enumerations</string>
-    <string name="generate_sample">Generate Sample</string>
-    <string name="collect_samples">Collect Samples</string>
-
-    <string name="min_gps_precision">Desired GPS Precision</string>
-    <string name="enter_min_gps_precision">Enter Desired GPS Precision</string>
-    <string name="define_enumeration_fields">Define Enumeration Fields</string>
-    <string name="define_enumeration_area">Define Enumeration Area</string>
-    <string name="define_sampling_method">Define Sampling Method</string>
-    <string name="studies">Studies</string>
-    <string name="enumeration_area">Enumeration Areas</string>
-    <string name="barcode_result" translatable="false">Barcode detected.\n%1$s</string>
-    <string name="error_scanner_cancelled" translatable="false">Code scanner is cancelled.</string>
-    <string name="error_camera_permission_not_granted" translatable="false">Camera permission is not granted.</string>
-    <string name="error_app_name_unavailable" translatable="false">App name is not set.</string>
-    <string name="error_default_message" translatable="false">Failed to scan code: %1$s</string>
-
-    <string name="menu_item_settings" translatable="false">Settings</string>
-    <string name="change_role">Change Role</string>
-    <string name="enter_your_user_name">Enter your User Name</string>
-    <string name="field_type">Field Type</string>
-    <string name="enter_checkbox_text">Enter checkbox item text</string>
-    <string name="enter_dropdown_item_text">Enter dropdown item text</string>
-    <string name="add_another">ADD ANOTHER</string>
-    <string name="delete_field">Delete Field</string>
-    <string name="manage_this_study">Manage this Study</string>
-    <string name="manage_study">Manage Study</string>
-    <string name="manage_configuration">Manage Configuration</string>
-    <string name="manage_configurations">Manage Configurations</string>
-    <string name="generate_qr_code">Generate QR Code</string>
-    <string name="create_filter">Create Filter</string>
-    <string name="create_rule">Create Rule</string>
-    <string name="enter_rule_name">Enter Rule Name</string>
-    <string name="field">Field</string>
-    <string name="operator">Operator</string>
-    <string name="enter_value">Enter Value</string>
-    <string name="value">Value</string>
-    <string name="filters">Filters</string>
-    <string name="rule">Rule</string>
-    <string name="connector">Connector</string>
-    <string name="sampling_method">Sampling Method</string>
-    <string name="enter_filter_name">Enter Filter Name</string>
-    <string name="sample_size">Sample Size</string>
-    <string name="filter_name">Filter Name</string>
-    <string name="rule_name">Rule Name</string>
-    <string name="total_sample_size">Total Sample Size Across All Clusters</string>
-    <string name="manage_studies">Manage Studies</string>
-    <string name="manage_samples">Manage Samples</string>
-    <string name="create_sample">Create Sample</string>
-    <string name="delete_sample">Delete Sample</string>
-    <string name="manage_supervisors">Manage Supervisors</string>
-    <string name="home">Home</string>
-    <string name="manage_enumeration_areas">Manage Enumeration Areas</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
 </resources>

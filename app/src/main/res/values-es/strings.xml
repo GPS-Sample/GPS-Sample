@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <string name="app_name">GPSSample</string>
+    <string name="action_settings">"Configuración"</string>
+    <string name="action_sign_out">"Cerrar sesión"</string>
+    <string name="next">"Siguiente"</string>
+    <string name="previous">"Anterior"</string>
+    <string name="manager">"Gerente"</string>
+    <string name="client">"Enumeración"</string>
+    <string name="connected_clients">"Clientes conectados"</string>
+    <string name="create_hotspot">"Crear punto de acceso"</string>
+    <string name="create_server">"Crear servidor"</string>
+    <string name="create_qr_code">"Crear código QR"</string>
+    <string name="connect_hotspot">"Conectar al punto de acceso"</string>
+    <string name="registering_device">"Registrando dispositivo"</string>
+    <string name="sending_command">"Enviando comando"</string>
+    <string name="sending_enum_data">"Enviando datos de enumeración"</string>
+    <string name="receiving_data">"Recibiendo datos"</string>
+    <string name="configuration_received">"Configuración recibida"</string>
+    <string name="admin">"Administrador"</string>
+    <string name="supervisor">"Supervisor"</string>
+    <string name="enumerator">"Enumerador"</string>
+    <string name="surveyor">"Encuestador"</string>
+    <string name="configurations">"Configuraciones"</string>
+    <string name="no_configurations">"No tiene ninguna configuración"</string>
+    <string name="no_studies">"No tienes ningún estudio para esta configuración"</string>
+    <string name="data_collector">"Recolector de datos"</string>
+    <string name="scan_qr_code">"Escanear código QR"</string>
+    <string name="continue_with_existing_study">"Continuar el estudio existente"</string>
+    <string name="admin_sign_in">"Inicio de sesión de administrador"</string>
+    <string name="supervisor_sign_in">"​​Inicio de sesión de supervisor"</string>
+    <string name="data_collector_sign_in">"Inicio de sesión de recolector de datos"</string>
+    <string name="admin_sign_up">"Registro de administrador"</string>
+    <string name="supervisor_sign_up">"Registro de supervisor"</string>
+    <string name="data_collector_sign_up">"Registro de recolector de datos"</string>
+    <string name="enter_your_pin">"Ingrese su PIN"</string>
+    <string name="reenter_your_pin">"Vuelva a ingresar su PIN"</string>
+    <string name="back">"Atrás"</string>
+    <string name="cancel">"Anular"</string>
+    <string name="finish">"Finalizar"</string>
+    <string name="save">"Grabar"</string>
+    <string name="done">"Hecho"</string>
+    <string name="select_role">"Selecciona su rol"</string>
+    <string name="admin_select_role">"Administrador - selecciona rol"</string>
+    <string name="supervisor_select_role">"Supervisor - selecciona rol"</string>
+    <string name="sign_in">"Iniciar sesión"</string>
+    <string name="sign_up">"Registrarse"</string>
+    <string name="sign_out">"Cerrar sesión"</string>
+    <string name="not_registered">"¿No estás registrado? ¡Regístrate!"</string>
+    <string name="name">"Nombre"</string>
+    <string name="enter_your_name">"Ingrese su nombre"</string>
+    <string name="pin">"PIN"</string>
+    <string name="forgot_pin_question">"Se olvidó la pregunta del PIN"</string>
+    <string name="forgot_pin_answer">"Se olvidó la respuesta del PIN"</string>
+    <string name="enter_your_answer">"Ingrese su respuesta"</string>
+    <string name="create_config">"Crear configuración"</string>
+    <string name="delete_config">"Eliminar configuración"</string>
+    <string name="edit_config">"Editar configuración"</string>
+    <string name="create_study">"Crear estudio"</string>
+    <string name="edit_study">"Modificar estudio"</string>
+    <string name="delete_study">"Eliminar estudio"</string>
+    <string name="create_field">"Crear campo"</string>
+    <string name="config_name">"Nombre de la configuración"</string>
+    <string name="study_name">"Nombre del estudio"</string>
+    <string name="field_name">"Nombre del campo"</string>
+    <string name="enumeration_fields">"Campos de enumeración"</string>
+    <string name="enter_config_name">"Ingrese el nombre de la configuración"</string>
+    <string name="enter_study_name">"Ingrese el nombre del estudio"</string>
+    <string name="enter_field_name">"Ingrese el nombre del campo"</string>
+    <string name="preferred_units">"Unidades preferidas"</string>
+    <string name="date_format">"Formato de fecha"</string>
+    <string name="time_format">"Formato de hora"</string>
+    <string name="manage_enumerators">"Administrar enumeradores"</string>
+    <string name="collect_enumerations">"Recoger enumeraciones"</string>
+    <string name="generate_sample">"Generar muestra"</string>
+    <string name="collect_samples">"Recoger muestras"</string>
+    <string name="min_gps_precision">"Precisión deseada de GPS"</string>
+    <string name="enter_min_gps_precision">"Ingrese la precisión deseada de GPS"</string>
+    <string name="define_enumeration_fields">"Definir campos de enumeración"</string>
+    <string name="define_enumeration_area">"Definir área de enumeración"</string>
+    <string name="define_sampling_method">"Definir método de muestreo"</string>
+    <string name="studies">"Estudios"</string>
+    <string name="enumeration_area">"Áreas de enumeración"</string>
+    <string name="barcode_result">"Código de barras detectado"</string>
+    <string name="error_scanner_cancelled">"El escáner del código fue anulado"</string>
+    <string name="error_camera_permission_not_granted">"Permiso de cámara no otorgado"</string>
+    <string name="error_app_name_unavailable">"Nombre de la aplicación no fue establecido"</string>
+    <string name="error_default_message">"Error en escanear el código:"</string>
+    <string name="menu_item_settings">"Configuración"</string>
+    <string name="change_role">"Cambiar rol"</string>
+    <string name="enter_your_user_name">"Ingrese su nombre de usuario"</string>
+    <string name="field_type">"Tipo de campo"</string>
+    <string name="enter_checkbox_text">"Ingrese el texto del elemento de la casilla de chequeo"</string>
+    <string name="enter_dropdown_item_text">"Ingrese el texto del elemento del menú de opciones"</string>
+    <string name="add_another">"SUMA OTRO"</string>
+    <string name="delete_field">"Eliminar campo"</string>
+    <string name="manage_this_study">"Administrar este estudio"</string>
+    <string name="manage_study">"Administrar estudio"</string>
+    <string name="manage_configuration">"Administrar configuración"</string>
+    <string name="manage_configurations">"Administrar configuraciones"</string>
+    <string name="generate_qr_code">"Generar código QR"</string>
+    <string name="create_filter">"Crear filtro"</string>
+    <string name="create_rule">"Crear regla"</string>
+    <string name="enter_rule_name">"Ingrese el nombre de la regla"</string>
+    <string name="field">"Campo"</string>
+    <string name="operator">"Operador"</string>
+    <string name="enter_value">"Ingrese valor"</string>
+    <string name="value">"Valor"</string>
+    <string name="filters">"Filtros"</string>
+    <string name="rule">"Regla"</string>
+    <string name="connector">"Conector"</string>
+    <string name="sampling_method">"Método de muestreo"</string>
+    <string name="enter_filter_name">"Ingrese el nombre del filtro"</string>
+    <string name="sample_size">"Tamaño de la muestra"</string>
+    <string name="filter_name">"Nombre del filtro"</string>
+    <string name="rule_name">"Nombre de la regla"</string>
+    <string name="total_sample_size">"Tamaño total de la muestra en todos los conglomerados"</string>
+    <string name="manage_studies">"Administrar estudios"</string>
+    <string name="manage_samples">"Administrar muestras"</string>
+    <string name="create_sample">"Crear muestra"</string>
+    <string name="delete_sample">"Eliminar muestra"</string>
+    <string name="manage_supervisors">"Administrar supervisores"</string>
+    <string name="home">"Pantalla de inicio"</string>
+    <string name="manage_enumeration_areas">"Administrar áreas de enumeración"</string>
+    <string-array name="forgot_pin_questions">
+        <item>"Segundo nombre del padre"</item>
+        <item>"Apellido de soltera de la madre"</item>
+        <item>"El nombre de tu mascota favorita"</item>
+        <item>"Últimas 4 cifras del número de celular"</item>
+        <item>"Comida favorita"</item>
+        <item>"Mes de nacimiento"</item>
+        <item>"Otra pregunta"</item>
+    </string-array>
+    <string-array name="distance_formats">
+        <item>"Metros / Kilómetros"</item>
+        <item>"Pies / Millas"</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>"12 horas (AM/PM)"</item>
+        <item>"24 horas"</item>
+    </string-array>
+    <string-array name="field_types">
+        <item>"Texto"</item>
+        <item>"Número"</item>
+        <item>"Fecha"</item>
+        <item>"Casilla de chequeo"</item>
+        <item>"Menú de opciones"</item>
+    </string-array>
+    <string-array name="operators">
+        <item>"Igual"</item>
+        <item>"No igual"</item>
+        <item>"Menor que"</item>
+        <item>"Mayor que"</item>
+        <item>"Mayor que o igual"</item>
+    </string-array>
+    <string-array name="connectors">
+        <item>"Y"</item>
+        <item>"O"</item>
+        <item>"NO"</item>
+    </string-array>
+    <string-array name="samling_methods">
+        <item>"Muestreo aleatorio simple"</item>
+        <item>"Muestreo por conglomerados"</item>
+        <item>"Subconjuntos: pueden superponerse"</item>
+        <item>"Estratos: Mutuamente excluyentes"</item>
+    </string-array>
+</resources>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <string name="app_name">GPSSample</string>
+    <string name="action_settings">"Настройки"</string>
+    <string name="action_sign_out">"Выйти из системы"</string>
+    <string name="next">"Следующий"</string>
+    <string name="previous">"Предыдущий"</string>
+    <string name="manager">"Менеджер"</string>
+    <string name="client">"Перечисление"</string>
+    <string name="connected_clients">"Подключенные клиенты"</string>
+    <string name="create_hotspot">"Создать точку доступа"</string>
+    <string name="create_server">"Создать сервер"</string>
+    <string name="create_qr_code">"Создать QR-код"</string>
+    <string name="connect_hotspot">"Подключение к точке доступа"</string>
+    <string name="registering_device">"Регистрация устройства"</string>
+    <string name="sending_command">"Отправка команды"</string>
+    <string name="sending_enum_data">"Отправка данных перечисления"</string>
+    <string name="receiving_data">"Получение данных"</string>
+    <string name="configuration_received">"Полученная конфигурация"</string>
+    <string name="admin">"Администратор"</string>
+    <string name="supervisor">"Руководитель"</string>
+    <string name="enumerator">"Перечислитель"</string>
+    <string name="surveyor">"Геодезист"</string>
+    <string name="configurations">"Конфигурации"</string>
+    <string name="no_configurations">"У вас нет конфигураций"</string>
+    <string name="no_studies">"У вас нет исследований для этой конфигурации"</string>
+    <string name="data_collector">"Сборщик данных"</string>
+    <string name="scan_qr_code">"Сканирование QR-кода"</string>
+    <string name="continue_with_existing_study">"Продолжить существующее исследование"</string>
+    <string name="admin_sign_in">"Вход администратора"</string>
+    <string name="supervisor_sign_in">"Администратор Войти"</string>
+    <string name="data_collector_sign_in">"Сборщик данных Войти"</string>
+    <string name="admin_sign_up">"Администратор Зарегистрироваться"</string>
+    <string name="supervisor_sign_up">"Администратор Регистрация"</string>
+    <string name="data_collector_sign_up">"Регистрация сборщика данных"</string>
+    <string name="enter_your_pin">"Введите PIN-код"</string>
+    <string name="reenter_your_pin">"Повторный ввод PIN-кода"</string>
+    <string name="back">"Назад"</string>
+    <string name="cancel">"Отменить"</string>
+    <string name="finish">"Завершить"</string>
+    <string name="save">"Сохранить"</string>
+    <string name="done">"Готово"</string>
+    <string name="select_role">"Выберите свою роль"</string>
+    <string name="admin_select_role">"Администратор Выберите роль"</string>
+    <string name="supervisor_select_role">"Супервайзер Выберите роль"</string>
+    <string name="sign_in">"Войти"</string>
+    <string name="sign_up">"Зарегистрироваться"</string>
+    <string name="sign_out">"Зарегистрироваться"</string>
+    <string name="not_registered">"Не зарегистрированы?  Зарегистрируйтесь!"</string>
+    <string name="name">"Имя"</string>
+    <string name="enter_your_name">"Введите Ваше имя"</string>
+    <string name="pin">"PIN"</string>
+    <string name="forgot_pin_question">"Вопрос о PIN-коде"</string>
+    <string name="forgot_pin_answer">"Забыли ответ PIN"</string>
+    <string name="enter_your_answer">"Введите ответ"</string>
+    <string name="create_config">"Создать конфигурацию"</string>
+    <string name="delete_config">"Удалить конфигурацию"</string>
+    <string name="edit_config">"Редактировать конфигурацию"</string>
+    <string name="create_study">"Создать исследование"</string>
+    <string name="edit_study">"Редактировать исследование"</string>
+    <string name="delete_study">"Удалить исследование"</string>
+    <string name="create_field">"Создать поле"</string>
+    <string name="config_name">"Имя конфигурации"</string>
+    <string name="study_name">"Имя исследования"</string>
+    <string name="field_name">"Имя поля"</string>
+    <string name="enumeration_fields">"Поля перечисления"</string>
+    <string name="enter_config_name">"Введите имя конфигурации"</string>
+    <string name="enter_study_name">"Введите имя исследования"</string>
+    <string name="enter_field_name">"Введите имя поля"</string>
+    <string name="preferred_units">"Предпочитаемые единицы"</string>
+    <string name="date_format">"Формат даты"</string>
+    <string name="time_format">"Формат времени"</string>
+    <string name="manage_enumerators">"Управление счетчиками"</string>
+    <string name="collect_enumerations">"Сбор перечислений"</string>
+    <string name="generate_sample">"Генерировать выборку"</string>
+    <string name="collect_samples">"Сбор образцов"</string>
+    <string name="min_gps_precision">"Желаемая точность GPS"</string>
+    <string name="enter_min_gps_precision">"Введите желаемую точность GPS"</string>
+    <string name="define_enumeration_fields">"Определить поля перечисления"</string>
+    <string name="define_enumeration_area">"Определить область перечисления"</string>
+    <string name="define_sampling_method">"Определить метод отбора проб"</string>
+    <string name="studies">"Исследования"</string>
+    <string name="enumeration_area">"Области перечисления"</string>
+    <string name="barcode_result">"Обнаружен штрих-код"</string>
+    <string name="error_scanner_cancelled">"Сканер кодов отменен."</string>
+    <string name="error_camera_permission_not_granted">"Разрешение камеры не выдано."</string>
+    <string name="error_app_name_unavailable">"Не задано имя приложения."</string>
+    <string name="error_default_message">"Не удалось отсканировать код:"</string>
+    <string name="menu_item_settings">"Настройки"</string>
+    <string name="change_role">"Изменить роль"</string>
+    <string name="enter_your_user_name">"Введите имя пользователя"</string>
+    <string name="field_type">"Тип поля"</string>
+    <string name="enter_checkbox_text">"Введите текст элемента флажка"</string>
+    <string name="enter_dropdown_item_text">"Введите текст элемента выпадающего списка"</string>
+    <string name="add_another">"ДОБАВИТЬ ДРУГОЕ"</string>
+    <string name="delete_field">"Удалить поле"</string>
+    <string name="manage_this_study">"Управление исследованием"</string>
+    <string name="manage_study">"Управление исследованием"</string>
+    <string name="manage_configuration">"Управление конфигурацией"</string>
+    <string name="manage_configurations">"Управление конфигурациями"</string>
+    <string name="generate_qr_code">"Генерировать QR-код"</string>
+    <string name="create_filter">"Создать фильтр"</string>
+    <string name="create_rule">"Создать правило"</string>
+    <string name="enter_rule_name">"Введите имя правила"</string>
+    <string name="field">"Поле"</string>
+    <string name="operator">"Оператор"</string>
+    <string name="enter_value">"Введите значение"</string>
+    <string name="value">"Значение"</string>
+    <string name="filters">"Фильтры"</string>
+    <string name="rule">"Правило"</string>
+    <string name="connector">"Коннектор"</string>
+    <string name="sampling_method">"Метод выборки"</string>
+    <string name="enter_filter_name">"Введите имя фильтра"</string>
+    <string name="sample_size">"Размер выборки"</string>
+    <string name="filter_name">"Имя фильтра"</string>
+    <string name="rule_name">"Имя правила"</string>
+    <string name="total_sample_size">"Общий размер выборки по всем кластерам"</string>
+    <string name="manage_studies">"Управление исследованиями"</string>
+    <string name="manage_samples">"Управление выборками"</string>
+    <string name="create_sample">"Создать выборку"</string>
+    <string name="delete_sample">"Удалить образец"</string>
+    <string name="manage_supervisors">"Управление супервизорами"</string>
+    <string name="home">"Главная"</string>
+    <string name="manage_enumeration_areas">"Управление участками переписи"</string>
+    <string-array name="forgot_pin_questions">
+        <item>"Отчество отца"</item>
+        <item>"Девичья фамилия матери"</item>
+        <item>"Имя любимого домашнего животного"</item>
+        <item>"Последние 4 цифры номера мобильного телефона"</item>
+        <item>"Любимая еда"</item>
+        <item>"Месяц рождения"</item>
+        <item>"Другой вопрос"</item>
+    </string-array>
+    <string-array name="distance_formats">
+        <item>"Метры / километры"</item>
+        <item>"Футы / Мили"</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>"12 часов (AM/PM)"</item>
+        <item>"24 часа"</item>
+    </string-array>
+    <string-array name="field_types">
+        <item>"Текст"</item>
+        <item>"Число"</item>
+        <item>"Дата"</item>
+        <item>"Флажок"</item>
+        <item>"Выпадающий"</item>
+    </string-array>
+    <string-array name="operators">
+        <item>"Равно"</item>
+        <item>"NotEqual"</item>
+        <item>"LessThan"</item>
+        <item>"БольшеТан"</item>
+        <item>"GreaterThanOrEqual"</item>
+    </string-array>
+    <string-array name="connectors">
+        <item>"И"</item>
+        <item>"ИЛИ"</item>
+        <item>"НЕ"</item>
+    </string-array>
+    <string-array name="samling_methods">
+        <item>"Простая случайная выборка"</item>
+        <item>"Кластерная выборка"</item>
+        <item>"Подмножества: Могут пересекаться"</item>
+        <item>"Страты: Взаимоисключающие"</item>
+    </string-array>
+</resources>
