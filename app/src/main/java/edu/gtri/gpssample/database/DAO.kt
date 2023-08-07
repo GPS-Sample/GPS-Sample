@@ -105,14 +105,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     // i think we can just use one key here.  if a field is connected to a study and
                     // a rule is connected to a field
                     // this needs to be a foreign key
-                    COLUMN_STUDY_ID + " INTEGER" + "," +
                     COLUMN_FIELD_ID + " INTEGER" + "," +
                     COLUMN_RULE_NAME + " TEXT" + "," +
 
                     // TODO:  this should be a look up table
                     COLUMN_OPERATOR_ID + " INTEGER" + "," +
                     COLUMN_RULE_VALUE + " TEXT" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableRule)
@@ -480,7 +478,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var fieldDAO: FieldDAO
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
-        lateinit var filterRuleDAO: FilterRuleDAO
+        //lateinit var filterRuleDAO: FilterRuleDAO
         lateinit var enumAreaDAO: EnumAreaDAO
         lateinit var teamDAO: TeamDAO
         lateinit var teamMemberDAO: TeamMemberDAO
@@ -548,7 +546,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 fieldDAO = FieldDAO( instance!! )
                 ruleDAO = RuleDAO( instance!! )
                 filterDAO = FilterDAO( instance!! )
-                filterRuleDAO = FilterRuleDAO( instance!! )
+              //  filterRuleDAO = FilterRuleDAO( instance!! )
                 enumAreaDAO = EnumAreaDAO( instance!! )
                 teamDAO = TeamDAO( instance!! )
                 teamMemberDAO = TeamMemberDAO( instance!! )
@@ -562,7 +560,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 211
+        private const val DATABASE_VERSION = 214
 
     }
 }

@@ -16,7 +16,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
-import edu.gtri.gpssample.database.models.FilterRule
+import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.databinding.FragmentCreateFilterBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 
@@ -81,13 +81,15 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
         createFilterAdapter.shouldEditFilterRule = this::shouldEditFilterRule
         createFilterAdapter.shouldDeleteFilterRule = this::shouldDeleteFilterRule
 
+        sharedViewModel.createFilterRuleModel.createFilterAdapter = createFilterAdapter
+
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         //binding.recyclerView.adapter = createFilterAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
         binding.addRuleButton.setOnClickListener {
             val bundle = Bundle()
-            sharedViewModel.createFilterRuleModel.createNewFilterRule()
+            sharedViewModel.createNewFilterRule()
             findNavController().navigate(R.id.action_navigate_to_SelectRuleDialogFragment, bundle)
 
 //            SelectRuleDialogFragment().show(
@@ -144,14 +146,14 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
        // createFilterAdapter.updateFilterRules(filterRules)
     }
 
-    private var selectedFilterRule: FilterRule? = null
+    private var selectedFilterRule: Rule? = null
 
-    fun shouldEditFilterRule( filterRule: FilterRule )
+    fun shouldEditFilterRule( filterRule: Rule )
     {
        // SelectRuleDialog( activity!!, study_uuid, filter.uuid, filterRule,this )
     }
 
-    fun shouldDeleteFilterRule( filterRule: FilterRule )
+    fun shouldDeleteFilterRule( filterRule: Rule )
     {
         selectedFilterRule = filterRule
         ConfirmationDialog( activity!!, "Please Confirm", "Are you sure you want to delete this Filter Rule?", "No", "Yes", 0, this )
@@ -164,7 +166,7 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
     override fun didSelectRightButton(tag: Any?)
     {
         selectedFilterRule?.let {
-            DAO.filterRuleDAO.deleteFilterRule( it )
+           // DAO.filterRuleDAO.deleteFilterRule( it )
             // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
             // createFilterAdapter.updateFilterRules( filterRules )
         }

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".dialogs.SelectRuleDialogFragment">
     <data>
+        <import type="android.view.View" />
         <variable
             name="viewModel"
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
@@ -18,65 +19,135 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginRight="20dp"
-            android:focusable="false"
-            android:text="@string/rule"
-            android:gravity="center_vertical"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="16sp" />
-
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="100dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@drawable/spinner_frame">
-
-            <Spinner
-                android:id="@+id/rule_spinner"
+            android:layout_marginRight="20dp">
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:entries="@{viewModel.createStudyModel.ruleList}"
-                android:selectedItemPosition="@={viewModel.createFilterRuleModel.ruleFieldPosition}"
-                android:onItemSelected="@{viewModel::onFilterRuleFieldSelected}"/>
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="20dp"
+                android:focusable="false"
+                android:text="@string/rule"
+                android:gravity="center_vertical"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="16sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/spinner_frame"
+                android:visibility="@{viewModel.createFilterRuleModel.filterHasRules ? View.GONE : View.VISIBLE}">
+
+                <Spinner
+                    android:id="@+id/rule_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:entries="@{viewModel.createFilterRuleModel.firstStringRuleList}"
+                    android:selectedItemPosition="@={viewModel.createFilterRuleModel.ruleFieldPosition}"
+                    android:onItemSelected="@{viewModel::onFirstRuleFieldSelected}"/>
+            </FrameLayout>
         </FrameLayout>
-
-        <TextView
-            android:id="@+id/connector_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:focusable="false"
-            android:text="@string/connector"
-            android:gravity="center_vertical"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="16sp" />
-
         <FrameLayout
-            android:id="@+id/connector_frame_layout"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="80dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:background="@drawable/spinner_frame">
+            android:background="@drawable/spinner_frame"
+            android:visibility="@{viewModel.createFilterRuleModel.filterHasRules ? View.VISIBLE : View.GONE}">
 
-            <Spinner
-                android:id="@+id/connector_spinner"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:entries="@{viewModel.createFilterRuleModel.connectors}"
-                android:selectedItemPosition="@={viewModel.createFilterRuleModel.ruleConditionPosition}"
-                android:onItemSelected="@{viewModel.createFilterRuleModel::onFilterConnectorFieldSelected}"/>
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="20dp"
+                android:focusable="false"
+                android:text="@string/rule"
+                android:gravity="center_vertical"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="16sp" />
         </FrameLayout>
+        <FrameLayout
+            android:id="@+id/connector_full_frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:visibility="@{viewModel.createFilterRuleModel.studyHasMultipleRules ? View.VISIBLE : View.GONE}">
 
+            <TextView
+                android:id="@+id/connector_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20dp"
+                android:focusable="false"
+                android:text="@string/connector"
+                android:gravity="center_vertical"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="16sp" />
+
+            <FrameLayout
+                android:id="@+id/connector_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/spinner_frame">
+
+                <Spinner
+                    android:id="@+id/connector_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:entries="@{viewModel.createFilterRuleModel.connectors}"
+                    android:selectedItemPosition="@={viewModel.createFilterRuleModel.ruleConditionPosition}"
+                    android:onItemSelected="@{viewModel.createFilterRuleModel::onFilterConnectorFieldSelected}"/>
+            </FrameLayout>
+        </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:visibility="@{viewModel.createFilterRuleModel.studyHasMultipleRules ? View.VISIBLE : View.GONE}">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="20dp"
+                android:focusable="false"
+                android:text="@string/rule"
+                android:gravity="center_vertical"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="16sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/spinner_frame">
+
+                <Spinner
+                    android:id="@+id/second_rule_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:entries="@{viewModel.createFilterRuleModel.firstStringRuleList}"
+                    android:selectedItemPosition="@={viewModel.createFilterRuleModel.secondRuleFieldPosition}"
+                    android:onItemSelected="@{viewModel::onSecondRuleFieldSelected}"/>
+            </FrameLayout>
+        </FrameLayout>
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"

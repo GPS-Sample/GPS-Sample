@@ -188,11 +188,11 @@ class SamplingViewModel : ViewModel() {
             for(filter in study.filters)
             {
                 Log.d("XXXXXX", filter.name )
-                for(rule in filter.filterRules)
-                {
-
-                    Log.d("XXXX", "THE NAME  CONNECTOR ${rule.connector.format}")
-                }
+//                for(rule in filter.filterRules)
+//                {
+//
+//                    Log.d("XXXX", "THE NAME  CONNECTOR ${rule.connector.format}")
+//                }
 
             }
 

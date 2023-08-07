@@ -132,6 +132,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
             }else
             {
+
                 sharedViewModel.createRuleModel.createNewRule()
                 findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
             }

@@ -106,7 +106,7 @@ class CreateStudyModel {
         return fieldList.toTypedArray()
     }
 
-    fun getRules() : Array<String>
+    private fun getRules() : Array<String>
     {
         val ruleList = ArrayList<String>()
         _currentStudy?.value?.rules?.let { rules ->

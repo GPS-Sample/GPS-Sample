@@ -299,19 +299,38 @@ class ConfigurationViewModel : ViewModel()
     //endregion
 
     //region FilterRule
-    fun onFilterRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    fun onFirstRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         createStudyModel.currentStudy?.value?.let{study ->
-            createFilterRuleModel.onFilterRuleFieldSelected(study, position)
+            createFilterRuleModel.onFirstRuleFieldSelected(study, position)
         }
 
+    }
+
+    fun onSecondRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        createStudyModel.currentStudy?.value?.let{study ->
+            createFilterRuleModel.onSecondRuleFieldSelected(study, position)
+        }
+
+    }
+
+    fun createNewFilterRule()
+    {
+        createFilterModel.currentFilter?.value?.let { filter ->
+            createStudyModel.currentStudy?.value?.let{study ->
+                // we set the filter on the CreateFilterRuleModel
+                createFilterRuleModel.createNewFilterRule(filter, study)
+            }
+
+        }
     }
 
     fun addFilerRule()
     {
         createFilterModel.currentFilter?.value?.let{filter ->
             createFilterRuleModel.addFilterRule(filter)
-            createFilterModel.createFilterAdapter.updateFilterRules(filter.filterRules)
+//            createFilterModel.createFilterAdapter.updateFilterRules(filter.filterRules)
         }
     }
 

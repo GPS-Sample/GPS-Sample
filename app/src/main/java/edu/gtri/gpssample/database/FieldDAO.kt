@@ -13,16 +13,16 @@ import edu.gtri.gpssample.database.models.Study
 class FieldDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createOrUpdateField( field: Field ) : Field?
+    fun createOrUpdateField( field: Field, study : Study ) : Field?
     {
         if (exists( field ))
         {
-            updateField( field )
+            updateField( field, study )
         }
         else
         {
             val values = ContentValues()
-            putField( field, values )
+            putField( field, study, values )
             field.id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
             field.id?.let { id ->
                 Log.d( "xxx", "new field id = ${id}")
@@ -33,14 +33,14 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun putField( field: Field, values: ContentValues )
+    fun putField( field: Field, study : Study, values: ContentValues )
     {
         field.id?.let { id ->
             Log.d( "xxx", "existing field id = ${id}")
             values.put( DAO.COLUMN_ID, field.id )
         }
 
-        values.put( DAO.COLUMN_STUDY_ID, field.studyId )
+        values.put( DAO.COLUMN_STUDY_ID, study.id )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
@@ -59,7 +59,7 @@ class FieldDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun updateField( field: Field )
+    fun updateField( field: Field, study : Study )
     {
         val db = dao.writableDatabase
 
@@ -70,7 +70,7 @@ class FieldDAO(private var dao: DAO)
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
 
-            putField( field, values )
+            putField( field, study, values )
 
             db.update(DAO.TABLE_FIELD, values, whereClause, args )
         }
@@ -93,7 +93,6 @@ class FieldDAO(private var dao: DAO)
     private fun  buildField(cursor: Cursor ): Field
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val type_index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
         val pii = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_PII)).toBoolean()
@@ -108,7 +107,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(type_index)
 
-        return Field(id, studyId, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
     //--------------------------------------------------------------------------
@@ -141,7 +140,10 @@ class FieldDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            fields.add( buildField( cursor ))
+            val field = buildField( cursor )
+            val rules = DAO.ruleDAO.getRulesForField(field)
+            study.rules.addAll(rules)
+            fields.add( field)
         }
 
         cursor.close()
