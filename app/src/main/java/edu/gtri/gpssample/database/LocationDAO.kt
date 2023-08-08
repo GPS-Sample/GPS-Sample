@@ -71,19 +71,18 @@ class LocationDAO(private var dao: DAO)
 
             for (item in location.items)
             {
+                val enumerationItem = item as EnumerationItem?
+                enumerationItem?.let{enumerationItem ->
+                    enumerationItem.fieldDataList?.let { fieldDataList ->
+                        for (fieldData in fieldDataList)
+                        {
+//                        fieldData.id = null
 
-//                enumerationItem.locationId = id
-//
-//                enumerationItem.fieldDataList?.let { fieldDataList ->
-//                    for (fieldData in fieldDataList)
-//                    {
-////                        fieldData.id = null
-//                        fieldData.enumerationItemId = enumerationItem.id!!
-//                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
-//                    }
-//                }
-//
-//                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
+                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                        }
+                    }
+                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                }
             }
         } ?: return null
 

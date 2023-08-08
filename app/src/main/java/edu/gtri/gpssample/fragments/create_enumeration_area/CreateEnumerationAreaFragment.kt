@@ -190,23 +190,30 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                     var numComplete = 0
 
-//                    for (enumerationItem in location.enumerationItems)
-//                    {
-//                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-//                        {
-//                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-//                            break
-//                        }
-//                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-//                        {
-//                            numComplete++
-//                        }
-//                    }
-//
-//                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
-//                    {
-//                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-//                    }
+                    for (item in location.items)
+                    {
+                        val enumerationItem = item as EnumerationItem?
+                        //enumerationItem?.let{enumerationItem ->
+                        if(enumerationItem != null)
+                        {
+
+                            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                            {
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                                break
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                            {
+                                numComplete++
+                            }
+                        }
+
+                    }
+
+                    if (numComplete > 0 && numComplete == location.items.size)
+                    {
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                    }
 
                     map.addMarker( MarkerOptions()
                         .position( LatLng( location.latitude, location.longitude ))

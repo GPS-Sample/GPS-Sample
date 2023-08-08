@@ -3,11 +3,13 @@ package edu.gtri.gpssample.viewmodels.models
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.annotation.RequiresApi
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -122,6 +124,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     {
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun startNetworking(networkInfo: NetworkInfo?) : Boolean
     {
         var status : NetworkStatus = NetworkStatus.None
@@ -217,14 +220,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
                     Log.d( "xxx", payload )
 
-//                    enumArea?.let { enumArea ->
-//                        for (location in enumArea.locations)
-//                        {
-//                            DAO.locationDAO.importLocation( location )
-//                        }
-//                        val ea = DAO.enumAreaDAO.getEnumArea(enumArea.id!!)
-//                        Log.d( "xxx", ea.toString())
-//                    }
+                    enumArea?.let { enumArea ->
+                        for (location in enumArea.locations)
+                        {
+                            DAO.locationDAO.importLocation( location, enumArea )
+                        }
+
+
+                    }
                 }
             }
         }

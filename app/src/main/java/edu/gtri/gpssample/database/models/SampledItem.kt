@@ -11,7 +11,7 @@ data class SampledItem (
     override var id: Int?,
     var enumItem : EnumerationItem,
     var samplingState : SamplingState = SamplingState.NotSampled
-     ): GeoItem()
+     ): GeoItem
 {
     constructor(enumItem : EnumerationItem) :
             this(null, enumItem, SamplingState.None)

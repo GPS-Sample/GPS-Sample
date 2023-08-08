@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database.models
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SampleState
 import edu.gtri.gpssample.constants.SamplingState
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -11,6 +12,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @Serializable
+@SerialName("EnumerationItem")
 data class EnumerationItem(
     override var id : Int? = null,
     var creationDate: Long,
@@ -20,7 +22,7 @@ data class EnumerationItem(
     var enumerationState : EnumerationState,
     var incompleteReason : String,
     var notes : String,
-    var fieldDataList : ArrayList<FieldData> ) : GeoItem()
+    var fieldDataList : ArrayList<FieldData> ) : GeoItem
 {
     constructor(  ) :
             this(null,  Date().time, UUID.randomUUID().toString(),
