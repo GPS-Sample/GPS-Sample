@@ -26,6 +26,7 @@ import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkConnectionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,6 +92,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     val hotspot : GPSSampleWifiManager = GPSSampleWifiManager()
     val qrCodeHeight = 500.0f
     val qrCodeWidth = 500.0f
+
+    var sharedViewModel : ConfigurationViewModel? = null
 
     private val _qrCodeBitmap : MutableLiveData<Bitmap> = MutableLiveData()
     val qrCodeBitmap :LiveData<Bitmap> = _qrCodeBitmap
@@ -225,7 +228,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                         {
                             DAO.locationDAO.importLocation( location, enumArea )
                         }
-
+                        // replace the enumArea from currentConfig with this one
+                        sharedViewModel?.replaceEnumArea(enumArea)
 
                     }
                 }

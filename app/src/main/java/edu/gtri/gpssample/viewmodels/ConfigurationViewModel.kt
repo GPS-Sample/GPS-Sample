@@ -341,4 +341,15 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
+    fun replaceEnumArea(enumArea : EnumArea)
+    {
+        currentConfiguration?.value?.let{config ->
+            for(ea in config.enumAreas)
+            {
+
+            }
+            config.enumAreas.remove(enumArea)
+            config.enumAreas.add(enumArea)
+        }
+    }
 }

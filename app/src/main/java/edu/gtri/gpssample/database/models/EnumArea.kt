@@ -10,15 +10,16 @@ import kotlin.collections.ArrayList
 @Serializable
 data class EnumArea (
     override var id : Int? = null,
+    var uuid : String,
     var creationDate: Long,
     var name: String,
     var vertices: ArrayList<LatLon>,
     var enumerationTeams: ArrayList<Team>,
     var locations: ArrayList<Location>) : GeoArea()
 {
-    constructor(id: Int, creationDate: Long, name: String) : this(id, creationDate, name,
+    constructor(id: Int, creationDate: Long, name: String) : this(id, UUID.randomUUID().toString(), creationDate, name,
                 ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>())
-    constructor( name: String, vertices: ArrayList<LatLon>) : this(null,
+    constructor( name: String, vertices: ArrayList<LatLon>) : this(null,UUID.randomUUID().toString(),
                 Date().time, name, vertices, ArrayList<Team>(), ArrayList<Location>())
 
     fun copy() : EnumArea?
@@ -35,6 +36,16 @@ data class EnumArea (
         return Json.encodeToString( this )
     }
 
+    override fun equals(other: Any?): Boolean {
+        if(other is EnumArea)
+        {
+            if (this.uuid == other.uuid)
+            {
+                return true
+            }
+        }
+        return false
+    }
     companion object
     {
         fun unpack( string: String ) : EnumArea?

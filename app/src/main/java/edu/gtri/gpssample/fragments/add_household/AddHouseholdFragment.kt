@@ -286,7 +286,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         }
         // update whole enum area
-        DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea,config)
+       // DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea,config)
 
         //DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
         findNavController().popBackStack()
