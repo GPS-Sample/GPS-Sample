@@ -33,32 +33,34 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
         return viewHolder
     }
 
-    fun updateRules( rule: Rule )
+    fun updateRules( rule: Rule? )
     {
         var rulesArray = ArrayList<Rule>()
+        rule?.let{rule->
+            var looprRule : Rule? = rule
 
-        var looprRule : Rule? = rule
-
-        // we loop til we don't find a rule.
-        // maybe do this with recursion
-        while(true)
-        {
-            if(looprRule != null)
+            // we loop til we don't find a rule.
+            // maybe do this with recursion
+            while(true)
             {
-                if(!rulesArray.contains(looprRule))
+                if(looprRule != null)
                 {
-                    rulesArray.add(looprRule)
+                    if(!rulesArray.contains(looprRule))
+                    {
+                        rulesArray.add(looprRule)
+                    }
+                    val op = looprRule.filterOperator
+                    op?.let{ op ->
+                        looprRule = op.rule
+                    }?: run{ looprRule = null }
+                }else
+                {
+                    break
                 }
-                val op = looprRule.filterOperator
-                op?.let{ op ->
-                    looprRule = op.rule
-                }?: run{ looprRule = null }
-            }else
-            {
-                break
-            }
 
+            }
         }
+
         this.filterRules = rulesArray
         notifyDataSetChanged()
     }

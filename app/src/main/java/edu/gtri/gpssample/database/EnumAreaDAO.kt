@@ -200,9 +200,9 @@ class EnumAreaDAO(private var dao: DAO)
         enumArea.id?.let {enumAreaId ->
 
             // latLon's are dependent on EnumAreas
-            DAO.latLonDAO.getAllLatLonsWithEnumAreaId(enumAreaId).map {
-                DAO.latLonDAO.delete( it )
-            }
+//            DAO.latLonDAO.getAllLatLonsWithEnumAreaId(enumAreaId).map {
+//                DAO.latLonDAO.delete( it )
+//            }
 
             // locations's are dependent on EnumAreas
             DAO.locationDAO.getLocations(enumArea).map {
