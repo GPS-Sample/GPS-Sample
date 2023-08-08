@@ -31,22 +31,22 @@ class CreateRuleModel {
 
     fun addRule(study : Study)
     {
-        study.id?.let { id ->
+        //study.id?.let { id ->
             currentRule?.value?.let { rule ->
-                rule.studyId = id
-                DAO.ruleDAO.createOrUpdateRule( rule )
+               // rule.studyId = id
+               // DAO.ruleDAO.createOrUpdateRule( rule )
                 if(!study.rules.contains(rule))
                 {
                     study.rules.add(rule)
                 }
             }
-        }
+       // }
     }
     fun setSelectedRule(rule : Rule)
     {
         _currentRule = MutableLiveData(rule)
         currentRule = _currentRule
-        _ruleOperatorPosition.value =  OperatorConverter.toArrayPosition(rule.operator)
+       // _ruleOperatorPosition.value =  OperatorConverter.toArrayPosition(rule.operator)
     }
 
     fun deleteSelectedRule(study : Study)
@@ -66,7 +66,7 @@ class CreateRuleModel {
 
     fun createNewRule() : Boolean
     {
-        val newRule = Rule(null, -1, -1, "", Operator.None, "" )
+        val newRule = Rule(null,  null, "", "" , Operator.None, null)
         _currentRule = MutableLiveData(newRule)
         currentRule = _currentRule
 
@@ -77,9 +77,7 @@ class CreateRuleModel {
     {
         currentRule?.value?.let{ rule ->
             val field = study.fields[position]
-            field.id?.let { id ->
-                rule.fieldId = id
-            }
+            rule.field = field
         }
     }
 

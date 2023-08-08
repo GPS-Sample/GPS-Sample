@@ -9,23 +9,36 @@ import kotlin.collections.ArrayList
 
 object NetworkUtils {
     const val kHeartbeatInterval : Long = 1000
+    const val kNumRetries = 200
     fun readToEnd(fullSize : Int, actualRead : Int, socket : Socket, payloadArray : ByteArray )
     {
+        var retryCounter : Int = 0
         if(actualRead < fullSize)
         {
-            val left = fullSize - actualRead
+            var left = fullSize - actualRead
             val leftover = ByteArray(left)
             // maybe read one byte at a time?
-            val read = socket.inputStream.read(leftover, 0,left)
-            if(read > 0)
+            var offset = 0
+            var read = 0
+            var leftAfterReading = left
+            
+            while(left - offset != 0)
             {
-                for ( i in (fullSize - left) until fullSize)
+                if(retryCounter < kNumRetries)
                 {
-                    payloadArray[i] = leftover[i - (fullSize - left)]
+                    read = socket.inputStream.read(leftover, offset,leftAfterReading)
+                    offset += read
+                    leftAfterReading -= read
+                    retryCounter += 1
+                }else
+                {
+                    break
                 }
-            }else
+            }
+
+            for ( i in (fullSize - left) until fullSize)
             {
-                // throw read error, give up
+                payloadArray[i] = leftover[i - (fullSize - left)]
             }
         }
     }

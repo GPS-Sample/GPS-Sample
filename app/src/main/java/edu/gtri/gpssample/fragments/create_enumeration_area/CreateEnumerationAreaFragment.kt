@@ -23,6 +23,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.LocationType
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
@@ -135,9 +136,9 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             vertices.add( LatLon( it.position.latitude, it.position.longitude ))
         }
 
-        var enumArea = EnumArea( config.id!!, name, vertices )
-        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        var enumArea = EnumArea(  name, vertices )
+        //DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+        config.enumAreas.add(enumArea) // = DAO.enumAreaDAO.getEnumAreas( config )
 
         addPolygon( enumArea )
 
@@ -167,16 +168,10 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 }
             }
         }
-
-        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-
         for (enumArea in config.enumAreas)
         {
             addPolygon( enumArea )
-
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
-
-            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
 
             for (location in enumArea.locations)
             {
@@ -195,20 +190,27 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                     var numComplete = 0
 
-                    for (enumerationItem in location.enumerationItems)
+                    for (item in location.items)
                     {
-                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        val enumerationItem = item as EnumerationItem?
+                        //enumerationItem?.let{enumerationItem ->
+                        if(enumerationItem != null)
                         {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                            break
+
+                            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                            {
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                                break
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                            {
+                                numComplete++
+                            }
                         }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            numComplete++
-                        }
+
                     }
 
-                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                    if (numComplete > 0 && numComplete == location.items.size)
                     {
                         icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
                     }
@@ -303,14 +305,14 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             feature.geometry?.let { geometry ->
                 when( geometry ) {
                     is MultiPolygon -> {
-                        val enumArea = EnumArea( config.id!!, name, ArrayList<LatLon>())
+                        val enumArea = EnumArea(name, ArrayList<LatLon>())
                         val multiPolygon = geometry as MultiPolygon
 
                         multiPolygon.coordinates[0][0].forEach { position ->
                             enumArea.vertices.add( LatLon( position.latitude, position.longitude ))
                         }
-
-                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                        config.enumAreas.add(enumArea)
+                        //DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
                     }
                     is Point -> {
                         val point = geometry as Point
@@ -321,12 +323,15 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
         }
 
-        config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-
         // figure out which enumArea contains each point
+
+        var count = 0
 
         for (point in points)
         {
+            Log.d( "xxx", "${count}/${points.size}")
+            count += 1
+
             for (enumArea in config.enumAreas)
             {
                 val points1 = ArrayList<Coordinate>()
@@ -342,11 +347,11 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 val geometry1 = geometryFactory.createPoint( coordinate )
                 if (geometry.contains( geometry1 ))
                 {
-                    val location = Location( enumArea.id!!, point.coordinates.latitude, point.coordinates.longitude, false )
-                    DAO.locationDAO.createOrUpdateLocation( location )
+                    val location = Location( LocationType.Enumeration, point.coordinates.latitude, point.coordinates.longitude, false )
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
                     enumArea.locations.add( location )
-                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+//                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
                     break // found! assuming that it can only exist in a single EA, for now!
                 }
             }

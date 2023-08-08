@@ -32,6 +32,7 @@ import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.ExportDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
@@ -52,7 +53,7 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
     private var userId = 0
-    private var enumAreaId = 0
+    //private var enumAreaId = 0
     private var dropMode = false
     private var addLocation: LatLng? = null
     private var _binding: FragmentPerformEnumerationBinding? = null
@@ -83,12 +84,7 @@ class PerformEnumerationFragment : Fragment(),
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
             enumArea = enum_area
-            enumArea.id?.let {id ->
-                enumAreaId = id
-            }
         }
-
-        Log.d( "xxx", enumArea.toString())
 
         sharedViewModel.teamViewModel.currentTeam?.value?.let {
             team = it
@@ -144,15 +140,14 @@ class PerformEnumerationFragment : Fragment(),
         binding.addHouseholdButton.setOnClickListener {
 
             addLocation?.let { location ->
-                val location = Location(enumAreaId, location.latitude, location.longitude, false)
-                location.enumerationTeamId = team.id!!
+                val location = Location( LocationType.Enumeration, location.latitude, location.longitude, false)
+                enumArea.locations.add(location)
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
             } ?: kotlin.run {
                 Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
             }
-
             addLocation = null
         }
 
@@ -199,7 +194,6 @@ class PerformEnumerationFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        enumArea.locations = DAO.locationDAO.getLocations(enumArea, team)
         performEnumerationAdapter.updateLocations( enumArea.locations )
 
         if (this::map.isInitialized)
@@ -207,34 +201,28 @@ class PerformEnumerationFragment : Fragment(),
             addMapObjects()
         }
     }
-
-    var once = true
-
-    fun addMapObjects()
+    private fun addMapObjects()
     {
         map.clear()
 
         val points = ArrayList<LatLng>()
 
         team.polygon.map {
-            points.add( it.toLatLng())
+            val pt = it.toLatLng()
+            points.add( pt)
         }
 
         if (points.isNotEmpty())
         {
+
             val polygon = PolygonOptions()
                 .clickable(false)
                 .addAll( points )
 
             map.addPolygon(polygon)
         }
-
-        if (once)
-        {
-            once = false
-            val latLng = getCenter()
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
-        }
+        val latLngBounds = GeoUtils.findGeobounds(team.polygon)
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
 
         for (location in enumArea.locations)
         {
@@ -249,20 +237,24 @@ class PerformEnumerationFragment : Fragment(),
             {
                 var numComplete = 0
 
-                for (enumerationItem in location.enumerationItems)
+                for (item in location.items)
                 {
-                    if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                    {
-                        icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                        break
+                    val enumerationItem = item as? EnumerationItem
+                    enumerationItem?.let{enumerationItem ->
+                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            numComplete++
+                        }
                     }
-                    else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                    {
-                        numComplete++
-                    }
+
                 }
 
-                if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                if (numComplete > 0 && numComplete == location.items.size)
                 {
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
                 }
@@ -280,7 +272,7 @@ class PerformEnumerationFragment : Fragment(),
                     marker.tag?.let { tag ->
                         val location = tag as Location
                         sharedViewModel.locationViewModel.setCurrentLocation(location)
-
+                        enumArea.locations.add(location)
                         if (location.isLandmark)
                         {
                             findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
@@ -347,9 +339,6 @@ class PerformEnumerationFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    // this is a hack
-//                    DAO.configDAO.updateAllLists( config )
-
                     team.id?.let {
                         config.teamId = it
                     }

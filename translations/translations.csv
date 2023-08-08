@@ -1,0 +1,150 @@
+﻿app_name,GPSSample::en,GPSSample::es,GPSSample::fr,GPSSample::pt,GPSSample::ru
+action_settings,Settings,Configuración,Paramètres,Configurações,Настройки
+action_sign_out,Sign Out,Cerrar sesión,Se déconnecter,Sair,Выйти из системы
+next,Next,Siguiente,Écran suivant,Seguinte,Следующий
+previous,Previous,Anterior,Écran précédent,Anterior,Предыдущий
+manager,Manager,Gerente,Directrice,Gerente,Менеджер
+client,Enumeration,Enumeración,Énumération,Enumeração,Перечисление
+connected_clients,Connected Clients,Clientes conectados,Clients connectés,Clientes ligados,Подключенные клиенты
+create_hotspot,Create Hotspot,Crear punto de acceso,Créer un hotspot,Criar ponto de acesso,Создать точку доступа
+create_server,Create Server,Crear servidor,Créer un serveur,Criar servidor,Создать сервер
+create_qr_code,Create QR Code,Crear código QR,Créer un code QR,Criar código QR,Создать QR-код
+connect_hotspot,Connect To Hotspot,Conectar al punto de acceso,Se connecter au hotspot,Conectar-se a um ponto de acesso,Подключение к точке доступа
+registering_device,Registering Device,Registrando dispositivo ,Enregistrement de l'appareil,Registar dispositivo,Регистрация устройства
+sending_command,Sending Command,Enviando comando,Envoi de la commande,Comando de envio,Отправка команды
+sending_enum_data,Sending Enumeration Data,Enviando datos de enumeración,Envoi de données d'énumération,Enviar dados de enumeração,Отправка данных перечисления
+receiving_data,Receiving Data,Recibiendo datos,Réception de données,Recebendo dados,Получение данных
+configuration_received,Configuration Received,Configuración recibida,Configuration reçue,Configuração recebida,Полученная конфигурация
+forgot_pin_questions,Father's middle name,Segundo nombre del padre,Deuxième prénom de votre père,Nome do meio do pai,Отчество отца
+forgot_pin_questions,Mother's maiden name,Apellido de soltera de la madre,Nom de jeune fille de la mère,Nome de solteira da mãe,Девичья фамилия матери
+forgot_pin_questions,Favorite Pet's name,El nombre de tu mascota favorita,Nom d'animal de compagnie préféré,Nome do animal de estimação favorito,Имя любимого домашнего животного
+forgot_pin_questions,Last 4 digits of cell phone #,Últimas 4 cifras del número de celular,4 derniers chiffres du numéro de téléphone portable,Últimos 4 dígitos do número de telemóvel,Последние 4 цифры номера мобильного телефона
+forgot_pin_questions,Favorite Food,Comida favorita,Nourriture favorite,Comida favorita,Любимая еда
+forgot_pin_questions,Birth Month,Mes de nacimiento,Mois de naissance,Mês de nascimento,Месяц рождения
+forgot_pin_questions,Other Question,Otra pregunta,Autre question,Outra pergunta,Другой вопрос
+distance_formats,Meters / KiloMeters,Metros / Kilómetros,Mètres / Kilomètres,Metros / Quilômetros ,Метры / километры
+distance_formats,Feet / Miles,Pies / Millas,Pieds / Miles,Pés / Milhas,Футы / Мили
+time_formats,12 hour (AM/PM),12 horas (AM/PM),12 heures (AM/PM),12 horas (AM/PM),12 часов (AM/PM)
+time_formats,24 hour,24 horas,24 heures,24 horas,24 часа
+field_types,Text,Texto,Texte,Texto,Текст
+field_types,Number,Número,Nombre,Número,Число
+field_types,Date,Fecha,Date,Data,Дата
+field_types,Checkbox,Casilla de chequeo,Case à cocher,Caixa de seleção,Флажок
+field_types,Dropdown,Menú de opciones,Question déroulante,Lista suspensa,Выпадающий
+operators,Equal,Igual,Égal,Igual,Равно
+operators,NotEqual,No igual,Inégal,Não igual,NotEqual
+operators,LessThan,Menor que,Moins que,Menor que,LessThan
+operators,GreaterThan,Mayor que,Plus grand que,Maior que,БольшеТан
+operators,GreaterThanOrEqual,Mayor que o igual,Meilleur que ou égal,Maior ou igual a,GreaterThanOrEqual
+connectors,AND,Y,ET,E,И
+connectors,OR,O,OU,OU,ИЛИ
+connectors,NOT,NO,PAS,NÃO,НЕ
+samling_methods,Simple Random Sampling,Muestreo aleatorio simple,Échantillonnage aléatoire simple,Amostragem aleatória simples,Простая случайная выборка
+samling_methods,Cluster Sampling,Muestreo por conglomerados,Échantillonnage en grappes,Amostragem por conglomerados,Кластерная выборка
+samling_methods,Subsets: May Overlap,Subconjuntos: pueden superponerse,Sous-ensembles : peuvent se chevaucher,Subconjuntos: Podem sobrepor-se,Подмножества: Могут пересекаться
+samling_methods,Strata: Mutually Exclusive,Estratos: Mutuamente excluyentes,Strates : mutuellement exclusives,Estratos: Mutuamente exclusivos,Страты: Взаимоисключающие
+admin,Admin,Administrador,Administrateur,Administrador,Администратор
+supervisor,Supervisor,Supervisor,Superviseur,Supervisor,Руководитель
+enumerator,Enumerator,Enumerador,Recenseur,Enumerador,Перечислитель
+surveyor,Surveyor,Encuestador,Arpenteur,Topógrafo,Геодезист
+configurations,Configurations,Configuraciones,Configurations,Configuração,Конфигурации
+no_configurations,You don't have any configurations,No tiene ninguna configuración,Vous n'avez aucune configuration,Não tem nenhuma configuração,У вас нет конфигураций
+no_studies,You don't have any studies for this configuration,No tienes ningún estudio para esta configuración,Vous n'avez pas d'études pour cette configuration,Não existem estudos para esta configuração,У вас нет исследований для этой конфигурации
+data_collector,Data Collector,Recolector de datos,Collecteur de données,Coletor de dados,Сборщик данных
+scan_qr_code,Scan QR Code,Escanear código QR,Scanner le code QR,Ler código QR,Сканирование QR-кода
+continue_with_existing_study,Continue with existing Study,Continuar el estudio existente,Continuer avec l'étude existante,Continuar com o estudo existente,Продолжить существующее исследование
+admin_sign_in,Admin Sign In,Inicio de sesión de administrador,Connexion administrateur,Login do Administrador,Вход администратора
+supervisor_sign_in,Supervisor Sign In,​​Inicio de sesión de supervisor,Connexion du superviseur,Login do Supervisor,Администратор Войти
+data_collector_sign_in,Data Collector Sign In,Inicio de sesión de recolector de datos,Connexion du collecteur de données,Login do coletor de dados,Сборщик данных Войти
+admin_sign_up,Admin Sign Up,Registro de administrador,Inscription administrateur,Registo do administrador,Администратор Зарегистрироваться
+supervisor_sign_up,Supervisor Sign Up,Registro de supervisor,Inscription du superviseur,Registo do supervisor,Администратор Регистрация
+data_collector_sign_up,Data Collector Sign Up,Registro de recolector de datos,Inscription du collecteur de données,Registo do coletor de dados,Регистрация сборщика данных
+enter_your_pin,Enter your PIN,Ingrese su PIN,Saisissez votre code PIN,Digite seu PIN,Введите PIN-код
+reenter_your_pin,Re-enter your PIN,Vuelva a ingresar su PIN,Saisissez à nouveau votre code PIN,Digite novamente seu PIN,Повторный ввод PIN-кода
+back,Back,Atrás,Écran précédent,Voltar,Назад
+cancel,Cancel,Anular,Annuler,Cancelar,Отменить
+finish,Finish,Finalizar,Finir,Terminar,Завершить
+save,Save,Grabar,Sauvegarder,Guardar,Сохранить
+done,Done,Hecho,Fait,Concluído,Готово
+select_role,Select your Role,Selecciona su rol,Sélectionnez votre rôle,Seleccione a sua função,Выберите свою роль
+admin_select_role,Admin Select Role,Administrador - selecciona rol,Administrateur - Sélectionner un rôle,Administrador - Selecionar função,Администратор Выберите роль
+supervisor_select_role,Supervisor Select Role,Supervisor - selecciona rol,Superviseur - Sélectionner un rôle,Supervisor - Selecionar função,Супервайзер Выберите роль
+sign_in,Sign In,Iniciar sesión,S'identifier,Login,Войти
+sign_up,Sign Up,Registrarse,S'inscrire,Inscrever-se,Зарегистрироваться
+sign_out,Sign Out,Cerrar sesión,Se déconnecter,Sair,Зарегистрироваться
+not_registered,Not registered?  Sign Up!,¿No estás registrado? ¡Regístrate!,Non enregistré? S'inscrire!,Não está registado?  Registe-se!,Не зарегистрированы?  Зарегистрируйтесь!
+name,Name,Nombre,Nom,Nome,Имя
+enter_your_name,Enter your name,Ingrese su nombre,Entrez votre nom,Insira seu nome,Введите Ваше имя
+pin,PIN,PIN,PIN,PIN,PIN
+forgot_pin_question,Forgot PIN question,Se olvidó la pregunta del PIN,Question PIN oublié,Pergunta sobre o PIN esquecido,Вопрос о PIN-коде
+forgot_pin_answer,Forgot PIN answer,Se olvidó la respuesta del PIN,Réponse PIN oublié,Resposta ao PIN esquecido,Забыли ответ PIN
+enter_your_answer,Enter your answer,Ingrese su respuesta,Saisissez votre réponse,Insira sua resposta,Введите ответ
+create_config,Create Configuration,Crear configuración,Créer une configuration,Criar configuração,Создать конфигурацию
+delete_config,Delete Configuration,Eliminar configuración,Supprimer la configuration,Eliminar configuração,Удалить конфигурацию
+edit_config,Edit Configuration,Editar configuración,Modifier la configuration,Editar configuração,Редактировать конфигурацию
+create_study,Create Study,Crear estudio,Créer une étude,Criar estudo,Создать исследование
+edit_study,Edit Study,Modificar estudio,Modifier l'étude,Editar estudo,Редактировать исследование
+delete_study,Delete Study,Eliminar estudio,Supprimer l'étude,Eliminar estudo,Удалить исследование
+create_field,Create Field,Crear campo,Créer un champ,Criar campo,Создать поле
+config_name,Configuration Name,Nombre de la configuración,Nom de configuration,Nome da configuração,Имя конфигурации
+study_name,Study Name,Nombre del estudio,Nom de l'étude,Nome do estudo,Имя исследования
+field_name,Field Name,Nombre del campo,Nom du champ,Nome do campo,Имя поля
+enumeration_fields,Enumeration Fields,Campos de enumeración,Champs d'énumération,Campos de enumeração,Поля перечисления
+enter_config_name,Enter Configuration Name,Ingrese el nombre de la configuración,Entrez le nom de la configuration,Insirar nome da configuração,Введите имя конфигурации
+enter_study_name,Enter Study Name,Ingrese el nombre del estudio,Entrez le nom de l'étude,Insirar nome do estudo,Введите имя исследования
+enter_field_name,Enter Field Name,Ingrese el nombre del campo,Entrez le nom du champ,Insirar o nome do campo,Введите имя поля
+preferred_units,Preferred Units,Unidades preferidas,Unités préférées,Unidades preferidas,Предпочитаемые единицы
+date_format,Date Format,Formato de fecha,Format de date,Formato de data,Формат даты
+time_format,Time Format,Formato de hora,Format horaire,Formato da hora,Формат времени
+manage_enumerators,Manage Enumerators,Administrar enumeradores,Gérer les enquêteurs,Gerir enumeradores,Управление счетчиками
+collect_enumerations,Collect Enumerations,Recoger enumeraciones,Collecter les énumérations,Coletar enumerações,Сбор перечислений
+generate_sample,Generate Sample,Generar muestra,Générer un échantillon,Gerar amostra,Генерировать выборку
+collect_samples,Collect Samples,Recoger muestras,Recueillir des échantillons,Coletar amostras,Сбор образцов
+min_gps_precision,Desired GPS Precision,Precisión deseada de GPS,Précision GPS souhaitée,Precisão GPS pretendida,Желаемая точность GPS
+enter_min_gps_precision,Enter Desired GPS Precision,Ingrese la precisión deseada de GPS ,Entrez la précision GPS souhaitée,Insirar a precisão GPS pretendida,Введите желаемую точность GPS
+define_enumeration_fields,Define Enumeration Fields,Definir campos de enumeración,Définir les champs d'énumération,Definir campos de enumeração,Определить поля перечисления
+define_enumeration_area,Define Enumeration Area,Definir área de enumeración,Définir la zone de dénombrement,Definir área de enumeração,Определить область перечисления
+define_sampling_method,Define Sampling Method,Definir método de muestreo,Définir la méthode d'échantillonnage,Definir método de amostragem,Определить метод отбора проб
+studies,Studies,Estudios,Études,Estudos,Исследования
+enumeration_area,Enumeration Areas,Áreas de enumeración,Zones de dénombrement,Áreas de enumeração,Области перечисления
+barcode_result,Barcode detected,Código de barras detectado,Code-barres détecté,Código de barras detectado,Обнаружен штрих-код
+error_scanner_cancelled,Code scanner is cancelled.,El escáner del código fue anulado,Le scanner de code est annulé.,Scanner de código é cancelado.,Сканер кодов отменен.
+error_camera_permission_not_granted,Camera permission is not granted.,Permiso de cámara no otorgado,L'autorisation de caméra n'est pas accordée.,A permissão da câmara não é concedida.,Разрешение камеры не выдано.
+error_app_name_unavailable,App name is not set.,Nombre de la aplicación no fue establecido,Le nom de l'application n'est pas défini.,O nome da aplicação não está definido.,Не задано имя приложения.
+error_default_message,Failed to scan code:,Error en escanear el código:,Échec de la numérisation du code :,Falha na leitura do código:,Не удалось отсканировать код:
+menu_item_settings,Settings,Configuración,Paramètres,Configurações,Настройки
+change_role,Change Role,Cambiar rol,Changer de rôle,Alterar função,Изменить роль
+enter_your_user_name,Enter your User Name,Ingrese su nombre de usuario,Entrez votre nom d'utilisateur,Insirar o seu Nome de Utilizador,Введите имя пользователя
+field_type,Field Type,Tipo de campo,Type de champ,Tipo de campo,Тип поля
+enter_checkbox_text,Enter checkbox item text,Ingrese el texto del elemento de la casilla de chequeo,Saisir le texte de l'élément de la case à cocher,Insirar o texto do item da caixa de seleção,Введите текст элемента флажка
+enter_dropdown_item_text,Enter dropdown item text,Ingrese el texto del elemento del menú de opciones,Saisir le texte de l'élément déroulant,Insirar o texto do item da lista suspensa,Введите текст элемента выпадающего списка
+add_another,ADD ANOTHER,SUMA OTRO,AJOUTER UN AUTRE,ADICIONAR OUTRO,ДОБАВИТЬ ДРУГОЕ
+delete_field,Delete Field,Eliminar campo,Supprimer le champ,Eliminar campo,Удалить поле
+manage_this_study,Manage this Study,Administrar este estudio,Gérer cette étude,Gerir este estudo,Управление исследованием
+manage_study,Manage Study,Administrar estudio,Gérer l'étude,Gerir estudo,Управление исследованием
+manage_configuration,Manage Configuration,Administrar configuración,Gérer la configuration,Gerir a configuração,Управление конфигурацией
+manage_configurations,Manage Configurations,Administrar configuraciones,Gérer les configurations,Gerir configurações,Управление конфигурациями
+generate_qr_code,Generate QR Code,Generar código QR,Générer un code QR,Gerar código QR,Генерировать QR-код
+create_filter,Create Filter,Crear filtro,Créer un filtre,Criar filtro,Создать фильтр
+create_rule,Create Rule,Crear regla,Créer une règle,Criar regra,Создать правило
+enter_rule_name,Enter Rule Name,Ingrese el nombre de la regla,Entrez le nom de la règle,Insirar nome da regra,Введите имя правила
+field,Field,Campo,Champ,Campo,Поле
+operator,Operator,Operador,Opérateur de fonction,Operador,Оператор
+enter_value,Enter Value,Ingrese valor,Entrez la valeur,Insirar valor,Введите значение
+value,Value,Valor,Valeur,Valor,Значение
+filters,Filters,Filtros,Filtres,Filtros,Фильтры
+rule,Rule,Regla,Règle,Regra,Правило
+connector,Connector,Conector,Connecteur,Conector,Коннектор
+sampling_method,Sampling Method,Método de muestreo,Méthode d'échantillonnage,Método de amostragem,Метод выборки
+enter_filter_name,Enter Filter Name,Ingrese el nombre del filtro,Entrez le nom du filtre,Insirar nome do filtro,Введите имя фильтра
+sample_size,Sample Size,Tamaño de la muestra,Taille de l'échantillon,Tamanho da amostra,Размер выборки
+filter_name,Filter Name,Nombre del filtro,Nom du filtre,Nome do filtro,Имя фильтра
+rule_name,Rule Name,Nombre de la regla,Nom de la règle,Nome da regra,Имя правила
+total_sample_size,Total Sample Size Across All Clusters,Tamaño total de la muestra en todos los conglomerados,Taille totale de l'échantillon dans tous les clusters,Tamanho total da amostra em todos os conglomerados,Общий размер выборки по всем кластерам
+manage_studies,Manage Studies,Administrar estudios,Gérer les études,Gerir estudos,Управление исследованиями
+manage_samples,Manage Samples,Administrar muestras,Gérer les échantillons,Gerir amostras,Управление выборками
+create_sample,Create Sample,Crear muestra,Créer un échantillon,Criar amostra,Создать выборку
+delete_sample,Delete Sample,Eliminar muestra,Supprimer l'échantillon,Eliminar amostra,Удалить образец
+manage_supervisors,Manage Supervisors,Administrar supervisores,Gérer les superviseurs,Gerir supervisores,Управление супервизорами
+home,Home,Pantalla de inicio,Écran d'accueil,Início,Главная
+manage_enumeration_areas,Manage Enumeration Areas,Administrar áreas de enumeración,Gérer les zones de dénombrement,Gerir áreas de enumeração,Управление участками переписи

@@ -20,6 +20,7 @@ import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -192,42 +193,42 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         Log.d( "xxx FROMCONFIG", text )
 
                         val config = Config.unpack( text )
-                        var count = 0
+                        //var count = 0
                         config?.let { config ->
 
-                            for(enumAreaa in config.enumAreas)
-                            {
-                                for(location in enumAreaa.locations)
-                                {
-                                    for(enumItem in location.enumerationItems)
-                                    {
-                                        for(fieldData in enumItem.fieldDataList)
-                                        {
-                                            count += 1
-                                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-                                        }
-                                    }
-                                }
-                            }
-                            for(study in config.studies)
-                            {
-                                for(enumAreaa in study.sampleAreas)
-                                {
-                                    for(location in enumAreaa.locations)
-                                    {
-                                        for(enumItem in location.enumerationItems)
-                                        {
-                                            for(fieldData in enumItem.fieldDataList)
-                                            {
-                                                count += 1
-                                                Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+//                            for(enumAreaa in config.enumAreas)
+//                            {
+//                                for(location in enumAreaa.locations)
+//                                {
+//                                    for(item in location.items)
+//                                    {
+//                                        for(fieldData in enumItem.fieldDataList)
+//                                        {
+//                                            count += 1
+//                                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            for(study in config.studies)
+//                            {
+//                                for(enumAreaa in study.sampleAreas)
+//                                {
+//                                    for(location in enumAreaa.locations)
+//                                    {
+//                                        for(enumItem in location.enumerationItems)
+//                                        {
+//                                            for(fieldData in enumItem.fieldDataList)
+//                                            {
+//                                                count += 1
+//                                                Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
 
-                            Log.d("XXXXX", "THE COUNT $count")
+//                            Log.d("XXXXX", "THE COUNT $count")
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
@@ -241,22 +242,22 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                             if (user.role == Role.Enumerator.toString())
                             {
-                                sharedViewModel.setCurrentConfig(config)
-                                val team = DAO.teamDAO.getTeam( config.teamId )
-                                team?.let { _team ->
-                                    sharedViewModel.teamViewModel.setCurrentTeam( _team )
-                                    val study = DAO.studyDAO.getStudy( _team.studyId )
-                                    study?.let { _study ->
-                                        sharedViewModel.createStudyModel.setStudy( _study )
-                                        val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
-                                        enumArea?.let { _enumArea ->
-                                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
-                                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
-                                        }
-                                    }
-                                }
+//                                sharedViewModel.setCurrentConfig(config)
+//                                val team = DAO.teamDAO.getTeam( config.teamId )
+//                                team?.let { _team ->
+//                                    sharedViewModel.teamViewModel.setCurrentTeam( _team )
+//                                    val study = DAO.studyDAO.getStudy( _team.studyId )
+//                                    study?.let { _study ->
+//                                        sharedViewModel.createStudyModel.setStudy( _study )
+//                                        val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
+//                                        enumArea?.let { _enumArea ->
+//                                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
+//                                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+//                                        }
+//                                    }
+//                                }
                             }
-                        } ?: Toast.makeText(activity!!.applicationContext, "2Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 catch( ex: Exception )
@@ -279,6 +280,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             val saved = DAO.configDAO.createConfig(config)
             saved?.let { config ->
                 sharedViewModel.configurations.add(config)
+                sharedViewModel.setCurrentConfig( config)
                 manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
             }
 
@@ -291,24 +293,27 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         {
             if (user.role == Role.Enumerator.toString())
             {
-                Log.d("xxx", "WTF")
-                // runBlocking (Dispatchers.Main){
                 if(sharedViewModel.configurations.size > 0)
                 {
-                    val config = sharedViewModel.configurations[0]
-                    sharedViewModel.setCurrentConfig(config)
-                    val team = DAO.teamDAO.getTeam( config.teamId )
-                    team?.let { _team ->
-                        sharedViewModel.teamViewModel.setCurrentTeam( _team )
-                        val study = DAO.studyDAO.getStudy( _team.studyId )
-                        study?.let { _study ->
-                            sharedViewModel.createStudyModel.setStudy( _study )
-                            val enumArea = DAO.enumAreaDAO.getEnumArea( _team.enumAreaId )
-                            enumArea?.let { _enumArea ->
-                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
-                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                    sharedViewModel.currentConfiguration?.value?.let{config->
+                        config.enumAreas.map { _enumArea ->
+                            _enumArea.enumerationTeams.map{enumTeam->
+                                enumTeam.id?.let{id->
+                                    if (id == config.teamId)
+                                    {
+                                        DAO.teamDAO.getTeam( config.teamId )?.let{ team ->
+                                            DAO.studyDAO.getStudy( team.studyId )?.let{ study ->
+                                                sharedViewModel.createStudyModel.setStudy( study )
+                                                sharedViewModel.teamViewModel.setCurrentTeam( team )
+                                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
+
+                        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                     }
                 }
             }

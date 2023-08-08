@@ -9,14 +9,14 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Filter(
     var id : Int? = null,
-    var studyId : Int,
     var name: String,
     var samplingType : SampleType,
     var sampleSize: Int,
-    var filterRules : ArrayList<FilterRule>)
+    var rule : Rule?)
+    //var filterRules : ArrayList<FilterRule>)
 {
-    constructor(name: String) : this(null, -1, name, SampleType.None, 0, ArrayList<FilterRule>())
-    constructor(id: Int, studyId: Int, name: String, samplingType : SampleType, sampleSize: Int) : this(id, studyId, name, samplingType,sampleSize, ArrayList<FilterRule>())
+    constructor(name: String) : this(null, name, SampleType.None, 0, null)//, ArrayList<FilterRule>())
+    constructor(id: Int, name: String, samplingType : SampleType, sampleSize: Int) : this(id, name, samplingType, sampleSize, null) //, ArrayList<FilterRule>())
     fun pack() : String
     {
         return Json.encodeToString( this )

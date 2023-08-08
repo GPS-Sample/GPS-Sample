@@ -51,7 +51,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentCreateStudyBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -66,7 +65,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         createStudyAdapter.shouldAddField = this::shouldAddField
         createStudyAdapter.shouldAddRule = this::shouldAddRule
         createStudyAdapter.shouldAddFilter = this::shouldAddFilter
-
         createStudyAdapter.didDeleteField = this::didDeleteField
         createStudyAdapter.didDeleteRule = this::didDeleteRule
         createStudyAdapter.didDeleteFilter = this::didDeleteFilter
@@ -134,12 +132,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
             }else
             {
+
                 sharedViewModel.createRuleModel.createNewRule()
                 findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
             }
-
         }
-
     }
 
     private fun shouldAddFilter()
@@ -152,6 +149,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }else
             {
                 sharedViewModel.createFilterModel.createNewFilter()
+                sharedViewModel.createFilterModel.createFilterAdapter.updateRules(null)
                 findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
             }
         }
@@ -161,7 +159,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         val bundle = Bundle()
         sharedViewModel.createFieldModel.setSelectedField(field)
-
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
     }
 
@@ -178,7 +175,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         sharedViewModel.createFilterModel.setSelectedFilter(filter)
         findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }
-
 
     private fun didDeleteField( field: Field )
     {

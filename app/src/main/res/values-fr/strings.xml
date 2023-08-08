@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <string name="app_name">GPSSample</string>
+    <string name="action_settings">"Paramètres"</string>
+    <string name="action_sign_out">"Se déconnecter"</string>
+    <string name="next">"Écran suivant"</string>
+    <string name="previous">"Écran précédent"</string>
+    <string name="manager">"Directrice"</string>
+    <string name="client">"Énumération"</string>
+    <string name="connected_clients">"Clients connectés"</string>
+    <string name="create_hotspot">"Créer un hotspot"</string>
+    <string name="create_server">"Créer un serveur"</string>
+    <string name="create_qr_code">"Créer un code QR"</string>
+    <string name="connect_hotspot">"Se connecter au hotspot"</string>
+    <string name="registering_device">"Enregistrement de l'appareil"</string>
+    <string name="sending_command">"Envoi de la commande"</string>
+    <string name="sending_enum_data">"Envoi de données d'énumération"</string>
+    <string name="receiving_data">"Réception de données"</string>
+    <string name="configuration_received">"Configuration reçue"</string>
+    <string name="admin">"Administrateur"</string>
+    <string name="supervisor">"Superviseur"</string>
+    <string name="enumerator">"Recenseur"</string>
+    <string name="surveyor">"Arpenteur"</string>
+    <string name="configurations">"Configurations"</string>
+    <string name="no_configurations">"Vous n'avez aucune configuration"</string>
+    <string name="no_studies">"Vous n'avez pas d'études pour cette configuration"</string>
+    <string name="data_collector">"Collecteur de données"</string>
+    <string name="scan_qr_code">"Scanner le code QR"</string>
+    <string name="continue_with_existing_study">"Continuer avec l'étude existante"</string>
+    <string name="admin_sign_in">"Connexion administrateur"</string>
+    <string name="supervisor_sign_in">"Connexion du superviseur"</string>
+    <string name="data_collector_sign_in">"Connexion du collecteur de données"</string>
+    <string name="admin_sign_up">"Inscription administrateur"</string>
+    <string name="supervisor_sign_up">"Inscription du superviseur"</string>
+    <string name="data_collector_sign_up">"Inscription du collecteur de données"</string>
+    <string name="enter_your_pin">"Saisissez votre code PIN"</string>
+    <string name="reenter_your_pin">"Saisissez à nouveau votre code PIN"</string>
+    <string name="back">"Écran précédent"</string>
+    <string name="cancel">"Annuler"</string>
+    <string name="finish">"Finir"</string>
+    <string name="save">"Sauvegarder"</string>
+    <string name="done">"Fait"</string>
+    <string name="select_role">"Sélectionnez votre rôle"</string>
+    <string name="admin_select_role">"Administrateur - Sélectionner un rôle"</string>
+    <string name="supervisor_select_role">"Superviseur - Sélectionner un rôle"</string>
+    <string name="sign_in">"S'identifier"</string>
+    <string name="sign_up">"S'inscrire"</string>
+    <string name="sign_out">"Se déconnecter"</string>
+    <string name="not_registered">"Non enregistré? S'inscrire!"</string>
+    <string name="name">"Nom"</string>
+    <string name="enter_your_name">"Entrez votre nom"</string>
+    <string name="pin">"PIN"</string>
+    <string name="forgot_pin_question">"Question PIN oublié"</string>
+    <string name="forgot_pin_answer">"Réponse PIN oublié"</string>
+    <string name="enter_your_answer">"Saisissez votre réponse"</string>
+    <string name="create_config">"Créer une configuration"</string>
+    <string name="delete_config">"Supprimer la configuration"</string>
+    <string name="edit_config">"Modifier la configuration"</string>
+    <string name="create_study">"Créer une étude"</string>
+    <string name="edit_study">"Modifier l'étude"</string>
+    <string name="delete_study">"Supprimer l'étude"</string>
+    <string name="create_field">"Créer un champ"</string>
+    <string name="config_name">"Nom de configuration"</string>
+    <string name="study_name">"Nom de l'étude"</string>
+    <string name="field_name">"Nom du champ"</string>
+    <string name="enumeration_fields">"Champs d'énumération"</string>
+    <string name="enter_config_name">"Entrez le nom de la configuration"</string>
+    <string name="enter_study_name">"Entrez le nom de l'étude"</string>
+    <string name="enter_field_name">"Entrez le nom du champ"</string>
+    <string name="preferred_units">"Unités préférées"</string>
+    <string name="date_format">"Format de date"</string>
+    <string name="time_format">"Format horaire"</string>
+    <string name="manage_enumerators">"Gérer les enquêteurs"</string>
+    <string name="collect_enumerations">"Collecter les énumérations"</string>
+    <string name="generate_sample">"Générer un échantillon"</string>
+    <string name="collect_samples">"Recueillir des échantillons"</string>
+    <string name="min_gps_precision">"Précision GPS souhaitée"</string>
+    <string name="enter_min_gps_precision">"Entrez la précision GPS souhaitée"</string>
+    <string name="define_enumeration_fields">"Définir les champs d'énumération"</string>
+    <string name="define_enumeration_area">"Définir la zone de dénombrement"</string>
+    <string name="define_sampling_method">"Définir la méthode d'échantillonnage"</string>
+    <string name="studies">"Études"</string>
+    <string name="enumeration_area">"Zones de dénombrement"</string>
+    <string name="barcode_result">"Code-barres détecté"</string>
+    <string name="error_scanner_cancelled">"Le scanner de code est annulé."</string>
+    <string name="error_camera_permission_not_granted">"L'autorisation de caméra n'est pas accordée."</string>
+    <string name="error_app_name_unavailable">"Le nom de l'application n'est pas défini."</string>
+    <string name="error_default_message">"Échec de la numérisation du code :"</string>
+    <string name="menu_item_settings">"Paramètres"</string>
+    <string name="change_role">"Changer de rôle"</string>
+    <string name="enter_your_user_name">"Entrez votre nom d'utilisateur"</string>
+    <string name="field_type">"Type de champ"</string>
+    <string name="enter_checkbox_text">"Saisir le texte de l'élément de la case à cocher"</string>
+    <string name="enter_dropdown_item_text">"Saisir le texte de l'élément déroulant"</string>
+    <string name="add_another">"AJOUTER UN AUTRE"</string>
+    <string name="delete_field">"Supprimer le champ"</string>
+    <string name="manage_this_study">"Gérer cette étude"</string>
+    <string name="manage_study">"Gérer l'étude"</string>
+    <string name="manage_configuration">"Gérer la configuration"</string>
+    <string name="manage_configurations">"Gérer les configurations"</string>
+    <string name="generate_qr_code">"Générer un code QR"</string>
+    <string name="create_filter">"Créer un filtre"</string>
+    <string name="create_rule">"Créer une règle"</string>
+    <string name="enter_rule_name">"Entrez le nom de la règle"</string>
+    <string name="field">"Champ"</string>
+    <string name="operator">"Opérateur de fonction"</string>
+    <string name="enter_value">"Entrez la valeur"</string>
+    <string name="value">"Valeur"</string>
+    <string name="filters">"Filtres"</string>
+    <string name="rule">"Règle"</string>
+    <string name="connector">"Connecteur"</string>
+    <string name="sampling_method">"Méthode d'échantillonnage"</string>
+    <string name="enter_filter_name">"Entrez le nom du filtre"</string>
+    <string name="sample_size">"Taille de l'échantillon"</string>
+    <string name="filter_name">"Nom du filtre"</string>
+    <string name="rule_name">"Nom de la règle"</string>
+    <string name="total_sample_size">"Taille totale de l'échantillon dans tous les clusters"</string>
+    <string name="manage_studies">"Gérer les études"</string>
+    <string name="manage_samples">"Gérer les échantillons"</string>
+    <string name="create_sample">"Créer un échantillon"</string>
+    <string name="delete_sample">"Supprimer l'échantillon"</string>
+    <string name="manage_supervisors">"Gérer les superviseurs"</string>
+    <string name="home">"Écran d'accueil"</string>
+    <string name="manage_enumeration_areas">"Gérer les zones de dénombrement"</string>
+    <string-array name="forgot_pin_questions">
+        <item>"Deuxième prénom de votre père"</item>
+        <item>"Nom de jeune fille de la mère"</item>
+        <item>"Nom d'animal de compagnie préféré"</item>
+        <item>"4 derniers chiffres du numéro de téléphone portable"</item>
+        <item>"Nourriture favorite"</item>
+        <item>"Mois de naissance"</item>
+        <item>"Autre question"</item>
+    </string-array>
+    <string-array name="distance_formats">
+        <item>"Mètres / Kilomètres"</item>
+        <item>"Pieds / Miles"</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>"12 heures (AM/PM)"</item>
+        <item>"24 heures"</item>
+    </string-array>
+    <string-array name="field_types">
+        <item>"Texte"</item>
+        <item>"Nombre"</item>
+        <item>"Date"</item>
+        <item>"Case à cocher"</item>
+        <item>"Question déroulante"</item>
+    </string-array>
+    <string-array name="operators">
+        <item>"Égal"</item>
+        <item>"Inégal"</item>
+        <item>"Moins que"</item>
+        <item>"Plus grand que"</item>
+        <item>"Meilleur que ou égal"</item>
+    </string-array>
+    <string-array name="connectors">
+        <item>"ET"</item>
+        <item>"OU"</item>
+        <item>"PAS"</item>
+    </string-array>
+    <string-array name="samling_methods">
+        <item>"Échantillonnage aléatoire simple"</item>
+        <item>"Échantillonnage en grappes"</item>
+        <item>"Sous-ensembles : peuvent se chevaucher"</item>
+        <item>"Strates : mutuellement exclusives"</item>
+    </string-array>
+</resources>

@@ -3,11 +3,13 @@ package edu.gtri.gpssample.viewmodels.models
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.annotation.RequiresApi
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,6 +26,7 @@ import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkConnectionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,6 +93,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     val qrCodeHeight = 500.0f
     val qrCodeWidth = 500.0f
 
+    var sharedViewModel : ConfigurationViewModel? = null
+
     private val _qrCodeBitmap : MutableLiveData<Bitmap> = MutableLiveData()
     val qrCodeBitmap :LiveData<Bitmap> = _qrCodeBitmap
 
@@ -122,6 +127,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     {
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun startNetworking(networkInfo: NetworkInfo?) : Boolean
     {
         var status : NetworkStatus = NetworkStatus.None
@@ -220,10 +226,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     enumArea?.let { enumArea ->
                         for (location in enumArea.locations)
                         {
-                            DAO.locationDAO.importLocation( location )
+                            DAO.locationDAO.importLocation( location, enumArea )
                         }
-                        val ea = DAO.enumAreaDAO.getEnumArea(enumArea.id!!)
-                        Log.d( "xxx", ea.toString())
+                        // replace the enumArea from currentConfig with this one
+                        sharedViewModel?.replaceEnumArea(enumArea)
+
                     }
                 }
             }

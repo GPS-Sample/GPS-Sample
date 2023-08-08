@@ -3,6 +3,7 @@ package edu.gtri.gpssample.database.models
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SampleState
 import edu.gtri.gpssample.constants.SamplingState
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -11,28 +12,27 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @Serializable
+@SerialName("EnumerationItem")
 data class EnumerationItem(
-    var id : Int? = null,
+    override var id : Int? = null,
     var creationDate: Long,
     var uuid : String,
-    var locationId : Int,
-    var collectionItemId: Int,
     var subAddress : String,
-    var samplingState : SamplingState,
+
     var enumerationState : EnumerationState,
     var incompleteReason : String,
     var notes : String,
-    var fieldDataList : ArrayList<FieldData> )
+    var fieldDataList : ArrayList<FieldData> ) : GeoItem
 {
-    constructor( locationId: Int ) :
-            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1,
-                "", SamplingState.None, EnumerationState.Undefined, "", "",
+    constructor(  ) :
+            this(null,  Date().time, UUID.randomUUID().toString(),
+                "", EnumerationState.Undefined, "", "",
                 ArrayList<FieldData>())
 
-    constructor( locationId: Int, subAddress: String, samplingState: SamplingState,
+    constructor(id: Int, subAddress: String,
                  enumerationState: EnumerationState, incompleteReason: String, notes: String ) :
-            this( null, Date().time, UUID.randomUUID().toString(), locationId, -1,
-                subAddress, samplingState, enumerationState, incompleteReason, notes,
+            this( id,  Date().time, UUID.randomUUID().toString(),
+                subAddress, enumerationState, incompleteReason, notes,
                 ArrayList<FieldData>())
 
     fun pack() : String

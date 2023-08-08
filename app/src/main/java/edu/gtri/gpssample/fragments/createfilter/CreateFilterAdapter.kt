@@ -10,16 +10,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.FilterRule
+import edu.gtri.gpssample.database.models.Rule
 
-class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Adapter<CreateFilterAdapter.ViewHolder>()
+class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<CreateFilterAdapter.ViewHolder>()
 {
     override fun getItemCount() = filterRules!!.size
 
     private var context: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var shouldEditFilterRule: ((filterRule: FilterRule) -> Unit)
-    lateinit var shouldDeleteFilterRule: ((filterRule: FilterRule) -> Unit)
+    lateinit var shouldEditFilterRule: ((rule: Rule) -> Unit)
+    lateinit var shouldDeleteFilterRule: ((rule: Rule) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -33,11 +33,38 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
         return viewHolder
     }
 
-    fun updateFilterRules( filterRules: List<FilterRule> )
+    fun updateRules( rule: Rule? )
     {
-        this.filterRules = filterRules
+        var rulesArray = ArrayList<Rule>()
+        rule?.let{rule->
+            var looprRule : Rule? = rule
+
+            // we loop til we don't find a rule.
+            // maybe do this with recursion
+            while(true)
+            {
+                if(looprRule != null)
+                {
+                    if(!rulesArray.contains(looprRule))
+                    {
+                        rulesArray.add(looprRule)
+                    }
+                    val op = looprRule.filterOperator
+                    op?.let{ op ->
+                        looprRule = op.rule
+                    }?: run{ looprRule = null }
+                }else
+                {
+                    break
+                }
+
+            }
+        }
+
+        this.filterRules = rulesArray
         notifyDataSetChanged()
     }
+
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
@@ -49,23 +76,27 @@ class CreateFilterAdapter(var filterRules: List<FilterRule>?) : RecyclerView.Ada
     {
         holder.itemView.isSelected = false
 
-        val filterRule = filterRules!!.get(holder.adapterPosition)
-
-        val rule = DAO.ruleDAO.getRule( filterRule.ruleId )
+        val rule = filterRules!!.get(holder.adapterPosition)
 
         rule?.let { rule ->
-            if (position == 0)
+            if (position == 0 && rule.filterOperator == null)
             {
                 holder.titleTextView.text = rule.name
             }
             else
             {
-                holder.titleTextView.text = filterRule!!.connector.format + " " + rule.name
+                // TODO: use resource holder
+                rule.filterOperator?.let{operator->
+                    holder.titleTextView.text = rule.name + " " + operator.conenctor.format    //rule!!.connector.format + " " + rule.name
+                }?: run{
+                    holder.titleTextView.text = rule.name
+                }
+
             }
         }
 
         holder.deleteButton.setOnClickListener {
-            shouldDeleteFilterRule( filterRule )
+            shouldDeleteFilterRule( rule )
         }
     }
 }

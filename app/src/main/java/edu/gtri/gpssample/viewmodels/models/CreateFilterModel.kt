@@ -9,7 +9,7 @@ import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Filter
-import edu.gtri.gpssample.database.models.FilterRule
+//import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
@@ -40,7 +40,7 @@ class CreateFilterModel {
             }
         }
 
-    val createFilterAdapter = CreateFilterAdapter(listOf<FilterRule>())
+    val createFilterAdapter = CreateFilterAdapter(listOf<Rule>())
     fun createNewFilter()
     {
         val newFilter = Filter("" )
@@ -51,7 +51,7 @@ class CreateFilterModel {
     fun addFilter(study : Study)
     {
         currentFilter?.value?.let { filter ->
-            DAO.filterDAO.createOrUpdateFilter(filter)
+           // DAO.filterDAO.createOrUpdateFilter(filter)
             if (!study.filters.contains( filter ))
             {
                 study.filters.add(filter)
@@ -63,7 +63,7 @@ class CreateFilterModel {
     {
         _currentFilter = MutableLiveData(filter)
         currentFilter = _currentFilter
-        createFilterAdapter.updateFilterRules(filter.filterRules)
+        //createFilterAdapter.updateFilterRules(filter.rule)
 
     }
 

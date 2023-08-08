@@ -165,7 +165,7 @@ class ConfigurationViewModel : ViewModel()
     {
         val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 0 )
         _currentConfiguration = MutableLiveData(newConfig)
-        saveNewConfiguration()
+        //saveNewConfiguration()
     }
 
     fun saveNewConfiguration()
@@ -183,6 +183,10 @@ class ConfigurationViewModel : ViewModel()
         _currentConfiguration?.value?.let{configuration ->
             // write to database
             DAO.configDAO.updateConfig(configuration)
+            if(!configurations.contains(configuration))
+            {
+                configurations.add(configuration)
+            }
         }
     }
 
@@ -194,8 +198,6 @@ class ConfigurationViewModel : ViewModel()
         }?: run{
             _currentConfiguration = MutableLiveData(_actualConfig!!)
         }
-
-
     }
 
     fun deleteConfig(config : Config)
@@ -297,19 +299,38 @@ class ConfigurationViewModel : ViewModel()
     //endregion
 
     //region FilterRule
-    fun onFilterRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    fun onFirstRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         createStudyModel.currentStudy?.value?.let{study ->
-            createFilterRuleModel.onFilterRuleFieldSelected(study, position)
+            createFilterRuleModel.onFirstRuleFieldSelected(study, position)
         }
 
+    }
+
+    fun onSecondRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        createStudyModel.currentStudy?.value?.let{study ->
+            createFilterRuleModel.onSecondRuleFieldSelected(study, position)
+        }
+
+    }
+
+    fun createNewFilterRule()
+    {
+        createFilterModel.currentFilter?.value?.let { filter ->
+            createStudyModel.currentStudy?.value?.let{study ->
+                // we set the filter on the CreateFilterRuleModel
+                createFilterRuleModel.createNewFilterRule(filter, study)
+            }
+
+        }
     }
 
     fun addFilerRule()
     {
         createFilterModel.currentFilter?.value?.let{filter ->
             createFilterRuleModel.addFilterRule(filter)
-            createFilterModel.createFilterAdapter.updateFilterRules(filter.filterRules)
+//            createFilterModel.createFilterAdapter.updateFilterRules(filter.filterRules)
         }
     }
 
@@ -320,4 +341,15 @@ class ConfigurationViewModel : ViewModel()
         }
     }
 
+    fun replaceEnumArea(enumArea : EnumArea)
+    {
+        currentConfiguration?.value?.let{config ->
+            for(ea in config.enumAreas)
+            {
+
+            }
+            config.enumAreas.remove(enumArea)
+            config.enumAreas.add(enumArea)
+        }
+    }
 }

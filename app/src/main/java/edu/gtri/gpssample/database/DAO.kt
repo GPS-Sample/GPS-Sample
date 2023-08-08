@@ -105,14 +105,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     // i think we can just use one key here.  if a field is connected to a study and
                     // a rule is connected to a field
                     // this needs to be a foreign key
-                    COLUMN_STUDY_ID + " INTEGER" + "," +
                     COLUMN_FIELD_ID + " INTEGER" + "," +
                     COLUMN_RULE_NAME + " TEXT" + "," +
 
                     // TODO:  this should be a look up table
                     COLUMN_OPERATOR_ID + " INTEGER" + "," +
                     COLUMN_RULE_VALUE + " TEXT" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableRule)
@@ -179,15 +177,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_UUID + " TEXT" + "," +
+                    COLUMN_LOCATION_TYPE_ID + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                    COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
-                    COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
+
                     COLUMN_LOCATION_LATITUDE + " REAL" + "," +
                     COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
                     COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
+//                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
+//                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableLocation)
 
@@ -197,14 +195,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_UUID + " TEXT" + "," +
                     COLUMN_LOCATION_ID + " INTEGER" + "," +
-                    COLUMN_COLLECTION_ITEM_ID + " INTEGER" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SAMPLE_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
-                    "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_COLLECTION_ITEM_ID) REFERENCES $TABLE_COLLECTION_ITEM($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableEnumerationItem)
 
@@ -246,13 +242,41 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_LAT + " REAL" + "," +
-                    COLUMN_LON + " REAL" + "," +
-                    COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
-                    COLUMN_TEAM_ID + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" +
+                    COLUMN_LON + " REAL" +
                     ")")
             db.execSQL(createTableLatLon)
+
+            val createTableEnumAreaLatLon = ("CREATE TABLE " +
+                    TABLE_ENUM_AREA_LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_ENUM_AREA_ID + " INTEGER " + "," +
+                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableEnumAreaLatLon)
+
+            val createTableSampleAreaLatLon = ("CREATE TABLE " +
+                    TABLE_SAMPLE_AREA_LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_SAMPLE_AREA_ID + " INTEGER " + "," +
+                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
+                    "FOREIGN KEY($COLUMN_SAMPLE_AREA_ID) REFERENCES $TABLE_SAMPLE_AREA($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableSampleAreaLatLon)
+
+
+            val createTableTeamLatLon = ("CREATE TABLE " +
+                    TABLE_TEAM_LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_TEAM_ID + " INTEGER " + "," +
+                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
+                    "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableTeamLatLon)
+
         }catch(ex: Exception)
         {
             Log.d("xxxxxxxx", "the problem ${ex.toString()}")
@@ -280,6 +304,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_ITEM")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_ITEM")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA_LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA_LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_LAT_LON")
 
         onCreate(db)
     }
@@ -303,6 +331,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RULE_ID = "rule_id"
         const val COLUMN_FILTER_ID = "filter_id"
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
+        const val COLUMN_SAMPLE_AREA_ID = "sample_area_id"
         const val COLUMN_TEAM_ID = "team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
         const val COLUMN_LOCATION_ID = "location_id"
@@ -378,6 +407,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_ENUM_AREA = "enum_area"
         const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
 
+        const val TABLE_SAMPLE_AREA = "sample_area"
         // Team Table
         const val TABLE_TEAM = "team"
         const val COLUMN_TEAM_NAME = "team_name"
@@ -395,6 +425,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 //        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
 //        const val COLUMN_ENUMERATION_TEAM_ID = "enumeration_team_id"
 //        const val COLUMN_COLLECTION_TEAM_ID = "collection_team_id"
+        const val COLUMN_LOCATION_TYPE_ID = "location_type_id"
         const val COLUMN_LOCATION_LATITUDE = "location_latitude"
         const val COLUMN_LOCATION_LONGITUDE = "location_longitude"
         const val COLUMN_LOCATION_IS_LANDMARK = "location_is_landmark"
@@ -436,6 +467,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LAT = "lat"
         const val COLUMN_LON = "lon"
 
+        // connector tables for lat lon
+        const val TABLE_ENUM_AREA_LAT_LON = "enum_area_lat_lon"
+        const val TABLE_SAMPLE_AREA_LAT_LON = "sample_area_lat_lon"
+        const val TABLE_TEAM_LAT_LON = "team_lat_lon"
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -443,7 +478,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var fieldDAO: FieldDAO
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
-        lateinit var filterRuleDAO: FilterRuleDAO
+        //lateinit var filterRuleDAO: FilterRuleDAO
         lateinit var enumAreaDAO: EnumAreaDAO
         lateinit var teamDAO: TeamDAO
         lateinit var teamMemberDAO: TeamMemberDAO
@@ -494,6 +529,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_LOCATION, null, null)
                 db.delete(TABLE_ENUMERATION_ITEM, null, null)
                 db.delete(TABLE_COLLECTION_ITEM, null, null)
+                db.delete(TABLE_ENUM_AREA_LAT_LON, null, null)
+                db.delete(TABLE_SAMPLE_AREA_LAT_LON, null, null)
             }
         }
 
@@ -509,7 +546,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 fieldDAO = FieldDAO( instance!! )
                 ruleDAO = RuleDAO( instance!! )
                 filterDAO = FilterDAO( instance!! )
-                filterRuleDAO = FilterRuleDAO( instance!! )
+              //  filterRuleDAO = FilterRuleDAO( instance!! )
                 enumAreaDAO = EnumAreaDAO( instance!! )
                 teamDAO = TeamDAO( instance!! )
                 teamMemberDAO = TeamMemberDAO( instance!! )
@@ -523,7 +560,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 190
+        private const val DATABASE_VERSION = 219
 
     }
 }

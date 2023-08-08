@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.LocationTypeConverter
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
@@ -12,28 +13,36 @@ import edu.gtri.gpssample.extensions.toInt
 class LocationDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createOrUpdateLocation( location: Location) : Location?
+    fun createOrUpdateLocation( location: Location, enumArea : EnumArea) : Location?
     {
         if (exists( location ))
         {
-            updateLocation( location )
+            updateLocation( location, enumArea )
+            for (item in location.items)
+            {
+                val enumerationItem = item as? EnumerationItem
+                enumerationItem?.let { enumerationItem ->
+                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
+                }
+            }
         }
         else
         {
             val values = ContentValues()
-
-            putLocation( location, values )
+            putLocation( location, enumArea, values )
 
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
             location.id?.let { id ->
                 Log.d( "xxx", "new location id = ${id}")
-                for (enumerationItem in location.enumerationItems)
+                for (item in location.items)
                 {
-                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
+                    val enumerationItem = item as? EnumerationItem
+                    enumerationItem?.let { enumerationItem ->
+                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
 
-                    for (fieldData in enumerationItem.fieldDataList)
-                    {
-                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
+                        for (fieldData in enumerationItem.fieldDataList) {
+                            DAO.fieldDataDAO.createOrUpdateFieldData(fieldData, enumerationItem)
+                        }
                     }
                 }
             } ?: return null
@@ -43,7 +52,7 @@ class LocationDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun importLocation( location: Location ) : Location?
+    fun importLocation( location: Location, enumArea : EnumArea ) : Location?
     {
         val existingLocation = getLocation( location.uuid )
 
@@ -54,26 +63,26 @@ class LocationDAO(private var dao: DAO)
         val values = ContentValues()
 
         location.id = null
-        putLocation( location, values )
+        putLocation( location, enumArea,  values )
 
         location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
         location.id?.let { id ->
             Log.d( "xxx", "new location id = ${id}")
 
-            for (enumerationItem in location.enumerationItems)
+            for (item in location.items)
             {
-                enumerationItem.locationId = id
-
-                enumerationItem.fieldDataList?.let { fieldDataList ->
-                    for (fieldData in fieldDataList)
-                    {
+                val enumerationItem = item as EnumerationItem?
+                enumerationItem?.let{enumerationItem ->
+                    enumerationItem.fieldDataList?.let { fieldDataList ->
+                        for (fieldData in fieldDataList)
+                        {
 //                        fieldData.id = null
-                        fieldData.enumerationItemId = enumerationItem.id!!
-                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
-                    }
-                }
 
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
+                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                        }
+                    }
+                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                }
             }
         } ?: return null
 
@@ -91,21 +100,21 @@ class LocationDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun updateLocation( location: Location )
+    fun updateLocation( location: Location, enumArea: EnumArea )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(location.id!!.toString())
         val values = ContentValues()
 
-        putLocation( location, values )
+        putLocation( location, enumArea, values )
 
         db.update(DAO.TABLE_LOCATION, values, whereClause, args )
         db.close()
     }
 
     //--------------------------------------------------------------------------
-    fun putLocation( location: Location, values: ContentValues)
+    fun putLocation( location: Location, enumArea : EnumArea, values: ContentValues)
     {
         location.id?.let { id ->
             Log.d( "xxx", "existing Location id = ${id}")
@@ -114,9 +123,10 @@ class LocationDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
         values.put( DAO.COLUMN_UUID, location.uuid )
-        values.put( DAO.COLUMN_ENUM_AREA_ID, location.enumAreaId )
-        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, location.enumerationTeamId )
-        values.put( DAO.COLUMN_COLLECTION_TEAM_ID, location.collectionTeamId )
+        values.put( DAO.COLUMN_ENUM_AREA_ID, enumArea.id )
+        values.put( DAO.COLUMN_LOCATION_TYPE_ID, LocationTypeConverter.toIndex(location.type) )
+//        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, location.enumerationTeamId )
+//        values.put( DAO.COLUMN_COLLECTION_TEAM_ID, location.collectionTeamId )
         values.put( DAO.COLUMN_LOCATION_LATITUDE, location.latitude )
         values.put( DAO.COLUMN_LOCATION_LONGITUDE, location.longitude )
         values.put( DAO.COLUMN_LOCATION_IS_LANDMARK, location.isLandmark.toInt())
@@ -129,16 +139,14 @@ class LocationDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
-        val enumerationTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_ID))
-        val collectionTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_ID))
+        val locationTypeId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_TYPE_ID))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LONGITUDE))
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
 
-        val enumerationItems = ArrayList<EnumerationItem>()
+        val items = ArrayList<GeoItem>()
 
-        return Location( id, creationDate, uuid, enumAreaId, enumerationTeamId, collectionTeamId, latitude, longitude, isLandmark, enumerationItems )
+        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, items )
     }
 
     fun getLocation( uuid: String ) : Location?
@@ -161,25 +169,23 @@ class LocationDAO(private var dao: DAO)
         return location
     }
 
-    fun getLocations( enumArea: EnumArea ) : ArrayList<Location>
+    fun getLocations( geoArea: GeoArea ) : ArrayList<Location>
     {
         var locations = ArrayList<Location>()
         val db = dao.writableDatabase
 
-        enumArea.id?.let { id ->
+        geoArea.id?.let { id ->
             val query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
                 val location = createLocation( cursor )
-                location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+                location.items = DAO.enumerationItemDAO.getEnumerationItems( location )
                 locations.add( location )
             }
-
             cursor.close()
         }
-
         db.close()
 
         return locations
@@ -208,7 +214,7 @@ class LocationDAO(private var dao: DAO)
                 while (cursor.moveToNext())
                 {
                     val location = createLocation( cursor )
-                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+                   // location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
                     locations.add( location )
                 }
 
@@ -244,15 +250,15 @@ class LocationDAO(private var dao: DAO)
                 while (cursor.moveToNext())
                 {
                     val location = createLocation( cursor )
-                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-                    for (enumerationItem in location.enumerationItems)
-                    {
-                        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            locations.add( location )
-                            break
-                        }
-                    }
+//                    location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+//                    for (enumerationItem in location.enumerationItems)
+//                    {
+//                        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+//                        {
+//                            locations.add( location )
+//                            break
+//                        }
+//                    }
                 }
 
                 cursor.close()
@@ -275,7 +281,7 @@ class LocationDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val location = createLocation( cursor )
-            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+           // location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
 
@@ -298,7 +304,7 @@ class LocationDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             location = createLocation( cursor )
-            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+           // location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
         }
 
         cursor.close()
@@ -312,10 +318,10 @@ class LocationDAO(private var dao: DAO)
         location.id?.let { id ->
             Log.d( "xxx", "deleting location with ID $id" )
 
-            for (enumerationItem in location.enumerationItems)
-            {
-                DAO.enumerationItemDAO.delete( enumerationItem )
-            }
+//            for (enumerationItem in location.enumerationItems)
+//            {
+//                DAO.enumerationItemDAO.delete( enumerationItem )
+//            }
 
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"

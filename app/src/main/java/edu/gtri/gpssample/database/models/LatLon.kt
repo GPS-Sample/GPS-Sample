@@ -7,11 +7,9 @@ import kotlinx.serialization.Serializable
 data class LatLon (
     var id: Int?,
     var latitude: Double,
-    var longitude: Double,
-    var enumAreaId: Int,
-    var teamId: Int)
+    var longitude: Double)
 {
-    constructor( latitude: Double, longitude: Double ) : this( null, latitude, longitude, -1, -1 )
+    constructor( latitude: Double, longitude: Double ) : this( null, latitude, longitude)
 
     fun toLatLng() : LatLng
     {

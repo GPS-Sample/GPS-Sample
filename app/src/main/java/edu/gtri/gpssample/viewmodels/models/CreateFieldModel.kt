@@ -37,16 +37,14 @@ class CreateFieldModel
     }
     fun addField(study : Study)
     {
-        study.id?.let { id ->
-            currentField?.value?.let { field ->
-                field.studyId = id
-                DAO.fieldDAO.createOrUpdateField( field )
-                if(!study.fields.contains(field))
-                {
-                    study.fields.add(field)
-                }
+        currentField?.value?.let { field ->
+
+            if(!study.fields.contains(field))
+            {
+                study.fields.add(field)
             }
         }
+
     }
 
     fun setSelectedField(field : Field)

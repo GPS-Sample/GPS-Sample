@@ -40,7 +40,7 @@
             <LinearLayout
                 android:id="@+id/image_layout"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="@{viewModel.networkHotspotModel.qrCodeHeight, default=match_parent}"
                 app:layout_constraintTop_toBottomOf="@+id/qr_code_title">
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -54,7 +54,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="0dp"
                         />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>

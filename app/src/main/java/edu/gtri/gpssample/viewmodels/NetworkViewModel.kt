@@ -22,6 +22,7 @@ import edu.gtri.gpssample.viewmodels.models.NetworkModel
 import kotlinx.coroutines.*
 import java.util.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.database.models.Config
 
@@ -48,6 +49,8 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
             _currentFragment?.let {fragment ->
                 navController = fragment.findNavController()
                 Activity = fragment.activity
+                val vm : ConfigurationViewModel by fragment.activityViewModels()
+                networkHotspotModel.sharedViewModel =  vm
             }
         }
 
@@ -134,7 +137,13 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         if(complete)
         {
             runBlocking(Dispatchers.Main) {
-                navController?.navigate(networkHotspotModel.destination)
+                try {
+                    navController?.navigate(networkHotspotModel.destination)
+                }catch (ex : Exception)
+                {
+                    navController?.navigate(networkHotspotModel.destination)
+                }
+
             }
         }else
         {

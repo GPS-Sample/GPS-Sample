@@ -21,6 +21,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.models.*
+import java.lang.Integer.min
 import java.util.ArrayList
 
 class SamplingViewModel : ViewModel() {
@@ -28,8 +29,8 @@ class SamplingViewModel : ViewModel() {
     private var activity : Activity? = null
     private var _map : GoogleMap? =  null
     private var _currentStudy : MutableLiveData<Study>? = null
-    private var _currentEnumerationArea : MutableLiveData<EnumArea>? = null
-    private var _currentEnumItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
+    private var _currentSampleArea : MutableLiveData<SampleArea>? = null
+    private var _currentSampledItemsForSampling : ArrayList<SampledItem> = ArrayList()
 
 
     var config : Config? = null
@@ -53,15 +54,15 @@ class SamplingViewModel : ViewModel() {
            // _currentStudy?.postValue(value?.value)
         }
 
-    var currentEnumArea : LiveData<EnumArea>?
+    var currentSampleArea : LiveData<SampleArea>?
         get(){
-            return _currentEnumerationArea
+            return _currentSampleArea
         }
         set(value){
-            value?.let{enumArea ->
-                _currentEnumerationArea = MutableLiveData(enumArea.value)
+            value?.let{sampleArea ->
+                _currentSampleArea = MutableLiveData(sampleArea.value)
                 _currentStudy?.value?.let{study->
-                    enumArea.value?.let{ea->
+                    sampleArea.value?.let{ea->
                         study.sampleAreas.add(ea)
                     }
                 }
@@ -69,11 +70,16 @@ class SamplingViewModel : ViewModel() {
         }
 
 
-    fun addPolygon( enumArea: EnumArea, map: GoogleMap)
+    fun createSampleArea(fromEnumArea: EnumArea)
+    {
+        val sampleArea = SampleArea(fromEnumArea)
+        _currentSampleArea = MutableLiveData(sampleArea)
+    }
+    fun addPolygon( sampleArea: SampleArea, map: GoogleMap)
     {
         val points = ArrayList<LatLng>()
 
-        enumArea.vertices.map {
+        sampleArea.vertices.map {
             points.add( it.toLatLng())
         }
 
@@ -82,16 +88,17 @@ class SamplingViewModel : ViewModel() {
             .addAll( points )
 
         val polygon = map.addPolygon( polygonOptions )
-        polygon.tag = enumArea
+        polygon.tag = sampleArea
 
     }
-    fun getEnumAreaLocations()
+    fun getSampleAreaLocations()
     {
-        currentEnumArea?.value?.let { enumArea ->
-            enumArea.locations = DAO.locationDAO.getLocations(enumArea)
-        }
+        // TODO:  build sample locations from enum locations.  they're different
+//        currentSampleArea?.value?.let { sampleArea ->
+//            sampleArea.locations = DAO.locationDAO.getLocations(sampleArea)
+//        }
     }
-    fun setEnumAreasForMap(map: GoogleMap) : SamplingState
+    fun setSampleAreasForMap(map: GoogleMap) : SamplingState
     {
 
         var minLat = 999999.0
@@ -104,13 +111,13 @@ class SamplingViewModel : ViewModel() {
         map.clear()
         map.uiSettings.isScrollGesturesEnabled = true
 
-        currentEnumArea?.value?.let{ enumArea->
+        currentSampleArea?.value?.let{ sampleArea->
 
-            addPolygon( enumArea, map )
+            addPolygon( sampleArea, map )
             // maybe a faster way to build the bounding box?
-            for (i in 0 until enumArea.vertices.size)
+            for (i in 0 until sampleArea.vertices.size)
             {
-                val pos = enumArea.vertices[i].toLatLng()
+                val pos = sampleArea.vertices[i].toLatLng()
                 minLat =  if (pos.latitude < minLat) pos.latitude else  minLat
                 minLon =  if (pos.longitude < minLon) pos.longitude else  minLon
                 maxLat =  if (pos.latitude > maxLat) pos.latitude else  maxLat
@@ -120,7 +127,7 @@ class SamplingViewModel : ViewModel() {
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
 
 
-            for (location in enumArea.locations)
+            for (location in sampleArea.locations)
             {
                 if (location.isLandmark)
                 {
@@ -135,30 +142,33 @@ class SamplingViewModel : ViewModel() {
                 {
                     var icon : BitmapDescriptor? = null
                     currentStudy?.value?.let{study->
-                        for (enumItem in location.enumerationItems) {
+                        for (item in location.items) {
 
+                            val sampledItem = item as? SampledItem
                             // add item for sampling
+                            sampledItem?.let{sampledItem ->
+                                if(!_currentSampledItemsForSampling.contains(sampledItem))
+                                {
+                                    _currentSampledItemsForSampling.add(sampledItem)
+                                }
 
-                            if(!_currentEnumItemsForSampling.contains(enumItem))
-                            {
-                                _currentEnumItemsForSampling.add(enumItem)
+                                icon = when(sampledItem.samplingState)
+                                {
+                                    SamplingState.None       -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                                    SamplingState.NotSampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_grey)
+                                    SamplingState.Sampled    -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                                    SamplingState.Resampled  -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                                    SamplingState.Invalid    -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                                }
+                                map.addMarker(
+                                    MarkerOptions()
+                                        .position(LatLng(location.latitude, location.longitude))
+                                        .icon(icon)
+                                )
+
                             }
-
-                            icon = when(enumItem.samplingState)
-                            {
-                                SamplingState.None       -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-                                SamplingState.NotSampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_grey)
-                                SamplingState.Sampled    -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                                SamplingState.Resampled  -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                                SamplingState.Invalid    -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                            }
-                            map.addMarker(
-                                MarkerOptions()
-                                    .position(LatLng(location.latitude, location.longitude))
-                                    .icon(icon)
-                            )
-
                         }
+
                     }
 
                 }
@@ -170,7 +180,7 @@ class SamplingViewModel : ViewModel() {
     {
         fixEnumData()
         // reset list
-        val removeList : ArrayList<EnumerationItem> = ArrayList()
+        val validSamples : ArrayList<SampledItem> = ArrayList()
 
         currentStudy?.value?.let { study ->
 
@@ -178,61 +188,67 @@ class SamplingViewModel : ViewModel() {
             for(filter in study.filters)
             {
                 Log.d("XXXXXX", filter.name )
-                for(rule in filter.filterRules)
-                {
-
-                    Log.d("XXXX", "THE NAME  CONNECTOR ${rule.connector.format}")
-                }
+//                for(rule in filter.filterRules)
+//                {
+//
+//                    Log.d("XXXX", "THE NAME  CONNECTOR ${rule.connector.format}")
+//                }
 
             }
 
 
-            for(enumItem in _currentEnumItemsForSampling)
+            for(sampleItem in _currentSampledItemsForSampling)
             {
-                enumItem.samplingState = SamplingState.NotSampled
+                sampleItem.samplingState = SamplingState.NotSampled
                 // find and remove items that are not valid
-                if(enumItem.enumerationState == EnumerationState.Incomplete)
+                if(sampleItem.enumItem.enumerationState == EnumerationState.Enumerated)
                 {
-                    enumItem.samplingState = SamplingState.Invalid
-                    removeList.add(enumItem)
+                    validSamples.add(sampleItem)
                 }
-                if(enumItem.enumerationState == EnumerationState.Enumerated)
-                {
-                   // for(filter in )
-                        for(fieldData in enumItem.fieldDataList)
-                        {
-                           // Log.d("XXX", "field data name ${fieldData.name}  value ${fieldData.numberValue}")
 
-                            // fieldData.
-                        }
-                }
+                // TODO: run through rules and filters, etc..
+
+//                if(sampleItem.enumerationState == EnumerationState.Incomplete)
+//                {
+//                    enumItem.samplingState = SamplingState.Invalid
+//                    removeList.add(enumItem)
+//                }
+//                if(enumItem.enumerationState == EnumerationState.Enumerated)
+//                {
+//                   // for(filter in )
+//                        for(fieldData in enumItem.fieldDataList)
+//                        {
+//                           // Log.d("XXX", "field data name ${fieldData.name}  value ${fieldData.numberValue}")
+//
+//                            // fieldData.
+//                        }
+//                }
 
             }
 
             // remove invalid houses as part of sampling
-            _currentEnumItemsForSampling.removeAll(removeList.toSet())
+           // _currentEnumItemsForSampling.removeAll(removeList.toSet())
 
             // just do random sampling as a test
-            currentEnumArea?.value?.let { enumArea ->
+            currentSampleArea?.value?.let { sampleArea ->
                 val sampledIndices: ArrayList<Int> = ArrayList()
-                for (i in 0 until study.sampleSize) {
+                val sampleSize =  min(study.sampleSize,validSamples.size)
+                for (i in 0 until sampleSize) {
 
-                    var rnds = (0 until _currentEnumItemsForSampling.size).random()
+                    var rnds = (0 until validSamples.size).random()
                     while(sampledIndices.contains(rnds))
                     {
-                        rnds = (0 until _currentEnumItemsForSampling.size).random()
+                        rnds = (0 until validSamples.size).random()
                     }
                     sampledIndices.add(rnds)
-                    _currentEnumItemsForSampling[rnds]?.samplingState = SamplingState.Sampled
+                    validSamples[rnds]?.samplingState = SamplingState.Sampled
                 }
-
-
             }
 
         }
 
         _map?.let{map->
-            setEnumAreasForMap(map)
+            setSampleAreasForMap(map)
         }
         return SamplingState.None
     }
@@ -240,62 +256,62 @@ class SamplingViewModel : ViewModel() {
     fun fixEnumData()
     {
         currentStudy?.value?.let{study ->
-            for(enumItem in _currentEnumItemsForSampling)
+            for(sampleItem in _currentSampledItemsForSampling)
             {
-                enumItem.fieldDataList[0].name = study.fields[0].name
-                enumItem.fieldDataList[0].type = study.fields[0].type
-
-                enumItem.fieldDataList[1].name = study.fields[1].name
-                enumItem.fieldDataList[1].type = study.fields[1].type
+//                sampleItem.fieldDataList[0].name = study.fields[0].name
+//                sampleItem.fieldDataList[0].type = study.fields[0].type
+//
+//                sampleItem.fieldDataList[1].name = study.fields[1].name
+//                sampleItem.fieldDataList[1].type = study.fields[1].type
             }
 
             // CHECK
-            for(enumAreaa in study.sampleAreas)
-            {
-                for(location in enumAreaa.locations)
-                {
-                    for(enumItem in location.enumerationItems)
-                    {
-                        for(fieldData in enumItem.fieldDataList)
-                        {
-
-                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-                        }
-                    }
-                }
-            }
+//            for(enumAreaa in study.sampleAreas)
+//            {
+//                for(location in enumAreaa.locations)
+//                {
+//                    for(enumItem in location.enumerationItems)
+//                    {
+//                        for(fieldData in enumItem.fieldDataList)
+//                        {
+//
+//                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+//                        }
+//                    }
+//                }
+//            }
 
             Log.d("XXXXXXX", "---------------- enumAreas")
-            currentEnumArea?.value?.let{enumArea ->
-                for(location in enumArea.locations)
-                {
-                    for(enumItem in location.enumerationItems)
-                    {
-                        for(fieldData in enumItem.fieldDataList)
-                        {
-
-                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-                        }
-                    }
-                }
-            }
+//            currentEnumArea?.value?.let{enumArea ->
+//                for(location in enumArea.locations)
+//                {
+//                    for(enumItem in location.enumerationItems)
+//                    {
+//                        for(fieldData in enumItem.fieldDataList)
+//                        {
+//
+//                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
+//                        }
+//                    }
+//                }
+//            }
 
             Log.d("XXXXXXXXXXX", "------------------- Config enum areas")
-            config?.let{config->
-                for(enumAreaa in config.enumAreas) {
-                    for (location in enumAreaa.locations) {
-                        for (enumItem in location.enumerationItems) {
-                            for (fieldData in enumItem.fieldDataList) {
-                                Log.d(
-                                    "XXXXXX",
-                                    "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}"
-                                )
-                            }
-                        }
-                    }
-                }
-
-            }
+//            config?.let{config->
+//                for(enumAreaa in config.enumAreas) {
+//                    for (location in enumAreaa.locations) {
+//                        for (enumItem in location.enumerationItems) {
+//                            for (fieldData in enumItem.fieldDataList) {
+//                                Log.d(
+//                                    "XXXXXX",
+//                                    "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}"
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            }
         }
         Log.d("XXXXXXXXXXX", "-------------------------------")
     }

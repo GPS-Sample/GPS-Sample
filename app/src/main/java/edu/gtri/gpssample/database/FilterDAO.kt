@@ -8,7 +8,6 @@ import edu.gtri.gpssample.constants.Connector
 import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.models.Filter
-import edu.gtri.gpssample.database.models.FilterRule
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
@@ -16,23 +15,23 @@ import edu.gtri.gpssample.extensions.toBoolean
 class FilterDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createOrUpdateFilter( filter: Filter ) : Filter?
+    fun createOrUpdateFilter( filter: Filter, study : Study ) : Filter?
     {
         if (exists( filter ))
         {
-            updateFilter( filter )
+            updateFilter( filter, study )
         }
         else
         {
             val values = ContentValues()
 
-            putFilter( filter, values )
+            putFilter( filter,study, values )
             filter.id = dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values).toInt()
             filter.id?.let { id ->
-                for (filterRule in filter.filterRules)
+              //  for (filterRule in filter.filterRules)
                 {
-                    filterRule.filterId = id
-                    DAO.filterRuleDAO.createOrUpdateFilterRule(filterRule)
+//                    filterRule.filterId = id
+//                    DAO.filterRuleDAO.createOrUpdateFilterRule(filterRule)
                 }
             } ?: return null
         }
@@ -51,7 +50,7 @@ class FilterDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    private fun putFilter( filter: Filter, values: ContentValues )
+    private fun putFilter( filter: Filter, study: Study, values: ContentValues )
     {
         val index = SampleTypeConverter.toIndex(filter.samplingType)
 
@@ -60,21 +59,21 @@ class FilterDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
-        values.put( DAO.COLUMN_STUDY_ID, filter.studyId )
+        values.put( DAO.COLUMN_STUDY_ID, study.id )
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
         values.put( DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX, index )
     }
 
     //--------------------------------------------------------------------------
-    fun updateFilter( filter: Filter )
+    fun updateFilter( filter: Filter, study : Study )
     {
         val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(filter.id.toString())
         val values = ContentValues()
 
-        putFilter( filter, values )
+        putFilter( filter, study, values )
 
         db.update(DAO.TABLE_FILTER, values, whereClause, args )
         db.close()
@@ -82,16 +81,15 @@ class FilterDAO(private var dao: DAO)
 
     //--------------------------------------------------------------------------
     @SuppressLint("Range")
-    private fun  buildFilter(cursor: Cursor ): Filter
+    private fun  buildFilter(cursor: Cursor ): Filter?
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
 
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
 
-        return Filter( id, studyId, name, type, sampleSize )
+        return Filter( id, name, type, sampleSize )
     }
 
     fun getFilter(id : Int) : Filter?
@@ -104,7 +102,9 @@ class FilterDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             filter = buildFilter(cursor)
-            filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
+            filter?.let{filter->
+              //  filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
+            }
         }
 
         cursor.close()
@@ -123,8 +123,10 @@ class FilterDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val filter = buildFilter(cursor)
-            filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
-            filters.add( filter)
+            filter?.let{filter->
+                //filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
+                filters.add( filter)
+            }
         }
 
         cursor.close()
@@ -143,8 +145,10 @@ class FilterDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val filter = buildFilter(cursor)
-            filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
-            filters.add( filter)
+            filter?.let{filter->
+                //filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
+                filters.add( filter)
+            }
         }
 
         cursor.close()

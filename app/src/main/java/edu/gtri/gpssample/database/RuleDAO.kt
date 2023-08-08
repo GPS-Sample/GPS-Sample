@@ -45,18 +45,20 @@ class RuleDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     private fun putRule( rule: Rule, values: ContentValues )
     {
-        val operatorId = OperatorConverter.toIndex(rule.operator)
+       // val operatorId = OperatorConverter.toIndex(rule.operator)
 
         rule.id?.let { id ->
             Log.d( "xxx", "existing filter id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
 
-        values.put( DAO.COLUMN_STUDY_ID, rule.studyId )
-        values.put( DAO.COLUMN_FIELD_ID, rule.fieldId )
-        values.put( DAO.COLUMN_RULE_NAME, rule.name )
-        values.put( DAO.COLUMN_OPERATOR_ID, operatorId )
-        values.put( DAO.COLUMN_RULE_VALUE, rule.value )
+        rule.field?.let{field->
+            values.put( DAO.COLUMN_FIELD_ID, field.id )
+            values.put( DAO.COLUMN_RULE_NAME, rule.name )
+         //   values.put( DAO.COLUMN_OPERATOR_ID, operatorId )
+            values.put( DAO.COLUMN_RULE_VALUE, rule.value )
+        }
+
     }
 
     //--------------------------------------------------------------------------
@@ -74,11 +76,11 @@ class RuleDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun  buildRule(cursor: Cursor): Rule
+    private fun  buildRule(cursor: Cursor): Rule?
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val studyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val fieldId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
+        val field = DAO.fieldDAO.getField(fieldId)
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
 
         // TODO:  this should be a lookup table
@@ -86,8 +88,10 @@ class RuleDAO(private var dao: DAO)
         val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
 
         val operator = OperatorConverter.fromIndex(operatorId)
-
-        return Rule( id, studyId, fieldId, name, operator, value )
+        field?.let{rule->
+            return Rule( id, field, name, value, operator, null )
+        }
+        return null
     }
 
     fun getRule( id: Int ) : Rule?
@@ -117,7 +121,11 @@ class RuleDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            rules.add( buildRule( cursor ))
+            val rule = buildRule( cursor )
+            rule?.let{rule->
+                rules.add( rule)
+            }
+
         }
 
         cursor.close()
@@ -126,18 +134,21 @@ class RuleDAO(private var dao: DAO)
         return rules
     }
 
-    fun getRules( study: Study ) : ArrayList<Rule>
+    fun getRulesForField( field : Field) : ArrayList<Rule>
     {
         val rules = ArrayList<Rule>()
 
-        study.id?.let { id ->
+        field.id?.let { id ->
             val db = dao.writableDatabase
-            val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_STUDY_ID} = '${id}'"
+            val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_FIELD_ID} = '${id}'"
             val cursor = db.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
-                rules.add( buildRule( cursor ))
+                val rule = buildRule( cursor )
+                rule?.let{rule->
+                    rules.add( rule)
+                }
             }
 
             cursor.close()
@@ -146,6 +157,31 @@ class RuleDAO(private var dao: DAO)
 
         return rules
     }
+
+
+//    fun getRules( study: Study ) : ArrayList<Rule>
+//    {
+//        val rules = ArrayList<Rule>()
+//
+//        study.id?.let { id ->
+//            val db = dao.writableDatabase
+//            val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_STUDY_ID} = '${id}'"
+//            val cursor = db.rawQuery(query, null)
+//
+//            while (cursor.moveToNext())
+//            {
+//                val rule = buildRule( cursor )
+//                rule?.let{rule->
+//                    rules.add( rule)
+//                }
+//            }
+//
+//            cursor.close()
+//            db.close()
+//        }
+//
+//        return rules
+//    }
 
     //--------------------------------------------------------------------------
     fun deleteRule( rule: Rule )

@@ -21,17 +21,17 @@ data class Study(
     var fields : ArrayList<Field>,
     var rules : ArrayList<Rule>,
     var filters : ArrayList<Filter>,
-    var sampleAreas : ArrayList<EnumArea>
+    var sampleAreas : ArrayList<SampleArea>
     )
 {
     constructor(name: String, samplingMethod: SamplingMethod,
                 sampleSize: Int, sampleType: SampleType) : this(null, Date().time,
                 name, samplingMethod, sampleSize, sampleType,
-                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<EnumArea>())
+                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<SampleArea>())
     constructor(id: Int, creationDate: Long, name: String, samplingMethod: SamplingMethod,
                 sampleSize: Int, sampleType: SampleType) : this(id,
                 creationDate, name, samplingMethod, sampleSize, sampleType,
-                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<EnumArea>())
+                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<SampleArea>())
     fun pack() : String
     {
         return Json.encodeToString( this )
