@@ -23,6 +23,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.LocationType
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
@@ -317,8 +318,13 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         // figure out which enumArea contains each point
 
+        var count = 0
+
         for (point in points)
         {
+            Log.d( "xxx", "${count}/${points.size}")
+            count += 1
+
             for (enumArea in config.enumAreas)
             {
                 val points1 = ArrayList<Coordinate>()
@@ -334,11 +340,11 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 val geometry1 = geometryFactory.createPoint( coordinate )
                 if (geometry.contains( geometry1 ))
                 {
-//                    val location = Location( enumArea.id!!, point.coordinates.latitude, point.coordinates.longitude, false )
-//                    DAO.locationDAO.createOrUpdateLocation( location )
-//
-//                    enumArea.locations.add( location )
-//                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                    val location = Location( LocationType.Enumeration, point.coordinates.latitude, point.coordinates.longitude, false )
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+
+                    enumArea.locations.add( location )
+//                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
                     break // found! assuming that it can only exist in a single EA, for now!
                 }
             }
