@@ -116,7 +116,7 @@ class LatLonDAO(private var dao: DAO)
     {
         var latLons = ArrayList<LatLon>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
+        val query = "SELECT ll.* FROM ${DAO.TABLE_LAT_LON} as ll, ${DAO.TABLE_ENUM_AREA_LAT_LON} as ell WHERE ll.id=ell.${DAO.COLUMN_LAT_LON_ID} and ell.${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())

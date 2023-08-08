@@ -149,6 +149,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             }else
             {
                 sharedViewModel.createFilterModel.createNewFilter()
+                sharedViewModel.createFilterModel.createFilterAdapter.updateRules(null)
                 findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
             }
         }
