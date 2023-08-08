@@ -137,7 +137,13 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
         if(complete)
         {
             runBlocking(Dispatchers.Main) {
-                navController?.navigate(networkHotspotModel.destination)
+                try {
+                    navController?.navigate(networkHotspotModel.destination)
+                }catch (ex : Exception)
+                {
+                    navController?.navigate(networkHotspotModel.destination)
+                }
+
             }
         }else
         {
