@@ -111,6 +111,7 @@ class CreateFilterRuleModel {
             studyObservable.postValue(study)
         } ?: run { _currentStudy = MutableLiveData(study) }
 
+
         // this list needs to be a copy every time.
         ruleList = getRules()
 

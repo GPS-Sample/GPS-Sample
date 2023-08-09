@@ -63,7 +63,7 @@ class CreateFilterModel {
     {
         _currentFilter = MutableLiveData(filter)
         currentFilter = _currentFilter
-        //createFilterAdapter.updateFilterRules(filter.rule)
+        createFilterAdapter.updateRules(filter.rule)
 
     }
 
