@@ -30,6 +30,15 @@ data class Rule(
         return Json.encodeToString( this )
     }
 
+    fun copy() : Rule?
+    {
+        val _copy = unpack(pack())
+
+        _copy?.let { _copy ->
+            return _copy
+        }
+        return null
+    }
     override fun toString() : String
     {
         return this.name
