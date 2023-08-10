@@ -122,6 +122,7 @@
     <string name="manage_supervisors">"Управление супервизорами"</string>
     <string name="home">"Главная"</string>
     <string name="manage_enumeration_areas">"Управление участками переписи"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

@@ -106,7 +106,8 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
 
     fun shouldDeleteTeam( team: Team)
     {
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this team?", "No", "Yes", team, this)
+        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_team_message),
+            resources.getString(R.string.no), resources.getString(R.string.yes), team, this)
     }
 
     override fun didSelectLeftButton(tag: Any?)

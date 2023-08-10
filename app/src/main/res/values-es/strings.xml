@@ -122,6 +122,7 @@
     <string name="manage_supervisors">"Administrar supervisores"</string>
     <string name="home">"Pantalla de inicio"</string>
     <string name="manage_enumeration_areas">"Administrar áreas de enumeración"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

@@ -122,6 +122,7 @@
     <string name="manage_supervisors">"Gérer les superviseurs"</string>
     <string name="home">"Écran d'accueil"</string>
     <string name="manage_enumeration_areas">"Gérer les zones de dénombrement"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de la mère"</item>
