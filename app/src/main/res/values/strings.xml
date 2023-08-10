@@ -130,15 +130,15 @@
     <string name="delete_field_message">Are you sure you want to permanently delete this field?</string>
     <string name="delete_rule_message">Are you sure you want to permanently delete this rule?</string>
     <string name="delete_team_message">Are you sure you want to permanently delete this team?</string>
-    <string name="delete_configuration_message">Are you sure you want to permanently delete this configuration?"</string>
+    <string name="delete_configuration_message">Are you sure you want to permanently delete this configuration?</string>
     <string name="delete_household_message">Are you sure you want to permanently delete this household?</string>
     <string name="create_field_rule_message">You must create at least one field before you can create a rule</string>
     <string name="create_rule_filter_message">You must create at least one rule before you can create a filter</string>
-    <string name="select_import_method_message">"Select an import method</string>
+    <string name="select_import_method_message">Select an import method</string>
     <string name="select_export_message">Select an export method</string>
     <string name="clear_selections_message">Are you sure you want clear all selections?</string>
     <string name="team_name_message">You must enter a team name</string>
-    <string name="configuration_documents_message">"The configuration has been saved to the Documents directory.</string>
+    <string name="configuration_documents_message">The configuration has been saved to the Documents directory.</string>
     <string name="delete_enum_area_message">Are you sure you want to permanently delete Enumeration Area</string>
     <string name="no_study_ea">You do not have a study associated with this EA.</string>
     <string name="filename_export_message">Enter a file name for the export</string>
@@ -154,7 +154,7 @@
     <string name="desired_gps_position">Please enter the minimum desired GPS precision</string>
     <string name="import_configuration">Import Configuration</string>
     <string name="select_import_method">Select an import method</string>
-    <string name="select_configuration">Select a configuration"</string>
+    <string name="select_configuration">Select a configuration</string>
     <string name="export_enum_data">Export Enumeration Data</string>
     <string name="enum_saved_doc">"Enumeration data has been saved to the Documents directory.</string>
     <string name="config_saved_doc">The configuration has been saved to the Documents directory.</string>
