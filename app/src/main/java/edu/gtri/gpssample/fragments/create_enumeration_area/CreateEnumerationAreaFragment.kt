@@ -241,7 +241,9 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         map.setOnPolygonClickListener {polygon ->
             val ea = polygon.tag as EnumArea
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete Enumeration Area ${ea.name}?", "No", "Yes", polygon, this)
+            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                "${resources.getString(R.string.delete_enum_area_message)} ${ea.name}?",
+                resources.getString(R.string.no), resources.getString(R.string.yes), polygon, this)
         }
     }
 
@@ -281,7 +283,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 }
                 catch( ex: java.lang.Exception )
                 {
-                    Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -296,7 +298,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         featureCollection.forEach { feature ->
 
-            var name = "Undefined"
+            var name = resources.getString(R.string.undefined)
 
             feature.getStringProperty("ClusterL")?.let {
                 name = it

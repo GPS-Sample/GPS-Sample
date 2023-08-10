@@ -172,13 +172,6 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
         }
     }
 
-//    override fun didDismissSelectRuleDialog()
-//    {
-//       // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-//
-//      //  createFilterAdapter.updateFilterRules( filterRules )
-//    }
-
     override fun onDestroyView()
     {
         super.onDestroyView()

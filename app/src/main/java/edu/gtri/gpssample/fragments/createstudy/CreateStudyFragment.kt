@@ -205,7 +205,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         val name = binding.studyNameEditText.text.toString()
         if (name.length == 0)
         {
-            Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
             return
         }
         sharedViewModel.addStudy()

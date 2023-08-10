@@ -146,22 +146,12 @@ class PerformEnumerationFragment : Fragment(),
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
             } ?: kotlin.run {
-                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.location_not_found), Toast.LENGTH_SHORT).show()
             }
             addLocation = null
         }
 
         binding.addLandmarkButton.setOnClickListener {
-
-//            location?.let { location ->
-//                var enumData = EnumData(userId, enumAreaId, false, false, "", "", location.latitude, location.longitude)
-//                enumData.isLocation = true
-//                sharedViewModel.enumDataViewModel.setCurrentEnumData(enumData)
-//
-//                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-//            } ?: kotlin.run {
-//                Toast.makeText(activity!!.applicationContext, "Location not found", Toast.LENGTH_SHORT).show()
-//            }
 
             addLocation = null
         }
@@ -176,11 +166,15 @@ class PerformEnumerationFragment : Fragment(),
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
-                            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+                            ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
+                                resources.getString(R.string.select_import_method_message),
+                                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                         }
                         Role.Enumerator.toString() ->
                         {
-                            ConfirmationDialog( activity, "Export Enumeration Data", "Select an export method", "QR Code", "File System", kExportTag, this)
+                            ConfirmationDialog( activity, resources.getString(R.string.export_enum_data),
+                                resources.getString(R.string.select_import_method_message),
+                                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                         }
                     }
                 }
@@ -295,20 +289,6 @@ class PerformEnumerationFragment : Fragment(),
         addMapObjects()
     }
 
-    fun getCenter() : LatLng
-    {
-        var sumLat: Double = 0.0
-        var sumLon: Double = 0.0
-
-        for (latLon in enumArea.vertices)
-        {
-            sumLat += latLon.latitude
-            sumLon += latLon.longitude
-        }
-
-        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
-    }
-
     private fun didSelectLocation( location: Location )
     {
         sharedViewModel.locationViewModel.setCurrentLocation(location)
@@ -355,7 +335,7 @@ class PerformEnumerationFragment : Fragment(),
                     writer.flush()
                     writer.close()
 
-                    Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
                 }
             }
             else
@@ -381,7 +361,7 @@ class PerformEnumerationFragment : Fragment(),
                 writer.flush()
                 writer.close()
 
-                Toast.makeText(activity!!.applicationContext, "Enumeration data has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -496,7 +476,7 @@ class PerformEnumerationFragment : Fragment(),
                         writer.flush()
                         writer.close()
 
-                        Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
                     }
 
                     Role.Enumerator.toString() ->
@@ -511,7 +491,7 @@ class PerformEnumerationFragment : Fragment(),
                         writer.flush()
                         writer.close()
 
-                        Toast.makeText(activity!!.applicationContext, "Enumeration data has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
