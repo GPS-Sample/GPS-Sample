@@ -124,16 +124,24 @@
     <string name="manage_enumeration_areas">"Manage Enumeration Areas"</string>
 
     <string name="please_confirm">Please Confirm</string>
+    <string name="import_enumeration">Import Enumeration Data</string>
+    <string name="export_configuration">Export Configuration</string>
     <string name="delete_study_message">Are you sure you want to permanently delete this study?</string>
     <string name="delete_field_message">Are you sure you want to permanently delete this field?</string>
     <string name="delete_rule_message">Are you sure you want to permanently delete this rule?</string>
     <string name="delete_team_message">Are you sure you want to permanently delete this team?</string>
+    <string name="delete_configuration_message">Are you sure you want to permanently delete this configuration?"</string>
     <string name="delete_household_message">Are you sure you want to permanently delete this household?</string>
     <string name="create_field_rule_message">You must create at least one field before you can create a rule</string>
     <string name="create_rule_filter_message">You must create at least one rule before you can create a filter</string>
-
+    <string name="select_import_method_message">"Select an import method</string>
+    <string name="select_export_message">Select an export method</string>
+    <string name="clear_selections_message">Are you sure you want clear all selections?</string>
+    <string name="team_name_message">You must enter a team name</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="qr_code">QR Code</string>
+    <string name="file_system">File System</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

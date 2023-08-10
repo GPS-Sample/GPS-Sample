@@ -105,17 +105,20 @@ class ConfigurationFragment : Fragment(),
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", "No", "Yes", kDeleteTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_configuration_message),
+                resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            ConfirmationDialog( activity, "Import Enumeration Data", "Select an import method", "QR Code", "File System", kExportTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.import_enumeration), resources.getString(R.string.select_import_method_message),
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
         binding.exportButton.setOnClickListener {
-            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message),
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
