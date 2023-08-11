@@ -42,6 +42,7 @@ class ConfigurationViewModel : ViewModel()
     val locationViewModel : LocationViewModel = LocationViewModel()
     var teamViewModel : TeamViewModel = TeamViewModel()
     val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
+    val performEnumerationModel: PerformEnumerationModel = PerformEnumerationModel()
 
     // Exposed LiveData each screen being controlled by the view model
     val currentConfiguration : LiveData<Config>?

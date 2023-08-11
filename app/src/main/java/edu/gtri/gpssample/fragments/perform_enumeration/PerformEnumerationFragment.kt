@@ -1,10 +1,13 @@
 package edu.gtri.gpssample.fragments.perform_enumeration
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +15,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -50,12 +55,14 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
     private var userId = 0
-    //private var enumAreaId = 0
     private var dropMode = false
     private var addLocation: LatLng? = null
+    private var currentLocation: LatLng? = null
+    private var currentLocationMarker: Marker? = null
     private var _binding: FragmentPerformEnumerationBinding? = null
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private val binding get() = _binding!!
@@ -81,6 +88,13 @@ class PerformEnumerationFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+
+        if (currentZoomLevel == null)
+        {
+            sharedViewModel.performEnumerationModel.setCurrentZoomLevel( 14F )
+        }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
             enumArea = enum_area
@@ -108,6 +122,8 @@ class PerformEnumerationFragment : Fragment(),
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
 
         val defaultColorList = binding.dropPinButton.backgroundTintList
 
@@ -139,16 +155,25 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.addHouseholdButton.setOnClickListener {
 
-            addLocation?.let { location ->
-                val location = Location( LocationType.Enumeration, location.latitude, location.longitude, false)
+            var latLng: LatLng? = null
+
+            if (addLocation != null)
+            {
+                latLng = addLocation
+                addLocation = null
+            }
+            else if (currentLocation != null)
+            {
+                latLng = currentLocation
+            }
+
+            latLng?.let { latLng ->
+                val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
                 enumArea.locations.add(location)
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
 
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-            } ?: kotlin.run {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.location_not_found), Toast.LENGTH_SHORT).show()
             }
-            addLocation = null
         }
 
         binding.addLandmarkButton.setOnClickListener {
@@ -189,12 +214,8 @@ class PerformEnumerationFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
         performEnumerationAdapter.updateLocations( enumArea.locations )
-
-        if (this::map.isInitialized)
-        {
-            addMapObjects()
-        }
     }
+
     private fun addMapObjects()
     {
         map.clear()
@@ -215,8 +236,23 @@ class PerformEnumerationFragment : Fragment(),
 
             map.addPolygon(polygon)
         }
+
         val latLngBounds = GeoUtils.findGeobounds(team.polygon)
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0 ))
+
+        sharedViewModel.performEnumerationModel.currentZoomLevel?.value?.let { zoomLevel ->
+            map.moveCamera(CameraUpdateFactory.zoomTo(zoomLevel))
+            currentLocation?.let { latLng ->
+
+                currentLocationMarker?.let {
+                    it.remove()
+                }
+
+                val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_bubble)
+                currentLocationMarker = map.addMarker(MarkerOptions().position(latLng).icon(icon))
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel))
+            }
+        }
 
         for (location in enumArea.locations)
         {
@@ -287,6 +323,12 @@ class PerformEnumerationFragment : Fragment(),
         map = googleMap
 
         addMapObjects()
+
+        requestNewLocationData()
+
+        map.setOnCameraMoveListener {
+            sharedViewModel.performEnumerationModel.setCurrentZoomLevel(map.cameraPosition.zoom)
+        }
     }
 
     private fun didSelectLocation( location: Location )
@@ -364,13 +406,6 @@ class PerformEnumerationFragment : Fragment(),
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    override fun onDestroyView()
-    {
-        super.onDestroyView()
-
-        _binding = null
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -496,5 +531,66 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
         }
+    }
+
+    private fun requestNewLocationData()
+    {
+        if (ActivityCompat.checkSelfPermission(
+                activity!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                activity!!,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        Log.d( "xxx", "requested location updates" )
+
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,1000).build()
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+    }
+
+    private val locationCallback = object : LocationCallback()
+    {
+        override fun onLocationResult(locationResult: LocationResult)
+        {
+            locationResult.lastLocation?.let{ location ->
+                val location = LatLng(location.latitude, location.longitude)
+                sharedViewModel.performEnumerationModel.currentZoomLevel?.value?.let { zoomLevel ->
+                    currentLocationMarker?.let { currentLocationMarker ->
+                        currentLocationMarker.position = location
+                        if (currentLocation == null)
+                        {
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoomLevel))
+                        }
+                        else
+                        {
+                            map.moveCamera(CameraUpdateFactory.zoomTo(zoomLevel))
+                        }
+                    } ?: run {
+                        val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_bubble)
+                        currentLocationMarker = map.addMarker(MarkerOptions().position(location).icon(icon))
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoomLevel ))
+                    }
+
+                    Log.d( "xxx", "received location update" )
+
+                    currentLocation = location
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        fusedLocationClient.removeLocationUpdates( locationCallback )
+
+        Log.d( "xxx", "removed location updates" )
+
+        _binding = null
     }
 }
