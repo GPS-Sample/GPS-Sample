@@ -122,7 +122,45 @@
     <string name="manage_supervisors">"Управление супервизорами"</string>
     <string name="home">"Главная"</string>
     <string name="manage_enumeration_areas">"Управление участками переписи"</string>
-
+    <string name="please_confirm">"veuillez confirmer""</string>
+    <string name="import_enumeration">"Импорт данных перечисления"</string>
+    <string name="export_configuration">"Экспорт конфигурации"</string>
+    <string name="delete_study_message">""Вы уверены"</string>
+    <string name="delete_field_message">""Вы уверены"</string>
+    <string name="delete_rule_message">""Вы уверены"</string>
+    <string name="delete_team_message">""Вы уверены"</string>
+    <string name="delete_configuration_message">""Вы уверены"</string>
+    <string name="delete_household_message">""Вы уверены"</string>
+    <string name="create_field_rule_message">"Перед созданием правила необходимо создать хотя бы одно поле"</string>
+    <string name="create_rule_filter_message">"Перед созданием фильтра необходимо создать хотя бы одно правило"</string>
+    <string name="select_import_method_message">"Выберите метод импорта"</string>
+    <string name="select_export_message">"Выберите метод экспорта"</string>
+    <string name="clear_selections_message">""Вы уверены"</string>
+    <string name="team_name_message">"Необходимо ввести имя команды"</string>
+    <string name="configuration_documents_message">"Конфигурация была сохранена в директории Documents."</string>
+    <string name="delete_enum_area_message">""Вы уверены"</string>
+    <string name="no_study_ea">""У вас нет исследования"</string>
+    <string name="filename_export_message">"Введите имя файла для экспорта"</string>
+    <string name="import_failed">"tente novamente.""</string>
+    <string name="select_task">"Выберите задачу"</string>
+    <string name="yes">"Да"</string>
+    <string name="no">"Нет"</string>
+    <string name="qr_code">"QR-код"</string>
+    <string name="file_system">"Файловая система"</string>
+    <string name="survey">"Опрос"</string>
+    <string name="undefined">"Неопределенный"</string>
+    <string name="enter_name">""Por favor"</string>
+    <string name="desired_gps_position">""Por favor"</string>
+    <string name="import_configuration">"Конфигурация импорта"</string>
+    <string name="select_import_method">"Выберите метод импорта"</string>
+    <string name="select_configuration">"Выберите конфигурацию"</string>
+    <string name="export_enum_data">"Выберите конфигурацию"</string>
+    <string name="enum_saved_doc">"Экспорт данных переписи"</string>
+    <string name="config_saved_doc">"Данные переписи были сохранены в директории Documents."</string>
+    <string name="location_not_found">"Конфигурация была сохранена в каталог Documents."</string>
+    <string name="nobody_home">">Местонахождение не найдено"</string>
+    <string name="home_not_exist">"Дом не существует"</string>
+    <string name="reason_incomplete">""Oops! Por favor"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
