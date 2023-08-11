@@ -118,7 +118,9 @@ class PerformCollectionFragment : Fragment(),
         binding.exportButton.setOnClickListener {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                ConfirmationDialog( activity, "Export Enumeration Data", "Select an export method", "QR Code", "File System", kExportTag, this)
+                ConfirmationDialog( activity, resources.getString(R.string.enum_saved_doc),
+                    resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code),
+                    resources.getString(R.string.file_system), kExportTag, this)
 
                 //ExportDialog( activity, "${config.name}-${team.name}", "${enumArea.name}-${team.name}", this )
             }
@@ -299,7 +301,7 @@ class PerformCollectionFragment : Fragment(),
                     writer.flush()
                     writer.close()
 
-                    Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.location_not_found), Toast.LENGTH_SHORT).show()
                 }
             }
             else
@@ -325,7 +327,7 @@ class PerformCollectionFragment : Fragment(),
                 writer.flush()
                 writer.close()
 
-                Toast.makeText(activity!!.applicationContext, "Enumeration data has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -499,7 +501,7 @@ class PerformCollectionFragment : Fragment(),
             writer.flush()
             writer.close()
 
-            Toast.makeText(activity!!.applicationContext, "Enumeration data has been saved to the Documents directory.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
         }
     }
 }
