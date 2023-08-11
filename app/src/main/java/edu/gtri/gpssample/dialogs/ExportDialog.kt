@@ -62,7 +62,7 @@ class ExportDialog
 
             if (fileNameEditText.text.toString().length == 0)
             {
-                Toast.makeText(context!!.applicationContext, "You must enter a fileName", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context!!.applicationContext, context?.getString(R.string.enter_file_name), Toast.LENGTH_SHORT).show()
 
             }
             else

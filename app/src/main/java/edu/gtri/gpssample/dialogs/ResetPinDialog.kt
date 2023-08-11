@@ -57,12 +57,12 @@ class ResetPinDialog
                     }
                     else
                     {
-                        Toast.makeText( context, "Oops! The PIN's do not match.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText( context, context?.getString(R.string.pin_not_match), Toast.LENGTH_SHORT).show()
                     }
                 }
                 else
                 {
-                    Toast.makeText( context, "Oops! The current PIN is incorrect.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText( context, context?.getString(R.string.pin_incorrect), Toast.LENGTH_SHORT).show()
                 }
             }
         }

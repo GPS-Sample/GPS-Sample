@@ -85,7 +85,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Config not found.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -98,7 +98,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
 
-            startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
+            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
         }
 
         binding.createButton.setOnClickListener {
@@ -108,7 +108,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 if (vertexMarkers.size > 2)
                 {
                     createMode = false
-                    InputDialog( activity!!, "Enter the Enumeration Area name", "", null, this )
+                    InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this )
                     binding.createButton.setBackgroundResource( R.drawable.edit_blue )
                 }
             }

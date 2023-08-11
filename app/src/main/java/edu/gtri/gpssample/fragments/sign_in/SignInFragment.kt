@@ -53,11 +53,11 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
         if (!this::role.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: role.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.missing_parameter_rule), Toast.LENGTH_SHORT).show()
             return
         }
 
-        binding.titleTextView.text = role.toString() + " Sign In"
+        binding.titleTextView.text = role.toString() + resources.getString(R.string.sign_in)
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
         val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)
@@ -156,11 +156,11 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         user?.let {
             if (text == it.recoveryAnswer)
             {
-                NotificationDialog( activity!!, "Your PIN is:", it.pin.toString())
+                NotificationDialog( activity!!, resources.getString(R.string.your_pin_is), it.pin.toString())
             }
             else
             {
-                Toast.makeText(activity!!.applicationContext, "Oops! Incorrect answer.  Please try again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
             }
         }
     }

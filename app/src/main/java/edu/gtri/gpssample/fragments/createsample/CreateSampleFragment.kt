@@ -137,7 +137,9 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         map.setOnPolygonClickListener {polygon ->
             val ea = polygon.tag as EnumArea
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete Enumeration Area ${ea.name}?", "No", "Yes", polygon, this)
+            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                "${resources.getString(R.string.delete_enum_area_message)} ${ea.name}?",
+                resources.getString(R.string.no), resources.getString(R.string.yes), polygon, this)
         }
     }
 

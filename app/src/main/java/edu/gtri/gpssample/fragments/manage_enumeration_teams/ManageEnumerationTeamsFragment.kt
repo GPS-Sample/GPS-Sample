@@ -90,9 +90,11 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
     }
 
-    fun shouldDeleteTeam( team: Team)
+    private fun shouldDeleteTeam(team: Team)
     {
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this team?", "No", "Yes", team, this)
+        ConfirmationDialog( activity, resources.getString(R.string.delete_team_message),
+            resources.getString(R.string.delete_team_message), resources.getString(R.string.no),
+            resources.getString(R.string.yes), team, this)
     }
 
     override fun didSelectLeftButton(tag: Any?)

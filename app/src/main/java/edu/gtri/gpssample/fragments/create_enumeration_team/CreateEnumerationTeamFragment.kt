@@ -147,7 +147,9 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
 
         binding.clearSelectionsButton.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want clear all selections?", "No", "Yes", null, this)
+            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                resources.getString(R.string.clear_selections_message), resources.getString(R.string.no),
+                resources.getString(R.string.yes), null, this)
         }
 
         binding.cancelButton.setOnClickListener {
@@ -157,7 +159,7 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
         binding.saveButton.setOnClickListener {
             if (binding.teamNameEditText.text.toString().length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, "You must enter a team name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.team_name_message), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -184,18 +186,9 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
                                             location.latitude
                                         )
                                     )
-                                    if (it.contains(point)) {
-//                                    location.enumerationTeamId = teamId
-//                                    DAO.locationDAO.updateLocation( location )
-                                    }
                                 }
                             }
 
-                            // refresh the shared config
-//                        val config = DAO.configDAO.getConfig( enumArea.configId )
-//                        config?.let {
-//                            sharedViewModel.setCurrentConfig( it )
-//                        }
                         }
 
                         findNavController().popBackStack()
