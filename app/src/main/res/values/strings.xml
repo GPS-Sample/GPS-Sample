@@ -177,6 +177,10 @@
     <string name="pin_incorrect">"The current PIN is incorrect"</string>
     <string name="config_not_found">"Fatal! Configuration not found."</string>
     <string name="missing_parameter_rule">"Fatal! Missing required parameter: rule"</string>
+    <string name="ok">Ok</string>
+    <string name="wifi_disabled">WiFi disabled</string>
+    <string name="wifi_disabled_message">WiFi is disabled. Please make sure Wifi is turned on</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
