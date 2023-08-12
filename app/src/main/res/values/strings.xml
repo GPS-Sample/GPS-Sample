@@ -161,23 +161,22 @@
     <string name="nobody_home">">Location not found"</string>
     <string name="home_not_exist">"Home does not exist"</string>
     <string name="reason_incomplete">"Oops! Please select a reason for incomplete"</string>
-    <string name="enter_enum_area_name">Enter the Enumeration Area name</string>
-    <string name="select_enumeration">Select an Enumeration</string>
-    <string name="select_time">Select Time</string>
-    <string name="select_date">Select Date</string>
-    <string name="your_pin_is">Your PIN is:</string>
-    <string name="incorrect_answer_message">Oops! Incorrect answer.  Please try again.</string>
-    <string name="enter_other_question">Enter Other Question</string>
-    <string name="reenter_pin">Please re-enter the PIN</string>
-    <string name="enter_pin">Please enter a PIN</string>
-    <string name="other_question">Other Question</string>
-    <string name="enter_answer">Please enter an answer.</string>
-    <string name="pin_not_match">The PIN's do not match</string>
-    <string name="enter_file_name">You must enter a file name</string>
-    <string name="pin_incorrect">The current PIN is incorrect</string>
-    <string name="config_not_found">Fatal! Config not found.</string>
-    <string name="missing_parameter_rule">Fatal! Missing required parameter: role.</string>
-
+    <string name="enter_enum_area_name">"Enter the Enumeration Area name"</string>
+    <string name="select_enumeration">"Select an Enumeration Area"</string>
+    <string name="select_time">"Select Time"</string>
+    <string name="select_date">"Select Date"</string>
+    <string name="your_pin_is">"Your PIN is:"</string>
+    <string name="incorrect_answer_message">"Oops! Incorrect answer.  Please try again."</string>
+    <string name="enter_other_question">"Enter Other Question"</string>
+    <string name="reenter_pin">"Please re-enter the PIN"</string>
+    <string name="enter_pin">"Please enter a PIN"</string>
+    <string name="other_question">"Other Question"</string>
+    <string name="enter_answer">"Please enter an answer."</string>
+    <string name="pin_not_match">"The PIN's do not match"</string>
+    <string name="enter_file_name">"You must enter a file name"</string>
+    <string name="pin_incorrect">"The current PIN is incorrect"</string>
+    <string name="config_not_found">"Fatal! Configuration not found."</string>
+    <string name="missing_parameter_rule">"Fatal! Missing required parameter: rule"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

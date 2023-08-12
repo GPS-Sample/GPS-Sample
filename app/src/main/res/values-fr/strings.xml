@@ -161,6 +161,22 @@
     <string name="nobody_home">">La configuration a été sauvegardée dans le répertoire Documents."</string>
     <string name="home_not_exist">"Le domicile n'existe pas"</string>
     <string name="reason_incomplete">"seleccione una razón para incompleto""</string>
+    <string name="enter_enum_area_name">"Saisir le nom de la zone d'énumération"</string>
+    <string name="select_enumeration">"Sélectionner une zone d'énumération"</string>
+    <string name="select_time">"Sélectionner l'heure"</string>
+    <string name="select_date">"Sélectionnez la date"</string>
+    <string name="your_pin_is">"Votre code PIN est :"</string>
+    <string name="incorrect_answer_message">"inténtelo de nuevo.""</string>
+    <string name="enter_other_question">"Saisir une autre question"</string>
+    <string name="reenter_pin">"Veuillez saisir à nouveau le code PIN"</string>
+    <string name="enter_pin">"introduzca un PIN""</string>
+    <string name="other_question">"Autre question"</string>
+    <string name="enter_answer">"introduzca una respuesta.""</string>
+    <string name="pin_not_match">"Les codes PIN ne correspondent pas"</string>
+    <string name="enter_file_name">"Vous devez saisir un nom de fichier"</string>
+    <string name="pin_incorrect">"Le code PIN actuel est incorrect"</string>
+    <string name="config_not_found">"Erreur fatale ! La configuration n'a pas été trouvée."</string>
+    <string name="missing_parameter_rule">"Fatal ! Paramètre requis manquant : règle"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de la mère"</item>

@@ -161,6 +161,22 @@
     <string name="nobody_home">">Localización no encontrada"</string>
     <string name="home_not_exist">"La hogar no existe"</string>
     <string name="reason_incomplete">""¡Oops! Por favor"</string>
+    <string name="enter_enum_area_name">"Introduzca el nombre del área de enumeración"</string>
+    <string name="select_enumeration">"Seleccione un Área de Enumeración"</string>
+    <string name="select_time">"Seleccione la hora"</string>
+    <string name="select_date">"Seleccione la fecha"</string>
+    <string name="your_pin_is">"Su PIN es"</string>
+    <string name="incorrect_answer_message">""¡Uy! Respuesta incorrecta.  Por favor"</string>
+    <string name="enter_other_question">"Introduzca otra pregunta"</string>
+    <string name="reenter_pin">"Vuelva a introducir el PIN"</string>
+    <string name="enter_pin">""Por favor"</string>
+    <string name="other_question">"Otra pregunta"</string>
+    <string name="enter_answer">""Por favor"</string>
+    <string name="pin_not_match">"Los PIN no coinciden"</string>
+    <string name="enter_file_name">"Debe introducir un nombre de archivo"</string>
+    <string name="pin_incorrect">"El PIN actual es incorrecto"</string>
+    <string name="config_not_found">"Fallo Configuración no encontrada."</string>
+    <string name="missing_parameter_rule">"¡Fatal! Falta el parámetro requerido: regla"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

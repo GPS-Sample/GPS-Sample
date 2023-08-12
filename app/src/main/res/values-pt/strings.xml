@@ -161,6 +161,22 @@
     <string name="nobody_home">">Localização não encontrada"</string>
     <string name="home_not_exist">"O agregado familiar não existe"</string>
     <string name="reason_incomplete">"Oups ! Veuillez sélectionner une raison pour l'incomplétude"</string>
+    <string name="enter_enum_area_name">"Insira o nome da área de enumeração"</string>
+    <string name="select_enumeration">"Selecione uma área de enumeração"</string>
+    <string name="select_time">"Selecione a hora"</string>
+    <string name="select_date">"Selecione a data"</string>
+    <string name="your_pin_is">"O seu PIN é:"</string>
+    <string name="incorrect_answer_message">"Oups ! Réponse incorrecte.  Veuillez réessayer."</string>
+    <string name="enter_other_question">"Insira outra pergunta"</string>
+    <string name="reenter_pin">"Volte a insirar o PIN"</string>
+    <string name="enter_pin">"Veuillez saisir un code PIN"</string>
+    <string name="other_question">"Outra pergunta"</string>
+    <string name="enter_answer">"Veuillez saisir une réponse."</string>
+    <string name="pin_not_match">"Os PIN's não coincidem"</string>
+    <string name="enter_file_name">"Tem de insirar um nome de ficheiro"</string>
+    <string name="pin_incorrect">"O PIN atual está incorreto"</string>
+    <string name="config_not_found">"Fatal! Configuração não encontrada."</string>
+    <string name="missing_parameter_rule">"Fatal! Parâmetro obrigatório em falta: regra"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

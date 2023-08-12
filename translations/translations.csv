@@ -187,3 +187,19 @@ location_not_found,The configuration has been saved to the Documents directory.,
 nobody_home,>Location not found,>Localización no encontrada,>La configuration a été sauvegardée dans le répertoire Documents.,>Localização não encontrada,>Местонахождение не найдено
 home_not_exist,Home does not exist,La hogar no existe ,Le domicile n'existe pas,O agregado familiar não existe,Дом не существует
 reason_incomplete,Oops! Please select a reason for incomplete,"¡Oops! Por favor, seleccione una razón para incompleto",Oups ! Veuillez sélectionner une raison pour l'incomplétude,"Oops! Por favor, seleccione um razão para incompleto","Упс! Пожалуйста, выберите причину неполного заполнения"
+enter_enum_area_name,Enter the Enumeration Area name,Introduzca el nombre del área de enumeración,Saisir le nom de la zone d'énumération,Insira o nome da área de enumeração,Введите название области перечисления
+select_enumeration,Select an Enumeration Area,Seleccione un Área de Enumeración,Sélectionner une zone d'énumération,Selecione uma área de enumeração,Выберите область пересчета
+select_time,Select Time,Seleccione la hora,Sélectionner l'heure,Selecione a hora,Выберите время
+select_date,Select Date,Seleccione la fecha,Sélectionnez la date,Selecione a data,Выберите дату
+your_pin_is,Your PIN is:,Su PIN es,Votre code PIN est :,O seu PIN é:,Ваш PIN-код:
+incorrect_answer_message,Oops! Incorrect answer.  Please try again.,"¡Uy! Respuesta incorrecta.  Por favor, inténtelo de nuevo.",Oups ! Réponse incorrecte.  Veuillez réessayer.,"Oops! Resposta incorrecta.  Por favor, tente novamente.","Oops! Неправильный ответ.  Пожалуйста, попробуйте еще раз."
+enter_other_question,Enter Other Question,Introduzca otra pregunta,Saisir une autre question,Insira outra pergunta,Введите другой вопрос
+reenter_pin,Please re-enter the PIN,Vuelva a introducir el PIN,Veuillez saisir à nouveau le code PIN,Volte a insirar o PIN,"Пожалуйста, введите PIN-код повторно"
+enter_pin,Please enter a PIN,"Por favor, introduzca un PIN",Veuillez saisir un code PIN,"Por favor, insira um PIN","Пожалуйста, введите PIN-код"
+other_question,Other Question,Otra pregunta,Autre question,Outra pergunta,Другой вопрос
+enter_answer,Please enter an answer.,"Por favor, introduzca una respuesta.",Veuillez saisir une réponse.,"Por favor, insira uma resposta.","Пожалуйста, введите ответ."
+pin_not_match,The PIN's do not match,Los PIN no coinciden,Les codes PIN ne correspondent pas,Os PIN's não coincidem,PIN-коды не совпадают
+enter_file_name,You must enter a file name,Debe introducir un nombre de archivo,Vous devez saisir un nom de fichier,Tem de insirar um nome de ficheiro,Необходимо ввести имя файла
+pin_incorrect,The current PIN is incorrect,El PIN actual es incorrecto,Le code PIN actuel est incorrect,O PIN atual está incorreto,Текущий PIN-код неверен
+config_not_found,Fatal! Configuration not found.,Fallo Configuración no encontrada.,Erreur fatale ! La configuration n'a pas été trouvée.,Fatal! Configuração não encontrada.,Fatal! Конфигурация не найдена.
+missing_parameter_rule,Fatal! Missing required parameter: rule,¡Fatal! Falta el parámetro requerido: regla,Fatal ! Paramètre requis manquant : règle,Fatal! Parâmetro obrigatório em falta: regra,Fatal! Отсутствует необходимый параметр: правило
