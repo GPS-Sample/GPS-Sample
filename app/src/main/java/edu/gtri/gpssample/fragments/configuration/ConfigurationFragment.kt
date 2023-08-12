@@ -105,17 +105,20 @@ class ConfigurationFragment : Fragment(),
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this configuration?", "No", "Yes", kDeleteTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_configuration_message),
+                resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            ConfirmationDialog( activity, "Import Enumeration Data", "Select an import method", "QR Code", "File System", kExportTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.import_enumeration), resources.getString(R.string.select_import_method_message),
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
         binding.exportButton.setOnClickListener {
-            ConfirmationDialog( activity, "Export Configuration", "Select an export method", "QR Code", "File System", kExportTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message),
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -258,7 +261,7 @@ class ConfigurationFragment : Fragment(),
                     }
 
                     kExportTag -> {
-                        InputDialog( activity!!, "Enter a file name for the export", config.name, null, this@ConfigurationFragment )
+                        InputDialog( activity!!, resources.getString(R.string.filename_export_message), config.name, null, this@ConfigurationFragment )
                     }
 
                     kTaskTag -> {
@@ -273,8 +276,6 @@ class ConfigurationFragment : Fragment(),
     override fun didEnterText( name: String, tag: Any? )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            // this is a hack
-//            DAO.configDAO.updateAllLists( config )
 
             val packedConfig = config.pack()
             Log.d( "xxx", packedConfig )
@@ -286,7 +287,7 @@ class ConfigurationFragment : Fragment(),
             writer.flush()
             writer.close()
 
-            Toast.makeText(activity!!.applicationContext, "The configuration has been saved to the Documents directory.",
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.configuration_documents_message),
                 Toast.LENGTH_SHORT).show()
         }
     }
@@ -296,10 +297,11 @@ class ConfigurationFragment : Fragment(),
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
 
             sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-            ConfirmationDialog( activity, "Enumeration Area ${enumArea.name}", "Select a task",
-                        "Enumeration", "Survey", kTaskTag, this)
+            ConfirmationDialog( activity, "${resources.getString(R.string.define_enumeration_area)} ${enumArea.name}",
+                resources.getString(R.string.select_task),
+                        resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
         } ?: Toast.makeText(activity!!.applicationContext,
-                        "You do not have a study associated with this EA.", Toast.LENGTH_SHORT).show()
+                        resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -319,18 +321,6 @@ class ConfigurationFragment : Fragment(),
                     inputStream?.let {  inputStream ->
                         val text = inputStream.bufferedReader().readText()
 
-                        Log.d( "xxx", text )
-
-                        val enumArea = EnumArea.unpack( text )
-
-//                        enumArea?.let { enumArea ->
-//                            for (location in enumArea.locations)
-//                            {
-//                               // DAO.locationDAO.importLocation( location )
-//                            }
-//                        } ?: Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.",
-//                            Toast.LENGTH_SHORT).show()
-
                         map?.let { map ->
                             onMapReady(map)
                         }
@@ -338,7 +328,7 @@ class ConfigurationFragment : Fragment(),
                 }
                 catch( ex: java.lang.Exception )
                 {
-                    Toast.makeText(activity!!.applicationContext, "Oops! The import failed.  Please try again.",
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed),
                         Toast.LENGTH_SHORT).show()
                 }
             }

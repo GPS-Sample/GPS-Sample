@@ -128,7 +128,7 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
 
             if (binding.nameEditText.text.toString().length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
 
                 return@setOnClickListener
             }
@@ -156,7 +156,8 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
     fun shouldDeleteFilterRule( filterRule: Rule )
     {
         selectedFilterRule = filterRule
-        ConfirmationDialog( activity!!, "Please Confirm", "Are you sure you want to delete this Filter Rule?", "No", "Yes", 0, this )
+        ConfirmationDialog( activity!!, resources.getString(R.string.please_confirm),
+            "Are you sure you want to delete this Filter Rule?", "No", "Yes", 0, this )
     }
 
     override fun didSelectLeftButton(tag: Any?)
@@ -171,13 +172,6 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
             // createFilterAdapter.updateFilterRules( filterRules )
         }
     }
-
-//    override fun didDismissSelectRuleDialog()
-//    {
-//       // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
-//
-//      //  createFilterAdapter.updateFilterRules( filterRules )
-//    }
 
     override fun onDestroyView()
     {

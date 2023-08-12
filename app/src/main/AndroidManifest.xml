@@ -37,7 +37,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <service android:name=".services.UDPBroadcastReceiverService"/>
-
+        <service android:name=".services.NetworkMonitorService"/>
         <activity
             android:name=".activities.MainActivity"
             android:exported="true"

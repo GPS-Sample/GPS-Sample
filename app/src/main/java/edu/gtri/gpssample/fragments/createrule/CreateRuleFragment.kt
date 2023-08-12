@@ -132,7 +132,8 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         when (item.itemId) {
             R.id.action_delete ->
             {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?", "No", "Yes", 0, this)
+                ConfirmationDialog( activity,  resources.getString(R.string.please_confirm), resources.getString(R.string.delete_rule_message),
+                     resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
                 return true
             }
         }

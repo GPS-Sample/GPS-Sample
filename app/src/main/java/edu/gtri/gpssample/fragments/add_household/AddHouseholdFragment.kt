@@ -174,7 +174,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 //        }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this household?", "No", "Yes", 0, this)
+            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_household_message),
+                resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
         }
 
         binding.addPhotoImageView.setOnClickListener {

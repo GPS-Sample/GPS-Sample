@@ -80,11 +80,12 @@ class AdditionalInfoDialog
             {
                 if (nobodyHomeButton.isChecked)
                 {
-                    incompleteReason = "Nobody home"
+
+                    incompleteReason = context?.getString(R.string.nobody_home) ?: "Nobody Home"
                 }
                 else if (doesNotExistButton.isChecked)
                 {
-                    incompleteReason = "Home does not exist"
+                    incompleteReason =  context?.getString(R.string.home_not_exist) ?:"Home does not exist"
                 }
                 else if (otherButton.isChecked)
                 {
@@ -92,7 +93,8 @@ class AdditionalInfoDialog
                 }
                 else
                 {
-                    Toast.makeText(context!!.applicationContext, "Oops! Please select a reason for incomplete", Toast.LENGTH_SHORT).show()
+                    val incompleteString = context?.getString(R.string.reason_incomplete) ?: "Oops! Please select a reason for incomplete"
+                    Toast.makeText(context!!.applicationContext, incompleteString, Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
             }

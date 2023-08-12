@@ -51,11 +51,11 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
 
         if (!this::role.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "Fatal! Missing required parameter: role.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.missing_parameter_rule), Toast.LENGTH_SHORT).show()
             return
         }
 
-        binding.titleTextView.text = role.toString() + " Sign Up"
+        binding.titleTextView.text = role.toString() + " " + resources.getString(R.string.sign_up)
 
         ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
             .also { adapter ->
@@ -69,7 +69,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             {
                 if (position == 7)
                 {
-                    InputDialog( activity!!, "Enter Other Question", "", null, this@SignUpFragment )
+                    InputDialog( activity!!, resources.getString(R.string.enter_other_question), "", null, this@SignUpFragment )
                 }
             }
 
@@ -88,42 +88,42 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
 
             if (name.length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (pin1 == null)
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter a PIN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_pin), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (pin2 == null)
             {
-                Toast.makeText(activity!!.applicationContext, "Please re-enter the PIN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.reenter_pin), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (question == "Other Question")
+            if (question == resources.getString(R.string.other_question))
             {
                 question = binding.otherQuestionTextView.text.toString()
 
                 if (question.length == 0)
                 {
-                    InputDialog( activity!!, "Enter Other Question", "", null, this@SignUpFragment )
+                    InputDialog( activity!!, resources.getString(R.string.enter_other_question), "", null, this@SignUpFragment )
                     return@setOnClickListener
                 }
             }
 
             if (answer.length == 0)
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter an answer.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_answer), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (pin1 != pin2)
             {
-                Toast.makeText(activity!!.applicationContext, "The PIN's do not match", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.pin_not_match), Toast.LENGTH_SHORT).show()
             }
             else
             {

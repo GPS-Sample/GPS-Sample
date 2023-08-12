@@ -117,7 +117,7 @@ class AddHouseholdAdapter( var config: Config, var fieldData: List< FieldData>) 
         }
         else
         {
-            TimePickerDialog( context!!, "Select Time", date, field, fieldData, editText,this )
+            TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
         }
     }
 
@@ -210,11 +210,11 @@ class AddHouseholdAdapter( var config: Config, var fieldData: List< FieldData>) 
 
                     if (!field.date && field.time)
                     {
-                        TimePickerDialog( context!!, "Select Time", date, field, curFieldData, editText,this )
+                        TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, curFieldData, editText,this )
                     }
                     else
                     {
-                        DatePickerDialog( context!!, "Select Date", date, field, curFieldData, editText,this )
+                        DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, curFieldData, editText,this )
                     }
                 }
             }

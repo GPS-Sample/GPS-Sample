@@ -41,22 +41,17 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
 
             // we loop til we don't find a rule.
             // maybe do this with recursion
-            while(true)
+            while(looprRule != null)
             {
-                if(looprRule != null)
-                {
-                    if(!rulesArray.contains(looprRule))
-                    {
-                        rulesArray.add(looprRule)
-                    }
-                    val op = looprRule.filterOperator
-                    op?.let{ op ->
-                        looprRule = op.rule
-                    }?: run{ looprRule = null }
-                }else
-                {
-                    break
-                }
+                 if(!rulesArray.contains(looprRule))
+                 {
+                     rulesArray.add(looprRule)
+                 }
+                 val op = looprRule.filterOperator
+                 op?.let{ op ->
+                     looprRule = op.rule
+                 }?: run{ looprRule = null }
+
 
             }
         }

@@ -1,7 +1,11 @@
 package edu.gtri.gpssample.fragments.main
 
 import android.Manifest
+import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -22,15 +26,27 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
+import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
+import edu.gtri.gpssample.services.NetworkMonitorService.Companion.NETWORK_SERVICE_STATUS_KEY
+import edu.gtri.gpssample.utils.NetworkConnectionStatus
 
 class MainFragment : Fragment()
 {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
+    private lateinit var networkStatusBroadcastReceiver: NetworkStatusBroadcastReceiver
+    private lateinit var intentFilter : IntentFilter
+    private var  networkConnectionStatus: NetworkConnectionStatus = NetworkConnectionStatus.UNKNOWN_STATUS
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+//        networkStatusBroadcastReceiver = NetworkStatusBroadcastReceiver( ::updateConnectionStatus)
+//
+//        intentFilter = IntentFilter()
+//        intentFilter.addAction(NETWORK_SERVICE_STATUS_KEY)
+//        activity?.registerReceiver(networkStatusBroadcastReceiver, intentFilter)
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?

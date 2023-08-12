@@ -93,11 +93,12 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
 
         binding.expandableListView.setAdapter( createStudyAdapter )
-        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
+        binding.expandableListView.setChildDivider( getResources().getDrawable(R.color.clear))
 
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", DeleteMode.deleteStudyTag.value, this)
+            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString( R.string.delete_study_message ),
+                resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, this)
         }
 
         binding.saveButton.setOnClickListener {
@@ -129,7 +130,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.fields.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "You must create at least one field before you can create a rule", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
             }else
             {
 
@@ -145,7 +146,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.rules.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "You must create at least one rule before you can create a filter", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_rule_filter_message), Toast.LENGTH_SHORT).show()
             }else
             {
                 sharedViewModel.createFilterModel.createNewFilter()
@@ -179,13 +180,15 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     private fun didDeleteField( field: Field )
     {
         sharedViewModel.createFieldModel.setSelectedField(field)
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this field?", "No", "Yes", DeleteMode.deleteFieldTag.value, this)
+        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_field_message),
+            resources.getString(R.string.no), resources.getString(R.string.yes),DeleteMode.deleteFieldTag.value, this)
     }
 
     private fun didDeleteRule( rule: Rule )
     {
         sharedViewModel.deleteRule(rule)
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this rule?", "No", "Yes", DeleteMode.deleteRuleTag.value, this)
+        ConfirmationDialog( activity, resources.getString( R.string.please_confirm),  resources.getString(R.string.delete_rule_message),
+            resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteRuleTag.value, this)
     }
 
     private fun didDeleteFilter( filter: Filter )
@@ -202,7 +205,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         val name = binding.studyNameEditText.text.toString()
         if (name.length == 0)
         {
-            Toast.makeText(activity!!.applicationContext, "Please enter a name.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
             return
         }
         sharedViewModel.addStudy()

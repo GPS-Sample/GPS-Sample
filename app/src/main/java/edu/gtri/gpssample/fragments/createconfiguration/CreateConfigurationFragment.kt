@@ -81,13 +81,13 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
 
             if (binding.configNameEditText.text.toString().isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter a name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (binding.minGpsPrecisionEditText.text.toString().isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "Please enter the minimum desired GPS precision", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.desired_gps_position), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -139,7 +139,8 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     private fun shouldDeleteStudy(study: Study)
     {
         selectedStudy = study
-        ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this study?", "No", "Yes", 0, this)
+        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message),
+            resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
     }
 
     override fun onMapClick(p0: LatLng) {

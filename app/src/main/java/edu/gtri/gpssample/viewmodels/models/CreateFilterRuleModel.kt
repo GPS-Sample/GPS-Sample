@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.constants.Connector
 import edu.gtri.gpssample.constants.ConnectorConverter
@@ -14,13 +15,14 @@ import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
 import java.util.*
+import edu.gtri.gpssample.utils.FilterUtils
 
 class CreateFilterRuleModel {
 
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentRule : MutableLiveData<Rule>? = null
     private var _secondRule : MutableLiveData<Rule>? = null
-    private var currentConnector : Connector = Connector.None
+    private var currentConnector : Connector = Connector.NONE
 
     private var _currentFilter : MutableLiveData<Filter>? = null
 //    private var _currentFilterRule : MutableLiveData<FilterRule>? = null
@@ -36,6 +38,10 @@ class CreateFilterRuleModel {
    // private var secondRules = ArrayList<String>()
 
     //private var _stringRuleList : MutableLiveData<ArrayList>
+
+    var currentRule : LiveData<Rule>? = null
+            get() = _currentRule
+
     var createFilterAdapter : CreateFilterAdapter?
         get() = _createFilterAdapter
         set(value)
@@ -79,8 +85,8 @@ class CreateFilterRuleModel {
         }
 
 
-    val ruleList : Array<Rule>
-        get() = getRules()
+    private lateinit var ruleList : Array<Rule>
+       // get() = getRules()
 
 //    val secondRuleList : Array<Rule>
 //        get() = getSecondRules()
@@ -93,6 +99,7 @@ class CreateFilterRuleModel {
 
     fun createNewFilterRule(filter : Filter, study : Study)
     {
+
         _createFilterAdapter?.updateRules(null)
         _currentFilter?.let{ filterObservable->
             filterObservable.value = filter
@@ -105,16 +112,32 @@ class CreateFilterRuleModel {
         } ?: run { _currentStudy = MutableLiveData(study) }
 
 
+        // this list needs to be a copy every time.
+        ruleList = getRules()
+
         // set the current rule to the first one
         allRules.clear()
        // secondRules.clear()
-        _currentRule = MutableLiveData(ruleList[0])
-        if(ruleList.size > 1)
-        {
-            _secondRule = MutableLiveData(ruleList[1])
-            _secondRuleFieldPosition = MutableLiveData(1)
-        }
+        _currentFilter?.value?.let { filter ->
 
+            val rule = FilterUtils.findLastRule(filter)
+            rule?.let{rule ->
+
+                _currentRule = MutableLiveData(rule)
+                val index = ruleList.indexOf(rule)
+                setupSecondRuleList(index)
+
+            } ?: run{
+                _currentRule = MutableLiveData(ruleList[0])
+                _ruleFieldPosition = MutableLiveData(0)
+                if(ruleList.size > 1)
+                {
+                    _secondRule = MutableLiveData(ruleList[1])
+                    _secondRuleFieldPosition = MutableLiveData(1)
+                }
+            }
+            Log.d("xxxxxx", "ummmmmm")
+        }
         // build list of rules
         for (rule in ruleList)
         {
@@ -199,7 +222,7 @@ class CreateFilterRuleModel {
 
         _currentRule?.let{liveRule->
             liveRule.value = ruleList[position]
-            liveRule.postValue(study.rules[position])
+            liveRule.postValue(ruleList[position])
 
 
         } ?: run{
@@ -229,12 +252,15 @@ class CreateFilterRuleModel {
         _currentStudy?.value?.rules?.let { rules ->
             for (rule in rules)
             {
-                ruleList.add( rule )
+                val ruleCopy = rule.copy()
+                ruleCopy?.let{ruleCopy->
+                    ruleList.add( ruleCopy )
+                }
             }
         }
-
         return ruleList.toTypedArray()
     }
+
 
 //    private fun getSecondRules() : Array<Rule>
 //    {

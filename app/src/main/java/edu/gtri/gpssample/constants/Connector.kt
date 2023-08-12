@@ -1,8 +1,7 @@
 package edu.gtri.gpssample.constants
 
 enum class Connector(val format : String) {
-
-    None("none"),
+    NONE("NONE"),
     AND("AND"),
     OR("OR"),
     NOT("NOT"),
@@ -12,12 +11,12 @@ object ConnectorConverter
 {
 
     // array indicies start at zero and we want to exclude the NONE option
-    val array : Array<String> = Array(4) { i ->
+    val array : Array<String> = Array(3) { i ->
         when (i) {
-            0 -> Connector.None.format
-            1 -> Connector.AND.format
-            2 -> Connector.OR.format
-            3 -> Connector.NOT.format
+
+            0 -> Connector.AND.format
+            1 -> Connector.OR.format
+            2 -> Connector.NOT.format
             else -> String()
         }
     }
@@ -26,7 +25,6 @@ object ConnectorConverter
     {
         return when(conenctor)
         {
-            Connector.None -> 0
             Connector.AND -> 1
             Connector.OR -> 2
             Connector.NOT -> 3
@@ -37,12 +35,11 @@ object ConnectorConverter
     {
         return when(index)
         {
-            0 -> Connector.None
             1 -> Connector.AND
             2 -> Connector.OR
             3 -> Connector.NOT
 
-            else -> Connector.None
+            else -> Connector.NONE
         }
     }
 
@@ -50,11 +47,11 @@ object ConnectorConverter
     {
         return when(type)
         {
-            Connector.None.format -> Connector.None
+            Connector.NONE.format -> Connector.NONE
             Connector.AND.format -> Connector.AND
             Connector.OR.format ->  Connector.OR
             Connector.NOT.format -> Connector.NOT
-            else -> Connector.None
+            else -> Connector.NONE
         }
     }
 }
