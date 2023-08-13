@@ -61,6 +61,7 @@ class StudyDAO(private var dao: DAO)
             // add filters
             for(filter in study.filters)
             {
+                DAO.filterDAO.createOrUpdateFilter(filter, study)
                 // filter must have a filter rule
 //                if(filter.filterRules.size > 0)
 //                {

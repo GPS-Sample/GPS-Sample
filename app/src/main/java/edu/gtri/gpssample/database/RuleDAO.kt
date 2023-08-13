@@ -55,7 +55,10 @@ class RuleDAO(private var dao: DAO)
         rule.field?.let{field->
             values.put( DAO.COLUMN_FIELD_ID, field.id )
             values.put( DAO.COLUMN_RULE_NAME, rule.name )
-         //   values.put( DAO.COLUMN_OPERATOR_ID, operatorId )
+            rule.operator?.let{operator ->
+                values.put( DAO.COLUMN_OPERATOR_ID, OperatorConverter.toIndex(operator) )
+            }
+
             values.put( DAO.COLUMN_RULE_VALUE, rule.value )
         }
 
