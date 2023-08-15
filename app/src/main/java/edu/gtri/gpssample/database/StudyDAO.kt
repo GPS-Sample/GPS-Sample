@@ -58,6 +58,11 @@ class StudyDAO(private var dao: DAO)
                 DAO.ruleDAO.createOrUpdateRule( rule )
             }
 
+            for(rule in study.rules)
+            {
+                Log.d("XXXXXXX", "the id ${rule.id}")
+            }
+
             // add filters
             for(filter in study.filters)
             {

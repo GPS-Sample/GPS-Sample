@@ -101,7 +101,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableRule = ("CREATE TABLE " +
                     TABLE_RULE + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
-
+                    COLUMN_UUID + " TEXT" + "," +
                     // i think we can just use one key here.  if a field is connected to a study and
                     // a rule is connected to a field
                     // this needs to be a foreign key
@@ -111,6 +111,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     // TODO:  this should be a look up table
                     COLUMN_OPERATOR_ID + " INTEGER" + "," +
                     COLUMN_RULE_VALUE + " TEXT" + "," +
+                    COLUMN_FILTEROPERATOR_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_FILTEROPERATOR_ID) REFERENCES $TABLE_FILTEROPERATOR($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableRule)
@@ -401,9 +403,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Rule Table
         const val TABLE_RULE = "rule"
         const val COLUMN_RULE_NAME = "rule_name"
-
         const val COLUMN_RULE_VALUE = "rule_value"
-
+        const val COLUMN_FILTEROPERATOR_ID = "filter_operator_id"
         // Filter Table
         const val TABLE_FILTER = "filter"
         const val COLUMN_FILTER_NAME = "filter_name"
@@ -562,7 +563,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 220
+        private const val DATABASE_VERSION = 222
 
     }
 }

@@ -31,7 +31,7 @@ class FilterDAO(private var dao: DAO)
             filter.id?.let { id ->
             // now traverse the rule - filter operator chain
                 filter.rule?.let{rule ->
-                    traverseRuleChain(rule)
+                    traverseRuleChain(rule, study)
                 }
             } ?: return null
         }
@@ -39,12 +39,13 @@ class FilterDAO(private var dao: DAO)
         return filter
     }
 
-    fun traverseRuleChain(rule : Rule?)
+    fun traverseRuleChain(rule : Rule?, study : Study)
     {
         rule?.let{rule ->
             // By the time we get here the rule should have been saved in the database
             rule.id?.let{rule_id ->
                 rule.filterOperator?.let{filterOperator ->
+                    // find the id of the connector copy
                     val values = ContentValues()
                     putFilterOperator(filterOperator, values)
                     filterOperator.id?.let{id ->
@@ -59,8 +60,10 @@ class FilterDAO(private var dao: DAO)
                             null, values).toInt()
 
                     }
-                    traverseRuleChain(filterOperator.rule)
+                    traverseRuleChain(filterOperator.rule, study)
                 }
+            }?: run{
+                Log.d("xxxxxx", "NO ID")
             }
         }
     }
@@ -79,9 +82,14 @@ class FilterDAO(private var dao: DAO)
         filterOperator.id?.let{id->
             values.put(DAO.COLUMN_ID, id)
         }
-        values.put(DAO.COLUMN_OPERATOR_ID, ConnectorConverter.toIndex(filterOperator.conenctor))
+        values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.conenctor))
         filterOperator.rule?.id?.let{rule_id ->
             values.put(DAO.COLUMN_RULE_ID, rule_id)
+        }?: run{
+            filterOperator.rule?.let{rule ->
+                DAO.ruleDAO.createOrUpdateRule(rule)
+                values.put(DAO.COLUMN_RULE_ID, rule.id)
+            }
         }
     }
     //--------------------------------------------------------------------------
@@ -141,7 +149,6 @@ class FilterDAO(private var dao: DAO)
         // find rule in list of rules in study
         for(rule in study.rules)
         {
-
             if(rule.id == rule_id)
             {
                 filter.rule = rule

@@ -7,10 +7,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
 
 @Serializable
 data class Rule(
     var id : Int? = null,
+    var uuid : String,
     var field: Field?,
     var name: String,
     var value: String,
@@ -19,11 +21,13 @@ data class Rule(
     )
 {
     constructor( field: Field, name: String, value: String, operator: Operator)
-            : this(null, field, name, value, operator, null)
+            : this(null, UUID.randomUUID().toString(), field, name, value, operator, null)
 
     constructor( field: Field, name: String, value: String)
-            : this(null, field, name, value, null, null)
+            : this(null, UUID.randomUUID().toString(), field, name, value, null, null)
 
+    constructor(id : Int?, field: Field?, name: String, value: String, operator: Operator, filterOperator: FilterOperator?)
+            : this(id, UUID.randomUUID().toString(), field, name, value, operator, filterOperator)
 
     fun pack() : String
     {
