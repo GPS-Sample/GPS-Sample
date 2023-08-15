@@ -55,7 +55,12 @@ class RuleDAO(private var dao: DAO)
         rule.field?.let{field->
             values.put( DAO.COLUMN_FIELD_ID, field.id )
             values.put( DAO.COLUMN_RULE_NAME, rule.name )
-         //   values.put( DAO.COLUMN_OPERATOR_ID, operatorId )
+            rule.operator?.let{operator ->
+                values.put( DAO.COLUMN_OPERATOR_ID, OperatorConverter.toIndex(operator) )
+            }
+            rule.filterOperator?.id?.let{filterOperatorId ->
+                values.put(DAO.COLUMN_FILTEROPERATOR_ID, filterOperatorId)
+            }
             values.put( DAO.COLUMN_RULE_VALUE, rule.value )
         }
 
@@ -98,6 +103,23 @@ class RuleDAO(private var dao: DAO)
     {
         val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_ID} = ${id}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            return buildRule( cursor )
+        }
+
+        cursor.close()
+        db.close()
+
+        return null
+    }
+
+    fun getRuleByUUID(uuid : String) : Rule?
+    {
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = ${uuid}"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())

@@ -101,7 +101,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableRule = ("CREATE TABLE " +
                     TABLE_RULE + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
-
+                    COLUMN_UUID + " TEXT" + "," +
                     // i think we can just use one key here.  if a field is connected to a study and
                     // a rule is connected to a field
                     // this needs to be a foreign key
@@ -111,6 +111,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     // TODO:  this should be a look up table
                     COLUMN_OPERATOR_ID + " INTEGER" + "," +
                     COLUMN_RULE_VALUE + " TEXT" + "," +
+                    COLUMN_FILTEROPERATOR_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_FILTEROPERATOR_ID) REFERENCES $TABLE_FILTEROPERATOR($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableRule)
@@ -122,23 +124,34 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FILTER_NAME + " TEXT" + "," +
                     COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
                     COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    COLUMN_RULE_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableFilter)
 
-            // connector table
-            // this is a logic chain
-            val createTableFilterRule = ("CREATE TABLE " +
-                    TABLE_FILTERRULE + "(" +
-                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                    COLUMN_FILTER_ID + " INTEGER" + "," +
-                    COLUMN_RULE_ID + " INTEGER" + "," +
-                    COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
-                    COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
+            val createTableFilterOperator = ("CREATE TABLE " +
+                    TABLE_FILTEROPERATOR + " (" +
+                    COLUMN_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT " + "," +
+                    COLUMN_CONNECTOR +  " INTEGER NOT NULL" + "," +
+                    COLUMN_RULE_ID +  " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
                     ")")
-            db.execSQL(createTableFilterRule)
+            db.execSQL(createTableFilterOperator)
+
+            // connector table
+            // this is a logic chain
+//            val createTableFilterRule = ("CREATE TABLE " +
+//                    TABLE_FILTERRULE + "(" +
+//                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
+//                    COLUMN_FILTER_ID + " INTEGER" + "," +
+//                    COLUMN_RULE_ID + " INTEGER" + "," +
+//                    COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
+//                    COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
+//                    "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
+//                    "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
+//                    ")")
+//            db.execSQL(createTableFilterRule)
 
             val createTableEnumArea = ("CREATE TABLE " +
                     TABLE_ENUM_AREA + "(" +
@@ -296,6 +309,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTERRULE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTEROPERATOR")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_MEMBER")
@@ -389,9 +403,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Rule Table
         const val TABLE_RULE = "rule"
         const val COLUMN_RULE_NAME = "rule_name"
-
         const val COLUMN_RULE_VALUE = "rule_value"
-
+        const val COLUMN_FILTEROPERATOR_ID = "filter_operator_id"
         // Filter Table
         const val TABLE_FILTER = "filter"
         const val COLUMN_FILTER_NAME = "filter_name"
@@ -402,6 +415,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_FILTERRULE = "filterrule"
         const val COLUMN_FILTERRULE_ORDER = "filterrule_order"
         const val COLUMN_FILTERRULE_CONNECTOR_INDEX = "filterrule_connector_index"
+
+        // FilterOperator
+        const val TABLE_FILTEROPERATOR = "filteroperator"
+        const val COLUMN_CONNECTOR = "connector"
+
 
         // EnumArea Table
         const val TABLE_ENUM_AREA = "enum_area"
@@ -419,12 +437,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // Location Table
         const val TABLE_LOCATION = "location"
-//        const val COLUMN_ID = "id"
-//        const val COLUMN_CREATION_DATE = "creation_date"
-//        const val COLUMN_UUID = "uuid"
-//        const val COLUMN_ENUM_AREA_ID = "enum_area_id"
-//        const val COLUMN_ENUMERATION_TEAM_ID = "enumeration_team_id"
-//        const val COLUMN_COLLECTION_TEAM_ID = "collection_team_id"
         const val COLUMN_LOCATION_TYPE_ID = "location_type_id"
         const val COLUMN_LOCATION_LATITUDE = "location_latitude"
         const val COLUMN_LOCATION_LONGITUDE = "location_longitude"
@@ -432,11 +444,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // EnumerationItem Table
         const val TABLE_ENUMERATION_ITEM = "enumeration_item"
-//        const val COLUMN_ID = "id"
-//        const val COLUMN_CREATION_DATE = "creation_date"
-//        const val COLUMN_UUID = "uuid"
-//        const val COLUMN_LOCATION_ID = "location_id"
-//        const val COLUMN_COLLECTION_ITEM_ID = "collection_item_id"
         const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
         const val COLUMN_ENUMERATION_ITEM_SAMPLE_STATE = "enumeration_item_sample_state"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE = "enumeration_item_enumeration_state"
@@ -445,10 +452,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // CollectionItem Table
         const val TABLE_COLLECTION_ITEM = "collection_item"
-//        const val COLUMN_ID = "id"
-//        const val COLUMN_CREATION_DATE = "creation_date"
-//        const val COLUMN_UUID = "uuid"
-//        const val COLUMN_ENUMERATION_ITEM_ID = "enumeration_item_id"
         const val COLUMN_COLLECTION_ITEM_STATE = "collection_item_state"
         const val COLUMN_COLLECTION_ITEM_INCOMPLETE_REASON = "collection_item_incomplete_reason"
         const val COLUMN_COLLECTION_ITEM_NOTES = "collection_item_notes"
@@ -560,7 +563,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 219
+        private const val DATABASE_VERSION = 222
 
     }
 }
