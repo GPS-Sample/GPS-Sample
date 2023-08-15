@@ -115,8 +115,8 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
             }
         }
 
-        val networkServiceIntent = Intent( this, NetworkMonitorService::class.java)
-        ContextCompat.startForegroundService(this, networkServiceIntent)
+//        val networkServiceIntent = Intent( this, NetworkMonitorService::class.java)
+//        ContextCompat.startForegroundService(this, networkServiceIntent)
         val networkMonitorIntent = Intent(this, NetworkMonitorService::class.java)
         this.bindService( networkMonitorIntent, networkMonitorConnection, Context.BIND_AUTO_CREATE)
 

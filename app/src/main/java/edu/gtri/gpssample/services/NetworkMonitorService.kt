@@ -54,7 +54,8 @@ class NetworkMonitorService : Service()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 try {
-                    if (ConnectionStatus.hasChanged && !ConnectionStatus.isConnected) {
+                    if ((ConnectionStatus.hasChanged && !ConnectionStatus.isConnected ) )
+                    {
                         netStatus = NetworkConnectionStatus.WIFI_NOT_AVAILABLE
 
                     }else if(ConnectionStatus.hasChanged && ConnectionStatus.isConnected)
@@ -114,6 +115,9 @@ class NetworkMonitorService : Service()
                 } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
                     return true
                 }
+            }else
+            {
+                return true
             }
         }
         return false
