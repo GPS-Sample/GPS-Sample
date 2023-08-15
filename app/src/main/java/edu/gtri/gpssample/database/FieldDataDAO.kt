@@ -26,7 +26,7 @@ class FieldDataDAO(private var dao: DAO)
             Log.d("XXXXX", "the field name ${fieldData.name}")
             val values = ContentValues()
 
-            putFieldData( fieldData, values )
+            putFieldData( fieldData, values, enumerationItem )
 
             fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
             fieldData.id?.let { id ->
@@ -38,10 +38,14 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun putFieldData(fieldData: FieldData, values: ContentValues)
+    fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)
     {
         fieldData.id?.let {
             values.put( DAO.COLUMN_ID, it )
+        }
+
+        enumerationItem?.id?.let {
+            values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, it )
         }
 
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
@@ -101,7 +105,7 @@ class FieldDataDAO(private var dao: DAO)
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
 
-            putFieldData( fieldData, values )
+            putFieldData( fieldData, values, null )
 
             db.update(DAO.TABLE_FIELD_DATA, values, whereClause, args )
             db.close()
