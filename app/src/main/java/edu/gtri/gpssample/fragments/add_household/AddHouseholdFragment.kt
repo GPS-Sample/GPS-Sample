@@ -32,11 +32,9 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var createMode = false
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
     private val OPEN_DOCUMENT_CODE = 2
-    private val fieldDataMap = HashMap<Int, FieldData>()
 
     private lateinit var study: Study
     private lateinit var config: Config
@@ -55,11 +53,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (createMode)
-                {
-                    enumArea.locations.remove(location)
-                    //DAO.locationDAO.delete( location )
-                }
                 findNavController().popBackStack()
             }
         })
@@ -75,8 +68,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onViewCreated(view, savedInstanceState)
 
-
-        Log.d("XXXXXXXX", "IN ADD HOUSEHOLD?")
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
         }
@@ -92,7 +83,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
             enumArea = it
         }
-        createMode = true
+
         // create an enumeration item
         if(location.items.isEmpty())
         {
@@ -107,39 +98,15 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-
-        // THIS IS STUPID
-//        if (location.id == null)
-//        {
-
-
-//            sharedViewModel.teamViewModel.currentTeam?.value?.let { team ->
-//            //    location.enumerationTeamId = team.id!!
-//            }
-
-
-            //DAO.locationDAO.createOrUpdateLocation(location)
-   //     }
-
-//        location.id?.let { locationId ->
-//            if (location.enumerationItems.isEmpty())
-//            {
-//                enumerationItem = EnumerationItem( locationId )
-//                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem )
-//                location.enumerationItems.add( enumerationItem )
-//            }
-//            else
-//            {
-//                enumerationItem = location.enumerationItems[0]
-//            }
-//        }
-
         // create enum data for every field
-        for (field in study.fields)
+        if (enumerationItem.fieldDataList.isEmpty())
         {
-            val fieldData = FieldData(field) //DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumerationItem.id!!)
-            enumerationItem.fieldDataList.add(fieldData)
+            for (field in study.fields)
+            {
+                val fieldData = FieldData(field) //DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumerationItem.id!!)
+                enumerationItem.fieldDataList.add(fieldData)
 
+            }
         }
 
         if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
@@ -186,10 +153,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.cancelButton.setOnClickListener {
-            if (createMode)
-            {
-                DAO.locationDAO.delete( location )
-            }
             findNavController().popBackStack()
         }
 
@@ -210,7 +173,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectRightButton(tag: Any?)
     {
-        DAO.locationDAO.delete( location )
         findNavController().popBackStack()
     }
 
@@ -222,74 +184,65 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         if (incompleteReason.isNotEmpty())
         {
-            for (key in fieldDataMap.keys) {
-                fieldDataMap[key]?.let { fieldData ->
-                    DAO.fieldDataDAO.updateFieldData( fieldData )
-                }
+            for (fieldData in enumerationItem.fieldDataList)
+            {
+                DAO.fieldDataDAO.updateFieldData( fieldData )
             }
 
             enumerationItem.enumerationState = EnumerationState.Incomplete
             enumerationItem.notes = notes
             enumerationItem.incompleteReason = incompleteReason
-//            DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
         }
         else
         {
-//            for (key in fieldDataMap.keys)
-//            {
-//                fieldDataMap[key]?.let {fieldData ->
-//                    val field = DAO.fieldDAO.getField( fieldData.fieldId )
-//
-//                    field?.let {
-//                        if (field.required)
-//                        {
-//                            when (field.type)
-//                            {
-//                                FieldType.Text -> {
-//                                    if (fieldData.textValue.isEmpty()) {
-//                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
-//                                        return
-//                                    }
-//                                }
-//                                FieldType.Number -> {
-//                                    if (fieldData.numberValue == null) {
-//                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
-//                                        return
-//                                    }
-//                                }
-//                                FieldType.Date -> {
-//                                    if (fieldData.dateValue == null) {
-//                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
-//                                        return
-//                                    }
-//                                }
-//                                FieldType.Checkbox -> {
-//                                    val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
-//                                    if (!selection) {
-//                                        Toast.makeText(activity!!.applicationContext, "Oops! ${field.name} field is required", Toast.LENGTH_SHORT).show()
-//                                        return
-//                                    }
-//                                }
-//                                else -> {
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    //DAO.fieldDataDAO.updateFieldData( fieldData )
-//                }
-//            }
+            for (fieldData in enumerationItem.fieldDataList)
+            {
+                if (fieldData.field.required)
+                {
+                    when (fieldData.field.type)
+                    {
+                        FieldType.Text -> {
+                            if (fieldData.textValue.isEmpty()) {
+                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
+                                return
+                            }
+                        }
+                        FieldType.Number -> {
+                            if (fieldData.numberValue == null) {
+                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
+                                return
+                            }
+                        }
+                        FieldType.Date -> {
+                            if (fieldData.dateValue == null) {
+                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
+                                return
+                            }
+                        }
+                        FieldType.Checkbox -> {
+                            val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
+                            if (!selection) {
+                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
+                                return
+                            }
+                        }
+                        else -> {
+                        }
+                    }
+                }
+
+                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+            }
 
             enumerationItem.notes = notes
-            enumerationItem.enumerationState = EnumerationState.Enumerated
             enumerationItem.incompleteReason = ""
-            //enumerationItem.fieldDataList = //DAO.fieldDataDAO.getFieldDataList( enumerationItem )
-
+            enumerationItem.enumerationState = EnumerationState.Enumerated
         }
-        // update whole enum area
-       // DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea,config)
 
-        //DAO.enumerationItemDAO.updateEnumerationItem( enumerationItem )
+        sharedViewModel.currentConfiguration?.value?.let {config ->
+            sharedViewModel.updateConfiguration()
+        }
+
         findNavController().popBackStack()
     }
 

@@ -546,8 +546,6 @@ class PerformEnumerationFragment : Fragment(),
             return
         }
 
-        Log.d( "xxx", "requested location updates" )
-
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,1000).build()
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
     }
@@ -575,8 +573,6 @@ class PerformEnumerationFragment : Fragment(),
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoomLevel ))
                     }
 
-                    Log.d( "xxx", "received location update" )
-
                     currentLocation = location
                 }
             }
@@ -588,8 +584,6 @@ class PerformEnumerationFragment : Fragment(),
         super.onDestroyView()
 
         fusedLocationClient.removeLocationUpdates( locationCallback )
-
-        Log.d( "xxx", "removed location updates" )
 
         _binding = null
     }
