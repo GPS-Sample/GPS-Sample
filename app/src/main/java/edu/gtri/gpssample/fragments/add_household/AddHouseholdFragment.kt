@@ -182,6 +182,11 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
+        if (enumerationItem.id == null)
+        {
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+        }
+
         if (incompleteReason.isNotEmpty())
         {
             for (fieldData in enumerationItem.fieldDataList)
