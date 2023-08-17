@@ -15,7 +15,7 @@ import java.util.*
 data class FieldData (
     var id : Int? = null,
     var uuid : String,
-    var field : Field,
+    var field : Field?,
     var name : String,
     var type : FieldType,
     var textValue : String,

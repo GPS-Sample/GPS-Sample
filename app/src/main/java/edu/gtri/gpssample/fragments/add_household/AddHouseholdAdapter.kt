@@ -129,198 +129,197 @@ class AddHouseholdAdapter( var config: Config, var fieldData: List< FieldData>) 
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        var frameLayout: FrameLayout? = null
-        val curFieldData = fieldData.get(holder.adapterPosition)
-        val field = curFieldData.field
+        val fieldData = fieldData.get(holder.adapterPosition)
 
-        if (field.id == null)
-        {
-            return
-        }
-        if (curFieldData == null)
-        {
-            return
-        }
+        fieldData.field?.let { field ->
 
-        holder.itemView.isSelected = false
+            var frameLayout: FrameLayout? = null
 
-        when (field.type) {
-            FieldType.Text -> {
-                frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
-                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-                editText.setText( curFieldData.textValue )
-                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
-                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
-                editText.doAfterTextChanged {
-                    curFieldData.textValue = it.toString()
-                }
+            if (field.id == null)
+            {
+                return
             }
 
-            FieldType.Number -> {
-                frameLayout = holder.frameLayout.findViewById(R.id.number_layout)
-                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+            holder.itemView.isSelected = false
 
-                if (field.integerOnly)
-                {
-                    editText.inputType = InputType.TYPE_CLASS_NUMBER
-                    curFieldData.numberValue?.let {
-                        editText.setText( it.toInt().toString())
-                    }
-                }
-                else
-                {
-                    editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-                    curFieldData.numberValue?.let {
-                        editText.setText( String.format( "%.2f", it ))
+            when (field.type) {
+                FieldType.Text -> {
+                    frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
+                    val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+                    editText.setText( fieldData.textValue )
+                    val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                    requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+                    editText.doAfterTextChanged {
+                        fieldData.textValue = it.toString()
                     }
                 }
 
-                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
-                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+                FieldType.Number -> {
+                    frameLayout = holder.frameLayout.findViewById(R.id.number_layout)
+                    val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
 
-                editText.doAfterTextChanged {
-                    if (it.toString().isNotEmpty())
+                    if (field.integerOnly)
                     {
-                        curFieldData.numberValue = it.toString().toDouble()
-                    }
-                }
-            }
-
-            FieldType.Date -> {
-                frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
-
-                var date = Date()
-                val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-
-                curFieldData.dateValue?.let {
-                    date = Date( it )
-                    displayDate( date, field, curFieldData, editText )
-                }
-
-                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
-                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
-
-                val editView = frameLayout.findViewById<View>(R.id.edit_view)
-
-                editView.setOnClickListener {
-
-                    curFieldData.dateValue?.let {
-                        date = Date( it )
-                    }
-
-                    if (!field.date && field.time)
-                    {
-                        TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, curFieldData, editText,this )
+                        editText.inputType = InputType.TYPE_CLASS_NUMBER
+                        fieldData.numberValue?.let {
+                            editText.setText( it.toInt().toString())
+                        }
                     }
                     else
                     {
-                        DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, curFieldData, editText,this )
+                        editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                        fieldData.numberValue?.let {
+                            editText.setText( String.format( "%.2f", it ))
+                        }
+                    }
+
+                    val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                    requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+
+                    editText.doAfterTextChanged {
+                        if (it.toString().isNotEmpty())
+                        {
+                            fieldData.numberValue = it.toString().toDouble()
+                        }
                     }
                 }
-            }
 
-            FieldType.Dropdown ->
-            {
-                frameLayout = holder.frameLayout.findViewById(R.id.dropdown_layout)
+                FieldType.Date -> {
+                    frameLayout = holder.frameLayout.findViewById(R.id.date_layout)
 
-                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
-                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+                    var date = Date()
+                    val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
 
-                var data = ArrayList<String>()
+                    fieldData.dateValue?.let {
+                        date = Date( it )
+                        displayDate( date, field, fieldData, editText )
+                    }
 
-                if (field.option1.length > 0) data.add(field.option1)
-                if (field.option2.length > 0) data.add(field.option2)
-                if (field.option3.length > 0) data.add(field.option3)
-                if (field.option4.length > 0) data.add(field.option4)
+                    val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                    requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
-                val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
-                spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
+                    val editView = frameLayout.findViewById<View>(R.id.edit_view)
 
-                curFieldData.dropdownIndex?.let {
-                    spinner.setSelection( it )
-                } ?: run {
-                    spinner.setSelection( data.size-1 )
+                    editView.setOnClickListener {
+
+                        fieldData.dateValue?.let {
+                            date = Date( it )
+                        }
+
+                        if (!field.date && field.time)
+                        {
+                            TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
+                        }
+                        else
+                        {
+                            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, fieldData, editText,this )
+                        }
+                    }
                 }
 
-                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+                FieldType.Dropdown ->
                 {
-                    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                    frameLayout = holder.frameLayout.findViewById(R.id.dropdown_layout)
+
+                    val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                    requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+
+                    var data = ArrayList<String>()
+
+                    if (field.option1.length > 0) data.add(field.option1)
+                    if (field.option2.length > 0) data.add(field.option2)
+                    if (field.option3.length > 0) data.add(field.option3)
+                    if (field.option4.length > 0) data.add(field.option4)
+
+                    val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
+                    spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
+
+                    fieldData.dropdownIndex?.let {
+                        spinner.setSelection( it )
+                    } ?: run {
+                        spinner.setSelection( data.size-1 )
+                    }
+
+                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
                     {
-                        curFieldData.dropdownIndex = position
-                    }
+                        override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                        {
+                            fieldData.dropdownIndex = position
+                        }
 
-                    override fun onNothingSelected(parent: AdapterView<*>)
+                        override fun onNothingSelected(parent: AdapterView<*>)
+                        {
+                        }
+                    }
+                }
+
+                FieldType.Checkbox ->
+                {
+                    frameLayout = holder.frameLayout.findViewById(R.id.checkbox_layout)
+
+                    val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+                    requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+
+                    var checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox1)
+                    checkBox.visibility = View.GONE
+                    if (field.option1.length > 0)
                     {
+                        checkBox.text = field.option1
+                        checkBox.visibility = View.VISIBLE
+                        checkBox.isChecked = fieldData.checkbox1
+
+                        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                            fieldData.checkbox1 = isChecked
+                        }
+                    }
+
+                    checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox2)
+                    checkBox.visibility = View.GONE
+                    if (field.option2.length > 0)
+                    {
+                        checkBox.text = field.option2
+                        checkBox.visibility = View.VISIBLE
+                        checkBox.isChecked = fieldData.checkbox2
+
+                        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                            fieldData.checkbox2 = isChecked
+                        }
+                    }
+
+                    checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox3)
+                    checkBox.visibility = View.GONE
+                    if (field.option3.length > 0)
+                    {
+                        checkBox.text = field.option3
+                        checkBox.visibility = View.VISIBLE
+                        checkBox.isChecked = fieldData.checkbox3
+
+                        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                            fieldData.checkbox3 = isChecked
+                        }
+                    }
+
+                    checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox4)
+                    checkBox.visibility = View.GONE
+                    if (field.option4.length > 0)
+                    {
+                        checkBox.text = field.option4
+                        checkBox.visibility = View.VISIBLE
+                        checkBox.isChecked = fieldData.checkbox4
+
+                        checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                            fieldData.checkbox4 = isChecked
+                        }
                     }
                 }
+                else -> {}
             }
 
-            FieldType.Checkbox ->
-            {
-                frameLayout = holder.frameLayout.findViewById(R.id.checkbox_layout)
-
-                val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
-                requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
-
-                var checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox1)
-                checkBox.visibility = View.GONE
-                if (field.option1.length > 0)
-                {
-                    checkBox.text = field.option1
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = curFieldData.checkbox1
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        curFieldData.checkbox1 = isChecked
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox2)
-                checkBox.visibility = View.GONE
-                if (field.option2.length > 0)
-                {
-                    checkBox.text = field.option2
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = curFieldData.checkbox2
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        curFieldData.checkbox2 = isChecked
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox3)
-                checkBox.visibility = View.GONE
-                if (field.option3.length > 0)
-                {
-                    checkBox.text = field.option3
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = curFieldData.checkbox3
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        curFieldData.checkbox3 = isChecked
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox4)
-                checkBox.visibility = View.GONE
-                if (field.option4.length > 0)
-                {
-                    checkBox.text = field.option4
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = curFieldData.checkbox4
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        curFieldData.checkbox4 = isChecked
-                    }
-                }
+            frameLayout?.let { layout ->
+                layout.visibility = View.VISIBLE
+                val titleView = layout.findViewById<TextView>(R.id.title_text_view)
+                titleView.text = field.name
             }
-            else -> {}
-        }
-
-        frameLayout?.let { layout ->
-            layout.visibility = View.VISIBLE
-            val titleView = layout.findViewById<TextView>(R.id.title_text_view)
-            titleView.text = field.name
         }
     }
 }
