@@ -40,7 +40,7 @@
                     android:textColor="@color/primary"
                     android:textStyle="bold"
                     android:textSize="20dp"
-                    android:text="Text" />
+                    android:text="@string/text" />
 
                 <ImageView
                     android:id="@+id/check_image_view"
