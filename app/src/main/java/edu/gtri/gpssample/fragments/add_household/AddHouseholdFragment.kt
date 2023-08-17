@@ -202,36 +202,38 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         {
             for (fieldData in enumerationItem.fieldDataList)
             {
-                if (fieldData.field.required)
-                {
-                    when (fieldData.field.type)
+                fieldData.field?.let { field ->
+                    if (field.required)
                     {
-                        FieldType.Text -> {
-                            if (fieldData.textValue.isEmpty()) {
-                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
-                                return
+                        when (field.type)
+                        {
+                            FieldType.Text -> {
+                                if (fieldData.textValue.isEmpty()) {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
                             }
-                        }
-                        FieldType.Number -> {
-                            if (fieldData.numberValue == null) {
-                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
-                                return
+                            FieldType.Number -> {
+                                if (fieldData.numberValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
                             }
-                        }
-                        FieldType.Date -> {
-                            if (fieldData.dateValue == null) {
-                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
-                                return
+                            FieldType.Date -> {
+                                if (fieldData.dateValue == null) {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
                             }
-                        }
-                        FieldType.Checkbox -> {
-                            val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
-                            if (!selection) {
-                                Toast.makeText(activity!!.applicationContext, "Oops! ${fieldData.field.name} field is required", Toast.LENGTH_SHORT).show()
-                                return
+                            FieldType.Checkbox -> {
+                                val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
+                                if (!selection) {
+                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
                             }
-                        }
-                        else -> {
+                            else -> {
+                            }
                         }
                     }
                 }
