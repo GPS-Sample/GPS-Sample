@@ -48,8 +48,11 @@ class FieldDataDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, it )
         }
 
+        fieldData.field?.let { field ->
+            values.put( DAO.COLUMN_FIELD_ID, field.id )
+        }
+
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
-        values.put( DAO.COLUMN_FIELD_ID, fieldData.field.id )
 
         values.put(DAO.COLUMN_FIELD_NAME, fieldData.name)
         values.put(DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(fieldData.type))
@@ -93,7 +96,7 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
 
-        return FieldData( id, uuid, field!!, name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
+        return FieldData( id, uuid, field, name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
     }
 
     //--------------------------------------------------------------------------

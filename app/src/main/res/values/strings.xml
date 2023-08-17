@@ -185,6 +185,8 @@
     <string name="does_not_exist">Does not exist</string>
     <string name="other">Other</string>
     <string name="notes">Notes</string>
+    <string name="oops">Oops!</string>
+    <string name="field_is_required">field is required</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
