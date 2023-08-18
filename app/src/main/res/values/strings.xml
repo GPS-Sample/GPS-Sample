@@ -36,9 +36,9 @@
     <string name="enter_your_pin">"Enter your PIN"</string>
     <string name="reenter_your_pin">"Re-enter your PIN"</string>
     <string name="back">"Back"</string>
-    <string name="cancel">Cancel</string>
-    <string name="finish">Finish</string>
-    <string name="save">Save</string>
+    <string name="cancel">"Cancel"</string>
+    <string name="finish">"Finish"</string>
+    <string name="save">"Save"</string>
     <string name="done">"Done"</string>
     <string name="select_role">"Select your Role"</string>
     <string name="admin_select_role">"Admin Select Role"</string>
@@ -177,19 +177,16 @@
     <string name="pin_incorrect">"The current PIN is incorrect"</string>
     <string name="config_not_found">"Fatal! Configuration not found."</string>
     <string name="missing_parameter_rule">"Fatal! Missing required parameter: rule"</string>
-    <string name="ok">Ok</string>
-    <string name="wifi_disabled">WiFi disabled</string>
-    <string name="wifi_disabled_message">WiFi is disabled. Please make sure Wifi is turned on</string>
-    <string name="additional_info">Additional Info</string>
-    <string name="incomplete">Incomplete</string>
-    <string name="does_not_exist">Does not exist</string>
-    <string name="other">Other</string>
-    <string name="notes">Notes</string>
-    <string name="oops">Oops!</string>
-    <string name="field_is_required">field is required</string>
-    <string name="text">Text</string>
-    <string name="checkbox">Checkbox</string>
-    <string name="number">Number</string>
+    <string name="ok">"Ok"</string>
+    <string name="wifi_disabled">"WiFi disabled"</string>
+    <string name="wifi_disabled_message">"WiFi is disabled. Please make sure Wifi is turned on"</string>
+    <string name="additional_info">"Additional Info"</string>
+    <string name="incomplete">"Incomplete"</string>
+    <string name="does_not_exist">"Does not exist"</string>
+    <string name="other">"Other"</string>
+    <string name="notes">"Notes"</string>
+    <string name="oops">"Oops!"</string>
+    <string name="field_is_required">"field is required"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

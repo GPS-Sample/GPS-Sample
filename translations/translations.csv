@@ -203,3 +203,13 @@ enter_file_name,You must enter a file name,Debe introducir un nombre de archivo,
 pin_incorrect,The current PIN is incorrect,El PIN actual es incorrecto,Le code PIN actuel est incorrect,O PIN atual está incorreto,Текущий PIN-код неверен
 config_not_found,Fatal! Configuration not found.,Fallo Configuración no encontrada.,Erreur fatale ! La configuration n'a pas été trouvée.,Fatal! Configuração não encontrada.,Fatal! Конфигурация не найдена.
 missing_parameter_rule,Fatal! Missing required parameter: rule,¡Fatal! Falta el parámetro requerido: regla,Fatal ! Paramètre requis manquant : règle,Fatal! Parâmetro obrigatório em falta: regra,Fatal! Отсутствует необходимый параметр: правило
+ok,Ok,Ok,Ok,Ok,Хорошо
+wifi_disabled,WiFi disabled,WiFi desactivado,WiFi désactivé,WiFi desativado,WiFi отключен
+wifi_disabled_message,WiFi is disabled. Please make sure Wifi is turned on,"El WiFi está desactivado. Por favor, asegúrese de que el Wifi está activado",Le WiFi est désactivé. Veuillez vous assurer que le Wifi est activé,O WiFi está desativado. Certifique-se de que o Wi-Fi está ativado,"WiFi отключен. Пожалуйста, убедитесь, что WiFi включен"
+additional_info,Additional Info,Información adicional,Informations complémentaires,Informações adicionais,Дополнительная информация
+incomplete,Incomplete,Incompleto,Incomplet,Incompleto,Неполный
+does_not_exist,Does not exist,No existe,N'existe pas,Não existe,Не существует
+other,Other,Otros,Autre,Outros,Другое
+notes,Notes,Notas,Notes (en anglais),Notas,Примечания
+oops,Oops!,¡Vaya!,Oups !,Oops!,Упс!
+field_is_required,field is required,campo obligatorio,le champ est obligatoire,o campo é obrigatório,поле обязательно для заполнения
