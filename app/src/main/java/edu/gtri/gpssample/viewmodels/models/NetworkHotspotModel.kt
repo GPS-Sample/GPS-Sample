@@ -10,6 +10,7 @@ import android.widget.ImageView
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -179,7 +180,13 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     val v1 = NetworkConnectionViewModel(socket)
 
                     v1.updateName(payload)
-                    v1.updateConnection("Connected")
+
+                    _activity?.let{activity ->
+                        v1.updateConnection(activity.getString(R.string.connected))
+                    }?: run{
+                        v1.updateConnection("Connected")
+                    }
+
                     v1.socket = socket
                     var check : NetworkConnectionViewModel? = null
                     for(client in clientConenctions)

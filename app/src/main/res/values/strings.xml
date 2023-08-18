@@ -187,6 +187,10 @@
     <string name="notes">"Notes"</string>
     <string name="oops">"Oops!"</string>
     <string name="field_is_required">"field is required"</string>
+    <string name="number">Number</string>
+    <string name="text">Text</string>
+    <string name="checkbox">Checkbox</string>
+    <string name="connected">Connected</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
