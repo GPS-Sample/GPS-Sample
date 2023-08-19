@@ -1,16 +1,11 @@
 package edu.gtri.gpssample.services
 
-import android.app.Notification
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.*
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import edu.gtri.gpssample.R
 import edu.gtri.gpssample.activities.MainActivity
 import edu.gtri.gpssample.utils.NetworkConnectionStatus
 import io.reactivex.Observable
@@ -18,9 +13,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
-
+import android.provider.Settings
 class NetworkMonitorService : Service()
 {
     private val enabled = true;
@@ -105,20 +99,34 @@ class NetworkMonitorService : Service()
         val connectivityManager =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (connectivityManager != null) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                    return true
-                }
-            }else
-            {
-                return true
-            }
+
+            var wifiEnabled = false
+            var airplaneModeOff = false
+
+            airplaneModeOff =
+                Settings.Global.getInt(contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) == 0
+
+            wifiEnabled = Settings.Global.getInt(contentResolver, Settings.Global.WIFI_ON, 0) != 0
+
+            return wifiEnabled and airplaneModeOff
+//            val mWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+//            val mData = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
+//
+
+//            val capabilities =
+//                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+//            if (capabilities != null) {
+//                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+//                    return true
+//                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+//                    return true
+//                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+//                    return true
+//                }
+//            }else
+//            {
+//                return true
+//            }
         }
         return false
     }

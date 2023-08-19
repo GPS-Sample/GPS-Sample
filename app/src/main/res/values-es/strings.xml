@@ -177,6 +177,26 @@
     <string name="pin_incorrect">"El PIN actual es incorrecto"</string>
     <string name="config_not_found">"Fallo Configuración no encontrada."</string>
     <string name="missing_parameter_rule">"¡Fatal! Falta el parámetro requerido: regla"</string>
+    <string name="ok">"Ok"</string>
+    <string name="wifi_disabled">"WiFi desactivado"</string>
+    <string name="wifi_disabled_message">""El WiFi está desactivado. Por favor"</string>
+    <string name="additional_info">"Información adicional"</string>
+    <string name="incomplete">"Incompleto"</string>
+    <string name="does_not_exist">"No existe"</string>
+    <string name="other">"Otros"</string>
+    <string name="notes">"Notas"</string>
+    <string name="oops">"¡Vaya!"</string>
+    <string name="field_is_required">"campo obligatorio"</string>
+
+    <string name="text">"Texto"</string>
+    <string name="number">"Número"</string>
+    <string name="date">"Fecha"</string>
+    <string name="checkbox">"Casilla de chequeo"</string>
+    <string name="dropdown">"Menú de opciones"</string>
+    <string name="fields">Campos</string>
+    <string name="rules">Regla</string>
+
+
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

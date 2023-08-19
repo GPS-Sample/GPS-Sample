@@ -177,6 +177,16 @@
     <string name="pin_incorrect">"Текущий PIN-код неверен"</string>
     <string name="config_not_found">"Fatal! Конфигурация не найдена."</string>
     <string name="missing_parameter_rule">"Fatal! Отсутствует необходимый параметр: правило"</string>
+    <string name="ok">"Хорошо"</string>
+    <string name="wifi_disabled">"WiFi отключен"</string>
+    <string name="wifi_disabled_message">"O WiFi está desativado. Certifique-se de que o Wi-Fi está ativado"</string>
+    <string name="additional_info">"Дополнительная информация"</string>
+    <string name="incomplete">"Неполный"</string>
+    <string name="does_not_exist">"Не существует"</string>
+    <string name="other">"Другое"</string>
+    <string name="notes">"Примечания"</string>
+    <string name="oops">"Упс!"</string>
+    <string name="field_is_required">"поле обязательно для заполнения"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

@@ -177,6 +177,16 @@
     <string name="pin_incorrect">"Le code PIN actuel est incorrect"</string>
     <string name="config_not_found">"Erreur fatale ! La configuration n'a pas été trouvée."</string>
     <string name="missing_parameter_rule">"Fatal ! Paramètre requis manquant : règle"</string>
+    <string name="ok">"Ok"</string>
+    <string name="wifi_disabled">"WiFi désactivé"</string>
+    <string name="wifi_disabled_message">"asegúrese de que el Wifi está activado""</string>
+    <string name="additional_info">"Informations complémentaires"</string>
+    <string name="incomplete">"Incomplet"</string>
+    <string name="does_not_exist">"N'existe pas"</string>
+    <string name="other">"Autre"</string>
+    <string name="notes">"Notes (en anglais)"</string>
+    <string name="oops">"Oups !"</string>
+    <string name="field_is_required">"le champ est obligatoire"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de la mère"</item>
