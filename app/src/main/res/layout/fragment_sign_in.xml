@@ -51,7 +51,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="Fogot PIN?"
+            android:text="@string/forgot_pin"
             android:textColor="@color/primary"
             android:textSize="17sp"/>
 
@@ -61,7 +61,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="0dp"
             android:gravity="center"
-            android:text="Reset PIN"
+            android:text="@string/reset_pin"
             android:textColor="@color/primary"
             android:textSize="17sp"/>
 

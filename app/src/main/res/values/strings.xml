@@ -191,6 +191,16 @@
     <string name="text">Text</string>
     <string name="checkbox">Checkbox</string>
     <string name="connected">Connected</string>
+    <string name="forgot_pin">Forgot PIN</string>
+    <string name="reset_pin">Reset PIN</string>
+    <string name="persoanlly_identifiable">Personally Identifiable Information</string>
+    <string name="required">Required</string>
+
+    <string name="date">"Date"</string>
+    <string name="dropdown">"Dropdown"</string>
+    <string name="fields">Fields</string>
+    <string name="rules">Rules</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

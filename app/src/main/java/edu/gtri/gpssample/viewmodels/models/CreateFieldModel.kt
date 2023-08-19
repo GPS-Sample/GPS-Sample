@@ -4,8 +4,10 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.CompoundButton
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.database.DAO
@@ -23,11 +25,31 @@ class CreateFieldModel
     var currentField : LiveData<Field>? = _currentField
     var fieldType : LiveData<FieldType> = _fieldType
 
+    var fragment : Fragment? = null
+
     val fieldTypePosition : MutableLiveData<Int>
         get() = _fieldTypePosition
 
     val fieldTypes : Array<String>
-        get() = FieldTypeConverter.array
+        get(){
+            val englishArray = FieldTypeConverter.array
+            fragment?.let { fragment ->
+
+                val array: Array<String> = Array(englishArray.size)
+                { i ->
+                    when (i) {
+                        0 -> fragment.getString(R.string.text)
+                        1 -> fragment.getString(R.string.number)
+                        2 -> fragment.getString(R.string.date)
+                        3 -> fragment.getString(R.string.checkbox)
+                        4 -> fragment.getString(R.string.dropdown)//FieldType.Dropdown.format
+                        else -> String()
+                    }
+                }
+                return array
+            }
+            return englishArray
+        }
 
     fun createNewField()
     {
