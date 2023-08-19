@@ -67,6 +67,7 @@ class PerformEnumerationFragment : Fragment(),
 
     private val kExportTag = 2
     private val kSelectLocationTag = 3
+    private val kDuplicateTag = 4
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -329,6 +330,11 @@ class PerformEnumerationFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
+        if (tag == kDuplicateTag)
+        {
+            return
+        }
+
         if (tag == kSelectLocationTag)
         {
             currentLocation?.let {
@@ -379,53 +385,65 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun didSelectRightButton(tag: Any?)
     {
-        if (tag == kSelectLocationTag)
+        when(tag)
         {
-            InfoDialog( activity, resources.getString(R.string.new_location), resources.getString(R.string.tap_the_map), resources.getString(R.string.ok), null, this)
-            return
-        }
+            kSelectLocationTag -> {
+                InfoDialog( activity, resources.getString(R.string.new_location), resources.getString(R.string.tap_the_map), resources.getString(R.string.ok), null, this)
+            }
 
-        sharedViewModel.currentConfiguration?.value?.let { config ->
+            kDuplicateTag -> {
+                currentLocation?.let {
+                    val location = Location( LocationType.Enumeration, it.latitude, it.longitude, false)
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                    enumArea.locations.add(location)
+                    addMapObjects()
+                }
+            }
 
-            val user = (activity!!.application as MainApplication).user
+            kExportTag -> {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
 
-            user?.let { user ->
-                when(user.role)
-                {
-                    Role.Supervisor.toString(), Role.Admin.toString() ->
-                    {
-                        team.id?.let {
-                            config.teamId = it
+                    val user = (activity!!.application as MainApplication).user
+
+                    user?.let { user ->
+                        when(user.role)
+                        {
+                            Role.Supervisor.toString(), Role.Admin.toString() ->
+                            {
+                                team.id?.let {
+                                    config.teamId = it
+                                }
+
+                                val packedConfig = config.pack()
+                                Log.d( "xxx", packedConfig )
+
+                                config.teamId = 0
+
+                                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                                val file = File(root, "Configuration.${Date().time}.json")
+                                val writer = FileWriter(file)
+                                writer.append(packedConfig)
+                                writer.flush()
+                                writer.close()
+
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+                            }
+
+                            Role.Enumerator.toString() ->
+                            {
+                                val packedEnumArea = enumArea.pack()
+                                Log.d( "xxx", packedEnumArea )
+
+                                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                                val file = File(root, "EnumArea.${Date().time}.json")
+                                val writer = FileWriter(file)
+                                writer.append(packedEnumArea)
+                                writer.flush()
+                                writer.close()
+
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
+                            }
                         }
-
-                        val packedConfig = config.pack()
-                        Log.d( "xxx", packedConfig )
-
-                        config.teamId = 0
-
-                        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                        val file = File(root, "Configuration.${Date().time}.json")
-                        val writer = FileWriter(file)
-                        writer.append(packedConfig)
-                        writer.flush()
-                        writer.close()
-
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
-                    }
-
-                    Role.Enumerator.toString() ->
-                    {
-                        val packedEnumArea = enumArea.pack()
-                        Log.d( "xxx", packedEnumArea )
-
-                        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                        val file = File(root, "EnumArea.${Date().time}.json")
-                        val writer = FileWriter(file)
-                        writer.append(packedEnumArea)
-                        writer.flush()
-                        writer.close()
-
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -453,7 +471,8 @@ class PerformEnumerationFragment : Fragment(),
 
             if (GeoUtils.isEqual( LatLng( it.latitude, it.longitude), latLng ))
             {
-                Toast.makeText(activity!!.applicationContext, "Location already exists", Toast.LENGTH_SHORT).show()
+                ConfirmationDialog( activity, resources.getString(R.string.warning),
+                    resources.getString(R.string.duplicate_warning), resources.getString(R.string.no), resources.getString(R.string.yes), kDuplicateTag, this)
                 return
             }
         }

@@ -208,6 +208,8 @@
     <string name="tap_the_map">Tap on the map to add a new location</string>
     <string name="complete">"Complete"</string>
     <string name="reason_incomplete_label">"Reason Incomplete"</string>
+    <string name="warning">"Warning!"</string>
+    <string name="duplicate_warning">"Adding this new location is extremely close to an existing location.  Are you sure that you want to add it?"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
