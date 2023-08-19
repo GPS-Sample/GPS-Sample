@@ -44,6 +44,6 @@
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:layout_centerInParent="true"
-        android:text="Import Configuration" />
+        android:text="@string/import_configuration" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -29,7 +29,7 @@
                     android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
                     android:gravity="center_vertical"
-                    android:text="Text" />
+                    android:text="@string/text" />
 
                 <TextView
                     android:id="@+id/required_text_view"

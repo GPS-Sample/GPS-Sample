@@ -13,7 +13,7 @@ import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
 
-class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rules: List<Rule>, var filters: List<Filter>) : BaseExpandableListAdapter()
+class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rules: List<Rule>, var filters: List<Filter>) : BaseExpandableListAdapter()
 {
     lateinit var didSelectField: ((field: Field) -> Unit)
     lateinit var didSelectRule: ((rule: Rule) -> Unit)
@@ -156,9 +156,9 @@ class CreateStudyAdapter(var context: Context, var fields: List<Field>, var rule
 
         when( groupPosition )
         {
-            0 -> listTitleTextView.text = "Fields"
-            1 -> listTitleTextView.text = "Rules"
-            2 -> listTitleTextView.text = "Filters"
+            0 -> listTitleTextView.text = context.getString(R.string.fields)
+            1 -> listTitleTextView.text = context.getString(R.string.rules)
+            2 -> listTitleTextView.text = context.getString(R.string.filters)
         }
 
         val downImageView = view.findViewById<View>(R.id.arrow_down_image_view) as ImageView

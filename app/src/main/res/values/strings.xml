@@ -177,11 +177,29 @@
     <string name="pin_incorrect">"The current PIN is incorrect"</string>
     <string name="config_not_found">"Fatal! Configuration not found."</string>
     <string name="missing_parameter_rule">"Fatal! Missing required parameter: rule"</string>
-    <string name="ok">Ok</string>
-    <string name="wifi_disabled">WiFi disabled</string>
-    <string name="wifi_disabled_message">WiFi is disabled. Please make sure Wifi is turned on</string>
-    <string name="oops">Oops!</string>
-    <string name="field_is_required">field is required</string>
+    <string name="ok">"Ok"</string>
+    <string name="wifi_disabled">"WiFi disabled"</string>
+    <string name="wifi_disabled_message">"WiFi is disabled. Please make sure Wifi is turned on"</string>
+    <string name="additional_info">"Additional Info"</string>
+    <string name="incomplete">"Incomplete"</string>
+    <string name="does_not_exist">"Does not exist"</string>
+    <string name="other">"Other"</string>
+    <string name="notes">"Notes"</string>
+    <string name="oops">"Oops!"</string>
+    <string name="field_is_required">"field is required"</string>
+    <string name="number">Number</string>
+    <string name="text">Text</string>
+    <string name="checkbox">Checkbox</string>
+    <string name="connected">Connected</string>
+    <string name="forgot_pin">Forgot PIN</string>
+    <string name="reset_pin">Reset PIN</string>
+    <string name="persoanlly_identifiable">Personally Identifiable Information</string>
+    <string name="required">Required</string>
+
+    <string name="date">"Date"</string>
+    <string name="dropdown">"Dropdown"</string>
+    <string name="fields">Fields</string>
+    <string name="rules">Rules</string>
 
     <string name="select_location">Select Location</string>
     <string name="current_location">Current</string>

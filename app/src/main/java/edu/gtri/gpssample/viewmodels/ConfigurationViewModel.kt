@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.viewmodels
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
 import android.view.View
@@ -93,20 +94,18 @@ class ConfigurationViewModel : ViewModel()
             return unavailable
         }
     private var _currentFragment : Fragment? = null
-    private var activity : Activity? = null
     var currentFragment : Fragment?
         get() = _currentFragment
         set(value){
             _currentFragment = value
             _currentFragment?.let {fragment ->
-
-                activity = fragment.activity
+                createFieldModel.fragment = fragment
             }
         }
 
     val currentUserRole : Role
         get(){
-            activity?.let{activity ->
+            _currentFragment?.activity?.let{activity ->
                 val _user = (activity.application as MainApplication).user
                 _user?.let{
 

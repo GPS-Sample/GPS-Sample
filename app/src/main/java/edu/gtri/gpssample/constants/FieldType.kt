@@ -1,4 +1,5 @@
 package edu.gtri.gpssample.constants
+import android.app.Activity
 import android.util.Log
 import java.util.*
 import android.view.View
@@ -28,7 +29,6 @@ object FieldTypeConverter
             2 -> FieldType.Date.format
             3 -> FieldType.Checkbox.format
             4 -> FieldType.Dropdown.format
-            5 -> FieldType.None.format
             else -> String()
         }
     }
