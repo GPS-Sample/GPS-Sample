@@ -302,7 +302,6 @@ class PerformEnumerationFragment : Fragment(),
                     marker.tag?.let { tag ->
                         val location = tag as Location
                         sharedViewModel.locationViewModel.setCurrentLocation(location)
-                        enumArea.locations.add(location)
                         if (location.isLandmark)
                         {
                             findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)

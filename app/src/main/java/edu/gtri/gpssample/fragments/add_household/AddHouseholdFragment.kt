@@ -173,6 +173,13 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectRightButton(tag: Any?)
     {
+        location.items.remove(enumerationItem)
+        enumArea.locations.remove(location)
+        sharedViewModel.locationViewModel.removeCurrentLocation(location)
+
+        DAO.locationDAO.delete( location )
+        DAO.enumerationItemDAO.delete( enumerationItem )
+
         findNavController().popBackStack()
     }
 
