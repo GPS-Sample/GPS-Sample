@@ -220,7 +220,7 @@
 
     <string name="add_condition">Add Condition</string>
     <string name="select_rule">Select Rule</string>
-
+    <string name="teams">Teams</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

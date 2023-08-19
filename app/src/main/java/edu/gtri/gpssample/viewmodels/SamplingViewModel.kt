@@ -32,7 +32,6 @@ class SamplingViewModel : ViewModel() {
     private var _currentSampleArea : MutableLiveData<SampleArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<SampledItem> = ArrayList()
 
-
     var config : Config? = null
 
     var currentFragment : Fragment?
@@ -69,7 +68,18 @@ class SamplingViewModel : ViewModel() {
             }
         }
 
+    val samplingMethod: String
+        get()
+        {
+            currentStudy?.value?.let{study ->
+                _currentFragment?.let{fragment ->
+                    return SamplingMethodConverter.internationalString(study.samplingMethod, fragment)
+                }
 
+                return study.samplingMethod.format
+            }
+            return ""
+        }
     fun createSampleArea(fromEnumArea: EnumArea)
     {
         val sampleArea = SampleArea(fromEnumArea)

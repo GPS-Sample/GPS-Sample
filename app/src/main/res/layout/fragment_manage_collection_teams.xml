@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center"
-                android:text="Teams"
+                android:text="@string/teams"
                 android:textColor="@color/primary_textcolor"
                 android:textSize="20sp"
                 android:textStyle="bold" />
