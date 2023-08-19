@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import edu.gtri.gpssample.R
 
@@ -41,21 +42,38 @@ class AdditionalInfoDialog
             alertDialog.dismiss()
         }
 
+        val completeCheckBox = view.findViewById<CheckBox>(R.id.complete_check_box)
         val incompleteCheckBox = view.findViewById<CheckBox>(R.id.incomplete_check_box)
         val notesTextView = view.findViewById<EditText>(R.id.notes_edit_text)
         val nobodyHomeButton = view.findViewById<RadioButton>(R.id.nobody_home_button)
         val doesNotExistButton = view.findViewById<RadioButton>(R.id.does_not_exist_button)
         val otherButton = view.findViewById<RadioButton>(R.id.other_button)
+        val reasonIncompleteLayout = view.findViewById<LinearLayout>(R.id.reason_incomplete_layout)
+
+        completeCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                if (isChecked)
+                {
+                    incompleteCheckBox.isChecked = false
+                    reasonIncompleteLayout.visibility = View.GONE
+                }
+            }
+        })
 
         incompleteCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
         {
             override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
             {
-                if (!isChecked)
+                nobodyHomeButton.isChecked = false
+                doesNotExistButton.isChecked = false
+                otherButton.isChecked = false
+
+                if (isChecked)
                 {
-                    nobodyHomeButton.isChecked = false
-                    doesNotExistButton.isChecked = false
-                    otherButton.isChecked = false
+                    completeCheckBox.isChecked = false
+                    reasonIncompleteLayout.visibility = View.VISIBLE
                 }
             }
         })
@@ -89,7 +107,7 @@ class AdditionalInfoDialog
                 }
                 else if (otherButton.isChecked)
                 {
-                    incompleteReason = "Other"
+                    incompleteReason = context?.getString(R.string.other) ?:"Other"
                 }
                 else
                 {
