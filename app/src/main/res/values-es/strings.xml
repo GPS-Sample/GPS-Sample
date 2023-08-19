@@ -196,6 +196,16 @@
     <string name="fields">Campos</string>
     <string name="rules">Regla</string>
 
+    <string name="simple_random">"Muestreo aleatorio simple"</string>
+    <string name="cluster_sampling">"Muestreo por conglomerados"</string>
+    <string name="subset_overlap">"Subconjuntos: pueden superponerse"</string>
+    <string name="strata_exclusive">"Estratos: Mutuamente excluyentes"</string>
+
+    <string name="equal">"Igual"</string>
+    <string name="not_equal">"No igual"</string>
+    <string name="less_than">"Menor que"</string>
+    <string name="greater_than">"Mayor que"</string>
+    <string name="greater_than_equal">"Mayor que o igual"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>

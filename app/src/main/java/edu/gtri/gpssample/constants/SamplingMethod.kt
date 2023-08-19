@@ -45,6 +45,18 @@ object SamplingMethodConverter
         }
     }
 
+    fun fromArrayPosition( position : Int) : SamplingMethod
+    {
+        return when(position)
+        {
+            0 -> SamplingMethod.SimpleRandom
+            1 -> SamplingMethod.Cluster
+            2 -> SamplingMethod.Subsets
+            3 -> SamplingMethod.Strata
+            else -> SamplingMethod.None
+        }
+    }
+
     fun toArrayPosition(samplingMethod : SamplingMethod) : Int
     {
         return when(samplingMethod)

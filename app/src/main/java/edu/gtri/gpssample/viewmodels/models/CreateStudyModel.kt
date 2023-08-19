@@ -8,12 +8,11 @@ import androidx.databinding.Bindable
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ObservableArrayList
 import androidx.databinding.ObservableBoolean
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import edu.gtri.gpssample.constants.SampleType
-import edu.gtri.gpssample.constants.SampleTypeConverter
-import edu.gtri.gpssample.constants.SamplingMethod
-import edu.gtri.gpssample.constants.SamplingMethodConverter
+import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
@@ -25,7 +24,7 @@ class CreateStudyModel {
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _samplingTypes : ObservableArrayList<String> = ObservableArrayList()
     private var _samplingTypesVisible : Boolean = false
-
+    var fragment : Fragment? = null
     var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
 
     val samplingMethodPosition : MutableLiveData<Int>
@@ -34,10 +33,47 @@ class CreateStudyModel {
         get() = _samplingTypePosition
 
     val samplingMethods : Array<String>
-        get() = SamplingMethodConverter.array
+        get(){
+            val englishArray = SamplingMethodConverter.array
+            fragment?.let { fragment ->
+
+                val array: Array<String> = Array(englishArray.size)
+                { i ->
+                    when (i) {
+
+                        0 -> fragment.getString(R.string.simple_random)
+                        1 -> fragment.getString(R.string.cluster_sampling)
+                        2 -> fragment.getString(R.string.subset_overlap)
+                        3 -> fragment.getString(R.string.strata_exclusive)
+                        else -> String()
+                    }
+                }
+                return array
+            }
+            return englishArray
+
+        }
 
     val sampleTypes : Array<String>
-        get() = SampleTypeConverter.array
+        get(){
+            val englishArray = SampleTypeConverter.array
+            fragment?.let { fragment ->
+
+                val array: Array<String> = Array(englishArray.size)
+                { i ->
+                    when (i) {
+
+                        0 -> fragment.getString(R.string.numberhouseholds)
+                        1 -> fragment.getString(R.string.percenthouseholds)
+                        2 -> fragment.getString(R.string.percenttotal)
+                        else -> String()
+                    }
+                }
+                return array
+            }
+            return englishArray
+
+        }
 
     val fieldList : Array<String>
         get() = getFields()
@@ -123,24 +159,22 @@ class CreateStudyModel {
     {
         if(position < samplingMethods.size)
         {
-            val samplingMethod : String = samplingMethods[position]
-
             _currentStudy?.value?.let {study ->
-                study.samplingMethod = SamplingMethodConverter.fromString(samplingMethod)
+                study.samplingMethod = SamplingMethodConverter.fromArrayPosition(position)
 
                 _samplingTypes.clear()
-                when(samplingMethod)
+                when(study.samplingMethod)
                 {
-                    SamplingMethod.SimpleRandom.format -> {
+                    SamplingMethod.SimpleRandom -> {
                         sampleTypesVisibility.set(true)
                     }
-                    SamplingMethod.Cluster.format -> {
+                    SamplingMethod.Cluster -> {
                         sampleTypesVisibility.set(true)
                     }
                     else -> {sampleTypesVisibility.set(false)}
 
                 }
-                //
+
             }
         }
     }

@@ -23,7 +23,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:text="Personally Identifiable Information"
+            android:text="@string/personally_identifiable"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.tempField.pii}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"/>

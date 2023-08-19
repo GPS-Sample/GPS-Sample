@@ -23,7 +23,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:text="Integer Only"
+            android:text="@string/integer_only"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.tempField.integerOnly}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldIntegerOnlySelected}"/>
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:text="Personally Identifiable Information"
+            android:text="@string/personally_identifiable"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.tempField.pii}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"/>
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:text="Required"
+            android:text="@string/required"
             android:textSize="18sp"
             android:checked="@{viewModel.createFieldModel.tempField.required}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldRequiredSelected}"/>

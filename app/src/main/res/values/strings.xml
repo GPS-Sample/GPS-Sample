@@ -187,19 +187,40 @@
     <string name="notes">"Notes"</string>
     <string name="oops">"Oops!"</string>
     <string name="field_is_required">"field is required"</string>
+
     <string name="number">Number</string>
     <string name="text">Text</string>
     <string name="checkbox">Checkbox</string>
     <string name="connected">Connected</string>
     <string name="forgot_pin">Forgot PIN</string>
     <string name="reset_pin">Reset PIN</string>
-    <string name="persoanlly_identifiable">Personally Identifiable Information</string>
+    <string name="personally_identifiable">Personally Identifiable Information</string>
+    <string name="integer_only">Integer Only</string>
     <string name="required">Required</string>
-
+    <string name="time">Time</string>
     <string name="date">"Date"</string>
     <string name="dropdown">"Dropdown"</string>
     <string name="fields">Fields</string>
     <string name="rules">Rules</string>
+
+    <string name="simple_random">"Simple Random Sampling"</string>
+    <string name="cluster_sampling">"Cluster Sampling"</string>
+    <string name="subset_overlap">"Subsets: May Overlap"</string>
+    <string name="strata_exclusive">"Strata: Mutually Exclusive"</string>
+
+    <string name="numberhouseholds">"# of Households"</string>
+    <string name="percenthouseholds">"% of all Households"</string>
+    <string name="percenttotal">% of total population"</string>
+
+    <string name="equal">"Equal"</string>
+    <string name="not_equal">"Not Equal"</string>
+    <string name="less_than">"Less Than"</string>
+    <string name="greater_than">"Greater Than"</string>
+    <string name="greater_than_equal">"Greater Than Or Equal"</string>
+
+    <string name="add_condition">Add Condition</string>
+    <string name="select_rule">Select Rule</string>
+
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
