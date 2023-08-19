@@ -183,6 +183,11 @@
     <string name="oops">Oops!</string>
     <string name="field_is_required">field is required</string>
 
+    <string name="select_location">Select Location</string>
+    <string name="current_location">Current</string>
+    <string name="new_location">New Location</string>
+    <string name="tap_the_map">Tap on the map to add a new location</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
