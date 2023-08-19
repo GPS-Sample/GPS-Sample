@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="Additional Info"
+        android:text="@string/additional_info"
         android:textColor="@color/primary"
         android:textSize="17sp"
         android:textStyle="bold"
@@ -15,51 +15,67 @@
         android:layout_height="wrap_content"/>
 
     <CheckBox
+        android:id="@+id/complete_check_box"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/complete" />
+
+    <CheckBox
         android:id="@+id/incomplete_check_box"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Incomplete" />
+        android:text="@string/incomplete" />
 
-    <TextView
-        android:text="Reason Incomplete"
-        android:textColor="@color/primary"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <RadioGroup
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/reason_incomplete_layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/nobody_home_button"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+        <TextView
+            android:text="@string/reason_incomplete_label"
+            android:textColor="@color/primary"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:padding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nobody_home" />
+            android:layout_height="wrap_content"/>
 
-        <RadioButton
-            android:id="@+id/does_not_exist_button"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+        <RadioGroup
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/does_not_exist" />
+            android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/other_button"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/other" />
+            <RadioButton
+                android:id="@+id/nobody_home_button"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/nobody_home" />
 
-    </RadioGroup>
+            <RadioButton
+                android:id="@+id/does_not_exist_button"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/does_not_exist" />
+
+            <RadioButton
+                android:id="@+id/other_button"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/other" />
+        </RadioGroup>
+    </LinearLayout>
 
     <TextView
         android:text="@string/notes"
