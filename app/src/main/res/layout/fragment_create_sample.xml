@@ -52,7 +52,7 @@
                     android:layout_height="50dp"
                     android:layout_marginStart="15dp"
                     android:gravity="left"
-                    android:text="@{sampleViewModel.currentStudy.samplingMethod.format}"
+                    android:text="@{sampleViewModel.samplingMethod}"
                     android:textSize="22sp" />
 
                 <ImageView

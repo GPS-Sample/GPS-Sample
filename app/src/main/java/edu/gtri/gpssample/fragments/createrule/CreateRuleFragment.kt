@@ -35,7 +35,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-
+        sharedViewModel.createRuleModel.fragment = this
         sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
                 rule.field?.let{field->

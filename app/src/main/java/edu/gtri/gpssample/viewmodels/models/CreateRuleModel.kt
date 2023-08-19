@@ -3,11 +3,14 @@ package edu.gtri.gpssample.viewmodels.models
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.ConnectorConverter
 import edu.gtri.gpssample.constants.Operator
 import edu.gtri.gpssample.constants.OperatorConverter
+import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
@@ -18,6 +21,7 @@ class CreateRuleModel {
     private var _ruleOperatorPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _currentRule : MutableLiveData<Rule>? = null
 
+    var fragment : Fragment? = null
     var currentRule : LiveData<Rule>? = _currentRule
     val ruleFieldPosition : MutableLiveData<Int>
         get() = _ruleFieldPosition
@@ -26,7 +30,28 @@ class CreateRuleModel {
         get() = _ruleOperatorPosition
 
     val operators : Array<String>
-        get() = OperatorConverter.array
+        get(){
+            val englishArray = OperatorConverter.array
+            fragment?.let { fragment ->
+
+                val array: Array<String> = Array(englishArray.size)
+                { i ->
+                    when (i) {
+
+                        0 -> fragment.getString(R.string.equal)
+                        1 -> fragment.getString(R.string.not_equal)
+                        2 -> fragment.getString(R.string.less_than)
+                        3 -> fragment.getString(R.string.greater_than)
+                        4 -> fragment.getString(R.string.greater_than_equal)
+                        else -> String()
+                    }
+                }
+                return array
+            }
+            return englishArray
+
+        }
+
 
 
     fun addRule(study : Study)
@@ -84,8 +109,7 @@ class CreateRuleModel {
     fun onRuleOperatorSelected(study : Study, position: Int,)
     {
         currentRule?.value?.let{rule ->
-            val operator = OperatorConverter.array[position]
-            rule.operator = OperatorConverter.fromString(operator)
+            rule.operator = OperatorConverter.fromArrayPosition(position)
         }
     }
 }

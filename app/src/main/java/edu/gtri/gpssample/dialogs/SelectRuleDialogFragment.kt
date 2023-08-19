@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import edu.gtri.gpssample.R
 
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.databinding.DialogSelectRuleBinding
@@ -64,7 +65,7 @@ class SelectRuleDialogFragment: DialogFragment() {
         _binding = DialogSelectRuleBinding.inflate(inflater )
 
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Select Rule").setView(binding.root)
+        builder.setTitle(getString(R.string.select_rule)).setView(binding.root)
 
         alertDialog = builder.create()
         alertDialog.setCancelable(false)

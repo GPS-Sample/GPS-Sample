@@ -54,6 +54,20 @@ object OperatorConverter
         }
     }
 
+    fun fromArrayPosition( position : Int) : Operator
+    {
+        return when(position)
+        {
+            0 -> Operator.Equal
+            1 -> Operator.NotEqual
+            2 -> Operator.LessThan
+            3 -> Operator.GreaterThan
+            4 -> Operator.LessThanOrEqual
+            5 -> Operator.GreaterThanOrEqual
+            else -> Operator.None
+        }
+    }
+
     fun toArrayPosition(operator: Operator) : Int
     {
         return when(operator)

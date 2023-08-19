@@ -233,7 +233,7 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:visibility="@{viewModel.currentUserRole == Role.Admin ? View.VISIBLE : View.GONE}"
-            android:text="Export Configuration" />
+            android:text="@string/export_configuration" />
 
         <Button
             android:id="@+id/import_button"
@@ -243,6 +243,6 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:visibility="@{(viewModel.currentUserRole != Role.Enumerator)  ? View.VISIBLE : View.GONE}"
-            android:text="Import Enumeration Data" />
+            android:text="@string/import_enumeration" />
     </LinearLayout>
 </layout>

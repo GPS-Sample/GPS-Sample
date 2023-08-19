@@ -1,5 +1,8 @@
 package edu.gtri.gpssample.constants
 
+import androidx.fragment.app.Fragment
+import edu.gtri.gpssample.R
+
 enum class SamplingMethod(val format : String) {
     None("None"),
     SimpleRandom("Simple Random Sampling"),
@@ -45,6 +48,18 @@ object SamplingMethodConverter
         }
     }
 
+    fun fromArrayPosition( position : Int) : SamplingMethod
+    {
+        return when(position)
+        {
+            0 -> SamplingMethod.SimpleRandom
+            1 -> SamplingMethod.Cluster
+            2 -> SamplingMethod.Subsets
+            3 -> SamplingMethod.Strata
+            else -> SamplingMethod.None
+        }
+    }
+
     fun toArrayPosition(samplingMethod : SamplingMethod) : Int
     {
         return when(samplingMethod)
@@ -63,7 +78,20 @@ object SamplingMethodConverter
             SamplingMethod.SimpleRandom.format -> SamplingMethod.SimpleRandom
             SamplingMethod.Cluster.format -> SamplingMethod.Cluster
             SamplingMethod.Subsets.format -> SamplingMethod.Subsets
+            SamplingMethod.Strata.format -> SamplingMethod.Strata
             else -> SamplingMethod.None
+        }
+    }
+
+    fun internationalString(samplingMethod: SamplingMethod, fragment: Fragment) : String
+    {
+        return when(samplingMethod)
+        {
+            SamplingMethod.SimpleRandom-> fragment.getString(R.string.simple_random)
+            SamplingMethod.Cluster -> fragment.getString(R.string.cluster_sampling)
+            SamplingMethod.Subsets -> fragment.getString(R.string.subset_overlap)
+            SamplingMethod.Strata -> fragment.getString(R.string.strata_exclusive)
+            else -> ""
         }
     }
 }
