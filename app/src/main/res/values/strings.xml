@@ -158,7 +158,7 @@
     <string name="enum_saved_doc">"Export Enumeration Data"</string>
     <string name="config_saved_doc">"Enumeration data has been saved to the Documents directory."</string>
     <string name="location_not_found">"The configuration has been saved to the Documents directory."</string>
-    <string name="nobody_home">">Location not found"</string>
+    <string name="nobody_home">"Nobody home"</string>
     <string name="home_not_exist">"Home does not exist"</string>
     <string name="reason_incomplete">"Oops! Please select a reason for incomplete"</string>
     <string name="enter_enum_area_name">"Enter the Enumeration Area name"</string>
@@ -187,6 +187,7 @@
     <string name="notes">"Notes"</string>
     <string name="oops">"Oops!"</string>
     <string name="field_is_required">"field is required"</string>
+
     <string name="number">Number</string>
     <string name="text">Text</string>
     <string name="checkbox">Checkbox</string>
@@ -200,6 +201,15 @@
     <string name="dropdown">"Dropdown"</string>
     <string name="fields">Fields</string>
     <string name="rules">Rules</string>
+
+    <string name="select_location">Select Location</string>
+    <string name="current_location">Current</string>
+    <string name="new_location">New Location</string>
+    <string name="tap_the_map">Tap on the map to add a new location</string>
+    <string name="complete">"Complete"</string>
+    <string name="reason_incomplete_label">"Reason Incomplete"</string>
+    <string name="warning">"Warning!"</string>
+    <string name="duplicate_warning">"Adding this new location is extremely close to an existing location.  Are you sure that you want to add it?"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
