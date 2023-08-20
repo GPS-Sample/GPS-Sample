@@ -197,7 +197,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
                             // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
-                            DAO.deleteAll()
+                            //DAO.deleteAll()
 
                             DAO.configDAO.createConfig( config )
 
