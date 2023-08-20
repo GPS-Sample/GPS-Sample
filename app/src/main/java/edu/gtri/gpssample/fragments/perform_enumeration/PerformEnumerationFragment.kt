@@ -357,6 +357,8 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     Role.Supervisor.toString() ->
                     {
+                        // TODO
+                        // teamId should be passed to setHotspotMode() instead of setting a global var
                         sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
 
