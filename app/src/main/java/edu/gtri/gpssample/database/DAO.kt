@@ -140,18 +140,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             db.execSQL(createTableFilterOperator)
 
             // connector table
-            // this is a logic chain
-//            val createTableFilterRule = ("CREATE TABLE " +
-//                    TABLE_FILTERRULE + "(" +
-//                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-//                    COLUMN_FILTER_ID + " INTEGER" + "," +
-//                    COLUMN_RULE_ID + " INTEGER" + "," +
-//                    COLUMN_FILTERRULE_ORDER + " INTEGER" + "," +
-//                    COLUMN_FILTERRULE_CONNECTOR_INDEX + " INTEGER" + "," +
-//                    "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
-//                    "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
-//                    ")")
-//            db.execSQL(createTableFilterRule)
 
             val createTableEnumArea = ("CREATE TABLE " +
                     TABLE_ENUM_AREA + "(" +
@@ -524,7 +512,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_FIELD_DATA, null, null)
                 db.delete(TABLE_RULE, null, null)
                 db.delete(TABLE_FILTER, null, null)
-                db.delete(TABLE_FILTERRULE, null, null)
                 db.delete(TABLE_ENUM_AREA, null, null)
                 db.delete(TABLE_TEAM, null, null)
                 db.delete(TABLE_TEAM_MEMBER, null, null)
