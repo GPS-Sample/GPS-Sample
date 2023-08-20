@@ -24,6 +24,7 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.utils.ConfigUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
@@ -225,14 +226,22 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     override fun configurationReceived(config: Config) {
         runBlocking(Dispatchers.Main) {
-            val saved = DAO.configDAO.createConfig(config)
-            saved?.let { config ->
-                sharedViewModel.configurations.add(config)
-                sharedViewModel.setCurrentConfig( config)
-                manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+
+            val configValicationResult = ConfigUtils.validateConfig( resources, user, config )
+
+            if (configValicationResult.success)
+            {
+                val saved = DAO.configDAO.createConfig(config)
+                saved?.let { config ->
+                    sharedViewModel.configurations.add(config)
+                    sharedViewModel.setCurrentConfig( config)
+                    manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+                }
             }
-
-
+            else
+            {
+                Toast.makeText(activity!!.applicationContext, configValicationResult.error, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

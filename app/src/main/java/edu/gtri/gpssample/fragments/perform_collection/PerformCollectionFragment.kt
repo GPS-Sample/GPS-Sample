@@ -357,11 +357,11 @@ class PerformCollectionFragment : Fragment(),
                     {
                         sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-
                         startHotspot(view)
                     }
                     Role.Admin.toString() ->
                     {
+                        sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
                         startHotspot(view)
                     }

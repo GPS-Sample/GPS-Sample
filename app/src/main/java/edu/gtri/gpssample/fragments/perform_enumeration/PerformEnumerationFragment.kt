@@ -365,6 +365,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     Role.Admin.toString() ->
                     {
+                        sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
                         startHotspot(view)
                     }
