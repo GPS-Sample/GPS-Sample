@@ -39,11 +39,10 @@ object NetworkUtils {
             for ( i in (fullSize - left) until fullSize)
             {
                 val test = i - (fullSize - left)
-                Log.d("XXXXXX", "the size ${test}")
-               // if(test > 0)
-               // {
+                if(test > -1)
+                {
                     payloadArray[i] = leftover[i - (fullSize - left)]
-              //  }
+                }
 
             }
         }
