@@ -4,6 +4,11 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
+import java.util.*
+import kotlin.text.Charsets.ISO_8859_1
+import kotlin.text.Charsets.UTF_16
+import kotlin.text.Charsets.UTF_8
 
 data class TCPHeader(val command : Int, val payloadSize : Int)
 {
@@ -35,18 +40,29 @@ data class TCPMessage(val command : Int, val payload : String?) {
 
     constructor(header : TCPHeader, payload : String) : this(header.command, payload)
 
-    var header : TCPHeader = TCPHeader(command, payload?.length ?: 0)
+    var header : TCPHeader = TCPHeader(command, payload?.toByteArray()?.size ?: 0)
     fun toByteArray(): ByteArray? {
+        // need to deal with string encoding
+        val payloadBuffer = payload?.toByteArray()
+        val keyBuffer = TCPHeader.key.toByteArray()
+
         val size: Int = 4 + 4 + TCPHeader.key.length + (payload?.toByteArray()?.size ?: 0)
         val adjusted  = size - (payload?.length ?: 0)
         Log.d("XXXXXXXX ", "SIZE ${size} and adjusted ${adjusted}")
         Log.d("XXXXXXXX", "${payload?.toByteArray()?.size}")
+        Log.d("XXXXXXXX", "payload size in header ${header.payloadSize}")
+
         val byteBuffer = ByteBuffer.allocate(size)
             .putInt(header.command)
-            .put(TCPHeader.key.toByteArray())
+            .put(keyBuffer)
             .putInt(header.payloadSize)
-            .put(payload?.toByteArray())
+            .put(payloadBuffer)
 
+        if(header.command == 2002)
+        {
+            val message = fromByteArray(byteBuffer.array())
+            Log.d("xxxxxxx", "response ${message?.payload}")
+        }
         return byteBuffer.array()
     }
     companion object
@@ -71,7 +87,7 @@ data class TCPMessage(val command : Int, val payload : String?) {
             byteBuffer.get(payloadBytes)
             // check
             if(key == TCPHeader.key) {
-                return TCPMessage(command, payloadBytes.toString())
+                return TCPMessage(command, String(payloadBytes))
             }
             return null
         }

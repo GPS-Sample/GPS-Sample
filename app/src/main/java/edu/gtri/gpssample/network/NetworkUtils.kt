@@ -40,10 +40,10 @@ object NetworkUtils {
             {
                 val test = i - (fullSize - left)
                 Log.d("XXXXXX", "the size ${test}")
-                if(test > 0)
-                {
+               // if(test > 0)
+               // {
                     payloadArray[i] = leftover[i - (fullSize - left)]
-                }
+              //  }
 
             }
         }
