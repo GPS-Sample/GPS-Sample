@@ -4,9 +4,18 @@ import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import edu.gtri.gpssample.database.models.LatLon
-import java.lang.Math.*
+import kotlin.math.*
+
+const val kMinimumDistance = 20.0
+data class HaversineCheck(val distance : Double, var withinBounds : Boolean)
+{
+    val minimumDistance = kMinimumDistance
+}
 
 object GeoUtils {
+    private const val earthRadius = 6378100
+    private const val degreeConversion = 0.017453292519943
+
     fun findGeobounds(points : ArrayList<LatLon>) : LatLngBounds
     {
         try{
@@ -31,16 +40,23 @@ object GeoUtils {
         return LatLngBounds(LatLng(0.0,0.0), LatLng(0.0,0.0))
     }
 
-    fun isEqual( latLng1: LatLng, latLng2: LatLng): Boolean
+    fun isCloseTo( latLng1: LatLng, latLng2: LatLng): HaversineCheck
     {
-        val deltaLat = abs( latLng1.latitude - latLng2.latitude )
-        val deltaLon = abs( latLng1.longitude - latLng2.longitude )
+        val lat1Rad = latLng1.latitude * degreeConversion
+        val lat2Rad = latLng2.latitude * degreeConversion
+        val lon1Rad = latLng1.latitude * degreeConversion
+        val lon2Rad = latLng2.latitude * degreeConversion
 
-        if (deltaLat > 1.0e-4 || deltaLon > 1.0e-4)
+        val sinDLat = sin((lat2Rad - lat1Rad) / 2.0)
+        val sinDLon = sin((lon2Rad - lon1Rad) / 2.0)
+
+        val distance = 2.0 * earthRadius * sqrt((sinDLat * sinDLat)  + cos(lat1Rad) * cos(lat2Rad) * (sinDLon * sinDLon) )
+
+        val haversineCheck = HaversineCheck(distance, false)
+        if(distance < kMinimumDistance)
         {
-            return false
+            haversineCheck.withinBounds = true
         }
-
-        return true
+        return haversineCheck
     }
 }
