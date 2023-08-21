@@ -5,7 +5,7 @@
     <string name="action_sign_out">"Se déconnecter"</string>
     <string name="next">"Écran suivant"</string>
     <string name="previous">"Écran précédent"</string>
-    <string name="manager">"Directrice"</string>
+    <string name="manager">"Responsable"</string>
     <string name="client">"Énumération"</string>
     <string name="connected_clients">"Clients connectés"</string>
     <string name="create_hotspot">"Créer un hotspot"</string>
@@ -15,7 +15,7 @@
     <string name="registering_device">"Enregistrement de l'appareil"</string>
     <string name="sending_command">"Envoi de la commande"</string>
     <string name="sending_enum_data">"Envoi de données d'énumération"</string>
-    <string name="receiving_data">"Réception de données"</string>
+    <string name="receiving_data">"Réception des données"</string>
     <string name="configuration_received">"Configuration reçue"</string>
     <string name="admin">"Administrateur"</string>
     <string name="supervisor">"Superviseur"</string>
@@ -25,33 +25,33 @@
     <string name="no_configurations">"Vous n'avez aucune configuration"</string>
     <string name="no_studies">"Vous n'avez pas d'études pour cette configuration"</string>
     <string name="data_collector">"Collecteur de données"</string>
-    <string name="scan_qr_code">"Scanner le code QR"</string>
-    <string name="continue_with_existing_study">"Continuer avec l'étude existante"</string>
-    <string name="admin_sign_in">"Connexion administrateur"</string>
+    <string name="scan_qr_code">"Scannez le code QR"</string>
+    <string name="continue_with_existing_study">"Continuez avec l'étude existante"</string>
+    <string name="admin_sign_in">"Connexion de l'administrateur"</string>
     <string name="supervisor_sign_in">"Connexion du superviseur"</string>
     <string name="data_collector_sign_in">"Connexion du collecteur de données"</string>
-    <string name="admin_sign_up">"Inscription administrateur"</string>
+    <string name="admin_sign_up">"Inscription de l'administrateur"</string>
     <string name="supervisor_sign_up">"Inscription du superviseur"</string>
     <string name="data_collector_sign_up">"Inscription du collecteur de données"</string>
     <string name="enter_your_pin">"Saisissez votre code PIN"</string>
     <string name="reenter_your_pin">"Saisissez à nouveau votre code PIN"</string>
     <string name="back">"Écran précédent"</string>
-    <string name="cancel">"Annuler"</string>
+    <string name="cancel">"Annulez"</string>
     <string name="finish">"Finir"</string>
-    <string name="save">"Sauvegarder"</string>
-    <string name="done">"Fait"</string>
+    <string name="save">"Sauvegardez"</string>
+    <string name="done">"Terminé"</string>
     <string name="select_role">"Sélectionnez votre rôle"</string>
-    <string name="admin_select_role">"Administrateur - Sélectionner un rôle"</string>
-    <string name="supervisor_select_role">"Superviseur - Sélectionner un rôle"</string>
+    <string name="admin_select_role">"Administrateur - Sélectionnez un rôle"</string>
+    <string name="supervisor_select_role">"Superviseur - Sélectionnez un rôle"</string>
     <string name="sign_in">"S'identifier"</string>
     <string name="sign_up">"S'inscrire"</string>
     <string name="sign_out">"Se déconnecter"</string>
-    <string name="not_registered">"Non enregistré? S'inscrire!"</string>
+    <string name="not_registered">"Pas enregistré? S'inscrire!"</string>
     <string name="name">"Nom"</string>
     <string name="enter_your_name">"Entrez votre nom"</string>
     <string name="pin">"PIN"</string>
-    <string name="forgot_pin_question">"Question PIN oublié"</string>
-    <string name="forgot_pin_answer">"Réponse PIN oublié"</string>
+    <string name="forgot_pin_question">"Question liée au PIN oubliée?"</string>
+    <string name="forgot_pin_answer">"Réponse liée au PIN oubliée?"</string>
     <string name="enter_your_answer">"Saisissez votre réponse"</string>
     <string name="create_config">"Créer une configuration"</string>
     <string name="delete_config">"Supprimer la configuration"</string>
@@ -60,20 +60,20 @@
     <string name="edit_study">"Modifier l'étude"</string>
     <string name="delete_study">"Supprimer l'étude"</string>
     <string name="create_field">"Créer un champ"</string>
-    <string name="config_name">"Nom de configuration"</string>
+    <string name="config_name">"Nom de la configuration"</string>
     <string name="study_name">"Nom de l'étude"</string>
     <string name="field_name">"Nom du champ"</string>
     <string name="enumeration_fields">"Champs d'énumération"</string>
     <string name="enter_config_name">"Entrez le nom de la configuration"</string>
     <string name="enter_study_name">"Entrez le nom de l'étude"</string>
     <string name="enter_field_name">"Entrez le nom du champ"</string>
-    <string name="preferred_units">"Unités préférées"</string>
-    <string name="date_format">"Format de date"</string>
+    <string name="preferred_units">"Unités de préférence"</string>
+    <string name="date_format">"Format de la date"</string>
     <string name="time_format">"Format horaire"</string>
     <string name="manage_enumerators">"Gérer les enquêteurs"</string>
     <string name="collect_enumerations">"Collecter les énumérations"</string>
     <string name="generate_sample">"Générer un échantillon"</string>
-    <string name="collect_samples">"Recueillir des échantillons"</string>
+    <string name="collect_samples">"Recueillir les échantillons"</string>
     <string name="min_gps_precision">"Précision GPS souhaitée"</string>
     <string name="enter_min_gps_precision">"Entrez la précision GPS souhaitée"</string>
     <string name="define_enumeration_fields">"Définir les champs d'énumération"</string>
@@ -83,11 +83,11 @@
     <string name="enumeration_area">"Zones de dénombrement"</string>
     <string name="barcode_result">"Code-barres détecté"</string>
     <string name="error_scanner_cancelled">"Le scanner de code est annulé."</string>
-    <string name="error_camera_permission_not_granted">"L'autorisation de caméra n'est pas accordée."</string>
+    <string name="error_camera_permission_not_granted">"L'autorisation pour la caméra n'est pas accordée."</string>
     <string name="error_app_name_unavailable">"Le nom de l'application n'est pas défini."</string>
-    <string name="error_default_message">"Échec de la numérisation du code :"</string>
+    <string name="error_default_message">"Le code QR n'a pas été scanné:"</string>
     <string name="menu_item_settings">"Paramètres"</string>
-    <string name="change_role">"Changer de rôle"</string>
+    <string name="change_role">"Changement de rôle"</string>
     <string name="enter_your_user_name">"Entrez votre nom d'utilisateur"</string>
     <string name="field_type">"Type de champ"</string>
     <string name="enter_checkbox_text">"Saisir le texte de l'élément de la case à cocher"</string>
@@ -114,7 +114,7 @@
     <string name="sample_size">"Taille de l'échantillon"</string>
     <string name="filter_name">"Nom du filtre"</string>
     <string name="rule_name">"Nom de la règle"</string>
-    <string name="total_sample_size">"Taille totale de l'échantillon dans tous les clusters"</string>
+    <string name="total_sample_size">"Taille totale de l'échantillon pour toutes les grappes"</string>
     <string name="manage_studies">"Gérer les études"</string>
     <string name="manage_samples">"Gérer les échantillons"</string>
     <string name="create_sample">"Créer un échantillon"</string>
@@ -123,8 +123,8 @@
     <string name="home">"Écran d'accueil"</string>
     <string name="manage_enumeration_areas">"Gérer les zones de dénombrement"</string>
     <string name="please_confirm">"confirme""</string>
-    <string name="import_enumeration">"Importer les données d'énumération"</string>
-    <string name="export_configuration">"Exporter la configuration"</string>
+    <string name="import_enumeration">"Importez les données d'énumération"</string>
+    <string name="export_configuration">"Exportez la configuration"</string>
     <string name="delete_study_message">"Êtes-vous sûr de vouloir supprimer définitivement cette étude ?"</string>
     <string name="delete_field_message">"Êtes-vous sûr de vouloir supprimer définitivement ce champ ?"</string>
     <string name="delete_rule_message">"Êtes-vous sûr de vouloir supprimer définitivement cette règle ?"</string>
@@ -133,7 +133,7 @@
     <string name="delete_household_message">"Êtes-vous sûr de vouloir supprimer définitivement ce ménage ?"</string>
     <string name="create_field_rule_message">"Vous devez créer au moins un champ avant de pouvoir créer une règle."</string>
     <string name="create_rule_filter_message">"Vous devez créer au moins une règle avant de pouvoir créer un filtre"</string>
-    <string name="select_import_method_message">"Sélectionner une méthode d'importation"</string>
+    <string name="select_import_method_message">"Sélectionnez une méthode d'importation"</string>
     <string name="select_export_message">"Sélectionnez une méthode d'exportation"</string>
     <string name="clear_selections_message">"Etes-vous sûr de vouloir effacer toutes les sélections ?"</string>
     <string name="team_name_message">"Vous devez saisir un nom d'équipe"</string>
@@ -142,7 +142,7 @@
     <string name="no_study_ea">"Vous n'avez pas d'étude associée à cette zone de dénombrement."</string>
     <string name="filename_export_message">"Entrez un nom de fichier pour l'exportation"</string>
     <string name="import_failed">"Oups ! L'importation a échoué.  Veuillez réessayer."</string>
-    <string name="select_task">"Sélectionner une tâche"</string>
+    <string name="select_task">"Sélectionnez une tâche"</string>
     <string name="yes">"Oui"</string>
     <string name="no">"Non"</string>
     <string name="qr_code">"Code QR"</string>
@@ -187,12 +187,50 @@
     <string name="notes">"Notes (en anglais)"</string>
     <string name="oops">"Oups !"</string>
     <string name="field_is_required">"le champ est obligatoire"</string>
+    <string name="number">"Numéro"</string>
+    <string name="text">"Texte"</string>
+    <string name="checkbox">"Case à cocher"</string>
+    <string name="connected">"Connecté"</string>
+    <string name="forgot_pin">"PIN oublié"</string>
+    <string name="reset_pin">"Réinitialiser le code PIN"</string>
+    <string name="personally_identifiable">"Informations personnelles identifiables"</string>
+    <string name="integer_only">"Nombre entier seulement"</string>
+    <string name="required">"Obligatoire"</string>
+    <string name="time">"L'heure"</string>
+    <string name="date">"La date"</string>
+    <string name="dropdown">"Question déroulante"</string>
+    <string name="fields">"Les Champs"</string>
+    <string name="rules">"Les Règles"</string>
+    <string name="simple_random">"Échantillonnage aléatoire simple"</string>
+    <string name="cluster_sampling">"Échantillonnage en grappes"</string>
+    <string name="subset_overlap">"Sous-ensembles : Peuvent se chevaucher"</string>
+    <string name="strata_exclusive">"Strates : Exclusivité mutuelle"</string>
+    <string name="numberhouseholds">"#  de ménages"</string>
+    <string name="percenthouseholds">"% de tous les ménages"</string>
+    <string name="percenttotal">"% de la population totale"</string>
+    <string name="equal">"Egaux"</string>
+    <string name="not_equal">"Non égaux"</string>
+    <string name="less_than">"Inférieur à"</string>
+    <string name="greater_than">"Supérieur à"</string>
+    <string name="greater_than_equal">"Supérieur ou égal"</string>
+    <string name="add_condition">"Ajoutez une condition"</string>
+    <string name="select_rule">"Sélectionnez une règle"</string>
+    <string name="teams">"Équipes"</string>
+    <string name="select_location">"Sélectionnez le lieu"</string>
+    <string name="current_location">"Actuel"</string>
+    <string name="new_location">"Nouveau lieu"</string>
+    <string name="tap_the_map">"Tapez sur la carte pour ajouter un nouveau lieu"</string>
+    <string name="complete">"Complet"</string>
+    <string name="reason_incomplete_label">"Motif Incomplet"</string>
+    <string name="warning">"Attention !"</string>
+    <string name="duplicate_warning">"L'ajout de ce nouveau lieu est extrêmement proche d'un lieu existant.  Êtes-vous sûr de vouloir l'ajouter ?"</string>
+    <string name="missing_team">"Il manque une définition d'équipe à la configuration"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
-        <item>"Nom de jeune fille de la mère"</item>
-        <item>"Nom d'animal de compagnie préféré"</item>
-        <item>"4 derniers chiffres du numéro de téléphone portable"</item>
-        <item>"Nourriture favorite"</item>
+        <item>"Nom de jeune fille de votre mère"</item>
+        <item>"Nom de votre animal de compagnie préféré"</item>
+        <item>"4 derniers chiffre de votre numéro de téléphone portable"</item>
+        <item>"Votre aliment/nourriture favorit(e)"</item>
         <item>"Mois de naissance"</item>
         <item>"Autre question"</item>
     </string-array>
@@ -214,9 +252,9 @@
     <string-array name="operators">
         <item>"Égal"</item>
         <item>"Inégal"</item>
-        <item>"Moins que"</item>
+        <item>"Plus petit que"</item>
         <item>"Plus grand que"</item>
-        <item>"Meilleur que ou égal"</item>
+        <item>"Plus grand ou égal à"</item>
     </string-array>
     <string-array name="connectors">
         <item>"ET"</item>

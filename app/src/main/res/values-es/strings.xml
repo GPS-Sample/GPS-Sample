@@ -187,26 +187,44 @@
     <string name="notes">"Notas"</string>
     <string name="oops">"¡Vaya!"</string>
     <string name="field_is_required">"campo obligatorio"</string>
-
-    <string name="text">"Texto"</string>
     <string name="number">"Número"</string>
-    <string name="date">"Fecha"</string>
+    <string name="text">"Texto"</string>
     <string name="checkbox">"Casilla de chequeo"</string>
+    <string name="connected">"Conectado"</string>
+    <string name="forgot_pin">"PIN olvidado"</string>
+    <string name="reset_pin">"Restablecer PIN"</string>
+    <string name="personally_identifiable">"Información personal identificable"</string>
+    <string name="integer_only">"Sólo números enteros"</string>
+    <string name="required">"Requerido"</string>
+    <string name="time">"Hora"</string>
+    <string name="date">"Fecha"</string>
     <string name="dropdown">"Menú de opciones"</string>
-    <string name="fields">Campos</string>
-    <string name="rules">Regla</string>
-
+    <string name="fields">"Campos"</string>
+    <string name="rules">"Reglas"</string>
     <string name="simple_random">"Muestreo aleatorio simple"</string>
     <string name="cluster_sampling">"Muestreo por conglomerados"</string>
-    <string name="subset_overlap">"Subconjuntos: pueden superponerse"</string>
+    <string name="subset_overlap">"Subconjuntos: Pueden solaparse"</string>
     <string name="strata_exclusive">"Estratos: Mutuamente excluyentes"</string>
-
+    <string name="numberhouseholds">"# de hogares"</string>
+    <string name="percenthouseholds">"% de todos los hogares"</string>
+    <string name="percenttotal">"% de la población total"</string>
     <string name="equal">"Igual"</string>
-    <string name="not_equal">"No igual"</string>
+    <string name="not_equal">"No iguales"</string>
     <string name="less_than">"Menor que"</string>
     <string name="greater_than">"Mayor que"</string>
     <string name="greater_than_equal">"Mayor que o igual"</string>
-
+    <string name="add_condition">"Añadir condición"</string>
+    <string name="select_rule">"Seleccionar regla"</string>
+    <string name="teams">"Equipos"</string>
+    <string name="select_location">"Seleccionar ubicación"</string>
+    <string name="current_location">"Actual"</string>
+    <string name="new_location">"Nueva ubicación"</string>
+    <string name="tap_the_map">"Pulse en el mapa para añadir una nueva ubicación"</string>
+    <string name="complete">"Completar"</string>
+    <string name="reason_incomplete_label">"Razón Incompleto"</string>
+    <string name="warning">"Advertencia"</string>
+    <string name="duplicate_warning">"Añadir esta nueva ubicación está extremadamente cerca de una ubicación existente.  ¿Está seguro de que desea añadirla?"</string>
+    <string name="missing_team">"A la configuración le falta una definición de Equipo"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
