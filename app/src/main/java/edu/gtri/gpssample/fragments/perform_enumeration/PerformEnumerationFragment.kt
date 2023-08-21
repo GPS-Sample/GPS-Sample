@@ -475,7 +475,7 @@ class PerformEnumerationFragment : Fragment(),
             val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), latLng )
             if (haversineCheck.withinBounds)
             {
-                val message = "${resources.getString(R.string.duplicate_warning)}"
+                val message = "Distance: ${haversineCheck.distance}\n\n  ${resources.getString(R.string.duplicate_warning)}"
                 ConfirmationDialog( activity, resources.getString(R.string.warning),
                     message, resources.getString(R.string.no), resources.getString(R.string.yes), kDuplicateTag, this)
                 return
