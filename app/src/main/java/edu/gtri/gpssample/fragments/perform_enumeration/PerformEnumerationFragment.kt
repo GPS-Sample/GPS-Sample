@@ -472,10 +472,12 @@ class PerformEnumerationFragment : Fragment(),
         enumArea.locations.map{
             Log.d( "xxx", "${it.latitude},${it.longitude}")
 
-            if (GeoUtils.isEqual( LatLng( it.latitude, it.longitude), latLng ))
+            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), latLng )
+            if (haversineCheck.withinBounds)
             {
+                val message = "${resources.getString(R.string.duplicate_warning)}"
                 ConfirmationDialog( activity, resources.getString(R.string.warning),
-                    resources.getString(R.string.duplicate_warning), resources.getString(R.string.no), resources.getString(R.string.yes), kDuplicateTag, this)
+                    message, resources.getString(R.string.no), resources.getString(R.string.yes), kDuplicateTag, this)
                 return
             }
         }
