@@ -47,10 +47,10 @@ data class TCPMessage(val command : Int, val payload : String?) {
         val keyBuffer = TCPHeader.key.toByteArray()
 
         val size: Int = 4 + 4 + TCPHeader.key.length + (payload?.toByteArray()?.size ?: 0)
-        val adjusted  = size - (payload?.length ?: 0)
-        Log.d("XXXXXXXX ", "SIZE ${size} and adjusted ${adjusted}")
-        Log.d("XXXXXXXX", "${payload?.toByteArray()?.size}")
-        Log.d("XXXXXXXX", "payload size in header ${header.payloadSize}")
+//        val adjusted  = size - (payload?.length ?: 0)
+//        Log.d("XXXXXXXX ", "SIZE ${size} and adjusted ${adjusted}")
+//        Log.d("XXXXXXXX", "${payload?.toByteArray()?.size}")
+//        Log.d("XXXXXXXX", "payload size in header ${header.payloadSize}")
 
         val byteBuffer = ByteBuffer.allocate(size)
             .putInt(header.command)
@@ -58,11 +58,11 @@ data class TCPMessage(val command : Int, val payload : String?) {
             .putInt(header.payloadSize)
             .put(payloadBuffer)
 
-        if(header.command == 2002)
-        {
-            val message = fromByteArray(byteBuffer.array())
-            Log.d("xxxxxxx", "response ${message?.payload}")
-        }
+//        if(header.command == 2002)
+//        {
+//            val message = fromByteArray(byteBuffer.array())
+//            Log.d("xxxxxxx", "response ${message?.payload}")
+//        }
         return byteBuffer.array()
     }
     companion object
