@@ -7,7 +7,7 @@ import edu.gtri.gpssample.database.models.LatLon
 import kotlin.math.*
 
 const val kMinimumDistance = 20.0
-data class HaversineCheck(val distance : Double, var withinBounds : Boolean)
+data class HaversineCheck(val distance : Double, var withinBounds : Boolean, val start : LatLng, val end : LatLng)
 {
     val minimumDistance = kMinimumDistance
 }
@@ -50,9 +50,9 @@ object GeoUtils {
         val sinDLat = sin((lat2Rad - lat1Rad) / 2.0)
         val sinDLon = sin((lon2Rad - lon1Rad) / 2.0)
 
-        val distance = 2.0 * earthRadius * sqrt((sinDLat * sinDLat)  + cos(lat1Rad) * cos(lat2Rad) * (sinDLon * sinDLon) )
+        val distance = 2.0 * earthRadius * asin(sqrt((sinDLat * sinDLat)  + (cos(lat1Rad) * cos(lat2Rad) * (sinDLon * sinDLon)) ))
 
-        val haversineCheck = HaversineCheck(distance, false)
+        val haversineCheck = HaversineCheck(distance, false, latLng1, latLng2)
         if(distance < kMinimumDistance)
         {
             haversineCheck.withinBounds = true
