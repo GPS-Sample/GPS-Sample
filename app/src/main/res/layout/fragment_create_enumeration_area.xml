@@ -11,6 +11,7 @@
             name="createEnumerationAreaFragment"
             type="edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment" />
     </data>
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -25,7 +26,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment" />
 
         <TextView
-            android:id="@+id/fragment_root_layout"
+            android:id="@+id/toolbarTitle"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center_vertical|center_horizontal"
@@ -36,6 +37,7 @@
             android:textStyle="bold" />
 
         <LinearLayout
+            android:id="@+id/toolbar_layout"
             android:orientation="horizontal"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
@@ -60,6 +62,43 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:background="@drawable/edit_blue" />
+
+            <Button
+                android:id="@+id/add_household_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:background="@drawable/add_house_blue" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/button_layout"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/save" />
         </LinearLayout>
     </LinearLayout>
 </layout>

@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.create_enumeration_area
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -29,10 +30,13 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.github.dellisd.spatialk.geojson.FeatureCollection
 import io.github.dellisd.spatialk.geojson.MultiPolygon
 import io.github.dellisd.spatialk.geojson.Point
+import io.github.dellisd.spatialk.geojson.dsl.point
+import io.github.dellisd.spatialk.geojson.dsl.polygon
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
@@ -47,10 +51,14 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
     private lateinit var map: GoogleMap
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var editMode = false
+    private var dropMode = false
     private var createMode = false
-    private var vertexMarkers = ArrayList<Marker>()
-    private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private val binding get() = _binding!!
+    private val unsavedEnumAreas = ArrayList<EnumArea>()
+    private var vertexMarkers = ArrayList<Marker>()
+    private lateinit var defaultColorList : ColorStateList
+    private var _binding: FragmentCreateEnumerationAreaBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -61,13 +69,14 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentCreateEnumerationAreaBinding.inflate(inflater, container, false)
+        _binding = FragmentCreateEnumerationAreaBinding.inflate( inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -89,11 +98,26 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             return
         }
 
+        arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
+            this.editMode = editMode
+        }
+
+        if (!editMode)
+        {
+            binding.toolbarTitle.visibility = View.GONE
+            binding.toolbarLayout.visibility = View.GONE
+            binding.buttonLayout.visibility = View.GONE
+        }
+
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
 
         mapFragment!!.getMapAsync(this)
 
         binding.imortButton.setOnClickListener {
+            dropMode = false
+            map.setOnMapClickListener(null)
+            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+
             val intent = Intent()
                 .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -102,6 +126,9 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
 
         binding.createButton.setOnClickListener {
+            dropMode = false
+            map.setOnMapClickListener(null)
+            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
             if (createMode)
             {
@@ -117,8 +144,90 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 vertexMarkers.clear()
                 createMode = true
                 binding.createButton.setBackgroundResource( R.drawable.save_blue )
+                onMapReady( map )
             }
         }
+
+        binding.addHouseholdButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
+        binding.addHouseholdButton.setOnClickListener {
+            if (dropMode)
+            {
+                dropMode = false
+                map.setOnMapClickListener(null)
+                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+            }
+            else
+            {
+                binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+
+                dropMode = true
+
+                onMapReady(map)
+
+                map.setOnMapClickListener { latLng ->
+                    dropMode = false
+                    addHousehold( latLng )
+                    map.setOnMapClickListener(null)
+                    binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+                }
+            }
+        }
+
+        binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.saveButton.setOnClickListener {
+            config.enumAreas.addAll( unsavedEnumAreas )
+            findNavController().popBackStack()
+        }
+    }
+
+    fun addHousehold( latLng: LatLng )
+    {
+        var enumArea = findEnumAreaOfLocation( config.enumAreas, latLng )
+
+        if (enumArea == null)
+        {
+            enumArea = findEnumAreaOfLocation( unsavedEnumAreas, latLng )
+        }
+
+        enumArea?.let{  enumArea ->
+            latLng?.let { latLng ->
+                val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
+                enumArea.locations.add(location)
+                onMapReady(map)
+            }
+        }
+    }
+
+    fun findEnumAreaOfLocation( enumAreas: ArrayList<EnumArea>, latLng: LatLng ) : EnumArea?
+    {
+        for (enumArea in enumAreas)
+        {
+            val points = ArrayList<Coordinate>()
+
+            enumArea.vertices.map {
+                points.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+            }
+
+            points.add( points[0])
+
+            val geometryFactory = GeometryFactory()
+            val geometry: Geometry = geometryFactory.createPolygon(points.toTypedArray())
+
+            val coordinate = Coordinate( latLng.longitude, latLng.latitude )
+            val geometry1 = geometryFactory.createPoint( coordinate )
+            if (geometry.contains( geometry1 ))
+            {
+                return enumArea
+            }
+        }
+
+        return null
     }
 
     override fun didEnterText( name: String, tag: Any? )
@@ -137,8 +246,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
         }
 
         var enumArea = EnumArea(  name, vertices )
-        //DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-        config.enumAreas.add(enumArea) // = DAO.enumAreaDAO.getEnumAreas( config )
+        unsavedEnumAreas.add(enumArea) // = DAO.enumAreaDAO.getEnumAreas( config )
 
         addPolygon( enumArea )
 
@@ -168,10 +276,25 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                 }
             }
         }
-        for (enumArea in config.enumAreas)
+
+        val allEnumAreas = ArrayList<EnumArea>()
+
+        if (config.enumAreas.isNotEmpty())
+        {
+            allEnumAreas.addAll( config.enumAreas)
+        }
+
+        if (unsavedEnumAreas.isNotEmpty())
+        {
+            allEnumAreas.addAll( unsavedEnumAreas )
+        }
+
+        for (enumArea in allEnumAreas)
         {
             addPolygon( enumArea )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( enumArea.vertices[0].toLatLng(), 14.0f ))
+
+            val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,14))
 
             for (location in enumArea.locations)
             {
@@ -215,10 +338,28 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                         icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
                     }
 
-                    map.addMarker( MarkerOptions()
+                    val marker = map.addMarker( MarkerOptions()
                         .position( LatLng( location.latitude, location.longitude ))
                         .icon( icon )
                     )
+
+                    if (editMode)
+                    {
+                        marker?.let { marker ->
+                            marker.tag = location
+
+                            map.setOnMarkerClickListener { marker ->
+                                marker.tag?.let { tag ->
+                                    val location = tag as Location
+                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+                                    ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently delete this location?",
+                                        resources.getString(R.string.no), resources.getString(R.string.yes), marker, this)
+                                }
+
+                                false
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -232,18 +373,26 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             points.add( it.toLatLng())
         }
 
+        val clickable = editMode && !dropMode && enumArea.locations.isEmpty()
+
         val polygonOptions = PolygonOptions()
-            .clickable(true)
+            .clickable(clickable)
             .addAll( points )
 
         val polygon = map.addPolygon( polygonOptions )
         polygon.tag = enumArea
 
-        map.setOnPolygonClickListener {polygon ->
-            val ea = polygon.tag as EnumArea
-            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                "${resources.getString(R.string.delete_enum_area_message)} ${ea.name}?",
-                resources.getString(R.string.no), resources.getString(R.string.yes), polygon, this)
+        if (clickable)
+        {
+            map.setOnPolygonClickListener {polygon ->
+                if (editMode)
+                {
+                    val ea = polygon.tag as EnumArea
+                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                        "${resources.getString(R.string.delete_enum_area_message)} ${ea.name}?",
+                        resources.getString(R.string.no), resources.getString(R.string.yes), polygon, this)
+                }
+            }
         }
     }
 
@@ -253,10 +402,31 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
 
     override fun didSelectRightButton(tag: Any?)
     {
-        val polygon = tag as Polygon
-        val enumArea = polygon.tag as EnumArea
-        DAO.enumAreaDAO.delete( enumArea )
-        polygon.remove()
+        if (tag is Polygon)
+        {
+            val polygon = tag as Polygon
+            val enumArea = polygon.tag as EnumArea
+
+            unsavedEnumAreas.remove( enumArea )
+            config.enumAreas.remove( enumArea )
+            DAO.enumAreaDAO.delete( enumArea )
+            polygon.remove()
+        }
+        else if (tag is Marker)
+        {
+            val marker = tag as Marker
+            val location = marker.tag as Location
+            var enumArea = findEnumAreaOfLocation( config.enumAreas, LatLng( location.latitude, location.longitude) )
+
+            if (enumArea == null)
+            {
+                enumArea = findEnumAreaOfLocation( unsavedEnumAreas, LatLng( location.latitude, location.longitude) )
+            }
+
+            enumArea?.let {
+                enumArea.locations.remove(location)
+            }
+        }
 
         onMapReady(map)
     }
@@ -313,8 +483,8 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                         multiPolygon.coordinates[0][0].forEach { position ->
                             enumArea.vertices.add( LatLon( position.latitude, position.longitude ))
                         }
-                        config.enumAreas.add(enumArea)
-                        //DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+
+                        unsavedEnumAreas.add(enumArea)
                     }
                     is Point -> {
                         val point = geometry as Point
@@ -334,7 +504,7 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             Log.d( "xxx", "${count}/${points.size}")
             count += 1
 
-            for (enumArea in config.enumAreas)
+            for (enumArea in unsavedEnumAreas)
             {
                 val points1 = ArrayList<Coordinate>()
 
@@ -353,7 +523,6 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
                     DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
                     enumArea.locations.add( location )
-//                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
                     break // found! assuming that it can only exist in a single EA, for now!
                 }
             }
