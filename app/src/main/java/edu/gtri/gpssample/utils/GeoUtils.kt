@@ -60,8 +60,6 @@ object GeoUtils {
         val haversineCheck = HaversineCheck(distance, false, latLng1, latLng2)
         if(distance < kMinimumDistance)
         {
-            DAO.gpsTestDAO.addFieldData(latLng1.latitude, latLng1.longitude,
-                                        latLng2.latitude, latLng2.longitude, distance)
             haversineCheck.withinBounds = true
         }
         return haversineCheck
