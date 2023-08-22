@@ -545,12 +545,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 locationDAO = LocationDAO( instance!!)
                 enumerationItemDAO = EnumerationItemDAO( instance!!)
                 collectionItemDAO = CollectionItemDAO( instance!!)
+
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 222
+        private const val DATABASE_VERSION = 226
 
     }
 }
