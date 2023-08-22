@@ -14,8 +14,8 @@ data class HaversineCheck(val distance : Double, var withinBounds : Boolean, val
 }
 
 object GeoUtils {
-    private const val earthRadius =  6371009.0 //6378100
-    private const val degreeConversion = PI / 180.0//0.017453292519943
+    private const val earthRadius =  6371009.0
+    private const val degreeConversion = PI / 180.0
 
     fun findGeobounds(points : ArrayList<LatLon>) : LatLngBounds
     {
