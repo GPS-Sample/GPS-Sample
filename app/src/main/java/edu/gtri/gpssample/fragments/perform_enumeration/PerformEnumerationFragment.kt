@@ -67,7 +67,6 @@ class PerformEnumerationFragment : Fragment(),
 
     private val kExportTag = 2
     private val kSelectLocationTag = 3
-    private val kDuplicateTag = 4
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -330,7 +329,7 @@ class PerformEnumerationFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
-        if (tag == kDuplicateTag)
+        if (tag is LatLng)
         {
             return
         }
