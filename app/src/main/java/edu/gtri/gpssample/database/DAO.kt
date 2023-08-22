@@ -12,20 +12,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     override fun onCreate( db: SQLiteDatabase )
     {
         try {
-
-            // TESTING
-            val createTableGPS = ("CREATE TABLE " +
-                    "gps_test" + "(" +
-                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " + "," +
-                    "lat1" + " REAL" + "," +
-                    "lon1" + " REAL" + "," +
-                    "lat2" + " REAL" + "," +
-                    "lon2" + " REAL" + "," +
-                    "distance" + " REAL" +
-                    ")")
-            db.execSQL(createTableGPS)
-
-            // TESTING
             val createTableUser = ("CREATE TABLE " +
                     TABLE_USER + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -325,8 +311,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_LAT_LON")
 
-        db.execSQL("DROP TABLE IF EXISTS gps_test")
-
         onCreate(db)
     }
 
@@ -495,8 +479,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var enumerationItemDAO: EnumerationItemDAO
         lateinit var collectionItemDAO: CollectionItemDAO
 
-        lateinit var gpsTestDAO: GpsTestDAO
-
         // creation/access methods
 
         private var instance: DAO? = null
@@ -564,13 +546,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 enumerationItemDAO = EnumerationItemDAO( instance!!)
                 collectionItemDAO = CollectionItemDAO( instance!!)
 
-                gpsTestDAO = GpsTestDAO(instance!!)
             }
 
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 225
+        private const val DATABASE_VERSION = 226
 
     }
 }
