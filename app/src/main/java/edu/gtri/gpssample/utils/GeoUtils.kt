@@ -56,21 +56,8 @@ object GeoUtils {
         val a : Double = (sinDLat * sinDLat)  + (cos(lat1Rad) * cos(lat2Rad) * (sinDLon * sinDLon))
 
         val ssrt : Double = asin(sqrt(a))
-        val distance : Double = 2.0 * earthRadius * ssrt //atan2(sqrt(a), sqrt(1-a))
-        Log.d("XXXX", "a ${a}")
-        Log.d("XXXX", "ssrt ${ssrt}")
-        Log.d("XXXX", "")
-//        Log.d("xxxxx", "coord 1 ${latLng1.latitude}, ${latLng1.longitude}}")
-//        Log.d("xxxxx", "coord 2 ${latLng2.latitude}, ${latLng2.longitude}}")
-        Log.d("xxxx", "distance ${distance}")
+        val distance : Double = 2.0 * earthRadius * ssrt
         val haversineCheck = HaversineCheck(distance, false, latLng1, latLng2)
-
-
-        // my test
-
-
-
-
         if(distance < kMinimumDistance)
         {
             DAO.gpsTestDAO.addFieldData(latLng1.latitude, latLng1.longitude,
