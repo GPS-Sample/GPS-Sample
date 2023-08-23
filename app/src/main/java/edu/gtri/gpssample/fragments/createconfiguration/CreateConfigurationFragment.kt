@@ -16,6 +16,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -23,20 +29,21 @@ import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.ArrayList
 
-class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener,
-    ConfirmationDialog.ConfirmationDialogDelegate {
-
+class CreateConfigurationFragment : Fragment(),
+    ConfirmationDialog.ConfirmationDialogDelegate
+{
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var map : GoogleMap
-    private lateinit var manageStudiesAdapter: ManageStudiesAdapter
     private var selectedStudy: Study? = null
+
+    private lateinit var mapboxManager: MapboxManager
+    private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var manageStudiesAdapter: ManageStudiesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -97,8 +104,25 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
             }
         }
 
-        val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        binding.mapView.getMapboxMap().loadStyleUri(
+            Style.MAPBOX_STREETS,
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(style: Style) {
+                    refreshMap()
+                }
+            }
+        )
+
+        binding.mapView.getMapboxMap().addOnMapClickListener {
+            val bundle = Bundle()
+            bundle.putBoolean( Keys.kEditMode.toString(), true )
+            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+            return@addOnMapClickListener true
+        }
+
+        val pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        val polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.addStudyButton.setOnClickListener{
             sharedViewModel.createStudyModel.createNewStudy()
@@ -117,18 +141,6 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
 
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
-
-        if (this::map.isInitialized)
-        {
-            addPolygons()
-        }
-    }
-
-    override fun onDestroyView()
-    {
-        super.onDestroyView()
-
-        _binding = null
     }
 
     private fun didSelectStudy(study: Study)
@@ -143,43 +155,35 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
             resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
     }
 
-    override fun onMapClick(p0: LatLng) {
-        val bundle = Bundle()
-        bundle.putBoolean( Keys.kEditMode.toString(), true )
-        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-    }
-    override fun onMapReady(p0: GoogleMap) {
-        map = p0
-        map.setOnMapClickListener(this)
-        map.uiSettings.isScrollGesturesEnabled = false
-
-        addPolygons()
-    }
-
-    fun addPolygons()
+    fun refreshMap()
     {
-        map.clear()
-        sharedViewModel.currentConfiguration?.value?.let { config ->
+        sharedViewModel.currentConfiguration?.value?.let {config ->
 
             val enumVerts = ArrayList<LatLon>()
+
             for (enumArea in config.enumAreas)
             {
-                val points = ArrayList<LatLng>()
+                val points = ArrayList<com.mapbox.geojson.Point>()
+                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
 
                 enumArea.vertices.map {
                     enumVerts.add(it)
-                    points.add( it.toLatLng())
+                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
                 }
 
-                val polygon = PolygonOptions()
-                    .clickable(false)
-                    .addAll( points )
+                pointList.add( points )
 
-                map.addPolygon(polygon)
+                mapboxManager.addPolygon( pointList )
             }
 
             val latLngBounds = GeoUtils.findGeobounds(enumVerts)
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(10.0)
+                .center(point)
+                .build()
+
+            binding.mapView.getMapboxMap().setCamera(cameraPosition)
         }
     }
 
@@ -191,5 +195,12 @@ class CreateConfigurationFragment : Fragment(), OnMapReadyCallback, GoogleMap.On
     {
         sharedViewModel.removeStudy(selectedStudy)
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }
