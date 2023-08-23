@@ -21,9 +21,13 @@ def translate(appName, language, index):
 		outputFileName = "../../app/src/main/res/values-" + language + "/strings.xml"
  
 	outputFile = open( outputFileName, 'w' )
+
 	outputFile.write('<?xml version="1.0" encoding="utf-8"?>\n')
 	outputFile.write('<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n')
 	outputFile.write( '    <string name="app_name">' + appName + '</string>\n' )
+
+	if (language == "en"):
+		outputFile.write('    <string name="mapbox_access_token" translatable="false">pk.eyJ1IjoicnVzc21pdGNoMzI0NTkiLCJhIjoiY2xrdHBmN2ZkMDBkNjNlcGh4cXNtc3ByaSJ9.YtrzcwUCzm9WauRYjT7gJg</string>\n')
 
 	inputFile = open(inputFileName, 'r')
 	lines = inputFile.readlines()
