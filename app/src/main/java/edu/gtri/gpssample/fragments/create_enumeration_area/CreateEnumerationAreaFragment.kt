@@ -504,7 +504,19 @@ class CreateEnumerationAreaFragment : Fragment(), OnMapReadyCallback, Confirmati
             Log.d( "xxx", "${count}/${points.size}")
             count += 1
 
-            for (enumArea in unsavedEnumAreas)
+            val allEnumAreas = ArrayList<EnumArea>()
+
+            if (config.enumAreas.isNotEmpty())
+            {
+                allEnumAreas.addAll( config.enumAreas)
+            }
+
+            if (unsavedEnumAreas.isNotEmpty())
+            {
+                allEnumAreas.addAll( unsavedEnumAreas )
+            }
+
+            for (enumArea in allEnumAreas)
             {
                 val points1 = ArrayList<Coordinate>()
 
