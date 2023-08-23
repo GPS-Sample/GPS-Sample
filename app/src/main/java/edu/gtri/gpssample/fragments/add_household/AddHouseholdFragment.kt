@@ -98,10 +98,11 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-        if (enumerationItem.fieldDataList.size != study.fields.size)
-        {
-            enumerationItem.fieldDataList.clear()
-        }
+        // the study fields have changed. need to fix the fieldDataList
+//        if (enumerationItem.fieldDataList.size != study.fields.size)
+//        {
+//            enumerationItem.fieldDataList.clear()
+//        }
 
         // create enum data for every field
         if (enumerationItem.fieldDataList.isEmpty())
