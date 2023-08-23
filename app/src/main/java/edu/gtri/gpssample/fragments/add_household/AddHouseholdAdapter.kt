@@ -21,12 +21,12 @@ import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class AddHouseholdAdapter( var config: Config, var fieldData: List< FieldData>) :
+class AddHouseholdAdapter( var config: Config, var fieldDataList: List<FieldData>) :
     RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
 {
-    override fun getItemCount() = fieldData.size
+    override fun getItemCount() = fieldDataList.size
 
     private var context: Context? = null
 
@@ -39,11 +39,6 @@ class AddHouseholdAdapter( var config: Config, var fieldData: List< FieldData>) 
         viewHolder.itemView.isSelected = false
 
         return viewHolder
-    }
-
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-    {
-        val frameLayout: FrameLayout = itemView as FrameLayout
     }
 
     fun dateString(date: Date?): String
@@ -127,9 +122,15 @@ class AddHouseholdAdapter( var config: Config, var fieldData: List< FieldData>) 
         displayDate( date, field, fieldData, editText )
     }
 
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    {
+        val frameLayout: FrameLayout = itemView as FrameLayout
+        val textEditText = frameLayout.findViewById<EditText>(R.id.edit_text)
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        val fieldData = fieldData.get(holder.adapterPosition)
+        val fieldData = fieldDataList.get(holder.adapterPosition)
 
         fieldData.field?.let { field ->
 

@@ -98,6 +98,11 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
+        if (enumerationItem.fieldDataList.size != study.fields.size)
+        {
+            enumerationItem.fieldDataList.clear()
+        }
+
         // create enum data for every field
         if (enumerationItem.fieldDataList.isEmpty())
         {
@@ -105,7 +110,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             {
                 val fieldData = FieldData(field) //DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumerationItem.id!!)
                 enumerationItem.fieldDataList.add(fieldData)
-
             }
         }
 
@@ -130,6 +134,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+
 
 //        if (enumData.imageFileName.isNotEmpty())
 //        {
@@ -269,8 +275,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 data?.data?.let {uri ->
                     activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-                    (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
-                    binding.imageView.setImageBitmap(bitmap)
+//                    (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
+//                    binding.imageView.setImageBitmap(bitmap)
 //                    enumData.imageFileName = uri.toString()
 //                    DAO.enumDataDAO.updateEnumData( enumData )
                 }
