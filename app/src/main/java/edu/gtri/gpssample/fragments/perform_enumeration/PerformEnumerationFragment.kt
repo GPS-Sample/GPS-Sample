@@ -70,7 +70,6 @@ class PerformEnumerationFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var team: Team
-    private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList : ColorStateList
@@ -171,12 +170,14 @@ class PerformEnumerationFragment : Fragment(),
                 locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
                 binding.mapView.gestures.addOnMoveListener(onMoveListener)
+                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
                 binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
                 binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
 
@@ -188,7 +189,7 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-                map.setOnMapClickListener(null)
+//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -200,7 +201,7 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-                map.setOnMapClickListener(null)
+//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -209,7 +210,7 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-                map.setOnMapClickListener(null)
+//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -408,7 +409,7 @@ class PerformEnumerationFragment : Fragment(),
         if (dropMode)
         {
             dropMode = false
-            map.setOnMapClickListener(null)
+//            map.setOnMapClickListener(null)
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
         }
 
@@ -434,6 +435,11 @@ class PerformEnumerationFragment : Fragment(),
 
         if (tag == kSelectLocationTag)
         {
+            if (currentLocation == null)
+            {
+                currentLocation = LatLng( binding.mapView.getMapboxMap().cameraState.center.latitude(), binding.mapView.getMapboxMap().cameraState.center.longitude())
+            }
+
             currentLocation?.let {
                 createLocation( it )
             }
@@ -497,7 +503,8 @@ class PerformEnumerationFragment : Fragment(),
             when(tag)
             {
                 kSelectLocationTag -> {
-                    InfoDialog( activity, resources.getString(R.string.new_location), resources.getString(R.string.tap_the_map), resources.getString(R.string.ok), null, this)
+                    dropMode = true
+                    binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
 
                 kExportTag -> {
@@ -553,16 +560,8 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun didSelectOkButton(tag: Any?)
     {
-        binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-
         dropMode = true
-
-//        map.setOnMapClickListener { latLng ->
-//            dropMode = false
-//            addHousehold( latLng )
-//            map.setOnMapClickListener(null)
-//            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-//        }
+        binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

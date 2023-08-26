@@ -41,6 +41,7 @@ import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.github.dellisd.spatialk.geojson.FeatureCollection
 import io.github.dellisd.spatialk.geojson.MultiPolygon
@@ -125,6 +126,13 @@ class CreateEnumerationAreaFragment : Fragment(),
             binding.buttonLayout.visibility = View.GONE
         }
 
+        val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+
+        if (currentZoomLevel == null)
+        {
+            sharedViewModel.performEnumerationModel.setCurrentZoomLevel( 14.0 )
+        }
+
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
@@ -149,12 +157,14 @@ class CreateEnumerationAreaFragment : Fragment(),
                 locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
                 binding.mapView.gestures.addOnMoveListener(onMoveListener)
+                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
                 binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
                 binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
 
@@ -339,13 +349,18 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (allEnumAreas.isNotEmpty())
         {
             val enumArea = allEnumAreas[0]
-            val point = com.mapbox.geojson.Point.fromLngLat( enumArea.vertices[0].longitude, enumArea.vertices[0].latitude )
-            val cameraPosition = CameraOptions.Builder()
-                .zoom(10.0)
-                .center(point)
-                .build()
+            val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
 
-            binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            currentZoomLevel?.let { currentZoomLevel ->
+                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(currentZoomLevel)
+                    .center(point)
+                    .build()
+
+                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            }
         }
     }
 
