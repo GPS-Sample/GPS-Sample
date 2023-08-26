@@ -49,7 +49,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     InputDialog.InputDialogDelegate
 {
     private lateinit var config: Config
-    private lateinit var map: GoogleMap
     private lateinit var mapboxManager: MapboxManager
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
