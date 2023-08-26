@@ -9,18 +9,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
+import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
@@ -58,6 +66,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var dropMode = false
     private var createMode = false
     private val binding get() = _binding!!
+    private var showCurrentLocation = false
     private val unsavedEnumAreas = ArrayList<EnumArea>()
     private val pointHashMap = HashMap<Long,Location>()
     private val polygonHashMap = HashMap<Long,EnumArea>()
@@ -120,6 +129,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
+                    initLocationComponent()
                     refreshMap()
                 }
             }
@@ -130,6 +140,23 @@ class CreateEnumerationAreaFragment : Fragment(),
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
+
+        binding.centerOnLocationButton.setOnClickListener {
+            showCurrentLocation = !showCurrentLocation
+            if (showCurrentLocation)
+            {
+                val locationComponentPlugin = binding.mapView.location
+                locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                binding.mapView.gestures.addOnMoveListener(onMoveListener)
+            }
+            else
+            {
+                binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+            }
+        }
 
         binding.importButton.setOnClickListener {
             dropMode = false
@@ -587,9 +614,69 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
+    private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
+        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
+    }
+
+    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
+        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(it)
+    }
+
+    private val onMoveListener = object : OnMoveListener {
+        override fun onMoveBegin(detector: MoveGestureDetector) {
+            onCameraTrackingDismissed()
+        }
+
+        override fun onMove(detector: MoveGestureDetector): Boolean {
+            return false
+        }
+
+        override fun onMoveEnd(detector: MoveGestureDetector) {}
+    }
+
+    private fun initLocationComponent() {
+        val locationComponentPlugin = binding.mapView.location
+        locationComponentPlugin.updateSettings {
+            this.enabled = true
+            this.locationPuck = LocationPuck2D(
+                bearingImage = AppCompatResources.getDrawable(
+                    activity!!,
+                    com.mapbox.maps.R.drawable.mapbox_user_puck_icon,
+                ),
+                shadowImage = AppCompatResources.getDrawable(
+                    activity!!,
+                    com.mapbox.maps.R.drawable.mapbox_user_icon_shadow,
+                ),
+                scaleExpression = interpolate {
+                    linear()
+                    zoom()
+                    stop {
+                        literal(0.0)
+                        literal(0.6)
+                    }
+                    stop {
+                        literal(20.0)
+                        literal(1.0)
+                    }
+                }.toJson()
+            )
+        }
+    }
+
+    private fun onCameraTrackingDismissed() {
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+    }
+
     override fun onDestroyView()
     {
         super.onDestroyView()
+
+        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
 
         _binding = null
     }

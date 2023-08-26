@@ -68,5 +68,14 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:background="@drawable/export_blue" />
+
+        <Button
+            android:id="@+id/center_on_location_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:background="@drawable/location_bubble" />
     </LinearLayout>
 </LinearLayout>
