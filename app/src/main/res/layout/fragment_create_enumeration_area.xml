@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
@@ -18,12 +19,15 @@
         android:layout_height="match_parent"
         tools:context=".fragments.create_enumeration_area.DefineEnumerationAreaFragment">
 
-        <fragment
-            android:id="@+id/map_fragment"
+        <com.mapbox.maps.MapView
+            android:id="@+id/map_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:name="com.google.android.gms.maps.SupportMapFragment" />
+            mapbox:mapbox_cameraTargetLat="33.77577524978659"
+            mapbox:mapbox_cameraTargetLng="-84.39630379821243"
+            mapbox:mapbox_cameraZoom="9.0">
+        </com.mapbox.maps.MapView>
 
         <TextView
             android:id="@+id/toolbarTitle"
@@ -46,7 +50,7 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/imort_button"
+                android:id="@+id/import_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="5dp"
@@ -71,6 +75,15 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:background="@drawable/add_house_blue" />
+
+            <Button
+                android:id="@+id/center_on_location_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:background="@drawable/location_bubble" />
         </LinearLayout>
 
         <LinearLayout

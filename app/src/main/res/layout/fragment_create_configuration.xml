@@ -3,6 +3,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
     tools:context=".fragments.createconfiguration.CreateConfigurationFragment"
@@ -153,9 +154,24 @@
                     android:layout_marginRight="20dp"
                     android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
                     android:hint="@string/enter_min_gps_precision" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
+
+                <com.mapbox.maps.MapView
+                    android:id="@+id/map_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    mapbox:mapbox_cameraTargetLat="33.77577524978659"
+                    mapbox:mapbox_cameraTargetLng="-84.39630379821243"
+                    mapbox:mapbox_cameraZoom="9.0">
+                </com.mapbox.maps.MapView>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
@@ -166,23 +182,6 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <androidx.fragment.app.FragmentContainerView
-                        android:id="@+id/map_fragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="20dp"
-                        android:name="com.google.android.gms.maps.SupportMapFragment" />
-                </RelativeLayout>
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp" />
                 <FrameLayout
                     android:layout_marginBottom="2dp"
                     android:layout_width="match_parent"

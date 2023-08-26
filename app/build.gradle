@@ -72,6 +72,9 @@ dependencies {
     implementation 'com.google.android.libraries.places:places:3.2.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
+    // MapBox
+    implementation 'com.mapbox.maps:android:10.15.0'
+
     // GeoJson
     implementation("io.github.dellisd.spatialk:geojson:0.2.1")
 

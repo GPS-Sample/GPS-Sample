@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <string name="app_name">GPSSample</string>
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1IjoicnVzc21pdGNoMzI0NTkiLCJhIjoiY2xrdHBmN2ZkMDBkNjNlcGh4cXNtc3ByaSJ9.YtrzcwUCzm9WauRYjT7gJg</string>
     <string name="action_settings">"Settings"</string>
     <string name="action_sign_out">"Sign Out"</string>
     <string name="next">"Next"</string>
@@ -158,6 +159,7 @@
     <string name="enum_saved_doc">"Export Enumeration Data"</string>
     <string name="config_saved_doc">"Enumeration data has been saved to the Documents directory."</string>
     <string name="location_not_found">"The configuration has been saved to the Documents directory."</string>
+    <string name="nobody_home">">Location not found"</string>
     <string name="home_not_exist">"Home does not exist"</string>
     <string name="reason_incomplete">"Oops! Please select a reason for incomplete"</string>
     <string name="enter_enum_area_name">"Enter the Enumeration Area name"</string>
@@ -224,7 +226,6 @@
     <string name="warning">"Warning!"</string>
     <string name="duplicate_warning">"Adding this new location is extremely close to an existing location.  Are you sure that you want to add it?"</string>
     <string name="missing_team">"Configuration is missing a Team definition"</string>
-    <string name="nobody_home">"Nobody home"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

@@ -23,6 +23,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolygonOptions
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -37,6 +43,7 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -45,17 +52,16 @@ import java.io.FileWriter
 import java.util.*
 
 class ConfigurationFragment : Fragment(),
-    OnMapReadyCallback,
-    GoogleMap.OnMapClickListener,
     InputDialog.InputDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var mapboxManager: MapboxManager
+    private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
-    private var map : GoogleMap? = null
-    private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var enumerationAreasAdapter: ManageEnumerationAreasAdapter
 
     private val kDeleteTag = 1
@@ -121,8 +127,25 @@ class ConfigurationFragment : Fragment(),
                 resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
-        val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        binding.mapView.getMapboxMap().loadStyleUri(
+            Style.MAPBOX_STREETS,
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(style: Style) {
+                    refreshMap()
+                }
+            }
+        )
+
+        binding.mapView.getMapboxMap().addOnMapClickListener {
+            val bundle = Bundle()
+            bundle.putBoolean( Keys.kEditMode.toString(), false )
+            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+            return@addOnMapClickListener true
+        }
+
+        val pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        val polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
         binding.studiesRecycler.adapter = studiesAdapter
@@ -141,9 +164,7 @@ class ConfigurationFragment : Fragment(),
 
         studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
 
-        // set the first study as selected.  TODO: save the id of the selected study
         sharedViewModel.currentConfiguration?.value?.let { config ->
-
 
             enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
 
@@ -153,56 +174,43 @@ class ConfigurationFragment : Fragment(),
                 sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
         }
-        map?.let { map ->
-            onMapReady(map)
+    }
+
+    fun refreshMap()
+    {
+        sharedViewModel.currentConfiguration?.value?.let {config ->
+
+            val enumVerts = ArrayList<LatLon>()
+
+            for (enumArea in config.enumAreas)
+            {
+                val points = ArrayList<com.mapbox.geojson.Point>()
+                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+
+                enumArea.vertices.map {
+                    enumVerts.add(it)
+                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+                }
+
+                pointList.add( points )
+
+                mapboxManager.addPolygon( pointList )
+            }
+
+            val latLngBounds = GeoUtils.findGeobounds(enumVerts)
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(10.0)
+                .center(point)
+                .build()
+
+            binding.mapView.getMapboxMap().setCamera(cameraPosition)
         }
     }
 
     private fun didSelectStudy(study: Study)
     {
         sharedViewModel.createStudyModel.setStudy(study)
-    }
-
-    override fun onMapClick(p0: LatLng) {
-        val bundle = Bundle()
-        bundle.putBoolean( Keys.kEditMode.toString(), false )
-        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-    }
-
-    override fun onMapReady(p0: GoogleMap) {
-        map = p0
-        map?.let{googleMap ->
-            googleMap.clear()
-            googleMap.setOnMapClickListener(this)
-            googleMap.uiSettings.isScrollGesturesEnabled = false
-
-            // put the enums
-            sharedViewModel.currentConfiguration?.value?.let {config ->
-
-                val enumVerts = ArrayList<LatLon>()
-                for (enumArea in config.enumAreas)
-                {
-                    val points = ArrayList<LatLng>()
-
-                    enumArea.vertices.map {
-                        enumVerts.add(it)
-                        points.add( it.toLatLng())
-                    }
-
-                    val polygon = PolygonOptions()
-                        .clickable(false)
-                        .addAll( points )
-
-                    googleMap.addPolygon(polygon)
-
-
-                }
-
-                val latLngBounds = GeoUtils.findGeobounds(enumVerts)
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
-
-            }
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -321,9 +329,7 @@ class ConfigurationFragment : Fragment(),
                     inputStream?.let {  inputStream ->
                         val text = inputStream.bufferedReader().readText()
 
-                        map?.let { map ->
-                            onMapReady(map)
-                        }
+                        refreshMap()
                     }
                 }
                 catch( ex: java.lang.Exception )

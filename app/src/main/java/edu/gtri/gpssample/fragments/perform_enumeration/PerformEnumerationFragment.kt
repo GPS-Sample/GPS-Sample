@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -27,6 +28,22 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.mapbox.android.gestures.MoveGestureDetector
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.Style
+import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
+import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.plugin.LocationPuck2D
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.OnMoveListener
+import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -36,6 +53,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
+import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -46,24 +64,33 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class PerformEnumerationFragment : Fragment(),
-    OnMapReadyCallback,
+    OnMapClickListener,
+    OnCameraChangeListener,
     InfoDialog.InfoDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var team: Team
-    private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
+    private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var sharedNetworkViewModel : NetworkViewModel
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
     private var userId = 0
     private var dropMode = false
+    private var showCurrentLocation = false
     private var currentLocation: LatLng? = null
+
     private var _binding: FragmentPerformEnumerationBinding? = null
-    private lateinit var sharedNetworkViewModel : NetworkViewModel
     private val binding get() = _binding!!
+
+    private val pointHashMap = HashMap<Long,Location>()
+    private val polygonHashMap = HashMap<Long,EnumArea>()
+    private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
+    private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
 
     private val kExportTag = 2
     private val kSelectLocationTag = 3
@@ -93,7 +120,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (currentZoomLevel == null)
         {
-            sharedViewModel.performEnumerationModel.setCurrentZoomLevel( 14F )
+            sharedViewModel.performEnumerationModel.setCurrentZoomLevel( 14.0 )
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
@@ -119,11 +146,40 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + team.name + " team)"
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+        binding.mapView.getMapboxMap().loadStyleUri(
+            Style.MAPBOX_STREETS,
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(style: Style) {
+                    initLocationComponent()
+                    refreshMap()
+                }
+            }
+        )
 
-        mapFragment!!.getMapAsync(this)
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+        binding.mapView.gestures.addOnMapClickListener(this )
+
+        binding.centerOnLocationButton.setOnClickListener {
+            showCurrentLocation = !showCurrentLocation
+            if (showCurrentLocation)
+            {
+                val locationComponentPlugin = binding.mapView.location
+                locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                binding.mapView.gestures.addOnMoveListener(onMoveListener)
+                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else
+            {
+                binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+            }
+        }
 
         binding.addHouseholdButton.backgroundTintList?.let {
             defaultColorList = it
@@ -133,7 +189,7 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-                map.setOnMapClickListener(null)
+//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -145,7 +201,7 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-                map.setOnMapClickListener(null)
+//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -154,7 +210,7 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-                map.setOnMapClickListener(null)
+//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -190,119 +246,162 @@ class PerformEnumerationFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    private fun addMapObjects()
+    private fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         performEnumerationAdapter.updateLocations( enumArea.locations )
 
-        map.clear()
+        for (polygonAnnotation in allPolygonAnnotations)
+        {
+            polygonAnnotationManager.delete( polygonAnnotation )
+        }
 
-        val points = ArrayList<LatLng>()
+        allPolygonAnnotations.clear()
+
+        for (pointAnnotation in allPointAnnotations)
+        {
+            pointAnnotationManager.delete( pointAnnotation )
+        }
+
+        allPointAnnotations.clear()
+
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
         team.polygon.map {
-            val pt = it.toLatLng()
-            points.add( pt)
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
-        if (points.isNotEmpty())
+        pointList.add( points )
+
+        if (pointList.isNotEmpty())
         {
+            val polygonAnnotation = mapboxManager.addPolygon( pointList )
 
-            val polygon = PolygonOptions()
-                .clickable(false)
-                .addAll( points )
-
-            map.addPolygon(polygon)
-        }
-
-        val latLngBounds = GeoUtils.findGeobounds(team.polygon)
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0 ))
-
-        sharedViewModel.performEnumerationModel.currentZoomLevel?.value?.let { zoomLevel ->
-            map.moveCamera(CameraUpdateFactory.zoomTo(zoomLevel))
-            currentLocation?.let { latLng ->
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel))
+            polygonAnnotation?.let { polygonAnnotation ->
+                polygonHashMap[polygonAnnotation.id] = enumArea
+                allPolygonAnnotations.add( polygonAnnotation)
             }
-        }
 
-        for (location in enumArea.locations)
-        {
-            var marker: Marker? = null
-            var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+            val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
 
-            if (location.isLandmark)
-            {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+            currentZoomLevel?.let { currentZoomLevel ->
+                val latLngBounds = GeoUtils.findGeobounds(team.polygon)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(currentZoomLevel)
+                    .center(point)
+                    .build()
+
+                binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
-            else
-            {
-                var numComplete = 0
 
-                for (item in location.items)
+            for (location in enumArea.locations)
+            {
+                if (location.isLandmark)
                 {
-                    val enumerationItem = item as? EnumerationItem
-                    enumerationItem?.let{enumerationItem ->
-                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                    mapboxManager.addMarker( point, R.drawable.location_blue )
+                }
+                else
+                {
+                    var resourceId = R.drawable.home_black
 
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                    var numComplete = 0
+
+                    for (item in location.items)
+                    {
+                        val enumerationItem = item as EnumerationItem?
+                        if(enumerationItem != null)
                         {
-                            numComplete++
+                            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                            {
+                                resourceId = R.drawable.home_red
+                                break
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                            {
+                                numComplete++
+                            }
                         }
                     }
 
-                }
-
-                if (numComplete > 0 && numComplete == location.items.size)
-                {
-                    icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                }
-            }
-
-            marker = map.addMarker( MarkerOptions()
-                .position( LatLng( location.latitude, location.longitude ))
-                .icon( icon )
-            )
-
-            marker?.let {marker ->
-                marker.tag = location
-
-                map.setOnMarkerClickListener { marker ->
-                    marker.tag?.let { tag ->
-                        val location = tag as Location
-                        sharedViewModel.locationViewModel.setCurrentLocation(location)
-                        if (location.isLandmark)
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-                        }
-                        else
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-                        }
+                    if (numComplete > 0 && numComplete == location.items.size)
+                    {
+                        resourceId = R.drawable.home_green
                     }
 
-                    false
+                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                    val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+
+                    pointAnnotation?.let {
+                        pointHashMap[pointAnnotation.id] = location
+                        allPointAnnotations.add( pointAnnotation )
+                    }
+
+                    pointAnnotationManager?.apply {
+                        addClickListener(
+                            OnPointAnnotationClickListener { pointAnnotation ->
+                                pointHashMap[pointAnnotation.id]?.let { location ->
+                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+                                    if (location.isLandmark)
+                                    {
+                                        findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                                    }
+                                    else
+                                    {
+                                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                                    }
+                                }
+                                true
+                            }
+                        )
+                    }
                 }
             }
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-
-        if (ActivityCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+    override fun onMapClick(point: com.mapbox.geojson.Point): Boolean
+    {
+        if (dropMode)
         {
-            map.isMyLocationEnabled = true
+            dropMode = false
+            createLocation( LatLng( point.latitude(), point.longitude()))
+            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+            return true
         }
 
-        addMapObjects()
+        return false
+    }
 
-        requestNewLocationData()
-
-        map.setOnCameraMoveListener {
-            sharedViewModel.performEnumerationModel.setCurrentZoomLevel(map.cameraPosition.zoom)
+    fun createLocation( latLng: LatLng )
+    {
+        enumArea.locations.map{
+            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), latLng )
+            if (haversineCheck.withinBounds)
+            {
+                val message = "Distance: ${haversineCheck.distance}\n\n " +
+                        "coord1 ${haversineCheck.start.latitude}, ${haversineCheck.start.longitude} \n"+
+                        "coord2 ${haversineCheck.end.latitude}, ${haversineCheck.end.longitude} \n"+
+                        " ${resources.getString(R.string.duplicate_warning)}"
+                ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), latLng, this)
+                return
+            }
         }
+
+        val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
+        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+        enumArea.locations.add(location)
+        refreshMap()
+    }
+
+    override fun onCameraChanged(eventData: CameraChangedEventData)
+    {
+        sharedViewModel.performEnumerationModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     private fun didSelectLocation( location: Location )
@@ -310,7 +409,7 @@ class PerformEnumerationFragment : Fragment(),
         if (dropMode)
         {
             dropMode = false
-            map.setOnMapClickListener(null)
+//            map.setOnMapClickListener(null)
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
         }
 
@@ -336,8 +435,13 @@ class PerformEnumerationFragment : Fragment(),
 
         if (tag == kSelectLocationTag)
         {
+            if (currentLocation == null)
+            {
+                currentLocation = LatLng( binding.mapView.getMapboxMap().cameraState.center.latitude(), binding.mapView.getMapboxMap().cameraState.center.longitude())
+            }
+
             currentLocation?.let {
-                addHousehold( it )
+                createLocation( it )
             }
 
             return
@@ -392,14 +496,15 @@ class PerformEnumerationFragment : Fragment(),
             val location = Location( LocationType.Enumeration, tag.latitude, tag.longitude, false)
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
-            addMapObjects()
+            refreshMap()
         }
         else
         {
             when(tag)
             {
                 kSelectLocationTag -> {
-                    InfoDialog( activity, resources.getString(R.string.new_location), resources.getString(R.string.tap_the_map), resources.getString(R.string.ok), null, this)
+                    dropMode = true
+                    binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
 
                 kExportTag -> {
@@ -455,42 +560,8 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun didSelectOkButton(tag: Any?)
     {
-        binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-
         dropMode = true
-
-        map.setOnMapClickListener { latLng ->
-            dropMode = false
-            addHousehold( latLng )
-            map.setOnMapClickListener(null)
-            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-        }
-    }
-
-    fun addHousehold( latLng: LatLng )
-    {
-        enumArea.locations.map{
-            Log.d( "xxx", "${it.latitude},${it.longitude}")
-
-            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), latLng )
-            if (haversineCheck.withinBounds)
-            {
-                val message = "Distance: ${haversineCheck.distance}\n\n " +
-                        "coord1 ${haversineCheck.start.latitude}, ${haversineCheck.start.longitude} \n"+
-                        "coord2 ${haversineCheck.end.latitude}, ${haversineCheck.end.longitude} \n"+
-                        " ${resources.getString(R.string.duplicate_warning)}"
-                ConfirmationDialog( activity, resources.getString(R.string.warning),
-                    message, resources.getString(R.string.no), resources.getString(R.string.yes), latLng, this)
-                return
-            }
-        }
-
-        latLng?.let { latLng ->
-            val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
-            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-            enumArea.locations.add(location)
-            addMapObjects()
-        }
+        binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -520,50 +591,70 @@ class PerformEnumerationFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-    private fun requestNewLocationData()
-    {
-        if (ActivityCompat.checkSelfPermission(
-                activity!!,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                activity!!,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,1000).build()
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+    private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
+        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
     }
 
-    private val locationCallback = object : LocationCallback()
-    {
-        override fun onLocationResult(locationResult: LocationResult)
-        {
-            locationResult.lastLocation?.let{ location ->
-                val location = LatLng(location.latitude, location.longitude)
-                sharedViewModel.performEnumerationModel.currentZoomLevel?.value?.let { zoomLevel ->
-                    if (currentLocation == null)
-                    {
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoomLevel))
-                    }
-                    else
-                    {
-                        map.moveCamera(CameraUpdateFactory.zoomTo(zoomLevel))
-                    }
+    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
+        currentLocation = LatLng( it.latitude(), it.longitude())
+        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(it)
+    }
 
-                    currentLocation = location
-                }
-            }
+    private val onMoveListener = object : OnMoveListener {
+        override fun onMoveBegin(detector: MoveGestureDetector) {
+            onCameraTrackingDismissed()
         }
+
+        override fun onMove(detector: MoveGestureDetector): Boolean {
+            return false
+        }
+
+        override fun onMoveEnd(detector: MoveGestureDetector) {}
+    }
+
+    private fun initLocationComponent() {
+        val locationComponentPlugin = binding.mapView.location
+        locationComponentPlugin.updateSettings {
+            this.enabled = true
+            this.locationPuck = LocationPuck2D(
+                bearingImage = AppCompatResources.getDrawable(
+                    activity!!,
+                    com.mapbox.maps.R.drawable.mapbox_user_puck_icon,
+                ),
+                shadowImage = AppCompatResources.getDrawable(
+                    activity!!,
+                    com.mapbox.maps.R.drawable.mapbox_user_icon_shadow,
+                ),
+                scaleExpression = interpolate {
+                    linear()
+                    zoom()
+                    stop {
+                        literal(0.0)
+                        literal(0.6)
+                    }
+                    stop {
+                        literal(20.0)
+                        literal(1.0)
+                    }
+                }.toJson()
+            )
+        }
+    }
+
+    private fun onCameraTrackingDismissed() {
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
     }
 
     override fun onDestroyView()
     {
         super.onDestroyView()
 
-        fusedLocationClient.removeLocationUpdates( locationCallback )
+        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
 
         _binding = null
     }
