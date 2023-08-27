@@ -15,6 +15,17 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -22,6 +33,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.locationtech.jts.geom.Coordinate
@@ -29,13 +41,18 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
-class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
+class CreateEnumerationTeamFragment : Fragment(),
+    OnMapClickListener,
+    ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var map: GoogleMap
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
+    private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList: ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
 
     private var createMode = false
     private var selectionGeometry: Geometry? = null
@@ -70,9 +87,20 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
             enumArea = _enumArea
         }
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+        binding.mapView.getMapboxMap().loadStyleUri(
+            Style.MAPBOX_STREETS,
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(style: Style) {
+                    refreshMap()
+                }
+            }
+        )
 
-        mapFragment!!.getMapAsync(this)
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+
+        binding.mapView.gestures.addOnMapClickListener(this )
 
         binding.dropPinButton.backgroundTintList?.let {
             defaultColorList = it
@@ -164,33 +192,24 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
             }
 
             study.id?.let { studyId ->
-                enumArea.id?.let { enumAreaId ->
+                val polygon = ArrayList<LatLon>()
 
-                    val polygon = ArrayList<LatLon>()
+                selectionPolygon?.points?.map {
+                    polygon.add( LatLon( it.latitude, it.longitude ))
+                }
 
-                    selectionPolygon?.points?.map {
+                if (polygon.isEmpty())
+                {
+                    enumArea?.vertices?.map {
                         polygon.add( LatLon( it.latitude, it.longitude ))
                     }
+                }
 
-                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), true, polygon ), enumArea)
+                val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), true, polygon ), enumArea)
 
-                    team?.let { team ->
-                        enumArea.enumerationTeams.add(team)
-//                        team.id?.let { teamId ->
-//                            for (location in enumArea.locations) {
-//                                selectionGeometry?.let {
-//                                    val point = GeometryFactory().createPoint(
-//                                        Coordinate(
-//                                            location.longitude,
-//                                            location.latitude
-//                                        )
-//                                    )
-//                                }
-//                            }
-//                        }
-
-                        findNavController().popBackStack()
-                    }
+                team?.let { team ->
+                    enumArea.enumerationTeams.add(team)
+                    findNavController().popBackStack()
                 }
             }
         }
@@ -232,7 +251,58 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
 
     var once = true
 
-    override fun onMapReady(googleMap: GoogleMap)
+    fun refreshMap()
+    {
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+
+        enumArea.vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        if (pointList.isNotEmpty())
+        {
+            mapboxManager.addPolygon(pointList)
+
+            val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+
+            if (currentZoomLevel == null)
+            {
+                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(14.0)
+            }
+
+            currentZoomLevel?.let { currentZoomLevel ->
+                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(currentZoomLevel)
+                    .center(point)
+                    .build()
+
+                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            }
+
+            for (location in enumArea.locations)
+            {
+                if (!location.isLandmark)
+                {
+                    var resourceId = R.drawable.home_black
+
+                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                    mapboxManager.addMarker( point, resourceId )
+                }
+            }
+        }
+    }
+
+    override fun onMapClick(point: Point): Boolean
+    {
+        return false
+    }
+
+    fun onMapReadyXXX(googleMap: GoogleMap)
     {
         map = googleMap
 
