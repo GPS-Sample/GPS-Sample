@@ -176,20 +176,18 @@ class CreateEnumerationTeamFragment : Fragment(), OnMapReadyCallback, Confirmati
 
                     team?.let { team ->
                         enumArea.enumerationTeams.add(team)
-                        team.id?.let { teamId ->
-
-                            for (location in enumArea.locations) {
-                                selectionGeometry?.let {
-                                    val point = GeometryFactory().createPoint(
-                                        Coordinate(
-                                            location.longitude,
-                                            location.latitude
-                                        )
-                                    )
-                                }
-                            }
-
-                        }
+//                        team.id?.let { teamId ->
+//                            for (location in enumArea.locations) {
+//                                selectionGeometry?.let {
+//                                    val point = GeometryFactory().createPoint(
+//                                        Coordinate(
+//                                            location.longitude,
+//                                            location.latitude
+//                                        )
+//                                    )
+//                                }
+//                            }
+//                        }
 
                         findNavController().popBackStack()
                     }

@@ -34,8 +34,10 @@ import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.ExportDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
+import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
@@ -52,6 +54,9 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var team: Team
     private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
+    private lateinit var sampleArea: SampleArea
+    private lateinit var mapboxManager: MapboxManager
+    private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
@@ -71,6 +76,16 @@ class PerformCollectionFragment : Fragment(),
         sharedViewModel = vm
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
+
+        val samplingVm : SamplingViewModel by activityViewModels()
+        samplingViewModel = samplingVm
+        samplingViewModel.currentFragment = this
+        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+        samplingViewModel.config = sharedViewModel.currentConfiguration?.value
+
+        samplingVm.currentSampleArea?.value?.let { sampleArea ->
+            this.sampleArea = sampleArea
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -135,7 +150,7 @@ class PerformCollectionFragment : Fragment(),
 
         var locations = ArrayList<Location>()
 
-        for (location in enumArea.locations)
+        for (location in sampleArea.locations)
         {
             if (!location.isLandmark && location.items.isNotEmpty())
             {
@@ -147,7 +162,6 @@ class PerformCollectionFragment : Fragment(),
                         locations.add( location )
                     }
                 }
-
             }
         }
 
@@ -184,7 +198,7 @@ class PerformCollectionFragment : Fragment(),
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        for (location in enumArea.locations)
+        for (location in sampleArea.locations)
         {
             if (location.isLandmark)
             {
@@ -204,7 +218,7 @@ class PerformCollectionFragment : Fragment(),
                     {
 //                        val collectionItem = DAO.collectionItemDAO.getCollectionItem( sampledItem.enumItem!!.collectionItemId )
 //
-//                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
 //
 //                        collectionItem?.let { collectionItem ->
 //
@@ -218,10 +232,10 @@ class PerformCollectionFragment : Fragment(),
 //                            }
 //                        }
 
-//                        val marker = map.addMarker( MarkerOptions()
-//                            .position( LatLng( location.latitude, location.longitude ))
-//                            .icon( icon )
-//                        )
+                        val marker = map.addMarker( MarkerOptions()
+                            .position( LatLng( location.latitude, location.longitude ))
+                            .icon( icon )
+                        )
 
 //                        marker?.let {marker ->
 //                            marker.tag = location
@@ -240,7 +254,6 @@ class PerformCollectionFragment : Fragment(),
 //                        }
                     }
                 }
-
             }
         }
     }
