@@ -17,6 +17,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
@@ -35,6 +36,7 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
     private lateinit var map: GoogleMap
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
+    private lateinit var sampleArea: SampleArea
     private lateinit var defaultColorList: ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var samplingViewModel: SamplingViewModel
@@ -55,6 +57,13 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
 
         val samplingVm : SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
+        samplingViewModel.currentFragment = this
+        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+        samplingViewModel.config = sharedViewModel.currentConfiguration?.value
+
+        samplingVm.currentSampleArea?.value?.let { sampleArea ->
+            this.sampleArea = sampleArea
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -167,58 +176,18 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
                 return@setOnClickListener
             }
 
+            val polygon = ArrayList<LatLon>()
+
+            selectionPolygon?.points?.map {
+                polygon.add( LatLon( it.latitude, it.longitude ))
+            }
+
             study.id?.let { studyId ->
-                enumArea.id?.let { enumAreaId ->
-
-                    var polygon = ArrayList<LatLon>()
-
-                    selectionPolygon?.points?.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
-                    }
-
-                    if (polygon.isEmpty())
-                    {
-                        enumArea.vertices.map {
-                            polygon.add( LatLon( it.latitude, it.longitude ))
-                        }
-                    }
-
-//                    val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), false, polygon ))
-//
-//                    team?.id?.let { teamId ->
-//
-//                        if (selectionGeometry == null)
-//                        {
-//                            for (location in enumArea.locations)
-//                            {
-//                               // location.collectionTeamId = teamId
-//                                DAO.locationDAO.updateLocation( location )
-//                            }
-//                        }
-//                        else
-//                        {
-//                            for (location in enumArea.locations)
-//                            {
-//                                selectionGeometry?.let {
-//                                    val point = GeometryFactory().createPoint( Coordinate( location.longitude, location.latitude ))
-//                                    if (it.contains( point ))
-//                                    {
-//                                       // location.collectionTeamId = teamId
-//                                        DAO.locationDAO.updateLocation( location )
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                        // refresh the shared config
-////                        val config = DAO.configDAO.getConfig( enumArea.configId )
-////                        config?.let {
-////                            sharedViewModel.setCurrentConfig( it )
-////                        }
-//                    }
-
-                    findNavController().popBackStack()
+                DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), false, polygon ), enumArea)?.let { team ->
+                    sampleArea.collectionTeams.add(team)
                 }
+
+                findNavController().popBackStack()
             }
         }
     }
@@ -293,23 +262,26 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
             map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
-        for (location in enumArea.locations)
+
+        for (location in sampleArea.locations)
         {
-//            if (!location.isLandmark && location.enumerationItems.isNotEmpty())
-//            {
-//                // assuming only 1 enumeration item per location, for now...
-//                val enumerationItem = location.enumerationItems[0]
-//
-//                if (enumerationItem.samplingState == SamplingState.Sampled)
-//                {
-//                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-//
-//                    map.addMarker( MarkerOptions()
-//                        .position( LatLng( location.latitude, location.longitude ))
-//                        .icon( icon )
-//                    )
-//                }
-//            }
+            if (!location.isLandmark && location.items.isNotEmpty())
+            {
+                // assuming only 1 enumeration item per location, for now...
+                val sampledItem = location.items[0] as? SampledItem
+
+                sampledItem?.let { sampledItem ->
+                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    {
+                        val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+
+                        map.addMarker( MarkerOptions()
+                            .position( LatLng( location.latitude, location.longitude ))
+                            .icon( icon )
+                        )
+                    }
+                }
+            }
         }
     }
 

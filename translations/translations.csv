@@ -184,7 +184,7 @@ export_enum_data,Select a configuration,Seleccione una configuración,Sélection
 enum_saved_doc,Export Enumeration Data,Exportar datos de enumeración,Exporter les données de dénombrement,Exportar dados de enumeração,Экспорт данных переписи
 config_saved_doc,Enumeration data has been saved to the Documents directory.,Los datos de enumeración se han guardado en el directorio Documentos.,Les données d'énumération ont été sauvegardées dans le répertoire Documents.,Os dados de enumeração foram guardados no diretório Documentos.,Данные переписи были сохранены в директории Documents.
 location_not_found,The configuration has been saved to the Documents directory.,La configuración se ha guardado en el directorio Documentos.,La configuration a été sauvegardée dans le répertoire Documents.,A configuração foi guardada no diretório Documentos.,Конфигурация была сохранена в каталог Documents.
-nobody_home,>Location not found,>Localización no encontrada,>La configuration a été sauvegardée dans le répertoire Documents.,>Localização não encontrada,>Местонахождение не найдено
+nobody_home,Nobody home,>Localización no encontrada,>La configuration a été sauvegardée dans le répertoire Documents.,>Localização não encontrada,>Местонахождение не найдено
 home_not_exist,Home does not exist,La hogar no existe ,Le domicile n'existe pas,O agregado familiar não existe,Дом не существует
 reason_incomplete,Oops! Please select a reason for incomplete,"¡Oops! Por favor, seleccione una razón para incompleto",Oups ! Veuillez sélectionner une raison pour l'incomplétude,"Oops! Por favor, seleccione um razão para incompleto","Упс! Пожалуйста, выберите причину неполного заполнения"
 enter_enum_area_name,Enter the Enumeration Area name,Introduzca el nombre del área de enumeración,Saisir le nom de la zone d'énumération,Insira o nome da área de enumeração,Введите название области перечисления
@@ -239,7 +239,7 @@ not_equal,Not Equal,No iguales,Non égaux,Não igual,Не равны
 less_than,Less Than,Menor que,Inférieur à,Menor que,Меньше
 greater_than,Greater Than,Mayor que,Supérieur à,Maior que,Больше чем
 greater_than_equal,Greater Than Or Equal,Mayor que o igual,Supérieur ou égal,Maior que ou igual,"Больше, чем или равно"
-add_condition,Add Condition,Añadir condición,Ajoutez une condition,Adicionar condição<,Добавить условие
+add_condition,Add Condition,Añadir condición,Ajoutez une condition,Adicionar condição,Добавить условие
 select_rule,Select Rule,Seleccionar regla,Sélectionnez une règle,Selecionar regra,Выберите правило
 teams,Teams,Equipos,Équipes,Equipas,Команды
 select_location,Select Location,Seleccionar ubicación,Sélectionnez le lieu,Selecionar localização,Выбрать местоположение
