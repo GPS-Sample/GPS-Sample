@@ -22,6 +22,15 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -35,6 +44,7 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.ExportDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -45,7 +55,6 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class PerformCollectionFragment : Fragment(),
-    OnMapReadyCallback,
     ExportDialog.ExportDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
@@ -58,10 +67,13 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
     private var userId = 0
     private var enumAreaId = 0
+    private val pointHashMap = java.util.HashMap<Long, Location>()
     private var _binding: FragmentPerformCollectionBinding? = null
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private val binding get() = _binding!!
@@ -124,11 +136,18 @@ class PerformCollectionFragment : Fragment(),
 
         binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + team.name + " team)"
 
-        binding.toolbarLayout.visibility = View.GONE
-        
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+        binding.mapView.getMapboxMap().loadStyleUri(
+            Style.MAPBOX_STREETS,
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(style: Style) {
+                    refreshMap()
+                }
+            }
+        )
 
-        mapFragment!!.getMapAsync(this)
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.exportButton.setOnClickListener {
             sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -168,9 +187,76 @@ class PerformCollectionFragment : Fragment(),
         performCollectionAdapter.updateLocations( locations )
     }
 
-    var once = true
+    fun refreshMap()
+    {
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-    override fun onMapReady(googleMap: GoogleMap)
+        enumArea.vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        if (pointList.isNotEmpty())
+        {
+            mapboxManager.addPolygon(pointList)
+
+            var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+
+            if (currentZoomLevel == null)
+            {
+                currentZoomLevel = 14.0
+                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(currentZoomLevel)
+            }
+
+            currentZoomLevel?.let { currentZoomLevel ->
+                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(currentZoomLevel)
+                    .center(point)
+                    .build()
+
+                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            }
+
+            for (location in sampleArea.locations)
+            {
+                if (!location.isLandmark && location.items.isNotEmpty())
+                {
+                    // assuming only 1 enumeration item per location, for now...
+                    val sampledItem = location.items[0] as? SampledItem
+
+                    sampledItem?.let { sampledItem ->
+                        if (sampledItem.samplingState == SamplingState.Sampled)
+                        {
+                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                            val pointAnnotation = mapboxManager.addMarker( point, R.drawable.home_black )
+
+                            pointAnnotation?.let { pointAnnotation ->
+                                pointHashMap[pointAnnotation.id] = location
+                            }
+
+                            pointAnnotationManager.apply {
+                                addClickListener(
+                                    OnPointAnnotationClickListener { pointAnnotation ->
+                                        pointHashMap[pointAnnotation.id]?.let { location ->
+                                            sharedViewModel.locationViewModel.setCurrentLocation(location)
+                                            LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+                                        }
+                                        true
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onMapReadyXXX(googleMap: GoogleMap)
     {
         map = googleMap
 
@@ -189,13 +275,6 @@ class PerformCollectionFragment : Fragment(),
                 .addAll( points )
 
             map.addPolygon(polygon)
-        }
-
-        if (once)
-        {
-            once = false
-            val latLng = getCenter()
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
         }
 
         for (location in sampleArea.locations)
@@ -275,81 +354,36 @@ class PerformCollectionFragment : Fragment(),
     private fun didSelectLocation( location: Location )
     {
         sharedViewModel.locationViewModel.setCurrentLocation(location)
-
         LaunchSurveyDialog( activity, this)
     }
 
-    override fun shouldExport( fileName: String, configuration: Boolean, qrCode: Boolean )
+    override fun didSelectRightButton(tag: Any?)
     {
-        if (qrCode)
-        {
-            if (configuration)
-            {
-            }
-            else
-            {
-            }
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+
+            // Sync the enumeration data back to the admin.
+            // For this scenario, we're trying to export the enumeration data only,
+            // not the entire configuration.
+            // On the admin side, the app will need to be able to add
+            // the enumeration data only, not the entire EnumArea container.
+            // EnumData ids on the admin side will need to be autogenerated
+            // during the import to accommodate uploads from multiple enumerators.
+            // We'll also need to handle duplicate updates from the same enumerator.
+
+//            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+
+            val packedEnumArea = enumArea.pack()
+            Log.d( "xxx", packedEnumArea )
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            val file = File(root, "EnumArea.${Date().time}.json")
+            val writer = FileWriter(file)
+            writer.append(packedEnumArea)
+            writer.flush()
+            writer.close()
+
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
         }
-        else
-        {
-            if (configuration)
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    // this is a hack
-//                    DAO.configDAO.updateAllLists( config )
-
-                    team.id?.let {
-                        config.teamId = it
-                    }
-
-                    val packedConfig = config.pack()
-                    Log.d( "xxx", packedConfig )
-
-                    config.teamId = 0
-
-                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                    val file = File(root, "$fileName.${Date().time}.json")
-                    val writer = FileWriter(file)
-                    writer.append(packedConfig)
-                    writer.flush()
-                    writer.close()
-
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.location_not_found), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                // Sync the enumeration data back to the admin.
-                // For this scenario, we're trying to export the enumeration data only,
-                // not the entire configuration.
-                // On the admin side, the app will need to be able to add
-                // the enumeration data only, not the entire EnumArea container.
-                // EnumData ids on the admin side will need to be autogenerated
-                // during the import to accommodate uploads from multiple enumerators.
-                // We'll also need to handle duplicate updates from the same enumerator.
-
-//                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
-
-                val packedEnumArea = enumArea.pack()
-                Log.d( "xxx", packedEnumArea )
-
-                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                val file = File(root, "$fileName.${Date().time}.json")
-                val writer = FileWriter(file)
-                writer.append(packedEnumArea)
-                writer.flush()
-                writer.close()
-
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    override fun onDestroyView()
-    {
-        super.onDestroyView()
-
-        _binding = null
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -423,6 +457,72 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
+    override fun shouldExport( fileName: String, configuration: Boolean, qrCode: Boolean )
+    {
+        if (qrCode)
+        {
+            if (configuration)
+            {
+            }
+            else
+            {
+            }
+        }
+        else
+        {
+            if (configuration)
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    // this is a hack
+//                    DAO.configDAO.updateAllLists( config )
+
+                    team.id?.let {
+                        config.teamId = it
+                    }
+
+                    val packedConfig = config.pack()
+                    Log.d( "xxx", packedConfig )
+
+                    config.teamId = 0
+
+                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                    val file = File(root, "$fileName.${Date().time}.json")
+                    val writer = FileWriter(file)
+                    writer.append(packedConfig)
+                    writer.flush()
+                    writer.close()
+
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.location_not_found), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                // Sync the enumeration data back to the admin.
+                // For this scenario, we're trying to export the enumeration data only,
+                // not the entire configuration.
+                // On the admin side, the app will need to be able to add
+                // the enumeration data only, not the entire EnumArea container.
+                // EnumData ids on the admin side will need to be autogenerated
+                // during the import to accommodate uploads from multiple enumerators.
+                // We'll also need to handle duplicate updates from the same enumerator.
+
+//                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+
+                val packedEnumArea = enumArea.pack()
+                Log.d( "xxx", packedEnumArea )
+
+                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                val file = File(root, "$fileName.${Date().time}.json")
+                val writer = FileWriter(file)
+                writer.append(packedEnumArea)
+                writer.flush()
+                writer.close()
+
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun launchSurveyButtonPressed()
     {
@@ -454,6 +554,9 @@ class PerformCollectionFragment : Fragment(),
 
             val sampledItem = location.items[0] as? SampledItem
             sampledItem?.let{sampledItem ->
+
+                refreshMap()
+
 //                var collectionItem = DAO.collectionItemDAO.getCollectionItem(sampledItem.enumItem!!.collectionItemId)
 //
 //                var state = CollectionState.Complete
@@ -482,39 +585,17 @@ class PerformCollectionFragment : Fragment(),
 //                    collectionItem.notes = notes
 //                    DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
 //                }
-
-                onMapReady(map)
+//
+//                onMapReady(map)
             }
 
         }
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun onDestroyView()
     {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
+        super.onDestroyView()
 
-            // Sync the enumeration data back to the admin.
-            // For this scenario, we're trying to export the enumeration data only,
-            // not the entire configuration.
-            // On the admin side, the app will need to be able to add
-            // the enumeration data only, not the entire EnumArea container.
-            // EnumData ids on the admin side will need to be autogenerated
-            // during the import to accommodate uploads from multiple enumerators.
-            // We'll also need to handle duplicate updates from the same enumerator.
-
-//            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
-
-            val packedEnumArea = enumArea.pack()
-            Log.d( "xxx", packedEnumArea )
-
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-            val file = File(root, "EnumArea.${Date().time}.json")
-            val writer = FileWriter(file)
-            writer.append(packedEnumArea)
-            writer.flush()
-            writer.close()
-
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
-        }
+        _binding = null
     }
 }

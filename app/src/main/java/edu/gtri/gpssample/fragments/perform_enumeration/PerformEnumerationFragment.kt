@@ -340,7 +340,7 @@ class PerformEnumerationFragment : Fragment(),
                         allPointAnnotations.add( pointAnnotation )
                     }
 
-                    pointAnnotationManager?.apply {
+                    pointAnnotationManager.apply {
                         addClickListener(
                             OnPointAnnotationClickListener { pointAnnotation ->
                                 pointHashMap[pointAnnotation.id]?.let { location ->
