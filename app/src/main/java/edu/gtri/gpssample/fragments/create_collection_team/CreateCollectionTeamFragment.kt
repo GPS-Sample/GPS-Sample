@@ -15,6 +15,16 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.gestures.OnMapClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
@@ -24,6 +34,8 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateCollectionTeamBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.locationtech.jts.geom.Coordinate
@@ -31,15 +43,18 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
-class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, ConfirmationDialog.ConfirmationDialogDelegate
+class CreateCollectionTeamFragment : Fragment()
 {
     private lateinit var map: GoogleMap
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
     private lateinit var sampleArea: SampleArea
+    private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList: ColorStateList
-    private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var samplingViewModel: SamplingViewModel
+    private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
 
     private var createMode = false
     private var selectionGeometry: Geometry? = null
@@ -84,9 +99,18 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
             enumArea = _enumArea
         }
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+        binding.mapView.getMapboxMap().loadStyleUri(
+            Style.MAPBOX_STREETS,
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(style: Style) {
+                    refreshMap()
+                }
+            }
+        )
 
-        mapFragment!!.getMapAsync(this)
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.dropPinButton.backgroundTintList?.let {
             defaultColorList = it
@@ -97,11 +121,9 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
             if (createMode)
             {
                 createMode = false
-                clearSelections()
             }
             else
             {
-                clearSelections()
                 createMode = true
                 binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
@@ -161,8 +183,6 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
         }
 
         binding.clearSelectionsButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_selections_message),
-                resources.getString(R.string.no), resources.getString(R.string.yes), null, this)
         }
 
         binding.cancelButton.setOnClickListener {
@@ -199,104 +219,57 @@ class CreateCollectionTeamFragment : Fragment(), OnMapReadyCallback, Confirmatio
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateCollectionTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun clearSelections()
+    fun refreshMap()
     {
-        createMode = false
-
-        selectionPolygon?.let {
-            it.remove()
-            selectionPolygon = null
-        }
-
-        selectionMarkers.map {
-            it.remove()
-        }
-
-        selectionMarkers.clear()
-
-        binding.dropPinButton.setBackgroundTintList(defaultColorList);
-    }
-
-    override fun didSelectLeftButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectRightButton(tag: Any?)
-    {
-        clearSelections()
-    }
-
-    var once = true
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-
-        map.clear()
-
-        map.setOnMapClickListener {
-            if (createMode)
-            {
-                val marker = map.addMarker( MarkerOptions().position(it))
-                marker?.let {
-                    selectionMarkers.add( marker )
-                }
-            }
-        }
-
-        val points = ArrayList<LatLng>()
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
         enumArea.vertices.map {
-            points.add( it.toLatLng())
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
-        val polygon = PolygonOptions()
-            .clickable(false)
-            .addAll( points )
+        pointList.add( points )
 
-        map.addPolygon(polygon)
-
-        if (once)
+        if (pointList.isNotEmpty())
         {
-            once = false
-            val latLng = getCenter()
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom( latLng, 14.0f))
-        }
+            mapboxManager.addPolygon(pointList)
 
+            var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
 
-        for (location in sampleArea.locations)
-        {
-            if (!location.isLandmark && location.items.isNotEmpty())
+            if (currentZoomLevel == null)
             {
-                // assuming only 1 enumeration item per location, for now...
-                val sampledItem = location.items[0] as? SampledItem
+                currentZoomLevel = 14.0
+                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(currentZoomLevel)
+            }
 
-                sampledItem?.let { sampledItem ->
-                    if (sampledItem.samplingState == SamplingState.Sampled)
-                    {
-                        val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+            currentZoomLevel?.let { currentZoomLevel ->
+                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(currentZoomLevel)
+                    .center(point)
+                    .build()
 
-                        map.addMarker( MarkerOptions()
-                            .position( LatLng( location.latitude, location.longitude ))
-                            .icon( icon )
-                        )
+                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            }
+
+            for (location in sampleArea.locations)
+            {
+                if (!location.isLandmark && location.items.isNotEmpty())
+                {
+                    // assuming only 1 enumeration item per location, for now...
+                    val sampledItem = location.items[0] as? SampledItem
+
+                    sampledItem?.let { sampledItem ->
+                        if (sampledItem.samplingState == SamplingState.Sampled)
+                        {
+                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                            mapboxManager.addMarker( point, R.drawable.home_black )
+                        }
                     }
                 }
             }
         }
-    }
-
-    fun getCenter() : LatLng
-    {
-        var sumLat: Double = 0.0
-        var sumLon: Double = 0.0
-
-        for (latLon in enumArea.vertices)
-        {
-            sumLat += latLon.latitude
-            sumLon += latLon.longitude
-        }
-
-        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
     override fun onDestroyView()

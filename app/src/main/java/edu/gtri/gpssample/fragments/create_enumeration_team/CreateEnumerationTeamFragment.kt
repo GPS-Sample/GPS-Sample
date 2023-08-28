@@ -12,8 +12,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -23,7 +21,6 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
-import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
@@ -111,11 +108,9 @@ class CreateEnumerationTeamFragment : Fragment(),
             if (createMode)
             {
                 createMode = false
-                clearSelections()
             }
             else
             {
-                clearSelections()
                 createMode = true
                 binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
@@ -222,34 +217,13 @@ class CreateEnumerationTeamFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun clearSelections()
-    {
-        createMode = false
-
-        selectionPolygon?.let {
-            it.remove()
-            selectionPolygon = null
-        }
-
-        selectionMarkers.map {
-            it.remove()
-        }
-
-        selectionMarkers.clear()
-
-        binding.dropPinButton.setBackgroundTintList(defaultColorList);
-    }
-
     override fun didSelectLeftButton(tag: Any?)
     {
     }
 
     override fun didSelectRightButton(tag: Any?)
     {
-        clearSelections()
     }
-
-    var once = true
 
     fun refreshMap()
     {
@@ -266,11 +240,12 @@ class CreateEnumerationTeamFragment : Fragment(),
         {
             mapboxManager.addPolygon(pointList)
 
-            val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+            var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
 
             if (currentZoomLevel == null)
             {
-                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(14.0)
+                currentZoomLevel = 14.0
+                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(currentZoomLevel)
             }
 
             currentZoomLevel?.let { currentZoomLevel ->
@@ -288,10 +263,8 @@ class CreateEnumerationTeamFragment : Fragment(),
             {
                 if (!location.isLandmark)
                 {
-                    var resourceId = R.drawable.home_black
-
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    mapboxManager.addMarker( point, resourceId )
+                    mapboxManager.addMarker( point, R.drawable.home_black )
                 }
             }
         }
