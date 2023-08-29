@@ -26,11 +26,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -67,16 +63,18 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
     private var userId = 0
     private var enumAreaId = 0
+    private val binding get() = _binding!!
     private val pointHashMap = java.util.HashMap<Long, Location>()
     private var _binding: FragmentPerformCollectionBinding? = null
-    private lateinit var sharedNetworkViewModel : NetworkViewModel
-    private val binding get() = _binding!!
+    private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
+    private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
 
     private val kExportTag = 2
     override fun onCreate(savedInstanceState: Bundle?)
@@ -189,6 +187,20 @@ class PerformCollectionFragment : Fragment(),
 
     fun refreshMap()
     {
+        for (polygonAnnotation in allPolygonAnnotations)
+        {
+            polygonAnnotationManager.delete( polygonAnnotation )
+        }
+
+        allPolygonAnnotations.clear()
+
+        for (pointAnnotation in allPointAnnotations)
+        {
+            pointAnnotationManager.delete( pointAnnotation )
+        }
+
+        allPointAnnotations.clear()
+
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -200,7 +212,10 @@ class PerformCollectionFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon(pointList)
+            val polygonAnnotation = mapboxManager.addPolygon(pointList)
+            polygonAnnotation?.let {
+                allPolygonAnnotations.add( it )
+            }
 
             var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
 
@@ -235,6 +250,7 @@ class PerformCollectionFragment : Fragment(),
                             val pointAnnotation = mapboxManager.addMarker( point, R.drawable.home_black )
 
                             pointAnnotation?.let { pointAnnotation ->
+                                allPointAnnotations.add( pointAnnotation )
                                 pointHashMap[pointAnnotation.id] = location
                             }
 

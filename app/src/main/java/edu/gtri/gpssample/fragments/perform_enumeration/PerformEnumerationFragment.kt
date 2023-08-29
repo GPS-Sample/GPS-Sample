@@ -89,8 +89,8 @@ class PerformEnumerationFragment : Fragment(),
 
     private val pointHashMap = HashMap<Long,Location>()
     private val polygonHashMap = HashMap<Long,EnumArea>()
-    private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
+    private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
 
     private val kExportTag = 2
     private val kSelectLocationTag = 3
@@ -384,10 +384,7 @@ class PerformEnumerationFragment : Fragment(),
             val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), latLng )
             if (haversineCheck.withinBounds)
             {
-                val message = "Distance: ${haversineCheck.distance}\n\n " +
-                        "coord1 ${haversineCheck.start.latitude}, ${haversineCheck.start.longitude} \n"+
-                        "coord2 ${haversineCheck.end.latitude}, ${haversineCheck.end.longitude} \n"+
-                        " ${resources.getString(R.string.duplicate_warning)}"
+                val message = "${resources.getString(R.string.duplicate_warning)}. (${haversineCheck.distance}m)"
                 ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), latLng, this)
                 return
             }
