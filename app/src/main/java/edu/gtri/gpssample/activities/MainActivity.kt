@@ -108,10 +108,10 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
         }
 
         binding.toolbar.setOnClickListener {
-            if (BuildConfig.DEBUG) {
+//            if (BuildConfig.DEBUG) {
                 (this.application as? MainApplication)?.currentFragment?.let {
                     Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-                }
+//                }
             }
         }
 

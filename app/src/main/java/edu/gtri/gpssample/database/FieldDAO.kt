@@ -107,7 +107,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(type_index)
 
-        return Field(id, name, type, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, name, type, false, null, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
     //--------------------------------------------------------------------------

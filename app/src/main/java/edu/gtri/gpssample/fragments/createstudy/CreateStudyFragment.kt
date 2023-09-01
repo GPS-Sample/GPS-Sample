@@ -120,23 +120,20 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     private fun shouldAddField()
     {
-        val bundle = Bundle()
         sharedViewModel.createFieldModel.createNewField()
-        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
     }
 
     private fun shouldAddRule()
     {
-        val bundle = Bundle()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{study ->
             if(study.fields.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
             }else
             {
-
                 sharedViewModel.createRuleModel.createNewRule()
-                findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment, bundle )
+                findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment )
             }
         }
     }

@@ -14,18 +14,25 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
 import java.util.*
+import kotlin.collections.ArrayDeque
 
 class CreateFieldModel
 {
     private var _currentField : MutableLiveData<Field>? = null
+    private var _currentFieldBlockUUID : MutableLiveData<String>? = null
     private var _fieldTypePosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _fieldType: MutableLiveData<FieldType> = MutableLiveData( FieldType.Text )
+    private var _fieldBlockContainer : MutableLiveData<Boolean> = MutableLiveData(false)
 
     var tempField : MutableLiveData<Field>? = null
     var currentField : LiveData<Field>? = _currentField
+    var currentFieldBlockUUID : LiveData<String>? = _currentFieldBlockUUID
     var fieldType : LiveData<FieldType> = _fieldType
 
     var fragment : Fragment? = null
+
+    val fieldBlockContainer : MutableLiveData<Boolean>
+        get() = _fieldBlockContainer
 
     val fieldTypePosition : MutableLiveData<Int>
         get() = _fieldTypePosition
@@ -33,21 +40,20 @@ class CreateFieldModel
     val fieldTypes : Array<String>
         get(){
             val englishArray = FieldTypeConverter.array
-            fragment?.let { fragment ->
-
-                val array: Array<String> = Array(englishArray.size)
-                { i ->
-                    when (i) {
-                        0 -> fragment.getString(R.string.text)
-                        1 -> fragment.getString(R.string.number)
-                        2 -> fragment.getString(R.string.date)
-                        3 -> fragment.getString(R.string.checkbox)
-                        4 -> fragment.getString(R.string.dropdown)//FieldType.Dropdown.format
-                        else -> String()
-                    }
-                }
-                return array
-            }
+//            fragment?.let { fragment ->
+//                val array: Array<String> = Array(englishArray.size)
+//                { i ->
+//                    when (i) {
+//                        0 -> fragment.getString(R.string.text)
+//                        1 -> fragment.getString(R.string.number)
+//                        2 -> fragment.getString(R.string.date)
+//                        3 -> fragment.getString(R.string.checkbox)
+//                        4 -> fragment.getString(R.string.dropdown)
+//                        else -> String()
+//                    }
+//                }
+//                return array
+//            }
             return englishArray
         }
 
@@ -57,6 +63,15 @@ class CreateFieldModel
         _currentField = MutableLiveData(newField)
         currentField = _currentField
     }
+
+    fun createNewField( fieldBlockUUID: String )
+    {
+        val newField = Field("", FieldType.Text, false, false, false, false, false, "", "", "", "" )
+        newField.fieldBlockUUID = fieldBlockUUID
+        _currentField = MutableLiveData(newField)
+        currentField = _currentField
+    }
+
     fun addField(study : Study)
     {
         currentField?.value?.let { field ->
@@ -66,7 +81,12 @@ class CreateFieldModel
                 study.fields.add(field)
             }
         }
+    }
 
+    fun setCurrentFieldBlockUUID( blockUUID: String? )
+    {
+        _currentFieldBlockUUID = MutableLiveData(blockUUID)
+        currentFieldBlockUUID = _currentFieldBlockUUID
     }
 
     fun setSelectedField(field : Field)
@@ -89,6 +109,7 @@ class CreateFieldModel
     {
         if(position < FieldTypeConverter.array.size)
         {
+            _fieldTypePosition = MutableLiveData(position)
             val type : String = FieldTypeConverter.array[position]
             tempField?.value?.let {
                 it.type = FieldTypeConverter.fromString( type )
@@ -108,6 +129,14 @@ class CreateFieldModel
     {
         tempField?.value?.let{field ->
             field.required = isChecked
+        }
+    }
+
+    fun onFieldBlockContainerSelected(buttonView : CompoundButton, isChecked : Boolean)
+    {
+        tempField?.value?.let{field ->
+            field.fieldBlockContainer = isChecked
+            _fieldBlockContainer.postValue(isChecked)
         }
     }
 

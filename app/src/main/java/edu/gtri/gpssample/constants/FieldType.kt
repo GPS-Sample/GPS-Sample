@@ -61,7 +61,6 @@ object FieldTypeConverter
 
     fun fromString( type : String) : FieldType
     {
-        Log.d("XXXXX", "from string")
         return when(type)
         {
             FieldType.Text.format -> FieldType.Text

@@ -90,14 +90,27 @@
                         android:selectedItemPosition="@={viewModel.createFieldModel.fieldTypePosition}"
                         android:onItemSelected="@{viewModel.createFieldModel::onFieldTypeSelected}"/>
                 </FrameLayout>
+
+                <CheckBox
+                    android:visibility="gone"
+                    android:id="@+id/field_block_container_checkBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginEnd="20dp"
+                    android:text="@string/begin_field_block"
+                    android:textSize="18sp"
+                    android:checked="@{viewModel.createFieldModel.tempField.fieldBlockContainer}"
+                    android:onCheckedChanged="@{viewModel.createFieldModel::onFieldBlockContainerSelected}"/>
+
                 <include
                     android:visibility="visible"
                     android:id="@+id/layout_field_text"
                     layout="@layout/layout_field_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:viewModel="@{viewModel}"
-                    />
+                    app:viewModel="@{viewModel}"/>
 
                 <include
                     android:visibility="gone"
@@ -113,8 +126,7 @@
                     layout="@layout/layout_field_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:viewModel="@{viewModel}"
-                    />
+                    app:viewModel="@{viewModel}"/>
 
                 <include
                     android:visibility="gone"
@@ -130,13 +142,58 @@
                     layout="@layout/layout_field_dropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:viewModel="@{viewModel}"
-                    />
+                    app:viewModel="@{viewModel}"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
 
         <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/block_button_layout"
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/cancel_block_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/end_block_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/save_and_end_block" />
+
+            <Button
+                android:id="@+id/add_another_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/add_another_field" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/normal_button_layout"
             android:orientation="horizontal"
             android:layout_gravity="bottom"
             android:layout_width="match_parent"

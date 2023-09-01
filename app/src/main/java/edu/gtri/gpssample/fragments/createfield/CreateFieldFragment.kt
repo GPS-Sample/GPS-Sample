@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.common.io.Resources
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
@@ -40,6 +41,8 @@ class CreateFieldFragment : Fragment()
     private lateinit var dropdown4Layout: LinearLayout
 
     private lateinit var sharedViewModel : ConfigurationViewModel
+
+    private var isBlockField = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -77,6 +80,25 @@ class CreateFieldFragment : Fragment()
             this.executePendingBindings()
         }
 
+        sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
+            currentField.fieldBlockUUID?.let {
+                isBlockField = true
+                binding.blockButtonLayout.visibility = View.VISIBLE
+                binding.normalButtonLayout.visibility = View.GONE
+            }
+        }
+
+        sharedViewModel.createFieldModel.fieldBlockContainer.observe( this, androidx.lifecycle.Observer { checked ->
+            if (checked)
+            {
+                binding.saveButton.text = resources.getString(R.string.next)
+            }
+            else
+            {
+                binding.saveButton.text = resources.getString(R.string.save)
+            }
+        })
+
         binding.deleteImageView.setOnClickListener {
             sharedViewModel.createStudyModel.currentStudy?.value?.let  { study ->
                 sharedViewModel.createFieldModel.deleteSelectedField( study )
@@ -106,6 +128,8 @@ class CreateFieldFragment : Fragment()
             val checkboxLayout = view.findViewById<LinearLayout>(R.id.layout_field_checkbox)
             val dropdownLayout = view.findViewById<LinearLayout>(R.id.layout_field_dropdown)
 
+            binding.fieldBlockContainerCheckBox.visibility = View.GONE
+
             when (fieldType)
             {
                 FieldType.Text -> {
@@ -116,6 +140,10 @@ class CreateFieldFragment : Fragment()
                     dropdownLayout.visibility = View.GONE
                 }
                 FieldType.Number -> {
+                    if (!isBlockField)
+                    {
+                        binding.fieldBlockContainerCheckBox.visibility = View.VISIBLE
+                    }
                     textLayout.visibility = View.GONE
                     numberLayout.visibility = View.VISIBLE
                     dateLayout.visibility = View.GONE
@@ -241,31 +269,20 @@ class CreateFieldFragment : Fragment()
             }
         }
 
-        binding.cancelButton.setOnClickListener {
+        binding.cancelBlockButton.setOnClickListener {
             findNavController().popBackStack()
         }
 
         binding.saveButton.setOnClickListener {
+            saveField()
+        }
 
-            // TODO: add validation code
-
-            sharedViewModel.createFieldModel.tempField?.value?.let { field ->
-                sharedViewModel.createFieldModel.currentField?.value?.name = field.name
-                sharedViewModel.createFieldModel.currentField?.value?.type = field.type
-                sharedViewModel.createFieldModel.currentField?.value?.pii = field.pii
-                sharedViewModel.createFieldModel.currentField?.value?.required = field.required
-                sharedViewModel.createFieldModel.currentField?.value?.integerOnly = field.integerOnly
-                sharedViewModel.createFieldModel.currentField?.value?.date = field.date
-                sharedViewModel.createFieldModel.currentField?.value?.time = field.time
-                sharedViewModel.createFieldModel.currentField?.value?.option1 = field.option1
-                sharedViewModel.createFieldModel.currentField?.value?.option2 = field.option2
-                sharedViewModel.createFieldModel.currentField?.value?.option3 = field.option3
-                sharedViewModel.createFieldModel.currentField?.value?.option4 = field.option4
-            }
-
-            sharedViewModel.addField()
-
+        binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
+        }
+
+        binding.addAnotherButton.setOnClickListener {
+            saveField()
         }
     }
 
@@ -273,6 +290,39 @@ class CreateFieldFragment : Fragment()
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFieldFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    fun saveField()
+    {
+        sharedViewModel.createFieldModel.tempField?.value?.let { tempField ->
+            sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
+                currentField.name = tempField.name
+                currentField.type = tempField.type
+                currentField.pii = tempField.pii
+                currentField.required = tempField.required
+                currentField.integerOnly = tempField.integerOnly
+                currentField.date = tempField.date
+                currentField.time = tempField.time
+                currentField.option1 = tempField.option1
+                currentField.option2 = tempField.option2
+                currentField.option3 = tempField.option3
+                currentField.option4 = tempField.option4
+                currentField.fieldBlockContainer = tempField.fieldBlockContainer
+
+                if (currentField.fieldBlockContainer)
+                {
+                    currentField.fieldBlockUUID = UUID.randomUUID().toString()
+                }
+
+                sharedViewModel.addField()
+
+                currentField.fieldBlockUUID?.let{ fieldBlockUUID ->
+                    sharedViewModel.createFieldModel.createNewField( fieldBlockUUID )
+                    sharedViewModel.createFieldModel.setCurrentFieldBlockUUID( fieldBlockUUID )
+                    findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                } ?: findNavController().popBackStack()
+            }
+        }
     }
 
     override fun onDestroyView()
