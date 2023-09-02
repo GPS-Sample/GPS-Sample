@@ -121,8 +121,8 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
                         listOfLists.add( blockFieldDataList )
                     }
 
-                    // Next up, refactor te FieldBlockAdapter to create items for each block
-                    // Then, add another recyclerView + adapter to create items for each field
+                    // Next up, refactor the FieldBlockAdapter to create items for each field block
+                    // Then, add another recyclerView/adapter to create items for each block field
 
 //                    val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
 //                    fieldBlockAdapter = FieldBlockAdapter( config, fieldList, fieldDataList, filteredDataList, listOfLists )
