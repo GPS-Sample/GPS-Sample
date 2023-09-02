@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -44,12 +45,28 @@ class CreateFieldFragment : Fragment()
 
     private var isBlockField = false
 
+    val fieldTypes : Array<String>
+        get() {
+            val array: Array<String> = Array(5)
+            { i ->
+                when (i) {
+                    0 -> getString(R.string.text)
+                    1 -> getString(R.string.number)
+                    2 -> getString(R.string.date)
+                    3 -> getString(R.string.checkbox)
+                    4 -> getString(R.string.dropdown)
+                    else -> String()
+                }
+            }
+            return array
+        }
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-        sharedViewModel.createFieldModel.fragment = this
+        sharedViewModel.createFieldModel.fieldTypes = fieldTypes
         sharedViewModel.createFieldModel.tempField = MutableLiveData( sharedViewModel.createFieldModel.currentField?.value?.copy())
 
         sharedViewModel.createFieldModel.tempField?.value?.type?.let { fieldType ->
@@ -269,12 +286,18 @@ class CreateFieldFragment : Fragment()
             }
         }
 
-        binding.cancelBlockButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
         binding.saveButton.setOnClickListener {
             saveField()
+            sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
+                if (currentField.fieldBlockUUID == null)
+                {
+                    findNavController().popBackStack()
+                }
+                else
+                {
+                    findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                }
+            }
         }
 
         binding.cancelButton.setOnClickListener {
@@ -283,6 +306,12 @@ class CreateFieldFragment : Fragment()
 
         binding.addAnotherButton.setOnClickListener {
             saveField()
+            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+        }
+
+        binding.endBlockButton.setOnClickListener {
+            saveField()
+            findNavController().popBackStack( R.id.CreateStudyFragment, false )
         }
     }
 
@@ -319,8 +348,7 @@ class CreateFieldFragment : Fragment()
                 currentField.fieldBlockUUID?.let{ fieldBlockUUID ->
                     sharedViewModel.createFieldModel.createNewField( fieldBlockUUID )
                     sharedViewModel.createFieldModel.setCurrentFieldBlockUUID( fieldBlockUUID )
-                    findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
-                } ?: findNavController().popBackStack()
+                }
             }
         }
     }

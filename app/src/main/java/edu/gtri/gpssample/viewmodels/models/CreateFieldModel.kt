@@ -29,33 +29,13 @@ class CreateFieldModel
     var currentFieldBlockUUID : LiveData<String>? = _currentFieldBlockUUID
     var fieldType : LiveData<FieldType> = _fieldType
 
-    var fragment : Fragment? = null
-
     val fieldBlockContainer : MutableLiveData<Boolean>
         get() = _fieldBlockContainer
 
     val fieldTypePosition : MutableLiveData<Int>
         get() = _fieldTypePosition
 
-    val fieldTypes : Array<String>
-        get(){
-            val englishArray = FieldTypeConverter.array
-//            fragment?.let { fragment ->
-//                val array: Array<String> = Array(englishArray.size)
-//                { i ->
-//                    when (i) {
-//                        0 -> fragment.getString(R.string.text)
-//                        1 -> fragment.getString(R.string.number)
-//                        2 -> fragment.getString(R.string.date)
-//                        3 -> fragment.getString(R.string.checkbox)
-//                        4 -> fragment.getString(R.string.dropdown)
-//                        else -> String()
-//                    }
-//                }
-//                return array
-//            }
-            return englishArray
-        }
+    var fieldTypes : Array<String>? = null
 
     fun createNewField()
     {

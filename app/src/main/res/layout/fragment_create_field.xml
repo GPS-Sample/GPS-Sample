@@ -156,7 +156,7 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/cancel_block_button"
+                android:id="@+id/add_another_button"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
@@ -165,22 +165,10 @@
                 android:layout_marginEnd="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="@string/cancel" />
+                android:text="@string/add_another_field" />
 
             <Button
                 android:id="@+id/end_block_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/save_and_end_block" />
-
-            <Button
-                android:id="@+id/add_another_button"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
@@ -189,7 +177,7 @@
                 android:layout_marginEnd="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="@string/add_another_field" />
+                android:text="@string/save_and_end_block" />
         </LinearLayout>
 
         <LinearLayout

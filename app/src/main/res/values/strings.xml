@@ -227,7 +227,7 @@
     <string name="missing_team">"Configuration is missing a Team definition"</string>
     <string name="begin_field_block">Begin Field Block</string>
     <string name="save_and_end_block">Save and End Block</string>
-    <string name="add_another_field">Add another field</string>
+    <string name="add_another_field">Save and Add Another Field</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

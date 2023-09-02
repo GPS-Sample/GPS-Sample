@@ -93,14 +93,12 @@ class ConfigurationViewModel : ViewModel()
             }
             return unavailable
         }
+
     private var _currentFragment : Fragment? = null
     var currentFragment : Fragment?
         get() = _currentFragment
         set(value){
             _currentFragment = value
-            _currentFragment?.let {fragment ->
-                createFieldModel.fragment = fragment
-            }
         }
 
     val currentUserRole : Role
