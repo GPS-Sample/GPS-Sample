@@ -43,6 +43,8 @@ class FieldDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_ID, study.id )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
+        values.put( DAO.COLUMN_FIELD_BLOCK_CONTAINER, field.fieldBlockContainer )
+        values.put( DAO.COLUMN_FIELD_BLOCK_UUID, field.fieldBlockUUID )
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
         values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
         values.put( DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
@@ -94,7 +96,9 @@ class FieldDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
-        val type_index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
+        val typeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
+        val fieldBlockContainer = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_BLOCK_CONTAINER)).toBoolean()
+        val fieldBlockUUID = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_BLOCK_UUID))
         val pii = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_PII)).toBoolean()
         val required = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_REQUIRED)).toBoolean()
         val integerOnly = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
@@ -105,9 +109,9 @@ class FieldDAO(private var dao: DAO)
         val option3 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_3))
         val option4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_4))
 
-        val type = FieldTypeConverter.fromIndex(type_index)
+        val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(id, name, type, false, null, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
     }
 
     //--------------------------------------------------------------------------

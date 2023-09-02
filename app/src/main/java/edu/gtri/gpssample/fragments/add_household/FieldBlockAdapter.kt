@@ -23,13 +23,12 @@ import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val fieldDataList: List<FieldData>, val filteredDataList: List<FieldData>) :
-    RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
+class FieldBlockAdapter( val config: Config, val fieldList: List<Field>, val fieldDataList: List<FieldData>, val filteredDataList: List<FieldData>, val listOfLists: ArrayList<ArrayList<FieldData>>) :
+    RecyclerView.Adapter<FieldBlockAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
 {
     private var context: Context? = null
-    private lateinit var fieldBlockAdapter: FieldBlockAdapter
 
     override fun getItemCount() = filteredDataList.size
 
@@ -106,7 +105,6 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
             {
                 field.fieldBlockUUID?.let {
                     val blockFields = getBlockFields( it )
-                    val listOfLists = ArrayList<ArrayList<FieldData>>()
 
                     for (i in 1..numberOfBlocks)
                     {
@@ -117,19 +115,7 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
                             val blockFieldData = FieldData(blockField)
                             blockFieldDataList.add(blockFieldData)
                         }
-
-                        listOfLists.add( blockFieldDataList )
                     }
-
-                    // Next up, refactor te FieldBlockAdapter to create items for each block
-                    // Then, add another recyclerView + adapter to create items for each field
-
-//                    val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
-//                    fieldBlockAdapter = FieldBlockAdapter( config, fieldList, fieldDataList, filteredDataList, listOfLists )
-//                    recyclerView.adapter = fieldBlockAdapter
-//                    recyclerView.itemAnimator = DefaultItemAnimator()
-//                    recyclerView.layoutManager = LinearLayoutManager(context)
-//                    recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
                 }
             }
         }
