@@ -22,7 +22,7 @@ import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class BlockAdapter(val config: Config, val fieldList: List<Field>, val listOfLists: ArrayList<ArrayList<FieldData>>) : RecyclerView.Adapter<BlockAdapter.ViewHolder>()
+class BlockAdapter(val config: Config, val listOfLists: ArrayList<ArrayList<FieldData>>) : RecyclerView.Adapter<BlockAdapter.ViewHolder>()
 {
     private var context: Context? = null
     private lateinit var blockFieldAdapter: BlockFieldAdapter

@@ -93,12 +93,18 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
             if (it.toString().isNotEmpty())
             {
                 fieldData.numberValue = it.toString().toDouble()
+                layoutBlockAdapter( fieldData, field, blockLayout )
             }
         }
 
         val titleView: TextView = numberLayout.findViewById<TextView>(R.id.title_text_view)
         titleView.text = field.name
 
+        layoutBlockAdapter( fieldData, field, blockLayout )
+    }
+
+    fun layoutBlockAdapter( fieldData: FieldData, field: Field, blockLayout: LinearLayout )
+    {
         fieldData.numberValue?.let {
             val numberOfBlocks = it.toInt()
 
@@ -108,23 +114,24 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
                     val blockFields = getBlockFields( it )
                     val listOfLists = ArrayList<ArrayList<FieldData>>()
 
-                    for (i in 1..numberOfBlocks)
+                    for (blockItemNumber in 1..numberOfBlocks)
                     {
                         val blockFieldDataList = ArrayList<FieldData>()
 
                         for (blockField in blockFields)
                         {
                             val blockFieldData = FieldData(blockField)
+
+                            // TODO: add the blockItemNumber to blockFieldData
+                            // TODO: add the blockFieldData to enumeratinItem.fieldDataList
+
                             blockFieldDataList.add(blockFieldData)
                         }
 
                         listOfLists.add( blockFieldDataList )
                     }
 
-                    // Next up, refactor the FieldBlockAdapter to create items for each field block
-                    // Then, add another recyclerView/adapter to create items for each block field
-
-                    blockAdapter = BlockAdapter( config, fieldList, listOfLists )
+                    blockAdapter = BlockAdapter( config, listOfLists )
 
                     val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
                     recyclerView.adapter = blockAdapter
