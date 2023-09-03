@@ -9,8 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.widget.doAfterTextChanged
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.DateFormat
@@ -23,20 +21,20 @@ import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class FieldBlockAdapter( val config: Config, val fieldList: List<Field>, val fieldDataList: List<FieldData>, val filteredDataList: List<FieldData>, val listOfLists: ArrayList<ArrayList<FieldData>>) :
-    RecyclerView.Adapter<FieldBlockAdapter.ViewHolder>(),
+class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) :
+    RecyclerView.Adapter<BlockFieldAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
 {
     private var context: Context? = null
 
-    override fun getItemCount() = filteredDataList.size
+    override fun getItemCount() = fieldDataList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.context = parent.context
 
-        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_household, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_block_field, parent, false))
 
         viewHolder.itemView.isSelected = false
 
@@ -50,7 +48,7 @@ class FieldBlockAdapter( val config: Config, val fieldList: List<Field>, val fie
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        val fieldData = filteredDataList.get(holder.adapterPosition)
+        val fieldData = fieldDataList.get(holder.adapterPosition)
 
         fieldData.field?.let { field ->
 
@@ -59,65 +57,11 @@ class FieldBlockAdapter( val config: Config, val fieldList: List<Field>, val fie
                 return
             }
 
+            Log.d( "xxx", field.type.format)
+
             holder.itemView.isSelected = false
 
-            if (field.fieldBlockContainer)
-            {
-                layoutBlockField( holder, field, fieldData )
-            }
-            else
-            {
-                layoutNonBlockField( holder, field, fieldData )
-            }
-        }
-    }
-
-    fun layoutBlockField( holder: ViewHolder, field: Field, fieldData: FieldData )
-    {
-        val blockLayout: FrameLayout = holder.frameLayout.findViewById(R.id.block_layout)
-        val frameLayout: FrameLayout = blockLayout.findViewById(R.id.number_layout)
-        val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
-
-        blockLayout.visibility = View.VISIBLE
-
-        editText.inputType = InputType.TYPE_CLASS_NUMBER
-        fieldData.numberValue?.let {
-            editText.setText( it.toInt().toString())
-        }
-
-        val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
-        requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
-
-        editText.doAfterTextChanged {
-            if (it.toString().isNotEmpty())
-            {
-                fieldData.numberValue = it.toString().toDouble()
-            }
-        }
-
-        val titleView: TextView = frameLayout.findViewById<TextView>(R.id.title_text_view)
-        titleView.text = field.name
-
-        fieldData.numberValue?.let {
-            val numberOfBlocks = it.toInt()
-
-            if (numberOfBlocks > 0)
-            {
-                field.fieldBlockUUID?.let {
-                    val blockFields = getBlockFields( it )
-
-                    for (i in 1..numberOfBlocks)
-                    {
-                        val blockFieldDataList = ArrayList<FieldData>()
-
-                        for (blockField in blockFields)
-                        {
-                            val blockFieldData = FieldData(blockField)
-                            blockFieldDataList.add(blockFieldData)
-                        }
-                    }
-                }
-            }
+            layoutNonBlockField( holder, field, fieldData )
         }
     }
 
@@ -365,26 +309,6 @@ class FieldBlockAdapter( val config: Config, val fieldList: List<Field>, val fie
         {
             editText.setText( date.toString())
         }
-    }
-
-    fun getBlockFields( uuid: String ) : ArrayList<Field>
-    {
-        val filteredFieldList = ArrayList<Field>()
-
-        for (field in fieldList)
-        {
-            if (!field.fieldBlockContainer)
-            {
-                field.fieldBlockUUID?.let { fieldBlockUUID ->
-                    if (uuid == field.fieldBlockUUID)
-                    {
-                        filteredFieldList.add( field )
-                    }
-                }
-            }
-        }
-
-        return filteredFieldList
     }
 
     override fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText)

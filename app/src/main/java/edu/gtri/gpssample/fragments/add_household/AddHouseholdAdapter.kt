@@ -3,7 +3,6 @@ package edu.gtri.gpssample.fragments.add_household
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +28,7 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
     TimePickerDialog.TimePickerDialogDelegate
 {
     private var context: Context? = null
-    private lateinit var fieldBlockAdapter: FieldBlockAdapter
+    private lateinit var blockAdapter: BlockAdapter
 
     override fun getItemCount() = filteredDataList.size
 
@@ -75,18 +74,19 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
 
     fun layoutBlockField( holder: ViewHolder, field: Field, fieldData: FieldData )
     {
-        val blockLayout: FrameLayout = holder.frameLayout.findViewById(R.id.block_layout)
-        val frameLayout: FrameLayout = blockLayout.findViewById(R.id.number_layout)
-        val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+        val blockLayout: LinearLayout = holder.frameLayout.findViewById(R.id.block_layout)
+        val numberLayout: FrameLayout = blockLayout.findViewById(R.id.number_layout)
+        val editText = numberLayout.findViewById<EditText>(R.id.edit_text)
 
         blockLayout.visibility = View.VISIBLE
+        numberLayout.visibility = View.VISIBLE
 
         editText.inputType = InputType.TYPE_CLASS_NUMBER
         fieldData.numberValue?.let {
             editText.setText( it.toInt().toString())
         }
 
-        val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
+        val requiredTextView = numberLayout.findViewById<TextView>(R.id.required_text_view)
         requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
         editText.doAfterTextChanged {
@@ -96,7 +96,7 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
             }
         }
 
-        val titleView: TextView = frameLayout.findViewById<TextView>(R.id.title_text_view)
+        val titleView: TextView = numberLayout.findViewById<TextView>(R.id.title_text_view)
         titleView.text = field.name
 
         fieldData.numberValue?.let {
@@ -124,12 +124,13 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
                     // Next up, refactor the FieldBlockAdapter to create items for each field block
                     // Then, add another recyclerView/adapter to create items for each block field
 
-//                    val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
-//                    fieldBlockAdapter = FieldBlockAdapter( config, fieldList, fieldDataList, filteredDataList, listOfLists )
-//                    recyclerView.adapter = fieldBlockAdapter
-//                    recyclerView.itemAnimator = DefaultItemAnimator()
-//                    recyclerView.layoutManager = LinearLayoutManager(context)
-//                    recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+                    blockAdapter = BlockAdapter( config, fieldList, listOfLists )
+
+                    val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
+                    recyclerView.adapter = blockAdapter
+                    recyclerView.itemAnimator = DefaultItemAnimator()
+                    recyclerView.layoutManager = LinearLayoutManager(context)
+                    recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
                 }
             }
         }
