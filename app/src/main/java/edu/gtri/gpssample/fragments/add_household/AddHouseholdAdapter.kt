@@ -130,6 +130,18 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
                             }
                         }
 
+                        // check to see if the block size changed
+
+//                        if (blockFieldDataList.isNotEmpty() && blockFieldDataList.size !=numberOfBlocks)
+//                        {
+//                            for (bfd in blockFieldDataList)
+//                            {
+//                                enumerationItem.fieldDataList.remove( bfd )
+//                            }
+//
+//                            blockFieldDataList.clear()
+//                        }
+
                         if (blockFieldDataList.isEmpty())
                         {
                             for (blockField in blockFields)
