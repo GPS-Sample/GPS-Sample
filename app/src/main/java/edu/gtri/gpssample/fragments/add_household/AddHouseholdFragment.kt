@@ -136,19 +136,21 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.cardView.visibility = View.GONE
         }
 
-        val filteredDataList = ArrayList<FieldData>()
+        // filteredFieldDataList contains only non-block fields and block field containers
+
+        val filteredFieldDataList = ArrayList<FieldData>()
 
         for (fieldData in enumerationItem.fieldDataList)
         {
             fieldData.field?.let { field ->
                 if (field.fieldBlockContainer || field.fieldBlockUUID == null)
                 {
-                    filteredDataList.add( fieldData )
+                    filteredFieldDataList.add( fieldData )
                 }
             }
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( config, study.fields, enumerationItem.fieldDataList, filteredDataList )
+        addHouseholdAdapter = AddHouseholdAdapter( config, enumerationItem, study.fields, filteredFieldDataList )
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)

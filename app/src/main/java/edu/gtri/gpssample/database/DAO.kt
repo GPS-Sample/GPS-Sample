@@ -236,6 +236,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_DATA_CHECKBOX2 + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_BLOCK_NUMBER + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
                     ")")
@@ -457,6 +458,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_DATA_CHECKBOX2 = "field_data_checkbox2"
         const val COLUMN_FIELD_DATA_CHECKBOX3 = "field_data_checkbox3"
         const val COLUMN_FIELD_DATA_CHECKBOX4 = "field_data_checkbox4"
+        const val COLUMN_FIELD_DATA_BLOCK_NUMBER = "field_data_block_number"
 
         const val TABLE_LAT_LON = "lat_lon"
         const val COLUMN_LAT = "lat"
@@ -555,7 +557,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 227
+        private const val DATABASE_VERSION = 228
 
     }
 }

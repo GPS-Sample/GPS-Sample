@@ -16,13 +16,14 @@ import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val fieldDataList: List<FieldData>, val filteredDataList: List<FieldData>) :
+class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationItem, val fieldList: List<Field>, val filteredFieldDataList: List<FieldData>) :
     RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
@@ -30,7 +31,7 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
     private var context: Context? = null
     private lateinit var blockAdapter: BlockAdapter
 
-    override fun getItemCount() = filteredDataList.size
+    override fun getItemCount() = filteredFieldDataList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -50,7 +51,7 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        val fieldData = filteredDataList.get(holder.adapterPosition)
+        val fieldData = filteredFieldDataList.get(holder.adapterPosition)
 
         fieldData.field?.let { field ->
 
@@ -110,22 +111,35 @@ class AddHouseholdAdapter( val config: Config, val fieldList: List<Field>, val f
 
             if (numberOfBlocks > 0)
             {
-                field.fieldBlockUUID?.let {
-                    val blockFields = getBlockFields( it )
+                field.fieldBlockUUID?.let { fieldBlockUUID ->
+                    val blockFields = getBlockFields( fieldBlockUUID )
                     val listOfLists = ArrayList<ArrayList<FieldData>>()
 
-                    for (blockItemNumber in 1..numberOfBlocks)
+                    for (blockNumber in 1..numberOfBlocks)
                     {
                         val blockFieldDataList = ArrayList<FieldData>()
 
-                        for (blockField in blockFields)
+                        // look for existing block FieldData items
+                        for (blockFieldData in enumerationItem.fieldDataList)
                         {
-                            val blockFieldData = FieldData(blockField)
+                            blockFieldData.field?.fieldBlockUUID?.let { uuid ->
+                                if (uuid == fieldBlockUUID && blockFieldData.blockNumber == blockNumber)
+                                {
+                                    blockFieldDataList.add(blockFieldData)
+                                }
+                            }
+                        }
 
-                            // TODO: add the blockItemNumber to blockFieldData
-                            // TODO: add the blockFieldData to enumeratinItem.fieldDataList
+                        if (blockFieldDataList.isEmpty())
+                        {
+                            for (blockField in blockFields)
+                            {
+                                val blockFieldData = FieldData(blockField,blockNumber)
 
-                            blockFieldDataList.add(blockFieldData)
+                                enumerationItem.fieldDataList.add(blockFieldData)
+
+                                blockFieldDataList.add(blockFieldData)
+                            }
                         }
 
                         listOfLists.add( blockFieldDataList )

@@ -64,6 +64,7 @@ class FieldDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX2, fieldData.checkbox2 )
         values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX3, fieldData.checkbox3 )
         values.put( DAO.COLUMN_FIELD_DATA_CHECKBOX4, fieldData.checkbox4 )
+        values.put( DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER, fieldData.blockNumber )
     }
 
     //--------------------------------------------------------------------------
@@ -95,8 +96,9 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox2 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX2)).toBoolean()
         val checkbox3 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX3)).toBoolean()
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
+        val blockNumber = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER))
 
-        return FieldData( id, uuid, field, name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4 )
+        return FieldData( id, uuid, field, name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4, blockNumber )
     }
 
     //--------------------------------------------------------------------------
