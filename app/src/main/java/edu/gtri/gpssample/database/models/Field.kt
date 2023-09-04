@@ -15,6 +15,8 @@ data class Field(
     var id : Int? = null,
     var name: String,
     var type: FieldType,
+    var fieldBlockContainer: Boolean,
+    var fieldBlockUUID: String?,
     var pii: Boolean,
     var required: Boolean,
     var integerOnly: Boolean,
@@ -27,7 +29,7 @@ data class Field(
 {
     constructor(name: String, type: FieldType, pii: Boolean, required: Boolean,
                 integerOnly: Boolean, date: Boolean, time: Boolean, option1: String, option2: String,
-                option3: String, option4: String ) : this(null,  name, type,
+                option3: String, option4: String ) : this(null,  name, type, false, null,
                 pii, required, integerOnly, date, time, option1, option2, option3, option4)
 
     fun copy() : Field

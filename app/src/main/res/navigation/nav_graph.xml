@@ -241,6 +241,10 @@
         android:id="@+id/CreateFieldFragment"
         android:name="edu.gtri.gpssample.fragments.createfield.CreateFieldFragment"
         tools:layout="@layout/fragment_create_field">
+
+        <action
+            android:id="@+id/action_navigate_to_CreateFieldFragment"
+            app:destination="@id/CreateFieldFragment"/>
     </fragment>
 
     <!--CreateSampleFragment-->

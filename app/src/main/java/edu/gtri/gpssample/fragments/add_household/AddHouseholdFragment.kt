@@ -29,6 +29,7 @@ import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.UriManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.ArrayList
 
 class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -89,7 +90,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         {
             enumerationItem = EnumerationItem()
             location.items.add(enumerationItem)
-        }else
+        }
+        else
         {
             // TODO: COME UP WITH INTERFACE OR SOMETHING TO DEAL WITH MULTIPLE ENUMITEMS
             val enum = location.items[0] as? EnumerationItem
@@ -98,19 +100,22 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-        // the study fields have changed. need to fix the fieldDataList
-//        if (enumerationItem.fieldDataList.size != study.fields.size)
-//        {
-//            enumerationItem.fieldDataList.clear()
-//        }
+        // TODO: if the study fields have changed we need to fix the fieldDataList
+        // if (enumerationItem.fieldDataList.size != study.fields.size)
+        // {
+        //     enumerationItem.fieldDataList.clear()
+        // }
 
-        // create enum data for every field
+        // create field data for every field that is not a block field
         if (enumerationItem.fieldDataList.isEmpty())
         {
             for (field in study.fields)
             {
-                val fieldData = FieldData(field) //DAO.fieldDataDAO.getOrCreateFieldData(field.id!!, enumerationItem.id!!)
-                enumerationItem.fieldDataList.add(fieldData)
+                if (field.fieldBlockContainer || field.fieldBlockUUID == null)
+                {
+                    val fieldData = FieldData(field)
+                    enumerationItem.fieldDataList.add(fieldData)
+                }
             }
         }
 
@@ -131,12 +136,25 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.cardView.visibility = View.GONE
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( config, enumerationItem.fieldDataList )
+        // filteredFieldDataList contains only non-block fields and block field containers
+
+        val filteredFieldDataList = ArrayList<FieldData>()
+
+        for (fieldData in enumerationItem.fieldDataList)
+        {
+            fieldData.field?.let { field ->
+                if (field.fieldBlockContainer || field.fieldBlockUUID == null)
+                {
+                    filteredFieldDataList.add( fieldData )
+                }
+            }
+        }
+
+        addHouseholdAdapter = AddHouseholdAdapter( config, enumerationItem, study.fields, filteredFieldDataList )
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+        binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
-
 
 //        if (enumData.imageFileName.isNotEmpty())
 //        {

@@ -82,6 +82,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_STUDY_ID + " INTEGER" + "," +
                     COLUMN_FIELD_NAME + " TEXT" + "," +
+                    COLUMN_FIELD_BLOCK_CONTAINER + " INTEGER" + "," +
+                    COLUMN_FIELD_BLOCK_UUID + " TEXT" + "," +
 
                     // should be look up table
                     COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
@@ -234,6 +236,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_DATA_CHECKBOX2 + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_BLOCK_NUMBER + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
                     ")")
@@ -377,6 +380,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Field Table
         const val TABLE_FIELD = "field"
         const val COLUMN_FIELD_NAME = "field_name"
+        const val COLUMN_FIELD_BLOCK_CONTAINER = "field_block_container"
+        const val COLUMN_FIELD_BLOCK_UUID = "field_block_uuid"
         const val COLUMN_FIELD_TYPE_INDEX = "field_type_index"
         const val COLUMN_FIELD_PII = "field_pii"
         const val COLUMN_FIELD_REQUIRED = "field_required"
@@ -453,6 +458,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_DATA_CHECKBOX2 = "field_data_checkbox2"
         const val COLUMN_FIELD_DATA_CHECKBOX3 = "field_data_checkbox3"
         const val COLUMN_FIELD_DATA_CHECKBOX4 = "field_data_checkbox4"
+        const val COLUMN_FIELD_DATA_BLOCK_NUMBER = "field_data_block_number"
 
         const val TABLE_LAT_LON = "lat_lon"
         const val COLUMN_LAT = "lat"
@@ -551,7 +557,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 226
+        private const val DATABASE_VERSION = 228
 
     }
 }

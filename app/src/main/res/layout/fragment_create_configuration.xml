@@ -163,6 +163,8 @@
                     android:id="@+id/map_view"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     mapbox:mapbox_cameraTargetLat="33.77577524978659"
                     mapbox:mapbox_cameraTargetLng="-84.39630379821243"
                     mapbox:mapbox_cameraZoom="9.0">
@@ -202,6 +204,7 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="end"
+                        android:layout_marginEnd="20dp"
                         android:src="@drawable/plus_blue" />
                 </FrameLayout>
                 <androidx.recyclerview.widget.RecyclerView

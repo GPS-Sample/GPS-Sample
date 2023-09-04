@@ -3,41 +3,38 @@ package edu.gtri.gpssample.fragments.add_household
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.widget.doAfterTextChanged
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationItem, val fieldList: List<Field>, val filteredFieldDataList: List<FieldData>) :
-    RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
+class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) :
+    RecyclerView.Adapter<BlockFieldAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
 {
     private var context: Context? = null
-    private lateinit var blockAdapter: BlockAdapter
 
-    override fun getItemCount() = filteredFieldDataList.size
+    override fun getItemCount() = fieldDataList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.context = parent.context
 
-        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_household, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_block_field, parent, false))
 
         viewHolder.itemView.isSelected = false
 
@@ -51,7 +48,7 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int)
     {
-        val fieldData = filteredFieldDataList.get(holder.adapterPosition)
+        val fieldData = fieldDataList.get(holder.adapterPosition)
 
         fieldData.field?.let { field ->
 
@@ -60,100 +57,11 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
                 return
             }
 
+            Log.d( "xxx", field.type.format)
+
             holder.itemView.isSelected = false
 
-            if (field.fieldBlockContainer)
-            {
-                layoutBlockField( holder, field, fieldData )
-            }
-            else
-            {
-                layoutNonBlockField( holder, field, fieldData )
-            }
-        }
-    }
-
-    fun layoutBlockField( holder: ViewHolder, field: Field, fieldData: FieldData )
-    {
-        val blockLayout: LinearLayout = holder.frameLayout.findViewById(R.id.block_layout)
-        val numberLayout: FrameLayout = blockLayout.findViewById(R.id.number_layout)
-        val editText = numberLayout.findViewById<EditText>(R.id.edit_text)
-
-        blockLayout.visibility = View.VISIBLE
-        numberLayout.visibility = View.VISIBLE
-
-        editText.inputType = InputType.TYPE_CLASS_NUMBER
-        fieldData.numberValue?.let {
-            editText.setText( it.toInt().toString())
-        }
-
-        val requiredTextView = numberLayout.findViewById<TextView>(R.id.required_text_view)
-        requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
-
-        editText.doAfterTextChanged {
-            if (it.toString().isNotEmpty())
-            {
-                fieldData.numberValue = it.toString().toDouble()
-                layoutBlockAdapter( fieldData, field, blockLayout )
-            }
-        }
-
-        val titleView: TextView = numberLayout.findViewById<TextView>(R.id.title_text_view)
-        titleView.text = field.name
-
-        layoutBlockAdapter( fieldData, field, blockLayout )
-    }
-
-    fun layoutBlockAdapter( fieldData: FieldData, field: Field, blockLayout: LinearLayout )
-    {
-        fieldData.numberValue?.let {
-            val numberOfBlocks = it.toInt()
-
-            if (numberOfBlocks > 0)
-            {
-                field.fieldBlockUUID?.let { fieldBlockUUID ->
-                    val blockFields = getBlockFields( fieldBlockUUID )
-                    val listOfLists = ArrayList<ArrayList<FieldData>>()
-
-                    for (blockNumber in 1..numberOfBlocks)
-                    {
-                        val blockFieldDataList = ArrayList<FieldData>()
-
-                        // look for existing block FieldData items
-                        for (blockFieldData in enumerationItem.fieldDataList)
-                        {
-                            blockFieldData.field?.fieldBlockUUID?.let { uuid ->
-                                if (uuid == fieldBlockUUID && blockFieldData.blockNumber == blockNumber)
-                                {
-                                    blockFieldDataList.add(blockFieldData)
-                                }
-                            }
-                        }
-
-                        if (blockFieldDataList.isEmpty())
-                        {
-                            for (blockField in blockFields)
-                            {
-                                val blockFieldData = FieldData(blockField,blockNumber)
-
-                                enumerationItem.fieldDataList.add(blockFieldData)
-
-                                blockFieldDataList.add(blockFieldData)
-                            }
-                        }
-
-                        listOfLists.add( blockFieldDataList )
-                    }
-
-                    blockAdapter = BlockAdapter( config, listOfLists )
-
-                    val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
-                    recyclerView.adapter = blockAdapter
-                    recyclerView.itemAnimator = DefaultItemAnimator()
-                    recyclerView.layoutManager = LinearLayoutManager(context)
-                    recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
-                }
-            }
+            layoutNonBlockField( holder, field, fieldData )
         }
     }
 
@@ -401,26 +309,6 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
         {
             editText.setText( date.toString())
         }
-    }
-
-    fun getBlockFields( uuid: String ) : ArrayList<Field>
-    {
-        val filteredFieldList = ArrayList<Field>()
-
-        for (field in fieldList)
-        {
-            if (!field.fieldBlockContainer)
-            {
-                field.fieldBlockUUID?.let { fieldBlockUUID ->
-                    if (uuid == field.fieldBlockUUID)
-                    {
-                        filteredFieldList.add( field )
-                    }
-                }
-            }
-        }
-
-        return filteredFieldList
     }
 
     override fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText)

@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <include android:id="@+id/block_layout" android:visibility="gone" layout="@layout/list_item_block" />
     <include android:id="@+id/text_layout" android:visibility="gone" layout="@layout/list_item_text_field" />
     <include android:id="@+id/number_layout" android:visibility="gone" layout="@layout/list_item_number_field" />
     <include android:id="@+id/date_layout" android:visibility="gone" layout="@layout/list_item_date_field" />
