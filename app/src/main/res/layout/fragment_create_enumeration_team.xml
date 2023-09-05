@@ -40,15 +40,27 @@
         android:textSize="17sp"
         android:textStyle="bold" />
 
-    <com.mapbox.maps.MapView
-        android:id="@+id/map_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+    <FrameLayout
         android:layout_weight="1"
-        mapbox:mapbox_cameraTargetLat="33.77577524978659"
-        mapbox:mapbox_cameraTargetLng="-84.39630379821243"
-        mapbox:mapbox_cameraZoom="9.0">
-    </com.mapbox.maps.MapView>
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <com.mapbox.maps.MapView
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            mapbox:mapbox_cameraTargetLat="33.77577524978659"
+            mapbox:mapbox_cameraTargetLng="-84.39630379821243"
+            mapbox:mapbox_cameraZoom="9.0">
+        </com.mapbox.maps.MapView>
+
+        <View
+            android:id="@+id/overlay_view"
+            android:background="#20000000"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </View>
+    </FrameLayout>
 
     <View
         android:background="@color/primary"

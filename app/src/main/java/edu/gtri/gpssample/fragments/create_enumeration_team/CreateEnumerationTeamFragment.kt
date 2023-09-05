@@ -4,7 +4,9 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -15,12 +17,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
@@ -40,16 +40,19 @@ import java.util.*
 
 class CreateEnumerationTeamFragment : Fragment(),
     OnMapClickListener,
+    OnTouchListener,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private lateinit var map: GoogleMap
     private lateinit var study: Study
+    private lateinit var map: GoogleMap
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList: ColorStateList
+    private lateinit var polylineAnnotation: PolylineAnnotation
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var createMode = false
     private var selectionGeometry: Geometry? = null
@@ -95,6 +98,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager(binding.mapView)
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
@@ -208,6 +212,8 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
         }
+
+        binding.overlayView.setOnTouchListener(this)
     }
 
     override fun onResume()
@@ -318,6 +324,85 @@ class CreateEnumerationTeamFragment : Fragment(),
                 )
             }
         }
+    }
+
+    private val polyLinePoints = ArrayList<Point>()
+
+    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
+    {
+        p1?.let { p1 ->
+
+            if (p1.action == MotionEvent.ACTION_UP)
+            {
+                val points1 = ArrayList<Coordinate>()
+                val points2 = ArrayList<Coordinate>()
+
+                // convert ArrayList<LatLon> to ArrayList<Coordinate>
+                enumArea.vertices.map {
+                    points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                }
+
+                // close the polygon
+                points1.add( points1[0])
+
+                // create a copy of the newly drawn polyline
+                val polyList = ArrayList<Point>( polyLinePoints )
+
+                // close the polygon
+                polyList.add( polyLinePoints[0])
+
+                // convert ArrayList<Point> to ArrayList<Coordinate>
+                polyList.map {
+                    points2.add( Coordinate( it.longitude(), it.latitude()))
+                }
+
+                // compute the intersection of points1 & points2
+                val geometryFactory = GeometryFactory()
+                val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
+                val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
+
+                geometry1.intersection(geometry2)?.let { polygon ->
+                    val vertices = ArrayList<Point>()
+
+                    polygon.boundary?.coordinates?.map {
+                        vertices.add( Point.fromLngLat(it.x, it.y))
+                    }
+
+                    if (vertices.isNotEmpty())
+                    {
+                        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                        pointList.add( vertices )
+                        mapboxManager.addPolygon(pointList)
+                    }
+                }
+
+                polyLinePoints.clear()
+                polylineAnnotation.points = polyLinePoints
+                polylineAnnotationManager.update(polylineAnnotation)
+            }
+            else
+            {
+                val point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                polyLinePoints.add( point )
+
+                if (!this::polylineAnnotation.isInitialized)
+                {
+                    val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+                        .withPoints(polyLinePoints)
+                        .withLineColor("#ee4e8b")
+                        .withLineWidth(5.0)
+
+                    polylineAnnotation = polylineAnnotationManager.create(polylineAnnotationOptions)
+                }
+                else
+                {
+                    polylineAnnotation.points = polyLinePoints
+                    polylineAnnotationManager.update(polylineAnnotation)
+                }
+            }
+        }
+
+        return true
     }
 
     override fun onDestroyView()
