@@ -57,8 +57,6 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
                 return
             }
 
-            Log.d( "xxx", field.type.format)
-
             holder.itemView.isSelected = false
 
             layoutNonBlockField( holder, field, fieldData )
