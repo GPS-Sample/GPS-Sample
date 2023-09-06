@@ -19,10 +19,12 @@ import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
@@ -54,6 +56,7 @@ import java.util.*
 
 class CreateEnumerationAreaFragment : Fragment(),
     OnMapClickListener,
+    OnCameraChangeListener,
     ConfirmationDialog.ConfirmationDialogDelegate,
     InputDialog.InputDialogDelegate
 {
@@ -148,6 +151,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
 
         binding.centerOnLocationButton.setOnClickListener {
             showCurrentLocation = !showCurrentLocation
@@ -683,6 +687,11 @@ class CreateEnumerationAreaFragment : Fragment(),
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+    }
+
+    override fun onCameraChanged(eventData: CameraChangedEventData)
+    {
+        sharedViewModel.performEnumerationModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onDestroyView()

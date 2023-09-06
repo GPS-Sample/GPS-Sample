@@ -228,6 +228,7 @@
     <string name="begin_field_block">Begin Field Block</string>
     <string name="save_and_end_block">Save and End Block</string>
     <string name="add_another_field">Save and Add Another Field</string>
+    <string name="current_location_not_set">Oops! Your current location is not set.  Tap the compass toolbar item to center on your current location.</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

@@ -384,7 +384,7 @@ class PerformEnumerationFragment : Fragment(),
             val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), latLng )
             if (haversineCheck.withinBounds)
             {
-                val message = "${resources.getString(R.string.duplicate_warning)}. (${haversineCheck.distance}m)"
+                val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
                 ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), latLng, this)
                 return
             }
@@ -434,7 +434,9 @@ class PerformEnumerationFragment : Fragment(),
         {
             if (currentLocation == null)
             {
-                currentLocation = LatLng( binding.mapView.getMapboxMap().cameraState.center.latitude(), binding.mapView.getMapboxMap().cameraState.center.longitude())
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+                return
+//                currentLocation = LatLng( binding.mapView.getMapboxMap().cameraState.center.latitude(), binding.mapView.getMapboxMap().cameraState.center.longitude())
             }
 
             currentLocation?.let {
