@@ -1,26 +1,22 @@
 package edu.gtri.gpssample.fragments.create_enumeration_team
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
@@ -40,21 +36,19 @@ import java.util.*
 
 class CreateEnumerationTeamFragment : Fragment(),
     OnMapClickListener,
-    ConfirmationDialog.ConfirmationDialogDelegate
+    OnTouchListener
 {
-    private lateinit var map: GoogleMap
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
-    private lateinit var defaultColorList: ColorStateList
+    private lateinit var polylineAnnotation: PolylineAnnotation
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var createMode = false
-    private var selectionGeometry: Geometry? = null
-    private var selectionPolygon: Polygon? = null
-    private var selectionMarkers = ArrayList<Marker>()
+    private var intersectionPolygon: PolygonAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
 
@@ -95,84 +89,29 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager(binding.mapView)
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
-        binding.dropPinButton.backgroundTintList?.let {
-            defaultColorList = it
-        }
-
-        binding.dropPinButton.setOnClickListener {
+        binding.drawPolygonButton.setOnClickListener {
 
             if (createMode)
             {
                 createMode = false
+                binding.overlayView.visibility = View.GONE
+                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
             {
+                intersectionPolygon?.let {
+                    polygonAnnotationManager.delete( it )
+                }
+
                 createMode = true
-                binding.dropPinButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                binding.overlayView.visibility = View.VISIBLE
+                binding.drawPolygonButton.setBackgroundResource( R.drawable.save_blue )
             }
-        }
-
-        binding.drawPolygonButton.setOnClickListener {
-
-            if (createMode && selectionMarkers.size > 2)
-            {
-                createMode = false
-                binding.dropPinButton.setBackgroundTintList(defaultColorList);
-
-                val points1 = ArrayList<Coordinate>()
-                val points2 = ArrayList<Coordinate>()
-
-                enumArea.vertices.map {
-                    points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
-                }
-
-                // close the poly
-                points1.add( points1[0] )
-
-                selectionMarkers.map { marker ->
-                    points2.add( Coordinate(marker.position.longitude, marker.position.latitude))
-                    marker.remove()
-                }
-
-                selectionMarkers.clear()
-
-                // close the poly
-                points2.add( points2[0] )
-
-                val geometryFactory = GeometryFactory()
-                val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
-                val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
-
-                geometry1.intersection(geometry2)?.let { polygon ->
-                    val vertices = ArrayList<LatLng>()
-
-                    selectionGeometry = polygon
-
-                    polygon.boundary?.coordinates?.map {
-                        vertices.add( LatLng( it.y, it.x ))  // latitude is th Y axis in JTS
-                    }
-
-                    if (vertices.isNotEmpty())
-                    {
-                        val polygonOptions = PolygonOptions()
-                            .fillColor(0x40ff0000.toInt())
-                            .clickable(false)
-                            .addAll( vertices )
-
-                        selectionPolygon = map.addPolygon( polygonOptions )
-                    }
-                }
-            }
-        }
-
-        binding.clearSelectionsButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                resources.getString(R.string.clear_selections_message), resources.getString(R.string.no),
-                resources.getString(R.string.yes), null, this)
         }
 
         binding.cancelButton.setOnClickListener {
@@ -189,13 +128,15 @@ class CreateEnumerationTeamFragment : Fragment(),
             study.id?.let { studyId ->
                 val polygon = ArrayList<LatLon>()
 
-                selectionPolygon?.points?.map {
-                    polygon.add( LatLon( it.latitude, it.longitude ))
+                intersectionPolygon?.points?.map { points ->
+                    points.map { point ->
+                        polygon.add( LatLon( point.latitude(), point.longitude()))
+                    }
                 }
 
                 if (polygon.isEmpty())
                 {
-                    enumArea?.vertices?.map {
+                    enumArea.vertices.map {
                         polygon.add( LatLon( it.latitude, it.longitude ))
                     }
                 }
@@ -208,6 +149,8 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
         }
+
+        binding.overlayView.setOnTouchListener(this)
     }
 
     override fun onResume()
@@ -215,14 +158,6 @@ class CreateEnumerationTeamFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationTeamFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    override fun didSelectLeftButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectRightButton(tag: Any?)
-    {
     }
 
     fun refreshMap()
@@ -275,49 +210,93 @@ class CreateEnumerationTeamFragment : Fragment(),
         return false
     }
 
-    fun onMapReadyXXX(googleMap: GoogleMap)
+    private val polyLinePoints = ArrayList<Point>()
+
+    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
-        map = googleMap
+        p1?.let { p1 ->
 
-        map.clear()
-
-        map.setOnMapClickListener {
-            if (createMode)
+            if (p1.action == MotionEvent.ACTION_UP)
             {
-                val marker = map.addMarker( MarkerOptions().position(it))
-                marker?.let {
-                    selectionMarkers.add( marker )
+                val points1 = ArrayList<Coordinate>()
+                val points2 = ArrayList<Coordinate>()
+
+                // convert ArrayList<LatLon> to ArrayList<Coordinate>
+                enumArea.vertices.map {
+                    points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                }
+
+                // close the polygon
+                points1.add( points1[0])
+
+                // create a copy of the newly drawn polyline
+                val polyList = ArrayList<Point>( polyLinePoints )
+
+                // close the polygon
+                polyList.add( polyLinePoints[0])
+
+                // convert ArrayList<Point> to ArrayList<Coordinate>
+                polyList.map {
+                    points2.add( Coordinate( it.longitude(), it.latitude()))
+                }
+
+                // compute the intersection of points1 & points2
+                val geometryFactory = GeometryFactory()
+                val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
+                val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
+
+                try {
+                    geometry1.intersection(geometry2)?.let { polygon ->
+                        val vertices = ArrayList<Point>()
+
+                        polygon.boundary?.coordinates?.map {
+                            vertices.add( Point.fromLngLat(it.x, it.y))
+                        }
+
+                        if (vertices.isNotEmpty())
+                        {
+                            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                            pointList.add( vertices )
+                            intersectionPolygon = mapboxManager.addPolygon(pointList)
+                        }
+                    }
+                }
+                catch( ex: Exception )
+                {
+                    Log.d( "xxx", ex.stackTrace.toString())
+                }
+
+                polyLinePoints.clear()
+                polylineAnnotation.points = polyLinePoints
+                polylineAnnotationManager.update(polylineAnnotation)
+
+                createMode = false
+                binding.overlayView.visibility = View.GONE
+                binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
+            }
+            else
+            {
+                val point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                polyLinePoints.add( point )
+
+                if (!this::polylineAnnotation.isInitialized)
+                {
+                    val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+                        .withPoints(polyLinePoints)
+                        .withLineColor("#ee4e8b")
+                        .withLineWidth(5.0)
+
+                    polylineAnnotation = polylineAnnotationManager.create(polylineAnnotationOptions)
+                }
+                else
+                {
+                    polylineAnnotation.points = polyLinePoints
+                    polylineAnnotationManager.update(polylineAnnotation)
                 }
             }
         }
 
-        val points = ArrayList<LatLng>()
-
-        enumArea.vertices.map {
-            points.add( it.toLatLng())
-        }
-
-        val polygon = PolygonOptions()
-            .clickable(false)
-            .addAll( points )
-
-        map.addPolygon(polygon)
-
-        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
-
-        for (location in enumArea.locations)
-        {
-            if (!location.isLandmark)
-            {
-                val icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-
-                map.addMarker( MarkerOptions()
-                    .position( LatLng( location.latitude, location.longitude ))
-                    .icon( icon )
-                )
-            }
-        }
+        return true
     }
 
     override fun onDestroyView()
