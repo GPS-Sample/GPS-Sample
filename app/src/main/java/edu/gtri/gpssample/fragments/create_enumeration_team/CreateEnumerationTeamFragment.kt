@@ -361,19 +361,25 @@ class CreateEnumerationTeamFragment : Fragment(),
                 val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
                 val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
 
-                geometry1.intersection(geometry2)?.let { polygon ->
-                    val vertices = ArrayList<Point>()
+                try {
+                    geometry1.intersection(geometry2)?.let { polygon ->
+                        val vertices = ArrayList<Point>()
 
-                    polygon.boundary?.coordinates?.map {
-                        vertices.add( Point.fromLngLat(it.x, it.y))
-                    }
+                        polygon.boundary?.coordinates?.map {
+                            vertices.add( Point.fromLngLat(it.x, it.y))
+                        }
 
-                    if (vertices.isNotEmpty())
-                    {
-                        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-                        pointList.add( vertices )
-                        mapboxManager.addPolygon(pointList)
+                        if (vertices.isNotEmpty())
+                        {
+                            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                            pointList.add( vertices )
+                            mapboxManager.addPolygon(pointList)
+                        }
                     }
+                }
+                catch( ex: Exception )
+                {
+                    Log.d( "xxx", ex.stackTrace.toString())
                 }
 
                 polyLinePoints.clear()
