@@ -76,7 +76,7 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
     fun layoutBlockField( holder: ViewHolder, field: Field, fieldData: FieldData )
     {
         val blockLayout: LinearLayout = holder.frameLayout.findViewById(R.id.block_layout)
-        val numberLayout: FrameLayout = blockLayout.findViewById(R.id.number_layout)
+        val numberLayout: FrameLayout = blockLayout.findViewById(R.id.block_number_layout)
         val editText = numberLayout.findViewById<EditText>(R.id.edit_text)
 
         blockLayout.visibility = View.VISIBLE
