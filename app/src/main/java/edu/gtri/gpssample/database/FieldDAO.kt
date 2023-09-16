@@ -8,6 +8,7 @@ import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
@@ -111,7 +112,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(id, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, date, time, ArrayList<FieldOption>(), option1, option2, option3, option4 )
     }
 
     //--------------------------------------------------------------------------
@@ -126,6 +127,7 @@ class FieldDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             field = buildField( cursor )
+            field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
         }
 
         cursor.close()
@@ -145,6 +147,7 @@ class FieldDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val field = buildField( cursor )
+            field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
             val rules = DAO.ruleDAO.getRulesForField(field)
             study.rules.addAll(rules)
             fields.add( field)
