@@ -10,6 +10,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.common.io.Resources
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -21,28 +23,31 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldOption
+import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
+import edu.gtri.gpssample.fragments.add_household.AddHouseholdAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
-class CreateFieldFragment : Fragment()
+class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
+
 {
     private var _binding: FragmentCreateFieldBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var field: Field
     private lateinit var checkboxLayout: LinearLayout
-    private lateinit var checkbox1Layout: LinearLayout
-    private lateinit var checkbox2Layout: LinearLayout
-    private lateinit var checkbox3Layout: LinearLayout
-    private lateinit var checkbox4Layout: LinearLayout
-
+    private lateinit var checkboxRecyclerView: RecyclerView
+    private lateinit var dropdownRecyclerView: RecyclerView
+    private lateinit var createFieldCheckboxAdapter: CreateFieldCheckboxAdapter
+    private lateinit var createFieldDropdownAdapter: CreateFieldDropdownAdapter
     private lateinit var dropdownLayout: LinearLayout
-    private lateinit var dropdown1Layout: LinearLayout
-    private lateinit var dropdown2Layout: LinearLayout
-    private lateinit var dropdown3Layout: LinearLayout
-    private lateinit var dropdown4Layout: LinearLayout
-
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private val kCheckboxTag = 1
+    private val kDropdownTag = 1
     private var isBlockField = false
 
     val fieldTypes : Array<String>
@@ -98,6 +103,7 @@ class CreateFieldFragment : Fragment()
         }
 
         sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
+            field = currentField
             currentField.fieldBlockUUID?.let {
                 isBlockField = true
                 binding.blockButtonLayout.visibility = View.VISIBLE
@@ -123,18 +129,19 @@ class CreateFieldFragment : Fragment()
             }
         }
 
-        checkboxLayout = view.findViewById<LinearLayout>(R.id.layout_field_checkbox)
-        dropdownLayout = view.findViewById<LinearLayout>(R.id.layout_field_dropdown)
+        checkboxLayout = view.findViewById(R.id.layout_field_checkbox)
+        checkboxRecyclerView = checkboxLayout.findViewById<RecyclerView>( R.id.checkbox_recycler_view )
+        createFieldCheckboxAdapter = CreateFieldCheckboxAdapter( field.fieldOptions )
+        createFieldCheckboxAdapter.shouldDeleteCheckboxFieldOption = this::shouldDeleteCheckboxFieldOption
+        checkboxRecyclerView.adapter = createFieldCheckboxAdapter
+        checkboxRecyclerView.layoutManager = LinearLayoutManager(activity)
 
-        checkbox1Layout = checkboxLayout.findViewById( R.id.option_1_layout )
-        checkbox2Layout = checkboxLayout.findViewById( R.id.option_2_layout )
-        checkbox3Layout = checkboxLayout.findViewById( R.id.option_3_layout )
-        checkbox4Layout = checkboxLayout.findViewById( R.id.option_4_layout )
-
-        dropdown1Layout = dropdownLayout.findViewById( R.id.option_1_layout )
-        dropdown2Layout = dropdownLayout.findViewById( R.id.option_2_layout )
-        dropdown3Layout = dropdownLayout.findViewById( R.id.option_3_layout )
-        dropdown4Layout = dropdownLayout.findViewById( R.id.option_4_layout )
+        dropdownLayout = view.findViewById(R.id.layout_field_dropdown)
+        dropdownRecyclerView = dropdownLayout.findViewById<RecyclerView>( R.id.dropdown_recycler_view )
+        createFieldDropdownAdapter = CreateFieldDropdownAdapter( ArrayList<FieldOption>() )
+        createFieldDropdownAdapter.shouldDeleteDropdownFieldOption = this::shouldDeleteDropdownFieldOption
+        dropdownRecyclerView.adapter = createFieldDropdownAdapter
+        dropdownRecyclerView.layoutManager = LinearLayoutManager(activity)
 
         // respond to changes to the FieldType dropdown
         sharedViewModel.createFieldModel.fieldType.observe( this, androidx.lifecycle.Observer { fieldType ->
@@ -142,8 +149,6 @@ class CreateFieldFragment : Fragment()
             val textLayout = view.findViewById<LinearLayout>(R.id.layout_field_text)
             val numberLayout = view.findViewById<LinearLayout>(R.id.layout_field_number)
             val dateLayout = view.findViewById<LinearLayout>(R.id.layout_field_date)
-            val checkboxLayout = view.findViewById<LinearLayout>(R.id.layout_field_checkbox)
-            val dropdownLayout = view.findViewById<LinearLayout>(R.id.layout_field_dropdown)
 
             binding.fieldBlockContainerCheckBox.visibility = View.GONE
 
@@ -180,31 +185,6 @@ class CreateFieldFragment : Fragment()
                     dateLayout.visibility = View.GONE
                     checkboxLayout.visibility = View.VISIBLE
                     dropdownLayout.visibility = View.GONE
-
-                    sharedViewModel.createFieldModel.tempField?.value?.option1?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            checkbox1Layout.visibility = View.VISIBLE
-                        }
-                    }
-                    sharedViewModel.createFieldModel.tempField?.value?.option2?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            checkbox2Layout.visibility = View.VISIBLE
-                        }
-                    }
-                    sharedViewModel.createFieldModel.tempField?.value?.option3?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            checkbox3Layout.visibility = View.VISIBLE
-                        }
-                    }
-                    sharedViewModel.createFieldModel.tempField?.value?.option4?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            checkbox4Layout.visibility = View.VISIBLE
-                        }
-                    }
                 }
                 FieldType.Dropdown -> {
                     textLayout.visibility = View.GONE
@@ -212,31 +192,6 @@ class CreateFieldFragment : Fragment()
                     dateLayout.visibility = View.GONE
                     checkboxLayout.visibility = View.GONE
                     dropdownLayout.visibility = View.VISIBLE
-
-                    sharedViewModel.createFieldModel.tempField?.value?.option1?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            dropdown1Layout.visibility = View.VISIBLE
-                        }
-                    }
-                    sharedViewModel.createFieldModel.tempField?.value?.option2?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            dropdown2Layout.visibility = View.VISIBLE
-                        }
-                    }
-                    sharedViewModel.createFieldModel.tempField?.value?.option3?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            dropdown3Layout.visibility = View.VISIBLE
-                        }
-                    }
-                    sharedViewModel.createFieldModel.tempField?.value?.option4?.let { text ->
-                        if (text.isNotEmpty())
-                        {
-                            dropdown4Layout.visibility = View.VISIBLE
-                        }
-                    }
                 }
                 else -> {}
             }
@@ -245,45 +200,13 @@ class CreateFieldFragment : Fragment()
         val checkboxAddAnotherButton = checkboxLayout.findViewById<Button>(R.id.add_another_button)
 
         checkboxAddAnotherButton.setOnClickListener {
-
-            if (checkbox1Layout.visibility == View.GONE)
-            {
-                checkbox1Layout.visibility = View.VISIBLE
-            }
-            else if (checkbox2Layout.visibility == View.GONE)
-            {
-                checkbox2Layout.visibility = View.VISIBLE
-            }
-            else if (checkbox3Layout.visibility == View.GONE)
-            {
-                checkbox3Layout.visibility = View.VISIBLE
-            }
-            else if (checkbox4Layout.visibility == View.GONE)
-            {
-                checkbox4Layout.visibility = View.VISIBLE
-            }
+            InputDialog( activity!!, resources.getString(R.string.option_item_name), "", kCheckboxTag, this@CreateFieldFragment )
         }
 
         val dropdownAddAnotherButton = dropdownLayout.findViewById<Button>(R.id.add_another_button)
 
         dropdownAddAnotherButton.setOnClickListener {
-
-            if (dropdown1Layout.visibility == View.GONE)
-            {
-                dropdown1Layout.visibility = View.VISIBLE
-            }
-            else if (dropdown2Layout.visibility == View.GONE)
-            {
-                dropdown2Layout.visibility = View.VISIBLE
-            }
-            else if (dropdown3Layout.visibility == View.GONE)
-            {
-                dropdown3Layout.visibility = View.VISIBLE
-            }
-            else if (dropdown4Layout.visibility == View.GONE)
-            {
-                dropdown4Layout.visibility = View.VISIBLE
-            }
+            InputDialog( activity!!, resources.getString(R.string.option_item_name), "", kDropdownTag, this@CreateFieldFragment )
         }
 
         binding.saveButton.setOnClickListener {
@@ -321,6 +244,24 @@ class CreateFieldFragment : Fragment()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFieldFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
+    override fun didEnterText( name: String, tag: Any? )
+    {
+        tag?.let {
+            if (tag as Int == kCheckboxTag)
+            {
+                val fieldOption = FieldOption( name )
+                field.fieldOptions.add( fieldOption )
+                createFieldCheckboxAdapter.updateFieldOptions( field.fieldOptions )
+            }
+            else
+            {
+                val fieldOption = FieldOption( name )
+                field.fieldOptions.add( fieldOption )
+                createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
+            }
+        }
+    }
+
     fun saveField()
     {
         sharedViewModel.createFieldModel.tempField?.value?.let { tempField ->
@@ -351,6 +292,14 @@ class CreateFieldFragment : Fragment()
                 }
             }
         }
+    }
+
+    private fun shouldDeleteCheckboxFieldOption(fieldOption: FieldOption)
+    {
+    }
+
+    private fun shouldDeleteDropdownFieldOption(fieldOption: FieldOption)
+    {
     }
 
     override fun onDestroyView()

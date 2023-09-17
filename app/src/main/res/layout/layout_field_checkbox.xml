@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".fragments.createconfiguration.CreateConfigurationFragment">
     <data>
@@ -16,108 +15,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/option_1_layout"
-            android:orientation="horizontal"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/checkbox_recycler_view"
+            android:layout_margin="20dp"
             android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/option_1_edit_text"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.tempField.option1}"/>
-
-            <Button
-                android:id="@+id/option_1_button"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/delete_white"
-                android:layout_width="50dp"
-                android:layout_height="50dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/option_2_layout"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/option_2_edit_text"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.tempField.option2}"/>
-
-            <Button
-                android:id="@+id/option_2_button"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/delete_white"
-                android:layout_width="50dp"
-                android:layout_height="50dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/option_3_layout"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/option_3_edit_text"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.tempField.option3}"/>
-
-            <Button
-                android:id="@+id/option_3_button"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/delete_white"
-                android:layout_width="50dp"
-                android:layout_height="50dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/option_4_layout"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/option_4_edit_text"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:hint="@string/enter_checkbox_text"
-                android:text="@={viewModel.createFieldModel.tempField.option4}"/>
-
-            <Button
-                android:id="@+id/option_4_button"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/delete_white"
-                android:layout_width="50dp"
-                android:layout_height="50dp"/>
-        </LinearLayout>
+            android:layout_height="wrap_content"/>
 
         <Button
             android:id="@+id/add_another_button"
