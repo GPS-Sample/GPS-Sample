@@ -115,6 +115,16 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 {
                     val fieldData = FieldData(field)
                     enumerationItem.fieldDataList.add(fieldData)
+
+                    if (field.type == FieldType.Checkbox)
+                    {
+                        // create a fiedDataOption for each fieldOption
+                        for (fieldOption in field.fieldOptions)
+                        {
+                            val fieldDataOption = FieldDataOption(fieldOption.name, false)
+                            fieldData.fieldDataOptions.add(fieldDataOption)
+                        }
+                    }
                 }
             }
         }
@@ -258,8 +268,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                                 }
                             }
                             FieldType.Checkbox -> {
-                                val selection = fieldData.checkbox1 or fieldData.checkbox2 or fieldData.checkbox3 or fieldData.checkbox4
-                                if (!selection) {
+                                if (fieldData.fieldDataOptions.isEmpty())
+                                {
                                     Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                     return
                                 }

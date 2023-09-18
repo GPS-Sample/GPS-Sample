@@ -249,10 +249,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_DATA_NUMBER_VALUE + " REAL" + "," +
                     COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_DROPDOWN_INDEX + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX1 + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX2 + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_BLOCK_NUMBER + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
@@ -262,6 +258,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFieldDataOption = ("CREATE TABLE " +
                     TABLE_FIELD_DATA_OPTION + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_FIELD_DATA_OPTION_NAME + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_VALUE + " INTEGER" +
                     ")")
             db.execSQL(createTableFieldDataOption)
@@ -498,13 +495,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_DATA_NUMBER_VALUE = "field_data_number_value"
         const val COLUMN_FIELD_DATA_DATE_VALUE = "field_data_date_value"
         const val COLUMN_FIELD_DATA_DROPDOWN_INDEX = "field_data_dropdown_index"
-        const val COLUMN_FIELD_DATA_CHECKBOX1 = "field_data_checkbox1"
-        const val COLUMN_FIELD_DATA_CHECKBOX2 = "field_data_checkbox2"
-        const val COLUMN_FIELD_DATA_CHECKBOX3 = "field_data_checkbox3"
-        const val COLUMN_FIELD_DATA_CHECKBOX4 = "field_data_checkbox4"
         const val COLUMN_FIELD_DATA_BLOCK_NUMBER = "field_data_block_number"
 
         const val TABLE_FIELD_DATA_OPTION = "field_data_option"
+        const val COLUMN_FIELD_DATA_OPTION_NAME = "field_data_option_name"
         const val COLUMN_FIELD_DATA_OPTION_VALUE = "field_data_option_value"
 
         // connector table, fieldData to fieldDataOption
@@ -611,7 +605,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 229
+        private const val DATABASE_VERSION = 230
 
     }
 }

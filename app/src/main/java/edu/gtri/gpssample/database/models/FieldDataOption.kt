@@ -8,9 +8,10 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class FieldDataOption(
     var id : Int? = null,
+    var name : String,
     var value: Boolean )
 {
-    constructor(value: Boolean) : this( null, value )
+    constructor(name: String, value: Boolean) : this( null, name, value )
 
     fun pack() : String
     {

@@ -20,7 +20,7 @@ class FieldDataOptionDAO(private var dao: DAO)
         {
             val values = ContentValues()
             putFieldDataOption( fieldDataOption, values )
-            fieldDataOption.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA__FIELD_DATA_OPTION, null, values).toInt()
+            fieldDataOption.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA_OPTION, null, values).toInt()
             fieldDataOption.id?.let { id ->
                 Log.d( "xxx", "new fieldDataOption id = ${id}")
                 createConnection( fieldDataOption, fieldData )
@@ -49,6 +49,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, fieldDataOption.id )
         }
 
+        values.put( DAO.COLUMN_FIELD_DATA_OPTION_NAME, fieldDataOption.name )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_VALUE, fieldDataOption.value )
     }
 
@@ -84,9 +85,10 @@ class FieldDataOptionDAO(private var dao: DAO)
     private fun  buildFieldDataOption(cursor: Cursor): FieldDataOption
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_NAME))
         val value = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_VALUE)).toBoolean()
 
-        return FieldDataOption(id, value)
+        return FieldDataOption(id, name, value)
     }
 
     fun getFieldDataOption( id : Int ): FieldDataOption?
