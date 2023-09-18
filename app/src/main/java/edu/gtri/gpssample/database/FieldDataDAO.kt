@@ -7,14 +7,16 @@ import android.util.Log
 import androidx.core.database.getDoubleOrNull
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
+import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.database.models.EnumerationItem
+import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.database.models.FieldDataOption
 import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem ) : FieldData?
     {
         if (exists( fieldData ))
@@ -23,7 +25,6 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
-            Log.d("XXXXX", "the field name ${fieldData.name}")
             val values = ContentValues()
 
             putFieldData( fieldData, values, enumerationItem )
@@ -31,13 +32,16 @@ class FieldDataDAO(private var dao: DAO)
             fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
             fieldData.id?.let { id ->
                 Log.d( "xxx", "new fieldData id = ${id}")
+                for (fieldDataOption in fieldData.fieldDataOptions)
+                {
+                    DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+                }
             } ?: return null
         }
 
         return fieldData
     }
 
-    //--------------------------------------------------------------------------
     fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)
     {
         fieldData.id?.let {
@@ -67,7 +71,6 @@ class FieldDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER, fieldData.blockNumber )
     }
 
-    //--------------------------------------------------------------------------
     fun exists( fieldData: FieldData): Boolean
     {
         fieldData.id?.let { id ->
@@ -77,7 +80,6 @@ class FieldDataDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createFieldData(cursor: Cursor): FieldData
     {
@@ -98,10 +100,9 @@ class FieldDataDAO(private var dao: DAO)
         val checkbox4 = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_CHECKBOX4)).toBoolean()
         val blockNumber = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER))
 
-        return FieldData( id, uuid, field, name, type, textValue, numberValue, dateValue, dropdownIndex, checkbox1, checkbox2, checkbox3, checkbox4, blockNumber )
+        return FieldData( id, uuid, field, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>(), checkbox1, checkbox2, checkbox3, checkbox4)
     }
 
-    //--------------------------------------------------------------------------
     fun updateFieldData( fieldData: FieldData )
     {
         val db = dao.writableDatabase
@@ -117,7 +118,6 @@ class FieldDataDAO(private var dao: DAO)
         }
     }
 
-    //--------------------------------------------------------------------------
     fun getFieldData( id: Int ): FieldData?
     {
         var fieldData: FieldData? = null
@@ -129,6 +129,7 @@ class FieldDataDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             fieldData = createFieldData( cursor )
+            fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
         }
 
         cursor.close()
@@ -137,33 +138,31 @@ class FieldDataDAO(private var dao: DAO)
         return fieldData
     }
 
-    //--------------------------------------------------------------------------
-    fun getOrCreateFieldData( field_id: Int, enumerationItem: EnumerationItem  ): FieldData
-    {
-        var fieldData: FieldData? = null
-        val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $enumerationItem.id"
-        val cursor = db.rawQuery(query, null)
+//    fun getOrCreateFieldData( field_id: Int, enumerationItem: EnumerationItem  ): FieldData
+//    {
+//        var fieldData: FieldData? = null
+//        val db = dao.writableDatabase
+//        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $enumerationItem.id"
+//        val cursor = db.rawQuery(query, null)
+//
+//        if (cursor.count > 0)
+//        {
+//            cursor.moveToNext()
+//            fieldData = createFieldData( cursor )
+//        }
+//        else
+//        {
+//            val field = DAO.fieldDAO.getField(field_id)
+//            fieldData = FieldData( field!! )
+//            createOrUpdateFieldData( fieldData, enumerationItem )
+//        }
+//
+//        cursor.close()
+//        db.close()
+//
+//        return fieldData
+//    }
 
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            fieldData = createFieldData( cursor )
-        }
-        else
-        {
-            val field = DAO.fieldDAO.getField(field_id)
-            fieldData = FieldData( field!! )
-            createOrUpdateFieldData( fieldData, enumerationItem )
-        }
-
-        cursor.close()
-        db.close()
-
-        return fieldData
-    }
-
-    //--------------------------------------------------------------------------
     fun getFieldDataList( enumerationItem: EnumerationItem ): ArrayList<FieldData>
     {
         var fieldDataList = ArrayList<FieldData>()
@@ -175,7 +174,9 @@ class FieldDataDAO(private var dao: DAO)
 
             while (cursor.moveToNext())
             {
-                fieldDataList.add( createFieldData( cursor ))
+                val fieldData = createFieldData( cursor )
+                fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
+                fieldDataList.add( fieldData )
             }
 
             cursor.close()
@@ -206,7 +207,6 @@ class FieldDataDAO(private var dao: DAO)
         return fieldDataList
     }
 
-    //--------------------------------------------------------------------------
     fun delete( fieldData: FieldData )
     {
         fieldData.id?.let {id ->
@@ -221,7 +221,6 @@ class FieldDataDAO(private var dao: DAO)
         }
     }
 
-    //--------------------------------------------------------------------------
     fun deleteAllFields( enumerationItem: EnumerationItem )
     {
         val fieldDataList = getFieldDataList( enumerationItem )

@@ -16,13 +16,11 @@ BroadcastReceiver()
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("XXXXXXX", "THE ON RECEIVE")
         if (intent?.action.equals(NETWORK_SERVICE_STATUS_KEY)) {
             if(intent != null)
             {
                 val statusIndex : Int = intent!!.getIntExtra(NETWORK_SERVICE_STATUS_KEY,0)
                 netConnectionCallback(NetworkConnectionStatus.values()[statusIndex])
-                Log.d("xxxx", "YEP")
             }else
             {
                // netConnectionCallback(BLEStatus.UNKNOWN_STATUS)
