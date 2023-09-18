@@ -27,6 +27,10 @@ class FieldDAO(private var dao: DAO)
             field.id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
             field.id?.let { id ->
                 Log.d( "xxx", "new field id = ${id}")
+                for (fieldOption in field.fieldOptions)
+                {
+                    DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
+                }
             } ?: return null
         }
 

@@ -52,6 +52,8 @@ class CreateFieldDropdownAdapter(var fieldOptions: List<FieldOption>) : Recycler
 
         val fieldOption = fieldOptions.get(position)
 
+        holder.optionEditText.setText( fieldOption.name )
+
         holder.optionDeleteButton.setOnClickListener {
             shouldDeleteDropdownFieldOption( fieldOption )
         }

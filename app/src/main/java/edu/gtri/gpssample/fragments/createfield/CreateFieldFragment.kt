@@ -47,7 +47,7 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private val kCheckboxTag = 1
-    private val kDropdownTag = 1
+    private val kDropdownTag = 2
     private var isBlockField = false
 
     val fieldTypes : Array<String>
@@ -72,9 +72,8 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
         sharedViewModel.createFieldModel.fieldTypes = fieldTypes
-        sharedViewModel.createFieldModel.tempField = MutableLiveData( sharedViewModel.createFieldModel.currentField?.value?.copy())
 
-        sharedViewModel.createFieldModel.tempField?.value?.type?.let { fieldType ->
+        sharedViewModel.createFieldModel.currentField?.value?.type?.let { fieldType ->
             sharedViewModel.createFieldModel.fieldTypePosition?.value = FieldTypeConverter.toIndex( fieldType )
         }
     }
@@ -138,7 +137,7 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
 
         dropdownLayout = view.findViewById(R.id.layout_field_dropdown)
         dropdownRecyclerView = dropdownLayout.findViewById<RecyclerView>( R.id.dropdown_recycler_view )
-        createFieldDropdownAdapter = CreateFieldDropdownAdapter( ArrayList<FieldOption>() )
+        createFieldDropdownAdapter = CreateFieldDropdownAdapter( field.fieldOptions )
         createFieldDropdownAdapter.shouldDeleteDropdownFieldOption = this::shouldDeleteDropdownFieldOption
         dropdownRecyclerView.adapter = createFieldDropdownAdapter
         dropdownRecyclerView.layoutManager = LinearLayoutManager(activity)
@@ -247,13 +246,14 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
     override fun didEnterText( name: String, tag: Any? )
     {
         tag?.let {
-            if (tag as Int == kCheckboxTag)
+            val tag = it as Int
+            if (tag == kCheckboxTag)
             {
                 val fieldOption = FieldOption( name )
                 field.fieldOptions.add( fieldOption )
                 createFieldCheckboxAdapter.updateFieldOptions( field.fieldOptions )
             }
-            else
+            else if (tag == kDropdownTag)
             {
                 val fieldOption = FieldOption( name )
                 field.fieldOptions.add( fieldOption )
@@ -264,32 +264,17 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
 
     fun saveField()
     {
-        sharedViewModel.createFieldModel.tempField?.value?.let { tempField ->
-            sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
-                currentField.name = tempField.name
-                currentField.type = tempField.type
-                currentField.pii = tempField.pii
-                currentField.required = tempField.required
-                currentField.integerOnly = tempField.integerOnly
-                currentField.date = tempField.date
-                currentField.time = tempField.time
-                currentField.option1 = tempField.option1
-                currentField.option2 = tempField.option2
-                currentField.option3 = tempField.option3
-                currentField.option4 = tempField.option4
-                currentField.fieldBlockContainer = tempField.fieldBlockContainer
+        sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
+            if (currentField.fieldBlockContainer)
+            {
+                currentField.fieldBlockUUID = UUID.randomUUID().toString()
+            }
 
-                if (currentField.fieldBlockContainer)
-                {
-                    currentField.fieldBlockUUID = UUID.randomUUID().toString()
-                }
+            sharedViewModel.addField()
 
-                sharedViewModel.addField()
-
-                currentField.fieldBlockUUID?.let{ fieldBlockUUID ->
-                    sharedViewModel.createFieldModel.createNewField( fieldBlockUUID )
-                    sharedViewModel.createFieldModel.setCurrentFieldBlockUUID( fieldBlockUUID )
-                }
+            currentField.fieldBlockUUID?.let{ fieldBlockUUID ->
+                sharedViewModel.createFieldModel.createNewField( fieldBlockUUID )
+                sharedViewModel.createFieldModel.setCurrentFieldBlockUUID( fieldBlockUUID )
             }
         }
     }

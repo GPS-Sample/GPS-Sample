@@ -38,7 +38,7 @@
             android:layout_marginEnd="20dp"
             android:text="@string/personally_identifiable"
             android:textSize="18sp"
-            android:checked="@{viewModel.createFieldModel.tempField.pii}"
+            android:checked="@{viewModel.createFieldModel.CurrentField.pii}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldPIISelected}"/>
 
         <CheckBox
@@ -49,7 +49,7 @@
             android:layout_marginEnd="20dp"
             android:text="@string/required"
             android:textSize="18sp"
-            android:checked="@{viewModel.createFieldModel.tempField.required}"
+            android:checked="@{viewModel.createFieldModel.CurrentField.required}"
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldRequiredSelected}"/>
 
     </LinearLayout>

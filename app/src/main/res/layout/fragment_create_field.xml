@@ -61,7 +61,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:hint="@string/enter_field_name"
-                    android:text="@={viewModel.createFieldModel.tempField.name}"
+                    android:text="@={viewModel.createFieldModel.CurrentField.name}"
                     android:imeOptions="actionDone"
                     android:inputType="textCapSentences" />
 
@@ -101,7 +101,7 @@
                     android:layout_marginEnd="20dp"
                     android:text="@string/begin_field_block"
                     android:textSize="18sp"
-                    android:checked="@{viewModel.createFieldModel.tempField.fieldBlockContainer}"
+                    android:checked="@{viewModel.createFieldModel.CurrentField.fieldBlockContainer}"
                     android:onCheckedChanged="@{viewModel.createFieldModel::onFieldBlockContainerSelected}"/>
 
                 <include
