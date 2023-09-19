@@ -116,7 +116,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                     val fieldData = FieldData(field)
                     enumerationItem.fieldDataList.add(fieldData)
 
-                    if (field.type == FieldType.Checkbox)
+                    if (field.type == FieldType.Checkbox || field.type == FieldType.Dropdown)
                     {
                         // create a fiedDataOption for each fieldOption
                         for (fieldOption in field.fieldOptions)

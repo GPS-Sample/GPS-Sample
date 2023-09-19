@@ -22,16 +22,10 @@ data class Field(
     var integerOnly: Boolean,
     var date: Boolean,
     var time: Boolean,
-    var fieldOptions: ArrayList<FieldOption>,
-    var option1: String,
-    var option2: String,
-    var option3: String,
-    var option4: String )
+    var fieldOptions: ArrayList<FieldOption>)
 {
-    constructor(name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, date: Boolean, time: Boolean,
-                option1: String, option2: String, option3: String, option4: String )
-            : this(null,  name, type, false, null, pii, required, integerOnly, date, time, ArrayList<FieldOption>(),
-                option1, option2, option3, option4)
+    constructor(name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, date: Boolean, time: Boolean)
+            : this(null,  name, type, false, null, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
 
     fun copy() : Field
     {
@@ -42,10 +36,6 @@ data class Field(
     {
         return Json.encodeToString( this )
     }
-
-//    override fun toString(): String {
-//        return name
-//    }
 
     companion object
     {
