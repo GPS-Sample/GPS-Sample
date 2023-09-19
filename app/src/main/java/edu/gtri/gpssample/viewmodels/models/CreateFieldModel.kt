@@ -24,7 +24,6 @@ class CreateFieldModel
     private var _fieldType: MutableLiveData<FieldType> = MutableLiveData( FieldType.Text )
     private var _fieldBlockContainer : MutableLiveData<Boolean> = MutableLiveData(false)
 
-    var tempField : MutableLiveData<Field>? = null
     var currentField : LiveData<Field>? = _currentField
     var currentFieldBlockUUID : LiveData<String>? = _currentFieldBlockUUID
     var fieldType : LiveData<FieldType> = _fieldType
@@ -39,14 +38,14 @@ class CreateFieldModel
 
     fun createNewField()
     {
-        val newField = Field("", FieldType.Text, false, false, false, false, false, "", "", "", "" )
+        val newField = Field( "", FieldType.Text, false, false, false, false, false)
         _currentField = MutableLiveData(newField)
         currentField = _currentField
     }
 
     fun createNewField( fieldBlockUUID: String )
     {
-        val newField = Field("", FieldType.Text, false, false, false, false, false, "", "", "", "" )
+        val newField = Field( "", FieldType.Text, false, false, false, false, false)
         newField.fieldBlockUUID = fieldBlockUUID
         _currentField = MutableLiveData(newField)
         currentField = _currentField
@@ -91,7 +90,7 @@ class CreateFieldModel
         {
             _fieldTypePosition = MutableLiveData(position)
             val type : String = FieldTypeConverter.array[position]
-            tempField?.value?.let {
+            currentField?.value?.let {
                 it.type = FieldTypeConverter.fromString( type )
                 _fieldType.value = it.type
             }
@@ -100,21 +99,21 @@ class CreateFieldModel
 
     fun onFieldPIISelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        tempField?.value?.let{field ->
+        currentField?.value?.let{field ->
             field.pii = isChecked
         }
     }
 
     fun onFieldRequiredSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        tempField?.value?.let{field ->
+        currentField?.value?.let{field ->
             field.required = isChecked
         }
     }
 
     fun onFieldBlockContainerSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        tempField?.value?.let{field ->
+        currentField?.value?.let{field ->
             field.fieldBlockContainer = isChecked
             _fieldBlockContainer.postValue(isChecked)
         }
@@ -122,19 +121,19 @@ class CreateFieldModel
 
     fun onFieldIntegerOnlySelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        tempField?.value?.let{field ->
+        currentField?.value?.let{field ->
             field.integerOnly = isChecked
         }
     }
     fun onFieldDateSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        tempField?.value?.let{field ->
+        currentField?.value?.let{field ->
             field.date = isChecked
         }
     }
     fun onFieldTimeSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
-        tempField?.value?.let{field ->
+        currentField?.value?.let{field ->
             field.time = isChecked
         }
     }

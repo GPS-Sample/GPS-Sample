@@ -8,6 +8,7 @@ import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
@@ -26,6 +27,10 @@ class FieldDAO(private var dao: DAO)
             field.id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
             field.id?.let { id ->
                 Log.d( "xxx", "new field id = ${id}")
+                for (fieldOption in field.fieldOptions)
+                {
+                    DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
+                }
             } ?: return null
         }
 
@@ -50,10 +55,6 @@ class FieldDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
         values.put( DAO.COLUMN_FIELD_DATE, field.date )
         values.put( DAO.COLUMN_FIELD_TIME, field.time )
-        values.put( DAO.COLUMN_FIELD_OPTION_1, field.option1 )
-        values.put( DAO.COLUMN_FIELD_OPTION_2, field.option2 )
-        values.put( DAO.COLUMN_FIELD_OPTION_3, field.option3 )
-        values.put( DAO.COLUMN_FIELD_OPTION_4, field.option4 )
 
         // TODO: use look up tables
         val type = FieldTypeConverter.toIndex(field.type)
@@ -104,14 +105,10 @@ class FieldDAO(private var dao: DAO)
         val integerOnly = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
         val date = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATE)).toBoolean()
         val time = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TIME)).toBoolean()
-        val option1 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_1))
-        val option2 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_2))
-        val option3 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_3))
-        val option4 = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_4))
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(id, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly,date, time, option1, option2, option3, option4 )
+        return Field(id, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
     }
 
     //--------------------------------------------------------------------------
@@ -126,6 +123,7 @@ class FieldDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             field = buildField( cursor )
+            field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
         }
 
         cursor.close()
@@ -145,6 +143,7 @@ class FieldDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val field = buildField( cursor )
+            field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
             val rules = DAO.ruleDAO.getRulesForField(field)
             study.rules.addAll(rules)
             fields.add( field)

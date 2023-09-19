@@ -100,6 +100,23 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableField)
 
+            val createTableFieldOption = ("CREATE TABLE " +
+                    TABLE_FIELD_OPTION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_FIELD_OPTION_NAME + " TEXT" +
+                    ")")
+            db.execSQL(createTableFieldOption)
+
+            val createTableField__FieldOption = ("CREATE TABLE " +
+                    TABLE_FIELD__FIELD_OPTION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_FIELD_ID + " INTEGER" + "," +
+                    COLUMN_FIELD_OPTION_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_FIELD_OPTION_ID) REFERENCES $TABLE_FIELD_OPTION($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableField__FieldOption)
+
             val createTableRule = ("CREATE TABLE " +
                     TABLE_RULE + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -232,15 +249,29 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_DATA_NUMBER_VALUE + " REAL" + "," +
                     COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_DROPDOWN_INDEX + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX1 + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX2 + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX3 + " INTEGER" + "," +
-                    COLUMN_FIELD_DATA_CHECKBOX4 + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_BLOCK_NUMBER + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableFieldData)
+
+            val createTableFieldDataOption = ("CREATE TABLE " +
+                    TABLE_FIELD_DATA_OPTION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_FIELD_DATA_OPTION_NAME + " TEXT" + "," +
+                    COLUMN_FIELD_DATA_OPTION_VALUE + " INTEGER" +
+                    ")")
+            db.execSQL(createTableFieldDataOption)
+
+            val createTableFieldData__FieldDataOption = ("CREATE TABLE " +
+                    TABLE_FIELD_DATA__FIELD_DATA_OPTION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_FIELD_DATA_ID + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_OPTION_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_FIELD_DATA_ID) REFERENCES $TABLE_FIELD_DATA($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_FIELD_DATA_OPTION_ID) REFERENCES $TABLE_FIELD_DATA_OPTION($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableFieldData__FieldDataOption)
 
             val createTableLatLon = ("CREATE TABLE " +
                     TABLE_LAT_LON + "(" +
@@ -313,6 +344,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TEAM_LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
 
         onCreate(db)
     }
@@ -333,6 +366,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_ID = "config_id"
         const val COLUMN_STUDY_ID = "study_id"
         const val COLUMN_FIELD_ID = "field_id"
+        const val COLUMN_FIELD_OPTION_ID = "field_option_id"
+        const val COLUMN_FIELD_DATA_ID = "field_data_id"
+        const val COLUMN_FIELD_DATA_OPTION_ID = "field_data_option_id"
         const val COLUMN_RULE_ID = "rule_id"
         const val COLUMN_FILTER_ID = "filter_id"
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
@@ -393,6 +429,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_OPTION_3 = "field_option_3"
         const val COLUMN_FIELD_OPTION_4 = "field_option_4"
 
+        const val TABLE_FIELD_OPTION = "field_option"
+        const val COLUMN_FIELD_OPTION_NAME = "field_option_name"
+
+        // connector table, field to field_option
+        const val TABLE_FIELD__FIELD_OPTION = "field__field_option"
+
         // Rule Table
         const val TABLE_RULE = "rule"
         const val COLUMN_RULE_NAME = "rule_name"
@@ -412,7 +454,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // FilterOperator
         const val TABLE_FILTEROPERATOR = "filteroperator"
         const val COLUMN_CONNECTOR = "connector"
-
 
         // EnumArea Table
         const val TABLE_ENUM_AREA = "enum_area"
@@ -454,11 +495,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_DATA_NUMBER_VALUE = "field_data_number_value"
         const val COLUMN_FIELD_DATA_DATE_VALUE = "field_data_date_value"
         const val COLUMN_FIELD_DATA_DROPDOWN_INDEX = "field_data_dropdown_index"
-        const val COLUMN_FIELD_DATA_CHECKBOX1 = "field_data_checkbox1"
-        const val COLUMN_FIELD_DATA_CHECKBOX2 = "field_data_checkbox2"
-        const val COLUMN_FIELD_DATA_CHECKBOX3 = "field_data_checkbox3"
-        const val COLUMN_FIELD_DATA_CHECKBOX4 = "field_data_checkbox4"
         const val COLUMN_FIELD_DATA_BLOCK_NUMBER = "field_data_block_number"
+
+        const val TABLE_FIELD_DATA_OPTION = "field_data_option"
+        const val COLUMN_FIELD_DATA_OPTION_NAME = "field_data_option_name"
+        const val COLUMN_FIELD_DATA_OPTION_VALUE = "field_data_option_value"
+
+        // connector table, fieldData to fieldDataOption
+        const val TABLE_FIELD_DATA__FIELD_DATA_OPTION = "field_data__field_data_option"
 
         const val TABLE_LAT_LON = "lat_lon"
         const val COLUMN_LAT = "lat"
@@ -473,6 +517,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var configDAO: ConfigDAO
         lateinit var studyDAO: StudyDAO
         lateinit var fieldDAO: FieldDAO
+        lateinit var fieldOptionDAO: FieldOptionDAO
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
         //lateinit var filterRuleDAO: FilterRuleDAO
@@ -480,6 +525,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var teamDAO: TeamDAO
         lateinit var teamMemberDAO: TeamMemberDAO
         lateinit var fieldDataDAO: FieldDataDAO
+        lateinit var fieldDataOptionDAO: FieldDataOptionDAO
         lateinit var latLonDAO: LatLonDAO
         lateinit var locationDAO: LocationDAO
         lateinit var enumerationItemDAO: EnumerationItemDAO
@@ -540,6 +586,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 configDAO = ConfigDAO( instance!! )
                 studyDAO = StudyDAO( instance!! )
                 fieldDAO = FieldDAO( instance!! )
+                fieldOptionDAO = FieldOptionDAO( instance!! )
                 ruleDAO = RuleDAO( instance!! )
                 filterDAO = FilterDAO( instance!! )
               //  filterRuleDAO = FilterRuleDAO( instance!! )
@@ -547,6 +594,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 teamDAO = TeamDAO( instance!! )
                 teamMemberDAO = TeamMemberDAO( instance!! )
                 fieldDataDAO = FieldDataDAO( instance!! )
+                fieldDataOptionDAO = FieldDataOptionDAO( instance!! )
                 latLonDAO = LatLonDAO( instance!!)
                 locationDAO = LocationDAO( instance!!)
                 enumerationItemDAO = EnumerationItemDAO( instance!!)
@@ -557,7 +605,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 228
+        private const val DATABASE_VERSION = 230
 
     }
 }

@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.widget.doAfterTextChanged
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.DateFormat
@@ -27,6 +29,7 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
     TimePickerDialog.TimePickerDialogDelegate
 {
     private var context: Context? = null
+    private lateinit var checkboxOptionAdapter: CheckboxOptionAdapter
 
     override fun getItemCount() = fieldDataList.size
 
@@ -149,12 +152,12 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
-                var data = ArrayList<String>()
+                val data = ArrayList<String>()
 
-                if (field.option1.length > 0) data.add(field.option1)
-                if (field.option2.length > 0) data.add(field.option2)
-                if (field.option3.length > 0) data.add(field.option3)
-                if (field.option4.length > 0) data.add(field.option4)
+                for (fieldDataOption in fieldData.fieldDataOptions)
+                {
+                    data.add( fieldDataOption.name )
+                }
 
                 val spinner = frameLayout.findViewById<Spinner>(R.id.spinner)
                 spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
@@ -185,57 +188,13 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
-                var checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox1)
-                checkBox.visibility = View.GONE
-                if (field.option1.length > 0)
-                {
-                    checkBox.text = field.option1
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox1
+                val recyclerView = frameLayout.findViewById<RecyclerView>(R.id.recycler_view)
 
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox1 = isChecked
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox2)
-                checkBox.visibility = View.GONE
-                if (field.option2.length > 0)
-                {
-                    checkBox.text = field.option2
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox2
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox2 = isChecked
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox3)
-                checkBox.visibility = View.GONE
-                if (field.option3.length > 0)
-                {
-                    checkBox.text = field.option3
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox3
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox3 = isChecked
-                    }
-                }
-
-                checkBox = frameLayout.findViewById<CheckBox>(R.id.checkbox4)
-                checkBox.visibility = View.GONE
-                if (field.option4.length > 0)
-                {
-                    checkBox.text = field.option4
-                    checkBox.visibility = View.VISIBLE
-                    checkBox.isChecked = fieldData.checkbox4
-
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        fieldData.checkbox4 = isChecked
-                    }
-                }
+                checkboxOptionAdapter = CheckboxOptionAdapter( fieldData.fieldDataOptions )
+                recyclerView.adapter = checkboxOptionAdapter
+                recyclerView.itemAnimator = DefaultItemAnimator()
+                recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+                recyclerView.layoutManager = LinearLayoutManager(context)
             }
             else -> {}
         }
