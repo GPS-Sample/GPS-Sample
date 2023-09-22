@@ -72,7 +72,6 @@ class CreateCollectionTeamFragment : Fragment()
 
         val samplingVm : SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
-        samplingViewModel.currentFragment = this
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
         samplingViewModel.config = sharedViewModel.currentConfiguration?.value
 

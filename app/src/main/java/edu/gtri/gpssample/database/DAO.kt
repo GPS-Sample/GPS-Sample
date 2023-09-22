@@ -224,25 +224,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_UUID + " TEXT" + "," +
                     COLUMN_LOCATION_ID + " INTEGER" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
-                    COLUMN_ENUMERATION_ITEM_SAMPLE_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_SAMPLING_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableEnumerationItem)
-
-            val createTableSampledItem = ("CREATE TABLE " +
-                    TABLE_SAMPLED_ITEM + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_SAMPLED_ITEM_SAMPLING_STATE + " TEXT" + "," +
-                    COLUMN_LOCATION_ID + " INTEGER" + "," +
-                    COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" +
-                    ")")
-            db.execSQL(createTableSampledItem)
 
             val createTableCollectionItem = ("CREATE TABLE " +
                     TABLE_COLLECTION_ITEM + "(" +
@@ -360,7 +348,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLED_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA_LAT_LON")
@@ -502,14 +489,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // EnumerationItem Table
         const val TABLE_ENUMERATION_ITEM = "enumeration_item"
         const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
-        const val COLUMN_ENUMERATION_ITEM_SAMPLE_STATE = "enumeration_item_sample_state"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE = "enumeration_item_enumeration_state"
+        const val COLUMN_ENUMERATION_ITEM_SAMPLING_STATE = "enumeration_item_sampling_state"
         const val COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON = "enumeration_item_incomplete_reason"
         const val COLUMN_ENUMERATION_ITEM_NOTES = "enumeration_item_notes"
-
-        // SampledItem Table
-        const val TABLE_SAMPLED_ITEM = "sampled_item"
-        const val COLUMN_SAMPLED_ITEM_SAMPLING_STATE = "sampled_item_sampling_state"
 
         // CollectionItem Table
         const val TABLE_COLLECTION_ITEM = "collection_item"
@@ -557,7 +540,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var latLonDAO: LatLonDAO
         lateinit var locationDAO: LocationDAO
         lateinit var enumerationItemDAO: EnumerationItemDAO
-        lateinit var sampledItemDAO: SampledItemDAO
         lateinit var collectionItemDAO: CollectionItemDAO
 
         // creation/access methods
@@ -600,7 +582,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_LAT_LON, null, null)
                 db.delete(TABLE_LOCATION, null, null)
                 db.delete(TABLE_ENUMERATION_ITEM, null, null)
-                db.delete(TABLE_SAMPLED_ITEM, null, null)
                 db.delete(TABLE_COLLECTION_ITEM, null, null)
                 db.delete(TABLE_ENUM_AREA_LAT_LON, null, null)
                 db.delete(TABLE_SAMPLE_AREA_LAT_LON, null, null)
@@ -630,7 +611,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 latLonDAO = LatLonDAO( instance!!)
                 locationDAO = LocationDAO( instance!!)
                 enumerationItemDAO = EnumerationItemDAO( instance!!)
-                sampledItemDAO = SampledItemDAO( instance!!)
                 collectionItemDAO = CollectionItemDAO( instance!!)
 
             }

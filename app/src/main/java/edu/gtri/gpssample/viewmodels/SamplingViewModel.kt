@@ -1,6 +1,5 @@
 package edu.gtri.gpssample.viewmodels
 
-import android.app.Activity
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -17,33 +16,31 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolygonOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.viewmodels.models.*
 import java.lang.Integer.min
 import java.util.ArrayList
 
 class SamplingViewModel : ViewModel() {
     private var _currentFragment : Fragment? = null
-    private var activity : Activity? = null
+//    private var activity : Activity? = null
     private var _map : GoogleMap? =  null
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentSampleArea : MutableLiveData<SampleArea>? = null
-    private var _currentSampledItemsForSampling : ArrayList<SampledItem> = ArrayList()
+    private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
     var config : Config? = null
     var enumArea : EnumArea? = null
 
-    var currentFragment : Fragment?
-        get() = _currentFragment
-        set(value){
-            _currentFragment = value
-            _currentFragment?.let {fragment ->
+//    var currentFragment : Fragment?
+//        get() = _currentFragment
+//        set(value){
+//            _currentFragment = value
+//            _currentFragment?.let {fragment ->
+//
+//                activity = fragment.activity
+//            }
+//        }
 
-                activity = fragment.activity
-            }
-        }
     var currentStudy : LiveData<Study>?
         get(){
           return _currentStudy
@@ -155,35 +152,28 @@ class SamplingViewModel : ViewModel() {
                     var icon : BitmapDescriptor? = null
                     currentStudy?.value?.let{study->
 
-                        for (item in location.sampledItems)
+                        for (item in location.enumerationItems)
                         {
-                            val sampledItem = item as? SampledItem
-                            // add item for sampling
-                            sampledItem?.let{sampledItem ->
-                                if(!_currentSampledItemsForSampling.contains(sampledItem))
-                                {
-                                    _currentSampledItemsForSampling.add(sampledItem)
-                                }
-
-                                icon = when(sampledItem.samplingState)
-                                {
-                                    SamplingState.None       -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-                                    SamplingState.NotSampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_grey)
-                                    SamplingState.Sampled    -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                                    SamplingState.Resampled  -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                                    SamplingState.Invalid    -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                                }
-                                map.addMarker(
-                                    MarkerOptions()
-                                        .position(LatLng(location.latitude, location.longitude))
-                                        .icon(icon)
-                                )
-
+                            if(!_currentSampledItemsForSampling.contains(item))
+                            {
+                                _currentSampledItemsForSampling.add(item)
                             }
+
+                            icon = when(item.samplingState)
+                            {
+                                SamplingState.None       -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
+                                SamplingState.NotSampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_grey)
+                                SamplingState.Sampled    -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                                SamplingState.Resampled  -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
+                                SamplingState.Invalid    -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
+                            }
+                            map.addMarker(
+                                MarkerOptions()
+                                    .position(LatLng(location.latitude, location.longitude))
+                                    .icon(icon)
+                            )
                         }
-
                     }
-
                 }
             }
         }
@@ -194,7 +184,7 @@ class SamplingViewModel : ViewModel() {
     {
         fixEnumData()
         // reset list
-        val validSamples : ArrayList<SampledItem> = ArrayList()
+        val validSamples : ArrayList<EnumerationItem> = ArrayList()
 
         currentStudy?.value?.let { study ->
 
@@ -210,17 +200,14 @@ class SamplingViewModel : ViewModel() {
 
             }
 
-            for(sampledItem in _currentSampledItemsForSampling)
+            for(enumerationItem in _currentSampledItemsForSampling)
             {
-                sampledItem.samplingState = SamplingState.NotSampled
+                enumerationItem.samplingState = SamplingState.NotSampled
 
                 // find and remove items that are not valid
-
-                sampledItem.enumerationItem?.let { enumerationItem ->
-                    if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                    {
-                        validSamples.add(sampledItem)
-                    }
+                if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                {
+                    validSamples.add(enumerationItem)
                 }
 
                 // TODO: run through rules and filters, etc..

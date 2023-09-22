@@ -54,7 +54,6 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         sharedViewModel.currentFragment = this
 
         samplingViewModel = samplingVm
-        samplingViewModel.currentFragment = this
 
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
 
@@ -126,7 +125,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         binding.nextButton.setOnClickListener {
             samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
                 DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
-//                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
+                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
                 Log.d( "xxx", "xxx" )
             }
 

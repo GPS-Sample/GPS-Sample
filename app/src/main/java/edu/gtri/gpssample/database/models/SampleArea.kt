@@ -22,15 +22,6 @@ data class SampleArea(
     constructor(enumArea: EnumArea) : this(null, Date().time, ArrayList<LatLon>(), ArrayList<Team>())
     {
         this.vertices.addAll(enumArea.vertices)
-
-        for (location in enumArea.locations)
-        {
-            for (enumerationItem in location.enumerationItems)
-            {
-                val sampledItem = SampledItem(location,enumerationItem)
-                location.sampledItems.add(sampledItem)
-            }
-        }
     }
 
     fun pack() : String

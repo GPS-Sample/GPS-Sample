@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.*
 
 class EnumerationItemDAO(private var dao: DAO)
@@ -98,6 +99,7 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE, enumerationItem.enumerationState.format )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE, enumerationItem.samplingState.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON, enumerationItem.incompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_NOTES, enumerationItem.notes )
         values.put(DAO.COLUMN_LOCATION_ID, location.id)
@@ -108,12 +110,10 @@ class EnumerationItemDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val subAddress =
-            cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
-        val enumerationState =
-            EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE)))
-        val incompleteReason =
-            cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
+        val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
+        val enumerationState = EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE)))
+        val samplingState = SamplingState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE)))
+        val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_NOTES))
 
         val fieldDataList = ArrayList<FieldData>()
@@ -124,6 +124,7 @@ class EnumerationItemDAO(private var dao: DAO)
             uuid,
             subAddress,
             enumerationState,
+            samplingState,
             incompleteReason,
             notes,
             fieldDataList

@@ -22,11 +22,6 @@ class LocationDAO(private var dao: DAO)
             {
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
             }
-
-            for (sampledItem in location.sampledItems)
-            {
-                DAO.sampledItemDAO.createOrUpdateSampledItem(sampledItem)
-            }
         }
         else
         {
@@ -43,12 +38,6 @@ class LocationDAO(private var dao: DAO)
                     {
                         DAO.fieldDataDAO.createOrUpdateFieldData(fieldData, enumerationItem)
                     }
-                }
-
-                for (sampledItem in location.sampledItems)
-                {
-                    sampledItem.location = location
-                    DAO.sampledItemDAO.createOrUpdateSampledItem(sampledItem)
                 }
             } ?: return null
         }
@@ -147,7 +136,7 @@ class LocationDAO(private var dao: DAO)
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LONGITUDE))
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
 
-        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, ArrayList<EnumerationItem>(), ArrayList<SampledItem>() )
+        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?
@@ -182,7 +171,6 @@ class LocationDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             location = createLocation( cursor )
-            location.sampledItems = DAO.sampledItemDAO.getSampledItems( location )
             location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
         }
 
@@ -205,8 +193,6 @@ class LocationDAO(private var dao: DAO)
             {
                 val location = createLocation( cursor )
                 location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
-                location.sampledItems = DAO.sampledItemDAO.getSampledItems( location )
-
                 locations.add( location )
             }
             cursor.close()
