@@ -22,24 +22,12 @@ import java.util.ArrayList
 
 class SamplingViewModel : ViewModel() {
     private var _currentFragment : Fragment? = null
-//    private var activity : Activity? = null
     private var _map : GoogleMap? =  null
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentSampleArea : MutableLiveData<SampleArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
     var config : Config? = null
-    var enumArea : EnumArea? = null
-
-//    var currentFragment : Fragment?
-//        get() = _currentFragment
-//        set(value){
-//            _currentFragment = value
-//            _currentFragment?.let {fragment ->
-//
-//                activity = fragment.activity
-//            }
-//        }
 
     var currentStudy : LiveData<Study>?
         get(){
@@ -121,7 +109,7 @@ class SamplingViewModel : ViewModel() {
         map.clear()
         map.uiSettings.isScrollGesturesEnabled = true
 
-        currentSampleArea?.value?.let{ sampleArea->
+        _currentSampleArea?.value?.let{ sampleArea->
 
             addPolygon( sampleArea, map )
             // maybe a faster way to build the bounding box?
@@ -136,7 +124,7 @@ class SamplingViewModel : ViewModel() {
             val latLngBounds = LatLngBounds(LatLng(minLat, minLon), LatLng(maxLat,maxLon))
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
 
-            for (location in enumArea!!.locations)
+            for (location in sampleArea.locations)
             {
                 if (location.isLandmark)
                 {

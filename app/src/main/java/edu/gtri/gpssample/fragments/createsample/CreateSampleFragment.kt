@@ -93,8 +93,6 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             this.enumArea = enumArea
-            samplingViewModel.enumArea = enumArea
-            Log.d( "xxx", "xxx" )
         }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
@@ -124,9 +122,17 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
 
         binding.nextButton.setOnClickListener {
             samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
+
                 DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
+
+                for (location in sampleArea.locations)
+                {
+                    DAO.locationDAO.updateConnectorTable( location, sampleArea )
+                }
+
+                // EnumArea contains Locations, which contains EnumerationItems, which contains the samplingState
+                // Consider moving the update to the SampleArea, which points to the same locations
                 DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
-                Log.d( "xxx", "xxx" )
             }
 
             findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)

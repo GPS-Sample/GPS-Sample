@@ -21,6 +21,8 @@ class SampleAreaDAO(private var dao: DAO)
             val values = ContentValues()
             putSampleArea( sampleArea, study, values )
             sampleArea.id = dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA, null, values).toInt()
+            sampleArea.id?.let {
+            } ?: return null
 
             updateSampleAreaElements(sampleArea)
         }
@@ -57,7 +59,7 @@ class SampleAreaDAO(private var dao: DAO)
         } ?: return false
     }
 
-    fun putSampleArea(sampleArea: SampleArea, study: Study, values: ContentValues )
+    fun putSampleArea( sampleArea: SampleArea, study: Study, values: ContentValues )
     {
         sampleArea.id?.let { id ->
             Log.d( "xxx", "existing sampleArea id = ${id}")
@@ -129,38 +131,14 @@ class SampleAreaDAO(private var dao: DAO)
                 val sampleArea = createSampleArea( cursor )
                 sampleArea.id?.let { id ->
                     sampleArea.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
-                    sampleArea.collectionTeams = DAO.teamDAO.getEnumerationTeams( id )
+                    sampleArea.locations = DAO.locationDAO.getLocations( sampleArea )
+                    sampleArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
                     sampleAreas.add( sampleArea )
                 }
             }
 
             cursor.close()
         }
-
-        db.close()
-
-        return sampleAreas
-    }
-
-    fun getSampleAreas(): ArrayList<SampleArea>
-    {
-        val sampleAreas = ArrayList<SampleArea>()
-        val db = dao.writableDatabase
-
-        val query = "SELECT * FROM ${DAO.TABLE_SAMPLE_AREA}"
-        val cursor = db.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val sampleArea = createSampleArea( cursor )
-            sampleArea.id?.let { id ->
-                sampleArea.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
-                sampleArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
-                sampleAreas.add( sampleArea )
-            }
-        }
-
-        cursor.close()
 
         db.close()
 
