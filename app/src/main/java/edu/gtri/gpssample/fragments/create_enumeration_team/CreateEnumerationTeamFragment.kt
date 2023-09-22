@@ -141,7 +141,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                     }
                 }
 
-                val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), true, polygon ), enumArea)
+                val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), polygon ), enumArea)
 
                 team?.let { team ->
                     enumArea.enumerationTeams.add(team)

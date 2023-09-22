@@ -42,7 +42,6 @@ class SampleAreaDAO(private var dao: DAO)
 
             for (team in sampleArea.collectionTeams)
             {
-                team.isEnumerationTeam = true
                 DAO.teamDAO.createOrUpdateTeam(team, sampleArea)
             }
 

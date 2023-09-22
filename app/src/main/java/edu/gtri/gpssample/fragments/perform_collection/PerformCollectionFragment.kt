@@ -235,39 +235,37 @@ class PerformCollectionFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-//            for (location in sampleArea.locations)
-//            {
-//                if (!location.isLandmark && location.items.isNotEmpty())
-//                {
-//                    // assuming only 1 enumeration item per location, for now...
-//                    val sampledItem = location.items[0] as? SampledItem
-//
-//                    sampledItem?.let { sampledItem ->
-//                        if (sampledItem.samplingState == SamplingState.Sampled)
-//                        {
-//                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-//                            val pointAnnotation = mapboxManager.addMarker( point, R.drawable.home_black )
-//
-//                            pointAnnotation?.let { pointAnnotation ->
-//                                allPointAnnotations.add( pointAnnotation )
-//                                pointHashMap[pointAnnotation.id] = location
-//                            }
-//
-//                            pointAnnotationManager.apply {
-//                                addClickListener(
-//                                    OnPointAnnotationClickListener { pointAnnotation ->
-//                                        pointHashMap[pointAnnotation.id]?.let { location ->
-//                                            sharedViewModel.locationViewModel.setCurrentLocation(location)
-//                                            LaunchSurveyDialog( activity, this@PerformCollectionFragment)
-//                                        }
-//                                        true
-//                                    }
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            for (location in sampleArea.locations)
+            {
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                {
+                    // assuming only 1 enumeration item per location, for now...
+                    val sampledItem = location.enumerationItems[0]
+
+                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    {
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        val pointAnnotation = mapboxManager.addMarker( point, R.drawable.home_black )
+
+                        pointAnnotation?.let { pointAnnotation ->
+                            allPointAnnotations.add( pointAnnotation )
+                            pointHashMap[pointAnnotation.id] = location
+                        }
+
+                        pointAnnotationManager.apply {
+                            addClickListener(
+                                OnPointAnnotationClickListener { pointAnnotation ->
+                                    pointHashMap[pointAnnotation.id]?.let { location ->
+                                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+                                        LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+                                    }
+                                    true
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -350,20 +348,6 @@ class PerformCollectionFragment : Fragment(),
 //                }
 //            }
 //        }
-    }
-
-    fun getCenter() : LatLng
-    {
-        var sumLat: Double = 0.0
-        var sumLon: Double = 0.0
-
-        for (latLon in enumArea.vertices)
-        {
-            sumLat += latLon.latitude
-            sumLon += latLon.longitude
-        }
-
-        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
     private fun didSelectLocation( location: Location )

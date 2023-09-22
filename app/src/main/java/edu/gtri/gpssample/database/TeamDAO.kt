@@ -54,7 +54,6 @@ class TeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, team.creationDate )
         values.put( DAO.COLUMN_STUDY_ID, team.studyId )
         values.put( DAO.COLUMN_TEAM_NAME, team.name )
-        values.put( DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM, team.isEnumerationTeam.toInt())
     }
 
     fun exists( team: Team ): Boolean
@@ -73,11 +72,10 @@ class TeamDAO(private var dao: DAO)
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_NAME))
-        val isEnumerationTeam = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM)).toBoolean()
 
         val latlngs = DAO.latLonDAO.getLatLonsWithTeamId( id )
 
-        return Team(id, creationDate, study_id, name, isEnumerationTeam,latlngs)
+        return Team(id, creationDate, study_id, name, latlngs)
     }
 
     fun updateTeam( team: Team, geoArea: GeoArea )
@@ -121,7 +119,7 @@ class TeamDAO(private var dao: DAO)
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 1"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -135,11 +133,11 @@ class TeamDAO(private var dao: DAO)
         return teams
     }
 
-    fun getCollectionTeams( enumArea_id: Int ): ArrayList<Team>
+    fun getCollectionTeams( sampleArea_id: Int ): ArrayList<Team>
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumArea_id AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 0"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleArea_id"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())

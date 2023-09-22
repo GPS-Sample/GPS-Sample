@@ -10,13 +10,11 @@ data class Team(
     var id : Int? = null,
     var creationDate: Long,
     var studyId: Int,
-
     var name: String,
-    var isEnumerationTeam: Boolean,
     var polygon: ArrayList<LatLon>)
 {
-    constructor( studyId: Int,  name: String, isEnumerationTeam: Boolean, polygon: ArrayList<LatLon> )
-            : this(null, Date().time, studyId, name, isEnumerationTeam, polygon )
+    constructor( studyId: Int,  name: String, polygon: ArrayList<LatLon> )
+            : this(null, Date().time, studyId, name, polygon )
 
     fun pack() : String
     {

@@ -47,7 +47,6 @@ class CreateCollectionTeamFragment : Fragment()
 {
     private lateinit var map: GoogleMap
     private lateinit var study: Study
-    private lateinit var enumArea: EnumArea
     private lateinit var sampleArea: SampleArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList: ColorStateList
@@ -94,10 +93,6 @@ class CreateCollectionTeamFragment : Fragment()
             study = _study
         }
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { _enumArea ->
-            enumArea = _enumArea
-        }
-
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
@@ -138,7 +133,7 @@ class CreateCollectionTeamFragment : Fragment()
                 val points1 = ArrayList<Coordinate>()
                 val points2 = ArrayList<Coordinate>()
 
-                enumArea.vertices.map {
+                sampleArea.vertices.map {
                     points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
                 }
 
@@ -202,7 +197,7 @@ class CreateCollectionTeamFragment : Fragment()
             }
 
             study.id?.let { studyId ->
-                DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), false, polygon ), enumArea)?.let { team ->
+                DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), polygon ), sampleArea)?.let { team ->
                     sampleArea.collectionTeams.add(team)
                 }
 
@@ -223,7 +218,7 @@ class CreateCollectionTeamFragment : Fragment()
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-        enumArea.vertices.map {
+        sampleArea.vertices.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
@@ -242,7 +237,7 @@ class CreateCollectionTeamFragment : Fragment()
             }
 
             currentZoomLevel?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                 val cameraPosition = CameraOptions.Builder()
                     .zoom(currentZoomLevel)
@@ -252,22 +247,20 @@ class CreateCollectionTeamFragment : Fragment()
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-//            for (location in sampleArea.locations)
-//            {
-//                if (!location.isLandmark && location.items.isNotEmpty())
-//                {
-//                    // assuming only 1 enumeration item per location, for now...
-//                    val sampledItem = location.items[0] as? SampledItem
-//
-//                    sampledItem?.let { sampledItem ->
-//                        if (sampledItem.samplingState == SamplingState.Sampled)
-//                        {
-//                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-//                            mapboxManager.addMarker( point, R.drawable.home_black )
-//                        }
-//                    }
-//                }
-//            }
+            for (location in sampleArea.locations)
+            {
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                {
+                    // assuming only 1 enumeration item per location, for now...
+                    val sampledItem = location.enumerationItems[0]
+
+                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    {
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        mapboxManager.addMarker( point, R.drawable.home_black )
+                    }
+                }
+            }
         }
     }
 
