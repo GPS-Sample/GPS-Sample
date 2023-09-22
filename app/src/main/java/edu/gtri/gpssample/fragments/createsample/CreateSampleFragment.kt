@@ -54,10 +54,7 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         sharedViewModel.currentFragment = this
 
         samplingViewModel = samplingVm
-
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-
-        samplingViewModel.config = sharedViewModel.currentConfiguration?.value
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?

@@ -90,7 +90,6 @@ class PerformCollectionFragment : Fragment(),
         val samplingVm : SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-        samplingViewModel.config = sharedViewModel.currentConfiguration?.value
 
         samplingVm.currentSampleArea?.value?.let { sampleArea ->
             this.sampleArea = sampleArea

@@ -8,7 +8,6 @@ import android.util.Log
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
 {
-    //--------------------------------------------------------------------------
     override fun onCreate( db: SQLiteDatabase )
     {
         try {
@@ -218,7 +217,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_LOCATION_ID + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_LOCATION_ID, $COLUMN_ENUM_AREA_ID)" +
                     ")")
             db.execSQL(createTableLocationEnumArea)
 
@@ -311,7 +311,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUM_AREA_ID + " INTEGER " + "," +
                     COLUMN_LAT_LON_ID + " INTEGER " + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_ENUM_AREA_ID, $COLUMN_LAT_LON_ID)" +
                     ")")
             db.execSQL(createTableEnumAreaLatLon)
 
@@ -321,7 +322,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_SAMPLE_AREA_ID + " INTEGER " + "," +
                     COLUMN_LAT_LON_ID + " INTEGER " + "," +
                     "FOREIGN KEY($COLUMN_SAMPLE_AREA_ID) REFERENCES $TABLE_SAMPLE_AREA($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_SAMPLE_AREA_ID, $COLUMN_LAT_LON_ID)" +
                     ")")
             db.execSQL(createTableSampleAreaLatLon)
 
@@ -331,7 +333,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_TEAM_ID + " INTEGER " + "," +
                     COLUMN_LAT_LON_ID + " INTEGER " + "," +
                     "FOREIGN KEY($COLUMN_TEAM_ID) REFERENCES $TABLE_TEAM($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_TEAM_ID, $COLUMN_LAT_LON_ID)" +
                     ")")
             db.execSQL(createTableTeamLatLon)
 
@@ -341,7 +344,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         }
     }
 
-    //--------------------------------------------------------------------------
     override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int )
     {
         // clear all tables
@@ -377,7 +379,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         onCreate(db)
     }
 
-    //--------------------------------------------------------------------------
     companion object
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
@@ -642,6 +643,5 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         }
 
         private const val DATABASE_VERSION = 234
-
     }
 }

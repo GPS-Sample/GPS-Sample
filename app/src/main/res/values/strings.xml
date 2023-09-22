@@ -224,6 +224,7 @@
     <string name="warning">"Warning!"</string>
     <string name="duplicate_warning">"This new location is extremely close to an existing location.  Are you sure that you want to add it?"</string>
     <string name="missing_team">"Configuration is missing a Team definition"</string>
+    <string name="collection_teams">"Collection Teams"</string>
     <string name="begin_field_block">Begin Field Block</string>
     <string name="save_and_end_block">Save and End Block</string>
     <string name="add_another_field">Save and Add Another Field</string>

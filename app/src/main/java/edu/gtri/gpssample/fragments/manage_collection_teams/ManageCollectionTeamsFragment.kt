@@ -11,32 +11,35 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.database.models.Team
-import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageCollectionTeamsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlin.collections.ArrayList
 
 class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private lateinit var study: Study
-    private lateinit var enumArea: EnumArea
-    private lateinit var manageCollectionTeamsAdapter: ManageCollectionTeamsAdapter
+    private lateinit var sampleArea: SampleArea
+    private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
+    private lateinit var manageCollectionTeamsAdapter: ManageCollectionTeamsAdapter
 
     private var _binding: FragmentManageCollectionTeamsBinding? = null
     private val binding get() = _binding!!
-    private var users = ArrayList<User>()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+        val samplingVm : SamplingViewModel by activityViewModels()
+
+        samplingViewModel = samplingVm
+        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentManageCollectionTeamsBinding.inflate(inflater, container, false)
@@ -48,15 +51,11 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.createStudyModel.currentStudy?.value?.let {
-            study = it
+        samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
+            this.sampleArea = sampleArea
         }
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
-            enumArea = it
-        }
-
-        enumArea.id?.let { enumAreaId ->
+        sampleArea.id?.let { sampleAreaId ->
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 var teams = ArrayList<Team>()
 
@@ -69,7 +68,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
                 }
                 else  // otherwise show all teams
                 {
-                    teams = DAO.teamDAO.getCollectionTeams( enumAreaId )
+                    teams = DAO.teamDAO.getCollectionTeams( sampleAreaId )
                 }
 
                 manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( teams )
@@ -83,7 +82,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
         binding.teamRecyclerView.adapter = manageCollectionTeamsAdapter
         binding.teamRecyclerView.layoutManager = LinearLayoutManager(activity)
 
-        binding.titleTextView.text = enumArea.name + " " + getString(R.string.teams)
+        binding.titleTextView.text = getString(R.string.collection_teams)
 
         binding.addButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateCollectionTeamFragment)
@@ -117,12 +116,9 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     override fun didSelectRightButton(tag: Any?)
     {
         val team = tag as Team
-
+        sampleArea.collectionTeams.remove(team)
+        manageCollectionTeamsAdapter.updateTeams(sampleArea.collectionTeams)
         DAO.teamDAO.deleteTeam( team )
-
-        enumArea.id?.let {
-            manageCollectionTeamsAdapter.updateTeams( DAO.teamDAO.getEnumerationTeams( it ))
-        }
     }
 
     override fun onDestroyView()

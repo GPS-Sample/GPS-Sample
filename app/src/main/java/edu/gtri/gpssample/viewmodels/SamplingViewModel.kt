@@ -27,8 +27,6 @@ class SamplingViewModel : ViewModel() {
     private var _currentSampleArea : MutableLiveData<SampleArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
-    var config : Config? = null
-
     var currentStudy : LiveData<Study>?
         get(){
           return _currentStudy
