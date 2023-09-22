@@ -25,8 +25,10 @@ import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -51,6 +53,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class PerformCollectionFragment : Fragment(),
+    OnCameraChangeListener,
     ExportDialog.ExportDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
@@ -123,6 +126,12 @@ class PerformCollectionFragment : Fragment(),
             userId = it
         }
 
+        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+        if (currentZoomLevel == null)
+        {
+            sharedViewModel.setCurrentZoomLevel( 14.0 )
+        }
+
         performCollectionAdapter = PerformCollectionAdapter( ArrayList<Location>() )
         performCollectionAdapter.didSelectLocation = this::didSelectLocation
 
@@ -163,24 +172,24 @@ class PerformCollectionFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        var locations = ArrayList<Location>()
-
-//        for (location in sampleArea.locations)
-//        {
-//            if (!location.isLandmark && location.items.isNotEmpty())
-//            {
-//                // assuming only 1 enumerationItem per location, for now...
-//                val sampledItem = location.items[0] as? SampledItem
-//                sampledItem?.let{sampledItem ->
-//                    if (sampledItem.samplingState == SamplingState.Sampled)
-//                    {
-//                        locations.add( location )
-//                    }
-//                }
-//            }
-//        }
-
-        performCollectionAdapter.updateLocations( locations )
+//        var locations = ArrayList<Location>()
+//
+////        for (location in sampleArea.locations)
+////        {
+////            if (!location.isLandmark && location.items.isNotEmpty())
+////            {
+////                // assuming only 1 enumerationItem per location, for now...
+////                val sampledItem = location.items[0] as? SampledItem
+////                sampledItem?.let{sampledItem ->
+////                    if (sampledItem.samplingState == SamplingState.Sampled)
+////                    {
+////                        locations.add( location )
+////                    }
+////                }
+////            }
+////        }
+//
+//        performCollectionAdapter.updateLocations( locations )
     }
 
     fun refreshMap()
@@ -215,14 +224,7 @@ class PerformCollectionFragment : Fragment(),
                 allPolygonAnnotations.add( it )
             }
 
-            var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
-
-            if (currentZoomLevel == null)
-            {
-                currentZoomLevel = 14.0
-                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(currentZoomLevel)
-            }
-
+            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
             currentZoomLevel?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
@@ -587,6 +589,11 @@ class PerformCollectionFragment : Fragment(),
 ////                onMapReady(map)
 //            }
         }
+    }
+
+    override fun onCameraChanged(eventData: CameraChangedEventData)
+    {
+        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onDestroyView()

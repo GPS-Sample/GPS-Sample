@@ -6,35 +6,33 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolygonOptions
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
+import edu.gtri.gpssample.managers.MapboxManager
 import java.lang.Integer.min
 import java.util.ArrayList
 
-class SamplingViewModel : ViewModel() {
+class SamplingViewModel : ViewModel()
+{
+    private lateinit var mapboxManager: MapboxManager
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+
     private var _currentFragment : Fragment? = null
-    private var _map : GoogleMap? =  null
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentSampleArea : MutableLiveData<SampleArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
+
+    private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
 
     var currentStudy : LiveData<Study>?
         get(){
           return _currentStudy
         }
         set(value){
-
             _currentStudy = MutableLiveData(value?.value)
-           // _currentStudy?.postValue(value?.value)
         }
 
     var currentSampleArea : LiveData<SampleArea>?
@@ -71,93 +69,50 @@ class SamplingViewModel : ViewModel() {
         _currentSampleArea = MutableLiveData(sampleArea)
     }
 
-    fun addPolygon( sampleArea: SampleArea, map: GoogleMap)
+    fun setSampleAreasForMap(mapboxManager: MapboxManager, pointAnnotationManager: PointAnnotationManager) : SamplingState
     {
-        val points = ArrayList<LatLng>()
+        this.mapboxManager = mapboxManager
+        this.pointAnnotationManager = pointAnnotationManager
 
-        sampleArea.vertices.map {
-            points.add( it.toLatLng())
+        for (pointAnnotation in allPointAnnotations)
+        {
+            pointAnnotationManager.delete( pointAnnotation )
         }
 
-        val polygonOptions = PolygonOptions()
-            .clickable(true)
-            .addAll( points )
-
-        val polygon = map.addPolygon( polygonOptions )
-        polygon.tag = sampleArea
-
-    }
-    fun getSampleAreaLocations()
-    {
-        // TODO:  build sample locations from enum locations.  they're different
-//        currentSampleArea?.value?.let { sampleArea ->
-//            sampleArea.locations = DAO.locationDAO.getLocations(sampleArea)
-//        }
-    }
-
-    fun setSampleAreasForMap(map: GoogleMap) : SamplingState
-    {
-        var minLat = 999999.0
-        var minLon = 999999.0
-        var maxLat = -999999.0
-        var maxLon = -999999.0
-
-        _map = map
-       // _currentEnumItemsForSampling.clear()
-        map.clear()
-        map.uiSettings.isScrollGesturesEnabled = true
+        allPointAnnotations.clear()
 
         _currentSampleArea?.value?.let{ sampleArea->
 
-            addPolygon( sampleArea, map )
-            // maybe a faster way to build the bounding box?
-            for (i in 0 until sampleArea.vertices.size)
-            {
-                val pos = sampleArea.vertices[i].toLatLng()
-                minLat =  if (pos.latitude < minLat) pos.latitude else  minLat
-                minLon =  if (pos.longitude < minLon) pos.longitude else  minLon
-                maxLat =  if (pos.latitude > maxLat) pos.latitude else  maxLat
-                maxLon =  if (pos.longitude > maxLon) pos.longitude else maxLon
-            }
-            val latLngBounds = LatLngBounds(LatLng(minLat, minLon), LatLng(maxLat,maxLon))
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
-
             for (location in sampleArea.locations)
             {
-                if (location.isLandmark)
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
+                    currentStudy?.value?.let{ study->
 
-                    map.addMarker( MarkerOptions()
-                        .position( LatLng( location.latitude, location.longitude ))
-                        .icon( icon )
-                    )
-                }
-                else
-                {
-                    var icon : BitmapDescriptor? = null
-                    currentStudy?.value?.let{study->
+                        // assuming only 1 enumeration item per location, for now...
+                        val sampledItem = location.enumerationItems[0]
 
-                        for (item in location.enumerationItems)
+                        if(!_currentSampledItemsForSampling.contains(sampledItem))
                         {
-                            if(!_currentSampledItemsForSampling.contains(item))
-                            {
-                                _currentSampledItemsForSampling.add(item)
-                            }
+                            _currentSampledItemsForSampling.add(sampledItem)
+                        }
 
-                            icon = when(item.samplingState)
-                            {
-                                SamplingState.None       -> BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-                                SamplingState.NotSampled -> BitmapDescriptorFactory.fromResource(R.drawable.home_grey)
-                                SamplingState.Sampled    -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                                SamplingState.Resampled  -> BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-                                SamplingState.Invalid    -> BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-                            }
-                            map.addMarker(
-                                MarkerOptions()
-                                    .position(LatLng(location.latitude, location.longitude))
-                                    .icon(icon)
-                            )
+                        Log.d( "xxx", sampledItem.samplingState.format )
+
+                        val color = when(sampledItem.samplingState)
+                        {
+                            SamplingState.None       -> R.drawable.home_black
+                            SamplingState.NotSampled -> R.drawable.home_grey
+                            SamplingState.Sampled    -> R.drawable.home_green
+                            SamplingState.Resampled  -> R.drawable.home_green
+                            SamplingState.Invalid    -> R.drawable.home_red
+                        }
+
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        val pointAnnotation = mapboxManager.addMarker( point, color )
+
+                        pointAnnotation?.let { pointAnnotation ->
+                            allPointAnnotations.add( pointAnnotation )
                         }
                     }
                 }
@@ -166,6 +121,7 @@ class SamplingViewModel : ViewModel() {
 
         return SamplingState.None
     }
+
     fun beginSampling(view : View) : SamplingState
     {
         fixEnumData()
@@ -238,9 +194,8 @@ class SamplingViewModel : ViewModel() {
 
         }
 
-        _map?.let{map->
-            setSampleAreasForMap(map)
-        }
+        setSampleAreasForMap(mapboxManager,pointAnnotationManager)
+
         return SamplingState.None
     }
 

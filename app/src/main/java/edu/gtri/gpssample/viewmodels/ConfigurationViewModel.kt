@@ -61,6 +61,15 @@ class ConfigurationViewModel : ViewModel()
     val dateFormats : Array<String>
         get() = DateFormatConverter.array
 
+    private var _currentZoomLevel : MutableLiveData<Double>? = null
+
+    var currentZoomLevel : LiveData<Double>? = _currentZoomLevel
+
+    fun setCurrentZoomLevel( zoomLevel: Double )
+    {
+        _currentZoomLevel = MutableLiveData(zoomLevel)
+        currentZoomLevel = _currentZoomLevel
+    }
 
 
 

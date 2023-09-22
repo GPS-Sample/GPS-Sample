@@ -116,11 +116,11 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
 
         if (currentZoomLevel == null)
         {
-            sharedViewModel.performEnumerationModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
@@ -284,7 +284,7 @@ class PerformEnumerationFragment : Fragment(),
                 allPolygonAnnotations.add( polygonAnnotation)
             }
 
-            val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
 
             currentZoomLevel?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(team.polygon)
@@ -398,7 +398,7 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
-        sharedViewModel.performEnumerationModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     private fun didSelectLocation( location: Location )
