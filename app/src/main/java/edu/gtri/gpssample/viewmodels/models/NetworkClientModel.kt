@@ -252,76 +252,130 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
        // if  (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
         if(client.socket == null)
         {
-            if(false)
+            //if(false)
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
             {
                 try {
+                    val connectivityManager =
+                        Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
                     val wifiConfig = WifiConfiguration()
 
-                    wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
-                    wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
+//                    wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
+//                    wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
+
+                    wifiConfig.SSID = "\"" + "Cypress Guest Wifi" + "\""
+                    wifiConfig.preSharedKey = "\"" + "cypresslovesyou" + "\""
+
                     wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
                     wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.OPEN);
                     wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.SHARED);
+                    wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+                    wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+                    wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+                    wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+                    wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
 
-                    var wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                    var wifiManager =
+                        Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
                     wifiManager!!.setWifiEnabled(true)
 
-                    val suggestionWpa2 = WifiNetworkSuggestion.Builder()
-                        .setSsid("Cypress Guest Wifi") //SSID name
-                        .setWpa2Passphrase("cypresslovesyou") //password
-                        .build()
-                    val networkSuggestions: ArrayList<WifiNetworkSuggestion> = ArrayList()
-                    networkSuggestions.add(suggestionWpa2)
+//                    val suggestionWpa2 = WifiNetworkSuggestion.Builder()
+//                        .setSsid("Cypress Guest Wifi") //SSID name
+//                        .setWpa2Passphrase("cypresslovesyou") //password
+//                        .build()
+//                    val networkSuggestions: ArrayList<WifiNetworkSuggestion> = ArrayList()
+//                    networkSuggestions.add(suggestionWpa2)
 
-                    wifiManager!!.startScan()
+                 //   wifiManager!!.startScan()
 
 
-                    if(wifiManager!!.isWifiEnabled)
-                    {
+                    if (wifiManager!!.isWifiEnabled) {
                         Log.d("xxxxxx", "WIFI ENABLED")
                     }
-                    var netId = wifiManager!! .addNetwork(wifiConfig)
-                    if (netId == -1){
+                    var netId = wifiManager!!.addNetwork(wifiConfig)
+                    if (netId == -1) {
                         //Try it again with no quotes in case of hex password
                         wifiConfig.wepKeys[0] = networkInfo.password;
                         netId = wifiManager.addNetwork(wifiConfig);
                     }
 
-                    if(netId == -1)
-                    {
-
-                        netId = wifiManager!!.addNetworkSuggestions(networkSuggestions)
-                    }
-                    val disconnect = wifiManager.disconnect()
-                    wifiManager.enableNetwork(netId, true)
-                    val a = wifiManager.reconnect()
                     runBlocking(Dispatchers.Main) {
-                        Handler().postDelayed({
-                            wifiManager =
-                                Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
 
-                            val serverAddress =
-                                intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
-                                    .substring(1)
-                            val myAddress =
-                                intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
-                                    .substring(1)
-                            val components = serverAddress.split(".")
-                            val broadcast_address =
-                                components[0] + "." + components[1] + "." + components[2] + ".255"
+                    val disconnect = wifiManager.disconnect()
+                    if (disconnect) {
+                        Log.d("xxxxxx", "${wifiManager?.isWifiEnabled}")
+                        val netid2 = wifiManager.addNetwork(wifiConfig)
+                        wifiManager.enableNetwork(netid2, true)
 
-                            val myInetAddress = InetAddress.getByName(myAddress)
-                            val broadcastInetAddress = InetAddress.getByName(broadcast_address)
-                            Log.d("here", "xxx  IP ADDRESS ${myInetAddress.hostAddress}")
+                       // val reconnect = wifiManager.reconnect()
+                        val reconnect = true
+                        if (reconnect) {
+                            Handler().postDelayed({
+                            // runBlocking(Dispatchers.Main) {
+//                                Handler().postDelayed({
+                                val reconnect = wifiManager.reconnect()
+
+                                Thread.sleep(12000)
+
+                                    val wifiInfo = wifiManager!!.connectionInfo
+                                    val ssid = wifiInfo.ssid
+
+                                    Log.d("xxxxxxx", "The SSID ${ssid}")
+
+
+
+
+
+                                    // wifiManager
+                                    wifiManager
+                                    val serverAddress =
+                                        intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
+                                            .substring(1)
+                                    val myAddress =
+                                        intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
+                                            .substring(1)
+                                    val components = serverAddress.split(".")
+                                    val broadcast_address =
+                                        components[0] + "." + components[1] + "." + components[2] + ".255"
+                                    //connectivityManager.network .requestNetwork( networkRequest, networkCallback )
+                                    val myInetAddress = InetAddress.getByName(myAddress)
+                                    val broadcastInetAddress = InetAddress.getByName(broadcast_address)
+                                    Log.d("here", "xxx  IP ADDRESS ${myInetAddress.hostAddress}")
+
+                                    viewModelScope?.let { viewModelScope ->
+                                        viewModelScope.launch(Dispatchers.IO) {
+                                            if (client.connect(
+                                                    //serverAddress,
+                                                    networkInfo.serverIP,
+                                                    this@NetworkClientModel
+                                                )
+                                            ) {
+                                                // start heartbeat
+                                                //startHeartbeat()
+                                                _networkConnected.postValue(NetworkStatus.NetworkConnected)
+                                                sendRegistration()
+                                            }
+                                        }
+                                    }
 
                             // tryto connect to server
-                            viewModelScope?.let { viewModelScope ->
-                                viewModelScope.launch(Dispatchers.IO) {
-                                    sleep(5000)
-                                    client.write("192.168.227.232", "TEST", this@NetworkClientModel)
-                                }
-                            }
-                        }, 1000)
+//                            viewModelScope?.let { viewModelScope ->
+//                                viewModelScope.launch(Dispatchers.IO) {
+//                                    sleep(5000)
+//                                    client.write("192.168.227.232", "TEST", this@NetworkClientModel)
+//                                }
+//                            }
+                                }, 1000)
+                            //  }
+                        }
+
+                    }
+//                }, 1000)
                     }
                 } catch (e: Exception) {
                     Log.d( "xxx", e.stackTraceToString())
