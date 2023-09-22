@@ -9,7 +9,6 @@ import edu.gtri.gpssample.database.models.*
 
 class EnumerationItemDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location) : EnumerationItem?
     {
         if (exists( enumerationItem ))
@@ -37,7 +36,6 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    //--------------------------------------------------------------------------
     fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
@@ -67,7 +65,6 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    //--------------------------------------------------------------------------
     fun exists( enumerationItem: EnumerationItem ): Boolean
     {
         enumerationItem.id?.let { id ->
@@ -77,7 +74,6 @@ class EnumerationItemDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
     {
         val db = dao.writableDatabase
@@ -91,7 +87,6 @@ class EnumerationItemDAO(private var dao: DAO)
         db.close()
     }
 
-    //--------------------------------------------------------------------------
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
     {
         enumerationItem.id?.let { id ->
@@ -108,7 +103,6 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put(DAO.COLUMN_LOCATION_ID, location.id)
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createEnumerationItem(cursor: Cursor): EnumerationItem {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
@@ -156,9 +150,9 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    fun getEnumerationItems( location: Location ) : ArrayList<GeoItem>
+    fun getEnumerationItems( location: Location ) : ArrayList<EnumerationItem>
     {
-        var enumerationItems = ArrayList<GeoItem>()
+        var enumerationItems = ArrayList<EnumerationItem>()
         val db = dao.writableDatabase
 
         location.id?.let { id ->
@@ -179,41 +173,6 @@ class EnumerationItemDAO(private var dao: DAO)
 
         return enumerationItems
     }
-
-//    fun getLocation( enumArea: EnumArea, team: Team ) : ArrayList<Location>
-//    {
-//        var locations = ArrayList<Location>()
-//        val db = dao.writableDatabase
-//
-//        enumArea.id?.let { enumAreaId ->
-//            team.id?.let { teamId ->
-//                var query = ""
-//
-//                if (team.isEnumerationTeam)
-//                {
-//                    query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_ENUMERATION_TEAM_ID} = $teamId"
-//                }
-//                else
-//                {
-//                    query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_COLLECTION_TEAM_ID} = $teamId"
-//                }
-//
-//                val cursor = db.rawQuery(query, null)
-//
-//                while (cursor.moveToNext())
-//                {
-//                    val location = createLocation( cursor )
-//                    locations.add( location )
-//                }
-//
-//                cursor.close()
-//            }
-//        }
-//
-//        db.close()
-//
-//        return locations
-//    }
 
     fun getEnumerationItems() : ArrayList<EnumerationItem>
     {

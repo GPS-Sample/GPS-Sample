@@ -33,6 +33,7 @@ class SamplingViewModel : ViewModel() {
     private var _currentSampledItemsForSampling : ArrayList<SampledItem> = ArrayList()
 
     var config : Config? = null
+    var enumArea : EnumArea? = null
 
     var currentFragment : Fragment?
         get() = _currentFragment
@@ -80,11 +81,13 @@ class SamplingViewModel : ViewModel() {
             }
             return ""
         }
+
     fun createSampleArea(fromEnumArea: EnumArea)
     {
         val sampleArea = SampleArea(fromEnumArea)
         _currentSampleArea = MutableLiveData(sampleArea)
     }
+
     fun addPolygon( sampleArea: SampleArea, map: GoogleMap)
     {
         val points = ArrayList<LatLng>()
@@ -108,9 +111,9 @@ class SamplingViewModel : ViewModel() {
 //            sampleArea.locations = DAO.locationDAO.getLocations(sampleArea)
 //        }
     }
+
     fun setSampleAreasForMap(map: GoogleMap) : SamplingState
     {
-
         var minLat = 999999.0
         var minLon = 999999.0
         var maxLat = -999999.0
@@ -136,8 +139,7 @@ class SamplingViewModel : ViewModel() {
             val latLngBounds = LatLngBounds(LatLng(minLat, minLon), LatLng(maxLat,maxLon))
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds,10))
 
-
-            for (location in sampleArea.locations)
+            for (location in enumArea!!.locations)
             {
                 if (location.isLandmark)
                 {
@@ -152,8 +154,9 @@ class SamplingViewModel : ViewModel() {
                 {
                     var icon : BitmapDescriptor? = null
                     currentStudy?.value?.let{study->
-                        for (item in location.items) {
 
+                        for (item in location.sampledItems)
+                        {
                             val sampledItem = item as? SampledItem
                             // add item for sampling
                             sampledItem?.let{sampledItem ->
@@ -184,6 +187,7 @@ class SamplingViewModel : ViewModel() {
                 }
             }
         }
+
         return SamplingState.None
     }
     fun beginSampling(view : View) : SamplingState
@@ -206,14 +210,17 @@ class SamplingViewModel : ViewModel() {
 
             }
 
-
-            for(sampleItem in _currentSampledItemsForSampling)
+            for(sampledItem in _currentSampledItemsForSampling)
             {
-                sampleItem.samplingState = SamplingState.NotSampled
+                sampledItem.samplingState = SamplingState.NotSampled
+
                 // find and remove items that are not valid
-                if(sampleItem.enumItem.enumerationState == EnumerationState.Enumerated)
-                {
-                    validSamples.add(sampleItem)
+
+                sampledItem.enumerationItem?.let { enumerationItem ->
+                    if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                    {
+                        validSamples.add(sampledItem)
+                    }
                 }
 
                 // TODO: run through rules and filters, etc..
@@ -243,6 +250,7 @@ class SamplingViewModel : ViewModel() {
             currentSampleArea?.value?.let { sampleArea ->
                 val sampledIndices: ArrayList<Int> = ArrayList()
                 val sampleSize =  min(study.sampleSize,validSamples.size)
+
                 for (i in 0 until sampleSize) {
 
                     var rnds = (0 until validSamples.size).random()

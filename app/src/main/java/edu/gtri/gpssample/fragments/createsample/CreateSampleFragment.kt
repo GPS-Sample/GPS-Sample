@@ -1,11 +1,13 @@
 package edu.gtri.gpssample.fragments.createsample
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,9 +22,9 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
 import edu.gtri.gpssample.databinding.FragmentHotspotBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -33,6 +35,8 @@ import java.util.ArrayList
 class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClickListener, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var config: Config
+    private lateinit var study: Study
+    private lateinit var enumArea: EnumArea
     private lateinit var map: GoogleMap
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var samplingViewModel: SamplingViewModel
@@ -40,7 +44,6 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
     private var _binding: FragmentCreateSampleBinding? = null
     private val binding get() = _binding!!
 
-    private var curEnumArea : EnumArea? = null
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -58,8 +61,6 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         samplingViewModel.config = sharedViewModel.currentConfiguration?.value
     }
 
-
-
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentCreateSampleBinding.inflate(inflater, container, false)
@@ -74,7 +75,9 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
             // Assign the fragment
             createSampleFragment = this@CreateSampleFragment
         }
+
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
         return binding.root
     }
 
@@ -82,20 +85,35 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.nextButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            this.config = config
+        }
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+            this.study = study
         }
 
-        sharedViewModel.currentConfiguration?.value.let { config ->
-            this.config = config!!
-            this.config.id?.let {
-               // configId = it
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            this.enumArea = enumArea
+            samplingViewModel.enumArea = enumArea
+            Log.d( "xxx", "xxx" )
+        }
+
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+
+            val sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
+
+            if (sampleAreas.isEmpty())
+            {
+                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{ enumArea->
+                    samplingViewModel.createSampleArea(enumArea)
+                }
+            }
+            else
+            {
+                binding.sampleButton.visibility = View.GONE
+                samplingViewModel.currentSampleArea = MutableLiveData(sampleAreas[0])
             }
         }
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{enumArea->
-            samplingViewModel.createSampleArea(enumArea)
-        }
-
 
         val mapFragment =  childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -103,6 +121,16 @@ class CreateSampleFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapClic
         binding.infoButton.setOnClickListener{
             // pop up dialog fragment
             findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
+        }
+
+        binding.nextButton.setOnClickListener {
+            samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
+                DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
+//                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
+                Log.d( "xxx", "xxx" )
+            }
+
+            findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
         }
     }
 

@@ -8,33 +8,60 @@ import edu.gtri.gpssample.database.models.*
 
 class LatLonDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
-    fun createOrUpdateLatLon( latLon: LatLon, area : GeoArea?, team : Team? ) : LatLon?
+    fun createOrUpdateLatLon( latLon: LatLon, geoArea : GeoArea?, team : Team? ) : LatLon?
     {
         if (exists( latLon ))
         {
-            updateLatLon( latLon )
+            if (geoArea is SampleArea)
+            {
+                // add the existing LatLon to the LatLon - SampleArea connector table
+                latLon.id?.let { latLonId ->
+                    geoArea.id?.let{ sampleAreaId->
+                        val values = ContentValues()
+                        putLatLonSampleArea( latLonId, sampleAreaId, values)
+                        dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA_LAT_LON, null, values)
+                    }
+                }
+            }
+            else
+            {
+                updateLatLon( latLon )
+            }
         }
         else
         {
-            var values = ContentValues()
+            val values = ContentValues()
 
             putLatLon( latLon, values )
 
             latLon.id = dao.writableDatabase.insert(DAO.TABLE_LAT_LON, null, values).toInt()
             latLon.id?.let { id ->
+
                 // insert into conenctor
 
-                area?.let{area ->
+                geoArea?.let { geoArea ->
                     values.clear()
-                    if (area is EnumArea)
-                    {
-                        area.id?.let{area_id->
-                            putLatLonEnumArea(id, area_id, values)
-                            dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA_LAT_LON, null, values)
+
+                    when (geoArea) {
+                        is EnumArea ->
+                        {
+                            geoArea.id?.let{ geo_area_id->
+                                putLatLonEnumArea( id, geo_area_id, values)
+                                dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA_LAT_LON, null, values)
+                            }
+                        }
+                        is SampleArea ->
+                        {
+                            geoArea.id?.let{ geo_area_id->
+                                putLatLonSampleArea( id, geo_area_id, values)
+                                dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA_LAT_LON, null, values)
+                            }
+                        }
+                        else -> {
                         }
                     }
                 }
+
                 team?.id?.let{team_id->
                     values.clear()
                     val ll = latLon
@@ -43,7 +70,6 @@ class LatLonDAO(private var dao: DAO)
                     dao.writableDatabase.insert(DAO.TABLE_TEAM_LAT_LON, null, values)
 
                 }
-//                Log.d( "xxx", "new LatLon id = ${id}")
             } ?: return null
         }
 
@@ -55,12 +81,19 @@ class LatLonDAO(private var dao: DAO)
         values.put( DAO.COLUMN_LAT_LON_ID, llID )
         values.put( DAO.COLUMN_TEAM_ID, teamId )
     }
+
     private fun putLatLonEnumArea(llID : Int, enumAreaId: Int, values : ContentValues)
     {
         values.put( DAO.COLUMN_LAT_LON_ID, llID )
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumAreaId )
     }
-    //--------------------------------------------------------------------------
+
+    private fun putLatLonSampleArea(llID : Int, sampleAreaId: Int, values : ContentValues)
+    {
+        values.put( DAO.COLUMN_LAT_LON_ID, llID )
+        values.put( DAO.COLUMN_SAMPLE_AREA_ID, sampleAreaId )
+    }
+
     private fun putLatLon(latLon: LatLon, values: ContentValues)
     {
         latLon.id?.let { id ->
@@ -71,7 +104,6 @@ class LatLonDAO(private var dao: DAO)
         values.put( DAO.COLUMN_LON, latLon.longitude )
     }
 
-    //--------------------------------------------------------------------------
     fun exists( latLon: LatLon ): Boolean
     {
         latLon.id?.let { id ->
@@ -81,7 +113,6 @@ class LatLonDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createLatLon(cursor: Cursor): LatLon
     {
@@ -92,7 +123,25 @@ class LatLonDAO(private var dao: DAO)
         return LatLon( id, lat, lon )
     }
 
-    //--------------------------------------------------------------------------
+    fun updateLatLon( latLon: LatLon )
+    {
+        val db = dao.writableDatabase
+
+        latLon.id?.let{ id ->
+            Log.d( "xxx", "update latLon id ${id}")
+
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args: Array<String> = arrayOf(id.toString())
+            val values = ContentValues()
+
+            putLatLon( latLon, values )
+
+            db.update(DAO.TABLE_LAT_LON, values, whereClause, args )
+        }
+
+        db.close()
+    }
+
     fun getLatLon( id : Int ): LatLon?
     {
         var latLon: LatLon? = null
@@ -112,16 +161,19 @@ class LatLonDAO(private var dao: DAO)
         return latLon
     }
 
-    fun getAllLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>
+    fun getLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>
     {
         var latLons = ArrayList<LatLon>()
         val db = dao.writableDatabase
-        val query = "SELECT ll.* FROM ${DAO.TABLE_LAT_LON} as ll, ${DAO.TABLE_ENUM_AREA_LAT_LON} as ell WHERE ll.id=ell.${DAO.COLUMN_LAT_LON_ID} and ell.${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
+        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_ENUM_AREA_LAT_LON} ELL WHERE" +
+                " ELL.${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
-            latLons.add( createLatLon( cursor ))
+            val latlon = createLatLon(cursor)
+
+            latLons.add( latlon )
         }
 
         cursor.close()
@@ -130,12 +182,12 @@ class LatLonDAO(private var dao: DAO)
         return latLons
     }
 
-    fun getLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>
+    fun getLatLonsWithSampleAreaId( sampleAreaId: Int ): ArrayList<LatLon>
     {
-        var latLons = ArrayList<LatLon>()
+        val latLons = ArrayList<LatLon>()
         val db = dao.writableDatabase
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_ENUM_AREA_LAT_LON} ELL WHERE" +
-                " ELL.${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
+        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_SAMPLE_AREA_LAT_LON} ELL WHERE" +
+                " ELL.${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleAreaId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -189,27 +241,6 @@ class LatLonDAO(private var dao: DAO)
         return latLons
     }
 
-    //--------------------------------------------------------------------------
-    fun updateLatLon( latLon: LatLon )
-    {
-        val db = dao.writableDatabase
-
-        latLon.id?.let{ id ->
-            Log.d( "xxx", "update latLon id ${id}")
-
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
-
-            putLatLon( latLon, values )
-
-            db.update(DAO.TABLE_LAT_LON, values, whereClause, args )
-        }
-
-        db.close()
-    }
-
-    //--------------------------------------------------------------------------
     fun delete( latLon: LatLon )
     {
         latLon.id?.let {lat_lon_id ->

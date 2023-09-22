@@ -232,7 +232,7 @@ class CreateCollectionTeamFragment : Fragment()
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon(pointList)
+            mapboxManager.addPolygon(pointList, "#000000")
 
             var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
 
@@ -253,22 +253,22 @@ class CreateCollectionTeamFragment : Fragment()
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in sampleArea.locations)
-            {
-                if (!location.isLandmark && location.items.isNotEmpty())
-                {
-                    // assuming only 1 enumeration item per location, for now...
-                    val sampledItem = location.items[0] as? SampledItem
-
-                    sampledItem?.let { sampledItem ->
-                        if (sampledItem.samplingState == SamplingState.Sampled)
-                        {
-                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            mapboxManager.addMarker( point, R.drawable.home_black )
-                        }
-                    }
-                }
-            }
+//            for (location in sampleArea.locations)
+//            {
+//                if (!location.isLandmark && location.items.isNotEmpty())
+//                {
+//                    // assuming only 1 enumeration item per location, for now...
+//                    val sampledItem = location.items[0] as? SampledItem
+//
+//                    sampledItem?.let { sampledItem ->
+//                        if (sampledItem.samplingState == SamplingState.Sampled)
+//                        {
+//                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+//                            mapboxManager.addMarker( point, R.drawable.home_black )
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 

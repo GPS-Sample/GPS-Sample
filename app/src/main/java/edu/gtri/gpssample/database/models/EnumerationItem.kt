@@ -18,7 +18,6 @@ data class EnumerationItem(
     var creationDate: Long,
     var uuid : String,
     var subAddress : String,
-
     var enumerationState : EnumerationState,
     var incompleteReason : String,
     var notes : String,

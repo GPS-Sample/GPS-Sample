@@ -303,7 +303,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                     var numComplete = 0
 
-                    for (item in location.items)
+                    for (item in location.enumerationItems)
                     {
                         val enumerationItem = item as EnumerationItem?
                         if(enumerationItem != null)
@@ -320,7 +320,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         }
                     }
 
-                    if (numComplete > 0 && numComplete == location.items.size)
+                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
                         resourceId = R.drawable.home_green
                     }
@@ -440,7 +440,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         pointList.add( points )
 
-        val polygonAnnotation = mapboxManager.addPolygon( pointList )
+        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000" )
 
         polygonAnnotation?.let { polygonAnnotation ->
             polygonHashMap[polygonAnnotation.id] = enumArea

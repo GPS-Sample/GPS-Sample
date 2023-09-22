@@ -86,15 +86,15 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         // create an enumeration item
-        if(location.items.isEmpty())
+        if(location.enumerationItems.isEmpty())
         {
             enumerationItem = EnumerationItem()
-            location.items.add(enumerationItem)
+            location.enumerationItems.add(enumerationItem)
         }
         else
         {
             // TODO: COME UP WITH INTERFACE OR SOMETHING TO DEAL WITH MULTIPLE ENUMITEMS
-            val enum = location.items[0] as? EnumerationItem
+            val enum = location.enumerationItems[0] as? EnumerationItem
             enum?.let{enum->
                 enumerationItem = enum
             }
@@ -208,7 +208,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectRightButton(tag: Any?)
     {
-        location.items.remove(enumerationItem)
+        location.enumerationItems.remove(enumerationItem)
         enumArea.locations.remove(location)
         sharedViewModel.locationViewModel.removeCurrentLocation(location)
 

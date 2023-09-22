@@ -173,7 +173,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon(pointList)
+            mapboxManager.addPolygon(pointList,"#000000")
 
             var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
 
@@ -257,7 +257,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                         {
                             val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                             pointList.add( vertices )
-                            intersectionPolygon = mapboxManager.addPolygon(pointList)
+                            intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000")
                         }
                     }
                 }
