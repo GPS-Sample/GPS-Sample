@@ -242,6 +242,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SAMPLING_STATE + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_COLLECTION_STATE + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" +
@@ -515,6 +516,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE = "enumeration_item_enumeration_state"
         const val COLUMN_ENUMERATION_ITEM_SAMPLING_STATE = "enumeration_item_sampling_state"
+        const val COLUMN_ENUMERATION_ITEM_COLLECTION_STATE = "enumeration_item_collection_state"
         const val COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON = "enumeration_item_incomplete_reason"
         const val COLUMN_ENUMERATION_ITEM_NOTES = "enumeration_item_notes"
 

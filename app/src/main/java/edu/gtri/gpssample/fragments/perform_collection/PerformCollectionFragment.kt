@@ -132,7 +132,16 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( ArrayList<Location>() )
+        val sampledLocations = ArrayList<Location>()
+
+        sampleArea.locations.map {
+            if (it.enumerationItems[0].samplingState == SamplingState.Sampled)
+            {
+                sampledLocations.add( it )
+            }
+        }
+
+        performCollectionAdapter = PerformCollectionAdapter( sampledLocations )
         performCollectionAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -245,8 +254,17 @@ class PerformCollectionFragment : Fragment(),
 
                     if (sampledItem.samplingState == SamplingState.Sampled)
                     {
+                        var color = R.drawable.home_black
+
+                        when(sampledItem.collectionState)
+                        {
+                            CollectionState.Undefined -> color = R.drawable.home_black
+                            CollectionState.Complete -> color = R.drawable.home_green
+                            CollectionState.Incomplete -> color = R.drawable.home_red
+                        }
+
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, R.drawable.home_black )
+                        val pointAnnotation = mapboxManager.addMarker( point, color )
 
                         pointAnnotation?.let { pointAnnotation ->
                             allPointAnnotations.add( pointAnnotation )
@@ -268,87 +286,6 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
         }
-    }
-
-    fun onMapReadyXXX(googleMap: GoogleMap)
-    {
-        map = googleMap
-
-        map.clear()
-
-        val points = ArrayList<LatLng>()
-
-        team.polygon.map {
-            points.add( it.toLatLng())
-        }
-
-        if (points.isNotEmpty())
-        {
-            val polygon = PolygonOptions()
-                .clickable(false)
-                .addAll( points )
-
-            map.addPolygon(polygon)
-        }
-
-//        for (location in sampleArea.locations)
-//        {
-//            if (location.isLandmark)
-//            {
-//                val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-//                map.addMarker( MarkerOptions()
-//                    .position( LatLng( location.latitude, location.longitude ))
-//                    .icon( icon )
-//                )
-//            }
-//            else if (location.items.isNotEmpty())
-//            {
-//                // assuming only 1 enumerationItem per location, for now...
-//
-//                val sampledItem = location.items[0] as? SampledItem
-//                sampledItem?.let{sampledItem ->
-//                    if (sampledItem.samplingState == SamplingState.Sampled)
-//                    {
-////                        val collectionItem = DAO.collectionItemDAO.getCollectionItem( sampledItem.enumItem!!.collectionItemId )
-////
-//                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-////
-////                        collectionItem?.let { collectionItem ->
-////
-////                            if (collectionItem.state == CollectionState.Incomplete)
-////                            {
-////                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-////                            }
-////                            else if (collectionItem.state == CollectionState.Complete)
-////                            {
-////                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-////                            }
-////                        }
-//
-//                        val marker = map.addMarker( MarkerOptions()
-//                            .position( LatLng( location.latitude, location.longitude ))
-//                            .icon( icon )
-//                        )
-//
-////                        marker?.let {marker ->
-////                            marker.tag = location
-////
-////                            map.setOnMarkerClickListener { marker ->
-////                                marker.tag?.let { tag ->
-////
-////                                    val location = tag as Location
-////                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-////
-////                                    LaunchSurveyDialog( activity, this)
-////                                }
-////
-////                                false
-////                            }
-////                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun didSelectLocation( location: Location )
@@ -552,42 +489,19 @@ class PerformCollectionFragment : Fragment(),
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
-//            val sampledItem = location.items[0] as? SampledItem
-//            sampledItem?.let{sampledItem ->
-//
-//                refreshMap()
-//
-////                var collectionItem = DAO.collectionItemDAO.getCollectionItem(sampledItem.enumItem!!.collectionItemId)
-////
-////                var state = CollectionState.Complete
-////
-////                if (incompleteReason.isNotEmpty())
-////                {
-////                    state = CollectionState.Incomplete
-////                }
-////
-////                if (collectionItem == null)
-////                {
-////                    val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
-////                        CollectionItem( sampledItem.enumItem!!.id!!, state, incompleteReason, notes )
-////                    )
-////
-////                    collectionItem?.id?.let {
-////                        sampledItem.enumItem!!.collectionItemId = it
-////                    }
-////
-////                    DAO.enumerationItemDAO.updateEnumerationItem( sampledItem.enumItem!! )
-////                }
-////                else
-////                {
-////                    collectionItem.state = state
-////                    collectionItem.incompleteReason = incompleteReason
-////                    collectionItem.notes = notes
-////                    DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
-////                }
-////
-////                onMapReady(map)
-//            }
+            val sampledItem = location.enumerationItems[0]
+
+            sampledItem.collectionState = CollectionState.Complete
+            sampledItem.notes = notes
+
+            if (incompleteReason.isNotEmpty())
+            {
+                sampledItem.collectionState = CollectionState.Incomplete
+            }
+
+            DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
+
+            refreshMap()
         }
     }
 
