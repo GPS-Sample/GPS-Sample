@@ -22,7 +22,8 @@
         android:id="@+id/recycler_view"
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
-        android:layout_height="150dp"/>
+        android:layout_weight="1"
+        android:layout_height="0dp"/>
 
     <TextView
         android:id="@+id/title_text_view"
@@ -35,40 +36,12 @@
         android:textStyle="bold" />
 
     <LinearLayout
-        android:visibility="gone"
         android:orientation="horizontal"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/drop_pin_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:background="@drawable/pin_drop_blue" />
-
-        <Button
-            android:id="@+id/add_household_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:background="@drawable/add_house_blue" />
-
-        <Button
-            android:id="@+id/add_location_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_margin="5dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:background="@drawable/add_location_blue" />
 
         <Button
             android:id="@+id/export_button"

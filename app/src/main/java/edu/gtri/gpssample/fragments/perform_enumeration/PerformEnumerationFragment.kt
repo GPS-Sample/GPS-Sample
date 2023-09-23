@@ -41,6 +41,7 @@ import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorAccuracyRadiusChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -95,6 +96,8 @@ class PerformEnumerationFragment : Fragment(),
     private val kExportTag = 2
     private val kSelectLocationTag = 3
 
+    private var lastLocationUpdateTime: Date = Date()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -116,11 +119,11 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
 
         if (currentZoomLevel == null)
         {
-            sharedViewModel.performEnumerationModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
@@ -189,7 +192,6 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -201,7 +203,6 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -210,7 +211,6 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -277,14 +277,14 @@ class PerformEnumerationFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            val polygonAnnotation = mapboxManager.addPolygon( pointList )
+            val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000" )
 
             polygonAnnotation?.let { polygonAnnotation ->
                 polygonHashMap[polygonAnnotation.id] = enumArea
                 allPolygonAnnotations.add( polygonAnnotation)
             }
 
-            val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
 
             currentZoomLevel?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(team.polygon)
@@ -310,7 +310,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     var numComplete = 0
 
-                    for (item in location.items)
+                    for (item in location.enumerationItems)
                     {
                         val enumerationItem = item as EnumerationItem?
                         if(enumerationItem != null)
@@ -327,7 +327,7 @@ class PerformEnumerationFragment : Fragment(),
                         }
                     }
 
-                    if (numComplete > 0 && numComplete == location.items.size)
+                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
                         resourceId = R.drawable.home_green
                     }
@@ -393,12 +393,24 @@ class PerformEnumerationFragment : Fragment(),
         val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
         enumArea.locations.add(location)
+
+        sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+        if (location.isLandmark)
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+        }
+        else
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+        }
+
         refreshMap()
     }
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
-        sharedViewModel.performEnumerationModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     private fun didSelectLocation( location: Location )
@@ -406,7 +418,6 @@ class PerformEnumerationFragment : Fragment(),
         if (dropMode)
         {
             dropMode = false
-//            map.setOnMapClickListener(null)
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
         }
 
@@ -436,7 +447,6 @@ class PerformEnumerationFragment : Fragment(),
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
                 return
-//                currentLocation = LatLng( binding.mapView.getMapboxMap().cameraState.center.latitude(), binding.mapView.getMapboxMap().cameraState.center.longitude())
             }
 
             currentLocation?.let {
@@ -595,6 +605,7 @@ class PerformEnumerationFragment : Fragment(),
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
+        lastLocationUpdateTime = Date()
         currentLocation = LatLng( it.latitude(), it.longitude())
         binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
         binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(it)
@@ -612,8 +623,10 @@ class PerformEnumerationFragment : Fragment(),
         override fun onMoveEnd(detector: MoveGestureDetector) {}
     }
 
-    private fun initLocationComponent() {
+    private fun initLocationComponent()
+    {
         val locationComponentPlugin = binding.mapView.location
+
         locationComponentPlugin.updateSettings {
             this.enabled = true
             this.locationPuck = LocationPuck2D(
@@ -641,7 +654,8 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    private fun onCameraTrackingDismissed() {
+    private fun onCameraTrackingDismissed()
+    {
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)

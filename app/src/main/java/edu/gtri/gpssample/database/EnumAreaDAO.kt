@@ -11,7 +11,6 @@ import edu.gtri.gpssample.database.models.Field
 
 class EnumAreaDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateEnumArea( enumArea: EnumArea, config : Config ) : EnumArea?
     {
         if (exists( enumArea ))
@@ -43,7 +42,6 @@ class EnumAreaDAO(private var dao: DAO)
 
             for (team in enumArea.enumerationTeams)
             {
-                team.isEnumerationTeam = true
                 DAO.teamDAO.createOrUpdateTeam(team, enumArea)
             }
 
@@ -55,7 +53,7 @@ class EnumAreaDAO(private var dao: DAO)
             return enumArea
         } ?: return null
     }
-    //--------------------------------------------------------------------------
+
     fun putEnumArea( enumArea: EnumArea, config : Config, values: ContentValues )
     {
         enumArea.id?.let { id ->
@@ -68,7 +66,6 @@ class EnumAreaDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createEnumArea(cursor: Cursor): EnumArea
     {
@@ -79,7 +76,6 @@ class EnumAreaDAO(private var dao: DAO)
         return EnumArea( id, creationDate, name )
     }
 
-    //--------------------------------------------------------------------------
     fun exists( enumArea: EnumArea ): Boolean
     {
         enumArea.id?.let { id ->
@@ -89,7 +85,6 @@ class EnumAreaDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     private fun getEnumArea( id: Int ): EnumArea?
     {
         var enumArea: EnumArea? = null
@@ -109,7 +104,6 @@ class EnumAreaDAO(private var dao: DAO)
         return enumArea
     }
 
-    //--------------------------------------------------------------------------
     fun getEnumAreas( config: Config ): ArrayList<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
@@ -138,7 +132,6 @@ class EnumAreaDAO(private var dao: DAO)
         return enumAreas
     }
 
-    //--------------------------------------------------------------------------
     fun getEnumAreas(): ArrayList<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
@@ -165,7 +158,6 @@ class EnumAreaDAO(private var dao: DAO)
         return enumAreas
     }
 
-    //--------------------------------------------------------------------------
     fun updateEnumArea( enumArea: EnumArea, config : Config )
     {
         val db = dao.writableDatabase
@@ -185,16 +177,6 @@ class EnumAreaDAO(private var dao: DAO)
         db.close()
     }
 
-    //--------------------------------------------------------------------------
-//    fun updateTeams(enumArea : EnumArea)
-//    {
-//        enumArea.id?.let{ id ->
-//
-//            enumArea.teams = DAO.teamDAO.getTeams( id )
-//        }
-//    }
-
-    //--------------------------------------------------------------------------
     fun delete( enumArea: EnumArea )
     {
         enumArea.id?.let {enumAreaId ->

@@ -173,7 +173,7 @@ class CreateConfigurationFragment : Fragment(),
 
                 pointList.add( points )
 
-                mapboxManager.addPolygon( pointList )
+                mapboxManager.addPolygon( pointList, "#000000" )
             }
 
             val latLngBounds = GeoUtils.findGeobounds(enumVerts)

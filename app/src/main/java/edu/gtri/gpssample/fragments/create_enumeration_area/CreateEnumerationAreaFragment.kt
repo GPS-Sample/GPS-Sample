@@ -129,11 +129,11 @@ class CreateEnumerationAreaFragment : Fragment(),
             binding.buttonLayout.visibility = View.GONE
         }
 
-        val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
 
         if (currentZoomLevel == null)
         {
-            sharedViewModel.performEnumerationModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
         binding.mapView.getMapboxMap().loadStyleUri(
@@ -303,7 +303,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                     var numComplete = 0
 
-                    for (item in location.items)
+                    for (item in location.enumerationItems)
                     {
                         val enumerationItem = item as EnumerationItem?
                         if(enumerationItem != null)
@@ -320,7 +320,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         }
                     }
 
-                    if (numComplete > 0 && numComplete == location.items.size)
+                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
                         resourceId = R.drawable.home_green
                     }
@@ -353,7 +353,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (allEnumAreas.isNotEmpty())
         {
             val enumArea = allEnumAreas[0]
-            val currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
+            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
 
             currentZoomLevel?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
@@ -440,7 +440,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         pointList.add( points )
 
-        val polygonAnnotation = mapboxManager.addPolygon( pointList )
+        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000" )
 
         polygonAnnotation?.let { polygonAnnotation ->
             polygonHashMap[polygonAnnotation.id] = enumArea
@@ -691,7 +691,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
-        sharedViewModel.performEnumerationModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onDestroyView()
