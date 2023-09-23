@@ -29,7 +29,7 @@ import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.UriManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.util.ArrayList
+import java.util.*
 
 class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -39,6 +39,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     private lateinit var study: Study
     private lateinit var config: Config
+    private lateinit var locationDate: Date
     private lateinit var enumArea : EnumArea
     private lateinit var location: Location
     private lateinit var enumerationItem: EnumerationItem
@@ -79,6 +80,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
             location = it
+        }
+
+        sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let {
+            locationDate = it
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
@@ -131,7 +136,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
         {
-            binding.cardView.visibility = View.VISIBLE
+            binding.additionalInfoLayout.visibility = View.VISIBLE
             binding.incompleteCheckBox.isChecked = enumerationItem.incompleteReason.isNotEmpty()
             binding.notesEditText.setText( enumerationItem.notes )
             when (enumerationItem.incompleteReason)
@@ -140,10 +145,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 "Home does not exist" -> binding.doesNotExistButton.isChecked = true
                 "Other" -> binding.otherButton.isChecked = true
             }
-        }
-        else
-        {
-            binding.cardView.visibility = View.GONE
         }
 
         // filteredFieldDataList contains only non-block fields and block field containers
@@ -174,6 +175,27 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 //            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
 //            binding.imageView.setImageBitmap(bitmap)
 //        }
+
+        binding.latitudeEditText.setText( location.latitude.toString())
+        binding.longitudeEditText.setText( location.longitude.toString())
+        binding.lastUpdatedEditText.setText( locationDate.toString())
+
+        binding.hideAdditionalInfoImageView.setOnClickListener {
+            binding.hideAdditionalInfoImageView.visibility = View.GONE
+            binding.showAdditionalInfoImageView.visibility = View.VISIBLE
+            binding.defaultInfoLayout.visibility = View.GONE
+            binding.additionalInfoLayout.visibility = View.GONE
+        }
+
+        binding.showAdditionalInfoImageView.setOnClickListener {
+            binding.showAdditionalInfoImageView.visibility = View.GONE
+            binding.hideAdditionalInfoImageView.visibility = View.VISIBLE
+            binding.defaultInfoLayout.visibility = View.VISIBLE
+            if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
+            {
+                binding.additionalInfoLayout.visibility = View.VISIBLE
+            }
+        }
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_household_message),

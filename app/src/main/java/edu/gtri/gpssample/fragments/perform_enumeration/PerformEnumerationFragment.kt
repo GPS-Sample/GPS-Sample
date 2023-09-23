@@ -41,6 +41,7 @@ import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorAccuracyRadiusChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -94,6 +95,8 @@ class PerformEnumerationFragment : Fragment(),
 
     private val kExportTag = 2
     private val kSelectLocationTag = 3
+
+    private var lastLocationUpdateTime: Date = Date()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -189,7 +192,6 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -201,7 +203,6 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -210,7 +211,6 @@ class PerformEnumerationFragment : Fragment(),
             if (dropMode)
             {
                 dropMode = false
-//                map.setOnMapClickListener(null)
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
@@ -393,6 +393,18 @@ class PerformEnumerationFragment : Fragment(),
         val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
         enumArea.locations.add(location)
+
+        sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+        if (location.isLandmark)
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+        }
+        else
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+        }
+
         refreshMap()
     }
 
@@ -406,7 +418,6 @@ class PerformEnumerationFragment : Fragment(),
         if (dropMode)
         {
             dropMode = false
-//            map.setOnMapClickListener(null)
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
         }
 
@@ -436,7 +447,6 @@ class PerformEnumerationFragment : Fragment(),
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
                 return
-//                currentLocation = LatLng( binding.mapView.getMapboxMap().cameraState.center.latitude(), binding.mapView.getMapboxMap().cameraState.center.longitude())
             }
 
             currentLocation?.let {
@@ -595,6 +605,7 @@ class PerformEnumerationFragment : Fragment(),
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
+        lastLocationUpdateTime = Date()
         currentLocation = LatLng( it.latitude(), it.longitude())
         binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
         binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(it)
@@ -612,8 +623,10 @@ class PerformEnumerationFragment : Fragment(),
         override fun onMoveEnd(detector: MoveGestureDetector) {}
     }
 
-    private fun initLocationComponent() {
+    private fun initLocationComponent()
+    {
         val locationComponentPlugin = binding.mapView.location
+
         locationComponentPlugin.updateSettings {
             this.enabled = true
             this.locationPuck = LocationPuck2D(
@@ -641,7 +654,8 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    private fun onCameraTrackingDismissed() {
+    private fun onCameraTrackingDismissed()
+    {
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)
