@@ -150,6 +150,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/last_updated_layout"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
@@ -169,7 +170,6 @@
                             android:id="@+id/last_updated_edit_text"
                             android:focusable="false"
                             android:layout_marginEnd="20dp"
-                            android:text="20 seconds ago"
                             android:textSize="17sp"
                             android:layout_weight="1"
                             android:layout_width="0dp"

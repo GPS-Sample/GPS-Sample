@@ -178,7 +178,18 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         binding.latitudeEditText.setText( location.latitude.toString())
         binding.longitudeEditText.setText( location.longitude.toString())
-        binding.lastUpdatedEditText.setText( locationDate.toString())
+
+        if (sharedViewModel.locationViewModel.isLocationUpdateTimeValid.value == true)
+        {
+            sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let { date ->
+                val dt = (Date().time - date.time) / 1000.0
+                binding.lastUpdatedEditText.setText( "${dt} seconds ago" )
+            } ?: {binding.lastUpdatedEditText.setText( "Undefined" )}
+        }
+        else
+        {
+            binding.lastUpdatedLayout.visibility = View.GONE
+        }
 
         binding.hideAdditionalInfoImageView.setOnClickListener {
             binding.hideAdditionalInfoImageView.visibility = View.GONE
@@ -232,7 +243,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         location.enumerationItems.remove(enumerationItem)
         enumArea.locations.remove(location)
-        sharedViewModel.locationViewModel.removeCurrentLocation(location)
 
         DAO.locationDAO.delete( location )
         DAO.enumerationItemDAO.delete( enumerationItem )
