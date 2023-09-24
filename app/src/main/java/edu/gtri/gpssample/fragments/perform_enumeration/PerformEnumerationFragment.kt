@@ -1,13 +1,10 @@
 package edu.gtri.gpssample.fragments.perform_enumeration
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,17 +13,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
@@ -41,7 +33,6 @@ import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorAccuracyRadiusChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -80,10 +71,11 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
 
+    private var gpsLocation: Point? = null
+
     private var userId = 0
     private var dropMode = false
     private var showCurrentLocation = false
-    private var currentLocation: LatLng? = null
 
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
@@ -95,8 +87,6 @@ class PerformEnumerationFragment : Fragment(),
 
     private val kExportTag = 2
     private val kSelectLocationTag = 3
-
-    private var lastLocationUpdateTime: Date = Date()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -154,6 +144,7 @@ class PerformEnumerationFragment : Fragment(),
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
                     initLocationComponent()
+                    addMapListeners()
                     refreshMap()
                 }
             }
@@ -169,18 +160,11 @@ class PerformEnumerationFragment : Fragment(),
             showCurrentLocation = !showCurrentLocation
             if (showCurrentLocation)
             {
-                val locationComponentPlugin = binding.mapView.location
-                locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-                locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-                binding.mapView.gestures.addOnMoveListener(onMoveListener)
-                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                addMapListeners()
             }
             else
             {
-                binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-                binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-                binding.mapView.gestures.removeOnMoveListener(onMoveListener)
-                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                removeMapListeners()
             }
         }
 
@@ -345,6 +329,7 @@ class PerformEnumerationFragment : Fragment(),
                             OnPointAnnotationClickListener { pointAnnotation ->
                                 pointHashMap[pointAnnotation.id]?.let { location ->
                                     sharedViewModel.locationViewModel.setCurrentLocation(location)
+                                    sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
                                     if (location.isLandmark)
                                     {
                                         findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
@@ -370,7 +355,7 @@ class PerformEnumerationFragment : Fragment(),
         if (dropMode)
         {
             dropMode = false
-            createLocation( LatLng( point.latitude(), point.longitude()))
+            createLocation( point, false )
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             return true
         }
@@ -378,23 +363,24 @@ class PerformEnumerationFragment : Fragment(),
         return false
     }
 
-    fun createLocation( latLng: LatLng )
+    fun createLocation( point: Point, isLocationUpdateTimeValid: Boolean )
     {
         enumArea.locations.map{
-            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), latLng )
+            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
             if (haversineCheck.withinBounds)
             {
                 val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
-                ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), latLng, this)
+                ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
                 return
             }
         }
 
-        val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
+        val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false)
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
         enumArea.locations.add(location)
 
         sharedViewModel.locationViewModel.setCurrentLocation(location)
+        sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(isLocationUpdateTimeValid)
 
         if (location.isLandmark)
         {
@@ -405,7 +391,7 @@ class PerformEnumerationFragment : Fragment(),
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
         }
 
-        refreshMap()
+//        refreshMap()
     }
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
@@ -422,6 +408,7 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         sharedViewModel.locationViewModel.setCurrentLocation(location)
+        sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
 
         if (location.isLandmark)
         {
@@ -436,22 +423,16 @@ class PerformEnumerationFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
-        if (tag is LatLng)
+        if (tag is Point)
         {
             return
         }
 
         if (tag == kSelectLocationTag)
         {
-            if (currentLocation == null)
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
-                return
-            }
-
-            currentLocation?.let {
-                createLocation( it )
-            }
+            gpsLocation?.let {
+                createLocation( it, true )
+            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
 
             return
         }
@@ -500,12 +481,23 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun didSelectRightButton(tag: Any?)
     {
-        if (tag is LatLng)
+        if (tag is Point)
         {
-            val location = Location( LocationType.Enumeration, tag.latitude, tag.longitude, false)
+            val location = Location( LocationType.Enumeration, tag.latitude(), tag.longitude(), false)
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
-            refreshMap()
+
+            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
+            if (location.isLandmark)
+            {
+                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+            }
+            else
+            {
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            }
         }
         else
         {
@@ -601,14 +593,14 @@ class PerformEnumerationFragment : Fragment(),
     }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
+//        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
     }
 
-    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        lastLocationUpdateTime = Date()
-        currentLocation = LatLng( it.latitude(), it.longitude())
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
-        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(it)
+    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
+        sharedViewModel.locationViewModel.setCurrentLocationUpdateTime(Date())
+        gpsLocation = point
+        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
+        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
     }
 
     private val onMoveListener = object : OnMoveListener {
@@ -654,20 +646,33 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    private fun onCameraTrackingDismissed()
+    private fun addMapListeners()
+    {
+        val locationComponentPlugin = binding.mapView.location
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.gestures.addOnMoveListener(onMoveListener)
+        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+    }
+
+    private fun removeMapListeners()
     {
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+    }
+
+    private fun onCameraTrackingDismissed()
+    {
+        removeMapListeners()
     }
 
     override fun onDestroyView()
     {
         super.onDestroyView()
 
-        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+        removeMapListeners()
 
         _binding = null
     }
