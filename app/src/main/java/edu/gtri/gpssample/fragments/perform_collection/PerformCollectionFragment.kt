@@ -410,17 +410,15 @@ class PerformCollectionFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    // this is a hack
-//                    DAO.configDAO.updateAllLists( config )
 
-                    team.id?.let {
-                        config.teamId = it
-                    }
+//                    team.id?.let {
+//                        config.teamId = it
+//                    }
 
                     val packedConfig = config.pack()
                     Log.d( "xxx", packedConfig )
 
-                    config.teamId = 0
+//                    config.teamId = 0
 
                     val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
                     val file = File(root, "$fileName.${Date().time}.json")

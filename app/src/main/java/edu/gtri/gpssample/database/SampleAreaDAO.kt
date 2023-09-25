@@ -67,6 +67,7 @@ class SampleAreaDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_CREATION_DATE, sampleArea.creationDate )
         values.put( DAO.COLUMN_STUDY_ID, study.id )
+        values.put( DAO.COLUMN_TEAM_ID, sampleArea.selectedTeamId )
     }
 
     @SuppressLint("Range")
@@ -74,8 +75,9 @@ class SampleAreaDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val teamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
 
-        return SampleArea( id, creationDate )
+        return SampleArea( id, creationDate, teamId )
     }
 
     fun updateSampleArea( sampleArea: SampleArea, study: Study )

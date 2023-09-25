@@ -155,7 +155,6 @@
     <string name="select_configuration">"Select a configuration"</string>
     <string name="export_enum_data">"Select a configuration"</string>
     <string name="enum_saved_doc">"Export Enumeration Data"</string>
-    <string name="config_saved_doc">"Enumeration data has been saved to the Documents directory."</string>
     <string name="location_not_found">"The configuration has been saved to the Documents directory."</string>
     <string name="nobody_home">"Nobody home"</string>
     <string name="home_not_exist">"Home does not exist"</string>
@@ -230,6 +229,7 @@
     <string name="add_another_field">Save and Add Another Field</string>
     <string name="current_location_not_set">Oops! Your current location is not set.  Tap the compass toolbar item to center on your current location.</string>
     <string name="option_item_name">Enter the option item name</string>
+    <string name="config_saved_doc">"Configuration has been saved to the Documents directory."</string>
     <string name="add_another">"ADD ANOTHER CHOICE"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

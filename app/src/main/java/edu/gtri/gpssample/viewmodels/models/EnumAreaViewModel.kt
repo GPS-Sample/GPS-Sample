@@ -2,6 +2,7 @@ package edu.gtri.gpssample.viewmodels.models
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 
 class EnumAreaViewModel

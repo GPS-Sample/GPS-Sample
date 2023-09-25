@@ -15,11 +15,13 @@ data class SampleArea(
     var creationDate: Long,
     var vertices : ArrayList<LatLon>,
     var collectionTeams: ArrayList<Team>,
-    var locations: ArrayList<Location> ) : GeoArea()
+    var locations: ArrayList<Location>,
+    var selectedTeamId: Int) : GeoArea()
 {
-    constructor( id: Int, creationDate: Long ) : this( id, creationDate, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>())
+    constructor( id: Int, creationDate: Long, selectedTeamId: Int )
+            : this( id, creationDate, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>(), selectedTeamId)
 
-    constructor(enumArea: EnumArea) : this(null, Date().time, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>())
+    constructor(enumArea: EnumArea) : this(null, Date().time, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>(),-1)
     {
         this.vertices.addAll(enumArea.vertices)
         this.locations.addAll( enumArea.locations )

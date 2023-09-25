@@ -176,8 +176,11 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 //            binding.imageView.setImageBitmap(bitmap)
 //        }
 
-        binding.latitudeEditText.setText( location.latitude.toString())
-        binding.longitudeEditText.setText( location.longitude.toString())
+        val components = location.uuid.split("-" )
+
+        binding.UUIDEditText.setText( components[0] )
+        binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
+        binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
 
         if (sharedViewModel.locationViewModel.isLocationUpdateTimeValid.value == true)
         {

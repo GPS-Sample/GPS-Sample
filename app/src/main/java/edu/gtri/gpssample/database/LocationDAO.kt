@@ -105,6 +105,7 @@ class LocationDAO(private var dao: DAO)
                         DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
                     }
                 }
+
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
             }
         } ?: return null

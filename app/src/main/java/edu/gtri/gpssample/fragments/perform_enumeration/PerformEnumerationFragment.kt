@@ -75,7 +75,7 @@ class PerformEnumerationFragment : Fragment(),
 
     private var userId = 0
     private var dropMode = false
-    private var showCurrentLocation = false
+    private var showCurrentLocation = true
 
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
@@ -144,11 +144,16 @@ class PerformEnumerationFragment : Fragment(),
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
                     initLocationComponent()
-                    addMapListeners()
                     refreshMap()
                 }
             }
         )
+
+        val locationComponentPlugin = binding.mapView.location
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.gestures.addOnMoveListener(onMoveListener)
+        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
@@ -160,11 +165,11 @@ class PerformEnumerationFragment : Fragment(),
             showCurrentLocation = !showCurrentLocation
             if (showCurrentLocation)
             {
-                addMapListeners()
+                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
-                removeMapListeners()
+                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
 
@@ -518,14 +523,14 @@ class PerformEnumerationFragment : Fragment(),
                             {
                                 Role.Supervisor.toString(), Role.Admin.toString() ->
                                 {
-                                    team.id?.let {
-                                        config.teamId = it
-                                    }
+//                                    team.id?.let {
+//                                        config.teamId = it
+//                                    }
 
                                     val packedConfig = config.pack()
                                     Log.d( "xxx", packedConfig )
 
-                                    config.teamId = 0
+//                                    config.teamId = 0
 
                                     val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
                                     val file = File(root, "Configuration.${Date().time}.json")
@@ -599,8 +604,11 @@ class PerformEnumerationFragment : Fragment(),
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
         sharedViewModel.locationViewModel.setCurrentLocationUpdateTime(Date())
         gpsLocation = point
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
-        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
+        if (showCurrentLocation)
+        {
+            binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
+            binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
+        }
     }
 
     private val onMoveListener = object : OnMoveListener {
@@ -646,33 +654,20 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    private fun addMapListeners()
-    {
-        val locationComponentPlugin = binding.mapView.location
-        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-        binding.mapView.gestures.addOnMoveListener(onMoveListener)
-        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-    }
-
-    private fun removeMapListeners()
+    private fun onCameraTrackingDismissed()
     {
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)
-        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-    }
-
-    private fun onCameraTrackingDismissed()
-    {
-        removeMapListeners()
     }
 
     override fun onDestroyView()
     {
         super.onDestroyView()
 
-        removeMapListeners()
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
 
         _binding = null
     }
