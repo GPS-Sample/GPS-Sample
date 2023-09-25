@@ -57,7 +57,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             return
         }
 
-        binding.titleTextView.text = role.toString() + resources.getString(R.string.sign_in)
+        binding.titleTextView.text = role.toString() + " " + resources.getString(R.string.sign_in)
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
         val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)

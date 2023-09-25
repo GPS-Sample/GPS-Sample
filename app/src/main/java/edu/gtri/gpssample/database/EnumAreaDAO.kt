@@ -64,6 +64,7 @@ class EnumAreaDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
         values.put( DAO.COLUMN_CONFIG_ID, config.id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
+        values.put( DAO.COLUMN_TEAM_ID, enumArea.selectedTeamId )
     }
 
     @SuppressLint("Range")
@@ -72,8 +73,9 @@ class EnumAreaDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
+        val selectedTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
 
-        return EnumArea( id, creationDate, name )
+        return EnumArea( id, creationDate, name, selectedTeamId )
     }
 
     fun exists( enumArea: EnumArea ): Boolean
@@ -83,6 +85,25 @@ class EnumAreaDAO(private var dao: DAO)
                 return true
             } ?: return false
         } ?: return false
+    }
+
+    fun updateEnumArea( enumArea: EnumArea, config : Config )
+    {
+        val db = dao.writableDatabase
+
+        enumArea.id?.let{ id ->
+            Log.d( "xxx", "update enumArea id ${id}")
+
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args: Array<String> = arrayOf(id.toString())
+            val values = ContentValues()
+
+            putEnumArea( enumArea, config, values )
+
+            db.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
+        }
+
+        db.close()
     }
 
     private fun getEnumArea( id: Int ): EnumArea?
@@ -156,25 +177,6 @@ class EnumAreaDAO(private var dao: DAO)
         db.close()
 
         return enumAreas
-    }
-
-    fun updateEnumArea( enumArea: EnumArea, config : Config )
-    {
-        val db = dao.writableDatabase
-
-        enumArea.id?.let{ id ->
-            Log.d( "xxx", "update enumArea id ${id}")
-
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
-
-            putEnumArea( enumArea, config, values )
-
-            db.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
-        }
-
-        db.close()
     }
 
     fun delete( enumArea: EnumArea )

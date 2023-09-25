@@ -208,15 +208,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             NetworkCommand.NetworkConfigRequest ->
             {
                 config?.let {config->
-                    currentTeamId?.let { teamId ->
-                        config.teamId = teamId
-                    }
+//                    currentTeamId?.let { teamId ->
+//                        config.teamId = teamId
+//                    }
 
                     val packedConfig = config.pack()
-
                     Log.d( "xxx", packedConfig )
 
-                    config.teamId = -1
+//                    config.teamId = -1
 
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
                     socket.outputStream.write(response.toByteArray())

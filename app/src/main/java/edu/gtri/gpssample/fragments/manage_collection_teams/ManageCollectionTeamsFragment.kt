@@ -59,9 +59,9 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 var teams = ArrayList<Team>()
 
-                if (config.teamId > 0) // if teamId is valid, then filter out all teams except this one
+                if (sampleArea.selectedTeamId > 0) // if teamId is valid, then filter out all teams except this one
                 {
-                    val team = DAO.teamDAO.getTeam( config.teamId )
+                    val team = DAO.teamDAO.getTeam( sampleArea.selectedTeamId )
                     team?.let {
                         teams.add( it )
                     }
@@ -99,6 +99,10 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     fun didSelectTeam( team: Team)
     {
         sharedViewModel.teamViewModel.setCurrentTeam( team )
+
+        team.id?.let {
+            sampleArea.selectedTeamId = it
+        }
 
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }

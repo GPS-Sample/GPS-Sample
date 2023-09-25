@@ -156,7 +156,6 @@
     <string name="select_configuration">"Выберите конфигурацию"</string>
     <string name="export_enum_data">"Выберите конфигурацию"</string>
     <string name="enum_saved_doc">"Экспорт данных переписи"</string>
-    <string name="config_saved_doc">"Данные переписи были сохранены в директории Documents."</string>
     <string name="location_not_found">"Конфигурация была сохранена в каталог Documents."</string>
     <string name="nobody_home">">Местонахождение не найдено"</string>
     <string name="home_not_exist">"Дом не существует"</string>

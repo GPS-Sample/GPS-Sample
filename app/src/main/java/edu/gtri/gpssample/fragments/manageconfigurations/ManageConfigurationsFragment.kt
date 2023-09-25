@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,9 +25,9 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.utils.ConfigUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -44,21 +45,22 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
-
-    private var selectedConfig: Config? = null
+    private lateinit var samplingViewModel: SamplingViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         val networkVm : NetworkViewModel by activityViewModels()
+        val samplingVm : SamplingViewModel by activityViewModels()
+
+        sharedViewModel = vm
+        samplingViewModel = samplingVm
 
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
         sharedNetworkViewModel.networkClientModel.configurationDelegate = this
         sharedNetworkViewModel.manageConfigurationNetworkDelegate = this
-
-        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -195,17 +197,14 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         val config = Config.unpack( text )
                         config?.let { config ->
 
-                            // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
-                            // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
-                            // HACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACKHACK
-                            //DAO.deleteAll()
-
                             DAO.configDAO.createConfig( config )
 
-                            sharedViewModel.initializeConfigurations()
+                            sharedViewModel.configurations.add(config)
+                            sharedViewModel.setCurrentConfig( config )
 
                             manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
 
+                            didReceiveConfiguration(true )
                         } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -227,50 +226,111 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     override fun configurationReceived(config: Config) {
         runBlocking(Dispatchers.Main) {
 
-            val configValicationResult = ConfigUtils.validateConfig( resources, user, config )
-
-            if (configValicationResult.success)
-            {
-                val saved = DAO.configDAO.createConfig(config)
-                saved?.let { config ->
-                    sharedViewModel.configurations.add(config)
-                    sharedViewModel.setCurrentConfig( config)
-                    manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
-                }
-            }
-            else
-            {
-                Toast.makeText(activity!!.applicationContext, configValicationResult.error, Toast.LENGTH_SHORT).show()
+            val saved = DAO.configDAO.createConfig(config)
+            saved?.let { config ->
+                sharedViewModel.configurations.add(config)
+                sharedViewModel.setCurrentConfig(config)
+                manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
             }
         }
     }
 
-    override fun didReceiveConfiguration(complete: Boolean) {
+    override fun didReceiveConfiguration(complete: Boolean)
+    {
         if(complete)
         {
             if (user.role == Role.Enumerator.toString())
             {
                 if(sharedViewModel.configurations.size > 0)
                 {
-                    sharedViewModel.currentConfiguration?.value?.let{config->
-                        config.enumAreas.map { _enumArea ->
-                            _enumArea.enumerationTeams.map{enumTeam->
-                                enumTeam.id?.let{id->
-                                    if (id == config.teamId)
-                                    {
-                                        DAO.teamDAO.getTeam( config.teamId )?.let{ team ->
-                                            DAO.studyDAO.getStudy( team.studyId )?.let{ study ->
-                                                sharedViewModel.createStudyModel.setStudy( study )
-                                                sharedViewModel.teamViewModel.setCurrentTeam( team )
-                                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( _enumArea )
-                                            }
-                                        }
-                                    }
+                    sharedViewModel.currentConfiguration?.value?.let{ config->
+
+                        // find the selected Enum Area
+                        val enumAreas = config.enumAreas.filter {
+                            it.id?.let { id ->
+                                id == config.selectedEnumAreaId
+                            } ?: false
+                        }
+
+                        // find the selected study
+                        val studies = config.studies.filter {
+                            it.id?.let { id ->
+                                id == config.selectedStudyId
+                            } ?: false
+                        }
+
+                        if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+                        {
+                            val enumArea = enumAreas[0]
+                            val study = studies[0]
+
+                            // find the selected enumeration Team
+                            val enumTeams = enumArea.enumerationTeams.filter {
+                                it.id?.let { id ->
+                                    id == enumArea.selectedTeamId
+                                } ?: false
+                            }
+
+                            if (enumTeams.isNotEmpty())
+                            {
+                                val enumTeam = enumTeams[0]
+
+                                sharedViewModel.createStudyModel.setStudy( study )
+                                sharedViewModel.teamViewModel.setCurrentTeam( enumTeam )
+                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                            }
+                        }
+                    }
+                }
+            }
+            else if (user.role == Role.DataCollector.toString())
+            {
+                if(sharedViewModel.configurations.size > 0)
+                {
+                    sharedViewModel.currentConfiguration?.value?.let{ config->
+
+                        // find the selected Enum Area
+                        val enumAreas = config.enumAreas.filter {
+                            it.id?.let { id ->
+                                id == config.selectedEnumAreaId
+                            } ?: false
+                        }
+
+                        // find the selected study
+                        val studies = config.studies.filter {
+                            it.id?.let { id ->
+                                id == config.selectedStudyId
+                            } ?: false
+                        }
+
+                        if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+                        {
+                            val enumArea = enumAreas[0]
+                            val study = studies[0]
+                            val sampleArea = study.sampleArea
+
+                            sampleArea?.let { sampleArea ->
+
+                                // find the selected collection Team
+                                val collectionTeams = sampleArea.collectionTeams.filter {
+                                    it.id?.let { id ->
+                                        id == enumArea.selectedTeamId
+                                    } ?: false
+                                }
+
+                                if (collectionTeams.isNotEmpty())
+                                {
+                                    val collectionTeam = collectionTeams[0]
+
+                                    sharedViewModel.createStudyModel.setStudy( study )
+                                    sharedViewModel.teamViewModel.setCurrentTeam( collectionTeam )
+                                    samplingViewModel.setCurrentSampleArea( sampleArea )
+                                    samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+                                    findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                                 }
                             }
                         }
-
-                        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                     }
                 }
             }

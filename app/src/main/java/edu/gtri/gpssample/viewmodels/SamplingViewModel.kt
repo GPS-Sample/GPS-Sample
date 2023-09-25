@@ -42,13 +42,22 @@ class SamplingViewModel : ViewModel()
         set(value){
             value?.let{sampleArea ->
                 _currentSampleArea = MutableLiveData(sampleArea.value)
-                _currentStudy?.value?.let{study->
-                    sampleArea.value?.let{ea->
-                        study.sampleAreas.add(ea)
+                _currentStudy?.value?.let{ study->
+                    if (study.sampleArea == null)
+                    {
+                        sampleArea.value?.let{ sampleArea->
+                            study.sampleArea = sampleArea
+                        }
                     }
                 }
             }
         }
+
+    fun setCurrentSampleArea( sampleArea: SampleArea )
+    {
+        _currentSampleArea = MutableLiveData( sampleArea )
+        currentSampleArea = _currentSampleArea
+    }
 
     val samplingMethod: String
         get()

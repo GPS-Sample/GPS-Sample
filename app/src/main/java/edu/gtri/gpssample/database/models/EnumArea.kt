@@ -15,12 +15,13 @@ data class EnumArea (
     var name: String,
     var vertices: ArrayList<LatLon>,
     var enumerationTeams: ArrayList<Team>,
-    var locations: ArrayList<Location>) : GeoArea()
+    var locations: ArrayList<Location>,
+    var selectedTeamId: Int ) : GeoArea()
 {
-    constructor(id: Int, creationDate: Long, name: String) : this(id, UUID.randomUUID().toString(), creationDate, name,
-                ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>())
+    constructor(id: Int, creationDate: Long, name: String, selectedTeamId: Int) : this(id, UUID.randomUUID().toString(), creationDate, name,
+                ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>(), selectedTeamId)
     constructor( name: String, vertices: ArrayList<LatLon>) : this(null,UUID.randomUUID().toString(),
-                Date().time, name, vertices, ArrayList<Team>(), ArrayList<Location>())
+                Date().time, name, vertices, ArrayList<Team>(), ArrayList<Location>(), -1)
 
     fun copy() : EnumArea?
     {

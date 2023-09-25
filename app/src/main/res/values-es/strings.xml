@@ -156,7 +156,6 @@
     <string name="select_configuration">"Seleccione una configuración"</string>
     <string name="export_enum_data">"Seleccione una configuración"</string>
     <string name="enum_saved_doc">"Exportar datos de enumeración"</string>
-    <string name="config_saved_doc">"Los datos de enumeración se han guardado en el directorio Documentos."</string>
     <string name="location_not_found">"La configuración se ha guardado en el directorio Documentos."</string>
     <string name="nobody_home">">Localización no encontrada"</string>
     <string name="home_not_exist">"La hogar no existe"</string>
