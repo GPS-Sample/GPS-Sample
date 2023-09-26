@@ -309,60 +309,12 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                                 val reconnect = wifiManager.reconnect()
                                 if (reconnect) {
-                                    Log.d("XXXXXXXXXXXXX", "THE INITIAL SSID ${wifiManager!!.connectionInfo.ssid}")
-                                    Log.d("XXXXXXXXXXXXX", "THE INITIAL RSSI ${wifiManager!!.connectionInfo.rssi}")
+
                                     Handler().postDelayed({
-                                        val wifiInfo = wifiManager!!.connectionInfo
-                                        var ssid = wifiInfo.ssid
-                                        var serverAddress =
-                                            intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
-                                        var myAddress =
-                                            intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
-                                                .substring(1)
-                                                .substring(1)
-                                        var linkSpeed = wifiManager!!.connectionInfo.linkSpeed
 
-                                        Log.d("XXXXXXX", "the server address ${serverAddress}")
-                                        Log.d("XXXXXXX", "the link speed ${wifiManager!!.connectionInfo.linkSpeed}")
-                                        // wifiManager
-                                        while(ssid.contains("unknown ssid") || linkSpeed < 0 )//|| serverAddress.contains("/"))
-                                        {
-                                            ssid = wifiManager!!.connectionInfo.ssid
-                                            linkSpeed = wifiManager!!.connectionInfo.linkSpeed
-                                            serverAddress =
-                                                intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
-                                            sleep(1000)
-                                        }
-
-                                        //sleep(5000)
-
-                                        serverAddress =
-                                            intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
-                                                .substring(1)
-                                        myAddress =
-                                            intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
-                                                .substring(1)
-                                        Log.d("XXXXXXX", "the server address ${serverAddress}")
-                                        Log.d("XXXXXXX", "the link speed ${wifiManager!!.connectionInfo.linkSpeed}")
-                                        val components = serverAddress.split(".")
-                                        val broadcast_address =
-                                            components[0] + "." + components[1] + "." + components[2] + ".255"
-                                        val myInetAddress = InetAddress.getByName(myAddress)
-                                        val broadcastInetAddress =
-                                            InetAddress.getByName(broadcast_address)
-
-                                        viewModelScope?.let { viewModelScope ->
-                                            viewModelScope.launch(Dispatchers.IO) {
-                                                if (client.connect(
-                                                        networkInfo.serverIP,
-                                                        this@NetworkClientModel
-                                                    )
-                                                ) {
-                                                    _networkConnected.postValue(NetworkStatus.NetworkConnected)
-                                                    sendRegistration()
-                                                }
-                                            }
-                                        }
+                                        val connectivityManager =
+                                            Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                                        connectivityManager.registerDefaultNetworkCallback(networkCallback)
                                     }, 100)
                                 }
 
@@ -410,15 +362,19 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
             val connectivityManager =
                 Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.bindProcessToNetwork(network)
+            sleep(1000)
             val job = GlobalScope.launch(Dispatchers.Default) {
 
                 networkInfo?.let { networkInfo ->
                     if (client.connect(networkInfo.serverIP, this@NetworkClientModel)) {
-                        // start heartbeat
-                        //startHeartbeat()
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
+                    }else
+                    {
+                        runError()
                     }
+                }?: run{
+                    runError()
                 }
             }
 
@@ -426,23 +382,13 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            _networkConnected.postValue(NetworkStatus.NetworkError)
-            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
-            _commandSent.postValue(NetworkStatus.CommandError)
-            _dataReceived.postValue(NetworkStatus.DataReceivedError)
-            sleep(kDialogTimeout)
-            connectDelegate?.didConnect(false)
+            runError()
 
         }
 
         override fun onUnavailable() {
             super.onUnavailable()
-            _networkConnected.postValue(NetworkStatus.NetworkError)
-            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
-            _commandSent.postValue(NetworkStatus.CommandError)
-            _dataReceived.postValue(NetworkStatus.DataReceivedError)
-            sleep(kDialogTimeout)
-            connectDelegate?.didConnect(false)
+            runError()
 
         }
 
@@ -452,18 +398,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         ) {
             super.onCapabilitiesChanged(network, networkCapabilities)
 
-//            val not_suspended = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
-//            val validated = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-//            val trusted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-//            val not_restricted = networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-
-//            if (udpBroadcaster == null && networkCapabilities.hasCapability( NetworkCapabilities.NET_CAPABILITY_VALIDATED))
-//            {
-//                Log.d( "xxx", "beginTransmittingHeartbeat" )
-//                udpBroadcaster = UDPBroadcaster()
-//                beginReceiving()
-//                beginTransmittingHeartbeat()
-//            }
         }
 
         @RequiresApi(Build.VERSION_CODES.R)
@@ -471,7 +405,18 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
             super.onLinkPropertiesChanged(network, linkProperties)
 
         }
+
+        fun runError()
+        {
+            _networkConnected.postValue(NetworkStatus.NetworkError)
+            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
+            _commandSent.postValue(NetworkStatus.CommandError)
+            _dataReceived.postValue(NetworkStatus.DataReceivedError)
+            sleep(kDialogTimeout)
+            connectDelegate?.didConnect(false)
+        }
     }
+
 
     override fun sentData(data: String) {
         Log.d("SERVER CONNECT", data)
