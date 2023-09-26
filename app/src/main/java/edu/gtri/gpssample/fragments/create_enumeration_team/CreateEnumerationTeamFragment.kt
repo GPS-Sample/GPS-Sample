@@ -15,8 +15,10 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
@@ -35,6 +37,7 @@ import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
 class CreateEnumerationTeamFragment : Fragment(),
+    OnCameraChangeListener,
     OnMapClickListener,
     OnTouchListener
 {
@@ -86,6 +89,12 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
         )
+
+        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+        if (currentZoomLevel == null)
+        {
+            sharedViewModel.setCurrentZoomLevel( 14.0 )
+        }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
@@ -141,7 +150,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                     }
                 }
 
-                val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), true, polygon ), enumArea)
+                val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), polygon ), enumArea)
 
                 team?.let { team ->
                     enumArea.enumerationTeams.add(team)
@@ -173,16 +182,9 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon(pointList)
+            mapboxManager.addPolygon(pointList,"#000000")
 
-            var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
-
-            if (currentZoomLevel == null)
-            {
-                currentZoomLevel = 14.0
-                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(currentZoomLevel)
-            }
-
+            var currentZoomLevel = sharedViewModel.currentZoomLevel?.value
             currentZoomLevel?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
@@ -257,7 +259,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                         {
                             val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                             pointList.add( vertices )
-                            intersectionPolygon = mapboxManager.addPolygon(pointList)
+                            intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000")
                         }
                     }
                 }
@@ -297,6 +299,11 @@ class CreateEnumerationTeamFragment : Fragment(),
         }
 
         return true
+    }
+
+    override fun onCameraChanged(eventData: CameraChangedEventData)
+    {
+        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onDestroyView()

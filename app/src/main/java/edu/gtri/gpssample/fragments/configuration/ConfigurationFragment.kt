@@ -66,7 +66,8 @@ class ConfigurationFragment : Fragment(),
 
     private val kDeleteTag = 1
     private val kExportTag = 2
-    private val kTaskTag = 3
+    private val kImportTag = 3
+    private val kTaskTag =   4
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -79,13 +80,8 @@ class ConfigurationFragment : Fragment(),
 
         sharedNetworkViewModel.currentFragment = this
         sharedViewModel.currentFragment = this
-
-        studiesAdapter = StudiesAdapter(listOf<Study>())
-        studiesAdapter.didSelectStudy = this::didSelectStudy
-
-        enumerationAreasAdapter = ManageEnumerationAreasAdapter( listOf<EnumArea>() )
-        enumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentConfigurationBinding.inflate(inflater, container, false)
@@ -119,7 +115,7 @@ class ConfigurationFragment : Fragment(),
 
         binding.importButton.setOnClickListener {
             ConfirmationDialog( activity, resources.getString(R.string.import_enumeration), resources.getString(R.string.select_import_method_message),
-                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
         }
 
         binding.exportButton.setOnClickListener {
@@ -147,6 +143,19 @@ class ConfigurationFragment : Fragment(),
         val polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            studiesAdapter = StudiesAdapter(config.studies)
+            studiesAdapter.didSelectStudy = this::didSelectStudy
+
+            if(config.studies.count() > 0)
+            {
+                sharedViewModel.createStudyModel.setStudy(config.studies[0])
+            }
+
+            enumerationAreasAdapter = ManageEnumerationAreasAdapter( config.enumAreas )
+            enumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
+        }
+
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
         binding.studiesRecycler.adapter = studiesAdapter
         binding.studiesRecycler.layoutManager = LinearLayoutManager(activity )
@@ -161,19 +170,6 @@ class ConfigurationFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
-
-        studiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
-
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-
-            enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
-
-            if(config.studies.count() > 0)
-            {
-                Log.d( "xxx", "selected study with ID ${config.studies[0].id}")
-                sharedViewModel.createStudyModel.setStudy(config.studies[0])
-            }
-        }
     }
 
     fun refreshMap()
@@ -194,7 +190,7 @@ class ConfigurationFragment : Fragment(),
 
                 pointList.add( points )
 
-                mapboxManager.addPolygon( pointList )
+                mapboxManager.addPolygon( pointList, "#000000" )
             }
 
             val latLngBounds = GeoUtils.findGeobounds(enumVerts)
@@ -219,7 +215,7 @@ class ConfigurationFragment : Fragment(),
         tag?.let {
             when(tag)
             {
-                kExportTag -> {
+                kImportTag, kExportTag -> {
                     // Launch connection screen
                     view?.let{view ->
                         val user = (activity!!.application as MainApplication).user
@@ -268,6 +264,13 @@ class ConfigurationFragment : Fragment(),
                         findNavController().popBackStack()
                     }
 
+                    kImportTag -> {
+                        val intent = Intent()
+                            .setType("*/*")
+                            .setAction(Intent.ACTION_GET_CONTENT)
+                        startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
+                    }
+
                     kExportTag -> {
                         InputDialog( activity!!, resources.getString(R.string.filename_export_message), config.name, null, this@ConfigurationFragment )
                     }
@@ -302,14 +305,18 @@ class ConfigurationFragment : Fragment(),
 
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
-        sharedViewModel.createStudyModel.currentStudy?.value?.let {
-
-            sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-            ConfirmationDialog( activity, "${resources.getString(R.string.define_enumeration_area)} ${enumArea.name}",
-                resources.getString(R.string.select_task),
-                        resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
-        } ?: Toast.makeText(activity!!.applicationContext,
-                        resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
+        enumArea.id?.let { enumAreaId ->
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                config.selectedEnumAreaId = enumAreaId
+                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                    study.id?.let { studyId ->
+                        config.selectedStudyId = studyId
+                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+                        ConfirmationDialog( activity, "${resources.getString(R.string.define_enumeration_area)} ${enumArea.name}", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
+                    }
+                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -329,7 +336,19 @@ class ConfigurationFragment : Fragment(),
                     inputStream?.let {  inputStream ->
                         val text = inputStream.bufferedReader().readText()
 
-                        refreshMap()
+                        Log.d( "xxx", text )
+
+                        val enumArea = EnumArea.unpack( text )
+
+                        enumArea?.let { enumArea ->
+                            for (location in enumArea.locations)
+                            {
+                                DAO.locationDAO.importLocation(location, enumArea)
+                            }
+
+                            // replace the enumArea from currentConfig with this one
+                            sharedViewModel?.replaceEnumArea(enumArea)
+                        }
                     }
                 }
                 catch( ex: java.lang.Exception )

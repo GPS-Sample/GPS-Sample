@@ -10,17 +10,16 @@ import edu.gtri.gpssample.extensions.toInt
 
 class TeamDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
-    fun createOrUpdateTeam( team: Team, enumArea: EnumArea ) : Team?
+    fun createOrUpdateTeam( team: Team, geoArea: GeoArea ) : Team?
     {
         if (exists( team ))
         {
-            updateTeam( team, enumArea )
+            updateTeam( team, geoArea )
         }
         else
         {
             val values = ContentValues()
-            putTeam( team, enumArea, values )
+            putTeam( team, geoArea, values )
             team.id = dao.writableDatabase.insert(DAO.TABLE_TEAM, null, values).toInt()
             team.id?.let { id ->
                 Log.d( "xxx", "new Team id = ${id}")
@@ -36,22 +35,27 @@ class TeamDAO(private var dao: DAO)
         return team
     }
 
-    //--------------------------------------------------------------------------
-    fun putTeam(team: Team, enumArea: EnumArea, values: ContentValues )
+    fun putTeam(team: Team, geoArea: GeoArea, values: ContentValues )
     {
         team.id?.let { id ->
             Log.d( "xxx", "existing team id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
 
+        if (geoArea is EnumArea)
+        {
+            values.put( DAO.COLUMN_ENUM_AREA_ID, geoArea.id )
+        }
+        else if (geoArea is SampleArea)
+        {
+            values.put( DAO.COLUMN_SAMPLE_AREA_ID, geoArea.id )
+        }
+
         values.put( DAO.COLUMN_CREATION_DATE, team.creationDate )
         values.put( DAO.COLUMN_STUDY_ID, team.studyId )
-        values.put( DAO.COLUMN_ENUM_AREA_ID, enumArea.id )
         values.put( DAO.COLUMN_TEAM_NAME, team.name )
-        values.put( DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM, team.isEnumerationTeam.toInt())
     }
 
-    //--------------------------------------------------------------------------
     fun exists( team: Team ): Boolean
     {
         team.id?.let { id ->
@@ -61,7 +65,6 @@ class TeamDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createTeam(cursor: Cursor): Team
     {
@@ -69,15 +72,13 @@ class TeamDAO(private var dao: DAO)
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_TEAM_NAME))
-        val isEnumerationTeam = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM)).toBoolean()
 
         val latlngs = DAO.latLonDAO.getLatLonsWithTeamId( id )
 
-        return Team(id, creationDate, study_id, name, isEnumerationTeam,latlngs)
+        return Team(id, creationDate, study_id, name, latlngs)
     }
 
-    //--------------------------------------------------------------------------
-    fun updateTeam( team: Team, enumArea: EnumArea )
+    fun updateTeam( team: Team, geoArea: GeoArea )
     {
         val db = dao.writableDatabase
 
@@ -86,7 +87,7 @@ class TeamDAO(private var dao: DAO)
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
 
-            putTeam( team, enumArea, values )
+            putTeam( team, geoArea, values )
 
             db.update(DAO.TABLE_TEAM, values, whereClause, args )
         }
@@ -94,7 +95,6 @@ class TeamDAO(private var dao: DAO)
         db.close()
     }
 
-    //--------------------------------------------------------------------------
     fun getTeam( id: Int ): Team?
     {
         var team: Team? = null
@@ -115,12 +115,11 @@ class TeamDAO(private var dao: DAO)
         return team
     }
 
-    //--------------------------------------------------------------------------
     fun getEnumerationTeams( enumAreaId: Int ): ArrayList<Team>
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 1"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -134,12 +133,11 @@ class TeamDAO(private var dao: DAO)
         return teams
     }
 
-    //--------------------------------------------------------------------------
-    fun getCollectionTeams( enumArea_id: Int ): ArrayList<Team>
+    fun getCollectionTeams( sampleArea_id: Int ): ArrayList<Team>
     {
         val teams = ArrayList<Team>()
         val db = dao.writableDatabase
-        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumArea_id AND ${DAO.COLUMN_TEAM_IS_ENUMERATION_TEAM} = 0"
+        val query = "SELECT * FROM ${DAO.TABLE_TEAM} WHERE ${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleArea_id"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -171,7 +169,6 @@ class TeamDAO(private var dao: DAO)
         return teams
     }
 
-    //--------------------------------------------------------------------------
     fun deleteTeam( team: Team )
     {
         val db = dao.writableDatabase

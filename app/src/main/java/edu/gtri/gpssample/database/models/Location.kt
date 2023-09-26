@@ -17,11 +17,10 @@ data class Location(
     var latitude : Double,
     var longitude : Double,
     var isLandmark: Boolean,
-    var items: ArrayList<GeoItem>)
-
+    var enumerationItems: ArrayList<EnumerationItem>)
 {
     constructor(type: LocationType, latitude: Double, longitude: Double, isLandmark: Boolean ) :
-            this( null, Date().time, UUID.randomUUID().toString(),type, latitude, longitude, isLandmark, ArrayList<GeoItem>())
+            this( null, Date().time, UUID.randomUUID().toString(), type, latitude, longitude, isLandmark, ArrayList<EnumerationItem>())
 
     fun pack() : String
     {

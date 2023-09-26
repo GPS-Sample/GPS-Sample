@@ -2,7 +2,7 @@ package edu.gtri.gpssample.constants
 
 enum class SamplingState(val format : String) {
     None("None"),
-    NotSampled("Not Sampled"),
+    NotSampled("NotSampled"),
     Sampled("Sampled"),
     Resampled("Resampled"),
     Invalid("Invalid"),

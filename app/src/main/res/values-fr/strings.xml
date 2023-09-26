@@ -156,7 +156,6 @@
     <string name="select_configuration">"Sélectionner une configuration"</string>
     <string name="export_enum_data">"Sélectionner une configuration"</string>
     <string name="enum_saved_doc">"Exporter les données de dénombrement"</string>
-    <string name="config_saved_doc">"Les données d'énumération ont été sauvegardées dans le répertoire Documents."</string>
     <string name="location_not_found">"La configuration a été sauvegardée dans le répertoire Documents."</string>
     <string name="nobody_home">">La configuration a été sauvegardée dans le répertoire Documents."</string>
     <string name="home_not_exist">"Le domicile n'existe pas"</string>

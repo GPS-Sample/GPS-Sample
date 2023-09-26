@@ -25,8 +25,10 @@ import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -51,6 +53,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class PerformCollectionFragment : Fragment(),
+    OnCameraChangeListener,
     ExportDialog.ExportDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
@@ -89,9 +92,7 @@ class PerformCollectionFragment : Fragment(),
 
         val samplingVm : SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
-        samplingViewModel.currentFragment = this
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-        samplingViewModel.config = sharedViewModel.currentConfiguration?.value
 
         samplingVm.currentSampleArea?.value?.let { sampleArea ->
             this.sampleArea = sampleArea
@@ -125,7 +126,22 @@ class PerformCollectionFragment : Fragment(),
             userId = it
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( ArrayList<Location>() )
+        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+        if (currentZoomLevel == null)
+        {
+            sharedViewModel.setCurrentZoomLevel( 14.0 )
+        }
+
+        val sampledLocations = ArrayList<Location>()
+
+        sampleArea.locations.map {
+            if (it.enumerationItems[0].samplingState == SamplingState.Sampled)
+            {
+                sampledLocations.add( it )
+            }
+        }
+
+        performCollectionAdapter = PerformCollectionAdapter( sampledLocations )
         performCollectionAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -165,24 +181,24 @@ class PerformCollectionFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
 
-        var locations = ArrayList<Location>()
-
-        for (location in sampleArea.locations)
-        {
-            if (!location.isLandmark && location.items.isNotEmpty())
-            {
-                // assuming only 1 enumerationItem per location, for now...
-                val sampledItem = location.items[0] as? SampledItem
-                sampledItem?.let{sampledItem ->
-                    if (sampledItem.samplingState == SamplingState.Sampled)
-                    {
-                        locations.add( location )
-                    }
-                }
-            }
-        }
-
-        performCollectionAdapter.updateLocations( locations )
+//        var locations = ArrayList<Location>()
+//
+////        for (location in sampleArea.locations)
+////        {
+////            if (!location.isLandmark && location.items.isNotEmpty())
+////            {
+////                // assuming only 1 enumerationItem per location, for now...
+////                val sampledItem = location.items[0] as? SampledItem
+////                sampledItem?.let{sampledItem ->
+////                    if (sampledItem.samplingState == SamplingState.Sampled)
+////                    {
+////                        locations.add( location )
+////                    }
+////                }
+////            }
+////        }
+//
+//        performCollectionAdapter.updateLocations( locations )
     }
 
     fun refreshMap()
@@ -212,19 +228,12 @@ class PerformCollectionFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            val polygonAnnotation = mapboxManager.addPolygon(pointList)
+            val polygonAnnotation = mapboxManager.addPolygon(pointList,"#000000")
             polygonAnnotation?.let {
                 allPolygonAnnotations.add( it )
             }
 
-            var currentZoomLevel = sharedViewModel.performEnumerationModel.currentZoomLevel?.value
-
-            if (currentZoomLevel == null)
-            {
-                currentZoomLevel = 14.0
-                sharedViewModel.performEnumerationModel.setCurrentZoomLevel(currentZoomLevel)
-            }
-
+            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
             currentZoomLevel?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
@@ -238,133 +247,45 @@ class PerformCollectionFragment : Fragment(),
 
             for (location in sampleArea.locations)
             {
-                if (!location.isLandmark && location.items.isNotEmpty())
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
                     // assuming only 1 enumeration item per location, for now...
-                    val sampledItem = location.items[0] as? SampledItem
+                    val sampledItem = location.enumerationItems[0]
 
-                    sampledItem?.let { sampledItem ->
-                        if (sampledItem.samplingState == SamplingState.Sampled)
+                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    {
+                        var color = R.drawable.home_black
+
+                        when(sampledItem.collectionState)
                         {
-                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            val pointAnnotation = mapboxManager.addMarker( point, R.drawable.home_black )
+                            CollectionState.Undefined -> color = R.drawable.home_black
+                            CollectionState.Complete -> color = R.drawable.home_green
+                            CollectionState.Incomplete -> color = R.drawable.home_red
+                        }
 
-                            pointAnnotation?.let { pointAnnotation ->
-                                allPointAnnotations.add( pointAnnotation )
-                                pointHashMap[pointAnnotation.id] = location
-                            }
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        val pointAnnotation = mapboxManager.addMarker( point, color )
 
-                            pointAnnotationManager.apply {
-                                addClickListener(
-                                    OnPointAnnotationClickListener { pointAnnotation ->
-                                        pointHashMap[pointAnnotation.id]?.let { location ->
-                                            sharedViewModel.locationViewModel.setCurrentLocation(location)
-                                            LaunchSurveyDialog( activity, this@PerformCollectionFragment)
-                                        }
-                                        true
+                        pointAnnotation?.let { pointAnnotation ->
+                            allPointAnnotations.add( pointAnnotation )
+                            pointHashMap[pointAnnotation.id] = location
+                        }
+
+                        pointAnnotationManager.apply {
+                            addClickListener(
+                                OnPointAnnotationClickListener { pointAnnotation ->
+                                    pointHashMap[pointAnnotation.id]?.let { location ->
+                                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+                                        LaunchSurveyDialog( activity, this@PerformCollectionFragment)
                                     }
-                                )
-                            }
+                                    true
+                                }
+                            )
                         }
                     }
                 }
             }
         }
-    }
-
-    fun onMapReadyXXX(googleMap: GoogleMap)
-    {
-        map = googleMap
-
-        map.clear()
-
-        val points = ArrayList<LatLng>()
-
-        team.polygon.map {
-            points.add( it.toLatLng())
-        }
-
-        if (points.isNotEmpty())
-        {
-            val polygon = PolygonOptions()
-                .clickable(false)
-                .addAll( points )
-
-            map.addPolygon(polygon)
-        }
-
-        for (location in sampleArea.locations)
-        {
-            if (location.isLandmark)
-            {
-                val icon = BitmapDescriptorFactory.fromResource(R.drawable.location_blue)
-                map.addMarker( MarkerOptions()
-                    .position( LatLng( location.latitude, location.longitude ))
-                    .icon( icon )
-                )
-            }
-            else if (location.items.isNotEmpty())
-            {
-                // assuming only 1 enumerationItem per location, for now...
-
-                val sampledItem = location.items[0] as? SampledItem
-                sampledItem?.let{sampledItem ->
-                    if (sampledItem.samplingState == SamplingState.Sampled)
-                    {
-//                        val collectionItem = DAO.collectionItemDAO.getCollectionItem( sampledItem.enumItem!!.collectionItemId )
-//
-                        var icon = BitmapDescriptorFactory.fromResource(R.drawable.home_black)
-//
-//                        collectionItem?.let { collectionItem ->
-//
-//                            if (collectionItem.state == CollectionState.Incomplete)
-//                            {
-//                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_red)
-//                            }
-//                            else if (collectionItem.state == CollectionState.Complete)
-//                            {
-//                                icon = BitmapDescriptorFactory.fromResource(R.drawable.home_green)
-//                            }
-//                        }
-
-                        val marker = map.addMarker( MarkerOptions()
-                            .position( LatLng( location.latitude, location.longitude ))
-                            .icon( icon )
-                        )
-
-//                        marker?.let {marker ->
-//                            marker.tag = location
-//
-//                            map.setOnMarkerClickListener { marker ->
-//                                marker.tag?.let { tag ->
-//
-//                                    val location = tag as Location
-//                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-//
-//                                    LaunchSurveyDialog( activity, this)
-//                                }
-//
-//                                false
-//                            }
-//                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun getCenter() : LatLng
-    {
-        var sumLat: Double = 0.0
-        var sumLon: Double = 0.0
-
-        for (latLon in enumArea.vertices)
-        {
-            sumLat += latLon.latitude
-            sumLon += latLon.longitude
-        }
-
-        return LatLng( sumLat/enumArea.vertices.size, sumLon/enumArea.vertices.size )
     }
 
     private fun didSelectLocation( location: Location )
@@ -489,17 +410,15 @@ class PerformCollectionFragment : Fragment(),
             if (configuration)
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    // this is a hack
-//                    DAO.configDAO.updateAllLists( config )
 
-                    team.id?.let {
-                        config.teamId = it
-                    }
+//                    team.id?.let {
+//                        config.teamId = it
+//                    }
 
                     val packedConfig = config.pack()
                     Log.d( "xxx", packedConfig )
 
-                    config.teamId = 0
+//                    config.teamId = 0
 
                     val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
                     val file = File(root, "$fileName.${Date().time}.json")
@@ -568,44 +487,25 @@ class PerformCollectionFragment : Fragment(),
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
-            val sampledItem = location.items[0] as? SampledItem
-            sampledItem?.let{sampledItem ->
+            val sampledItem = location.enumerationItems[0]
 
-                refreshMap()
+            sampledItem.collectionState = CollectionState.Complete
+            sampledItem.notes = notes
 
-//                var collectionItem = DAO.collectionItemDAO.getCollectionItem(sampledItem.enumItem!!.collectionItemId)
-//
-//                var state = CollectionState.Complete
-//
-//                if (incompleteReason.isNotEmpty())
-//                {
-//                    state = CollectionState.Incomplete
-//                }
-//
-//                if (collectionItem == null)
-//                {
-//                    val collectionItem = DAO.collectionItemDAO.createOrUpdateCollectionItem(
-//                        CollectionItem( sampledItem.enumItem!!.id!!, state, incompleteReason, notes )
-//                    )
-//
-//                    collectionItem?.id?.let {
-//                        sampledItem.enumItem!!.collectionItemId = it
-//                    }
-//
-//                    DAO.enumerationItemDAO.updateEnumerationItem( sampledItem.enumItem!! )
-//                }
-//                else
-//                {
-//                    collectionItem.state = state
-//                    collectionItem.incompleteReason = incompleteReason
-//                    collectionItem.notes = notes
-//                    DAO.collectionItemDAO.createOrUpdateCollectionItem( collectionItem )
-//                }
-//
-//                onMapReady(map)
+            if (incompleteReason.isNotEmpty())
+            {
+                sampledItem.collectionState = CollectionState.Incomplete
             }
 
+            DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
+
+            refreshMap()
         }
+    }
+
+    override fun onCameraChanged(eventData: CameraChangedEventData)
+    {
+        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onDestroyView()

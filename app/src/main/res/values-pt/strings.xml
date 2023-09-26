@@ -156,7 +156,6 @@
     <string name="select_configuration">"Selecione uma configuração"</string>
     <string name="export_enum_data">"Selecione uma configuração"</string>
     <string name="enum_saved_doc">"Exportar dados de enumeração"</string>
-    <string name="config_saved_doc">"Os dados de enumeração foram guardados no diretório Documentos."</string>
     <string name="location_not_found">"A configuração foi guardada no diretório Documentos."</string>
     <string name="nobody_home">">Localização não encontrada"</string>
     <string name="home_not_exist">"O agregado familiar não existe"</string>

@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.database.models
 
 import edu.gtri.gpssample.constants.LocationType
+import edu.gtri.gpssample.database.DAO
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -14,34 +15,16 @@ data class SampleArea(
     var creationDate: Long,
     var vertices : ArrayList<LatLon>,
     var collectionTeams: ArrayList<Team>,
-    var locations : ArrayList<Location>
-
-) : GeoArea()
+    var locations: ArrayList<Location>,
+    var selectedTeamId: Int) : GeoArea()
 {
+    constructor( id: Int, creationDate: Long, selectedTeamId: Int )
+            : this( id, creationDate, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>(), selectedTeamId)
 
-    constructor(enumArea: EnumArea) : this(null, Date().time, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>()) {
-        this.vertices.addAll(enumArea.vertices)
-        // build locations into smaple locations
-        for(enumLoc in enumArea.locations)
-        {
-            val location = Location(LocationType.Sample, enumLoc.latitude,enumLoc.longitude,enumLoc.isLandmark)
-            location.creationDate = Date().time
-            for(item in enumLoc.items)
-            {
-                val enumItem = item as EnumerationItem
-                val sampledItem = SampledItem(enumItem)
-                location.items.add(sampledItem)
-            }
-            this.locations.add(location)
-        }
-    }
-    fun copy() : SampleArea?
+    constructor(enumArea: EnumArea) : this(null, Date().time, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>(),-1)
     {
-        val _copy = SampleArea.unpack(pack())
-
-        _copy?.let { _copy ->
-            return _copy
-        } ?: return null
+        this.vertices.addAll(enumArea.vertices)
+        this.locations.addAll( enumArea.locations )
     }
 
     fun pack() : String

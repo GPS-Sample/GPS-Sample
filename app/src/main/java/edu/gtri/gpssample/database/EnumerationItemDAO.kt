@@ -4,12 +4,13 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.*
 
 class EnumerationItemDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location) : EnumerationItem?
     {
         if (exists( enumerationItem ))
@@ -37,7 +38,6 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    //--------------------------------------------------------------------------
     fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
@@ -67,7 +67,6 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    //--------------------------------------------------------------------------
     fun exists( enumerationItem: EnumerationItem ): Boolean
     {
         enumerationItem.id?.let { id ->
@@ -77,7 +76,6 @@ class EnumerationItemDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
     {
         val db = dao.writableDatabase
@@ -91,7 +89,6 @@ class EnumerationItemDAO(private var dao: DAO)
         db.close()
     }
 
-    //--------------------------------------------------------------------------
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
     {
         enumerationItem.id?.let { id ->
@@ -103,23 +100,23 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE, enumerationItem.enumerationState.format )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE, enumerationItem.samplingState.format )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE, enumerationItem.collectionState.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON, enumerationItem.incompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_NOTES, enumerationItem.notes )
         values.put(DAO.COLUMN_LOCATION_ID, location.id)
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun createEnumerationItem(cursor: Cursor): EnumerationItem {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val subAddress =
-            cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
-        val enumerationState =
-            EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE)))
-        val incompleteReason =
-            cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
+        val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
+        val enumerationState = EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE)))
+        val samplingState = SamplingState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE)))
+        val collectionState = CollectionState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE)))
+        val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_NOTES))
 
         val fieldDataList = ArrayList<FieldData>()
@@ -130,6 +127,8 @@ class EnumerationItemDAO(private var dao: DAO)
             uuid,
             subAddress,
             enumerationState,
+            samplingState,
+            collectionState,
             incompleteReason,
             notes,
             fieldDataList
@@ -156,9 +155,9 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    fun getEnumerationItems( location: Location ) : ArrayList<GeoItem>
+    fun getEnumerationItems( location: Location ) : ArrayList<EnumerationItem>
     {
-        var enumerationItems = ArrayList<GeoItem>()
+        var enumerationItems = ArrayList<EnumerationItem>()
         val db = dao.writableDatabase
 
         location.id?.let { id ->
@@ -179,41 +178,6 @@ class EnumerationItemDAO(private var dao: DAO)
 
         return enumerationItems
     }
-
-//    fun getLocation( enumArea: EnumArea, team: Team ) : ArrayList<Location>
-//    {
-//        var locations = ArrayList<Location>()
-//        val db = dao.writableDatabase
-//
-//        enumArea.id?.let { enumAreaId ->
-//            team.id?.let { teamId ->
-//                var query = ""
-//
-//                if (team.isEnumerationTeam)
-//                {
-//                    query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_ENUMERATION_TEAM_ID} = $teamId"
-//                }
-//                else
-//                {
-//                    query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND ${DAO.COLUMN_COLLECTION_TEAM_ID} = $teamId"
-//                }
-//
-//                val cursor = db.rawQuery(query, null)
-//
-//                while (cursor.moveToNext())
-//                {
-//                    val location = createLocation( cursor )
-//                    locations.add( location )
-//                }
-//
-//                cursor.close()
-//            }
-//        }
-//
-//        db.close()
-//
-//        return locations
-//    }
 
     fun getEnumerationItems() : ArrayList<EnumerationItem>
     {

@@ -25,7 +25,7 @@ class PerformEnumerationAdapter(var locations: List<Location>) : RecyclerView.Ad
     {
         this.mContext = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -45,7 +45,7 @@ class PerformEnumerationAdapter(var locations: List<Location>) : RecyclerView.Ad
 
         val location = locations.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( location.id.toString())
+        holder.nameTextView.setText( location.uuid )
         holder.dateTextView.setText( Date(location.creationDate).toString())
 
         holder.itemView.setOnClickListener {

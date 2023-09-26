@@ -29,7 +29,7 @@ import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.UriManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.util.ArrayList
+import java.util.*
 
 class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -39,6 +39,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     private lateinit var study: Study
     private lateinit var config: Config
+    private lateinit var locationDate: Date
     private lateinit var enumArea : EnumArea
     private lateinit var location: Location
     private lateinit var enumerationItem: EnumerationItem
@@ -81,20 +82,24 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             location = it
         }
 
+        sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let {
+            locationDate = it
+        }
+
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
             enumArea = it
         }
 
         // create an enumeration item
-        if(location.items.isEmpty())
+        if(location.enumerationItems.isEmpty())
         {
             enumerationItem = EnumerationItem()
-            location.items.add(enumerationItem)
+            location.enumerationItems.add(enumerationItem)
         }
         else
         {
             // TODO: COME UP WITH INTERFACE OR SOMETHING TO DEAL WITH MULTIPLE ENUMITEMS
-            val enum = location.items[0] as? EnumerationItem
+            val enum = location.enumerationItems[0] as? EnumerationItem
             enum?.let{enum->
                 enumerationItem = enum
             }
@@ -131,7 +136,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
         {
-            binding.cardView.visibility = View.VISIBLE
+            binding.additionalInfoLayout.visibility = View.VISIBLE
             binding.incompleteCheckBox.isChecked = enumerationItem.incompleteReason.isNotEmpty()
             binding.notesEditText.setText( enumerationItem.notes )
             when (enumerationItem.incompleteReason)
@@ -140,10 +145,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 "Home does not exist" -> binding.doesNotExistButton.isChecked = true
                 "Other" -> binding.otherButton.isChecked = true
             }
-        }
-        else
-        {
-            binding.cardView.visibility = View.GONE
         }
 
         // filteredFieldDataList contains only non-block fields and block field containers
@@ -174,6 +175,41 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 //            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
 //            binding.imageView.setImageBitmap(bitmap)
 //        }
+
+        val components = location.uuid.split("-" )
+
+        binding.UUIDEditText.setText( components[0] )
+        binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
+        binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
+
+        if (sharedViewModel.locationViewModel.isLocationUpdateTimeValid.value == true)
+        {
+            sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let { date ->
+                val dt = (Date().time - date.time) / 1000.0
+                binding.lastUpdatedEditText.setText( "${dt} seconds ago" )
+            } ?: {binding.lastUpdatedEditText.setText( "Undefined" )}
+        }
+        else
+        {
+            binding.lastUpdatedLayout.visibility = View.GONE
+        }
+
+        binding.hideAdditionalInfoImageView.setOnClickListener {
+            binding.hideAdditionalInfoImageView.visibility = View.GONE
+            binding.showAdditionalInfoImageView.visibility = View.VISIBLE
+            binding.defaultInfoLayout.visibility = View.GONE
+            binding.additionalInfoLayout.visibility = View.GONE
+        }
+
+        binding.showAdditionalInfoImageView.setOnClickListener {
+            binding.showAdditionalInfoImageView.visibility = View.GONE
+            binding.hideAdditionalInfoImageView.visibility = View.VISIBLE
+            binding.defaultInfoLayout.visibility = View.VISIBLE
+            if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
+            {
+                binding.additionalInfoLayout.visibility = View.VISIBLE
+            }
+        }
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_household_message),
@@ -208,9 +244,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectRightButton(tag: Any?)
     {
-        location.items.remove(enumerationItem)
+        location.enumerationItems.remove(enumerationItem)
         enumArea.locations.remove(location)
-        sharedViewModel.locationViewModel.removeCurrentLocation(location)
 
         DAO.locationDAO.delete( location )
         DAO.enumerationItemDAO.delete( enumerationItem )

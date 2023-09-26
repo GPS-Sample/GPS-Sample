@@ -24,7 +24,7 @@ class PerformCollectionAdapter(var locations: List<Location>) : RecyclerView.Ada
     {
         this.mContext = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -44,8 +44,8 @@ class PerformCollectionAdapter(var locations: List<Location>) : RecyclerView.Ada
 
         val location = locations.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( location.id.toString())
-        holder.dateTextView.setText( location.uuid )
+        holder.nameTextView.setText( location.uuid)
+        holder.dateTextView.setText( Date(location.creationDate).toString())
 
         holder.itemView.setOnClickListener {
             didSelectLocation(location)

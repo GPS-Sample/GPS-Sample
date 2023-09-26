@@ -25,7 +25,6 @@ import kotlin.collections.ArrayList
 @Serializable
 data class Config(
     var id : Int? = null,
-    var teamId : Int,
     var creationDate: Long,
     var name: String,
     var dateFormat: DateFormat,
@@ -33,14 +32,17 @@ data class Config(
     var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
     var studies : ArrayList<Study>,
-    var enumAreas : ArrayList<EnumArea>)
+    var enumAreas : ArrayList<EnumArea>,
+    var selectedStudyId: Int,
+    var selectedEnumAreaId: Int)
 {
-    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-        minGpsPrecision: Int) : this(null, -1, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
-                                    ArrayList<Study>(), ArrayList<EnumArea>())
-    constructor(id: Int?, teamId: Int, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int) : this(id, teamId, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
-                ArrayList<Study>(), ArrayList<EnumArea>())
+    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int)
+            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
+                                    ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1)
+    constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+                minGpsPrecision: Int, selectedStudyId: Int, selectedEnumAreaId: Int)
+            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
+        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId)
 
     var minimumGPSPrecision : String
         get() = minGpsPrecision.toString()

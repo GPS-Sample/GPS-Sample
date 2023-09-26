@@ -87,6 +87,10 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
     {
         sharedViewModel.teamViewModel.setCurrentTeam( team )
 
+        team.id?.let {
+            enumArea.selectedTeamId = it
+        }
+
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
     }
 
@@ -104,11 +108,9 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
     override fun didSelectRightButton(tag: Any?)
     {
         val team = tag as Team
-
         enumArea.enumerationTeams.remove(team)
         manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
         DAO.teamDAO.deleteTeam( team )
-
     }
 
     override fun onDestroyView()

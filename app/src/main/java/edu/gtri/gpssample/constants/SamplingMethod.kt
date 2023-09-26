@@ -87,10 +87,10 @@ object SamplingMethodConverter
     {
         return when(samplingMethod)
         {
-            SamplingMethod.SimpleRandom-> fragment.getString(R.string.simple_random)
-            SamplingMethod.Cluster -> fragment.getString(R.string.cluster_sampling)
-            SamplingMethod.Subsets -> fragment.getString(R.string.subset_overlap)
-            SamplingMethod.Strata -> fragment.getString(R.string.strata_exclusive)
+            SamplingMethod.SimpleRandom-> "Simple Random Sampling" //fragment.getString(R.string.simple_random)
+            SamplingMethod.Cluster -> "Cluster Sampling" //fragment.getString(R.string.cluster_sampling)
+            SamplingMethod.Subsets -> "Subset Sampling" //fragment.getString(R.string.subset_overlap)
+            SamplingMethod.Strata -> "Strata Sampling" //fragment.getString(R.string.strata_exclusive)
             else -> ""
         }
     }

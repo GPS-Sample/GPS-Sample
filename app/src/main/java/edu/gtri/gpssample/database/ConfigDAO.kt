@@ -39,13 +39,15 @@ class ConfigDAO(private var dao: DAO)
     fun putConfig( config: Config, values: ContentValues )
     {
         config.id?.let { id ->
-            Log.d( "xxx", "existing config id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
 
-        values.put( DAO.COLUMN_TEAM_ID, config.teamId )
+        values.put( DAO.COLUMN_ENUM_AREA_ID, config.selectedEnumAreaId )
+        values.put( DAO.COLUMN_STUDY_ID, config.selectedStudyId )
+
         values.put( DAO.COLUMN_CREATION_DATE, config.creationDate )
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
+        values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
 
         // TODO: these should be from lookup tables
@@ -113,7 +115,8 @@ class ConfigDAO(private var dao: DAO)
     private fun buildConfig(cursor: Cursor ) : Config
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val teamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
+        val selectedEnumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
+        val selectedStudyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
         val distanceFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX))
@@ -126,7 +129,7 @@ class ConfigDAO(private var dao: DAO)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( id, teamId, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision )
+        return Config( id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, selectedStudyId, selectedEnumAreaId )
     }
 
     //--------------------------------------------------------------------------

@@ -34,10 +34,11 @@ class MapboxManager(
         return null
     }
 
-    fun addPolygon( points: List<List<Point>> ) : PolygonAnnotation?
+    fun addPolygon( points: List<List<Point>>, fillColor: String ) : PolygonAnnotation?
     {
         val polygonAnnotationOptions = PolygonAnnotationOptions()
             .withPoints(points)
+            .withFillColor( fillColor )
             .withFillOpacity(0.25 )
 
         polygonAnnotationManager?.let { polygonAnnotationManager ->
