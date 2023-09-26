@@ -351,11 +351,30 @@ class ConfigurationViewModel : ViewModel()
     fun replaceEnumArea(enumArea : EnumArea)
     {
         currentConfiguration?.value?.let{config ->
-            for(ea in config.enumAreas)
-            {
 
+            // this does not work, not sure why
+            // config.enumAreas.add(enumArea)
+
+            enumArea.id?.let { enumAreaId ->
+                var found = false
+
+                for (i in 0..config.enumAreas.size-1)
+                {
+                    val ea = config.enumAreas[i]
+                    ea.id?.let { eaId ->
+                        if (ea.id == enumAreaId)
+                        {
+                            config.enumAreas.removeAt(i)
+                            found = true
+                        }
+                    }
+                    if (found)
+                    {
+                        break
+                    }
+                }
             }
-            config.enumAreas.remove(enumArea)
+
             config.enumAreas.add(enumArea)
         }
     }

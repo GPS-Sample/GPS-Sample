@@ -1,7 +1,6 @@
 package edu.gtri.gpssample.fragments.perform_collection
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -14,13 +13,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -34,12 +28,10 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-//import edu.gtri.gpssample.database.DAO.Companion.collectionDataDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.ExportDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
@@ -50,17 +42,16 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
 import java.util.*
-import kotlin.collections.HashMap
 
 class PerformCollectionFragment : Fragment(),
     OnCameraChangeListener,
-    ExportDialog.ExportDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
+    private lateinit var user: User
     private lateinit var team: Team
-    private lateinit var map: GoogleMap
+    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var sampleArea: SampleArea
     private lateinit var mapboxManager: MapboxManager
@@ -71,7 +62,6 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
-    private var userId = 0
     private var enumAreaId = 0
     private val binding get() = _binding!!
     private val pointHashMap = java.util.HashMap<Long, Location>()
@@ -109,6 +99,10 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            this.config = config
+        }
+
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
             enumArea = enum_area
             enumArea.id?.let {id ->
@@ -122,8 +116,8 @@ class PerformCollectionFragment : Fragment(),
 
         val user = (activity!!.application as? MainApplication)?.user
 
-        user?.id?.let {
-            userId = it
+        user?.let { user ->
+            this.user = user
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
@@ -164,14 +158,9 @@ class PerformCollectionFragment : Fragment(),
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
         binding.exportButton.setOnClickListener {
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-
-                ConfirmationDialog( activity, resources.getString(R.string.enum_saved_doc),
-                    resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code),
-                    resources.getString(R.string.file_system), kExportTag, this)
-
-                //ExportDialog( activity, "${config.name}-${team.name}", "${enumArea.name}-${team.name}", this )
-            }
+            ConfirmationDialog( activity, resources.getString(R.string.export_configuration),
+                resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code),
+                resources.getString(R.string.file_system), kExportTag, this)
         }
     }
 
@@ -180,25 +169,6 @@ class PerformCollectionFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
-
-//        var locations = ArrayList<Location>()
-//
-////        for (location in sampleArea.locations)
-////        {
-////            if (!location.isLandmark && location.items.isNotEmpty())
-////            {
-////                // assuming only 1 enumerationItem per location, for now...
-////                val sampledItem = location.items[0] as? SampledItem
-////                sampledItem?.let{sampledItem ->
-////                    if (sampledItem.samplingState == SamplingState.Sampled)
-////                    {
-////                        locations.add( location )
-////                    }
-////                }
-////            }
-////        }
-//
-//        performCollectionAdapter.updateLocations( locations )
     }
 
     fun refreshMap()
@@ -296,72 +266,74 @@ class PerformCollectionFragment : Fragment(),
 
     override fun didSelectRightButton(tag: Any?)
     {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
+        // Sync the enumeration data back to the admin.
+        // For this scenario, we're trying to export the enumeration data only,
+        // not the entire configuration.
+        // On the admin side, the app will need to be able to add
+        // the enumeration data only, not the entire EnumArea container.
+        // EnumData ids on the admin side will need to be autogenerated
+        // during the import to accommodate uploads from multiple enumerators.
+        // We'll also need to handle duplicate updates from the same enumerator.
 
-            // Sync the enumeration data back to the admin.
-            // For this scenario, we're trying to export the enumeration data only,
-            // not the entire configuration.
-            // On the admin side, the app will need to be able to add
-            // the enumeration data only, not the entire EnumArea container.
-            // EnumData ids on the admin side will need to be autogenerated
-            // during the import to accommodate uploads from multiple enumerators.
-            // We'll also need to handle duplicate updates from the same enumerator.
+        var payload: String = ""
+        var name: String = ""
 
-//            enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+        when(user.role) {
+            Role.Supervisor.toString() ->
+            {
+                name = "Config"
+                payload = config.pack()
+            }
 
-            val packedEnumArea = enumArea.pack()
-            Log.d( "xxx", packedEnumArea )
-
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-            val file = File(root, "EnumArea.${Date().time}.json")
-            val writer = FileWriter(file)
-            writer.append(packedEnumArea)
-            writer.flush()
-            writer.close()
-
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+            Role.Enumerator.toString() ->
+            {
+                name = "EnumArea"
+                payload = enumArea.pack()
+            }
         }
+
+        Log.d( "xxx", payload )
+
+        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+        val file = File(root, "${name}.${Date().time}.json")
+        val writer = FileWriter(file)
+        writer.append(payload)
+        writer.flush()
+        writer.close()
+
+        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
         // Launch connection screen
-        view?.let{view ->
-            val user = (activity!!.application as MainApplication).user
-            user?.let { user ->
+        view?.let{ view ->
+            sharedNetworkViewModel.setCurrentConfig(config)
 
-                sharedViewModel?.currentConfiguration?.value?.let{
-                    sharedNetworkViewModel.setCurrentConfig(it)
-                }
-                //TODO: fix this! compare should be the enum
-                when(user.role)
+            when(user.role)
+            {
+                Role.Supervisor.toString() ->
                 {
-                    Role.Supervisor.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-                        startHotspot(view)
-                    }
-                    Role.Admin.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
-                        startHotspot(view)
-                    }
-                    Role.Enumerator.toString() ->
-                    {
-                        // start camera
-                        // set what client mode we are
-                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                    startHotspot(view)
+                }
 
-                        // I don't know why this should be necessary.
-//                        enumArea.locations = DAO.locationDAO.getLocations(enumArea,team)
+                Role.Admin.toString() ->
+                {
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                    startHotspot(view)
+                }
 
-                        sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
-                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                        getResult.launch(intent)
-                    }
+                Role.Enumerator.toString() ->
+                {
+                    // start camera
+                    // set what client mode we are
+                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+
+                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                    getResult.launch(intent)
                 }
             }
         }
@@ -392,70 +364,6 @@ class PerformCollectionFragment : Fragment(),
     fun startHotspot(view : View)
     {
         sharedNetworkViewModel.createHotspot(view)
-    }
-
-    override fun shouldExport( fileName: String, configuration: Boolean, qrCode: Boolean )
-    {
-        if (qrCode)
-        {
-            if (configuration)
-            {
-            }
-            else
-            {
-            }
-        }
-        else
-        {
-            if (configuration)
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-
-//                    team.id?.let {
-//                        config.teamId = it
-//                    }
-
-                    val packedConfig = config.pack()
-                    Log.d( "xxx", packedConfig )
-
-//                    config.teamId = 0
-
-                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                    val file = File(root, "$fileName.${Date().time}.json")
-                    val writer = FileWriter(file)
-                    writer.append(packedConfig)
-                    writer.flush()
-                    writer.close()
-
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.location_not_found), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                // Sync the enumeration data back to the admin.
-                // For this scenario, we're trying to export the enumeration data only,
-                // not the entire configuration.
-                // On the admin side, the app will need to be able to add
-                // the enumeration data only, not the entire EnumArea container.
-                // EnumData ids on the admin side will need to be autogenerated
-                // during the import to accommodate uploads from multiple enumerators.
-                // We'll also need to handle duplicate updates from the same enumerator.
-
-//                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
-
-                val packedEnumArea = enumArea.pack()
-                Log.d( "xxx", packedEnumArea )
-
-                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                val file = File(root, "$fileName.${Date().time}.json")
-                val writer = FileWriter(file)
-                writer.append(packedEnumArea)
-                writer.flush()
-                writer.close()
-
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

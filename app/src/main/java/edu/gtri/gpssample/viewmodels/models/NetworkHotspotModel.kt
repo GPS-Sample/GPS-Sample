@@ -104,11 +104,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     private var qrCodeCreated = false
     private var generatedQRCode : Bitmap? = null
 
-
-    // this is a hack
-    var currentTeamId : Int? = null
-
-
     override var Activity : Activity?
         get() = _activity
         set(value)
@@ -208,14 +203,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
             NetworkCommand.NetworkConfigRequest ->
             {
                 config?.let {config->
-//                    currentTeamId?.let { teamId ->
-//                        config.teamId = teamId
-//                    }
-
                     val packedConfig = config.pack()
                     Log.d( "xxx", packedConfig )
-
-//                    config.teamId = -1
 
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
                     socket.outputStream.write(response.toByteArray())
@@ -236,7 +225,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                         }
                         // replace the enumArea from currentConfig with this one
                         sharedViewModel?.replaceEnumArea(enumArea)
-
+                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                     }
                 }
             }

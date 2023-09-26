@@ -78,7 +78,7 @@ class LocationDAO(private var dao: DAO)
         }
     }
 
-    fun importLocation( location: Location, enumArea : EnumArea ) : Location?
+    fun importLocation( location: Location, geoArea : GeoArea ) : Location?
     {
         val existingLocation = getLocation( location.uuid )
 
@@ -89,11 +89,20 @@ class LocationDAO(private var dao: DAO)
         val values = ContentValues()
 
         location.id = null
-        putLocation( location, enumArea,  values )
+        putLocation( location, geoArea,  values )
 
         location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
         location.id?.let { id ->
             Log.d( "xxx", "new location id = ${id}")
+
+            if (geoArea is EnumArea)
+            {
+                updateConnectorTable( location, geoArea as EnumArea )
+            }
+            else if (geoArea is SampleArea)
+            {
+                updateConnectorTable( location, geoArea as SampleArea )
+            }
 
             for (enumerationItem in location.enumerationItems)
             {
