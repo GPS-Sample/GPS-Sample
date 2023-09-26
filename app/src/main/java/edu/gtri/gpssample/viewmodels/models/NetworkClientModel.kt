@@ -314,22 +314,27 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                                     Handler().postDelayed({
                                         val wifiInfo = wifiManager!!.connectionInfo
                                         var ssid = wifiInfo.ssid
-                                        // wifiManager
-                                        while(ssid.contains("unknown ssid"))
-                                        {
-                                            Log.d("XXXXXXX","waiting on ssid ${ssid}")
-                                            ssid = wifiManager!!.connectionInfo.ssid
-                                            sleep(1000)
-                                        }
                                         var serverAddress =
                                             intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
                                         var myAddress =
                                             intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
                                                 .substring(1)
                                                 .substring(1)
-                                        Log.d("XXXXXXXXXXXXX", "THE server ${serverAddress}")
-                                        Log.d("XXXXXXXXXXXXX", "THE me  ${myAddress}")
-                                        sleep(3000)
+                                        var linkSpeed = wifiManager!!.connectionInfo.linkSpeed
+
+                                        Log.d("XXXXXXX", "the server address ${serverAddress}")
+                                        Log.d("XXXXXXX", "the link speed ${wifiManager!!.connectionInfo.linkSpeed}")
+                                        // wifiManager
+                                        while(ssid.contains("unknown ssid") || linkSpeed < 0 )//|| serverAddress.contains("/"))
+                                        {
+                                            ssid = wifiManager!!.connectionInfo.ssid
+                                            linkSpeed = wifiManager!!.connectionInfo.linkSpeed
+                                            serverAddress =
+                                                intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
+                                            sleep(1000)
+                                        }
+
+                                        //sleep(5000)
 
                                         serverAddress =
                                             intToInetAddress(wifiManager!!.dhcpInfo.serverAddress)!!.toString()
@@ -337,11 +342,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                                         myAddress =
                                             intToInetAddress(wifiManager!!.dhcpInfo.ipAddress)!!.toString()
                                                 .substring(1)
-                                        Log.d("XXXXXXXXXXXXX", "THE SSID ${wifiManager!!.connectionInfo.ssid}")
-                                        Log.d("XXXXXXXXXXXXX", "THE RSSI ${wifiManager!!.connectionInfo.rssi}")
-                                        Log.d("XXXXXXXXXXXXX", "THE server ${serverAddress}")
-                                        Log.d("XXXXXXXXXXXXX", "THE me  ${myAddress}")
-
+                                        Log.d("XXXXXXX", "the server address ${serverAddress}")
+                                        Log.d("XXXXXXX", "the link speed ${wifiManager!!.connectionInfo.linkSpeed}")
                                         val components = serverAddress.split(".")
                                         val broadcast_address =
                                             components[0] + "." + components[1] + "." + components[2] + ".255"
