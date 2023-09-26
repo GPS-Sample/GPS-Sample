@@ -395,8 +395,6 @@ class PerformEnumerationFragment : Fragment(),
         {
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
         }
-
-//        refreshMap()
     }
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
@@ -450,30 +448,25 @@ class PerformEnumerationFragment : Fragment(),
                 sharedViewModel?.currentConfiguration?.value?.let{
                     sharedNetworkViewModel.setCurrentConfig(it)
                 }
+
                 //TODO: fix this! compare should be the enum
                 when(user.role)
                 {
+                    Role.Admin.toString() ->
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                        startHotspot(view)
+                    }
+
                     Role.Supervisor.toString() ->
                     {
-                        // TODO
-                        // teamId should be passed to setHotspotMode() instead of setting a global var
-                        sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
 
                         startHotspot(view)
                     }
 
-                    Role.Admin.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.currentTeamId = sharedViewModel.teamViewModel.currentTeam?.value?.id
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
-                        startHotspot(view)
-                    }
-
                     Role.Enumerator.toString() ->
                     {
-                        // start camera
-                        // set what client mode we are
                         sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
                         sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
                         val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -523,14 +516,8 @@ class PerformEnumerationFragment : Fragment(),
                             {
                                 Role.Supervisor.toString(), Role.Admin.toString() ->
                                 {
-//                                    team.id?.let {
-//                                        config.teamId = it
-//                                    }
-
                                     val packedConfig = config.pack()
                                     Log.d( "xxx", packedConfig )
-
-//                                    config.teamId = 0
 
                                     val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
                                     val file = File(root, "Configuration.${Date().time}.json")
