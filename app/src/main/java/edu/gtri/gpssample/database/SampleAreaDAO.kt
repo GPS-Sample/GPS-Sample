@@ -33,7 +33,7 @@ class SampleAreaDAO(private var dao: DAO)
     private fun updateSampleAreaElements(sampleArea : SampleArea) : SampleArea?
     {
         sampleArea.id?.let {id ->
-            Log.d( "xxx", "new enumArea id = ${id}")
+            Log.d( "xxx", "new sampleArea id = ${id}")
 
             for (latLon in sampleArea.vertices)
             {

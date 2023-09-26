@@ -43,7 +43,7 @@ class SamplingViewModel : ViewModel()
             value?.let{sampleArea ->
                 _currentSampleArea = MutableLiveData(sampleArea.value)
                 _currentStudy?.value?.let{ study->
-                    if (study.sampleArea == null)
+                    if (study.sampleArea == null)  // is this check necessary / correct?
                     {
                         sampleArea.value?.let{ sampleArea->
                             study.sampleArea = sampleArea
@@ -76,6 +76,9 @@ class SamplingViewModel : ViewModel()
     {
         val sampleArea = SampleArea(fromEnumArea)
         _currentSampleArea = MutableLiveData(sampleArea)
+        _currentStudy?.value?.let { study ->
+            study.sampleArea = sampleArea
+        }
     }
 
     fun setSampleAreasForMap(mapboxManager: MapboxManager, pointAnnotationManager: PointAnnotationManager) : SamplingState
