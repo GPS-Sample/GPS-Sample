@@ -255,8 +255,7 @@
     <string name="sampling_type">Sampling Type</string>
     <string name="generating_qr_code">Generating QR Code...</string>
     <string name="samples">Samples</string>
-    <string name="you_don_t_have_any_samples_for_this_study">You don\'t have any samples for this study</string>
-    <string name="networkfragment">NetworkFragment</string>
+    <string name="you_don_t_have_any_samples_for_this_study">You do not have any samples for this study</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

@@ -216,7 +216,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 Role.Enumerator.toString() ->
                 {
-                    ConfirmationDialog( activity, resources.getString(R.string.enum_saved_doc),
+                    ConfirmationDialog( activity, resources.getString(R.string.export_enum_data),
                         resources.getString(R.string.select_export_message),
                         resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                 }
