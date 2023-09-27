@@ -235,6 +235,6 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:visibility="@{(viewModel.currentUserRole != Role.Enumerator)  ? View.VISIBLE : View.GONE}"
-            android:text="@string/import_enumeration" />
+            android:text="@string/import_field_data" />
     </LinearLayout>
 </layout>

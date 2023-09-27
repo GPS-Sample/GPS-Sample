@@ -232,6 +232,7 @@
     <string name="option_item_name">Enter the option item name</string>
     <string name="config_saved_doc">"Configuration has been saved to the Documents directory."</string>
     <string name="export_collection_data">"Export Collection Data"</string>
+    <string name="import_field_data">"Import Field Data"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
