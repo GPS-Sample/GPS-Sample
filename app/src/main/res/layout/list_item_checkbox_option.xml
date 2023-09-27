@@ -11,6 +11,6 @@
         android:layout_height="50dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:text="CheckBox" />
+        android:text="@string/checkbox" />
 
 </LinearLayout>

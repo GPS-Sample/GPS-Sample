@@ -5,15 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.manage_enumeration_areas.ManageEnumerationAreasFragment">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/title_text_view"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center"
-        android:text="Enumeration Areas"
+        android:text="@string/enumeration_areas"
         android:textColor="@color/primary_textcolor"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -31,6 +30,5 @@
         android:layout_margin="20dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:layout_centerInParent="true"
         android:text="@string/finish" />
 </LinearLayout>

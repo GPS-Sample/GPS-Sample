@@ -60,7 +60,7 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:padding="10dp"
-                        android:text="Additional Info"
+                        android:text="@string/additional_info"
                         android:textColor="@color/primary"
                         android:textSize="17sp"
                         android:textStyle="bold" />
@@ -106,7 +106,7 @@
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="UUID"
+                            android:text="@string/uuid"
                             android:textColor="@color/primary"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -115,7 +115,6 @@
                             android:id="@+id/UUID_edit_text"
                             android:focusable="false"
                             android:layout_marginEnd="20dp"
-                            android:text="abcdef"
                             android:textSize="17sp"
                             android:layout_weight="1"
                             android:layout_width="0dp"
@@ -133,7 +132,7 @@
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Latitude"
+                            android:text="@string/latitude"
                             android:textColor="@color/primary"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -142,7 +141,6 @@
                             android:id="@+id/latitude_edit_text"
                             android:focusable="false"
                             android:layout_marginEnd="20dp"
-                            android:text="30.123"
                             android:textSize="17sp"
                             android:layout_weight="1"
                             android:layout_width="0dp"
@@ -160,7 +158,7 @@
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Longitude"
+                            android:text="@string/longitude"
                             android:textColor="@color/primary"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -169,7 +167,6 @@
                             android:id="@+id/longitude_edit_text"
                             android:focusable="false"
                             android:layout_marginEnd="20dp"
-                            android:text="-87.123"
                             android:textSize="17sp"
                             android:layout_weight="1"
                             android:layout_width="0dp"
@@ -188,7 +185,7 @@
                             android:layout_height="50dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Last Updated"
+                            android:text="@string/last_updated"
                             android:textColor="@color/primary"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -212,7 +209,7 @@
                     android:layout_height="wrap_content">
 
                      <TextView
-                         android:text="Status"
+                         android:text="@string/status"
                          android:textColor="@color/primary"
                          android:textSize="17sp"
                          android:textStyle="bold"
@@ -227,10 +224,10 @@
                         android:layout_marginEnd="20dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Incomplete" />
+                        android:text="@string/incomplete" />
 
                     <TextView
-                        android:text="Reason Incomplete"
+                        android:text="@string/reason_incomplete"
                         android:textColor="@color/primary"
                         android:textSize="17sp"
                         android:textStyle="bold"
@@ -248,7 +245,7 @@
                             android:layout_marginEnd="20dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Nobody home" />
+                            android:text="@string/nobody_home" />
 
                         <RadioButton
                             android:id="@+id/does_not_exist_button"
@@ -257,7 +254,7 @@
                             android:layout_marginEnd="20dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Does not exist" />
+                            android:text="@string/does_not_exist" />
 
                         <RadioButton
                             android:id="@+id/other_button"
@@ -266,11 +263,11 @@
                             android:layout_marginEnd="20dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Other" />
+                            android:text="@string/other" />
                     </RadioGroup>
 
                     <TextView
-                        android:text="Notes"
+                        android:text="@string/notes"
                         android:textColor="@color/primary"
                         android:textSize="17sp"
                         android:textStyle="bold"
