@@ -33,10 +33,7 @@ import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListen
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.EnumerationState
-import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.LocationType
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
@@ -301,28 +298,57 @@ class CreateEnumerationAreaFragment : Fragment(),
                 {
                     var resourceId = R.drawable.home_black
 
-                    var numComplete = 0
+                    var numCollectionsComplete = 0
+                    var numEnumerationsComplete = 0
 
                     for (item in location.enumerationItems)
                     {
                         val enumerationItem = item as EnumerationItem?
-                        if(enumerationItem != null)
+
+                        if (enumerationItem != null)
                         {
-                            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                            if (enumerationItem.collectionState == CollectionState.Incomplete)
+                            {
+                                resourceId = R.drawable.home_orange
+                                break
+                            }
+                            else if (enumerationItem.collectionState == CollectionState.Complete)
+                            {
+                                numCollectionsComplete++
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
                                 resourceId = R.drawable.home_red
                                 break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                             {
-                                numComplete++
+                                numEnumerationsComplete++
                             }
                         }
                     }
 
-                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                    if (numCollectionsComplete > 0)
                     {
-                        resourceId = R.drawable.home_green
+                        if (numCollectionsComplete == location.enumerationItems.size)
+                        {
+                            resourceId = R.drawable.home_purple
+                        }
+                        else
+                        {
+                            resourceId = R.drawable.home_orange
+                        }
+                    }
+                    else if (numEnumerationsComplete > 0)
+                    {
+                        if (numEnumerationsComplete == location.enumerationItems.size)
+                        {
+                            resourceId = R.drawable.home_green
+                        }
+                        else
+                        {
+                            resourceId = R.drawable.home_red
+                        }
                     }
 
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )

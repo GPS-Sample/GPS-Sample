@@ -30,6 +30,7 @@ import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkConnectionViewModel
+import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -80,14 +81,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     private var _hotspotMode : MutableLiveData<HotspotMode> = MutableLiveData(HotspotMode.None)
     var hotspotMode : LiveData<HotspotMode> = _hotspotMode
 
-
-
     val connections: LiveData<List<NetworkConnectionViewModel>>
         get() = _connections
     private val _connections = MutableLiveData<List<NetworkConnectionViewModel>>(emptyList())
 
     private val clientConenctions : MutableList<NetworkConnectionViewModel> = mutableListOf()
-
 
     val destination = R.id.action_navigate_to_HotspotFragment
 
@@ -224,6 +222,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                         {
                             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         }
+
                         // replace the enumArea from currentConfig with this one
                         sharedViewModel?.replaceEnumArea(enumArea)
                         sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
@@ -242,6 +241,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                         {
                             DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
                         }
+
 //                        sharedViewModel?.replaceEnumArea(enumArea)
 //                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                     }

@@ -118,23 +118,25 @@ class SampleAreaDAO(private var dao: DAO)
         return sampleArea
     }
 
-    fun getSampleAreas( study: Study ): ArrayList<SampleArea>
+    fun getSampleArea( study: Study ): SampleArea?
     {
-        val sampleAreas = ArrayList<SampleArea>()
+        var sampleArea : SampleArea? = null
+
         val db = dao.writableDatabase
 
         study.id?.let { id ->
             val query = "SELECT * FROM ${DAO.TABLE_SAMPLE_AREA} WHERE ${DAO.COLUMN_STUDY_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
-            while (cursor.moveToNext())
+            if (cursor.count > 0)
             {
-                val sampleArea = createSampleArea( cursor )
-                sampleArea.id?.let { id ->
-                    sampleArea.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
-                    sampleArea.locations = DAO.locationDAO.getLocations( sampleArea )
-                    sampleArea.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
-                    sampleAreas.add( sampleArea )
+                cursor.moveToNext()
+                val sa = createSampleArea( cursor )
+                sa.id?.let { id ->
+                    sa.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
+                    sa.locations = DAO.locationDAO.getLocations( sa )
+                    sa.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
+                    sampleArea = sa
                 }
             }
 
@@ -143,7 +145,7 @@ class SampleAreaDAO(private var dao: DAO)
 
         db.close()
 
-        return sampleAreas
+        return sampleArea
     }
 
     fun delete( sampleArea: SampleArea )

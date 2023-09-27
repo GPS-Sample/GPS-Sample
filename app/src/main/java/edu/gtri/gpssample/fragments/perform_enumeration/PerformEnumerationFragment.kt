@@ -302,7 +302,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceId = R.drawable.home_orange
+                                resourceId = R.drawable.home_red
                                 break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
@@ -314,7 +314,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
-                        resourceId = R.drawable.home_purple
+                        resourceId = R.drawable.home_green
                     }
 
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )

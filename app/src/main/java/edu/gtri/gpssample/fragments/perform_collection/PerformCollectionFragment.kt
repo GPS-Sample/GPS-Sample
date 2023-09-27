@@ -235,11 +235,29 @@ class PerformCollectionFragment : Fragment(),
                     {
                         var color = R.drawable.home_black
 
-                        when(sampledItem.collectionState)
+                        var numComplete = 0
+
+                        for (item in location.enumerationItems)
                         {
-                            CollectionState.Undefined -> color = R.drawable.home_black
-                            CollectionState.Complete -> color = R.drawable.home_green
-                            CollectionState.Incomplete -> color = R.drawable.home_red
+                            val enumerationItem = item as EnumerationItem?
+
+                            if(enumerationItem != null)
+                            {
+                                if (enumerationItem.collectionState == CollectionState.Incomplete)
+                                {
+                                    color = R.drawable.home_orange
+                                    break
+                                }
+                                else if (enumerationItem.collectionState == CollectionState.Complete)
+                                {
+                                    numComplete++
+                                }
+                            }
+                        }
+
+                        if (numComplete == location.enumerationItems.size)
+                        {
+                            color = R.drawable.home_purple
                         }
 
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
