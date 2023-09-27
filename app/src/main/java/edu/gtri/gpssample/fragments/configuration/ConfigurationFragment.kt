@@ -343,7 +343,7 @@ class ConfigurationFragment : Fragment(),
                         enumArea?.let { enumArea ->
                             for (location in enumArea.locations)
                             {
-                                DAO.locationDAO.importLocation(location, enumArea)
+                                DAO.locationDAO.createOrUpdateLocation(location, enumArea)
                             }
 
                             // replace the enumArea from currentConfig with this one

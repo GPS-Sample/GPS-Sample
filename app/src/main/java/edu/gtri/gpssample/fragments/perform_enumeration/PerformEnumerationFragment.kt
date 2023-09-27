@@ -61,7 +61,9 @@ class PerformEnumerationFragment : Fragment(),
     InfoDialog.InfoDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
+    private lateinit var user: User
     private lateinit var team: Team
+    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList : ColorStateList
@@ -73,7 +75,6 @@ class PerformEnumerationFragment : Fragment(),
 
     private var gpsLocation: Point? = null
 
-    private var userId = 0
     private var dropMode = false
     private var showCurrentLocation = true
 
@@ -116,18 +117,20 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
-            enumArea = enum_area
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
+        }
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
         }
 
         sharedViewModel.teamViewModel.currentTeam?.value?.let {
             team = it
         }
 
-        val user = (activity!!.application as? MainApplication)?.user
-
-        user?.id?.let {
-            userId = it
+        (activity!!.application as? MainApplication)?.user?.let {
+            user = it
         }
 
         performEnumerationAdapter = PerformEnumerationAdapter( ArrayList<Location>() )
@@ -203,26 +206,19 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-
-                val user = (activity!!.application as MainApplication).user
-
-                user?.let { user ->
-                    when(user.role)
-                    {
-                        Role.Supervisor.toString(), Role.Admin.toString() ->
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
-                                resources.getString(R.string.select_export_message),
-                                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                        }
-                        Role.Enumerator.toString() ->
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.enum_saved_doc),
-                                resources.getString(R.string.select_export_message),
-                                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                        }
-                    }
+            when(user.role)
+            {
+                Role.Supervisor.toString(), Role.Admin.toString() ->
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
+                        resources.getString(R.string.select_export_message),
+                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                }
+                Role.Enumerator.toString() ->
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.enum_saved_doc),
+                        resources.getString(R.string.select_export_message),
+                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                 }
             }
         }
@@ -306,7 +302,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceId = R.drawable.home_red
+                                resourceId = R.drawable.home_orange
                                 break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
@@ -318,7 +314,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
-                        resourceId = R.drawable.home_green
+                        resourceId = R.drawable.home_purple
                     }
 
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
@@ -441,37 +437,30 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         // Launch connection screen
-        view?.let{view ->
-            val user = (activity!!.application as MainApplication).user
-            user?.let { user ->
+        view?.let{ view ->
+            sharedNetworkViewModel.setCurrentConfig(config)
 
-                sharedViewModel?.currentConfiguration?.value?.let{
-                    sharedNetworkViewModel.setCurrentConfig(it)
+            when(user.role)
+            {
+                Role.Admin.toString() ->
+                {
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                    startHotspot(view)
                 }
 
-                //TODO: fix this! compare should be the enum
-                when(user.role)
+                Role.Supervisor.toString() ->
                 {
-                    Role.Admin.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
-                        startHotspot(view)
-                    }
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
 
-                    Role.Supervisor.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                    startHotspot(view)
+                }
 
-                        startHotspot(view)
-                    }
-
-                    Role.Enumerator.toString() ->
-                    {
-                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                        sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
-                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                        getResult.launch(intent)
-                    }
+                Role.Enumerator.toString() ->
+                {
+                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
+                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                    getResult.launch(intent)
                 }
             }
         }
@@ -507,43 +496,36 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 kExportTag -> {
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                    when(user.role)
+                    {
+                        Role.Supervisor.toString(), Role.Admin.toString() ->
+                        {
+                            val packedConfig = config.pack()
+                            Log.d( "xxx", packedConfig )
 
-                        val user = (activity!!.application as MainApplication).user
+                            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                            val file = File(root, "Configuration.${Date().time}.json")
+                            val writer = FileWriter(file)
+                            writer.append(packedConfig)
+                            writer.flush()
+                            writer.close()
 
-                        user?.let { user ->
-                            when(user.role)
-                            {
-                                Role.Supervisor.toString(), Role.Admin.toString() ->
-                                {
-                                    val packedConfig = config.pack()
-                                    Log.d( "xxx", packedConfig )
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+                        }
 
-                                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                                    val file = File(root, "Configuration.${Date().time}.json")
-                                    val writer = FileWriter(file)
-                                    writer.append(packedConfig)
-                                    writer.flush()
-                                    writer.close()
+                        Role.Enumerator.toString() ->
+                        {
+                            val packedEnumArea = enumArea.pack()
+                            Log.d( "xxx", packedEnumArea )
 
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
-                                }
+                            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                            val file = File(root, "EnumArea.${Date().time}.json")
+                            val writer = FileWriter(file)
+                            writer.append(packedEnumArea)
+                            writer.flush()
+                            writer.close()
 
-                                Role.Enumerator.toString() ->
-                                {
-                                    val packedEnumArea = enumArea.pack()
-                                    Log.d( "xxx", packedEnumArea )
-
-                                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                                    val file = File(root, "EnumArea.${Date().time}.json")
-                                    val writer = FileWriter(file)
-                                    writer.append(packedEnumArea)
-                                    writer.flush()
-                                    writer.close()
-
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

@@ -223,6 +223,7 @@
     <string name="warning">"Warning!"</string>
     <string name="duplicate_warning">"This new location is extremely close to an existing location.  Are you sure that you want to add it?"</string>
     <string name="missing_team">"Configuration is missing a Team definition"</string>
+    <string name="add_another">"ADD ANOTHER CHOICE"</string>
     <string name="collection_teams">"Collection Teams"</string>
     <string name="begin_field_block">Begin Field Block</string>
     <string name="save_and_end_block">Save and End Block</string>
@@ -230,7 +231,7 @@
     <string name="current_location_not_set">Oops! Your current location is not set.  Tap the compass toolbar item to center on your current location.</string>
     <string name="option_item_name">Enter the option item name</string>
     <string name="config_saved_doc">"Configuration has been saved to the Documents directory."</string>
-    <string name="add_another">"ADD ANOTHER CHOICE"</string>
+    <string name="export_collection_data">"Export Collection Data"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

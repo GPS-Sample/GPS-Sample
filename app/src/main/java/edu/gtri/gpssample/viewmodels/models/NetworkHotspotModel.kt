@@ -23,6 +23,7 @@ import edu.gtri.gpssample.constants.NetworkStatus
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.SampleArea
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
@@ -221,11 +222,28 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     enumArea?.let { enumArea ->
                         for (location in enumArea.locations)
                         {
-                            DAO.locationDAO.importLocation( location, enumArea )
+                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         }
                         // replace the enumArea from currentConfig with this one
                         sharedViewModel?.replaceEnumArea(enumArea)
                         sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
+                    }
+                }
+            }
+            NetworkCommand.NetworkSampleAreaExport ->
+            {
+                message.payload?.let { payload ->
+                    val sampleArea = SampleArea.unpack( payload )
+
+                    Log.d( "xxx", payload )
+
+                    sampleArea?.let { sampleArea ->
+                        for (location in sampleArea.locations)
+                        {
+                            DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
+                        }
+//                        sharedViewModel?.replaceEnumArea(enumArea)
+//                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                     }
                 }
             }
