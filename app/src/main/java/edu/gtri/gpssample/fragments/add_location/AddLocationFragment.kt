@@ -1,11 +1,9 @@
 package edu.gtri.gpssample.fragments.add_location
 
-import android.R.attr
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -32,26 +30,26 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 {
     private var _binding: FragmentAddLocationBinding? = null
     private val binding get() = _binding!!
-    private val OPEN_DOCUMENT_CODE = 2
 
     private lateinit var study: Study
     private lateinit var config: Config
     private lateinit var locationDate: Date
     private lateinit var enumArea : EnumArea
     private lateinit var location: Location
-    private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
+        Log.d( "xxx", "onCreate" )
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        Log.d( "xxx", "onCreateView" )
         _binding = FragmentAddLocationBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -60,25 +58,27 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.d( "xxx", "onViewCreated" )
+
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
-        }
+        } ?: Log.d( "xxx", "config did not get inited" )
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
-        }
+        } ?: Log.d( "xxx", "study did not get inited" )
 
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
             location = it
-        }
+        } ?: Log.d( "xxx", "location did not get inited" )
 
         sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let {
             locationDate = it
-        }
+        } ?: Log.d( "xxx", "locationDate did not get inited" )
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
             enumArea = it
-        }
+        } ?: Log.d( "xxx", "enumArea did not get inited" )
 
         val components = location.uuid.split("-" )
 
@@ -99,18 +99,18 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             binding.lastUpdatedLayout.visibility = View.GONE
         }
 
+        if (location.imageFileName.isNotEmpty())
+        {
+            binding.landmarkImageView.setImageBitmap(BitmapFactory.decodeFile(location.imageFileName))
+        }
+
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_landmark_message),
                 resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
         }
 
         binding.addPhotoImageView.setOnClickListener {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            resultLauncher.launch(cameraIntent)
-//            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-//            intent.addCategory(Intent.CATEGORY_OPENABLE)
-//            intent.type = "image/*"
-//            startActivityForResult(intent, OPEN_DOCUMENT_CODE)
+            resultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
         }
 
         binding.cancelButton.setOnClickListener {
@@ -152,6 +152,7 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             if (result?.data != null)
             {
+                Log.d( "xxx", "return from camera" )
                 val bitmap = result.data?.extras?.get("data") as Bitmap
                 binding.landmarkImageView.setImageBitmap(bitmap)
                 saveBitmap( bitmap )
@@ -161,46 +162,27 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     fun saveBitmap(bitmap: Bitmap)
     {
+        Log.d( "xxx", "saveBitmap" )
         try
         {
+            val imageFileName = UUID.randomUUID().toString() + ".jpg"
             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-            val file = File(root, UUID.randomUUID().toString() + ".jpg")
+            val file = File(root, imageFileName)
             val fileOutputStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
-
-//            val fileName: String = UUID.randomUUID().toString() + ".jpg"
-//            val values = ContentValues()
-//            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-//            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-//            {
-//                values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/")
-//                values.put(MediaStore.MediaColumns.IS_PENDING, 1)
-//            }
-//            else
-//            {
-//                val directory: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-//                val file = File(directory, fileName)
-//                values.put(MediaStore.MediaColumns.DATA, file.getAbsolutePath())
-//            }
-//
-//            val uri = activity!!.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-//
-//            uri?.let { uri ->
-//                activity!!.contentResolver.openOutputStream(uri).use { output ->
-//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output)
-//                }
-//            }
+            location.imageFileName = file.absolutePath
         } catch (e: Exception) {
             Log.d( "xxx", e.stackTrace.toString())
         }
     }
+
     override fun onDestroyView()
     {
         super.onDestroyView()
 
+        Log.d( "xxx", "onDestroyView")
         _binding = null
     }
 }
