@@ -158,6 +158,8 @@ class LocationDAO(private var dao: DAO)
         values.put( DAO.COLUMN_LOCATION_LATITUDE, location.latitude )
         values.put( DAO.COLUMN_LOCATION_LONGITUDE, location.longitude )
         values.put( DAO.COLUMN_LOCATION_IS_LANDMARK, location.isLandmark.toInt())
+        values.put( DAO.COLUMN_LOCATION_DESCRIPTION, location.description)
+        values.put( DAO.COLUMN_LOCATION_IMAGE_FILE_NAME, location.imageFileName)
     }
 
     @SuppressLint("Range")
@@ -170,8 +172,10 @@ class LocationDAO(private var dao: DAO)
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LONGITUDE))
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
+        val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_DESCRIPTION))
+        val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_FILE_NAME))
 
-        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, ArrayList<EnumerationItem>())
+        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageFileName, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?

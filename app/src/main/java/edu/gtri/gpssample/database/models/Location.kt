@@ -17,10 +17,12 @@ data class Location(
     var latitude : Double,
     var longitude : Double,
     var isLandmark: Boolean,
+    var description: String,
+    var imageFileName: String,
     var enumerationItems: ArrayList<EnumerationItem>)
 {
-    constructor(type: LocationType, latitude: Double, longitude: Double, isLandmark: Boolean ) :
-            this( null, Date().time, UUID.randomUUID().toString(), type, latitude, longitude, isLandmark, ArrayList<EnumerationItem>())
+    constructor(type: LocationType, latitude: Double, longitude: Double, isLandmark: Boolean, description: String ) :
+            this( null, Date().time, UUID.randomUUID().toString(), type, latitude, longitude, isLandmark, description, "", ArrayList<EnumerationItem>())
 
     fun pack() : String
     {
