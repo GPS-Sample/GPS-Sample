@@ -106,12 +106,13 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
-                enumerationItem.fieldDataList?.let { fieldDataList ->
-                    for (fieldData in fieldDataList)
-                    {
-//                        fieldData.id = null
-
-                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                if (geoArea is EnumArea)
+                {
+                    enumerationItem.fieldDataList?.let { fieldDataList ->
+                        for (fieldData in fieldDataList)
+                        {
+                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                        }
                     }
                 }
 

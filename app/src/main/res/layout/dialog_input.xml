@@ -13,7 +13,7 @@
         android:layout_marginTop="0dp"
         android:layout_marginRight="20dp"
         android:focusable="false"
-        android:text="Team Name"
+        android:text="@string/team_name"
         android:gravity="center_vertical"
         android:textColor="@color/primary_textcolor"
         android:textSize="16sp" />

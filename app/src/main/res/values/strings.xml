@@ -223,6 +223,7 @@
     <string name="warning">"Warning!"</string>
     <string name="duplicate_warning">"This new location is extremely close to an existing location.  Are you sure that you want to add it?"</string>
     <string name="missing_team">"Configuration is missing a Team definition"</string>
+    <string name="add_another">"ADD ANOTHER CHOICE"</string>
     <string name="collection_teams">"Collection Teams"</string>
     <string name="begin_field_block">Begin Field Block</string>
     <string name="save_and_end_block">Save and End Block</string>
@@ -230,7 +231,31 @@
     <string name="current_location_not_set">Oops! Your current location is not set.  Tap the compass toolbar item to center on your current location.</string>
     <string name="option_item_name">Enter the option item name</string>
     <string name="config_saved_doc">"Configuration has been saved to the Documents directory."</string>
-    <string name="add_another">"ADD ANOTHER CHOICE"</string>
+    <string name="export_collection_data">"Export Collection Data"</string>
+    <string name="import_field_data">"Import Field Data"</string>
+    <string name="select_a_date">Select a date</string>
+    <string name="select">Select</string>
+    <string name="team_name">Team Name</string>
+    <string name="launch_survey">Launch Survey</string>
+    <string name="mark_as_incomplete">Mark as incomplete</string>
+    <string name="enter_current_pin">Enter Current PIN</string>
+    <string name="enter_new_pin">Enter New PIN</string>
+    <string name="re_enter_new_pin">Re-Enter New PIN</string>
+    <string name="select_a_time">Select a time</string>
+    <string name="uuid">UUID</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="last_updated">Last Updated</string>
+    <string name="status">Status</string>
+    <string name="description">Description</string>
+    <string name="add_image">Add Image</string>
+    <string name="enumeration_areas">Enumeration Areas</string>
+    <string name="enter_team_name">Enter Team Name</string>
+    <string name="assign_households">Assign Households</string>
+    <string name="sampling_type">Sampling Type</string>
+    <string name="generating_qr_code">Generating QR Code...</string>
+    <string name="samples">Samples</string>
+    <string name="you_don_t_have_any_samples_for_this_study">You do not have any samples for this study</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

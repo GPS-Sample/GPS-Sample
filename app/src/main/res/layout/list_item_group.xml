@@ -32,15 +32,14 @@
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-thin"
                 android:gravity="center"
-                android:paddingLeft="20dp"
-                android:text="9999"
+                android:paddingStart="20dp"
                 android:textColor="@android:color/black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <RelativeLayout
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:layout_width="50dp"
             android:layout_height="50dp">
 

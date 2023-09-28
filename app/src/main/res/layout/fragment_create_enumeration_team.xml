@@ -15,7 +15,7 @@
         android:layout_marginRight="20dp"
         android:gravity="center_vertical"
         android:textColor="@color/primary"
-        android:text="Team Name"
+        android:text="@string/team_name"
         android:textSize="17sp"
         android:textStyle="bold" />
 
@@ -25,7 +25,7 @@
         android:layout_height="50dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:hint="Enter Team Name"
+        android:hint="@string/enter_team_name"
         android:imeOptions="actionDone"
         android:inputType="textCapWords"/>
 
@@ -35,7 +35,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:gravity="center_vertical"
-        android:text="Assign Households"
+        android:text="@string/assign_households"
         android:textColor="@color/primary"
         android:textSize="17sp"
         android:textStyle="bold" />

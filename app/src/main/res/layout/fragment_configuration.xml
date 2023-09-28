@@ -177,7 +177,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:gravity="center_vertical"
-                    android:text="Enumeration Areas"
+                    android:text="@string/enumeration_areas"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
@@ -235,6 +235,6 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:visibility="@{(viewModel.currentUserRole != Role.Enumerator)  ? View.VISIBLE : View.GONE}"
-            android:text="@string/import_enumeration" />
+            android:text="@string/import_field_data" />
     </LinearLayout>
 </layout>

@@ -306,8 +306,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                         if (enumAreas.isNotEmpty() && studies.isNotEmpty())
                         {
-                            val enumArea = enumAreas[0]
                             val study = studies[0]
+                            val enumArea = enumAreas[0]
                             val sampleArea = study.sampleArea
 
                             sampleArea?.let { sampleArea ->
@@ -315,7 +315,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                                 // find the selected collection Team
                                 val collectionTeams = sampleArea.collectionTeams.filter {
                                     it.id?.let { id ->
-                                        id == enumArea.selectedTeamId
+                                        id == sampleArea.selectedTeamId
                                     } ?: false
                                 }
 
@@ -324,8 +324,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                                     val collectionTeam = collectionTeams[0]
 
                                     sharedViewModel.createStudyModel.setStudy( study )
-                                    sharedViewModel.teamViewModel.setCurrentTeam( collectionTeam )
                                     samplingViewModel.setCurrentSampleArea( sampleArea )
+                                    sharedViewModel.teamViewModel.setCurrentTeam( collectionTeam )
+                                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                                     samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
                                     findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                                 }

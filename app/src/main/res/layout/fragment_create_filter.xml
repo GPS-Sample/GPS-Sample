@@ -147,7 +147,7 @@
                             android:entries="@{viewModel.createStudyModel.SampleTypes}"
                             android:selectedItemPosition="@={viewModel.createFilterModel.samplingTypePosition}"
                             android:onItemSelected="@{viewModel.createFilterModel::onSampleTypeSelected}"
-                            android:contentDescription="Sampling Type"/>
+                            android:contentDescription="@string/sampling_type"/>
                     </FrameLayout>
 
                 </LinearLayout>

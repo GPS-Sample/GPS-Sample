@@ -34,7 +34,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:gravity="center_vertical"
-                    android:text="Description" />
+                    android:text="@string/description" />
 
                 <EditText
                     android:id="@+id/edit_text"
@@ -75,7 +75,7 @@
             android:layout_marginEnd="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Add Image" />
+            android:text="@string/add_image" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -91,7 +91,7 @@
                 android:layout_margin="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Cancel" />
+                android:text="@string/cancel" />
 
             <Button
                 android:id="@+id/save_button"

@@ -93,7 +93,7 @@
                 android:entries="@{viewModel.createStudyModel.samplingMethods}"
                 android:selectedItemPosition="@={viewModel.createStudyModel.samplingMethodPosition}"
                 android:onItemSelected="@{viewModel.createStudyModel::onSamplingMethodSelected}"
-                android:contentDescription="Sampling Method"/>
+                android:contentDescription="@string/sampling_method"/>
         </FrameLayout>
 
         <TextView
@@ -123,7 +123,7 @@
                 android:imeOptions="actionDone"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
                 android:text="@={viewModel.createStudyModel.currentSampleSize}"
                 android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
             <FrameLayout
@@ -142,7 +142,7 @@
                 android:entries="@{viewModel.createStudyModel.SampleTypes}"
                 android:selectedItemPosition="@={viewModel.createStudyModel.samplingTypePosition}"
                 android:onItemSelected="@{viewModel.createStudyModel::onSampleTypeSelected}"
-                android:contentDescription="Sampling Type"/>
+                android:contentDescription="@string/sampling_type"/>
             </FrameLayout>
 
         </LinearLayout>

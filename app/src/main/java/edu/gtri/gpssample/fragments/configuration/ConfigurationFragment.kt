@@ -114,7 +114,7 @@ class ConfigurationFragment : Fragment(),
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.import_enumeration), resources.getString(R.string.select_import_method_message),
+            ConfirmationDialog( activity, resources.getString(R.string.import_field_data), resources.getString(R.string.select_import_method_message),
                 resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
         }
 
@@ -343,7 +343,7 @@ class ConfigurationFragment : Fragment(),
                         enumArea?.let { enumArea ->
                             for (location in enumArea.locations)
                             {
-                                DAO.locationDAO.importLocation(location, enumArea)
+                                DAO.locationDAO.createOrUpdateLocation(location, enumArea)
                             }
 
                             // replace the enumArea from currentConfig with this one
