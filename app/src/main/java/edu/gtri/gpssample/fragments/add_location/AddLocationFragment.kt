@@ -64,6 +64,11 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             config = it
         } ?: Log.d( "xxx", "config did not get inited" )
 
+        if (!this::config.isInitialized)
+        {
+            return
+        }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
         } ?: Log.d( "xxx", "study did not get inited" )
@@ -101,7 +106,15 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (location.imageFileName.isNotEmpty())
         {
-            binding.landmarkImageView.setImageBitmap(BitmapFactory.decodeFile(location.imageFileName))
+            try
+            {
+                val bitmap = BitmapFactory.decodeFile(location.imageFileName)
+                binding.landmarkImageView.setImageBitmap(bitmap)
+            }
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTrace.toString())
+            }
         }
 
         binding.deleteImageView.setOnClickListener {
@@ -182,7 +195,7 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onDestroyView()
 
-        Log.d( "xxx", "onDestroyView")
+        Log.d( "xxx", "onDestroyView!!!!!!!!!!!!!!!!!!!!!!!!!!")
         _binding = null
     }
 }
