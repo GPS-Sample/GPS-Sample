@@ -77,6 +77,7 @@ class PerformEnumerationFragment : Fragment(),
     private var gpsLocation: Point? = null
 
     private var dropMode = false
+    private var isLandmark = false
     private var showCurrentLocation = true
 
     private var _binding: FragmentPerformEnumerationBinding? = null
@@ -88,7 +89,8 @@ class PerformEnumerationFragment : Fragment(),
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
 
     private val kExportTag = 2
-    private val kSelectLocationTag = 3
+    private val kAddHouseholdTag = 3
+    private val kAddLandmarkTag = 4
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -192,8 +194,10 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
+            isLandmark = false
+
             ConfirmationDialog( activity, resources.getString(R.string.select_location),
-                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kSelectLocationTag, this)
+                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
         }
 
         binding.addLandmarkButton.setOnClickListener {
@@ -202,6 +206,11 @@ class PerformEnumerationFragment : Fragment(),
                 dropMode = false
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
+
+            isLandmark = true
+
+            ConfirmationDialog( activity, resources.getString(R.string.select_location),
+                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddLandmarkTag, this)
         }
 
         binding.exportButton.setOnClickListener {
@@ -292,7 +301,25 @@ class PerformEnumerationFragment : Fragment(),
                 if (location.isLandmark)
                 {
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    mapboxManager.addMarker( point, R.drawable.location_blue )
+                    val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+
+                    pointAnnotation?.let {
+                        pointHashMap[pointAnnotation.id] = location
+                        allPointAnnotations.add( pointAnnotation )
+                    }
+
+//                    pointAnnotationManager.apply {
+//                        addClickListener(
+//                            OnPointAnnotationClickListener { pointAnnotation ->
+//                                pointHashMap[pointAnnotation.id]?.let { location ->
+//                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+//                                    sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+//                                    findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+//                                }
+//                                true
+//                            }
+//                        )
+//                    }
                 }
                 else
                 {
@@ -336,6 +363,7 @@ class PerformEnumerationFragment : Fragment(),
                                 pointHashMap[pointAnnotation.id]?.let { location ->
                                     sharedViewModel.locationViewModel.setCurrentLocation(location)
                                     sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
                                     if (location.isLandmark)
                                     {
                                         findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
@@ -361,7 +389,7 @@ class PerformEnumerationFragment : Fragment(),
         if (dropMode)
         {
             dropMode = false
-            createLocation( point, false )
+            createLocation( point, false, isLandmark )
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             return true
         }
@@ -369,7 +397,7 @@ class PerformEnumerationFragment : Fragment(),
         return false
     }
 
-    fun createLocation( point: Point, isLocationUpdateTimeValid: Boolean )
+    fun createLocation( point: Point, isLocationUpdateTimeValid: Boolean, isLandmark: Boolean )
     {
         enumArea.locations.map{
             val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
@@ -381,7 +409,7 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
-        val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false)
+        val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
         enumArea.locations.add(location)
 
@@ -432,10 +460,10 @@ class PerformEnumerationFragment : Fragment(),
             return
         }
 
-        if (tag == kSelectLocationTag)
+        if (tag == kAddHouseholdTag || tag == kAddLandmarkTag)
         {
             gpsLocation?.let {
-                createLocation( it, true )
+                createLocation( it, true, isLandmark )
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
 
             return
@@ -475,7 +503,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         if (tag is Point)
         {
-            val location = Location( LocationType.Enumeration, tag.latitude(), tag.longitude(), false)
+            val location = Location( LocationType.Enumeration, tag.latitude(), tag.longitude(), false, "")
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
 
@@ -495,8 +523,9 @@ class PerformEnumerationFragment : Fragment(),
         {
             when(tag)
             {
-                kSelectLocationTag -> {
+                kAddHouseholdTag, kAddLandmarkTag -> {
                     dropMode = true
+                    isLandmark = isLandmark
                     binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
 
