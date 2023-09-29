@@ -205,21 +205,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
-
-//            for (location in enumArea.locations)
-//            {
-//                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
-//                {
-//                    // assuming only 1 enumeration item per location, for now...
-//                    val sampledItem = location.enumerationItems[0]
-//
-//                    if (sampledItem.samplingState == SamplingState.Sampled)
-//                    {
-//                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-//                        mapboxManager.addMarker( point, R.drawable.home_black )
-//                    }
-//                }
-//            }
         }
     }
 
