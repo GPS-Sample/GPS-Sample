@@ -137,8 +137,8 @@
             app:destination="@id/AddHouseholdFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_AddLocationFragment"
-            app:destination="@id/AddLocationFragment"/>
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_CreateStudyFragment"
@@ -303,8 +303,8 @@
             app:destination="@id/AddHouseholdFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_AddLocationFragment"
-            app:destination="@id/AddLocationFragment"/>
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
     </fragment>
 
     <fragment
@@ -323,8 +323,8 @@
             app:destination="@id/AddHouseholdFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_AddLocationFragment"
-            app:destination="@id/AddLocationFragment"/>
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
     </fragment>
 
     <fragment
@@ -334,20 +334,23 @@
     </fragment>
 
     <fragment
-        android:id="@+id/AddLocationFragment"
-        android:name="edu.gtri.gpssample.fragments.add_location.AddLocationFragment"
-        tools:layout="@layout/fragment_add_location">
+        android:id="@+id/AddLandmarkFragment"
+        android:name="edu.gtri.gpssample.fragments.add_landmark.AddLandmarkFragment"
+        tools:layout="@layout/fragment_add_landmark">
     </fragment>
+
     <fragment
         android:id="@+id/ClientFragment"
         android:name="edu.gtri.gpssample.fragments.networkconnectiondialog.ClientConnectFragment"
         tools:layout="@layout/fragment_client_connect">
     </fragment>
+
     <fragment
         android:id="@+id/HotspotFragment"
         android:name="edu.gtri.gpssample.fragments.hotspot.HotspotFragment"
         tools:layout="@layout/fragment_hotspot">
     </fragment>
+
     <dialog
         android:id="@+id/SelectRuleDialogFragment"
         android:name="edu.gtri.gpssample.dialogs.SelectRuleDialogFragment"

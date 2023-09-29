@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.add_location
+package edu.gtri.gpssample.fragments.add_landmark
 
 import android.app.Activity
 import android.content.Intent
@@ -18,7 +18,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.databinding.FragmentAddLocationBinding
+import edu.gtri.gpssample.databinding.FragmentAddLandmarkBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.io.File
@@ -26,9 +26,9 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
-    private var _binding: FragmentAddLocationBinding? = null
+    private var _binding: FragmentAddLandmarkBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var study: Study
@@ -50,7 +50,7 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         Log.d( "xxx", "onCreateView" )
-        _binding = FragmentAddLocationBinding.inflate(inflater, container, false)
+        _binding = FragmentAddLandmarkBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -144,7 +144,7 @@ class AddLocationFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddLocationFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddLandmarkFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun didSelectLeftButton(tag: Any?)

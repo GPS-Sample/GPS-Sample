@@ -366,7 +366,7 @@ class PerformEnumerationFragment : Fragment(),
 
                                     if (location.isLandmark)
                                     {
-                                        findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                                        findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
                                     }
                                     else
                                     {
@@ -418,7 +418,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (location.isLandmark)
         {
-            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
         }
         else
         {
@@ -444,7 +444,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (location.isLandmark)
         {
-            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
         }
         else
         {
@@ -512,7 +512,7 @@ class PerformEnumerationFragment : Fragment(),
 
             if (location.isLandmark)
             {
-                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
             }
             else
             {

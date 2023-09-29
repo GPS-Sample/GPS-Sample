@@ -22,7 +22,7 @@ enum class FragmentNumber( val value: Int ) {
     SignUpFragment(1019 ),
     SystemStatusFragment(1020 ),
     AddHouseholdFragment(1021 ),
-    AddLocationFragment(1022 ),
+    AddLandmarkFragment(1022 ),
     ConfigurationFragment(1023),
     CreateEnumerationTeamFragment(1024),
     CreateCollectionTeamFragment(1025),
