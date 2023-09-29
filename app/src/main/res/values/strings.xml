@@ -258,6 +258,7 @@
     <string name="you_don_t_have_any_samples_for_this_study">You do not have any samples for this study</string>
 
     <string name="delete_landmark_message">"Are you sure you want to permanently delete this landmark?"</string>
+    <string name="subaddress">Subaddress</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

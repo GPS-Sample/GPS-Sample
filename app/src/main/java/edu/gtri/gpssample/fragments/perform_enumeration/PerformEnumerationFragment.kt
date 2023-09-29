@@ -308,6 +308,8 @@ class PerformEnumerationFragment : Fragment(),
                         allPointAnnotations.add( pointAnnotation )
                     }
 
+                    // not sure why this click is handled by the non location marker click listener?
+
 //                    pointAnnotationManager.apply {
 //                        addClickListener(
 //                            OnPointAnnotationClickListener { pointAnnotation ->
@@ -323,7 +325,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
-                    var resourceId = R.drawable.home_black
+                    var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_black else R.drawable.home_black
 
                     var numComplete = 0
 
@@ -334,7 +336,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceId = R.drawable.home_red
+                                resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_red else R.drawable.home_red
                                 break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
@@ -346,7 +348,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
-                        resourceId = R.drawable.home_green
+                        resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_green else R.drawable.home_green
                     }
 
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
@@ -370,7 +372,7 @@ class PerformEnumerationFragment : Fragment(),
                                     }
                                     else
                                     {
-                                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                                        navigateToAddHouseholdFragment()
                                     }
                                 }
                                 true
@@ -382,6 +384,27 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+    }
+
+    fun navigateToAddHouseholdFragment()
+    {
+        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+
+            if (location.enumerationItems.isEmpty())
+            {
+                sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            }
+            else if (location.enumerationItems.size == 1)
+            {
+                sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            }
+            else
+            {
+                findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+            }
+        }
     }
 
     override fun onMapClick(point: com.mapbox.geojson.Point): Boolean
@@ -422,7 +445,7 @@ class PerformEnumerationFragment : Fragment(),
         }
         else
         {
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            navigateToAddHouseholdFragment()
         }
     }
 
@@ -448,7 +471,7 @@ class PerformEnumerationFragment : Fragment(),
         }
         else
         {
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            navigateToAddHouseholdFragment()
         }
     }
 
@@ -516,7 +539,7 @@ class PerformEnumerationFragment : Fragment(),
             }
             else
             {
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                navigateToAddHouseholdFragment()
             }
         }
         else
