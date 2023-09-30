@@ -259,6 +259,11 @@
 
     <string name="delete_landmark_message">"Are you sure you want to permanently delete this landmark?"</string>
     <string name="subaddress">Subaddress</string>
+    <string name="sampled">Sampled</string>
+    <string name="completed_enumeration">Completed Enumeration</string>
+    <string name="incomplete_enumeration">Incomplete Enumeration</string>
+    <string name="incomplete_collection">Incomplete Collection</string>
+    <string name="completed_collection">Completed Collection</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

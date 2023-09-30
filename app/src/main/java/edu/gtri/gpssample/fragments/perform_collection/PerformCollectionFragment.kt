@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.*
@@ -65,7 +66,7 @@ class PerformCollectionFragment : Fragment(),
 
     private var enumAreaId = 0
     private val binding get() = _binding!!
-    private val pointHashMap = java.util.HashMap<Long, Location>()
+    private val locationHashMap = java.util.HashMap<Long, Location>()
     private var _binding: FragmentPerformCollectionBinding? = null
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
@@ -129,10 +130,13 @@ class PerformCollectionFragment : Fragment(),
 
         val sampledLocations = ArrayList<Location>()
 
-        sampleArea.locations.map {
-            if (it.enumerationItems[0].samplingState == SamplingState.Sampled)
+        sampleArea.locations.map { location ->
+            for (enumurationItem in location.enumerationItems)
             {
-                sampledLocations.add( it )
+                if (enumurationItem.samplingState == SamplingState.Sampled)
+                {
+                    sampledLocations.add( location )
+                }
             }
         }
 
@@ -238,7 +242,7 @@ class PerformCollectionFragment : Fragment(),
 
                     if (sampledItem.samplingState == SamplingState.Sampled)
                     {
-                        var color = R.drawable.home_black
+                        var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_orange else R.drawable.home_orange
 
                         var numComplete = 0
 
@@ -246,14 +250,8 @@ class PerformCollectionFragment : Fragment(),
                         {
                             val enumerationItem = item as EnumerationItem?
 
-                            if(enumerationItem != null)
-                            {
-                                if (enumerationItem.collectionState == CollectionState.Incomplete)
-                                {
-                                    color = R.drawable.home_orange
-                                    break
-                                }
-                                else if (enumerationItem.collectionState == CollectionState.Complete)
+                            enumerationItem?.let {
+                                if (enumerationItem.collectionState == CollectionState.Complete)
                                 {
                                     numComplete++
                                 }
@@ -262,23 +260,31 @@ class PerformCollectionFragment : Fragment(),
 
                         if (numComplete == location.enumerationItems.size)
                         {
-                            color = R.drawable.home_purple
+                            resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_purple else R.drawable.home_purple
                         }
 
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, color )
+                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
                         pointAnnotation?.let { pointAnnotation ->
                             allPointAnnotations.add( pointAnnotation )
-                            pointHashMap[pointAnnotation.id] = location
+                            locationHashMap[pointAnnotation.id] = location
                         }
 
                         pointAnnotationManager.apply {
                             addClickListener(
                                 OnPointAnnotationClickListener { pointAnnotation ->
-                                    pointHashMap[pointAnnotation.id]?.let { location ->
+                                    locationHashMap[pointAnnotation.id]?.let { location ->
                                         sharedViewModel.locationViewModel.setCurrentLocation(location)
-                                        LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+
+                                        if (location.enumerationItems.size > 1)
+                                        {
+                                            findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment)
+                                        }
+                                        else
+                                        {
+                                            LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+                                        }
                                     }
                                     true
                                 }

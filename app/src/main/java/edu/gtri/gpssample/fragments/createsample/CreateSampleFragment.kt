@@ -115,14 +115,16 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
             val sampleArea = DAO.sampleAreaDAO.getSampleArea( study )
 
-            sampleArea?.let {
+            if (sampleArea != null)
+            {
                 binding.sampleButton.visibility = View.GONE
                 samplingViewModel.currentSampleArea = MutableLiveData(sampleArea)
-            } ?: {
+            }
+            else
+            {
                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{ enumArea->
                     samplingViewModel.createSampleArea(enumArea)
                 }
-
             }
         }
 

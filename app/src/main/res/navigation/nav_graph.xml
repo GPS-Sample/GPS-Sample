@@ -314,7 +314,8 @@
     <fragment
         android:id="@+id/PerformCollectionFragment"
         android:name="edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment"
-        tools:layout="@layout/fragment_perform_enumeration">
+        tools:layout="@layout/fragment_perform_collection">
+
         <action
             android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
             app:destination="@id/NetworkConnectionDialogFragment" />
@@ -323,12 +324,22 @@
             app:popUpTo="@id/ManageConfigurationsFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_AddHouseholdFragment"
-            app:destination="@id/AddHouseholdFragment"/>
+            android:id="@+id/action_navigate_to_PerformMultiCollectionFragment"
+            app:destination="@id/PerformMultiCollectionFragment"/>
 
-        <action
-            android:id="@+id/action_navigate_to_AddLandmarkFragment"
-            app:destination="@id/AddLandmarkFragment"/>
+<!--        <action-->
+<!--            android:id="@+id/action_navigate_to_AddHouseholdFragment"-->
+<!--            app:destination="@id/AddHouseholdFragment"/>-->
+
+<!--        <action-->
+<!--            android:id="@+id/action_navigate_to_AddLandmarkFragment"-->
+<!--            app:destination="@id/AddLandmarkFragment"/>-->
+    </fragment>
+
+    <fragment
+        android:id="@+id/PerformMultiCollectionFragment"
+        android:name="edu.gtri.gpssample.fragments.perform_multi_collection.PerformMultiCollectionFragment"
+        tools:layout="@layout/fragment_perform_multi_collection">
     </fragment>
 
     <fragment
