@@ -3,6 +3,7 @@ package edu.gtri.gpssample.viewmodels.models
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import java.util.*
 
@@ -10,11 +11,13 @@ class LocationViewModel
 {
     private var _currentLocation : MutableLiveData<Location>? = null
     private var _currentLocationUpdateTime : MutableLiveData<Date>? = null
+    private var _currentEnumerationItem : MutableLiveData<EnumerationItem>? = null
     private var _isLocationUpdateTimeValid : MutableLiveData<Boolean> = MutableLiveData(false)
 
     var currentLocation : LiveData<Location>? = _currentLocation
     var currentLocationUpdateTime : LiveData<Date>? = _currentLocationUpdateTime
     var isLocationUpdateTimeValid : LiveData<Boolean> = _isLocationUpdateTimeValid
+    var currentEnumerationItem : LiveData<EnumerationItem>? = _currentEnumerationItem
 
     fun setIsLocationUpdateTimeValid( value: Boolean )
     {
@@ -26,6 +29,12 @@ class LocationViewModel
     {
         _currentLocation = MutableLiveData(location)
         currentLocation = _currentLocation
+    }
+
+    fun setCurrentEnumerationItem(enumerationItem: EnumerationItem)
+    {
+        _currentEnumerationItem = MutableLiveData(enumerationItem)
+        currentEnumerationItem = _currentEnumerationItem
     }
 
     fun setCurrentLocationUpdateTime(date: Date?)

@@ -101,27 +101,46 @@ class SamplingViewModel : ViewModel()
                 {
                     currentStudy?.value?.let{ study->
 
-                        // assuming only 1 enumeration item per location, for now...
-                        val sampledItem = location.enumerationItems[0]
+                        var resourceId: Int
 
-                        if(!_currentSampledItemsForSampling.contains(sampledItem))
+                        if (location.enumerationItems.size == 1)
                         {
-                            _currentSampledItemsForSampling.add(sampledItem)
+                            val sampledItem = location.enumerationItems[0]
+
+                            if(!_currentSampledItemsForSampling.contains(sampledItem))
+                            {
+                                _currentSampledItemsForSampling.add(sampledItem)
+                            }
+
+                            resourceId = when(sampledItem.samplingState)
+                            {
+                                SamplingState.None       -> R.drawable.home_black
+                                SamplingState.NotSampled -> R.drawable.home_green
+                                SamplingState.Sampled    -> R.drawable.home_blue
+                                SamplingState.Resampled  -> R.drawable.home_blue
+                                SamplingState.Invalid    -> R.drawable.home_red
+                            }
                         }
-
-                        Log.d( "xxx", sampledItem.samplingState.format )
-
-                        val color = when(sampledItem.samplingState)
+                        else
                         {
-                            SamplingState.None       -> R.drawable.home_black
-                            SamplingState.NotSampled -> R.drawable.home_grey
-                            SamplingState.Sampled    -> R.drawable.home_green
-                            SamplingState.Resampled  -> R.drawable.home_green
-                            SamplingState.Invalid    -> R.drawable.home_red
+                            resourceId = R.drawable.multi_home_green
+
+                            for (sampledItem in location.enumerationItems)
+                            {
+                                if(!_currentSampledItemsForSampling.contains(sampledItem))
+                                {
+                                    _currentSampledItemsForSampling.add(sampledItem)
+                                }
+
+                                if (sampledItem.samplingState == SamplingState.Sampled)
+                                {
+                                    resourceId = R.drawable.multi_home_blue
+                                }
+                            }
                         }
 
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, color )
+                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
                         pointAnnotation?.let { pointAnnotation ->
                             allPointAnnotations.add( pointAnnotation )
@@ -154,14 +173,14 @@ class SamplingViewModel : ViewModel()
 
             }
 
-            for(enumerationItem in _currentSampledItemsForSampling)
+            for(sampleItem in _currentSampledItemsForSampling)
             {
-                enumerationItem.samplingState = SamplingState.NotSampled
+                sampleItem.samplingState = SamplingState.NotSampled
 
                 // find and remove items that are not valid
-                if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                if (sampleItem.enumerationState == EnumerationState.Enumerated)
                 {
-                    validSamples.add(enumerationItem)
+                    validSamples.add(sampleItem)
                 }
 
                 // TODO: run through rules and filters, etc..
@@ -192,18 +211,19 @@ class SamplingViewModel : ViewModel()
                 val sampledIndices: ArrayList<Int> = ArrayList()
                 val sampleSize =  min(study.sampleSize,validSamples.size)
 
-                for (i in 0 until sampleSize) {
-
+                for (i in 0 until sampleSize)
+                {
                     var rnds = (0 until validSamples.size).random()
+
                     while(sampledIndices.contains(rnds))
                     {
                         rnds = (0 until validSamples.size).random()
                     }
+
                     sampledIndices.add(rnds)
-                    validSamples[rnds]?.samplingState = SamplingState.Sampled
+                    validSamples[rnds].samplingState = SamplingState.Sampled
                 }
             }
-
         }
 
         setSampleAreasForMap(mapboxManager,pointAnnotationManager)

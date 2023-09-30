@@ -1,17 +1,10 @@
 package edu.gtri.gpssample.fragments.add_household
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import android.view.*
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -27,7 +20,6 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.managers.UriManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
@@ -39,9 +31,9 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     private lateinit var study: Study
     private lateinit var config: Config
+    private lateinit var location: Location
     private lateinit var locationDate: Date
     private lateinit var enumArea : EnumArea
-    private lateinit var location: Location
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
@@ -78,6 +70,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             study = it
         }
 
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
+            enumArea = it
+        }
+
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
             location = it
         }
@@ -86,22 +82,23 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             locationDate = it
         }
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
-            enumArea = it
+        sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let {
+            enumerationItem = it
         }
 
-        // create an enumeration item
-        if(location.enumerationItems.isEmpty())
+        if (enumerationItem.id != null)
         {
-            enumerationItem = EnumerationItem()
-            location.enumerationItems.add(enumerationItem)
-        }
-        else
-        {
-            // TODO: COME UP WITH INTERFACE OR SOMETHING TO DEAL WITH MULTIPLE ENUMITEMS
-            val enum = location.enumerationItems[0] as? EnumerationItem
-            enum?.let{enum->
-                enumerationItem = enum
+            binding.addMultiButton.visibility = View.VISIBLE
+
+            binding.addMultiButton.setOnClickListener {
+                if (enumerationItem.subAddress.isEmpty())
+                {
+                    Toast.makeText(activity!!.applicationContext, "Please set the subaddress field, then save this enumeration item.", Toast.LENGTH_SHORT).show()
+                }
+                else
+                {
+                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                }
             }
         }
 
@@ -167,18 +164,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-//        if (enumData.imageFileName.isNotEmpty())
-//        {
-//            val uri = Uri.parse(enumData.imageFileName )
-//            activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-//            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-//            (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
-//            binding.imageView.setImageBitmap(bitmap)
-//        }
-
         val components = location.uuid.split("-" )
 
         binding.UUIDEditText.setText( components[0] )
+        binding.subaddressEditText.setText( enumerationItem.subAddress )
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
 
@@ -228,7 +217,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.saveButton.setOnClickListener {
-            AdditionalInfoDialog( activity, enumerationItem.incompleteReason, enumerationItem.notes, this)
+            if (location.enumerationItems.size > 0 && binding.subaddressEditText.text.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, "The Subaddress must be defined for a multi family location.", Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                AdditionalInfoDialog( activity, enumerationItem.incompleteReason, enumerationItem.notes, this)
+            }
         }
     }
 
@@ -262,6 +258,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         if (enumerationItem.id == null)
         {
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+            location.enumerationItems.add(enumerationItem)
         }
 
         if (incompleteReason.isNotEmpty())
@@ -271,9 +268,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 DAO.fieldDataDAO.updateFieldData( fieldData )
             }
 
-            enumerationItem.enumerationState = EnumerationState.Incomplete
-            enumerationItem.notes = notes
             enumerationItem.incompleteReason = incompleteReason
+            enumerationItem.enumerationState = EnumerationState.Incomplete
         }
         else
         {
@@ -318,34 +314,18 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
             }
 
-            enumerationItem.notes = notes
             enumerationItem.incompleteReason = ""
             enumerationItem.enumerationState = EnumerationState.Enumerated
         }
+
+        enumerationItem.notes = notes
+        enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
         sharedViewModel.currentConfiguration?.value?.let {config ->
             sharedViewModel.updateConfiguration()
         }
 
         findNavController().popBackStack()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-    {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == OPEN_DOCUMENT_CODE) {
-                data?.data?.let {uri ->
-                    activity!!.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(activity!!.getContentResolver(), uri)
-//                    (binding.imageView.layoutParams as ConstraintLayout.LayoutParams).dimensionRatio = "${bitmap.width}:${bitmap.height}"
-//                    binding.imageView.setImageBitmap(bitmap)
-//                    enumData.imageFileName = uri.toString()
-//                    DAO.enumDataDAO.updateEnumData( enumData )
-                }
-            }
-        }
     }
 
     override fun onDestroyView()

@@ -137,8 +137,8 @@
             app:destination="@id/AddHouseholdFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_AddLocationFragment"
-            app:destination="@id/AddLocationFragment"/>
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
 
         <action
             android:id="@+id/action_navigate_to_CreateStudyFragment"
@@ -303,14 +303,19 @@
             app:destination="@id/AddHouseholdFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_AddLocationFragment"
-            app:destination="@id/AddLocationFragment"/>
+            android:id="@+id/action_navigate_to_AddMultiHouseholdFragment"
+            app:destination="@id/AddMultiHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
     </fragment>
 
     <fragment
         android:id="@+id/PerformCollectionFragment"
         android:name="edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment"
-        tools:layout="@layout/fragment_perform_enumeration">
+        tools:layout="@layout/fragment_perform_collection">
+
         <action
             android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
             app:destination="@id/NetworkConnectionDialogFragment" />
@@ -319,35 +324,66 @@
             app:popUpTo="@id/ManageConfigurationsFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_AddHouseholdFragment"
-            app:destination="@id/AddHouseholdFragment"/>
+            android:id="@+id/action_navigate_to_PerformMultiCollectionFragment"
+            app:destination="@id/PerformMultiCollectionFragment"/>
 
-        <action
-            android:id="@+id/action_navigate_to_AddLocationFragment"
-            app:destination="@id/AddLocationFragment"/>
+<!--        <action-->
+<!--            android:id="@+id/action_navigate_to_AddHouseholdFragment"-->
+<!--            app:destination="@id/AddHouseholdFragment"/>-->
+
+<!--        <action-->
+<!--            android:id="@+id/action_navigate_to_AddLandmarkFragment"-->
+<!--            app:destination="@id/AddLandmarkFragment"/>-->
+    </fragment>
+
+    <fragment
+        android:id="@+id/PerformMultiCollectionFragment"
+        android:name="edu.gtri.gpssample.fragments.perform_multi_collection.PerformMultiCollectionFragment"
+        tools:layout="@layout/fragment_perform_multi_collection">
     </fragment>
 
     <fragment
         android:id="@+id/AddHouseholdFragment"
         android:name="edu.gtri.gpssample.fragments.add_household.AddHouseholdFragment"
         tools:layout="@layout/fragment_add_household">
+
+        <action
+            android:id="@+id/action_navigate_to_AddMultiHouseholdFragment"
+            app:destination="@id/AddMultiHouseholdFragment"/>
     </fragment>
 
     <fragment
-        android:id="@+id/AddLocationFragment"
-        android:name="edu.gtri.gpssample.fragments.add_location.AddLocationFragment"
-        tools:layout="@layout/fragment_add_location">
+        android:id="@+id/AddMultiHouseholdFragment"
+        android:name="edu.gtri.gpssample.fragments.add_multi_household.AddMultiHouseholdFragment"
+        tools:layout="@layout/fragment_add_multi_household">
+
+        <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
+            app:popUpTo="@id/PerformEnumerationFragment"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/AddLandmarkFragment"
+        android:name="edu.gtri.gpssample.fragments.add_landmark.AddLandmarkFragment"
+        tools:layout="@layout/fragment_add_landmark">
+    </fragment>
+
     <fragment
         android:id="@+id/ClientFragment"
         android:name="edu.gtri.gpssample.fragments.networkconnectiondialog.ClientConnectFragment"
         tools:layout="@layout/fragment_client_connect">
     </fragment>
+
     <fragment
         android:id="@+id/HotspotFragment"
         android:name="edu.gtri.gpssample.fragments.hotspot.HotspotFragment"
         tools:layout="@layout/fragment_hotspot">
     </fragment>
+
     <dialog
         android:id="@+id/SelectRuleDialogFragment"
         android:name="edu.gtri.gpssample.dialogs.SelectRuleDialogFragment"
@@ -362,12 +398,6 @@
         <action
             android:id="@+id/action_navigate_to_HotspotFragment"
             app:destination="@id/HotspotFragment" />
-<!--        <action-->
-<!--            android:id="@+id/action_FirstFragment_to_ClientFragment"-->
-<!--            app:destination="@id/ClientFragment" />-->
-<!--        <action-->
-<!--            android:id="@+id/action_navigate_to_FirstFragment"-->
-<!--            app:destination="@id/FirstFragment" />-->
     </dialog>
 
     <dialog

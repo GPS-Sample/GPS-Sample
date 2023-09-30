@@ -52,7 +52,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="Incomplete Enumeration"
+            android:text="@string/incomplete_enumeration"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />
@@ -78,7 +78,33 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="Completed Enumeration"
+            android:text="@string/completed_enumeration"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <ImageView
+            android:id="@+id/sampled_image_view"
+            android:layout_marginStart="10dp"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:srcCompat="@drawable/home_blue"/>
+
+        <TextView
+            android:id="@+id/sampled_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/sampled"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />
@@ -104,7 +130,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="Incomplete Collection"
+            android:text="@string/incomplete_collection"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />
@@ -131,7 +157,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="Completed Collection"
+            android:text="@string/completed_collection"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />

@@ -39,6 +39,7 @@ import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
 import edu.gtri.gpssample.databinding.FragmentHotspotBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
+import edu.gtri.gpssample.dialogs.MapLegendDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -115,15 +116,21 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
             val sampleArea = DAO.sampleAreaDAO.getSampleArea( study )
 
-            sampleArea?.let {
+            if (sampleArea != null)
+            {
                 binding.sampleButton.visibility = View.GONE
                 samplingViewModel.currentSampleArea = MutableLiveData(sampleArea)
-            } ?: {
+            }
+            else
+            {
                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{ enumArea->
                     samplingViewModel.createSampleArea(enumArea)
                 }
-
             }
+        }
+
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
         }
 
         binding.mapView.getMapboxMap().loadStyleUri(
@@ -205,21 +212,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
-
-//            for (location in enumArea.locations)
-//            {
-//                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
-//                {
-//                    // assuming only 1 enumeration item per location, for now...
-//                    val sampledItem = location.enumerationItems[0]
-//
-//                    if (sampledItem.samplingState == SamplingState.Sampled)
-//                    {
-//                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-//                        mapboxManager.addMarker( point, R.drawable.home_black )
-//                    }
-//                }
-//            }
         }
     }
 
