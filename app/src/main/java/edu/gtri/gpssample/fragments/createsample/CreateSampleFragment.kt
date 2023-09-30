@@ -39,6 +39,7 @@ import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
 import edu.gtri.gpssample.databinding.FragmentHotspotBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
+import edu.gtri.gpssample.dialogs.MapLegendDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -126,6 +127,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                     samplingViewModel.createSampleArea(enumArea)
                 }
             }
+        }
+
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
         }
 
         binding.mapView.getMapboxMap().loadStyleUri(
