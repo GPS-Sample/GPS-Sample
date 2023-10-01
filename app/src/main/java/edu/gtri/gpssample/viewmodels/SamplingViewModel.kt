@@ -134,7 +134,8 @@ class SamplingViewModel : ViewModel()
 
                                 if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
-                                    resourceId = R.drawable.multi_home_blue
+                                     resourceId = R.drawable.multi_home_blue
+                                    Log.d( "xxx", sampledItem.subAddress )
                                 }
                             }
                         }

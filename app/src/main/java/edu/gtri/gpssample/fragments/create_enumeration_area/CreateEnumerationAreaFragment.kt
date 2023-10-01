@@ -295,68 +295,67 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             for (location in enumArea.locations)
             {
-                if (location.isLandmark)
+                var resourceId = 0
+
+                if (location.enumerationItems.size == 0)
                 {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    mapboxManager.addMarker( point, R.drawable.location_blue )
+                    resourceId = R.drawable.home_black
+                }
+                else if (location.enumerationItems.size == 1)
+                {
+                    val enumerationItem = location.enumerationItems[0]
+
+                    if (enumerationItem.samplingState == SamplingState.Sampled)
+                    {
+                        resourceId = if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                    }
+                    else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                    {
+                        resourceId = R.drawable.home_black
+                    }
+                    else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                    {
+                        resourceId = R.drawable.home_red
+                    }
+                    else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                    {
+                        resourceId = R.drawable.home_green
+                    }
                 }
                 else
                 {
-                    var resourceId = R.drawable.home_black
-
-                    var numCollectionsComplete = 0
-                    var numEnumerationsComplete = 0
-
-                    for (item in location.enumerationItems)
+                    for (enumerationItem in location.enumerationItems)
                     {
-                        val enumerationItem = item as EnumerationItem?
-
-                        if (enumerationItem != null)
+                        if (enumerationItem.samplingState == SamplingState.Sampled)
                         {
                             if (enumerationItem.collectionState == CollectionState.Incomplete)
                             {
-                                resourceId = R.drawable.home_orange
+                                resourceId = R.drawable.multi_home_orange
                                 break
                             }
                             else if (enumerationItem.collectionState == CollectionState.Complete)
                             {
-                                numCollectionsComplete++
-                            }
-                            else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                            {
-                                resourceId = R.drawable.home_red
-                                break
-                            }
-                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                            {
-                                numEnumerationsComplete++
+                                resourceId = R.drawable.multi_home_purple
                             }
                         }
+                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                        {
+                            resourceId = R.drawable.multi_home_black
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            resourceId = R.drawable.multi_home_red
+                            break
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            resourceId = R.drawable.multi_home_green
+                        }
                     }
+                }
 
-                    if (numCollectionsComplete > 0)
-                    {
-                        if (numCollectionsComplete == location.enumerationItems.size)
-                        {
-                            resourceId = R.drawable.home_purple
-                        }
-                        else
-                        {
-                            resourceId = R.drawable.home_orange
-                        }
-                    }
-                    else if (numEnumerationsComplete > 0)
-                    {
-                        if (numEnumerationsComplete == location.enumerationItems.size)
-                        {
-                            resourceId = R.drawable.home_green
-                        }
-                        else
-                        {
-                            resourceId = R.drawable.home_red
-                        }
-                    }
-
+                if (resourceId > 0)
+                {
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
                     val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 

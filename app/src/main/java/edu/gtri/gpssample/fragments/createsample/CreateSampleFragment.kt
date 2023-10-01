@@ -118,7 +118,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
             if (sampleArea != null)
             {
-                binding.sampleButton.visibility = View.GONE
+//                binding.sampleButton.visibility = View.GONE
                 samplingViewModel.currentSampleArea = MutableLiveData(sampleArea)
             }
             else
