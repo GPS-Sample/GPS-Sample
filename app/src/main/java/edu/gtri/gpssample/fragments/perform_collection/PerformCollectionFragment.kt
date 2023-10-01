@@ -245,7 +245,7 @@ class PerformCollectionFragment : Fragment(),
 
                         if (sampledItem.samplingState == SamplingState.Sampled)
                         {
-                            if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                            resourceId = if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
                         }
                     }
                     else
