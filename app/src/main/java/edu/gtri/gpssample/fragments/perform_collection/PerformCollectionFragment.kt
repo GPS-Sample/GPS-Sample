@@ -128,20 +128,20 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
-        val sampledLocations = ArrayList<Location>()
+        val enumerationItems = ArrayList<EnumerationItem>()
 
         sampleArea.locations.map { location ->
             for (enumurationItem in location.enumerationItems)
             {
                 if (enumurationItem.samplingState == SamplingState.Sampled)
                 {
-                    sampledLocations.add( location )
+                    enumerationItems.add( enumurationItem )
                 }
             }
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( sampledLocations )
-        performCollectionAdapter.didSelectLocation = this::didSelectLocation
+        performCollectionAdapter = PerformCollectionAdapter( enumerationItems )
+        performCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
@@ -237,32 +237,39 @@ class PerformCollectionFragment : Fragment(),
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    // assuming only 1 enumeration item per location, for now...
-                    val sampledItem = location.enumerationItems[0]
+                    var resourceId = 0
 
-                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    if (location.enumerationItems.size == 1)
                     {
-                        var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_orange else R.drawable.home_orange
+                        val sampledItem = location.enumerationItems[0]
 
-                        var numComplete = 0
-
-                        for (item in location.enumerationItems)
+                        if (sampledItem.samplingState == SamplingState.Sampled)
                         {
-                            val enumerationItem = item as EnumerationItem?
-
-                            enumerationItem?.let {
-                                if (enumerationItem.collectionState == CollectionState.Complete)
+                            if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                        }
+                    }
+                    else
+                    {
+                        for (sampledItem in location.enumerationItems)
+                        {
+                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            {
+                                if (sampledItem.collectionState == CollectionState.Incomplete)
                                 {
-                                    numComplete++
+                                    resourceId = R.drawable.multi_home_orange
+                                    break
+                                }
+                                else if (sampledItem.collectionState == CollectionState.Complete)
+                                {
+                                    resourceId = R.drawable.multi_home_purple
                                 }
                             }
                         }
+                    }
 
-                        if (numComplete == location.enumerationItems.size)
-                        {
-                            resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_purple else R.drawable.home_purple
-                        }
-
+                    if (resourceId > 0)
+                    {
+                        // one point per location!
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
                         val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
@@ -277,7 +284,21 @@ class PerformCollectionFragment : Fragment(),
                                     locationHashMap[pointAnnotation.id]?.let { location ->
                                         sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-                                        if (location.enumerationItems.size > 1)
+                                        var count = 0
+
+                                        for (enumerationItem in location.enumerationItems)
+                                        {
+                                            if (enumerationItem.samplingState == SamplingState.Sampled)
+                                            {
+                                                count += 1
+
+                                                // This is really only necessary here for the enumerationItems.size == 1 case
+                                                // For size > 1, this will get set in the multiCollectionFragment
+                                                sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                                            }
+                                        }
+
+                                        if (count > 1)
                                         {
                                             findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment)
                                         }
@@ -296,10 +317,15 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
-    private fun didSelectLocation( location: Location )
+    private fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
     {
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
-        LaunchSurveyDialog( activity, this)
+        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
+
+        location?.let { location ->
+            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
+            LaunchSurveyDialog( activity, this)
+        }
     }
 
     override fun didSelectRightButton(tag: Any?)
@@ -427,19 +453,19 @@ class PerformCollectionFragment : Fragment(),
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
-            val sampledItem = location.enumerationItems[0]
+            sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
+                sampledItem.collectionState = CollectionState.Complete
+                sampledItem.notes = notes
 
-            sampledItem.collectionState = CollectionState.Complete
-            sampledItem.notes = notes
+                if (incompleteReason.isNotEmpty())
+                {
+                    sampledItem.collectionState = CollectionState.Incomplete
+                }
 
-            if (incompleteReason.isNotEmpty())
-            {
-                sampledItem.collectionState = CollectionState.Incomplete
+                DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
+
+                refreshMap()
             }
-
-            DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
-
-            refreshMap()
         }
     }
 

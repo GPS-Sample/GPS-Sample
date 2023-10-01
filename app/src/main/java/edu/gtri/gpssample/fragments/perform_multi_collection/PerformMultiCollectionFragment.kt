@@ -57,7 +57,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
             location = it
         }
 
-        performMultiCollectionAdapter = PerformMultiCollectionAdapter( location, location.enumerationItems )
+        performMultiCollectionAdapter = PerformMultiCollectionAdapter( location.enumerationItems )
         performMultiCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -126,6 +126,8 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
                 {
                     sampledItem.collectionState = CollectionState.Incomplete
                 }
+
+                performMultiCollectionAdapter.updateEnumerationItems( location.enumerationItems )
 
                 DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
             }
