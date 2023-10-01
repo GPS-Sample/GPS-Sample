@@ -307,7 +307,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                     if (enumerationItem.samplingState == SamplingState.Sampled)
                     {
-                        if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                        resourceId = if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
                     }
                     else if (enumerationItem.enumerationState == EnumerationState.Undefined)
                     {
