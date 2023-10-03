@@ -13,7 +13,7 @@ class MainApplication : Application()
 {
     var user: User? = null
     var currentFragment = ""
-    var currentLocationUUID = "9999"
+    var currentEnumerationItemUUID = "9999"
 
     override fun onCreate()
     {

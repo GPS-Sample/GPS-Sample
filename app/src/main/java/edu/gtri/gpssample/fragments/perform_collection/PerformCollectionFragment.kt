@@ -309,6 +309,7 @@ class PerformCollectionFragment : Fragment(),
                                         }
                                         else
                                         {
+                                            (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                             LaunchSurveyDialog( activity, this@PerformCollectionFragment)
                                         }
                                     }
@@ -329,6 +330,7 @@ class PerformCollectionFragment : Fragment(),
         location?.let { location ->
             sharedViewModel.locationViewModel.setCurrentLocation(location)
             sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
+            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
             LaunchSurveyDialog( activity, this)
         }
     }
@@ -433,7 +435,6 @@ class PerformCollectionFragment : Fragment(),
     override fun launchSurveyButtonPressed()
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            (this.activity!!.application as? MainApplication)?.currentLocationUUID = location.uuid
             val intent = Intent(Intent.ACTION_VIEW)
             intent.type = "vnd.android.cursor.dir/vnd.odk.form"
             odk_result.launch(intent)

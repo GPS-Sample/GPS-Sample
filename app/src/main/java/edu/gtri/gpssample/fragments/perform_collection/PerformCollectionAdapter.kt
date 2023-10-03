@@ -46,12 +46,9 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>) : Re
 
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
+//        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
 
-        location?.let { location ->
-            holder.nameTextView.setText( location.uuid )
-        }
-
+        holder.nameTextView.setText( enumerationItem.uuid )
         holder.dateTextView.setText( enumerationItem.subAddress )
 
         holder.itemView.setOnClickListener {

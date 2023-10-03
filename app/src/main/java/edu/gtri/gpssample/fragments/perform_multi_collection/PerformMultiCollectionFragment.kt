@@ -21,6 +21,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.databinding.FragmentAddMultiHouseholdBinding
+import edu.gtri.gpssample.databinding.FragmentPerformMultiCollectionBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -31,7 +32,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performMultiCollectionAdapter: PerformMultiCollectionAdapter
 
-    private var _binding: FragmentAddMultiHouseholdBinding? = null
+    private var _binding: FragmentPerformMultiCollectionBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -44,7 +45,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentAddMultiHouseholdBinding.inflate(inflater, container, false)
+        _binding = FragmentPerformMultiCollectionBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -64,12 +65,6 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
         binding.recyclerView.adapter = performMultiCollectionAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
-        binding.addButton.setOnClickListener {
-            val enumerationItem = EnumerationItem()
-            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-        }
-
         binding.backButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -84,6 +79,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem)
     {
+        (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
         sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
         LaunchSurveyDialog( activity, this@PerformMultiCollectionFragment)
     }
@@ -92,7 +88,6 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     override fun launchSurveyButtonPressed()
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            (this.activity!!.application as? MainApplication)?.currentLocationUUID = location.uuid
             val intent = Intent(Intent.ACTION_VIEW)
             intent.type = "vnd.android.cursor.dir/vnd.odk.form"
             odk_result.launch(intent)

@@ -22,18 +22,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center"
-                android:text="Multi Families"
+                android:text="@string/multi_families"
                 android:textColor="@color/primary_textcolor"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/add_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="20dp"
-                android:src="@drawable/plus_blue" />
         </FrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView
