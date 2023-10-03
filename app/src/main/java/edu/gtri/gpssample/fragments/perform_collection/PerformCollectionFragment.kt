@@ -238,8 +238,13 @@ class PerformCollectionFragment : Fragment(),
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
                     var resourceId = 0
+                    var isMultiFamily = false
 
-                    if (location.enumerationItems.size == 1)
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
+                    }
+
+                    if (!isMultiFamily)
                     {
                         val sampledItem = location.enumerationItems[0]
 

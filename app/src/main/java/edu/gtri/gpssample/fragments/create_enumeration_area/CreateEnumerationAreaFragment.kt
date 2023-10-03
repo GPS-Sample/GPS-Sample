@@ -296,12 +296,17 @@ class CreateEnumerationAreaFragment : Fragment(),
             for (location in enumArea.locations)
             {
                 var resourceId = 0
+                var isMultiFamily = false
 
-                if (location.enumerationItems.size == 0)
+                location.isMultiFamily?.let {
+                    isMultiFamily = it
+                }
+
+                if (location.isMultiFamily == null)
                 {
                     resourceId = R.drawable.home_black
                 }
-                else if (location.enumerationItems.size == 1)
+                else if (!isMultiFamily)
                 {
                     val enumerationItem = location.enumerationItems[0]
 
