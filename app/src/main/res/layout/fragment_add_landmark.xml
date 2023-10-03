@@ -73,7 +73,7 @@
                                 android:layout_height="50dp"
                                 android:gravity="center_vertical"
                                 android:padding="10dp"
-                                android:text="@string/uuid"
+                                android:text="@string/UUID"
                                 android:textColor="@color/primary"
                                 android:textSize="17sp"
                                 android:textStyle="bold" />
