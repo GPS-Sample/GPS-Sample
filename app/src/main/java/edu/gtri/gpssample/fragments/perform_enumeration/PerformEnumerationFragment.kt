@@ -91,6 +91,7 @@ class PerformEnumerationFragment : Fragment(),
     private val kExportTag = 2
     private val kAddHouseholdTag = 3
     private val kAddLandmarkTag = 4
+    private val kSelectHouseholdTag = 5
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -325,7 +326,16 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
-                    var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_black else R.drawable.home_black
+                    var isMultiHousehold = false
+
+                    if (location.enumerationItems.size > 0)
+                    {
+                        location.isMultiFamily?.let {
+                            isMultiHousehold = it
+                        }
+                    }
+
+                    var resourceId = if (isMultiHousehold) R.drawable.multi_home_black else R.drawable.home_black
 
                     var numComplete = 0
 
@@ -336,7 +346,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_red else R.drawable.home_red
+                                resourceId = if (isMultiHousehold) R.drawable.multi_home_red else R.drawable.home_red
                                 break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
@@ -348,7 +358,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
-                        resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_green else R.drawable.home_green
+                        resourceId = if (isMultiHousehold) R.drawable.multi_home_green else R.drawable.home_green
                     }
 
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
@@ -393,12 +403,23 @@ class PerformEnumerationFragment : Fragment(),
             if (location.enumerationItems.isEmpty())
             {
                 sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+
+
+                ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
             }
             else if (location.enumerationItems.size == 1)
             {
-                sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                location.isMultiFamily?.let { isMultiFamily ->
+                    if (isMultiFamily)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                    }
+                    else
+                    {
+                        sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                    }
+                }
             }
             else
             {
@@ -412,41 +433,38 @@ class PerformEnumerationFragment : Fragment(),
         if (dropMode)
         {
             dropMode = false
-            createLocation( point, false, isLandmark )
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+
+            enumArea.locations.map{
+                val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                if (haversineCheck.withinBounds)
+                {
+                    val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                    ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                    return true
+                }
+            }
+
+            val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
+            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+            enumArea.locations.add(location)
+
+            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
+            if (location.isLandmark)
+            {
+                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+            }
+            else
+            {
+                navigateToAddHouseholdFragment()
+            }
+
             return true
         }
 
         return false
-    }
-
-    fun createLocation( point: Point, isLocationUpdateTimeValid: Boolean, isLandmark: Boolean )
-    {
-        enumArea.locations.map{
-            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
-            if (haversineCheck.withinBounds)
-            {
-                val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
-                ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
-                return
-            }
-        }
-
-        val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
-        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-        enumArea.locations.add(location)
-
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
-        sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(isLocationUpdateTimeValid)
-
-        if (location.isLandmark)
-        {
-            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-        }
-        else
-        {
-            navigateToAddHouseholdFragment()
-        }
     }
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
@@ -483,10 +501,45 @@ class PerformEnumerationFragment : Fragment(),
             return
         }
 
+        if (tag == kSelectHouseholdTag)
+        {
+            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                location.isMultiFamily = false
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            }
+
+            return
+        }
+
         if (tag == kAddHouseholdTag || tag == kAddLandmarkTag)
         {
-            gpsLocation?.let {
-                createLocation( it, true, isLandmark )
+            gpsLocation?.let { point ->
+                enumArea.locations.map{
+                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                    if (haversineCheck.withinBounds)
+                    {
+                        val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                        ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                        return
+                    }
+                }
+
+                val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
+                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                enumArea.locations.add(location)
+
+                sharedViewModel.locationViewModel.setCurrentLocation(location)
+                sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
+                if (location.isLandmark)
+                {
+                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                }
+                else
+                {
+                    navigateToAddHouseholdFragment()
+                }
+
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
 
             return
@@ -546,6 +599,14 @@ class PerformEnumerationFragment : Fragment(),
         {
             when(tag)
             {
+                kSelectHouseholdTag ->
+                {
+                    sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                        location.isMultiFamily = true
+                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                    }
+                }
+
                 kAddHouseholdTag, kAddLandmarkTag -> {
                     dropMode = true
                     isLandmark = isLandmark

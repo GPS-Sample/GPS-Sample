@@ -264,6 +264,8 @@
     <string name="incomplete_enumeration">Incomplete Enumeration</string>
     <string name="incomplete_collection">Incomplete Collection</string>
     <string name="completed_collection">Completed Collection</string>
+    <string name="is_multi_family">Is this a multi family location?</string>
+    <string name="multi_families">Multi Families</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
