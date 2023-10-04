@@ -125,6 +125,12 @@ class PerformEnumerationFragment : Fragment(),
             config = it
         }
 
+        if (!this::config.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
+            return
+        }
+
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
         }

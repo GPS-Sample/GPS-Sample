@@ -8,30 +8,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/top_bar"
+        android:orientation="horizontal"
         android:background="@color/primary"
         android:layout_width="match_parent"
         android:layout_height="50dp">
 
+        <View
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+
         <ImageView
             android:id="@+id/add_photo_image_view"
             android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="start"
             app:srcCompat="@drawable/add_photo_white"/>
 
         <ImageView
             android:id="@+id/delete_image_view"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="20dp"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="end"
             app:srcCompat="@drawable/delete_white"/>
-    </FrameLayout>
+    </LinearLayout>
 
     <ScrollView
         android:layout_weight="1"

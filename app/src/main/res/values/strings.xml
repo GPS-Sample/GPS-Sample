@@ -265,6 +265,8 @@
     <string name="completed_collection">Completed Collection</string>
     <string name="is_multi_family">Is this a multi family location?</string>
     <string name="multi_families">Multi Families</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="delete">Delete</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

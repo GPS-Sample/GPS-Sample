@@ -350,6 +350,10 @@
         <action
             android:id="@+id/action_navigate_to_AddMultiHouseholdFragment"
             app:destination="@id/AddMultiHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:destination="@id/MainFragment"/>
     </fragment>
 
     <fragment
@@ -370,6 +374,10 @@
         android:id="@+id/AddLandmarkFragment"
         android:name="edu.gtri.gpssample.fragments.add_landmark.AddLandmarkFragment"
         tools:layout="@layout/fragment_add_landmark">
+
+        <action
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:destination="@id/MainFragment"/>
     </fragment>
 
     <fragment

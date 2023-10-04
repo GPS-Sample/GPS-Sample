@@ -15,10 +15,6 @@ class LocationDAO(private var dao: DAO)
 {
     fun createOrUpdateLocation( location: Location, geoArea : GeoArea) : Location?
     {
-        location?.id.let {
-            Log.d( "xxx", "location id = ${it}")
-        }
-
         if (exists( location ))
         {
             updateLocation( location, geoArea )
