@@ -31,10 +31,7 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
-import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
-import edu.gtri.gpssample.dialogs.MapLegendDialog
+import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -49,7 +46,8 @@ class PerformCollectionFragment : Fragment(),
     OnCameraChangeListener,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate
+    ConfirmationDialog.ConfirmationDialogDelegate,
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var user: User
     private lateinit var team: Team
@@ -431,8 +429,13 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun launchSurveyButtonPressed()
+    {
+        SurveyLaunchNotificationDialog( activity!!, this )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun shouldLaunchODK()
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
             val intent = Intent(Intent.ACTION_VIEW)
