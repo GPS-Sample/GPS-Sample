@@ -32,7 +32,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     private val client: TCPClient = TCPClient()
     private var heartbeatBroadcasting: Boolean = false
     private var connectWaiting : Boolean = true
-
+    private val kNetworkTimeout = 20
     interface ConfigurationDelegate {
         fun configurationReceived(config: Config)
     }
@@ -299,12 +299,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                                             Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                                         connectivityManager.registerDefaultNetworkCallback(networkCallback)
 
-
                                         CoroutineScope(Dispatchers.IO +  SupervisorJob()).launch {
-                                            test()
+                                            networkErrorCheck()
                                         }
-
-
                                     }, 100)
                                 }
 
@@ -336,7 +333,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 val connectivityManager =
                     Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 connectivityManager.requestNetwork(networkRequest, networkCallback)
-
+                CoroutineScope(Dispatchers.IO +  SupervisorJob()).launch {
+                    networkErrorCheck()
+                }
             }
         } else {
             _networkConnected.postValue(NetworkStatus.NetworkConnected)
@@ -438,7 +437,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     }
 
-    fun test()
+    private fun networkErrorCheck()
     {
         var count = 0
         var timeout = false
@@ -447,7 +446,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
             sleep(1000)
             count += 1
 
-            if(count > 20)
+            if(count > kNetworkTimeout)
             {
                 timeout = true
                 break
