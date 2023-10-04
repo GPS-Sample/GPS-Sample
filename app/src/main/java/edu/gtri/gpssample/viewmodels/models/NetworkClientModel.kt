@@ -16,6 +16,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.SampleArea
 import edu.gtri.gpssample.network.*
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
@@ -45,6 +46,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     // maybe a better way
     var currentEnumArea: EnumArea? = null
+    var currentSampleArea: SampleArea? = null
 
     var configurationDelegate: ConfigurationDelegate? = null
 
@@ -126,6 +128,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                                 ClientMode.EnumerationTeam -> {
                                     sendEnumerationData()
                                 }
+                                ClientMode.CollectionTeam -> {
+                                    sendCollectionData()
+                                }
                                 else -> {}
                             }
                             // TODO:  change this to be more generic
@@ -188,7 +193,24 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 sleep(kDialogTimeout)
                 connectDelegate?.didSendData(true)
             }
+        }
+    }
 
+    fun sendCollectionData() {
+        currentSampleArea?.let { sampleArea ->
+            networkInfo?.let { networkInfo ->
+                val payload = sampleArea.pack()
+
+                Log.d("xxx", payload)
+
+                val message = TCPMessage(NetworkCommand.NetworkSampleAreaExport, payload)
+                val response = client.sendMessage(networkInfo.serverIP, message, this)
+
+                _commandSent.postValue(NetworkStatus.CommandSent)
+                // quick sleep to make the UI look better
+                sleep(kDialogTimeout)
+                connectDelegate?.didSendData(true)
+            }
         }
     }
 

@@ -13,14 +13,14 @@
         android:layout_marginTop="0dp"
         android:layout_marginRight="20dp"
         android:focusable="false"
-        android:text="Reset PIN"
+        android:text="@string/reset_pin"
         android:gravity="center_vertical"
         android:textColor="@color/primary_textcolor"
         android:textSize="16sp" />
 
     <EditText
         android:id="@+id/current_pin_edit_text"
-        android:hint="Enter Current PIN"
+        android:hint="@string/enter_current_pin"
         android:inputType="textCapWords"
         android:imeOptions="actionDone"
         android:layout_marginStart="20dp"
@@ -33,7 +33,7 @@
         android:id="@+id/pin1_edit_text"
         android:inputType="textCapWords"
         android:imeOptions="actionDone"
-        android:hint="Enter New PIN"
+        android:hint="@string/enter_new_pin"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
@@ -44,7 +44,7 @@
         android:id="@+id/pin2_edit_text"
         android:inputType="textCapWords"
         android:imeOptions="actionDone"
-        android:hint="Re-Enter New PIN"
+        android:hint="@string/re_enter_new_pin"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
@@ -83,5 +83,4 @@
             android:text="@string/save" />
 
     </LinearLayout>
-
 </LinearLayout>

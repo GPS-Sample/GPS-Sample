@@ -33,15 +33,14 @@ import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListen
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.EnumerationState
-import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.LocationType
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.MapLegendDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -224,6 +223,10 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         }
 
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -292,39 +295,72 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             for (location in enumArea.locations)
             {
-                if (location.isLandmark)
-                {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    mapboxManager.addMarker( point, R.drawable.location_blue )
+                var resourceId = 0
+                var isMultiFamily = false
+
+                location.isMultiFamily?.let {
+                    isMultiFamily = it
                 }
-                else
+
+                if (location.isMultiFamily == null)
                 {
-                    var resourceId = R.drawable.home_black
+                    resourceId = R.drawable.home_black
+                }
+                else if (!isMultiFamily)
+                {
+                    val enumerationItem = location.enumerationItems[0]
 
-                    var numComplete = 0
-
-                    for (item in location.enumerationItems)
+                    if (enumerationItem.samplingState == SamplingState.Sampled)
                     {
-                        val enumerationItem = item as EnumerationItem?
-                        if(enumerationItem != null)
-                        {
-                            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                            {
-                                resourceId = R.drawable.home_red
-                                break
-                            }
-                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                            {
-                                numComplete++
-                            }
-                        }
+                        resourceId = if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
                     }
-
-                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                    else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                    {
+                        resourceId = R.drawable.home_black
+                    }
+                    else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                    {
+                        resourceId = R.drawable.home_red
+                    }
+                    else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                     {
                         resourceId = R.drawable.home_green
                     }
+                }
+                else
+                {
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        if (enumerationItem.samplingState == SamplingState.Sampled)
+                        {
+                            if (enumerationItem.collectionState == CollectionState.Incomplete)
+                            {
+                                resourceId = R.drawable.multi_home_orange
+                                break
+                            }
+                            else if (enumerationItem.collectionState == CollectionState.Complete)
+                            {
+                                resourceId = R.drawable.multi_home_purple
+                            }
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                        {
+                            resourceId = R.drawable.multi_home_black
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            resourceId = R.drawable.multi_home_red
+                            break
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            resourceId = R.drawable.multi_home_green
+                        }
+                    }
+                }
 
+                if (resourceId > 0)
+                {
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
                     val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
@@ -387,7 +423,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         enumArea?.let{  enumArea ->
             latLng?.let { latLng ->
-                val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false)
+                val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false, "")
                 enumArea.locations.add(location)
                 refreshMap()
             }
@@ -619,7 +655,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 val geometry1 = geometryFactory.createPoint( coordinate )
                 if (geometry.contains( geometry1 ))
                 {
-                    val location = Location( LocationType.Enumeration, point.coordinates.latitude, point.coordinates.longitude, false )
+                    val location = Location( LocationType.Enumeration, point.coordinates.latitude, point.coordinates.longitude, false, "" )
                     DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
                     enumArea.locations.add( location )

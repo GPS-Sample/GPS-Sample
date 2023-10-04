@@ -104,7 +104,7 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE, enumerationItem.collectionState.format )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON, enumerationItem.incompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_NOTES, enumerationItem.notes )
-        values.put(DAO.COLUMN_LOCATION_ID, location.id)
+        values.put( DAO.COLUMN_LOCATION_ID, location.id)
     }
 
     @SuppressLint("Range")
@@ -118,6 +118,7 @@ class EnumerationItemDAO(private var dao: DAO)
         val collectionState = CollectionState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE)))
         val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
         val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_NOTES))
+        val locationId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_ID))
 
         val fieldDataList = ArrayList<FieldData>()
 
@@ -131,7 +132,8 @@ class EnumerationItemDAO(private var dao: DAO)
             collectionState,
             incompleteReason,
             notes,
-            fieldDataList
+            fieldDataList,
+            locationId
         )
     }
 

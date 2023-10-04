@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:orientation="horizontal"
+        android:background="@color/primary"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <View
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/add_photo_image_view"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/add_photo_white"/>
+
+        <ImageView
+            android:id="@+id/delete_image_view"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/delete_white"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                card_view:cardCornerRadius="4dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/default_info_layout"
+                        android:visibility="visible"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/UUID"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/UUID_edit_text"
+                                android:focusable="false"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/latitude"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/latitude_edit_text"
+                                android:focusable="false"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/longitude"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/longitude_edit_text"
+                                android:focusable="false"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/last_updated_layout"
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/last_updated"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/last_updated_edit_text"
+                                android:focusable="false"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/description"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/description_edit_text"
+                                android:focusable="true"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <FrameLayout
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_width="400dp"
+                android:layout_height="400dp">
+
+                <ImageView
+                    android:id="@+id/landmark_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:visibility="visible"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="10dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/save" />
+    </LinearLayout>
+</LinearLayout>

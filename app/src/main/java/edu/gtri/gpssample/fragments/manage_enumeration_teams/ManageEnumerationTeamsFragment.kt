@@ -28,7 +28,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
 
     private var _binding: FragmentManageEnumerationTeamsBinding? = null
     private val binding get() = _binding!!
-    private var users = ArrayList<User>()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -36,6 +36,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentManageEnumerationTeamsBinding.inflate(inflater, container, false)
@@ -80,7 +81,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun didSelectTeam( team: Team )

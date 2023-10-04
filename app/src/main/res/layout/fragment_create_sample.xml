@@ -18,90 +18,101 @@
             name="createSampleFragment"
             type="edu.gtri.gpssample.fragments.createsample.CreateSampleFragment" />
     </data>
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <RelativeLayout
-            android:id="@+id/button_layout"
+
+        <TextView
+            android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:paddingHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/create_sample"
+            android:textColor="@color/primary_textcolor"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true" />
+
+        <FrameLayout
+            android:id="@+id/sampling_method"
+            android:layout_marginBottom="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/title">
 
             <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="15dp"
-                android:paddingHorizontal="10dp"
-                android:layout_marginTop="10dp"
-                android:text="@string/create_sample"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_alignParentTop="true" />
-
-            <FrameLayout
-                android:id="@+id/sampling_method"
-                android:layout_marginBottom="2dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_below="@+id/title">
+                android:layout_marginStart="15dp"
+                android:gravity="start"
+                android:text="@{sampleViewModel.samplingMethod}"
+                android:textSize="22sp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="15dp"
-                    android:gravity="left"
-                    android:text="@{sampleViewModel.samplingMethod}"
-                    android:textSize="22sp" />
+            <ImageView
+                android:id="@+id/info_button"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="25dp"
+                android:src="@drawable/info" />
+        </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/info_button"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="25dp"
-                    android:src="@drawable/info" />
-            </FrameLayout>
+        <FrameLayout
+            android:layout_weight="1"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
 
             <com.mapbox.maps.MapView
                 android:id="@+id/map_view"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_centerHorizontal="true"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:layout_above="@+id/sample_button"
-                android:layout_below="@+id/sampling_method"
+                android:layout_height="match_parent"
                 mapbox:mapbox_cameraTargetLat="33.77577524978659"
                 mapbox:mapbox_cameraTargetLng="-84.39630379821243"
                 mapbox:mapbox_cameraZoom="9.0">
             </com.mapbox.maps.MapView>
 
-            <Button
-                android:id="@+id/sample_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="bottom"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:layout_above="@+id/next_button"
-                android:onClick="@{(v) -> sampleViewModel.beginSampling(v)}"
-                android:text="@string/generate_sample" />
-            <Button
-                android:id="@+id/next_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="bottom"
-                android:layout_margin="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:layout_alignParentBottom="true"
-                android:text="@string/next" />
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/legend_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_gravity="top|start"
+                android:text="Legend"
+                android:layout_marginTop="30dp"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/mapbox_gray"
+                android:textSize="15sp"
+                android:textStyle="normal" />
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/sample_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_above="@+id/next_button"
+            android:onClick="@{(v) -> sampleViewModel.beginSampling(v)}"
+            android:text="@string/generate_sample" />
+
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_alignParentBottom="true"
+            android:text="@string/next" />
     </LinearLayout>
 </layout>

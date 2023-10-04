@@ -45,6 +45,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
+import edu.gtri.gpssample.dialogs.MapLegendDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -61,7 +62,9 @@ class PerformEnumerationFragment : Fragment(),
     InfoDialog.InfoDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
+    private lateinit var user: User
     private lateinit var team: Team
+    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList : ColorStateList
@@ -73,8 +76,8 @@ class PerformEnumerationFragment : Fragment(),
 
     private var gpsLocation: Point? = null
 
-    private var userId = 0
     private var dropMode = false
+    private var isLandmark = false
     private var showCurrentLocation = true
 
     private var _binding: FragmentPerformEnumerationBinding? = null
@@ -86,7 +89,9 @@ class PerformEnumerationFragment : Fragment(),
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
 
     private val kExportTag = 2
-    private val kSelectLocationTag = 3
+    private val kAddHouseholdTag = 3
+    private val kAddLandmarkTag = 4
+    private val kSelectHouseholdTag = 5
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -116,18 +121,26 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
-            enumArea = enum_area
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
+        }
+
+        if (!this::config.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
         }
 
         sharedViewModel.teamViewModel.currentTeam?.value?.let {
             team = it
         }
 
-        val user = (activity!!.application as? MainApplication)?.user
-
-        user?.id?.let {
-            userId = it
+        (activity!!.application as? MainApplication)?.user?.let {
+            user = it
         }
 
         performEnumerationAdapter = PerformEnumerationAdapter( ArrayList<Location>() )
@@ -161,6 +174,10 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         binding.centerOnLocationButton.setOnClickListener {
             showCurrentLocation = !showCurrentLocation
             if (showCurrentLocation)
@@ -184,8 +201,10 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
+            isLandmark = false
+
             ConfirmationDialog( activity, resources.getString(R.string.select_location),
-                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kSelectLocationTag, this)
+                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
         }
 
         binding.addLandmarkButton.setOnClickListener {
@@ -194,6 +213,11 @@ class PerformEnumerationFragment : Fragment(),
                 dropMode = false
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
+
+            isLandmark = true
+
+            ConfirmationDialog( activity, resources.getString(R.string.select_location),
+                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddLandmarkTag, this)
         }
 
         binding.exportButton.setOnClickListener {
@@ -203,26 +227,19 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-
-                val user = (activity!!.application as MainApplication).user
-
-                user?.let { user ->
-                    when(user.role)
-                    {
-                        Role.Supervisor.toString(), Role.Admin.toString() ->
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
-                                resources.getString(R.string.select_export_message),
-                                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                        }
-                        Role.Enumerator.toString() ->
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.enum_saved_doc),
-                                resources.getString(R.string.select_export_message),
-                                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                        }
-                    }
+            when(user.role)
+            {
+                Role.Supervisor.toString(), Role.Admin.toString() ->
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
+                        resources.getString(R.string.select_export_message),
+                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                }
+                Role.Enumerator.toString() ->
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.export_enum_data),
+                        resources.getString(R.string.select_export_message),
+                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                 }
             }
         }
@@ -291,11 +308,40 @@ class PerformEnumerationFragment : Fragment(),
                 if (location.isLandmark)
                 {
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    mapboxManager.addMarker( point, R.drawable.location_blue )
+                    val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+
+                    pointAnnotation?.let {
+                        pointHashMap[pointAnnotation.id] = location
+                        allPointAnnotations.add( pointAnnotation )
+                    }
+
+                    // not sure why this click is handled by the non location marker click listener?
+
+//                    pointAnnotationManager.apply {
+//                        addClickListener(
+//                            OnPointAnnotationClickListener { pointAnnotation ->
+//                                pointHashMap[pointAnnotation.id]?.let { location ->
+//                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+//                                    sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+//                                    findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+//                                }
+//                                true
+//                            }
+//                        )
+//                    }
                 }
                 else
                 {
-                    var resourceId = R.drawable.home_black
+                    var isMultiHousehold = false
+
+                    if (location.enumerationItems.size > 0)
+                    {
+                        location.isMultiFamily?.let {
+                            isMultiHousehold = it
+                        }
+                    }
+
+                    var resourceId = if (isMultiHousehold) R.drawable.multi_home_black else R.drawable.home_black
 
                     var numComplete = 0
 
@@ -306,7 +352,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceId = R.drawable.home_red
+                                resourceId = if (isMultiHousehold) R.drawable.multi_home_red else R.drawable.home_red
                                 break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
@@ -318,7 +364,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
-                        resourceId = R.drawable.home_green
+                        resourceId = if (isMultiHousehold) R.drawable.multi_home_green else R.drawable.home_green
                     }
 
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
@@ -335,13 +381,14 @@ class PerformEnumerationFragment : Fragment(),
                                 pointHashMap[pointAnnotation.id]?.let { location ->
                                     sharedViewModel.locationViewModel.setCurrentLocation(location)
                                     sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
                                     if (location.isLandmark)
                                     {
-                                        findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                                        findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
                                     }
                                     else
                                     {
-                                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                                        navigateToAddHouseholdFragment()
                                     }
                                 }
                                 true
@@ -355,46 +402,75 @@ class PerformEnumerationFragment : Fragment(),
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
+    fun navigateToAddHouseholdFragment()
+    {
+        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+
+            if (location.enumerationItems.isEmpty())
+            {
+                sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
+
+
+                ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
+            }
+            else if (location.enumerationItems.size == 1)
+            {
+                location.isMultiFamily?.let { isMultiFamily ->
+                    if (isMultiFamily)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                    }
+                    else
+                    {
+                        sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                    }
+                }
+            }
+            else
+            {
+                findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+            }
+        }
+    }
+
     override fun onMapClick(point: com.mapbox.geojson.Point): Boolean
     {
         if (dropMode)
         {
             dropMode = false
-            createLocation( point, false )
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+
+            enumArea.locations.map{
+                val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                if (haversineCheck.withinBounds)
+                {
+                    val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                    ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                    return true
+                }
+            }
+
+            val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
+            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+            enumArea.locations.add(location)
+
+            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
+            if (location.isLandmark)
+            {
+                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+            }
+            else
+            {
+                navigateToAddHouseholdFragment()
+            }
+
             return true
         }
 
         return false
-    }
-
-    fun createLocation( point: Point, isLocationUpdateTimeValid: Boolean )
-    {
-        enumArea.locations.map{
-            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
-            if (haversineCheck.withinBounds)
-            {
-                val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
-                ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
-                return
-            }
-        }
-
-        val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false)
-        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-        enumArea.locations.add(location)
-
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
-        sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(isLocationUpdateTimeValid)
-
-        if (location.isLandmark)
-        {
-            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-        }
-        else
-        {
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
-        }
     }
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
@@ -415,11 +491,11 @@ class PerformEnumerationFragment : Fragment(),
 
         if (location.isLandmark)
         {
-            findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
         }
         else
         {
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            navigateToAddHouseholdFragment()
         }
     }
 
@@ -431,47 +507,75 @@ class PerformEnumerationFragment : Fragment(),
             return
         }
 
-        if (tag == kSelectLocationTag)
+        if (tag == kSelectHouseholdTag)
         {
-            gpsLocation?.let {
-                createLocation( it, true )
+            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                location.isMultiFamily = false
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            }
+
+            return
+        }
+
+        if (tag == kAddHouseholdTag || tag == kAddLandmarkTag)
+        {
+            gpsLocation?.let { point ->
+                enumArea.locations.map{
+                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                    if (haversineCheck.withinBounds)
+                    {
+                        val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                        ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                        return
+                    }
+                }
+
+                val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
+                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                enumArea.locations.add(location)
+
+                sharedViewModel.locationViewModel.setCurrentLocation(location)
+                sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
+                if (location.isLandmark)
+                {
+                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                }
+                else
+                {
+                    navigateToAddHouseholdFragment()
+                }
+
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
 
             return
         }
 
         // Launch connection screen
-        view?.let{view ->
-            val user = (activity!!.application as MainApplication).user
-            user?.let { user ->
+        view?.let{ view ->
+            sharedNetworkViewModel.setCurrentConfig(config)
 
-                sharedViewModel?.currentConfiguration?.value?.let{
-                    sharedNetworkViewModel.setCurrentConfig(it)
+            when(user.role)
+            {
+                Role.Admin.toString() ->
+                {
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                    startHotspot(view)
                 }
 
-                //TODO: fix this! compare should be the enum
-                when(user.role)
+                Role.Supervisor.toString() ->
                 {
-                    Role.Admin.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
-                        startHotspot(view)
-                    }
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
 
-                    Role.Supervisor.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                    startHotspot(view)
+                }
 
-                        startHotspot(view)
-                    }
-
-                    Role.Enumerator.toString() ->
-                    {
-                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                        sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
-                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                        getResult.launch(intent)
-                    }
+                Role.Enumerator.toString() ->
+                {
+                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
+                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                    getResult.launch(intent)
                 }
             }
         }
@@ -481,7 +585,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         if (tag is Point)
         {
-            val location = Location( LocationType.Enumeration, tag.latitude(), tag.longitude(), false)
+            val location = Location( LocationType.Enumeration, tag.latitude(), tag.longitude(), false, "")
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
 
@@ -490,60 +594,62 @@ class PerformEnumerationFragment : Fragment(),
 
             if (location.isLandmark)
             {
-                findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
+                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
             }
             else
             {
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                navigateToAddHouseholdFragment()
             }
         }
         else
         {
             when(tag)
             {
-                kSelectLocationTag -> {
+                kSelectHouseholdTag ->
+                {
+                    sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                        location.isMultiFamily = true
+                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                    }
+                }
+
+                kAddHouseholdTag, kAddLandmarkTag -> {
                     dropMode = true
+                    isLandmark = isLandmark
                     binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
 
                 kExportTag -> {
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                    when(user.role)
+                    {
+                        Role.Supervisor.toString(), Role.Admin.toString() ->
+                        {
+                            val packedConfig = config.pack()
+                            Log.d( "xxx", packedConfig )
 
-                        val user = (activity!!.application as MainApplication).user
+                            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                            val file = File(root, "Configuration.${Date().time}.json")
+                            val writer = FileWriter(file)
+                            writer.append(packedConfig)
+                            writer.flush()
+                            writer.close()
 
-                        user?.let { user ->
-                            when(user.role)
-                            {
-                                Role.Supervisor.toString(), Role.Admin.toString() ->
-                                {
-                                    val packedConfig = config.pack()
-                                    Log.d( "xxx", packedConfig )
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+                        }
 
-                                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                                    val file = File(root, "Configuration.${Date().time}.json")
-                                    val writer = FileWriter(file)
-                                    writer.append(packedConfig)
-                                    writer.flush()
-                                    writer.close()
+                        Role.Enumerator.toString() ->
+                        {
+                            val packedEnumArea = enumArea.pack()
+                            Log.d( "xxx", packedEnumArea )
 
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
-                                }
+                            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+                            val file = File(root, "EnumArea.${Date().time}.json")
+                            val writer = FileWriter(file)
+                            writer.append(packedEnumArea)
+                            writer.flush()
+                            writer.close()
 
-                                Role.Enumerator.toString() ->
-                                {
-                                    val packedEnumArea = enumArea.pack()
-                                    Log.d( "xxx", packedEnumArea )
-
-                                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                                    val file = File(root, "EnumArea.${Date().time}.json")
-                                    val writer = FileWriter(file)
-                                    writer.append(packedEnumArea)
-                                    writer.flush()
-                                    writer.close()
-
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

@@ -23,12 +23,14 @@ import edu.gtri.gpssample.constants.NetworkStatus
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.SampleArea
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkConnectionViewModel
+import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -79,14 +81,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
     private var _hotspotMode : MutableLiveData<HotspotMode> = MutableLiveData(HotspotMode.None)
     var hotspotMode : LiveData<HotspotMode> = _hotspotMode
 
-
-
     val connections: LiveData<List<NetworkConnectionViewModel>>
         get() = _connections
     private val _connections = MutableLiveData<List<NetworkConnectionViewModel>>(emptyList())
 
     private val clientConenctions : MutableList<NetworkConnectionViewModel> = mutableListOf()
-
 
     val destination = R.id.action_navigate_to_HotspotFragment
 
@@ -221,11 +220,30 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     enumArea?.let { enumArea ->
                         for (location in enumArea.locations)
                         {
-                            DAO.locationDAO.importLocation( location, enumArea )
+                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         }
+
                         // replace the enumArea from currentConfig with this one
                         sharedViewModel?.replaceEnumArea(enumArea)
                         sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
+                    }
+                }
+            }
+            NetworkCommand.NetworkSampleAreaExport ->
+            {
+                message.payload?.let { payload ->
+                    val sampleArea = SampleArea.unpack( payload )
+
+                    Log.d( "xxx", payload )
+
+                    sampleArea?.let { sampleArea ->
+                        for (location in sampleArea.locations)
+                        {
+                            DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
+                        }
+
+//                        sharedViewModel?.replaceEnumArea(enumArea)
+//                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                     }
                 }
             }

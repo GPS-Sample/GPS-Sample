@@ -43,7 +43,7 @@ class SamplingViewModel : ViewModel()
             value?.let{sampleArea ->
                 _currentSampleArea = MutableLiveData(sampleArea.value)
                 _currentStudy?.value?.let{ study->
-                    if (study.sampleArea == null)
+                    if (study.sampleArea == null)  // is this check necessary / correct?
                     {
                         sampleArea.value?.let{ sampleArea->
                             study.sampleArea = sampleArea
@@ -76,6 +76,9 @@ class SamplingViewModel : ViewModel()
     {
         val sampleArea = SampleArea(fromEnumArea)
         _currentSampleArea = MutableLiveData(sampleArea)
+        _currentStudy?.value?.let { study ->
+            study.sampleArea = sampleArea
+        }
     }
 
     fun setSampleAreasForMap(mapboxManager: MapboxManager, pointAnnotationManager: PointAnnotationManager) : SamplingState
@@ -98,27 +101,52 @@ class SamplingViewModel : ViewModel()
                 {
                     currentStudy?.value?.let{ study->
 
-                        // assuming only 1 enumeration item per location, for now...
-                        val sampledItem = location.enumerationItems[0]
+                        var resourceId: Int
+                        var isMultiFamily = false
 
-                        if(!_currentSampledItemsForSampling.contains(sampledItem))
-                        {
-                            _currentSampledItemsForSampling.add(sampledItem)
+                        location.isMultiFamily?.let {
+                            isMultiFamily = it
                         }
 
-                        Log.d( "xxx", sampledItem.samplingState.format )
-
-                        val color = when(sampledItem.samplingState)
+                        if (!isMultiFamily)
                         {
-                            SamplingState.None       -> R.drawable.home_black
-                            SamplingState.NotSampled -> R.drawable.home_grey
-                            SamplingState.Sampled    -> R.drawable.home_green
-                            SamplingState.Resampled  -> R.drawable.home_green
-                            SamplingState.Invalid    -> R.drawable.home_red
+                            val sampledItem = location.enumerationItems[0]
+
+                            if(!_currentSampledItemsForSampling.contains(sampledItem))
+                            {
+                                _currentSampledItemsForSampling.add(sampledItem)
+                            }
+
+                            resourceId = when(sampledItem.samplingState)
+                            {
+                                SamplingState.None       -> R.drawable.home_black
+                                SamplingState.NotSampled -> R.drawable.home_green
+                                SamplingState.Sampled    -> R.drawable.home_blue
+                                SamplingState.Resampled  -> R.drawable.home_blue
+                                SamplingState.Invalid    -> R.drawable.home_red
+                            }
+                        }
+                        else
+                        {
+                            resourceId = R.drawable.multi_home_green
+
+                            for (sampledItem in location.enumerationItems)
+                            {
+                                if(!_currentSampledItemsForSampling.contains(sampledItem))
+                                {
+                                    _currentSampledItemsForSampling.add(sampledItem)
+                                }
+
+                                if (sampledItem.samplingState == SamplingState.Sampled)
+                                {
+                                     resourceId = R.drawable.multi_home_blue
+                                    Log.d( "xxx", sampledItem.subAddress )
+                                }
+                            }
                         }
 
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, color )
+                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
                         pointAnnotation?.let { pointAnnotation ->
                             allPointAnnotations.add( pointAnnotation )
@@ -151,14 +179,14 @@ class SamplingViewModel : ViewModel()
 
             }
 
-            for(enumerationItem in _currentSampledItemsForSampling)
+            for(sampleItem in _currentSampledItemsForSampling)
             {
-                enumerationItem.samplingState = SamplingState.NotSampled
+                sampleItem.samplingState = SamplingState.NotSampled
 
                 // find and remove items that are not valid
-                if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                if (sampleItem.enumerationState == EnumerationState.Enumerated)
                 {
-                    validSamples.add(enumerationItem)
+                    validSamples.add(sampleItem)
                 }
 
                 // TODO: run through rules and filters, etc..
@@ -189,18 +217,19 @@ class SamplingViewModel : ViewModel()
                 val sampledIndices: ArrayList<Int> = ArrayList()
                 val sampleSize =  min(study.sampleSize,validSamples.size)
 
-                for (i in 0 until sampleSize) {
-
+                for (i in 0 until sampleSize)
+                {
                     var rnds = (0 until validSamples.size).random()
+
                     while(sampledIndices.contains(rnds))
                     {
                         rnds = (0 until validSamples.size).random()
                     }
+
                     sampledIndices.add(rnds)
-                    validSamples[rnds]?.samplingState = SamplingState.Sampled
+                    validSamples[rnds].samplingState = SamplingState.Sampled
                 }
             }
-
         }
 
         setSampleAreasForMap(mapboxManager,pointAnnotationManager)

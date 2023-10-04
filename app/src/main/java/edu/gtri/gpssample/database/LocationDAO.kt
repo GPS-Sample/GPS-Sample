@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import androidx.core.database.getIntOrNull
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.LocationTypeConverter
 import edu.gtri.gpssample.database.models.*
@@ -106,12 +107,13 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
-                enumerationItem.fieldDataList?.let { fieldDataList ->
-                    for (fieldData in fieldDataList)
-                    {
-//                        fieldData.id = null
-
-                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                if (geoArea is EnumArea)
+                {
+                    enumerationItem.fieldDataList?.let { fieldDataList ->
+                        for (fieldData in fieldDataList)
+                        {
+                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                        }
                     }
                 }
 
@@ -151,12 +153,18 @@ class LocationDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        location.isMultiFamily?.let {
+            values.put( DAO.COLUMN_LOCATION_IS_MULTI_FAMILY, it.toInt())
+        }
+
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
         values.put( DAO.COLUMN_UUID, location.uuid )
         values.put( DAO.COLUMN_LOCATION_TYPE_ID, LocationTypeConverter.toIndex(location.type) )
         values.put( DAO.COLUMN_LOCATION_LATITUDE, location.latitude )
         values.put( DAO.COLUMN_LOCATION_LONGITUDE, location.longitude )
         values.put( DAO.COLUMN_LOCATION_IS_LANDMARK, location.isLandmark.toInt())
+        values.put( DAO.COLUMN_LOCATION_DESCRIPTION, location.description)
+        values.put( DAO.COLUMN_LOCATION_IMAGE_FILE_NAME, location.imageFileName)
     }
 
     @SuppressLint("Range")
@@ -169,8 +177,17 @@ class LocationDAO(private var dao: DAO)
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LONGITUDE))
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
+        val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_DESCRIPTION))
+        val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_FILE_NAME))
+        val isMultiFamilyValue = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY))
 
-        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, ArrayList<EnumerationItem>())
+        var isMultiFamily: Boolean? = null
+
+        isMultiFamilyValue?.let {
+            isMultiFamily = it.toBoolean()
+        }
+
+        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageFileName, isMultiFamily, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?

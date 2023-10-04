@@ -40,8 +40,7 @@
                     android:gravity="center_vertical"
                     android:textColor="@color/primary"
                     android:textStyle="bold"
-                    android:textSize="20dp"
-                    android:text="Text" />
+                    android:textSize="20dp"/>
 
                 <ImageView
                     android:visibility="gone"
@@ -60,7 +59,6 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:gravity="center_vertical"
-                android:text="Created on May 4, 2023 @ 3:13pm"
                 android:textColor="@color/black"
                 android:textStyle="italic"
                 android:textSize="15sp"/>

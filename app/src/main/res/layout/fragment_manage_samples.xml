@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.ManageStudies.ManageStudiesFragment">
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:layout_marginBottom="2dp"
@@ -19,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
-            android:text="Samples"
+            android:text="@string/samples"
             android:textColor="@color/primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -44,7 +43,7 @@
             android:layout_margin="20dp"
             android:layout_above="@+id/create_button"
             android:gravity="center"
-            android:text="You don't have any samples for this study"
+            android:text="@string/you_don_t_have_any_samples_for_this_study"
             android:textColor="@color/primary_textcolor"
             android:textSize="17sp"
             android:textStyle="bold" />
@@ -60,7 +59,7 @@
             android:layout_marginBottom="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Create Sample" />
+            android:text="@string/create_sample" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView

@@ -8,17 +8,19 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PerformCollectionAdapter(var locations: List<Location>) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
+class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
 {
-    override fun getItemCount() = locations.size
+    override fun getItemCount() = enumerationItems.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var didSelectLocation: ((location: Location) -> Unit)
+    lateinit var didSelectEnumerationItem: ((enumerationItem: EnumerationItem) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -32,9 +34,9 @@ class PerformCollectionAdapter(var locations: List<Location>) : RecyclerView.Ada
         return viewHolder
     }
 
-    fun updateLocations( locations: List<Location> )
+    fun updateEnumerationItems( enumerationItems: List<EnumerationItem> )
     {
-        this.locations = locations
+        this.enumerationItems = enumerationItems
         notifyDataSetChanged()
     }
 
@@ -42,13 +44,15 @@ class PerformCollectionAdapter(var locations: List<Location>) : RecyclerView.Ada
     {
         holder.itemView.isSelected = false
 
-        val location = locations.get(holder.adapterPosition)
+        val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( location.uuid)
-        holder.dateTextView.setText( Date(location.creationDate).toString())
+//        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
+
+        holder.nameTextView.setText( enumerationItem.uuid )
+        holder.dateTextView.setText( enumerationItem.subAddress )
 
         holder.itemView.setOnClickListener {
-            didSelectLocation(location)
+            didSelectEnumerationItem( enumerationItem )
         }
     }
 

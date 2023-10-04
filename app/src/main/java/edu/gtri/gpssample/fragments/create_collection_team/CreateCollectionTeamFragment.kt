@@ -1,6 +1,5 @@
 package edu.gtri.gpssample.fragments.create_collection_team
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,11 +10,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.ScreenCoordinate
@@ -28,14 +22,11 @@ import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.databinding.FragmentCreateCollectionTeamBinding
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -180,7 +171,7 @@ class CreateCollectionTeamFragment : Fragment(),
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationTeamFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateCollectionTeamFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun refreshMap()
@@ -212,13 +203,34 @@ class CreateCollectionTeamFragment : Fragment(),
 
             for (location in sampleArea.locations)
             {
-                if (!location.isLandmark && location.enumerationItems.isNotEmpty()) {
-                    // assuming only 1 enumeration item per location, for now...
-                    val sampledItem = location.enumerationItems[0]
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                {
+                    var isMultiFamily = false
 
-                    if (sampledItem.samplingState == SamplingState.Sampled) {
-                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        mapboxManager.addMarker( point, R.drawable.home_black )
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
+                    }
+
+                    if (!isMultiFamily)
+                    {
+                        val sampledItem = location.enumerationItems[0]
+
+                        if (sampledItem.samplingState == SamplingState.Sampled) {
+                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                            mapboxManager.addMarker( point, R.drawable.home_black )
+                        }
+                    }
+                    else
+                    {
+                        for (sampledItem in location.enumerationItems)
+                        {
+                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            {
+                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                                mapboxManager.addMarker( point, R.drawable.multi_home_black )
+                                break
+                            }
+                        }
                     }
                 }
             }

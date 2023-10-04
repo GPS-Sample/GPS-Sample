@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.*
@@ -30,9 +31,7 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
-import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
+import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -47,7 +46,8 @@ class PerformCollectionFragment : Fragment(),
     OnCameraChangeListener,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate
+    ConfirmationDialog.ConfirmationDialogDelegate,
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var user: User
     private lateinit var team: Team
@@ -64,7 +64,7 @@ class PerformCollectionFragment : Fragment(),
 
     private var enumAreaId = 0
     private val binding get() = _binding!!
-    private val pointHashMap = java.util.HashMap<Long, Location>()
+    private val locationHashMap = java.util.HashMap<Long, Location>()
     private var _binding: FragmentPerformCollectionBinding? = null
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
@@ -114,9 +114,9 @@ class PerformCollectionFragment : Fragment(),
             team = it
         }
 
-        val user = (activity!!.application as? MainApplication)?.user
+        val _user = (activity!!.application as? MainApplication)?.user
 
-        user?.let { user ->
+        _user?.let { user ->
             this.user = user
         }
 
@@ -126,17 +126,20 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
-        val sampledLocations = ArrayList<Location>()
+        val enumerationItems = ArrayList<EnumerationItem>()
 
-        sampleArea.locations.map {
-            if (it.enumerationItems[0].samplingState == SamplingState.Sampled)
+        sampleArea.locations.map { location ->
+            for (enumurationItem in location.enumerationItems)
             {
-                sampledLocations.add( it )
+                if (enumurationItem.samplingState == SamplingState.Sampled)
+                {
+                    enumerationItems.add( enumurationItem )
+                }
             }
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( sampledLocations )
-        performCollectionAdapter.didSelectLocation = this::didSelectLocation
+        performCollectionAdapter = PerformCollectionAdapter( enumerationItems )
+        performCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
@@ -157,10 +160,23 @@ class PerformCollectionFragment : Fragment(),
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
 
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         binding.exportButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.export_configuration),
-                resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code),
-                resources.getString(R.string.file_system), kExportTag, this)
+
+            when(user.role)
+            {
+                Role.Supervisor.toString(), Role.Admin.toString() ->
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.export_configuration) , resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                }
+                Role.DataCollector.toString() ->
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.export_collection_data), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                }
+            }
         }
     }
 
@@ -219,34 +235,81 @@ class PerformCollectionFragment : Fragment(),
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    // assuming only 1 enumeration item per location, for now...
-                    val sampledItem = location.enumerationItems[0]
+                    var resourceId = 0
+                    var isMultiFamily = false
 
-                    if (sampledItem.samplingState == SamplingState.Sampled)
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
+                    }
+
+                    if (!isMultiFamily)
                     {
-                        var color = R.drawable.home_black
+                        val sampledItem = location.enumerationItems[0]
 
-                        when(sampledItem.collectionState)
+                        if (sampledItem.samplingState == SamplingState.Sampled)
                         {
-                            CollectionState.Undefined -> color = R.drawable.home_black
-                            CollectionState.Complete -> color = R.drawable.home_green
-                            CollectionState.Incomplete -> color = R.drawable.home_red
+                            resourceId = if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
                         }
+                    }
+                    else
+                    {
+                        for (sampledItem in location.enumerationItems)
+                        {
+                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            {
+                                if (sampledItem.collectionState == CollectionState.Incomplete)
+                                {
+                                    resourceId = R.drawable.multi_home_orange
+                                    break
+                                }
+                                else if (sampledItem.collectionState == CollectionState.Complete)
+                                {
+                                    resourceId = R.drawable.multi_home_purple
+                                }
+                            }
+                        }
+                    }
 
+                    if (resourceId > 0)
+                    {
+                        // one point per location!
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, color )
+                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
                         pointAnnotation?.let { pointAnnotation ->
                             allPointAnnotations.add( pointAnnotation )
-                            pointHashMap[pointAnnotation.id] = location
+                            locationHashMap[pointAnnotation.id] = location
                         }
 
                         pointAnnotationManager.apply {
                             addClickListener(
                                 OnPointAnnotationClickListener { pointAnnotation ->
-                                    pointHashMap[pointAnnotation.id]?.let { location ->
+                                    locationHashMap[pointAnnotation.id]?.let { location ->
                                         sharedViewModel.locationViewModel.setCurrentLocation(location)
-                                        LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+
+                                        var count = 0
+
+                                        for (enumerationItem in location.enumerationItems)
+                                        {
+                                            if (enumerationItem.samplingState == SamplingState.Sampled)
+                                            {
+                                                count += 1
+
+                                                // This is really only necessary here for the enumerationItems.size == 1 case
+                                                // For size > 1, this will get set in the multiCollectionFragment
+                                                sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                                            }
+                                        }
+
+                                        if (count > 1)
+                                        {
+                                            findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment)
+                                        }
+                                        else
+                                        {
+                                            (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
+                                            LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+                                        }
                                     }
                                     true
                                 }
@@ -258,23 +321,20 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
-    private fun didSelectLocation( location: Location )
+    private fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
     {
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
-        LaunchSurveyDialog( activity, this)
+        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
+
+        location?.let { location ->
+            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
+            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
+            LaunchSurveyDialog( activity, this)
+        }
     }
 
     override fun didSelectRightButton(tag: Any?)
     {
-        // Sync the enumeration data back to the admin.
-        // For this scenario, we're trying to export the enumeration data only,
-        // not the entire configuration.
-        // On the admin side, the app will need to be able to add
-        // the enumeration data only, not the entire EnumArea container.
-        // EnumData ids on the admin side will need to be autogenerated
-        // during the import to accommodate uploads from multiple enumerators.
-        // We'll also need to handle duplicate updates from the same enumerator.
-
         var payload: String = ""
         var name: String = ""
 
@@ -289,6 +349,12 @@ class PerformCollectionFragment : Fragment(),
             {
                 name = "EnumArea"
                 payload = enumArea.pack()
+            }
+
+            Role.DataCollector.toString() ->
+            {
+                name = "SampleArea"
+                payload = sampleArea.pack()
             }
         }
 
@@ -325,13 +391,10 @@ class PerformCollectionFragment : Fragment(),
                     startHotspot(view)
                 }
 
-                Role.Enumerator.toString() ->
+                Role.DataCollector.toString() ->
                 {
-                    // start camera
-                    // set what client mode we are
                     sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-
-                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                    sharedNetworkViewModel.networkClientModel.currentSampleArea = sampleArea
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                     getResult.launch(intent)
                 }
@@ -366,11 +429,15 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun launchSurveyButtonPressed()
     {
+        SurveyLaunchNotificationDialog( activity!!, this )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun shouldLaunchODK()
+    {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            (this.activity!!.application as? MainApplication)?.currentLocationUUID = location.uuid
             val intent = Intent(Intent.ACTION_VIEW)
             intent.type = "vnd.android.cursor.dir/vnd.odk.form"
             odk_result.launch(intent)
@@ -395,19 +462,19 @@ class PerformCollectionFragment : Fragment(),
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
-            val sampledItem = location.enumerationItems[0]
+            sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
+                sampledItem.collectionState = CollectionState.Complete
+                sampledItem.notes = notes
 
-            sampledItem.collectionState = CollectionState.Complete
-            sampledItem.notes = notes
+                if (incompleteReason.isNotEmpty())
+                {
+                    sampledItem.collectionState = CollectionState.Incomplete
+                }
 
-            if (incompleteReason.isNotEmpty())
-            {
-                sampledItem.collectionState = CollectionState.Incomplete
+                DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
+
+                refreshMap()
             }
-
-            DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
-
-            refreshMap()
         }
     }
 
