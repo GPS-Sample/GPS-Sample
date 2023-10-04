@@ -105,7 +105,7 @@
                 android:layout_centerInParent="true"
                 android:text="@string/done"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:onClick="@{viewModel.hotspotDonePopBack}"
+                android:onClick="@{viewModel::hotspotDonePopBack}"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
