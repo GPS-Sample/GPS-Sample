@@ -205,7 +205,13 @@ class CreateCollectionTeamFragment : Fragment(),
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    if (location.enumerationItems.size == 1)
+                    var isMultiFamily = false
+
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
+                    }
+
+                    if (!isMultiFamily)
                     {
                         val sampledItem = location.enumerationItems[0]
 

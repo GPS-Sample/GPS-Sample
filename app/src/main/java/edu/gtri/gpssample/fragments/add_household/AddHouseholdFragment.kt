@@ -1,10 +1,16 @@
 package edu.gtri.gpssample.fragments.add_household
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -20,20 +26,22 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.ImageDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
-class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
+class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate, ImageDialog.ImageDialogDelegate
 {
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
-    private val OPEN_DOCUMENT_CODE = 2
 
     private lateinit var study: Study
     private lateinit var config: Config
     private lateinit var location: Location
-    private lateinit var locationDate: Date
     private lateinit var enumArea : EnumArea
+    private lateinit var locationUpdateTime: Date
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
@@ -42,6 +50,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onCreate(savedInstanceState)
 
+        Log.d( "xxx", "AddHouseholdFragment.onCreate" )
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
 
@@ -54,6 +63,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
+        Log.d( "xxx", "AddHouseholdFragment.onCreateView" )
         _binding = FragmentAddHouseholdBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -62,8 +72,16 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.d( "xxx", "AddHouseholdFragment.onViewCreated" )
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
+        }
+
+        if (!this::config.isInitialized)
+        {
+            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
+            findNavController().navigate(R.id.action_navigate_to_MainFragment)
+            return
         }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
@@ -79,7 +97,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let {
-            locationDate = it
+            locationUpdateTime = it
         }
 
         sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let {
@@ -206,10 +224,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.addPhotoImageView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/*"
-            startActivityForResult(intent, OPEN_DOCUMENT_CODE)
+            if (location.imageFileName.isEmpty())
+            {
+                resultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+            }
+            else
+            {
+                ImageDialog( activity!!, location.imageFileName, this )
+            }
         }
 
         binding.cancelButton.setOnClickListener {
@@ -326,6 +348,43 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         findNavController().popBackStack()
+    }
+
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK)
+        {
+            if (result?.data != null)
+            {
+                if (this::location.isInitialized)  // activity may have been destroyed by the Camera app
+                {
+                    val bitmap = result.data?.extras?.get("data") as Bitmap
+                    saveBitmap( bitmap )
+                    ImageDialog( activity!!, location.imageFileName, this )
+                }
+            }
+        }
+    }
+
+    fun saveBitmap(bitmap: Bitmap)
+    {
+        try
+        {
+            val imageFileName = UUID.randomUUID().toString() + ".jpg"
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            val file = File(root, imageFileName)
+            val fileOutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
+            location.imageFileName = file.absolutePath
+        } catch (e: Exception) {
+            Log.d( "xxx", e.stackTrace.toString())
+        }
+    }
+
+    override fun shouldDeleteImage()
+    {
+        location.imageFileName = ""
     }
 
     override fun onDestroyView()

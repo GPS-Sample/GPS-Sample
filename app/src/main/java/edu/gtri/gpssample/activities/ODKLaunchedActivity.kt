@@ -12,7 +12,7 @@ class ODKLaunchedActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
 
         val intent = Intent()
-        intent.putExtra("value", (this.application as? MainApplication)!!.currentLocationUUID)
+        intent.putExtra("value", (this.application as? MainApplication)!!.currentEnumerationItemUUID)
         setResult(RESULT_OK, intent)
 
         finish()

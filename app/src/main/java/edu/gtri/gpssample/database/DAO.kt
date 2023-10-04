@@ -215,7 +215,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
                     COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
                     COLUMN_LOCATION_DESCRIPTION + " TEXT" + "," +
-                    COLUMN_LOCATION_IMAGE_FILE_NAME + " TEXT" +
+                    COLUMN_LOCATION_IMAGE_FILE_NAME + " TEXT" + "," +
+                    COLUMN_LOCATION_IS_MULTI_FAMILY + " INTEGER" +
                     ")")
             db.execSQL(createTableLocation)
 
@@ -496,6 +497,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LOCATION_IS_LANDMARK = "location_is_landmark"
         const val COLUMN_LOCATION_DESCRIPTION = "location_description"
         const val COLUMN_LOCATION_IMAGE_FILE_NAME = "location_image_file_name"
+        const val COLUMN_LOCATION_IS_MULTI_FAMILY = "location_is_multi_family"
 
         // connector table, location to EnumArea
         const val TABLE_LOCATION__ENUM_AREA = "location__enum_area"

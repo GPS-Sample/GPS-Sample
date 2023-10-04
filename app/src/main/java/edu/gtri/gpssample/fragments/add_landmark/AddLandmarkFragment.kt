@@ -9,6 +9,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -33,7 +34,6 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     private lateinit var study: Study
     private lateinit var config: Config
-    private lateinit var locationDate: Date
     private lateinit var enumArea : EnumArea
     private lateinit var location: Location
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -42,14 +42,12 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onCreate(savedInstanceState)
 
-        Log.d( "xxx", "onCreate" )
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View
     {
-        Log.d( "xxx", "onCreateView" )
         _binding = FragmentAddLandmarkBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -58,32 +56,28 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d( "xxx", "onViewCreated" )
-
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
-        } ?: Log.d( "xxx", "config did not get inited" )
+        }
 
         if (!this::config.isInitialized)
         {
+            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
+            findNavController().navigate(R.id.action_navigate_to_MainFragment)
             return
         }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
-        } ?: Log.d( "xxx", "study did not get inited" )
+        }
 
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
             location = it
-        } ?: Log.d( "xxx", "location did not get inited" )
-
-        sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let {
-            locationDate = it
-        } ?: Log.d( "xxx", "locationDate did not get inited" )
+        }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
             enumArea = it
-        } ?: Log.d( "xxx", "enumArea did not get inited" )
+        }
 
         val components = location.uuid.split("-" )
 
@@ -165,17 +159,18 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             if (result?.data != null)
             {
-                Log.d( "xxx", "return from camera" )
-                val bitmap = result.data?.extras?.get("data") as Bitmap
-                binding.landmarkImageView.setImageBitmap(bitmap)
-                saveBitmap( bitmap )
+                if (this::location.isInitialized)  // activity may have been destroyed by the Camera app
+                {
+                    val bitmap = result.data?.extras?.get("data") as Bitmap
+                    binding.landmarkImageView.setImageBitmap(bitmap)
+                    saveBitmap( bitmap )
+                }
             }
         }
     }
 
     fun saveBitmap(bitmap: Bitmap)
     {
-        Log.d( "xxx", "saveBitmap" )
         try
         {
             val imageFileName = UUID.randomUUID().toString() + ".jpg"
@@ -195,7 +190,6 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onDestroyView()
 
-        Log.d( "xxx", "onDestroyView!!!!!!!!!!!!!!!!!!!!!!!!!!")
         _binding = null
     }
 }

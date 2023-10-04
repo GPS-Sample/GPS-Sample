@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
     {
         super.onCreate(savedInstanceState)
 
+        Log.d( "xxx", "MainActivity.onCreate" )
+
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
         configurationViewModel = viewModel
@@ -83,6 +85,12 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
 
         if (savedInstanceState == null)
         {
+            DAO.createSharedInstance(applicationContext)
+            configurationViewModel.initializeConfigurations()
+        }
+        else
+        {
+            // TODO: Figure out how to save the ViewModel state in onSaveInstanceState restore the state here...
             DAO.createSharedInstance(applicationContext)
             configurationViewModel.initializeConfigurations()
         }
@@ -128,6 +136,13 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle)
+    {
+        super.onSaveInstanceState(outState)
+
+        // TODO: Figure out how to save the ViewModel state.
+    }
+
     private fun updateConnectionStatus(status : NetworkConnectionStatus)
     {
         if(networkConnectionStatus != status)
@@ -159,14 +174,12 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
 
     override fun onDestroy() {
         super.onDestroy()
-        this.unbindService( networkMonitorConnection)
-        Log.d("xx", "DESTROY")
+        Log.d("xxx", "MainActivity.onDestroy")
 
+        this.unbindService( networkMonitorConnection)
         networkViewModel.shutdown()
     }
 
     override fun didSelectOkButton(tag: Any?) {
-
     }
-
 }

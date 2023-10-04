@@ -44,12 +44,9 @@ class PerformMultiCollectionAdapter(var enumerationItems: List<EnumerationItem>)
 
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
+//        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
 
-        location?.let { location ->
-            holder.nameTextView.setText( location.uuid )
-        }
-
+        holder.nameTextView.setText( enumerationItem.uuid )
         holder.dateTextView.setText( enumerationItem.subAddress )
 
         if (enumerationItem.collectionState == CollectionState.Complete)

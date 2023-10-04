@@ -31,10 +31,7 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
-import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
-import edu.gtri.gpssample.dialogs.MapLegendDialog
+import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -49,7 +46,8 @@ class PerformCollectionFragment : Fragment(),
     OnCameraChangeListener,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate
+    ConfirmationDialog.ConfirmationDialogDelegate,
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var user: User
     private lateinit var team: Team
@@ -238,8 +236,13 @@ class PerformCollectionFragment : Fragment(),
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
                     var resourceId = 0
+                    var isMultiFamily = false
 
-                    if (location.enumerationItems.size == 1)
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
+                    }
+
+                    if (!isMultiFamily)
                     {
                         val sampledItem = location.enumerationItems[0]
 
@@ -304,6 +307,7 @@ class PerformCollectionFragment : Fragment(),
                                         }
                                         else
                                         {
+                                            (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                             LaunchSurveyDialog( activity, this@PerformCollectionFragment)
                                         }
                                     }
@@ -324,6 +328,7 @@ class PerformCollectionFragment : Fragment(),
         location?.let { location ->
             sharedViewModel.locationViewModel.setCurrentLocation(location)
             sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
+            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
             LaunchSurveyDialog( activity, this)
         }
     }
@@ -424,11 +429,15 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun launchSurveyButtonPressed()
     {
+        SurveyLaunchNotificationDialog( activity!!, this )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun shouldLaunchODK()
+    {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            (this.activity!!.application as? MainApplication)?.currentLocationUUID = location.uuid
             val intent = Intent(Intent.ACTION_VIEW)
             intent.type = "vnd.android.cursor.dir/vnd.odk.form"
             odk_result.launch(intent)

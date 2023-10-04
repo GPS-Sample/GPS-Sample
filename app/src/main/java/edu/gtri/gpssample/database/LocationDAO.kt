@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import androidx.core.database.getIntOrNull
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.LocationTypeConverter
 import edu.gtri.gpssample.database.models.*
@@ -14,10 +15,6 @@ class LocationDAO(private var dao: DAO)
 {
     fun createOrUpdateLocation( location: Location, geoArea : GeoArea) : Location?
     {
-        location?.id.let {
-            Log.d( "xxx", "location id = ${it}")
-        }
-
         if (exists( location ))
         {
             updateLocation( location, geoArea )
@@ -156,6 +153,10 @@ class LocationDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        location.isMultiFamily?.let {
+            values.put( DAO.COLUMN_LOCATION_IS_MULTI_FAMILY, it.toInt())
+        }
+
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
         values.put( DAO.COLUMN_UUID, location.uuid )
         values.put( DAO.COLUMN_LOCATION_TYPE_ID, LocationTypeConverter.toIndex(location.type) )
@@ -178,8 +179,15 @@ class LocationDAO(private var dao: DAO)
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_DESCRIPTION))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_FILE_NAME))
+        val isMultiFamilyValue = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY))
 
-        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageFileName, ArrayList<EnumerationItem>())
+        var isMultiFamily: Boolean? = null
+
+        isMultiFamilyValue?.let {
+            isMultiFamily = it.toBoolean()
+        }
+
+        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageFileName, isMultiFamily, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?
