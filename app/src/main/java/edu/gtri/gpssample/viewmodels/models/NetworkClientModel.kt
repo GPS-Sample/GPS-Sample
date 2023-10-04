@@ -19,10 +19,7 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.network.*
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.lang.Thread.sleep
 import java.net.InetAddress
 
@@ -33,7 +30,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     override val type = NetworkMode.NetworkClient
     private val client: TCPClient = TCPClient()
     private var heartbeatBroadcasting: Boolean = false
-
+    private var connectWaiting : Boolean = true
 
     interface ConfigurationDelegate {
         fun configurationReceived(config: Config)
@@ -236,6 +233,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectToWifi(networkInfo: NetworkInfo) {
+        connectWaiting = true
         clientStarted = true
         this.networkInfo = networkInfo
         // if  (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
@@ -251,47 +249,11 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
                     wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
 
-//                    wifiConfig.SSID = "\"" + "Cypress Guest Wifi" + "\""
-//                    wifiConfig.preSharedKey = "\"" + "cypresslovesyou" + "\""
-
-//                    wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-//                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.OPEN);
-//                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.AuthAlgorithm.SHARED);
-//                    wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-//                    wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-//                    wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-//                    wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-//                    wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-//                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-//                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-//                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-//                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-
                     var wifiManager =
                         Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
                     wifiManager!!.setWifiEnabled(true)
 
-
-                    val wifiList = wifiManager!!.configuredNetworks
-                    for (item in wifiList) {
-                        Log.d("XXXX wifi ", "ssid ${item.SSID}")
-//                        if(item.SSID != null && item.SSID.equals(ssid)){
-//                            return item
-//                        }
-                    }
-
-//                    val suggestionWpa2 = WifiNetworkSuggestion.Builder()
-//                        .setSsid("Cypress Guest Wifi") //SSID name
-//                        .setWpa2Passphrase("cypresslovesyou") //password
-//                        .build()
-//                    val networkSuggestions: ArrayList<WifiNetworkSuggestion> = ArrayList()
-//                    networkSuggestions.add(suggestionWpa2)
-
-                    //   wifiManager!!.startScan()
-
-
                     if (wifiManager!!.isWifiEnabled) {
-                        Log.d("xxxxxx", "WIFI ENABLED")
 
                         var netId = wifiManager!!.addNetwork(wifiConfig)
                         if (netId == -1) {
@@ -304,7 +266,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                             val disconnect = wifiManager.disconnect()
                             if (disconnect) {
-                                Log.d("xxxxxx", "${wifiManager?.isWifiEnabled}")
                                 wifiManager.enableNetwork(netId, true)
 
                                 val reconnect = wifiManager.reconnect()
@@ -315,6 +276,13 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                                         val connectivityManager =
                                             Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                                         connectivityManager.registerDefaultNetworkCallback(networkCallback)
+
+
+                                        CoroutineScope(Dispatchers.IO +  SupervisorJob()).launch {
+                                            test()
+                                        }
+
+
                                     }, 100)
                                 }
 
@@ -322,13 +290,12 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                         }
                     }
                 } catch (e: Exception) {
-                    Log.d("xxx", e.stackTraceToString())
+                    Log.d("error", e.stackTraceToString())
                 }
             } else {
                 var wifiManager =
                     Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
                 val wifiInfo: WifiInfo = wifiManager!!.getConnectionInfo()
-                Log.d("xxx", "wifiinfo ${wifiInfo}")
 
                 val builder = WifiNetworkSpecifier.Builder()
                 builder.setSsid(networkInfo.ssid);
@@ -358,6 +325,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
+
             super.onAvailable(network)
             val connectivityManager =
                 Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -367,8 +335,10 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                 networkInfo?.let { networkInfo ->
                     if (client.connect(networkInfo.serverIP, this@NetworkClientModel)) {
+
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
+                        connectWaiting = false
                     }else
                     {
                         runError()
@@ -405,50 +375,15 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
             super.onLinkPropertiesChanged(network, linkProperties)
 
         }
-
-        fun runError()
-        {
-            _networkConnected.postValue(NetworkStatus.NetworkError)
-            _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
-            _commandSent.postValue(NetworkStatus.CommandError)
-            _dataReceived.postValue(NetworkStatus.DataReceivedError)
-            sleep(kDialogTimeout)
-            connectDelegate?.didConnect(false)
-        }
     }
 
 
     override fun sentData(data: String) {
-        Log.d("SERVER CONNECT", data)
         _clientDataMessage.postValue(data)
     }
 
     override fun connectionString(connection: String) {
         _clientConnectMessage.postValue(connection)
-    }
-
-    private fun startHeartbeat() {
-        viewModelScope?.let { viewModelScope ->
-            viewModelScope.launch(Dispatchers.IO) {
-                //join multicast
-                val newWifiInterfaces = NetworkUtils.getWifiApInterfaces()
-                if (newWifiInterfaces.size > 0) {
-                    /* Acquire MultiCast Lock */
-//                    val wifi = Activity!!.getSystemService(Context.WIFI_SERVICE) as WifiManager
-//                    val multicastLock = wifi.createMulticastLock("multicastLock")
-//                    multicastLock.setReferenceCounted(true)
-//                    multicastLock.acquire()
-                    Multicast.join(newWifiInterfaces[0])
-                }
-                heartbeatBroadcasting = true
-                while (heartbeatBroadcasting) {
-                    val heartbeat = "HEARTBEAT"
-                    Multicast.broadcast(heartbeat.toByteArray())
-                    sleep(NetworkUtils.kHeartbeatInterval)
-                }
-            }
-
-        }
     }
 
     fun resetState() {
@@ -473,14 +408,46 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 } catch (e: Exception) {
 
                 }
-
-
                 clientStarted = false
             }
-
         } catch (ex: Exception) {
             Log.d("shutdown Exception ", ex.stackTraceToString())
         }
 
+    }
+
+    fun test()
+    {
+        var count = 0
+        var timeout = false
+        while(connectWaiting)
+        {
+            sleep(1000)
+            count += 1
+
+            if(count > 20)
+            {
+                timeout = true
+                break
+            }
+        }
+
+        if(timeout)
+        {
+            GlobalScope.launch(Dispatchers.Default) {
+                runError()
+            }
+        }
+
+
+    }
+    fun runError()
+    {
+        _networkConnected.postValue(NetworkStatus.NetworkError)
+        _clientRegistered.postValue(NetworkStatus.ClientRegisterError)
+        _commandSent.postValue(NetworkStatus.CommandError)
+        _dataReceived.postValue(NetworkStatus.DataReceivedError)
+        sleep(kDialogTimeout)
+        connectDelegate?.didConnect(false)
     }
 }
