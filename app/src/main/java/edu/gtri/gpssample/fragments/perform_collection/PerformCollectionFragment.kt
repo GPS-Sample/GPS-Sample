@@ -165,7 +165,6 @@ class PerformCollectionFragment : Fragment(),
         }
 
         binding.exportButton.setOnClickListener {
-
             when(user.role)
             {
                 Role.Supervisor.toString(), Role.Admin.toString() ->

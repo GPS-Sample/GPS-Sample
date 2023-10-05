@@ -159,7 +159,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         binding.nextButton.setOnClickListener {
             samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
 
-                if (binding.sampleButton.visibility == View.VISIBLE)
+                if (sampleArea.id == null)
                 {
                     DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
 

@@ -236,15 +236,13 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
                     Log.d( "xxx", payload )
 
-                    sampleArea?.let { sampleArea ->
-                        for (location in sampleArea.locations)
-                        {
-                            DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
-                        }
-
-//                        sharedViewModel?.replaceEnumArea(enumArea)
-//                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
+                    for (location in sampleArea.locations)
+                    {
+                        DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
                     }
+
+//                    sharedViewModel?.replaceEnumArea(enumArea)
+//                    sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                 }
             }
         }
