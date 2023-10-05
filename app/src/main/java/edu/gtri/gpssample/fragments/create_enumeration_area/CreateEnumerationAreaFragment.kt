@@ -407,7 +407,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     fun getAllEnumAreas() : ArrayList<EnumArea>
     {
         val allEnumAreas = ArrayList<EnumArea>()
-        allEnumAreas.addAll( config.enumAreas )
+        allEnumAreas.addAll( DAO.enumAreaDAO.getEnumAreas( config ) )
         allEnumAreas.addAll( unsavedEnumAreas )
         return allEnumAreas
     }
