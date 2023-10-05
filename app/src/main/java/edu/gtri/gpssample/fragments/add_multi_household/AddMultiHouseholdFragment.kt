@@ -56,8 +56,7 @@ class AddMultiHouseholdFragment : Fragment()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.addButton.setOnClickListener {
-            val enumerationItem = EnumerationItem()
-            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+            sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
         }
 
@@ -69,12 +68,12 @@ class AddMultiHouseholdFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
     {
+        sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
         findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
     }
 
