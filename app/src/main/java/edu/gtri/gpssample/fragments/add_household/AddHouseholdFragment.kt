@@ -239,7 +239,13 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.saveButton.setOnClickListener {
-            if (location.enumerationItems.size > 0 && binding.subaddressEditText.text.isEmpty())
+            var isMultiFamily = false
+
+            location.isMultiFamily?.let {
+                isMultiFamily = it
+            }
+
+            if (isMultiFamily && binding.subaddressEditText.text.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, "The Subaddress must be defined for a multi family location.", Toast.LENGTH_SHORT).show()
             }

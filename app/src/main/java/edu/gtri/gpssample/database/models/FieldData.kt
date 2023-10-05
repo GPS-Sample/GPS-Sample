@@ -29,7 +29,7 @@ data class FieldData (
         "", null, null, null, null, ArrayList<FieldDataOption>())
 
     constructor( field: Field, blockNumber: Int ) : this( null, UUID.randomUUID().toString(), field, "", FieldType.None,
-        "", null, null, null, null, ArrayList<FieldDataOption>())
+        "", null, null, null, blockNumber, ArrayList<FieldDataOption>())
 
     constructor( field: Field,  name : String, type : FieldType, textValue: String,
                  numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :

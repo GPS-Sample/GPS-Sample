@@ -410,7 +410,6 @@ class PerformEnumerationFragment : Fragment(),
             {
                 sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
 
-
                 ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
             }
             else if (location.enumerationItems.size == 1)
