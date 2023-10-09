@@ -43,6 +43,14 @@
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_PerformEnumerationFragment"
+            app:destination="@id/PerformEnumerationFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_PerformCollectionFragment"
+            app:destination="@id/PerformCollectionFragment" />
     </fragment>
 
     <!--ManageConfigurationsFragment-->

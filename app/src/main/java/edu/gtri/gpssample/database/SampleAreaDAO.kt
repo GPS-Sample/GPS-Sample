@@ -40,6 +40,11 @@ class SampleAreaDAO(private var dao: DAO)
                 DAO.latLonDAO.createOrUpdateLatLon(latLon, sampleArea,null)
             }
 
+            for (location in sampleArea.locations)
+            {
+                DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
+            }
+
             for (team in sampleArea.collectionTeams)
             {
                 DAO.teamDAO.createOrUpdateTeam(team, sampleArea)
