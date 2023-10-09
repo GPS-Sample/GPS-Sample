@@ -106,7 +106,6 @@
     <string name="operator">"Opérateur de fonction"</string>
     <string name="enter_value">"Entrez la valeur"</string>
     <string name="value">"Valeur"</string>
-    <string name="filters">"Filtres"</string>
     <string name="rule">"Règle"</string>
     <string name="connector">"Connecteur"</string>
     <string name="sampling_method">"Méthode d'échantillonnage"</string>
@@ -114,7 +113,6 @@
     <string name="sample_size">"Taille de l'échantillon"</string>
     <string name="filter_name">"Nom du filtre"</string>
     <string name="rule_name">"Nom de la règle"</string>
-    <string name="total_sample_size">"Taille totale de l'échantillon pour toutes les grappes"</string>
     <string name="manage_studies">"Gérer les études"</string>
     <string name="manage_samples">"Gérer les échantillons"</string>
     <string name="create_sample">"Créer un échantillon"</string>
@@ -213,11 +211,10 @@
     <string name="teams">"Équipes"</string>
     <string name="select_location">"Sélectionnez le lieu"</string>
     <string name="current_location">"Actuel"</string>
-    <string name="new_location">"Nouveau lieu"</string>
     <string name="tap_the_map">"Tapez sur la carte pour ajouter un nouveau lieu"</string>
     <string name="complete">"Complet"</string>
     <string name="reason_incomplete_label">"Motif Incomplet"</string>
-    <string name="warning">"Attention !"</string>
+    <string name="warning">"Attention!"</string>
     <string name="duplicate_warning">"L'ajout de ce nouveau lieu est extrêmement proche d'un lieu existant.  Êtes-vous sûr de vouloir l'ajouter ?"</string>
     <string name="missing_team">"Il manque une définition d'équipe à la configuration"</string>
     <string name="collection_teams">"Équipes de collecte"</string>

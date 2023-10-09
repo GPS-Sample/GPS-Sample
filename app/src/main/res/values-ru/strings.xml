@@ -20,18 +20,18 @@
     <string name="admin">"Администратор"</string>
     <string name="supervisor">"Руководитель"</string>
     <string name="enumerator">"Перечислитель"</string>
-    <string name="surveyor">"Геодезист"</string>
+    <string name="surveyor">"Исследователь"</string>
     <string name="configurations">"Конфигурации"</string>
-    <string name="no_configurations">"У вас нет конфигураций"</string>
+    <string name="no_configurations">"У вас нет каких -либо конфигураций"</string>
     <string name="no_studies">"У вас нет исследований для этой конфигурации"</string>
-    <string name="data_collector">"Сборщик данных"</string>
+    <string name="data_collector">"Опрашивающий"</string>
     <string name="scan_qr_code">"Сканирование QR-кода"</string>
     <string name="continue_with_existing_study">"Продолжить существующее исследование"</string>
     <string name="admin_sign_in">"Вход администратора"</string>
-    <string name="supervisor_sign_in">"Администратор Войти"</string>
-    <string name="data_collector_sign_in">"Сборщик данных Войти"</string>
-    <string name="admin_sign_up">"Администратор Зарегистрироваться"</string>
-    <string name="supervisor_sign_up">"Администратор Регистрация"</string>
+    <string name="supervisor_sign_in">"Вход  Руководитель"</string>
+    <string name="data_collector_sign_in">"Вход опрашивающего"</string>
+    <string name="admin_sign_up">"Зарегистрироваться как Администратор"</string>
+    <string name="supervisor_sign_up">"Зарегистрироваться как Руководитель"</string>
     <string name="data_collector_sign_up">"Регистрация сборщика данных"</string>
     <string name="enter_your_pin">"Введите PIN-код"</string>
     <string name="reenter_your_pin">"Повторный ввод PIN-кода"</string>
@@ -41,16 +41,16 @@
     <string name="save">"Сохранить"</string>
     <string name="done">"Готово"</string>
     <string name="select_role">"Выберите свою роль"</string>
-    <string name="admin_select_role">"Администратор Выберите роль"</string>
-    <string name="supervisor_select_role">"Супервайзер Выберите роль"</string>
+    <string name="admin_select_role">"Выберите роль Администратора"</string>
+    <string name="supervisor_select_role">"Выберите роль Супервайзера"</string>
     <string name="sign_in">"Войти"</string>
     <string name="sign_up">"Зарегистрироваться"</string>
-    <string name="sign_out">"Зарегистрироваться"</string>
+    <string name="sign_out">"Выйти из системы"</string>
     <string name="not_registered">"Не зарегистрированы?  Зарегистрируйтесь!"</string>
     <string name="name">"Имя"</string>
     <string name="enter_your_name">"Введите Ваше имя"</string>
     <string name="pin">"PIN"</string>
-    <string name="forgot_pin_question">"Вопрос о PIN-коде"</string>
+    <string name="forgot_pin_question">"Забыли PIN-код"</string>
     <string name="forgot_pin_answer">"Забыли ответ PIN"</string>
     <string name="enter_your_answer">"Введите ответ"</string>
     <string name="create_config">"Создать конфигурацию"</string>
@@ -60,7 +60,7 @@
     <string name="edit_study">"Редактировать исследование"</string>
     <string name="delete_study">"Удалить исследование"</string>
     <string name="create_field">"Создать поле"</string>
-    <string name="config_name">"Имя конфигурации"</string>
+    <string name="config_name">"Конфигурация имени"</string>
     <string name="study_name">"Имя исследования"</string>
     <string name="field_name">"Имя поля"</string>
     <string name="enumeration_fields">"Поля перечисления"</string>
@@ -72,13 +72,13 @@
     <string name="time_format">"Формат времени"</string>
     <string name="manage_enumerators">"Управление счетчиками"</string>
     <string name="collect_enumerations">"Сбор перечислений"</string>
-    <string name="generate_sample">"Генерировать выборку"</string>
+    <string name="generate_sample">"Создасть выборку"</string>
     <string name="collect_samples">"Сбор образцов"</string>
     <string name="min_gps_precision">"Желаемая точность GPS"</string>
     <string name="enter_min_gps_precision">"Введите желаемую точность GPS"</string>
     <string name="define_enumeration_fields">"Определить поля перечисления"</string>
     <string name="define_enumeration_area">"Определить область перечисления"</string>
-    <string name="define_sampling_method">"Определить метод отбора проб"</string>
+    <string name="define_sampling_method">"Определить метод выборки"</string>
     <string name="studies">"Исследования"</string>
     <string name="enumeration_area">"Области перечисления"</string>
     <string name="barcode_result">"Обнаружен штрих-код"</string>
@@ -106,7 +106,6 @@
     <string name="operator">"Оператор"</string>
     <string name="enter_value">"Введите значение"</string>
     <string name="value">"Значение"</string>
-    <string name="filters">"Фильтры"</string>
     <string name="rule">"Правило"</string>
     <string name="connector">"Коннектор"</string>
     <string name="sampling_method">"Метод выборки"</string>
@@ -114,7 +113,6 @@
     <string name="sample_size">"Размер выборки"</string>
     <string name="filter_name">"Имя фильтра"</string>
     <string name="rule_name">"Имя правила"</string>
-    <string name="total_sample_size">"Общий размер выборки по всем кластерам"</string>
     <string name="manage_studies">"Управление исследованиями"</string>
     <string name="manage_samples">"Управление выборками"</string>
     <string name="create_sample">"Создать выборку"</string>
@@ -182,7 +180,7 @@
     <string name="notes">"Примечания"</string>
     <string name="oops">"Упс!"</string>
     <string name="field_is_required">"поле обязательно для заполнения"</string>
-    <string name="number">"Номер"</string>
+    <string name="number">"Число"</string>
     <string name="text">"Текст"</string>
     <string name="checkbox">"Флажок"</string>
     <string name="connected">"Подключено"</string>
@@ -193,7 +191,7 @@
     <string name="required">"Требуется"</string>
     <string name="time">"Время"</string>
     <string name="date">"Дата"</string>
-    <string name="dropdown">"Выпадающий список"</string>
+    <string name="dropdown">"Выпадающее окно"</string>
     <string name="fields">"Поля"</string>
     <string name="rules">"Правила"</string>
     <string name="simple_random">"Простая случайная выборка"</string>
@@ -203,7 +201,7 @@
     <string name="numberhouseholds">"# домохозяйств"</string>
     <string name="percenthouseholds">"% от всех домохозяйств"</string>
     <string name="percenttotal">"% от общей численности населения"</string>
-    <string name="equal">"Равные"</string>
+    <string name="equal">"Равно"</string>
     <string name="not_equal">"Не равны"</string>
     <string name="less_than">"Меньше"</string>
     <string name="greater_than">"Больше чем"</string>
@@ -213,7 +211,6 @@
     <string name="teams">"Команды"</string>
     <string name="select_location">"Выбрать местоположение"</string>
     <string name="current_location">"Текущее"</string>
-    <string name="new_location">"Новое местоположение"</string>
     <string name="tap_the_map">""Нажмите на карту"</string>
     <string name="complete">"Завершить"</string>
     <string name="reason_incomplete_label">"Причина незавершенности"</string>
@@ -244,7 +241,7 @@
     <string name="status">"Статус"</string>
     <string name="description">"Описание"</string>
     <string name="add_image">"Добавить изображение"</string>
-    <string name="enumeration_areas">"Зоны перечисления"</string>
+    <string name="enumeration_areas">"Области перечисления"</string>
     <string name="enter_team_name">"Введите название команды"</string>
     <string name="assign_households">"Назначить домохозяйства"</string>
     <string name="sampling_type">"Тип выборки"</string>
@@ -276,14 +273,14 @@
         <item>"Число"</item>
         <item>"Дата"</item>
         <item>"Флажок"</item>
-        <item>"Выпадающий"</item>
+        <item>"Выпадающее окно"</item>
     </string-array>
     <string-array name="operators">
         <item>"Равно"</item>
-        <item>"NotEqual"</item>
-        <item>"LessThan"</item>
-        <item>"БольшеТан"</item>
-        <item>"GreaterThanOrEqual"</item>
+        <item>"Не равно"</item>
+        <item>"Меньше чем"</item>
+        <item>"Больше чем"</item>
+        <item>"Больше чем или равно"</item>
     </string-array>
     <string-array name="connectors">
         <item>"И"</item>

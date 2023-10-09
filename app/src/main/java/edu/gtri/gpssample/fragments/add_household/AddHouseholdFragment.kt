@@ -189,6 +189,18 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
 
+        binding.subaddressEditText.setOnFocusChangeListener { view, b ->
+
+            if (b)
+            {
+                Log.d( "xxx", "b is true" )
+            }
+            else
+            {
+                Log.d( "xxx", "b is false" )
+            }
+        }
+
         if (sharedViewModel.locationViewModel.isLocationUpdateTimeValid.value == true)
         {
             sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let { date ->

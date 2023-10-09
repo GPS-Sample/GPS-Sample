@@ -14,6 +14,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.managers.MapboxManager
 import java.lang.Integer.min
 import java.util.ArrayList
+import kotlin.math.roundToInt
 
 class SamplingViewModel : ViewModel()
 {
@@ -212,22 +213,42 @@ class SamplingViewModel : ViewModel()
             // remove invalid houses as part of sampling
            // _currentEnumItemsForSampling.removeAll(removeList.toSet())
 
-            // just do random sampling as a test
-            currentSampleArea?.value?.let { sampleArea ->
-                val sampledIndices: ArrayList<Int> = ArrayList()
-                val sampleSize =  min(study.sampleSize,validSamples.size)
+            currentStudy?.value?.let { study ->
+                var sampleSize = 0
 
-                for (i in 0 until sampleSize)
+                when (study.sampleType)
                 {
-                    var rnds = (0 until validSamples.size).random()
-
-                    while(sampledIndices.contains(rnds))
+                    SampleType.NumberHouseholds ->
                     {
-                        rnds = (0 until validSamples.size).random()
+                        sampleSize =  min(study.sampleSize,validSamples.size)
                     }
+                    SampleType.PercentHouseholds ->
+                    {
+                        sampleSize = (study.sampleSize.toDouble() / 100.0 * validSamples.size.toDouble()).roundToInt()
+                    }
+                    else ->
+                    {
+                    }
+                }
 
-                    sampledIndices.add(rnds)
-                    validSamples[rnds].samplingState = SamplingState.Sampled
+                if (sampleSize > 0)
+                {
+                    currentSampleArea?.value?.let { sampleArea ->
+                        val sampledIndices: ArrayList<Int> = ArrayList()
+
+                        for (i in 0 until sampleSize)
+                        {
+                            var rnds = (0 until validSamples.size).random()
+
+                            while(sampledIndices.contains(rnds))
+                            {
+                                rnds = (0 until validSamples.size).random()
+                            }
+
+                            sampledIndices.add(rnds)
+                            validSamples[rnds].samplingState = SamplingState.Sampled
+                        }
+                    }
                 }
             }
         }
