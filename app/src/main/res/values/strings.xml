@@ -269,7 +269,7 @@
     <string name="filters">"Filters (combines rules)"</string>
     <string name="new_location">"Identify Location"</string>
     <string name="delete_configuration">The current configuration will be replaced by the import.  Would you like to proceed?</string>
-    
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

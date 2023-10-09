@@ -77,7 +77,6 @@ class PerformEnumerationFragment : Fragment(),
     private var gpsLocation: Point? = null
 
     private var dropMode = false
-    private var isLandmark = false
     private var showCurrentLocation = true
 
     private var _binding: FragmentPerformEnumerationBinding? = null
@@ -88,10 +87,9 @@ class PerformEnumerationFragment : Fragment(),
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
 
-    private val kExportTag = 2
-    private val kAddHouseholdTag = 3
-    private val kAddLandmarkTag = 4
-    private val kSelectHouseholdTag = 5
+    private val kExportTag = 1
+    private val kAddHouseholdTag = 2
+    private val kSelectHouseholdTag = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -201,8 +199,6 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            isLandmark = false
-
             ConfirmationDialog( activity, resources.getString(R.string.select_location),
                 "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
         }
@@ -214,10 +210,16 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            isLandmark = true
+            gpsLocation?.let { point ->
+                val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), true, "")
+                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                enumArea.locations.add(location)
 
-            ConfirmationDialog( activity, resources.getString(R.string.select_location),
-                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddLandmarkTag, this)
+                sharedViewModel.locationViewModel.setCurrentLocation(location)
+                sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
+                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
         }
 
         binding.exportButton.setOnClickListener {
@@ -450,7 +452,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
-            val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
+            val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false, "")
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
 
@@ -516,7 +518,7 @@ class PerformEnumerationFragment : Fragment(),
             return
         }
 
-        if (tag == kAddHouseholdTag || tag == kAddLandmarkTag)
+        if (tag == kAddHouseholdTag)
         {
             gpsLocation?.let { point ->
                 enumArea.locations.map{
@@ -529,7 +531,7 @@ class PerformEnumerationFragment : Fragment(),
                     }
                 }
 
-                val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), isLandmark, "")
+                val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false, "")
                 DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                 enumArea.locations.add(location)
 
@@ -612,9 +614,8 @@ class PerformEnumerationFragment : Fragment(),
                     }
                 }
 
-                kAddHouseholdTag, kAddLandmarkTag -> {
+                kAddHouseholdTag -> {
                     dropMode = true
-                    isLandmark = isLandmark
                     binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
 
