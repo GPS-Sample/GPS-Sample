@@ -211,7 +211,6 @@
     <string name="teams">"Команды"</string>
     <string name="select_location">"Выбрать местоположение"</string>
     <string name="current_location">"Текущее"</string>
-    <string name="new_location">"Новое местоположение"</string>
     <string name="tap_the_map">""Нажмите на карту"</string>
     <string name="complete">"Завершить"</string>
     <string name="reason_incomplete_label">"Причина незавершенности"</string>
