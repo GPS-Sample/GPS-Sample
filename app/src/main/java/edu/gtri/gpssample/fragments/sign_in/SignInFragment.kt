@@ -149,38 +149,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
                     val bundle = Bundle()
                     bundle.putString(Keys.kRole.toString(), expectedRole.toString())
-
-                    when(user.role)
-                    {
-                        Role.Enumerator.toString() ->
-                        {
-                            if(sharedViewModel.configurations.size > 0)
-                            {
-                                navigateToEnumeration()
-                            }
-                            else
-                            {
-                                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-                            }
-                        }
-
-                        Role.DataCollector.toString() ->
-                        {
-                            if(sharedViewModel.configurations.size > 0)
-                            {
-                                navigateToCollection()
-                            }
-                            else
-                            {
-                                findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-                            }
-                        }
-
-                        Role.Admin.toString(), Role.Supervisor.toString() ->
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
-                        }
-                    }
+                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                 }
             }
         }
@@ -217,102 +186,6 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         user?.let {
             it.pin = pin.toInt()
             DAO.userDAO.updateUser( it )
-        }
-    }
-
-    fun navigateToEnumeration()
-    {
-        if (sharedViewModel.configurations.size > 0)
-        {
-            val config = sharedViewModel.configurations[0]
-            sharedViewModel.setCurrentConfig( config )
-
-            // find the selected Enum Area
-            val enumAreas = config.enumAreas.filter {
-                it.id?.let { id ->
-                    id == config.selectedEnumAreaId
-                } ?: false
-            }
-
-            // find the selected study
-            val studies = config.studies.filter {
-                it.id?.let { id ->
-                    id == config.selectedStudyId
-                } ?: false
-            }
-
-            if (enumAreas.isNotEmpty() && studies.isNotEmpty())
-            {
-                val enumArea = enumAreas[0]
-                val study = studies[0]
-
-                // find the selected enumeration Team
-                val enumTeams = enumArea.enumerationTeams.filter {
-                    it.id?.let { id ->
-                        id == enumArea.selectedTeamId
-                    } ?: false
-                }
-
-                if (enumTeams.isNotEmpty())
-                {
-                    val enumTeam = enumTeams[0]
-                    sharedViewModel.createStudyModel.setStudy( study )
-                    sharedViewModel.teamViewModel.setCurrentTeam( enumTeam )
-                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                    findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
-                }
-            }
-        }
-    }
-
-    fun navigateToCollection()
-    {
-        if(sharedViewModel.configurations.size > 0)
-        {
-            val config = sharedViewModel.configurations[0]
-            sharedViewModel.setCurrentConfig( config )
-
-            // find the selected Enum Area
-            val enumAreas = config.enumAreas.filter {
-                it.id?.let { id ->
-                    id == config.selectedEnumAreaId
-                } ?: false
-            }
-
-            // find the selected study
-            val studies = config.studies.filter {
-                it.id?.let { id ->
-                    id == config.selectedStudyId
-                } ?: false
-            }
-
-            if (enumAreas.isNotEmpty() && studies.isNotEmpty())
-            {
-                val study = studies[0]
-                val enumArea = enumAreas[0]
-                val sampleArea = study.sampleArea
-
-                sampleArea?.let { sampleArea ->
-
-                    // find the selected collection Team
-                    val collectionTeams = sampleArea.collectionTeams.filter {
-                        it.id?.let { id ->
-                            id == sampleArea.selectedTeamId
-                        } ?: false
-                    }
-
-                    if (collectionTeams.isNotEmpty())
-                    {
-                        val collectionTeam = collectionTeams[0]
-                        sharedViewModel.createStudyModel.setStudy( study )
-                        samplingViewModel.setCurrentSampleArea( sampleArea )
-                        sharedViewModel.teamViewModel.setCurrentTeam( collectionTeam )
-                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-                        findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
-                    }
-                }
-            }
         }
     }
 

@@ -47,6 +47,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var samplingViewModel: SamplingViewModel
 
+    private val kImportTag = 1
+    private val kDeleteTag = 2
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -99,18 +102,18 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         binding.importButton.setOnClickListener {
 
-            if (user.role == Role.Enumerator.toString())
+            if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())
+                && (sharedViewModel.configurations.size > 0))
             {
-                for (config in sharedViewModel.configurations)
-                {
-                    sharedViewModel.deleteConfig( config )
-                    manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
-                }
+                ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
+                    resources.getString(R.string.delete_configuration),
+                    resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
             }
-
-            ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
-                resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code),
-                resources.getString(R.string.file_system), 0, this)
+            else
+            {
+                ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
+                    resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+            }
         }
     }
 
@@ -128,7 +131,118 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         val bundle = Bundle()
         sharedViewModel.setCurrentConfig(config)
-        findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
+
+        when (user.role)
+        {
+            Role.Enumerator.toString() ->
+            {
+                navigateToEnumeration()
+            }
+            Role.DataCollector.toString() ->
+            {
+                navigateToCollection()
+            }
+            Role.Admin.toString(), Role.Supervisor.toString() ->
+            {
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment, bundle)
+            }
+        }
+    }
+
+    fun navigateToEnumeration()
+    {
+        if (sharedViewModel.configurations.size > 0)
+        {
+            val config = sharedViewModel.configurations[0]
+            sharedViewModel.setCurrentConfig( config )
+
+            // find the selected Enum Area
+            val enumAreas = config.enumAreas.filter {
+                it.id?.let { id ->
+                    id == config.selectedEnumAreaId
+                } ?: false
+            }
+
+            // find the selected study
+            val studies = config.studies.filter {
+                it.id?.let { id ->
+                    id == config.selectedStudyId
+                } ?: false
+            }
+
+            if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+            {
+                val enumArea = enumAreas[0]
+                val study = studies[0]
+
+                // find the selected enumeration Team
+                val enumTeams = enumArea.enumerationTeams.filter {
+                    it.id?.let { id ->
+                        id == enumArea.selectedTeamId
+                    } ?: false
+                }
+
+                if (enumTeams.isNotEmpty())
+                {
+                    val enumTeam = enumTeams[0]
+                    sharedViewModel.createStudyModel.setStudy( study )
+                    sharedViewModel.teamViewModel.setCurrentTeam( enumTeam )
+                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                    findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+                }
+            }
+        }
+    }
+
+    fun navigateToCollection()
+    {
+        if(sharedViewModel.configurations.size > 0)
+        {
+            val config = sharedViewModel.configurations[0]
+            sharedViewModel.setCurrentConfig( config )
+
+            // find the selected Enum Area
+            val enumAreas = config.enumAreas.filter {
+                it.id?.let { id ->
+                    id == config.selectedEnumAreaId
+                } ?: false
+            }
+
+            // find the selected study
+            val studies = config.studies.filter {
+                it.id?.let { id ->
+                    id == config.selectedStudyId
+                } ?: false
+            }
+
+            if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+            {
+                val study = studies[0]
+                val enumArea = enumAreas[0]
+                val sampleArea = study.sampleArea
+
+                sampleArea?.let { sampleArea ->
+
+                    // find the selected collection Team
+                    val collectionTeams = sampleArea.collectionTeams.filter {
+                        it.id?.let { id ->
+                            id == sampleArea.selectedTeamId
+                        } ?: false
+                    }
+
+                    if (collectionTeams.isNotEmpty())
+                    {
+                        val collectionTeam = collectionTeams[0]
+                        sharedViewModel.createStudyModel.setStudy( study )
+                        samplingViewModel.setCurrentSampleArea( sampleArea )
+                        sharedViewModel.teamViewModel.setCurrentTeam( collectionTeam )
+                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+                        findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
+                    }
+                }
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -158,24 +272,36 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
-        // set what client mode we are
-        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
-        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-        getResult.launch(intent)
-
-        // FAKE
-       // sharedNetworkViewModel.connectHotspotFake()
-
-        //findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
+        if (tag == kImportTag)
+        {
+            sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
+            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+            getResult.launch(intent)
+        }
     }
 
     override fun didSelectRightButton(tag: Any?)
     {
-        val intent = Intent()
-            .setType("*/*")
-            .setAction(Intent.ACTION_GET_CONTENT)
+        if (tag == kDeleteTag)
+        {
+            for (config in sharedViewModel.configurations)
+            {
+                sharedViewModel.deleteConfig( config )
+                manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+            }
 
-        startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), 1023)
+            ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
+                resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code),
+                resources.getString(R.string.file_system), kImportTag, this)
+        }
+        else
+        {
+            val intent = Intent()
+                .setType("*/*")
+                .setAction(Intent.ACTION_GET_CONTENT)
+
+            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), 1023)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
