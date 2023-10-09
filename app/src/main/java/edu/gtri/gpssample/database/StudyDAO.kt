@@ -46,6 +46,11 @@ class StudyDAO(private var dao: DAO)
         }
 
         study.id?.let { id ->
+
+             study.sampleArea?.let { sampleArea ->
+                DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
+            }
+
             // add fields
             for (field in study.fields)
             {
@@ -150,7 +155,11 @@ class StudyDAO(private var dao: DAO)
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
-        return Study( id, creationDate, name, samplingMethod, sampleSize, sampleType )
+        val study = Study( id, creationDate, name, samplingMethod, sampleSize, sampleType )
+
+        study.sampleArea = DAO.sampleAreaDAO.getSampleArea( study )
+
+        return study
     }
 
     //--------------------------------------------------------------------------

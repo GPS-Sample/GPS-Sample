@@ -205,7 +205,7 @@ class PerformCollectionFragment : Fragment(),
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-        enumArea.vertices.map {
+        sampleArea.vertices.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
@@ -220,7 +220,7 @@ class PerformCollectionFragment : Fragment(),
 
             val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
             currentZoomLevel?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                 val cameraPosition = CameraOptions.Builder()
                     .zoom(currentZoomLevel)
