@@ -56,7 +56,6 @@
         <View
             android:visibility="gone"
             android:id="@+id/overlay_view"
-            android:background="#10ff0000"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         </View>
