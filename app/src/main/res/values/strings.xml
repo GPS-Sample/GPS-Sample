@@ -106,7 +106,6 @@
     <string name="operator">"Operator"</string>
     <string name="enter_value">"Enter Value"</string>
     <string name="value">"Value"</string>
-    <string name="filters">"Filters"</string>
     <string name="rule">"Rule"</string>
     <string name="connector">"Connector"</string>
     <string name="sampling_method">"Sampling Method"</string>
@@ -114,7 +113,6 @@
     <string name="sample_size">"Sample Size"</string>
     <string name="filter_name">"Filter Name"</string>
     <string name="rule_name">"Rule Name"</string>
-    <string name="total_sample_size">"Total Sample Size Across All Clusters"</string>
     <string name="manage_studies">"Manage Studies"</string>
     <string name="manage_samples">"Manage Samples"</string>
     <string name="create_sample">"Create Sample"</string>
@@ -268,6 +266,8 @@
     <string name="dismiss">Dismiss</string>
     <string name="delete">Delete</string>
     <string name="launching_odk_collect_application">Launching ODK Collect Application...</string>
+    <string name="total_sample_size">"Sample Size per cluster"</string>
+    <string name="filters">"Filters (combines rules)"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

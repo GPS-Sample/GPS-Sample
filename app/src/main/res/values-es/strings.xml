@@ -106,7 +106,6 @@
     <string name="operator">"Operador"</string>
     <string name="enter_value">"Ingrese valor"</string>
     <string name="value">"Valor"</string>
-    <string name="filters">"Filtros"</string>
     <string name="rule">"Regla"</string>
     <string name="connector">"Conector"</string>
     <string name="sampling_method">"Método de muestreo"</string>
@@ -114,7 +113,6 @@
     <string name="sample_size">"Tamaño de la muestra"</string>
     <string name="filter_name">"Nombre del filtro"</string>
     <string name="rule_name">"Nombre de la regla"</string>
-    <string name="total_sample_size">"Tamaño total de la muestra en todos los conglomerados"</string>
     <string name="manage_studies">"Administrar estudios"</string>
     <string name="manage_samples">"Administrar muestras"</string>
     <string name="create_sample">"Crear muestra"</string>
