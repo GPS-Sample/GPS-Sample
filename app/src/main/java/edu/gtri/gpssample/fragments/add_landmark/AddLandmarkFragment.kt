@@ -22,6 +22,8 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddLandmarkBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -173,7 +175,7 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         try
         {
-            val imageFileName = UUID.randomUUID().toString() + ".jpg"
+            val imageFileName = UUID.randomUUID().toString() + ".png"
             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
             val file = File(root, imageFileName)
             val fileOutputStream = FileOutputStream(file)
@@ -181,7 +183,15 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             fileOutputStream.flush()
             fileOutputStream.close()
             location.imageFileName = file.absolutePath
-        } catch (e: Exception) {
+
+            // base64 encode the bitmap
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+            val byteArray = byteArrayOutputStream.toByteArray()
+            location.imageData = Base64.getEncoder().encodeToString(byteArray)
+        }
+        catch (e: Exception)
+        {
             Log.d( "xxx", e.stackTrace.toString())
         }
     }
