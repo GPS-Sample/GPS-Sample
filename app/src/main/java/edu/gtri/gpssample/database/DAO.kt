@@ -215,6 +215,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
                     COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
                     COLUMN_LOCATION_DESCRIPTION + " TEXT" + "," +
+                    COLUMN_LOCATION_IMAGE_DATA + " TEXT" + "," +
                     COLUMN_LOCATION_IMAGE_FILE_NAME + " TEXT" + "," +
                     COLUMN_LOCATION_IS_MULTI_FAMILY + " INTEGER" +
                     ")")
@@ -496,6 +497,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LOCATION_LONGITUDE = "location_longitude"
         const val COLUMN_LOCATION_IS_LANDMARK = "location_is_landmark"
         const val COLUMN_LOCATION_DESCRIPTION = "location_description"
+        const val COLUMN_LOCATION_IMAGE_DATA = "location_image_data"
         const val COLUMN_LOCATION_IMAGE_FILE_NAME = "location_image_file_name"
         const val COLUMN_LOCATION_IS_MULTI_FAMILY = "location_is_multi_family"
 
@@ -627,6 +629,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return instance!!
         }
 
-        private const val DATABASE_VERSION = 234
+        private const val DATABASE_VERSION = 235
     }
 }

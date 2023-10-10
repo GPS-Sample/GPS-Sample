@@ -3,6 +3,8 @@ package edu.gtri.gpssample.database
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.core.database.getIntOrNull
 import edu.gtri.gpssample.constants.EnumerationState
@@ -10,6 +12,11 @@ import edu.gtri.gpssample.constants.LocationTypeConverter
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.extensions.toInt
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 class LocationDAO(private var dao: DAO)
 {
@@ -50,6 +57,21 @@ class LocationDAO(private var dao: DAO)
                     }
                 }
             } ?: return null
+        }
+
+        if (location.imageFileName.isNotEmpty() && location.imageData.isNotEmpty())
+        {
+            // base64 decode the bitmap
+            val byteArray = Base64.getDecoder().decode( location.imageData )
+            val byteArrayInputStream = ByteArrayInputStream(byteArray)
+            val bitmap = BitmapFactory.decodeStream(byteArrayInputStream)
+
+            // write the file
+            val file = File(location.imageFileName)
+            val fileOutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
         }
 
         return location
@@ -164,6 +186,7 @@ class LocationDAO(private var dao: DAO)
         values.put( DAO.COLUMN_LOCATION_LONGITUDE, location.longitude )
         values.put( DAO.COLUMN_LOCATION_IS_LANDMARK, location.isLandmark.toInt())
         values.put( DAO.COLUMN_LOCATION_DESCRIPTION, location.description)
+        values.put( DAO.COLUMN_LOCATION_IMAGE_DATA, location.imageData)
         values.put( DAO.COLUMN_LOCATION_IMAGE_FILE_NAME, location.imageFileName)
     }
 
@@ -178,6 +201,7 @@ class LocationDAO(private var dao: DAO)
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LONGITUDE))
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_DESCRIPTION))
+        val imageData = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_DATA))
         val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_FILE_NAME))
         val isMultiFamilyValue = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY))
 
@@ -187,7 +211,7 @@ class LocationDAO(private var dao: DAO)
             isMultiFamily = it.toBoolean()
         }
 
-        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageFileName, isMultiFamily, ArrayList<EnumerationItem>())
+        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageData, imageFileName, isMultiFamily, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?
