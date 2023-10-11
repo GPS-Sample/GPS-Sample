@@ -1,10 +1,12 @@
 package edu.gtri.gpssample.fragments.createstudy
 
+import android.R.attr.left
+import android.R.attr.right
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.widget.BaseExpandableListAdapter
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,6 +14,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
+
 
 class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rules: List<Rule>, var filters: List<Filter>) : BaseExpandableListAdapter()
 {
@@ -73,7 +76,7 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
 
     override fun getChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean, childView: View?, viewGroup: ViewGroup?): View
     {
-        var view: View
+        val view: View
 
         if (childView == null)
         {
@@ -84,8 +87,8 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
             view = childView
         }
 
-        val nameTextView = view!!.findViewById<View>(R.id.name_text_view) as TextView
-        val dateTextView = view!!.findViewById<View>(R.id.date_text_view) as TextView
+        val nameTextView = view.findViewById<View>(R.id.name_text_view) as TextView
+        val dateTextView = view.findViewById<View>(R.id.date_text_view) as TextView
         dateTextView.visibility = View.GONE
 
         when( groupPosition )
@@ -93,6 +96,16 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
             0 -> nameTextView.text = fields[childPosition].name
             1 -> nameTextView.text = rules[childPosition].name
             2 -> nameTextView.text = filters[childPosition].name
+        }
+
+        if (groupPosition == 0)
+        {
+            val field = fields[childPosition]
+
+            if (!field.fieldBlockContainer && field.fieldBlockUUID != null)
+            {
+                nameTextView.text = "    " + fields[childPosition].name
+            }
         }
 
         view.setOnClickListener {
