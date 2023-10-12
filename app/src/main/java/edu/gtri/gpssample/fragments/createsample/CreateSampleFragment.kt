@@ -23,10 +23,7 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -56,6 +53,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var _binding: FragmentCreateSampleBinding? = null
     private val binding get() = _binding!!
@@ -140,7 +138,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                 {
                     pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
                     polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-                    mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+                    polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+                    mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
                     refreshMap()
 
@@ -199,10 +198,9 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         if (pointList.isNotEmpty())
         {
             mapboxManager.addPolygon(pointList,"#000000")
+            mapboxManager.addPolyline( pointList[0] )
 
-            var currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-
-            currentZoomLevel?.let { currentZoomLevel ->
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                 val cameraPosition = CameraOptions.Builder()

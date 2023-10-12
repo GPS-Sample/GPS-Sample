@@ -16,7 +16,8 @@ import edu.gtri.gpssample.database.*
 class MapboxManager(
     var context: Context,
     var pointAnnotationManager: PointAnnotationManager?,
-    var polygonAnnotationManager: PolygonAnnotationManager?
+    var polygonAnnotationManager: PolygonAnnotationManager?,
+    var polylineAnnotationManager: PolylineAnnotationManager?
 )
 {
     fun addMarker( point: Point, @DrawableRes resourceId: Int ) : PointAnnotation?
@@ -43,6 +44,23 @@ class MapboxManager(
 
         polygonAnnotationManager?.let { polygonAnnotationManager ->
             return polygonAnnotationManager.create(polygonAnnotationOptions)
+        }
+
+        return null
+    }
+
+    fun addPolyline( points: List<Point> ) : PolylineAnnotation?
+    {
+        val outlinePoints = ArrayList<Point>(points)
+        outlinePoints.add( outlinePoints[0] )
+
+        val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+            .withPoints(outlinePoints)
+            .withLineColor("#ff0000")
+            .withLineWidth(4.0)
+
+        polylineAnnotationManager?.let { polylineAnnotationManager ->
+            return polylineAnnotationManager.create(polylineAnnotationOptions)
         }
 
         return null

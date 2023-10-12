@@ -64,6 +64,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var editMode = false
     private var dropMode = false
@@ -77,6 +78,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
+    private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
     private var allPointAnnotations = ArrayList<PointAnnotation>()
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -145,9 +147,10 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         )
 
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
@@ -275,6 +278,13 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         allPolygonAnnotations.clear()
 
+        for (polylineAnnotation in allPolylineAnnotations)
+        {
+            polylineAnnotationManager.delete( polylineAnnotation )
+        }
+
+        allPolylineAnnotations.clear()
+
         for (pointAnnotation in allPointAnnotations)
         {
             pointAnnotationManager.delete( pointAnnotation )
@@ -308,23 +318,26 @@ class CreateEnumerationAreaFragment : Fragment(),
                 }
                 else if (!isMultiFamily)
                 {
-                    val enumerationItem = location.enumerationItems[0]
+                    if (location.enumerationItems.isNotEmpty())
+                    {
+                        val enumerationItem = location.enumerationItems[0]
 
-                    if (enumerationItem.samplingState == SamplingState.Sampled)
-                    {
-                        resourceId = if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
-                    }
-                    else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                    {
-                        resourceId = R.drawable.home_black
-                    }
-                    else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                    {
-                        resourceId = R.drawable.home_red
-                    }
-                    else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                    {
-                        resourceId = R.drawable.home_green
+                        if (enumerationItem.samplingState == SamplingState.Sampled)
+                        {
+                            resourceId = if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                        {
+                            resourceId = R.drawable.home_black
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            resourceId = R.drawable.home_red
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            resourceId = R.drawable.home_green
+                        }
                     }
                 }
                 else
@@ -481,6 +494,12 @@ class CreateEnumerationAreaFragment : Fragment(),
         polygonAnnotation?.let { polygonAnnotation ->
             polygonHashMap[polygonAnnotation.id] = enumArea
             allPolygonAnnotations.add( polygonAnnotation)
+        }
+
+        val polylineAnnotation = mapboxManager.addPolyline( pointList[0] )
+
+        polylineAnnotation?.let { polylineAnnotation ->
+            allPolylineAnnotations.add( polylineAnnotation )
         }
 
         if (editMode)

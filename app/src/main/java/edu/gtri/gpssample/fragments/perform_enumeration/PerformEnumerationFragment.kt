@@ -73,6 +73,7 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var gpsLocation: Point? = null
 
@@ -86,6 +87,7 @@ class PerformEnumerationFragment : Fragment(),
     private val polygonHashMap = HashMap<Long,EnumArea>()
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
+    private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 1
     private val kAddHouseholdTag = 2
@@ -168,7 +170,8 @@ class PerformEnumerationFragment : Fragment(),
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
@@ -267,6 +270,13 @@ class PerformEnumerationFragment : Fragment(),
 
         allPolygonAnnotations.clear()
 
+        for (polylineAnnotation in allPolylineAnnotations)
+        {
+            polylineAnnotationManager.delete( polylineAnnotation )
+        }
+
+        allPolylineAnnotations.clear()
+
         for (pointAnnotation in allPointAnnotations)
         {
             pointAnnotationManager.delete( pointAnnotation )
@@ -290,6 +300,12 @@ class PerformEnumerationFragment : Fragment(),
             polygonAnnotation?.let { polygonAnnotation ->
                 polygonHashMap[polygonAnnotation.id] = enumArea
                 allPolygonAnnotations.add( polygonAnnotation)
+            }
+
+            val polylineAnnotation = mapboxManager.addPolyline( pointList[0] )
+
+            polylineAnnotation?.let { polylineAnnotation ->
+                allPolylineAnnotations.add( polylineAnnotation)
             }
 
             val currentZoomLevel = sharedViewModel.currentZoomLevel?.value

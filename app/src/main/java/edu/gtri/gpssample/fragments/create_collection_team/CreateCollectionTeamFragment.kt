@@ -104,7 +104,7 @@ class CreateCollectionTeamFragment : Fragment(),
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager(binding.mapView)
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
@@ -188,9 +188,9 @@ class CreateCollectionTeamFragment : Fragment(),
         if (pointList.isNotEmpty())
         {
             mapboxManager.addPolygon(pointList,"#000000")
+            mapboxManager.addPolyline( pointList[0] )
 
-            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-            currentZoomLevel?.let { currentZoomLevel ->
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                 val cameraPosition = CameraOptions.Builder()

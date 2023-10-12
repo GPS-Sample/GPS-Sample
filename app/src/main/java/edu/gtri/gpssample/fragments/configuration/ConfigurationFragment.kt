@@ -26,8 +26,10 @@ import com.google.android.gms.maps.model.PolygonOptions
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -139,9 +141,10 @@ class ConfigurationFragment : Fragment(),
             return@addOnMapClickListener true
         }
 
-        val pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
+        val pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         val polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+        val polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             studiesAdapter = StudiesAdapter(config.studies)
@@ -191,6 +194,8 @@ class ConfigurationFragment : Fragment(),
                 pointList.add( points )
 
                 mapboxManager.addPolygon( pointList, "#000000" )
+                mapboxManager.addPolyline( pointList[0] )
+
             }
 
             val latLngBounds = GeoUtils.findGeobounds(enumVerts)
