@@ -21,6 +21,7 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -122,7 +123,8 @@ class CreateConfigurationFragment : Fragment(),
 
         val pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         val polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+        val polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         binding.addStudyButton.setOnClickListener{
             sharedViewModel.createStudyModel.createNewStudy()
@@ -174,6 +176,7 @@ class CreateConfigurationFragment : Fragment(),
                 pointList.add( points )
 
                 mapboxManager.addPolygon( pointList, "#000000" )
+                mapboxManager.addPolyline( pointList[0] )
             }
 
             val latLngBounds = GeoUtils.findGeobounds(enumVerts)

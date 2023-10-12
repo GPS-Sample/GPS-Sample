@@ -61,6 +61,7 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var enumAreaId = 0
     private val binding get() = _binding!!
@@ -68,6 +69,7 @@ class PerformCollectionFragment : Fragment(),
     private var _binding: FragmentPerformCollectionBinding? = null
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
+    private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 2
     override fun onCreate(savedInstanceState: Bundle?)
@@ -158,7 +160,8 @@ class PerformCollectionFragment : Fragment(),
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager )
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
@@ -195,6 +198,13 @@ class PerformCollectionFragment : Fragment(),
 
         allPolygonAnnotations.clear()
 
+        for (polylineAnnotation in allPolylineAnnotations)
+        {
+            polylineAnnotationManager.delete( polylineAnnotation )
+        }
+
+        allPolylineAnnotations.clear()
+
         for (pointAnnotation in allPointAnnotations)
         {
             pointAnnotationManager.delete( pointAnnotation )
@@ -214,8 +224,15 @@ class PerformCollectionFragment : Fragment(),
         if (pointList.isNotEmpty())
         {
             val polygonAnnotation = mapboxManager.addPolygon(pointList,"#000000")
+
             polygonAnnotation?.let {
                 allPolygonAnnotations.add( it )
+            }
+
+            val polylineAnnotation = mapboxManager.addPolyline(pointList[0])
+
+            polylineAnnotation?.let {
+                allPolylineAnnotations.add( it )
             }
 
             val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
