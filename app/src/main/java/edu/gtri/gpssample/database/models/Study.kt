@@ -15,6 +15,7 @@ data class Study(
     var id : Int? = null,
     var creationDate: Long,
     var name: String,
+    var totalPopulationSize: Int,
     var samplingMethod: SamplingMethod,
     var sampleSize: Int,
     var sampleType : SampleType,
@@ -24,14 +25,11 @@ data class Study(
     var sampleArea : SampleArea?
     )
 {
-    constructor(name: String, samplingMethod: SamplingMethod,
-                sampleSize: Int, sampleType: SampleType) : this(null, Date().time,
-                name, samplingMethod, sampleSize, sampleType,
-                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), null)
-    constructor(id: Int, creationDate: Long, name: String, samplingMethod: SamplingMethod,
-                sampleSize: Int, sampleType: SampleType) : this(id,
-                creationDate, name, samplingMethod, sampleSize, sampleType,
-                ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), null)
+    constructor(name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
+            : this(null, Date().time, name, 0, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), null)
+    constructor(id: Int, creationDate: Long, name: String, totalPopulationSize: Int, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
+            : this(id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), null)
+
     fun pack() : String
     {
         return Json.encodeToString( this )

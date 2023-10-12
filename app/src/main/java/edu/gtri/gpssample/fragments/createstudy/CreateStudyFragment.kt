@@ -70,7 +70,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         createStudyAdapter.didDeleteRule = this::didDeleteRule
         createStudyAdapter.didDeleteFilter = this::didDeleteFilter
 
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -200,13 +200,26 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     private fun updateStudy()
     {
-        val name = binding.studyNameEditText.text.toString()
-        if (name.length == 0)
+        if (study.name.isEmpty())
         {
             Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
             return
         }
+
+        if (study.sampleSize == 0)
+        {
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.sample_size_error), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (study.sampleType == SampleType.PercentTotal && study.totalPopulationSize == 0)
+        {
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.total_population_size_error), Toast.LENGTH_SHORT).show()
+            return
+        }
+
         sharedViewModel.addStudy()
+
         findNavController().popBackStack()
     }
 

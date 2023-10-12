@@ -265,10 +265,14 @@
     <string name="dismiss">Dismiss</string>
     <string name="delete">Delete</string>
     <string name="launching_odk_collect_application">Launching ODK Collect Application...</string>
-    <string name="total_sample_size">"Sample Size per cluster"</string>
+    <string name="total_sample_size">"Sample Size"</string>
     <string name="filters">"Filters (combines rules)"</string>
     <string name="new_location">"Identify Location"</string>
     <string name="delete_configuration">The current configuration will be replaced by the import.  Would you like to proceed?</string>
+    <string name="total_population">Total Population Size</string>
+    <string name="enter_the_total_population_size">Enter the total population size</string>
+    <string name="total_population_size_error">"The total population size must be greater than 0"</string>
+    <string name="sample_size_error">"The sample size must be greater than 0"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

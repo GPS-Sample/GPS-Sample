@@ -97,6 +97,7 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, study.creationDate )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
+        values.put( DAO.COLUMN_STUDY_TOTAL_POPULATION_SIZE, study.totalPopulationSize )
 
         // convert enum to int.  Maybe not do this and have look up tables?
         var index = SampleTypeConverter.toIndex(study.sampleType)
@@ -151,11 +152,13 @@ class StudyDAO(private var dao: DAO)
         val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX}"))
         val sampleSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE}"))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX}"))
+        val totalPopulationSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_TOTAL_POPULATION_SIZE}"))
 
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
-        val study = Study( id, creationDate, name, samplingMethod, sampleSize, sampleType )
+
+        val study = Study( id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType )
 
         study.sampleArea = DAO.sampleAreaDAO.getSampleArea( study )
 

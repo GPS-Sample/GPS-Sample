@@ -64,6 +64,7 @@ class SamplingViewModel : ViewModel()
         get()
         {
             currentStudy?.value?.let{study ->
+                Log.d( "xxx", study.samplingMethod.format)
                 _currentFragment?.let{fragment ->
                     return SamplingMethodConverter.internationalString(study.samplingMethod, fragment)
                 }
@@ -226,9 +227,11 @@ class SamplingViewModel : ViewModel()
                     {
                         sampleSize = (study.sampleSize.toDouble() / 100.0 * validSamples.size.toDouble()).roundToInt()
                     }
-                    else ->
+                    SampleType.PercentTotal ->
                     {
+                        sampleSize = (study.sampleSize.toDouble() / 100.0 * study.totalPopulationSize.toDouble()).roundToInt()
                     }
+                    else -> {}
                 }
 
                 if (sampleSize > 0)

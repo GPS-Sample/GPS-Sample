@@ -47,6 +47,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_NAME + " TEXT" + "," +
                     COLUMN_CONFIG_ID + " INTEGER" + "," +
+                    COLUMN_STUDY_TOTAL_POPULATION_SIZE + " INTEGER" + "," +
 
                     // this needs to be a look up table
                     COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
@@ -431,6 +432,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
         const val COLUMN_STUDY_SAMPLING_METHOD_INDEX = "study_sampling_method_index"
+        const val COLUMN_STUDY_TOTAL_POPULATION_SIZE = "study_total_population_size"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
 
