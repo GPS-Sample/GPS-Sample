@@ -305,18 +305,14 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             for (location in enumArea.locations)
             {
-                var resourceId = 0
+                var resourceId = R.drawable.home_black
                 var isMultiFamily = false
 
                 location.isMultiFamily?.let {
                     isMultiFamily = it
                 }
 
-                if (location.isMultiFamily == null)
-                {
-                    resourceId = R.drawable.home_black
-                }
-                else if (!isMultiFamily)
+                if (!isMultiFamily)
                 {
                     if (location.enumerationItems.isNotEmpty())
                     {
