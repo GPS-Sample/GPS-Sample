@@ -184,8 +184,9 @@ class StudyDAO(private var dao: DAO)
                 studies.add( study )
                 study.fields = DAO.fieldDAO.getFields(study)
                // study.rules = DAO.ruleDAO.getRules(study)
-
                 study.filters.addAll(DAO.filterDAO.getFilters(study))
+                study.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( study )
+                study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             }
 
             cursor.close()

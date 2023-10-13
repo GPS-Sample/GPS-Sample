@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
-import com.google.android.gms.maps.model.LatLng
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.Field
 
 class EnumAreaDAO(private var dao: DAO)
 {
@@ -37,12 +35,7 @@ class EnumAreaDAO(private var dao: DAO)
 
             for (latLon in enumArea.vertices)
             {
-                DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea,null)
-            }
-
-            for (team in enumArea.enumerationTeams)
-            {
-                DAO.teamDAO.createOrUpdateTeam(team, enumArea)
+                DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea)
             }
 
             for (location in enumArea.locations)
@@ -64,7 +57,6 @@ class EnumAreaDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
         values.put( DAO.COLUMN_CONFIG_ID, config.id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
-        values.put( DAO.COLUMN_TEAM_ID, enumArea.selectedTeamId )
     }
 
     @SuppressLint("Range")
@@ -73,9 +65,8 @@ class EnumAreaDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
-        val selectedTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
 
-        return EnumArea( id, creationDate, name, selectedTeamId )
+        return EnumArea( id, creationDate, name )
     }
 
     fun exists( enumArea: EnumArea ): Boolean
@@ -139,7 +130,6 @@ class EnumAreaDAO(private var dao: DAO)
                 val enumArea = createEnumArea( cursor )
                 enumArea.id?.let { id ->
                     enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
-                    enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
                     enumArea.locations = DAO.locationDAO.getLocations( enumArea )
                     enumAreas.add( enumArea )
                 }
@@ -166,7 +156,6 @@ class EnumAreaDAO(private var dao: DAO)
             val enumArea = createEnumArea( cursor )
             enumArea.id?.let { id ->
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
-                enumArea.enumerationTeams = DAO.teamDAO.getEnumerationTeams( id )
                 enumArea.locations = DAO.locationDAO.getLocations( enumArea )
                 enumAreas.add( enumArea )
             }
@@ -191,16 +180,6 @@ class EnumAreaDAO(private var dao: DAO)
             // locations's are dependent on EnumAreas
             DAO.locationDAO.getLocations(enumArea).map {
                 DAO.locationDAO.delete( it )
-            }
-
-            // enumeration teams are dependent on EnumAreas
-            DAO.teamDAO.getEnumerationTeams( enumAreaId ).map {
-                DAO.teamDAO.deleteTeam( it )
-            }
-
-            // collection teams are dependent on EnumAreas
-            DAO.teamDAO.getCollectionTeams( enumAreaId ).map {
-                DAO.teamDAO.deleteTeam( it )
             }
 
             val db = dao.writableDatabase

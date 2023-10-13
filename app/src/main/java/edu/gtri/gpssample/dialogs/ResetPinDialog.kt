@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.*
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.Team
 
 class ResetPinDialog
 {

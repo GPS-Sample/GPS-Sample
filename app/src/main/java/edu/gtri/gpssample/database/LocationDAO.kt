@@ -255,6 +255,56 @@ class LocationDAO(private var dao: DAO)
         return location
     }
 
+    fun getLocations( enumerationTeam: EnumerationTeam ) : ArrayList<Location>
+    {
+        val locations = ArrayList<Location>()
+
+        val db = dao.writableDatabase
+        enumerationTeam.id?.let { id ->
+            val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__ENUMERATION_TEAM} ELL WHERE" +
+                    " ELL.${DAO.COLUMN_ENUMERATION_TEAM_ID} = $id AND LL.ID = ELL.${DAO.COLUMN_LOCATION_ID}"
+            val cursor = db.rawQuery(query, null)
+
+            while (cursor.moveToNext())
+            {
+                val location = createLocation( cursor )
+                location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+                locations.add( location )
+            }
+
+            cursor.close()
+        }
+
+        db.close()
+
+        return locations
+    }
+
+    fun getLocations( collectionTeam: CollectionTeam ) : ArrayList<Location>
+    {
+        val locations = ArrayList<Location>()
+
+        val db = dao.writableDatabase
+        collectionTeam.id?.let { id ->
+            val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__COLLECTION_TEAM} ELL WHERE" +
+                    " ELL.${DAO.COLUMN_COLLECTION_TEAM_ID} = $id AND LL.ID = ELL.${DAO.COLUMN_LOCATION_ID}"
+            val cursor = db.rawQuery(query, null)
+
+            while (cursor.moveToNext())
+            {
+                val location = createLocation( cursor )
+                location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+                locations.add( location )
+            }
+
+            cursor.close()
+        }
+
+        db.close()
+
+        return locations
+    }
+
     fun getLocations( enumArea: EnumArea ): ArrayList<Location>
     {
         val locations = ArrayList<Location>()

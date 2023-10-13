@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +20,6 @@ import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -32,7 +30,6 @@ import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
-import java.io.InputStream
 
 class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate,
         NetworkClientModel.ConfigurationDelegate,
@@ -176,9 +173,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 val study = studies[0]
 
                 // find the selected enumeration Team
-                val enumTeams = enumArea.enumerationTeams.filter {
+                val enumTeams = study.enumerationTeams.filter {
                     it.id?.let { id ->
-                        id == enumArea.selectedTeamId
+                        id == study.selectedEnumerationTeamId
                     } ?: false
                 }
 
@@ -186,7 +183,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 {
                     val enumTeam = enumTeams[0]
                     sharedViewModel.createStudyModel.setStudy( study )
-                    sharedViewModel.teamViewModel.setCurrentTeam( enumTeam )
+                    sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
                     sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                     findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                 }
@@ -224,9 +221,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 sampleArea?.let { sampleArea ->
 
                     // find the selected collection Team
-                    val collectionTeams = sampleArea.collectionTeams.filter {
-                        it.id?.let { id ->
-                            id == sampleArea.selectedTeamId
+                    val collectionTeams = study.collectionTeams.filter { collectionTeam ->
+                        collectionTeam.id?.let { id ->
+                            id == study.selectedCollectionTeamId
                         } ?: false
                     }
 
@@ -235,7 +232,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         val collectionTeam = collectionTeams[0]
                         sharedViewModel.createStudyModel.setStudy( study )
                         samplingViewModel.setCurrentSampleArea( sampleArea )
-                        sharedViewModel.teamViewModel.setCurrentTeam( collectionTeam )
+                        sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
                         sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
                         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
@@ -391,9 +388,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                             val study = studies[0]
 
                             // find the selected enumeration Team
-                            val enumTeams = enumArea.enumerationTeams.filter {
-                                it.id?.let { id ->
-                                    id == enumArea.selectedTeamId
+                            val enumTeams = study.enumerationTeams.filter { enumTeam ->
+                                enumTeam.id?.let { id ->
+                                    id == study.selectedEnumerationTeamId
                                 } ?: false
                             }
 
@@ -402,7 +399,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                                 val enumTeam = enumTeams[0]
 
                                 sharedViewModel.createStudyModel.setStudy( study )
-                                sharedViewModel.teamViewModel.setCurrentTeam( enumTeam )
+                                sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
                                 sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                                 findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                             }
@@ -439,9 +436,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                             sampleArea?.let { sampleArea ->
 
                                 // find the selected collection Team
-                                val collectionTeams = sampleArea.collectionTeams.filter {
-                                    it.id?.let { id ->
-                                        id == sampleArea.selectedTeamId
+                                val collectionTeams = study.collectionTeams.filter { collectionTeam ->
+                                    collectionTeam.id?.let { id ->
+                                        id == study.selectedCollectionTeamId
                                     } ?: false
                                 }
 
@@ -451,9 +448,10 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                                     sharedViewModel.createStudyModel.setStudy( study )
                                     samplingViewModel.setCurrentSampleArea( sampleArea )
-                                    sharedViewModel.teamViewModel.setCurrentTeam( collectionTeam )
+                                    sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
                                     sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                                     samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
                                     findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                                 }
                             }

@@ -50,7 +50,7 @@ class PerformCollectionFragment : Fragment(),
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var user: User
-    private lateinit var team: Team
+    private lateinit var collectionTeam: CollectionTeam
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var sampleArea: SampleArea
@@ -112,8 +112,8 @@ class PerformCollectionFragment : Fragment(),
             }
         }
 
-        sharedViewModel.teamViewModel.currentTeam?.value?.let {
-            team = it
+        sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
+            collectionTeam = it
         }
 
         val _user = (activity!!.application as? MainApplication)?.user
@@ -130,7 +130,7 @@ class PerformCollectionFragment : Fragment(),
 
         val enumerationItems = ArrayList<EnumerationItem>()
 
-        sampleArea.locations.map { location ->
+        collectionTeam.locations.map { location ->
             for (enumurationItem in location.enumerationItems)
             {
                 if (enumurationItem.samplingState == SamplingState.Sampled)
@@ -147,7 +147,7 @@ class PerformCollectionFragment : Fragment(),
         binding.recyclerView.adapter = performCollectionAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + team.name + " team)"
+        binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + collectionTeam.name + " team)"
 
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
@@ -247,7 +247,7 @@ class PerformCollectionFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in sampleArea.locations)
+            for (location in collectionTeam.locations)
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {

@@ -9,18 +9,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.Team
+import edu.gtri.gpssample.database.models.EnumerationTeam
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<ManageEnumerationTeamsAdapter.ViewHolder>()
+class ManageEnumerationTeamsAdapter(var enumerationTeams: List<EnumerationTeam>?) : RecyclerView.Adapter<ManageEnumerationTeamsAdapter.ViewHolder>()
 {
-    override fun getItemCount() = teams!!.size
+    override fun getItemCount() = enumerationTeams!!.size
 
     private lateinit var context: Context
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var didSelectTeam: ((team: Team) -> Unit)
-    lateinit var shouldDeleteTeam: ((team: Team) -> Unit)
+    lateinit var didSelectTeam: ((enumerationTeam: EnumerationTeam) -> Unit)
+    lateinit var shouldDeleteTeam: ((enumerationTeam: EnumerationTeam) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -34,9 +34,9 @@ class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapt
         return viewHolder
     }
 
-    fun updateTeams( teams: List<Team> )
+    fun updateTeams(enumerationTeams: List<EnumerationTeam> )
     {
-        this.teams = teams
+        this.enumerationTeams = enumerationTeams
         notifyDataSetChanged()
     }
 
@@ -44,7 +44,7 @@ class ManageEnumerationTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapt
     {
         holder.itemView.isSelected = false
 
-        val team = teams!!.get(holder.adapterPosition)
+        val team = enumerationTeams!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( team.name )
         holder.imageView.visibility = View.VISIBLE

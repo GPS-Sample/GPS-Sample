@@ -11,14 +11,15 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.CollectionTeam
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
-import edu.gtri.gpssample.database.models.Team
-import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.database.models.EnumerationTeam
 import edu.gtri.gpssample.databinding.FragmentManageEnumerationTeamsBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.fragments.manage_collection_teams.ManageCollectionTeamsAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import kotlin.collections.ArrayList
+
 class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var study: Study
@@ -56,11 +57,25 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
             enumArea = it
         }
 
-        enumArea?.let { enumArea ->
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-
-                manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( enumArea.enumerationTeams )
+        if (study.selectedEnumerationTeamId > 0) // if teamId is valid, then filter out all teams except this one
+        {
+            val teams = study.enumerationTeams.filter { enumerationTeam ->
+                enumerationTeam.id?.let { id ->
+                    id == study.selectedEnumerationTeamId
+                } ?: false
             }
+
+            if (teams.isNotEmpty())
+            {
+                val enumerationTeams = ArrayList<EnumerationTeam>()
+                enumerationTeams.add( teams[0] )
+                manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( enumerationTeams )
+            }
+        }
+
+        if (!this::manageEnumerationTeamsAdapter.isInitialized)
+        {
+            manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( study.enumerationTeams )
         }
 
         manageEnumerationTeamsAdapter.didSelectTeam = this::didSelectTeam
@@ -84,22 +99,22 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun didSelectTeam( team: Team )
+    fun didSelectTeam(enumerationTeam: EnumerationTeam )
     {
-        sharedViewModel.teamViewModel.setCurrentTeam( team )
+        sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumerationTeam )
 
-        team.id?.let {
-            enumArea.selectedTeamId = it
-        }
+//        enumerationTeam.id?.let {
+//            study.selectedEnumerationTeamId = it
+//        }
 
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
     }
 
-    private fun shouldDeleteTeam(team: Team)
+    private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)
     {
         ConfirmationDialog( activity, resources.getString(R.string.delete_team_message),
             resources.getString(R.string.delete_team_message), resources.getString(R.string.no),
-            resources.getString(R.string.yes), team, this)
+            resources.getString(R.string.yes), enumerationTeam, this)
     }
 
     override fun didSelectLeftButton(tag: Any?)
@@ -108,10 +123,10 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
 
     override fun didSelectRightButton(tag: Any?)
     {
-        val team = tag as Team
-        enumArea.enumerationTeams.remove(team)
-        manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
-        DAO.teamDAO.deleteTeam( team )
+        val enumerationTeam = tag as EnumerationTeam
+        study.enumerationTeams.remove(enumerationTeam)
+        manageEnumerationTeamsAdapter.updateTeams(study.enumerationTeams)
+        DAO.enumerationTeamDAO.deleteTeam( enumerationTeam )
     }
 
     override fun onDestroyView()

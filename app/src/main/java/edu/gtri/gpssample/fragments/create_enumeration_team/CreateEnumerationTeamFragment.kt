@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.mapbox.geojson.Point
+import com.mapbox.geojson.Polygon
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
@@ -27,7 +28,6 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -50,6 +50,7 @@ class CreateEnumerationTeamFragment : Fragment(),
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
+    private val locations = ArrayList<Location>()
     private var createMode = false
     private var intersectionPolygon: PolygonAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
@@ -135,25 +136,10 @@ class CreateEnumerationTeamFragment : Fragment(),
             }
 
             study.id?.let { studyId ->
-                val polygon = ArrayList<LatLon>()
+                val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( studyId, binding.teamNameEditText.text.toString(), locations ))
 
-                intersectionPolygon?.points?.map { points ->
-                    points.map { point ->
-                        polygon.add( LatLon( point.latitude(), point.longitude()))
-                    }
-                }
-
-                if (polygon.isEmpty())
-                {
-                    enumArea.vertices.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
-                    }
-                }
-
-                val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), polygon ), enumArea)
-
-                team?.let { team ->
-                    enumArea.enumerationTeams.add(team)
+                enumerationTeam?.let { team ->
+                    study.enumerationTeams.add(team)
                     findNavController().popBackStack()
                 }
             }
@@ -244,8 +230,8 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 // compute the intersection of points1 & points2
                 val geometryFactory = GeometryFactory()
-                val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
-                val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
+                val geometry1 = geometryFactory.createPolygon(points1.toTypedArray())
+                val geometry2 = geometryFactory.createPolygon(points2.toTypedArray())
 
                 try {
                     geometry1.intersection(geometry2)?.let { polygon ->
@@ -260,6 +246,17 @@ class CreateEnumerationTeamFragment : Fragment(),
                             val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                             pointList.add( vertices )
                             intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000")
+
+                            locations.clear()
+
+                            for (location in enumArea.locations)
+                            {
+                                val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                                if (polygon.contains(geometry3))
+                                {
+                                    locations.add( location )
+                                }
+                            }
                         }
                     }
                 }
