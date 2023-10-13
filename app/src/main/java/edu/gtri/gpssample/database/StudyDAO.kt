@@ -47,7 +47,8 @@ class StudyDAO(private var dao: DAO)
 
         study.id?.let { id ->
 
-             study.sampleArea?.let { sampleArea ->
+            for (sampleArea in study.sampleAreas)
+            {
                 DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
             }
 
@@ -160,7 +161,7 @@ class StudyDAO(private var dao: DAO)
 
         val study = Study( id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType )
 
-        study.sampleArea = DAO.sampleAreaDAO.getSampleArea( study )
+        study.sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
 
         return study
     }
@@ -169,14 +170,14 @@ class StudyDAO(private var dao: DAO)
     fun getStudies( config: Config ): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
-        var db = dao.writableDatabase
+        val db = dao.writableDatabase
 
         config.id?.let { id ->
-            var query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
+            val query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
                     "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_ID} = conn.${DAO.COLUMN_STUDY_ID} and "  +
                     "conn.${DAO.COLUMN_CONFIG_ID} = ${id}"
 
-            var cursor = db.rawQuery(query, null)
+            val cursor = db.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -200,11 +201,11 @@ class StudyDAO(private var dao: DAO)
     fun getStudies(): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
-        var db = dao.writableDatabase
+        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_STUDY}"
 
-        var cursor = db.rawQuery(query, null)
+        val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {

@@ -110,20 +110,14 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             this.enumArea = enumArea
         }
 
-        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-
-            val sampleArea = DAO.sampleAreaDAO.getSampleArea( study )
-
-            if (sampleArea != null)
-            {
-//                binding.sampleButton.visibility = View.GONE
-                samplingViewModel.currentSampleArea = MutableLiveData(sampleArea)
-            }
-            else
-            {
-                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{ enumArea->
-                    samplingViewModel.createSampleArea(enumArea)
-                }
+        if (study.sampleAreas.isNotEmpty())
+        {
+            samplingViewModel.currentSampleArea = MutableLiveData(study.sampleAreas[0])
+        }
+        else
+        {
+            sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{ enumArea->
+                samplingViewModel.createSampleArea(enumArea)
             }
         }
 
@@ -158,8 +152,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         binding.nextButton.setOnClickListener {
             samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
 
-                if (sampleArea.id == null)
-                {
+                sampleArea.id?.let { sampleAreaId ->
                     DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
 
                     for (location in sampleArea.locations)
@@ -167,8 +160,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                         DAO.locationDAO.updateConnectorTable( location, sampleArea )
                     }
 
-                    // EnumArea contains Locations, which contains EnumerationItems, which contains the samplingState
-                    // Consider moving the update to the SampleArea, which points to the same locations
                     DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
                 }
             }

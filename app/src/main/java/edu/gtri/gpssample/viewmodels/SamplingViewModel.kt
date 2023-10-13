@@ -41,13 +41,13 @@ class SamplingViewModel : ViewModel()
             return _currentSampleArea
         }
         set(value){
-            value?.let{sampleArea ->
+            value?.let{ sampleArea ->
                 _currentSampleArea = MutableLiveData(sampleArea.value)
                 _currentStudy?.value?.let{ study->
-                    if (study.sampleArea == null)  // is this check necessary / correct?
-                    {
-                        sampleArea.value?.let{ sampleArea->
-                            study.sampleArea = sampleArea
+                    sampleArea.value?.let{ sampleArea->
+                        if (!study.sampleAreas.contains( sampleArea))
+                        {
+                            study.sampleAreas.add( sampleArea )
                         }
                     }
                 }
@@ -79,7 +79,7 @@ class SamplingViewModel : ViewModel()
         val sampleArea = SampleArea(fromEnumArea)
         _currentSampleArea = MutableLiveData(sampleArea)
         _currentStudy?.value?.let { study ->
-            study.sampleArea = sampleArea
+            study.sampleAreas.add( sampleArea )
         }
     }
 
@@ -142,7 +142,6 @@ class SamplingViewModel : ViewModel()
                                 if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
                                      resourceId = R.drawable.multi_home_blue
-                                    Log.d( "xxx", sampledItem.subAddress )
                                 }
                             }
                         }

@@ -216,27 +216,24 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             {
                 val study = studies[0]
                 val enumArea = enumAreas[0]
-                val sampleArea = study.sampleArea
+                val sampleArea = study.sampleAreas[0]
 
-                sampleArea?.let { sampleArea ->
+                // find the selected collection Team
+                val collectionTeams = study.collectionTeams.filter { collectionTeam ->
+                    collectionTeam.id?.let { id ->
+                        id == study.selectedCollectionTeamId
+                    } ?: false
+                }
 
-                    // find the selected collection Team
-                    val collectionTeams = study.collectionTeams.filter { collectionTeam ->
-                        collectionTeam.id?.let { id ->
-                            id == study.selectedCollectionTeamId
-                        } ?: false
-                    }
-
-                    if (collectionTeams.isNotEmpty())
-                    {
-                        val collectionTeam = collectionTeams[0]
-                        sharedViewModel.createStudyModel.setStudy( study )
-                        samplingViewModel.setCurrentSampleArea( sampleArea )
-                        sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
-                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-                        findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
-                    }
+                if (collectionTeams.isNotEmpty())
+                {
+                    val collectionTeam = collectionTeams[0]
+                    sharedViewModel.createStudyModel.setStudy( study )
+                    samplingViewModel.setCurrentSampleArea( sampleArea )
+                    sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
+                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                    samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+                    findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                 }
             }
         }
@@ -431,29 +428,26 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         {
                             val study = studies[0]
                             val enumArea = enumAreas[0]
-                            val sampleArea = study.sampleArea
+                            val sampleArea = study.sampleAreas[0]
 
-                            sampleArea?.let { sampleArea ->
+                            // find the selected collection Team
+                            val collectionTeams = study.collectionTeams.filter { collectionTeam ->
+                                collectionTeam.id?.let { id ->
+                                    id == study.selectedCollectionTeamId
+                                } ?: false
+                            }
 
-                                // find the selected collection Team
-                                val collectionTeams = study.collectionTeams.filter { collectionTeam ->
-                                    collectionTeam.id?.let { id ->
-                                        id == study.selectedCollectionTeamId
-                                    } ?: false
-                                }
+                            if (collectionTeams.isNotEmpty())
+                            {
+                                val collectionTeam = collectionTeams[0]
 
-                                if (collectionTeams.isNotEmpty())
-                                {
-                                    val collectionTeam = collectionTeams[0]
+                                sharedViewModel.createStudyModel.setStudy( study )
+                                samplingViewModel.setCurrentSampleArea( sampleArea )
+                                sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
+                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                                samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
 
-                                    sharedViewModel.createStudyModel.setStudy( study )
-                                    samplingViewModel.setCurrentSampleArea( sampleArea )
-                                    sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
-                                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                                    samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-
-                                    findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
-                                }
+                                findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
                             }
                         }
                     }

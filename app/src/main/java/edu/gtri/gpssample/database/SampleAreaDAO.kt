@@ -73,8 +73,12 @@ class SampleAreaDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val sampleArea = SampleArea( id, creationDate )
 
-        return SampleArea( id, creationDate )
+        sampleArea.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
+        sampleArea.locations = DAO.locationDAO.getLocations( sampleArea )
+
+        return sampleArea
     }
 
     fun updateSampleArea( sampleArea: SampleArea, study: Study )
@@ -115,9 +119,9 @@ class SampleAreaDAO(private var dao: DAO)
         return sampleArea
     }
 
-    fun getSampleArea( study: Study ): SampleArea?
+    fun getSampleAreas( study: Study ): ArrayList<SampleArea>
     {
-        var sampleArea : SampleArea? = null
+        val sampleAreas = ArrayList<SampleArea>()
 
         val db = dao.writableDatabase
 
@@ -125,16 +129,9 @@ class SampleAreaDAO(private var dao: DAO)
             val query = "SELECT * FROM ${DAO.TABLE_SAMPLE_AREA} WHERE ${DAO.COLUMN_STUDY_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
-            if (cursor.count > 0)
+            while (cursor.moveToNext())
             {
-                cursor.moveToNext()
-                val sa = createSampleArea( cursor )
-                sa.id?.let { id ->
-                    sa.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
-                    sa.locations = DAO.locationDAO.getLocations( sa )
-//                    sa.collectionEnumerationTeams = DAO.enumerationTeamDAO.getCollectionTeams( id )
-                    sampleArea = sa
-                }
+                sampleAreas.add( createSampleArea( cursor ))
             }
 
             cursor.close()
@@ -142,7 +139,7 @@ class SampleAreaDAO(private var dao: DAO)
 
         db.close()
 
-        return sampleArea
+        return sampleAreas
     }
 
     fun delete( sampleArea: SampleArea )
