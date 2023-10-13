@@ -8,7 +8,7 @@ import edu.gtri.gpssample.database.models.*
 
 class LatLonDAO(private var dao: DAO)
 {
-    fun createOrUpdateLatLon( latLon: LatLon, geoArea : GeoArea?, team : Team? ) : LatLon?
+    fun createOrUpdateLatLon(latLon: LatLon, geoArea : GeoArea? ) : LatLon?
     {
         if (exists( latLon ))
         {
@@ -61,15 +61,6 @@ class LatLonDAO(private var dao: DAO)
                         }
                     }
                 }
-
-                team?.id?.let{team_id->
-                    values.clear()
-                    val ll = latLon
-                    Log.d("xxx", "the lat lon ${ll.latitude}, ${ll.longitude} team id ${team_id} and id $id")
-                    putLatLonTeam(id, team_id, values)
-                    dao.writableDatabase.insert(DAO.TABLE_TEAM_LAT_LON, null, values)
-
-                }
             } ?: return null
         }
 
@@ -79,7 +70,7 @@ class LatLonDAO(private var dao: DAO)
     private fun putLatLonTeam(llID : Int, teamId : Int, values : ContentValues)
     {
         values.put( DAO.COLUMN_LAT_LON_ID, llID )
-        values.put( DAO.COLUMN_TEAM_ID, teamId )
+        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, teamId )
     }
 
     private fun putLatLonEnumArea(llID : Int, enumAreaId: Int, values : ContentValues)
@@ -195,26 +186,6 @@ class LatLonDAO(private var dao: DAO)
             val latlon = createLatLon(cursor)
 
             latLons.add( latlon )
-        }
-
-        cursor.close()
-        db.close()
-
-        return latLons
-    }
-
-    fun getLatLonsWithTeamId( teamId: Int ): ArrayList<LatLon>
-    {
-        var latLons = ArrayList<LatLon>()
-        val db = dao.writableDatabase
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_TEAM_LAT_LON} ELL WHERE" +
-                " ELL.${DAO.COLUMN_TEAM_ID} = $teamId AND LL.${DAO.COLUMN_ID} = ELL.${DAO.COLUMN_LAT_LON_ID}"
-        val cursor = db.rawQuery(query, null)
-
-        Log.d("XXXXXSQL", "$query")
-        while (cursor.moveToNext())
-        {
-            latLons.add( createLatLon( cursor ))
         }
 
         cursor.close()

@@ -1,7 +1,5 @@
 package edu.gtri.gpssample.database.models
 
-import edu.gtri.gpssample.constants.LocationType
-import edu.gtri.gpssample.database.DAO
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -14,14 +12,11 @@ data class SampleArea(
     override var id : Int? = null,
     var creationDate: Long,
     var vertices : ArrayList<LatLon>,
-    var collectionTeams: ArrayList<Team>,
-    var locations: ArrayList<Location>,
-    var selectedTeamId: Int) : GeoArea()
+    var locations: ArrayList<Location>) : GeoArea()
 {
-    constructor( id: Int, creationDate: Long, selectedTeamId: Int )
-            : this( id, creationDate, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>(), selectedTeamId)
+    constructor( id: Int, creationDate: Long ) : this( id, creationDate, ArrayList<LatLon>(), ArrayList<Location>())
 
-    constructor(enumArea: EnumArea) : this(null, Date().time, ArrayList<LatLon>(), ArrayList<Team>(), ArrayList<Location>(),-1)
+    constructor(enumArea: EnumArea) : this(null, Date().time, ArrayList<LatLon>(), ArrayList<Location>())
     {
         this.vertices.addAll(enumArea.vertices)
         this.locations.addAll( enumArea.locations )

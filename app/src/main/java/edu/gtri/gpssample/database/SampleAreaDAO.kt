@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
-import com.google.android.gms.maps.model.LatLng
 import edu.gtri.gpssample.database.models.*
 
 class SampleAreaDAO(private var dao: DAO)
@@ -37,17 +36,12 @@ class SampleAreaDAO(private var dao: DAO)
 
             for (latLon in sampleArea.vertices)
             {
-                DAO.latLonDAO.createOrUpdateLatLon(latLon, sampleArea,null)
+                DAO.latLonDAO.createOrUpdateLatLon(latLon, sampleArea)
             }
 
             for (location in sampleArea.locations)
             {
                 DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
-            }
-
-            for (team in sampleArea.collectionTeams)
-            {
-                DAO.teamDAO.createOrUpdateTeam(team, sampleArea)
             }
 
             return sampleArea
@@ -72,7 +66,6 @@ class SampleAreaDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_CREATION_DATE, sampleArea.creationDate )
         values.put( DAO.COLUMN_STUDY_ID, study.id )
-        values.put( DAO.COLUMN_TEAM_ID, sampleArea.selectedTeamId )
     }
 
     @SuppressLint("Range")
@@ -80,9 +73,12 @@ class SampleAreaDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
-        val teamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TEAM_ID))
+        val sampleArea = SampleArea( id, creationDate )
 
-        return SampleArea( id, creationDate, teamId )
+        sampleArea.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
+        sampleArea.locations = DAO.locationDAO.getLocations( sampleArea )
+
+        return sampleArea
     }
 
     fun updateSampleArea( sampleArea: SampleArea, study: Study )
@@ -123,9 +119,9 @@ class SampleAreaDAO(private var dao: DAO)
         return sampleArea
     }
 
-    fun getSampleArea( study: Study ): SampleArea?
+    fun getSampleAreas( study: Study ): ArrayList<SampleArea>
     {
-        var sampleArea : SampleArea? = null
+        val sampleAreas = ArrayList<SampleArea>()
 
         val db = dao.writableDatabase
 
@@ -133,16 +129,9 @@ class SampleAreaDAO(private var dao: DAO)
             val query = "SELECT * FROM ${DAO.TABLE_SAMPLE_AREA} WHERE ${DAO.COLUMN_STUDY_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
-            if (cursor.count > 0)
+            while (cursor.moveToNext())
             {
-                cursor.moveToNext()
-                val sa = createSampleArea( cursor )
-                sa.id?.let { id ->
-                    sa.vertices = DAO.latLonDAO.getLatLonsWithSampleAreaId( id )
-                    sa.locations = DAO.locationDAO.getLocations( sa )
-                    sa.collectionTeams = DAO.teamDAO.getCollectionTeams( id )
-                    sampleArea = sa
-                }
+                sampleAreas.add( createSampleArea( cursor ))
             }
 
             cursor.close()
@@ -150,7 +139,7 @@ class SampleAreaDAO(private var dao: DAO)
 
         db.close()
 
-        return sampleArea
+        return sampleAreas
     }
 
     fun delete( sampleArea: SampleArea )
@@ -158,9 +147,9 @@ class SampleAreaDAO(private var dao: DAO)
         sampleArea.id?.let {sampleAreaId ->
 
             // collection teams are dependent on SampleAreas
-            DAO.teamDAO.getCollectionTeams( sampleAreaId ).map {
-                DAO.teamDAO.deleteTeam( it )
-            }
+//            DAO.enumerationTeamDAO.getCollectionTeams( sampleAreaId ).map {
+//                DAO.enumerationTeamDAO.deleteTeam( it )
+//            }
 
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"

@@ -47,7 +47,8 @@ class StudyDAO(private var dao: DAO)
 
         study.id?.let { id ->
 
-             study.sampleArea?.let { sampleArea ->
+            for (sampleArea in study.sampleAreas)
+            {
                 DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
             }
 
@@ -97,6 +98,7 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, study.creationDate )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
+        values.put( DAO.COLUMN_STUDY_TOTAL_POPULATION_SIZE, study.totalPopulationSize )
 
         // convert enum to int.  Maybe not do this and have look up tables?
         var index = SampleTypeConverter.toIndex(study.sampleType)
@@ -151,13 +153,15 @@ class StudyDAO(private var dao: DAO)
         val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX}"))
         val sampleSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE}"))
         val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX}"))
+        val totalPopulationSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_TOTAL_POPULATION_SIZE}"))
 
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
-        val study = Study( id, creationDate, name, samplingMethod, sampleSize, sampleType )
 
-        study.sampleArea = DAO.sampleAreaDAO.getSampleArea( study )
+        val study = Study( id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType )
+
+        study.sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
 
         return study
     }
@@ -166,14 +170,14 @@ class StudyDAO(private var dao: DAO)
     fun getStudies( config: Config ): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
-        var db = dao.writableDatabase
+        val db = dao.writableDatabase
 
         config.id?.let { id ->
-            var query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
+            val query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
                     "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_ID} = conn.${DAO.COLUMN_STUDY_ID} and "  +
                     "conn.${DAO.COLUMN_CONFIG_ID} = ${id}"
 
-            var cursor = db.rawQuery(query, null)
+            val cursor = db.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -181,8 +185,9 @@ class StudyDAO(private var dao: DAO)
                 studies.add( study )
                 study.fields = DAO.fieldDAO.getFields(study)
                // study.rules = DAO.ruleDAO.getRules(study)
-
                 study.filters.addAll(DAO.filterDAO.getFilters(study))
+                study.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( study )
+                study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             }
 
             cursor.close()
@@ -196,11 +201,11 @@ class StudyDAO(private var dao: DAO)
     fun getStudies(): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
-        var db = dao.writableDatabase
+        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_STUDY}"
 
-        var cursor = db.rawQuery(query, null)
+        val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {

@@ -9,18 +9,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.database.models.Team
+import edu.gtri.gpssample.database.models.CollectionTeam
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ManageCollectionTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapter<ManageCollectionTeamsAdapter.ViewHolder>()
+class ManageCollectionTeamsAdapter(var collectionTeams: List<CollectionTeam>?) : RecyclerView.Adapter<ManageCollectionTeamsAdapter.ViewHolder>()
 {
-    override fun getItemCount() = teams!!.size
+    override fun getItemCount() = collectionTeams!!.size
 
     private lateinit var context: Context
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var didSelectTeam: ((team: Team) -> Unit)
-    lateinit var shouldDeleteTeam: ((team: Team) -> Unit)
+    lateinit var didSelectTeam: ((collectionTeam: CollectionTeam) -> Unit)
+    lateinit var shouldDeleteTeam: ((collectionTeam: CollectionTeam) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -34,9 +34,9 @@ class ManageCollectionTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapte
         return viewHolder
     }
 
-    fun updateTeams( teams: List<Team> )
+    fun updateTeams(collectionTeams: List<CollectionTeam> )
     {
-        this.teams = teams
+        this.collectionTeams = collectionTeams
         notifyDataSetChanged()
     }
 
@@ -44,7 +44,7 @@ class ManageCollectionTeamsAdapter(var teams: List<Team>?) : RecyclerView.Adapte
     {
         holder.itemView.isSelected = false
 
-        val team = teams!!.get(holder.adapterPosition)
+        val team = collectionTeams!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( team.name )
         holder.imageView.visibility = View.VISIBLE

@@ -63,7 +63,7 @@ class PerformEnumerationFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var user: User
-    private lateinit var team: Team
+    private lateinit var enumerationTeam: EnumerationTeam
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
@@ -135,8 +135,8 @@ class PerformEnumerationFragment : Fragment(),
             enumArea = it
         }
 
-        sharedViewModel.teamViewModel.currentTeam?.value?.let {
-            team = it
+        sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.let {
+            enumerationTeam = it
         }
 
         (activity!!.application as? MainApplication)?.user?.let {
@@ -150,7 +150,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.recyclerView.adapter = performEnumerationAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + team.name + " team)"
+        binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + enumerationTeam.name + " team)"
 
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
@@ -261,7 +261,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
 
-        performEnumerationAdapter.updateLocations( enumArea.locations )
+        performEnumerationAdapter.updateLocations( enumerationTeam.locations )
 
         for (polygonAnnotation in allPolygonAnnotations)
         {
@@ -287,7 +287,7 @@ class PerformEnumerationFragment : Fragment(),
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-        team.polygon.map {
+        enumArea.vertices.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
@@ -311,7 +311,7 @@ class PerformEnumerationFragment : Fragment(),
             val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
 
             currentZoomLevel?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(team.polygon)
+                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                 val cameraPosition = CameraOptions.Builder()
                     .zoom(currentZoomLevel)
@@ -321,7 +321,7 @@ class PerformEnumerationFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in enumArea.locations)
+            for (location in enumerationTeam.locations)
             {
                 if (location.isLandmark)
                 {
@@ -481,6 +481,8 @@ class PerformEnumerationFragment : Fragment(),
             }
             else
             {
+                enumerationTeam.locations.add(location)
+                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                 navigateToAddHouseholdFragment()
             }
 
@@ -560,6 +562,8 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
+                    enumerationTeam.locations.add(location)
+                    DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                     navigateToAddHouseholdFragment()
                 }
 
@@ -615,6 +619,8 @@ class PerformEnumerationFragment : Fragment(),
             }
             else
             {
+                enumerationTeam.locations.add(location)
+                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                 navigateToAddHouseholdFragment()
             }
         }

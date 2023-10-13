@@ -20,6 +20,7 @@ import kotlin.collections.ArrayList
 
 class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
+    private lateinit var study: Study
     private lateinit var sampleArea: SampleArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -51,28 +52,33 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedViewModel.createStudyModel.currentStudy?.value?.let {
+            study = it
+        }
+
         samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
             this.sampleArea = sampleArea
         }
 
-        sampleArea.id?.let { sampleAreaId ->
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                var teams = ArrayList<Team>()
-
-                if (sampleArea.selectedTeamId > 0) // if teamId is valid, then filter out all teams except this one
-                {
-                    val team = DAO.teamDAO.getTeam( sampleArea.selectedTeamId )
-                    team?.let {
-                        teams.add( it )
-                    }
-                }
-                else  // otherwise show all teams
-                {
-                    teams = DAO.teamDAO.getCollectionTeams( sampleAreaId )
-                }
-
-                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( teams )
+        if (study.selectedCollectionTeamId > 0) // if teamId is valid, then filter out all teams except this one
+        {
+            val teams = study.collectionTeams.filter { collectionTeam ->
+                collectionTeam.id?.let { id ->
+                    id == study.selectedCollectionTeamId
+                } ?: false
             }
+
+            if (teams.isNotEmpty())
+            {
+                val collectionTeams = ArrayList<CollectionTeam>()
+                collectionTeams.add( teams[0] )
+                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
+            }
+        }
+
+        if (!this::manageCollectionTeamsAdapter.isInitialized)
+        {
+            manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( study.collectionTeams )
         }
 
         manageCollectionTeamsAdapter.didSelectTeam = this::didSelectTeam
@@ -93,24 +99,24 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageCollectionTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun didSelectTeam( team: Team)
+    fun didSelectTeam(collectionTeam: CollectionTeam)
     {
-        sharedViewModel.teamViewModel.setCurrentTeam( team )
+        sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
 
-        team.id?.let {
-            sampleArea.selectedTeamId = it
-        }
+//        collectionTeam.id?.let {
+//            study.selectedCollectionTeamId = it
+//        }
 
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }
 
-    fun shouldDeleteTeam( team: Team)
+    fun shouldDeleteTeam(collectionTeam: CollectionTeam)
     {
         ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_team_message),
-            resources.getString(R.string.no), resources.getString(R.string.yes), team, this)
+            resources.getString(R.string.no), resources.getString(R.string.yes), collectionTeam, this)
     }
 
     override fun didSelectLeftButton(tag: Any?)
@@ -119,10 +125,10 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
 
     override fun didSelectRightButton(tag: Any?)
     {
-        val team = tag as Team
-        sampleArea.collectionTeams.remove(team)
-        manageCollectionTeamsAdapter.updateTeams(sampleArea.collectionTeams)
-        DAO.teamDAO.deleteTeam( team )
+        val collectionTeam = tag as CollectionTeam
+        study.collectionTeams.remove(collectionTeam)
+        manageCollectionTeamsAdapter.updateTeams(study.collectionTeams)
+        DAO.collectionTeamDAO.deleteTeam( collectionTeam )
     }
 
     override fun onDestroyView()

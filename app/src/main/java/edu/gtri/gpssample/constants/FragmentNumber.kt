@@ -22,4 +22,5 @@ enum class FragmentNumber( val value: Int ) {
     CreateCollectionTeamFragment(1025),
     HotspotFragment( 1026),
     AddMultiHouseholdFragment( 1027 ),
+    ManageCollectionTeamsFragment(1013 ),
 }

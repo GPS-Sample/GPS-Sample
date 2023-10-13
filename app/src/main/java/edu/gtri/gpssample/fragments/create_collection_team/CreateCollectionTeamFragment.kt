@@ -52,6 +52,7 @@ class CreateCollectionTeamFragment : Fragment(),
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var createMode = false
+    private val locations = ArrayList<Location>()
     private var intersectionPolygon: PolygonAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
@@ -140,25 +141,10 @@ class CreateCollectionTeamFragment : Fragment(),
             }
 
             study.id?.let { studyId ->
-                val polygon = ArrayList<LatLon>()
+                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( studyId, binding.teamNameEditText.text.toString(), locations ))
 
-                intersectionPolygon?.points?.map { points ->
-                    points.map { point ->
-                        polygon.add( LatLon( point.latitude(), point.longitude()))
-                    }
-                }
-
-                if (polygon.isEmpty())
-                {
-                    sampleArea.vertices.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
-                    }
-                }
-
-                val team = DAO.teamDAO.createOrUpdateTeam( Team( studyId, binding.teamNameEditText.text.toString(), polygon ), sampleArea)
-
-                team?.let { team ->
-                    sampleArea.collectionTeams.add(team)
+                collectionTeam?.let { team ->
+                    study.collectionTeams.add(team)
                     findNavController().popBackStack()
                 }
             }
@@ -290,6 +276,17 @@ class CreateCollectionTeamFragment : Fragment(),
                             val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                             pointList.add( vertices )
                             intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000")
+
+                            locations.clear()
+
+                            for (location in sampleArea.locations)
+                            {
+                                val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                                if (polygon.contains(geometry3))
+                                {
+                                    locations.add( location )
+                                }
+                            }
                         }
                     }
                 }

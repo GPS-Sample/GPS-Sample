@@ -26,6 +26,7 @@ class CreateStudyModel {
     private var _samplingTypesVisible : Boolean = false
     var fragment : Fragment? = null
     var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
+    var totalPopulationVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
 
     val samplingMethodPosition : MutableLiveData<Int>
         get() = _samplingMethodPosition
@@ -102,6 +103,7 @@ class CreateStudyModel {
 //            }
 //
 //        }
+
     var  currentSampleSize : String
         get(){
             currentStudy?.value?.let{study ->
@@ -111,17 +113,27 @@ class CreateStudyModel {
         }
         set(value){
             currentStudy?.value?.let{study ->
-
                 value.toIntOrNull()?.let {size ->
                     if(size > 0)
                     {
                         study.sampleSize = size
-                    }else
-                    {
-
                     }
-
                 } ?: run{ study.sampleSize = 0
+                }
+            }
+        }
+
+    var  totalPopulationSize : String
+        get(){
+            currentStudy?.value?.let{ study ->
+                return study.totalPopulationSize.toString()
+            }
+            return ""
+        }
+        set(value) {
+            currentStudy?.value?.let{ study ->
+                value.toIntOrNull()?.let{ size ->
+                    study.totalPopulationSize = size
                 }
             }
         }
@@ -184,8 +196,17 @@ class CreateStudyModel {
         if(position < sampleTypes.size)
         {
             val sampleType : String = SampleTypeConverter.array[position]
-            _currentStudy?.value?.let {
-                it.sampleType = SampleTypeConverter.fromString(sampleType)
+            _currentStudy?.value?.let { study ->
+                study.sampleType = SampleTypeConverter.fromString(sampleType)
+
+                if (study.sampleType == SampleType.PercentTotal)
+                {
+                    totalPopulationVisibility.set(true)
+                }
+                else
+                {
+                    totalPopulationVisibility.set(false)
+                }
             }
         }
     }

@@ -6,15 +6,15 @@ import kotlinx.serialization.json.Json
 import java.util.*
 
 @kotlinx.serialization.Serializable
-data class Team(
+data class CollectionTeam(
     var id : Int? = null,
     var creationDate: Long,
     var studyId: Int,
     var name: String,
-    var polygon: ArrayList<LatLon>)
+    var locations: ArrayList<Location>
+)
 {
-    constructor( studyId: Int,  name: String, polygon: ArrayList<LatLon> )
-            : this(null, Date().time, studyId, name, polygon )
+    constructor( studyId: Int,  name: String, locations: ArrayList<Location>) : this(null, Date().time, studyId, name, locations )
 
     fun pack() : String
     {
@@ -23,9 +23,9 @@ data class Team(
 
     companion object
     {
-        fun unpack( message: String ) : Team
+        fun unpack( message: String ) : EnumerationTeam
         {
-            return Json.decodeFromString<Team>( message )
+            return Json.decodeFromString<EnumerationTeam>( message )
         }
     }
 }

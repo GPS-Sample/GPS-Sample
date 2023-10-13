@@ -41,13 +41,13 @@ class SamplingViewModel : ViewModel()
             return _currentSampleArea
         }
         set(value){
-            value?.let{sampleArea ->
+            value?.let{ sampleArea ->
                 _currentSampleArea = MutableLiveData(sampleArea.value)
                 _currentStudy?.value?.let{ study->
-                    if (study.sampleArea == null)  // is this check necessary / correct?
-                    {
-                        sampleArea.value?.let{ sampleArea->
-                            study.sampleArea = sampleArea
+                    sampleArea.value?.let{ sampleArea->
+                        if (!study.sampleAreas.contains( sampleArea))
+                        {
+                            study.sampleAreas.add( sampleArea )
                         }
                     }
                 }
@@ -64,6 +64,7 @@ class SamplingViewModel : ViewModel()
         get()
         {
             currentStudy?.value?.let{study ->
+                Log.d( "xxx", study.samplingMethod.format)
                 _currentFragment?.let{fragment ->
                     return SamplingMethodConverter.internationalString(study.samplingMethod, fragment)
                 }
@@ -78,7 +79,7 @@ class SamplingViewModel : ViewModel()
         val sampleArea = SampleArea(fromEnumArea)
         _currentSampleArea = MutableLiveData(sampleArea)
         _currentStudy?.value?.let { study ->
-            study.sampleArea = sampleArea
+            study.sampleAreas.add( sampleArea )
         }
     }
 
@@ -141,7 +142,6 @@ class SamplingViewModel : ViewModel()
                                 if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
                                      resourceId = R.drawable.multi_home_blue
-                                    Log.d( "xxx", sampledItem.subAddress )
                                 }
                             }
                         }
@@ -226,9 +226,11 @@ class SamplingViewModel : ViewModel()
                     {
                         sampleSize = (study.sampleSize.toDouble() / 100.0 * validSamples.size.toDouble()).roundToInt()
                     }
-                    else ->
+                    SampleType.PercentTotal ->
                     {
+                        sampleSize = (study.sampleSize.toDouble() / 100.0 * study.totalPopulationSize.toDouble()).roundToInt()
                     }
+                    else -> {}
                 }
 
                 if (sampleSize > 0)
