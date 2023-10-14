@@ -47,7 +47,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 {
     private lateinit var study: Study
     private lateinit var config: Config
-    private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -74,7 +73,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentCreateSampleBinding.inflate(inflater, container, false)
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -106,18 +105,12 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             this.study = study
         }
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-            this.enumArea = enumArea
-        }
-
-        if (study.sampleAreas.isNotEmpty())
+        if (study.sampleAreas.isEmpty())
         {
-            samplingViewModel.currentSampleArea = MutableLiveData(study.sampleAreas[0])
-        }
-        else
-        {
-            sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{ enumArea->
-                samplingViewModel.createSampleArea(enumArea)
+            for (enumArea in config.enumAreas)
+            {
+                val sampleArea = SampleArea(enumArea)
+                study.sampleAreas.add( sampleArea )
             }
         }
 
@@ -145,14 +138,14 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
 
         binding.infoButton.setOnClickListener{
-            // pop up dialog fragment
             findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
         }
 
         binding.nextButton.setOnClickListener {
-            samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
-
-                sampleArea.id?.let { sampleAreaId ->
+            for (sampleArea in study.sampleAreas)
+            {
+                if (sampleArea.id == null)
+                {
                     DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
 
                     for (location in sampleArea.locations)
@@ -160,7 +153,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                         DAO.locationDAO.updateConnectorTable( location, sampleArea )
                     }
 
-                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
+                    // we should not have to do this anymore
+//                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
                 }
             }
 
@@ -177,29 +171,32 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
     fun refreshMap()
     {
-        val points = java.util.ArrayList<Point>()
-        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-
-        enumArea.vertices.map {
-            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-        }
-
-        pointList.add( points )
-
-        if (pointList.isNotEmpty())
+        for (sampleArea in study.sampleAreas)
         {
-            mapboxManager.addPolygon(pointList,"#000000")
-            mapboxManager.addPolyline( pointList[0] )
+            val points = java.util.ArrayList<Point>()
+            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                val cameraPosition = CameraOptions.Builder()
-                    .zoom(currentZoomLevel)
-                    .center(point)
-                    .build()
+            sampleArea.vertices.map {
+                points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+            }
 
-                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            pointList.add( points )
+
+            if (pointList.isNotEmpty())
+            {
+                mapboxManager.addPolygon(pointList,"#000000")
+                mapboxManager.addPolyline( pointList[0] )
+
+                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                    val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
+                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                    val cameraPosition = CameraOptions.Builder()
+                        .zoom(currentZoomLevel)
+                        .center(point)
+                        .build()
+
+                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                }
             }
         }
     }

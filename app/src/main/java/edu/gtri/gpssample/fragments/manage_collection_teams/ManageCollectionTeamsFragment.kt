@@ -21,7 +21,6 @@ import kotlin.collections.ArrayList
 class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var study: Study
-    private lateinit var sampleArea: SampleArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var manageCollectionTeamsAdapter: ManageCollectionTeamsAdapter
@@ -54,10 +53,6 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
-        }
-
-        samplingViewModel.currentSampleArea?.value?.let { sampleArea ->
-            this.sampleArea = sampleArea
         }
 
         if (study.selectedCollectionTeamId > 0) // if teamId is valid, then filter out all teams except this one

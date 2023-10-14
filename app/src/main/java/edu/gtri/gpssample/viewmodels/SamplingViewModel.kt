@@ -23,7 +23,6 @@ class SamplingViewModel : ViewModel()
 
     private var _currentFragment : Fragment? = null
     private var _currentStudy : MutableLiveData<Study>? = null
-    private var _currentSampleArea : MutableLiveData<SampleArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
@@ -35,30 +34,6 @@ class SamplingViewModel : ViewModel()
         set(value){
             _currentStudy = MutableLiveData(value?.value)
         }
-
-    var currentSampleArea : LiveData<SampleArea>?
-        get(){
-            return _currentSampleArea
-        }
-        set(value){
-            value?.let{ sampleArea ->
-                _currentSampleArea = MutableLiveData(sampleArea.value)
-                _currentStudy?.value?.let{ study->
-                    sampleArea.value?.let{ sampleArea->
-                        if (!study.sampleAreas.contains( sampleArea))
-                        {
-                            study.sampleAreas.add( sampleArea )
-                        }
-                    }
-                }
-            }
-        }
-
-    fun setCurrentSampleArea( sampleArea: SampleArea )
-    {
-        _currentSampleArea = MutableLiveData( sampleArea )
-        currentSampleArea = _currentSampleArea
-    }
 
     val samplingMethod: String
         get()
@@ -74,15 +49,6 @@ class SamplingViewModel : ViewModel()
             return ""
         }
 
-    fun createSampleArea(fromEnumArea: EnumArea)
-    {
-        val sampleArea = SampleArea(fromEnumArea)
-        _currentSampleArea = MutableLiveData(sampleArea)
-        _currentStudy?.value?.let { study ->
-            study.sampleAreas.add( sampleArea )
-        }
-    }
-
     fun setSampleAreasForMap(mapboxManager: MapboxManager, pointAnnotationManager: PointAnnotationManager) : SamplingState
     {
         this.mapboxManager = mapboxManager
@@ -95,62 +61,64 @@ class SamplingViewModel : ViewModel()
 
         allPointAnnotations.clear()
 
-        _currentSampleArea?.value?.let{ sampleArea->
-
-            for (location in sampleArea.locations)
+        currentStudy?.value?.let { study ->
+            for (sampleArea in study.sampleAreas)
             {
-                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                for (location in sampleArea.locations)
                 {
-                    currentStudy?.value?.let{ study->
+                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                    {
+                        currentStudy?.value?.let{ study->
 
-                        var resourceId: Int
-                        var isMultiFamily = false
+                            var resourceId: Int
+                            var isMultiFamily = false
 
-                        location.isMultiFamily?.let {
-                            isMultiFamily = it
-                        }
-
-                        if (!isMultiFamily)
-                        {
-                            val sampledItem = location.enumerationItems[0]
-
-                            if(!_currentSampledItemsForSampling.contains(sampledItem))
-                            {
-                                _currentSampledItemsForSampling.add(sampledItem)
+                            location.isMultiFamily?.let {
+                                isMultiFamily = it
                             }
 
-                            resourceId = when(sampledItem.samplingState)
+                            if (!isMultiFamily)
                             {
-                                SamplingState.None       -> R.drawable.home_black
-                                SamplingState.NotSampled -> R.drawable.home_green
-                                SamplingState.Sampled    -> R.drawable.home_blue
-                                SamplingState.Resampled  -> R.drawable.home_blue
-                                SamplingState.Invalid    -> R.drawable.home_red
-                            }
-                        }
-                        else
-                        {
-                            resourceId = R.drawable.multi_home_green
+                                val sampledItem = location.enumerationItems[0]
 
-                            for (sampledItem in location.enumerationItems)
-                            {
                                 if(!_currentSampledItemsForSampling.contains(sampledItem))
                                 {
                                     _currentSampledItemsForSampling.add(sampledItem)
                                 }
 
-                                if (sampledItem.samplingState == SamplingState.Sampled)
+                                resourceId = when(sampledItem.samplingState)
                                 {
-                                     resourceId = R.drawable.multi_home_blue
+                                    SamplingState.None       -> R.drawable.home_black
+                                    SamplingState.NotSampled -> R.drawable.home_green
+                                    SamplingState.Sampled    -> R.drawable.home_blue
+                                    SamplingState.Resampled  -> R.drawable.home_blue
+                                    SamplingState.Invalid    -> R.drawable.home_red
                                 }
                             }
-                        }
+                            else
+                            {
+                                resourceId = R.drawable.multi_home_green
 
-                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                                for (sampledItem in location.enumerationItems)
+                                {
+                                    if(!_currentSampledItemsForSampling.contains(sampledItem))
+                                    {
+                                        _currentSampledItemsForSampling.add(sampledItem)
+                                    }
 
-                        pointAnnotation?.let { pointAnnotation ->
-                            allPointAnnotations.add( pointAnnotation )
+                                    if (sampledItem.samplingState == SamplingState.Sampled)
+                                    {
+                                        resourceId = R.drawable.multi_home_blue
+                                    }
+                                }
+                            }
+
+                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                            val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+
+                            pointAnnotation?.let { pointAnnotation ->
+                                allPointAnnotations.add( pointAnnotation )
+                            }
                         }
                     }
                 }
@@ -162,25 +130,10 @@ class SamplingViewModel : ViewModel()
 
     fun beginSampling(view : View) : SamplingState
     {
-        fixEnumData()
-        // reset list
         val validSamples : ArrayList<EnumerationItem> = ArrayList()
 
         currentStudy?.value?.let { study ->
-
-/// TEST
-            for(filter in study.filters)
-            {
-                Log.d("XXXXXX", filter.name )
-//                for(rule in filter.filterRules)
-//                {
-//
-//                    Log.d("XXXX", "THE NAME  CONNECTOR ${rule.connector.format}")
-//                }
-
-            }
-
-            for(sampleItem in _currentSampledItemsForSampling)
+            for (sampleItem in _currentSampledItemsForSampling)
             {
                 sampleItem.samplingState = SamplingState.NotSampled
 
@@ -189,29 +142,7 @@ class SamplingViewModel : ViewModel()
                 {
                     validSamples.add(sampleItem)
                 }
-
-                // TODO: run through rules and filters, etc..
-
-//                if(sampleItem.enumerationState == EnumerationState.Incomplete)
-//                {
-//                    enumItem.samplingState = SamplingState.Invalid
-//                    removeList.add(enumItem)
-//                }
-//                if(enumItem.enumerationState == EnumerationState.Enumerated)
-//                {
-//                   // for(filter in )
-//                        for(fieldData in enumItem.fieldDataList)
-//                        {
-//                           // Log.d("XXX", "field data name ${fieldData.name}  value ${fieldData.numberValue}")
-//
-//                            // fieldData.
-//                        }
-//                }
-
             }
-
-            // remove invalid houses as part of sampling
-           // _currentEnumItemsForSampling.removeAll(removeList.toSet())
 
             currentStudy?.value?.let { study ->
                 var sampleSize = 0
@@ -235,21 +166,19 @@ class SamplingViewModel : ViewModel()
 
                 if (sampleSize > 0)
                 {
-                    currentSampleArea?.value?.let { sampleArea ->
-                        val sampledIndices: ArrayList<Int> = ArrayList()
+                    val sampledIndices = ArrayList<Int>()
 
-                        for (i in 0 until sampleSize)
+                    for (i in 0 until sampleSize)
+                    {
+                        var rnds = (0 until validSamples.size).random()
+
+                        while(sampledIndices.contains(rnds))
                         {
-                            var rnds = (0 until validSamples.size).random()
-
-                            while(sampledIndices.contains(rnds))
-                            {
-                                rnds = (0 until validSamples.size).random()
-                            }
-
-                            sampledIndices.add(rnds)
-                            validSamples[rnds].samplingState = SamplingState.Sampled
+                            rnds = (0 until validSamples.size).random()
                         }
+
+                        sampledIndices.add(rnds)
+                        validSamples[rnds].samplingState = SamplingState.Sampled
                     }
                 }
             }
@@ -259,75 +188,4 @@ class SamplingViewModel : ViewModel()
 
         return SamplingState.None
     }
-
-    fun fixEnumData()
-    {
-        currentStudy?.value?.let{study ->
-            for(sampleItem in _currentSampledItemsForSampling)
-            {
-//                sampleItem.fieldDataList[0].name = study.fields[0].name
-//                sampleItem.fieldDataList[0].type = study.fields[0].type
-//
-//                sampleItem.fieldDataList[1].name = study.fields[1].name
-//                sampleItem.fieldDataList[1].type = study.fields[1].type
-            }
-
-            // CHECK
-//            for(enumAreaa in study.sampleAreas)
-//            {
-//                for(location in enumAreaa.locations)
-//                {
-//                    for(enumItem in location.enumerationItems)
-//                    {
-//                        for(fieldData in enumItem.fieldDataList)
-//                        {
-//
-//                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-//                        }
-//                    }
-//                }
-//            }
-
-            Log.d("XXXXXXX", "---------------- enumAreas")
-//            currentEnumArea?.value?.let{enumArea ->
-//                for(location in enumArea.locations)
-//                {
-//                    for(enumItem in location.enumerationItems)
-//                    {
-//                        for(fieldData in enumItem.fieldDataList)
-//                        {
-//
-//                            Log.d("XXXXXX", "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}")
-//                        }
-//                    }
-//                }
-//            }
-
-            Log.d("XXXXXXXXXXX", "------------------- Config enum areas")
-//            config?.let{config->
-//                for(enumAreaa in config.enumAreas) {
-//                    for (location in enumAreaa.locations) {
-//                        for (enumItem in location.enumerationItems) {
-//                            for (fieldData in enumItem.fieldDataList) {
-//                                Log.d(
-//                                    "XXXXXX",
-//                                    "fieldData id ${fieldData.id} name ${fieldData.name} type ${fieldData.type} ${fieldData.numberValue}"
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//
-//            }
-        }
-        Log.d("XXXXXXXXXXX", "-------------------------------")
-    }
-
-//    fun samplingInfo(view : View)
-//    {
-//        currentStudy?.value?.let { study ->
-//            print("study.samplingMethod.name()  ${study.samplingMethod.name}")
-//        }
-//        print("begin sampling")
-//    }
 }

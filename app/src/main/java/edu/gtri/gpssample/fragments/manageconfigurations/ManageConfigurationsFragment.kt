@@ -229,7 +229,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 {
                     val collectionTeam = collectionTeams[0]
                     sharedViewModel.createStudyModel.setStudy( study )
-                    samplingViewModel.setCurrentSampleArea( sampleArea )
                     sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
                     sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                     samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
@@ -442,7 +441,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                                 val collectionTeam = collectionTeams[0]
 
                                 sharedViewModel.createStudyModel.setStudy( study )
-                                samplingViewModel.setCurrentSampleArea( sampleArea )
                                 sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
                                 sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                                 samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
