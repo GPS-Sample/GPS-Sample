@@ -33,9 +33,10 @@ data class Study(
             : this(null, Date().time, name, 0, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(),
         ArrayList<SampleArea>(), ArrayList<EnumerationTeam>(), ArrayList<CollectionTeam>(), -1, -1)
 
-    constructor(id: Int, creationDate: Long, name: String, totalPopulationSize: Int, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
+    constructor(id: Int, creationDate: Long, name: String, totalPopulationSize: Int, samplingMethod: SamplingMethod,
+                sampleSize: Int, sampleType: SampleType, selectedEnumerationTeamId: Int, selectedCollectionTeamId: Int )
             : this(id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(),
-        ArrayList<SampleArea>(), ArrayList<EnumerationTeam>(), ArrayList<CollectionTeam>(), -1, -1)
+        ArrayList<SampleArea>(), ArrayList<EnumerationTeam>(), ArrayList<CollectionTeam>(), selectedEnumerationTeamId, selectedCollectionTeamId)
 
     fun pack() : String
     {

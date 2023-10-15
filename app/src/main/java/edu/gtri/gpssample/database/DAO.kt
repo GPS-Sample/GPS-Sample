@@ -47,6 +47,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_NAME + " TEXT" + "," +
                     COLUMN_CONFIG_ID + " INTEGER" + "," +
+                    COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
+                    COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
                     COLUMN_STUDY_TOTAL_POPULATION_SIZE + " INTEGER" + "," +
 
                     // this needs to be a look up table
@@ -55,7 +57,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
                     // this needs to be a look up table
                     COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableStudy)
 

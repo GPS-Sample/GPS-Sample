@@ -17,6 +17,7 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.SampleArea
+import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.network.*
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
@@ -44,9 +45,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     var clientStarted = false
 
-    // maybe a better way
+    var currentStudy: Study? = null
     var currentEnumArea: EnumArea? = null
-    var currentSampleArea: SampleArea? = null
 
     var configurationDelegate: ConfigurationDelegate? = null
 
@@ -197,9 +197,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     }
 
     fun sendCollectionData() {
-        currentSampleArea?.let { sampleArea ->
+        currentStudy?.let { study ->
             networkInfo?.let { networkInfo ->
-                val payload = sampleArea.pack()
+                val payload = study.pack()
 
                 Log.d("xxx", payload)
 
