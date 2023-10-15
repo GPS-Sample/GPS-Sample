@@ -13,6 +13,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.SampleType
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateStudyBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -55,11 +56,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
-    {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        createStudyAdapter = CreateStudyAdapter( activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
+        createStudyAdapter =
+            CreateStudyAdapter(activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
         createStudyAdapter.didSelectField = this::didSelectField
         createStudyAdapter.didSelectRule = this::didSelectRule
         createStudyAdapter.didSelectFilter = this::didSelectFilter
@@ -81,7 +82,11 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             createStudyFragment = this@CreateStudyFragment
         }
 
-        ArrayAdapter.createFromResource(activity!!, R.array.samling_methods, android.R.layout.simple_spinner_item)
+        ArrayAdapter.createFromResource(
+            activity!!,
+            R.array.samling_methods,
+            android.R.layout.simple_spinner_item
+        )
             .also { adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 binding.samplingMethodSpinner.adapter = adapter
@@ -90,23 +95,38 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
             this.study = study
         } ?: run {
-            binding.deleteImageView.visibility= View.GONE
+            binding.deleteImageView.visibility = View.GONE
         }
 
-        binding.expandableListView.setAdapter( createStudyAdapter )
-        binding.expandableListView.setChildDivider( getResources().getDrawable(R.color.clear))
+        binding.expandableListView.setAdapter(createStudyAdapter)
+        binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
 
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString( R.string.delete_study_message ),
-                resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, this)
+            ConfirmationDialog(
+                activity,
+                resources.getString(R.string.please_confirm),
+                resources.getString(R.string.delete_study_message),
+                resources.getString(R.string.no),
+                resources.getString(R.string.yes),
+                DeleteMode.deleteStudyTag.value,
+                this
+            )
         }
 
         binding.saveButton.setOnClickListener {
             updateStudy()
         }
-    }
 
+        sharedViewModel.createStudyModel.samplingMethod.observe( this, androidx.lifecycle.Observer { samplingMethod ->
+            when(study.samplingMethod)
+            {
+                SamplingMethod.SimpleRandom -> binding.sampleSizeTextView.text = resources.getString(R.string.simple_random_sampling_label)
+                SamplingMethod.Cluster -> binding.sampleSizeTextView.text = resources.getString(R.string.cluster_sampling_label)
+                else -> {}
+            }
+        })
+    }
     override fun onResume()
     {
         super.onResume()

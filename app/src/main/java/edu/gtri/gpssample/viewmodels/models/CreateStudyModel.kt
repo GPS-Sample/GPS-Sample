@@ -24,6 +24,10 @@ class CreateStudyModel {
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _samplingTypes : ObservableArrayList<String> = ObservableArrayList()
     private var _samplingTypesVisible : Boolean = false
+    private var _samplingMethod: MutableLiveData<SamplingMethod> = MutableLiveData( SamplingMethod.SimpleRandom )
+
+    var samplingMethod : LiveData<SamplingMethod> = _samplingMethod
+
     var fragment : Fragment? = null
     var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
     var totalPopulationVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
@@ -173,8 +177,10 @@ class CreateStudyModel {
         {
             _currentStudy?.value?.let {study ->
                 study.samplingMethod = SamplingMethodConverter.fromArrayPosition(position)
+                _samplingMethod.value = study.samplingMethod
 
                 _samplingTypes.clear()
+
                 when(study.samplingMethod)
                 {
                     SamplingMethod.SimpleRandom -> {
@@ -184,9 +190,7 @@ class CreateStudyModel {
                         sampleTypesVisibility.set(true)
                     }
                     else -> {sampleTypesVisibility.set(false)}
-
                 }
-
             }
         }
     }

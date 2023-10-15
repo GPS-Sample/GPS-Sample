@@ -104,7 +104,6 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:gravity="center_vertical"
-            android:text="@string/total_sample_size"
             android:textSize="17sp"
             android:textColor="@color/primary_textcolor"
             android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.VISIBLE : View.GONE}" />
