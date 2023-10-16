@@ -170,7 +170,7 @@ class ConfigurationViewModel : ViewModel()
     }
     fun createNewConfiguration()
     {
-        val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 0 )
+        val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 0, false )
         _currentConfiguration = MutableLiveData(newConfig)
         //saveNewConfiguration()
     }

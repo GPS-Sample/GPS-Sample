@@ -110,6 +110,7 @@ class PerformEnumerationFragment : Fragment(),
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
@@ -202,8 +203,15 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            ConfirmationDialog( activity, resources.getString(R.string.select_location),
-                "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
+            if (config.allowManualLocationEntry)
+            {
+                ConfirmationDialog( activity, resources.getString(R.string.select_location),
+                    "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
+            }
+            else
+            {
+                didSelectLeftButton( kAddHouseholdTag )
+            }
         }
 
         binding.addLandmarkButton.setOnClickListener {
@@ -432,15 +440,23 @@ class PerformEnumerationFragment : Fragment(),
             }
             else if (location.enumerationItems.size == 1)
             {
-                location.isMultiFamily?.let { isMultiFamily ->
-                    if (isMultiFamily)
-                    {
-                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
-                    }
-                    else
-                    {
-                        sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                if (location.isMultiFamily == null)
+                {
+                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                }
+                else
+                {
+                    location.isMultiFamily?.let { isMultiFamily ->
+                        if (isMultiFamily)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                        }
+                        else
+                        {
+                            sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                        }
                     }
                 }
             }

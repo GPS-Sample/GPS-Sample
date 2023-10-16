@@ -34,6 +34,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" + "," +
+                    COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                     COLUMN_STUDY_ID + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
@@ -433,6 +434,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_DATE_FORMAT_INDEX = "config_date_format_index"
         const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
         const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
+        const val COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY = "config_allow_manual_location_entry"
 
         // Study EnumArea connector table
         const val TABLE_STUDY_ENUM_AREA = "study_enum_area"

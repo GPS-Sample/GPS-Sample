@@ -154,6 +154,31 @@
                     android:textSize="17sp"
                     android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"/>
 
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp">
+
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:gravity="center_vertical"
+                        android:text="Allow manual identification of locations"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/location_switch"
+                        android:clickable="false"
+                        android:checked="@={viewModel.currentConfiguration.allowManualLocationEntry}"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp" />
+                </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
@@ -162,6 +187,8 @@
                     android:id="@+id/map_view"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     mapbox:mapbox_cameraTargetLat="33.77577524978659"
                     mapbox:mapbox_cameraTargetLng="-84.39630379821243"
                     mapbox:mapbox_cameraZoom="9.0">

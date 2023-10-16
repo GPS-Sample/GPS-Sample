@@ -48,7 +48,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
 
-    private var editMode = false
+    private var editMode = true
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -283,8 +283,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         location.enumerationItems.remove(enumerationItem)
         enumArea.locations.remove(location)
 
+        sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.locations?.remove(location)
+
         DAO.locationDAO.delete( location )
         DAO.enumerationItemDAO.delete( enumerationItem )
+
+//        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+//        sharedViewModel.updateConfiguration()
+//        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(config.enumAreas[0])
 
         findNavController().popBackStack()
     }
