@@ -216,7 +216,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             {
                 val study = studies[0]
                 val enumArea = enumAreas[0]
-                val sampleArea = study.sampleAreas[0]
 
                 // find the selected collection Team
                 val collectionTeams = study.collectionTeams.filter { collectionTeam ->

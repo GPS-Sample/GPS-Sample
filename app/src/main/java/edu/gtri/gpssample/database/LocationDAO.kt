@@ -105,54 +105,9 @@ class LocationDAO(private var dao: DAO)
     {
         for (enumerationItem in location.enumerationItems)
         {
-            DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location )
+            DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, geoArea )
         }
     }
-
-//    fun importLocationX( location: Location, geoArea : GeoArea ) : Location?
-//    {
-//        val existingLocation = getLocation( location.uuid )
-//
-//        existingLocation?.let {
-//            delete( it )
-//        }
-//
-//        val values = ContentValues()
-//
-//        location.id = null
-//        putLocation( location, geoArea,  values )
-//
-//        location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
-//        location.id?.let { id ->
-//            Log.d( "xxx", "new location id = ${id}")
-//
-//            if (geoArea is EnumArea)
-//            {
-//                updateConnectorTable( location, geoArea as EnumArea )
-//            }
-//            else if (geoArea is SampleArea)
-//            {
-//                updateConnectorTable( location, geoArea as SampleArea )
-//            }
-//
-//            for (enumerationItem in location.enumerationItems)
-//            {
-//                if (geoArea is EnumArea)
-//                {
-//                    enumerationItem.fieldDataList?.let { fieldDataList ->
-//                        for (fieldData in fieldDataList)
-//                        {
-//                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
-//                        }
-//                    }
-//                }
-//
-//                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-//            }
-//        } ?: return null
-//
-//        return location
-//    }
 
     fun exists( location: Location ): Boolean
     {

@@ -101,9 +101,9 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
 
-//        collectionTeam.id?.let {
-//            study.selectedCollectionTeamId = it
-//        }
+        collectionTeam.id?.let {
+            study.selectedCollectionTeamId = it
+        }
 
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }
