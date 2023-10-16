@@ -335,13 +335,9 @@
             android:id="@+id/action_navigate_to_PerformMultiCollectionFragment"
             app:destination="@id/PerformMultiCollectionFragment"/>
 
-<!--        <action-->
-<!--            android:id="@+id/action_navigate_to_AddHouseholdFragment"-->
-<!--            app:destination="@id/AddHouseholdFragment"/>-->
-
-<!--        <action-->
-<!--            android:id="@+id/action_navigate_to_AddLandmarkFragment"-->
-<!--            app:destination="@id/AddLandmarkFragment"/>-->
+        <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
     </fragment>
 
     <fragment

@@ -274,6 +274,7 @@
     <string name="sample_size_error">"The sample size must be greater than 0"</string>
     <string name="simple_random_sampling_label">"Total Sample Size Across All Clusters"</string>
     <string name="cluster_sampling_label">"Sample Size Per Cluster"</string>
+    <string name="show_enumeration_info">Show Enumeration Info</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

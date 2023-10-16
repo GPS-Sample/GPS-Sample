@@ -21,6 +21,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
@@ -46,6 +47,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
+
+    private var editMode = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -73,7 +76,15 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d( "xxx", "AddHouseholdFragment.onViewCreated" )
+        arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
+            this.editMode = editMode
+        }
+
+        if (!editMode)
+        {
+            binding.saveButton.visibility = View.GONE
+        }
+
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
         }

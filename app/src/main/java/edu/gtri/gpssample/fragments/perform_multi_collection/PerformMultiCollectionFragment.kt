@@ -17,6 +17,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
@@ -97,6 +98,13 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     override fun markAsIncompleteButtonPressed()
     {
         AdditionalInfoDialog( activity, "", "", this)
+    }
+
+    override fun showInfoButtonPressed()
+    {
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.toString(), false )
+        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
     }
 
     override fun didSelectCancelButton()
