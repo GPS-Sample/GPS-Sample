@@ -241,7 +241,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     {
                         for (location in sampleArea.locations)
                         {
-                            DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
+                            DAO.locationDAO.importLocation( location, sampleArea )
                         }
                     }
 

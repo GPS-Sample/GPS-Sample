@@ -358,16 +358,11 @@ class PerformCollectionFragment : Fragment(),
         var name: String = ""
 
         when(user.role) {
+            Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
                 name = "Config"
                 payload = config.pack()
-            }
-
-            Role.Enumerator.toString() ->
-            {
-                name = "EnumArea"
-                payload = enumArea.pack()
             }
 
             Role.DataCollector.toString() ->
@@ -413,7 +408,6 @@ class PerformCollectionFragment : Fragment(),
 
                 Role.DataCollector.toString() ->
                 {
-                    Toast.makeText(activity!!.applicationContext, "TODO! Finish this!", Toast.LENGTH_SHORT).show()
                     sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
                     sharedNetworkViewModel.networkClientModel.currentStudy = study
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
@@ -492,7 +486,27 @@ class PerformCollectionFragment : Fragment(),
                     sampledItem.collectionState = CollectionState.Incomplete
                 }
 
-                DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
+
+
+                config.studies = DAO.studyDAO.getStudies(config)
+
+                for (study in config.studies)
+                {
+                    study.id?.let { studyId ->
+                        if (studyId == config.selectedStudyId)
+                        {
+                            this.study = study
+                        }
+                    }
+                }
+
+                sharedViewModel.updateConfiguration()
+
+//                DAO.studyDAO.createOrUpdateStudy( study )?.let {
+//                    study = it
+//                    sharedViewModel.createStudyModel.setStudy( study )
+//                }
 
                 refreshMap()
             }

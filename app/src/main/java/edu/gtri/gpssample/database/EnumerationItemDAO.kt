@@ -38,17 +38,35 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location )
+    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, geoArea: GeoArea )
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 
-        if (existingEnumerationItem != null)
+        if (existingEnumerationItem == null)
         {
-            delete( existingEnumerationItem )
+            enumerationItem.id = null // force the new item be created
+            createOrUpdateEnumerationItem( enumerationItem, location )
         }
+        else
+        {
+            var shouldDelete = false
 
-        enumerationItem.id = null // force the new item be created
-        createOrUpdateEnumerationItem( enumerationItem, location )
+            if (geoArea is EnumArea && (existingEnumerationItem.enumerationState==EnumerationState.Undefined || existingEnumerationItem.enumerationState==EnumerationState.Incomplete))
+            {
+                shouldDelete = true
+            }
+            else if (geoArea is SampleArea && existingEnumerationItem.collectionState==CollectionState.Incomplete)
+            {
+                shouldDelete = true
+            }
+
+            if (shouldDelete)
+            {
+                delete( existingEnumerationItem )
+                enumerationItem.id = null // force the new item be created
+                createOrUpdateEnumerationItem( enumerationItem, location )
+            }
+        }
     }
 
     fun exists( enumerationItem: EnumerationItem ): Boolean
