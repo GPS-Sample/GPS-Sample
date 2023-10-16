@@ -38,33 +38,17 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
+    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location )
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 
-        existingEnumerationItem?.let {
-            delete( it )
+        if (existingEnumerationItem != null)
+        {
+            delete( existingEnumerationItem )
         }
 
-        val values = ContentValues()
-
-        enumerationItem.id = null
-        putEnumerationItem( enumerationItem, location, values )
-
-        enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
-        enumerationItem.id?.let { id ->
-            Log.d( "xxx", "new EnumerationItem id = ${id}")
-//            enumData.fieldDataList?.let { fieldDataList ->
-//                for (fieldData in fieldDataList)
-//                {
-//                    fieldData.id = null
-//                    fieldData.enumDataId = id
-//                    DAO.fieldDataDAO.createOrUpdateFieldData( fieldData )
-//                }
-//            }
-        } ?: return null
-
-        return enumerationItem
+        enumerationItem.id = null // force the new item be created
+        createOrUpdateEnumerationItem( enumerationItem, location )
     }
 
     fun exists( enumerationItem: EnumerationItem ): Boolean
@@ -137,7 +121,7 @@ class EnumerationItemDAO(private var dao: DAO)
         )
     }
 
-    private fun getEnumerationItem(uuid: String ) : EnumerationItem?
+    private fun getEnumerationItem( uuid: String ) : EnumerationItem?
     {
         var enumerationItem : EnumerationItem? = null
         val db = dao.writableDatabase
@@ -159,7 +143,7 @@ class EnumerationItemDAO(private var dao: DAO)
 
     fun getEnumerationItems( location: Location ) : ArrayList<EnumerationItem>
     {
-        var enumerationItems = ArrayList<EnumerationItem>()
+        val enumerationItems = ArrayList<EnumerationItem>()
         val db = dao.writableDatabase
 
         location.id?.let { id ->
@@ -183,7 +167,7 @@ class EnumerationItemDAO(private var dao: DAO)
 
     fun getEnumerationItems() : ArrayList<EnumerationItem>
     {
-        var enumerationItems = ArrayList<EnumerationItem>()
+        val enumerationItems = ArrayList<EnumerationItem>()
         val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM}"

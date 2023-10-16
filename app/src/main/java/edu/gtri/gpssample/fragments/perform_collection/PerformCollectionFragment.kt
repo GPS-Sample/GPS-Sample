@@ -414,10 +414,10 @@ class PerformCollectionFragment : Fragment(),
                 Role.DataCollector.toString() ->
                 {
                     Toast.makeText(activity!!.applicationContext, "TODO! Finish this!", Toast.LENGTH_SHORT).show()
-//                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-//                    sharedNetworkViewModel.networkClientModel.currentSampleArea = sampleArea
-//                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-//                    getResult.launch(intent)
+                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                    sharedNetworkViewModel.networkClientModel.currentStudy = study
+                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                    getResult.launch(intent)
                 }
             }
         }
