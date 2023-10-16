@@ -469,6 +469,13 @@ class PerformCollectionFragment : Fragment(),
         AdditionalInfoDialog( activity, "", "", this)
     }
 
+    override fun showInfoButtonPressed()
+    {
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.toString(), false )
+        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+    }
+
     override fun didSelectCancelButton()
     {
     }

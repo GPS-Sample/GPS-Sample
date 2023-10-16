@@ -12,6 +12,7 @@ class LaunchSurveyDialog
     {
         fun launchSurveyButtonPressed()
         fun markAsIncompleteButtonPressed()
+        fun showInfoButtonPressed()
     }
 
     constructor()
@@ -43,6 +44,13 @@ class LaunchSurveyDialog
 
         incompleteButton.setOnClickListener {
             delegate.markAsIncompleteButtonPressed()
+            alertDialog.dismiss()
+        }
+
+        val showInfoButton = view.findViewById<Button>(R.id.show_info_button)
+
+        showInfoButton.setOnClickListener {
+            delegate.showInfoButtonPressed()
             alertDialog.dismiss()
         }
 
