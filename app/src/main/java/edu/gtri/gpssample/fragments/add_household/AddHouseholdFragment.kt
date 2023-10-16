@@ -284,12 +284,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
-        if (enumerationItem.id == null)
-        {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-            location.enumerationItems.add(enumerationItem)
-        }
-
         if (incompleteReason.isNotEmpty())
         {
             for (fieldData in enumerationItem.fieldDataList)
@@ -350,9 +344,21 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         enumerationItem.notes = notes
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
-        sharedViewModel.currentConfiguration?.value?.let {config ->
-            sharedViewModel.updateConfiguration()
+        if (enumerationItem.id == null)
+        {
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+            location.enumerationItems.add(enumerationItem)
         }
+        else
+        {
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+        }
+
+        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+
+        sharedViewModel.updateConfiguration()
+
+        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(config.enumAreas[0])
 
         findNavController().popBackStack()
     }

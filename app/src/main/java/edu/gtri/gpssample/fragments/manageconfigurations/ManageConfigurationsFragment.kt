@@ -104,7 +104,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             {
                 ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
                     resources.getString(R.string.delete_configuration),
-                    resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
+                    resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
             }
             else
             {

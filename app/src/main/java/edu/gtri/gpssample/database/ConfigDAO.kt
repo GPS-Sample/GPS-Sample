@@ -136,10 +136,10 @@ class ConfigDAO(private var dao: DAO)
     fun getConfigs(): List<Config>
     {
         val configs = ArrayList<Config>()
-        var db = dao.writableDatabase
-        var query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
+        val db = dao.writableDatabase
+        val query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
 
-        var cursor = db.rawQuery(query, null)
+        val cursor = db.rawQuery(query, null)
         while (cursor.moveToNext())
         {
             val config = buildConfig( cursor )
@@ -152,22 +152,22 @@ class ConfigDAO(private var dao: DAO)
             configs.add( config)
         }
 
-        db = dao.writableDatabase
-        for(config in configs)
-        {
-            query = "SELECT * FROM ${DAO.TABLE_CONFIG_STUDY} WHERE ${DAO.COLUMN_CONFIG_ID} = '${config.id}'"
-
-            cursor = db.rawQuery(query, null)
-
-            while(cursor.moveToNext())
-            {
-                val coid = cursor.getColumnIndex(DAO.COLUMN_CONFIG_ID)
-                val stid = cursor.getColumnIndex(DAO.COLUMN_STUDY_ID)
-                val conid = cursor.getInt(coid)
-                val stuid = cursor.getInt(stid)
-                Log.d("xxxx CON", "the config id ${conid} and study id ${stuid}")
-            }
-        }
+//        db = dao.writableDatabase
+//        for(config in configs)
+//        {
+//            query = "SELECT * FROM ${DAO.TABLE_CONFIG_STUDY} WHERE ${DAO.COLUMN_CONFIG_ID} = '${config.id}'"
+//
+//            cursor = db.rawQuery(query, null)
+//
+//            while(cursor.moveToNext())
+//            {
+//                val coid = cursor.getColumnIndex(DAO.COLUMN_CONFIG_ID)
+//                val stid = cursor.getColumnIndex(DAO.COLUMN_STUDY_ID)
+//                val conid = cursor.getInt(coid)
+//                val stuid = cursor.getInt(stid)
+//                Log.d("xxxx CON", "the config id ${conid} and study id ${stuid}")
+//            }
+//        }
 
         cursor.close()
         db.close()

@@ -221,12 +221,12 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     enumArea?.let { enumArea ->
                         for (location in enumArea.locations)
                         {
-                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                            DAO.locationDAO.importLocation( location, enumArea )
                         }
 
                         // replace the enumArea from currentConfig with this one
-                        sharedViewModel?.replaceEnumArea(enumArea)
-                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
+//                        sharedViewModel?.replaceEnumArea(enumArea)
+//                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                     }
                 }
             }

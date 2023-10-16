@@ -101,50 +101,58 @@ class LocationDAO(private var dao: DAO)
         }
     }
 
-    fun importLocation( location: Location, geoArea : GeoArea ) : Location?
+    fun importLocation( location: Location, geoArea : GeoArea )
     {
-        val existingLocation = getLocation( location.uuid )
-
-        existingLocation?.let {
-            delete( it )
+        for (enumerationItem in location.enumerationItems)
+        {
+            DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location )
         }
-
-        val values = ContentValues()
-
-        location.id = null
-        putLocation( location, geoArea,  values )
-
-        location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
-        location.id?.let { id ->
-            Log.d( "xxx", "new location id = ${id}")
-
-            if (geoArea is EnumArea)
-            {
-                updateConnectorTable( location, geoArea as EnumArea )
-            }
-            else if (geoArea is SampleArea)
-            {
-                updateConnectorTable( location, geoArea as SampleArea )
-            }
-
-            for (enumerationItem in location.enumerationItems)
-            {
-                if (geoArea is EnumArea)
-                {
-                    enumerationItem.fieldDataList?.let { fieldDataList ->
-                        for (fieldData in fieldDataList)
-                        {
-                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
-                        }
-                    }
-                }
-
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-            }
-        } ?: return null
-
-        return location
     }
+
+//    fun importLocationX( location: Location, geoArea : GeoArea ) : Location?
+//    {
+//        val existingLocation = getLocation( location.uuid )
+//
+//        existingLocation?.let {
+//            delete( it )
+//        }
+//
+//        val values = ContentValues()
+//
+//        location.id = null
+//        putLocation( location, geoArea,  values )
+//
+//        location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
+//        location.id?.let { id ->
+//            Log.d( "xxx", "new location id = ${id}")
+//
+//            if (geoArea is EnumArea)
+//            {
+//                updateConnectorTable( location, geoArea as EnumArea )
+//            }
+//            else if (geoArea is SampleArea)
+//            {
+//                updateConnectorTable( location, geoArea as SampleArea )
+//            }
+//
+//            for (enumerationItem in location.enumerationItems)
+//            {
+//                if (geoArea is EnumArea)
+//                {
+//                    enumerationItem.fieldDataList?.let { fieldDataList ->
+//                        for (fieldData in fieldDataList)
+//                        {
+//                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+//                        }
+//                    }
+//                }
+//
+//                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+//            }
+//        } ?: return null
+//
+//        return location
+//    }
 
     fun exists( location: Location ): Boolean
     {
@@ -211,7 +219,7 @@ class LocationDAO(private var dao: DAO)
             isMultiFamily = it.toBoolean()
         }
 
-        return Location( id, creationDate, uuid,LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageData, imageFileName, isMultiFamily, ArrayList<EnumerationItem>())
+        return Location( id, creationDate, uuid, LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageData, imageFileName, isMultiFamily, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?
