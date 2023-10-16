@@ -227,12 +227,23 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         }
 
         binding.addAnotherButton.setOnClickListener {
-            saveField()
-            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+            if (binding.fieldNameEditText.text.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.please_enter_a_name), Toast.LENGTH_LONG).show()
+            }
+            else
+            {
+                saveField()
+                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+            }
         }
 
         binding.endBlockButton.setOnClickListener {
-            saveField()
+            if (binding.fieldNameEditText.text.isNotEmpty())
+            {
+                saveField()
+            }
+
             findNavController().popBackStack( R.id.CreateStudyFragment, false )
         }
     }
