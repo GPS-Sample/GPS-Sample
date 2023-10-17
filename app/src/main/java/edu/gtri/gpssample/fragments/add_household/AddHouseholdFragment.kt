@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -48,7 +49,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
 
-    private var editMode = false
+    private var editMode = true
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -78,11 +79,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
             this.editMode = editMode
-        }
-
-        if (!editMode)
-        {
-            binding.saveButton.visibility = View.GONE
         }
 
         sharedViewModel.currentConfiguration?.value?.let {
@@ -116,7 +112,19 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             enumerationItem = it
         }
 
-        if (enumerationItem.id != null)
+        if (!editMode)
+        {
+            binding.deleteImageView.visibility = View.GONE
+            binding.saveButton.visibility = View.GONE
+            binding.subaddressEditText.inputType = InputType.TYPE_NULL
+
+            if (location.imageFileName.isEmpty())
+            {
+                binding.addPhotoImageView.visibility = View.GONE
+            }
+        }
+
+        if (editMode && enumerationItem.id != null)
         {
             binding.addMultiButton.visibility = View.VISIBLE
 
@@ -188,7 +196,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( config, enumerationItem, study.fields, filteredFieldDataList )
+        addHouseholdAdapter = AddHouseholdAdapter( editMode, config, enumerationItem, study.fields, filteredFieldDataList )
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
@@ -283,8 +291,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         location.enumerationItems.remove(enumerationItem)
         enumArea.locations.remove(location)
 
+        sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.locations?.remove(location)
+
         DAO.locationDAO.delete( location )
         DAO.enumerationItemDAO.delete( enumerationItem )
+
+//        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+//        sharedViewModel.updateConfiguration()
+//        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(config.enumAreas[0])
 
         findNavController().popBackStack()
     }
@@ -367,9 +381,17 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
 
+        val enumAreaId = enumArea.id
+
         sharedViewModel.updateConfiguration()
 
-        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(config.enumAreas[0])
+        enumAreaId?.let {
+            val enumArea = DAO.enumAreaDAO.getEnumArea( it )
+
+            enumArea?.let {
+                sharedViewModel.enumAreaViewModel.setCurrentEnumArea(it)
+            }
+        }
 
         findNavController().popBackStack()
     }

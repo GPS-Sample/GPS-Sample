@@ -173,9 +173,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 val study = studies[0]
 
                 // find the selected enumeration Team
-                val enumTeams = study.enumerationTeams.filter {
+                val enumTeams = enumArea.enumerationTeams.filter {
                     it.id?.let { id ->
-                        id == study.selectedEnumerationTeamId
+                        id == enumArea.selectedEnumerationTeamId
                     } ?: false
                 }
 
@@ -383,9 +383,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                             val study = studies[0]
 
                             // find the selected enumeration Team
-                            val enumTeams = study.enumerationTeams.filter { enumTeam ->
+                            val enumTeams = enumArea.enumerationTeams.filter { enumTeam ->
                                 enumTeam.id?.let { id ->
-                                    id == study.selectedEnumerationTeamId
+                                    id == enumArea.selectedEnumerationTeamId
                                 } ?: false
                             }
 

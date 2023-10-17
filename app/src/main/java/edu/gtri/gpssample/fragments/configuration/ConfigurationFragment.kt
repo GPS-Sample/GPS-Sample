@@ -150,6 +150,8 @@ class ConfigurationFragment : Fragment(),
             studiesAdapter = StudiesAdapter(config.studies)
             studiesAdapter.didSelectStudy = this::didSelectStudy
 
+            binding.locationSwitch.isChecked = config.allowManualLocationEntry
+
             if(config.studies.count() > 0)
             {
                 sharedViewModel.createStudyModel.setStudy(config.studies[0])

@@ -31,17 +31,18 @@ data class Config(
     var timeFormat: TimeFormat,
     var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
+    var allowManualLocationEntry: Boolean,
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
     var selectedStudyId: Int,
     var selectedEnumAreaId: Int)
 {
-    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int)
-            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision,
+    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, allowManualLocationEntry: Boolean)
+            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry,
                                     ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1)
     constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, selectedStudyId: Int, selectedEnumAreaId: Int)
-            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision,
+                minGpsPrecision: Int, allowManualLocationEntry: Boolean, selectedStudyId: Int, selectedEnumAreaId: Int)
+            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry,
         ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId)
 
     var minimumGPSPrecision : String

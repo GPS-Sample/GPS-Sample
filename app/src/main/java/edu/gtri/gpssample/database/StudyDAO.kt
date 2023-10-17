@@ -51,11 +51,6 @@ class StudyDAO(private var dao: DAO)
                 DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
             }
 
-            for (enumerationTeam in study.enumerationTeams)
-            {
-                DAO.enumerationTeamDAO.createOrUpdateTeam( enumerationTeam )
-            }
-
             for (collectionTeam in study.collectionTeams)
             {
                 DAO.collectionTeamDAO.createOrUpdateTeam( collectionTeam )
@@ -107,7 +102,6 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
         values.put( DAO.COLUMN_STUDY_TOTAL_POPULATION_SIZE, study.totalPopulationSize )
-        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, study.selectedEnumerationTeamId )
         values.put( DAO.COLUMN_COLLECTION_TEAM_ID, study.selectedCollectionTeamId )
 
         // convert enum to int.  Maybe not do this and have look up tables?
@@ -157,7 +151,6 @@ class StudyDAO(private var dao: DAO)
     private fun buildStudy(cursor: Cursor ): Study
     {
         val id = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_ID}"))
-        val selectedEnumerationTeamId = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_ENUMERATION_TEAM_ID}"))
         val selectedCollectionTeamId = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_COLLECTION_TEAM_ID}"))
         val creationDate = cursor.getLong(cursor.getColumnIndex("${DAO.COLUMN_CREATION_DATE}"))
         val name = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_NAME}"))
@@ -170,7 +163,7 @@ class StudyDAO(private var dao: DAO)
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
 
-        val study = Study( id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType, selectedEnumerationTeamId, selectedCollectionTeamId )
+        val study = Study( id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType, selectedCollectionTeamId )
 
         study.sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
 
@@ -197,7 +190,6 @@ class StudyDAO(private var dao: DAO)
                 study.fields = DAO.fieldDAO.getFields(study)
                // study.rules = DAO.ruleDAO.getRules(study)
                 study.filters.addAll(DAO.filterDAO.getFilters(study))
-                study.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( study )
                 study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             }
 

@@ -52,7 +52,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_CREATION_DATE, enumerationTeam.creationDate )
-        values.put( DAO.COLUMN_STUDY_ID, enumerationTeam.studyId )
+        values.put( DAO.COLUMN_ENUM_AREA_ID, enumerationTeam.enumerAreaId )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
     }
 
@@ -70,10 +70,10 @@ class EnumerationTeamDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
-        val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
+        val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
 
-        val enumerationTeam = EnumerationTeam(id, creationDate, study_id, name, ArrayList<Location>())
+        val enumerationTeam = EnumerationTeam(id, creationDate, enumAreaId, name, ArrayList<Location>())
 
         enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
 
@@ -117,13 +117,13 @@ class EnumerationTeamDAO(private var dao: DAO)
         return enumerationTeam
     }
 
-    fun getEnumerationTeams( study: Study ): ArrayList<EnumerationTeam>
+    fun getEnumerationTeams( enumArea: EnumArea ): ArrayList<EnumerationTeam>
     {
         val enumerationTeams = ArrayList<EnumerationTeam>()
         val db = dao.writableDatabase
 
-        study.id?.let { id ->
-            val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_STUDY_ID} = $id"
+        enumArea.id?.let { id ->
+            val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $id"
             val cursor = db.rawQuery(query, null)
 
             while (cursor.moveToNext())

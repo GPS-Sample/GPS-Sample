@@ -14,7 +14,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.FieldDataOption
 import edu.gtri.gpssample.database.models.FieldOption
 
-class CheckboxOptionAdapter( var fieldDataOptions: List<FieldDataOption>) : RecyclerView.Adapter<CheckboxOptionAdapter.ViewHolder>()
+class CheckboxOptionAdapter( val editMode: Boolean, var fieldDataOptions: List<FieldDataOption>) : RecyclerView.Adapter<CheckboxOptionAdapter.ViewHolder>()
 {
     override fun getItemCount() = fieldDataOptions.size
 
@@ -51,12 +51,19 @@ class CheckboxOptionAdapter( var fieldDataOptions: List<FieldDataOption>) : Recy
         holder.checkbox.text = fieldDataOption.name
         holder.checkbox.isChecked = fieldDataOption.value
 
-        holder.checkbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        if (!editMode)
         {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            holder.checkbox.isEnabled = false
+        }
+        else
+        {
+            holder.checkbox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
             {
-                fieldDataOption.value = isChecked
-            }
-        })
+                override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+                {
+                    fieldDataOption.value = isChecked
+                }
+            })
+        }
     }
 }

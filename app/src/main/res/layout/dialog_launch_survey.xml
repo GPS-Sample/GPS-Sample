@@ -6,6 +6,17 @@
     android:layout_height="wrap_content">
 
     <Button
+        android:id="@+id/show_info_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/show_enumeration_info" />
+
+    <Button
         android:id="@+id/launch_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,17 +37,6 @@
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/mark_as_incomplete" />
-
-    <Button
-        android:id="@+id/show_info_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="@string/show_enumeration_info" />
 
     <Button
         android:id="@+id/cancel_button"

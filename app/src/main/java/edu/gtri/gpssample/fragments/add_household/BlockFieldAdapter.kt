@@ -23,7 +23,7 @@ import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) :
+class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldDataList: List<FieldData>) :
     RecyclerView.Adapter<BlockFieldAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
@@ -77,8 +77,14 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
                 editText.setText( fieldData.textValue )
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+
                 editText.doAfterTextChanged {
                     fieldData.textValue = it.toString()
+                }
+
+                if (!editMode)
+                {
+                    editText.inputType = InputType.TYPE_NULL
                 }
             }
 
@@ -110,6 +116,11 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
                         fieldData.numberValue = it.toString().toDouble()
                     }
                 }
+
+                if (!editMode)
+                {
+                    editText.inputType = InputType.TYPE_NULL
+                }
             }
 
             FieldType.Date -> {
@@ -128,19 +139,22 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
 
                 val editView = frameLayout.findViewById<View>(R.id.edit_view)
 
-                editView.setOnClickListener {
+                if (editMode)
+                {
+                    editView.setOnClickListener {
 
-                    fieldData.dateValue?.let {
-                        date = Date( it )
-                    }
+                        fieldData.dateValue?.let {
+                            date = Date( it )
+                        }
 
-                    if (!field.date && field.time)
-                    {
-                        TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
-                    }
-                    else
-                    {
-                        DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, fieldData, editText,this )
+                        if (!field.date && field.time)
+                        {
+                            TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
+                        }
+                        else
+                        {
+                            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, fieldData, editText,this )
+                        }
                     }
                 }
             }
@@ -168,15 +182,18 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
                     spinner.setSelection( data.size-1 )
                 }
 
-                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+                if (editMode)
                 {
-                    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
                     {
-                        fieldData.dropdownIndex = position
-                    }
+                        override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                        {
+                            fieldData.dropdownIndex = position
+                        }
 
-                    override fun onNothingSelected(parent: AdapterView<*>)
-                    {
+                        override fun onNothingSelected(parent: AdapterView<*>)
+                        {
+                        }
                     }
                 }
             }
@@ -190,7 +207,7 @@ class BlockFieldAdapter(val config: Config, val fieldDataList: List<FieldData>) 
 
                 val recyclerView = frameLayout.findViewById<RecyclerView>(R.id.recycler_view)
 
-                checkboxOptionAdapter = CheckboxOptionAdapter( fieldData.fieldDataOptions )
+                checkboxOptionAdapter = CheckboxOptionAdapter( editMode, fieldData.fieldDataOptions )
                 recyclerView.adapter = checkboxOptionAdapter
                 recyclerView.itemAnimator = DefaultItemAnimator()
                 recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );

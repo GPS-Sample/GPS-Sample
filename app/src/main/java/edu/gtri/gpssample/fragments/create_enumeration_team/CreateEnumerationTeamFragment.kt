@@ -135,11 +135,11 @@ class CreateEnumerationTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            study.id?.let { studyId ->
-                val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( studyId, binding.teamNameEditText.text.toString(), locations ))
+            enumArea.id?.let { enumAreaId ->
+                val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumAreaId, binding.teamNameEditText.text.toString(), locations ))
 
                 enumerationTeam?.let { team ->
-                    study.enumerationTeams.add(team)
+                    enumArea.enumerationTeams.add(team)
                     findNavController().popBackStack()
                 }
             }
