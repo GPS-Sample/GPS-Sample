@@ -24,12 +24,13 @@ import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.fragments.createfield.CreateFieldCheckboxAdapter
 import java.util.*
 
-class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationItem, val fieldList: List<Field>, val filteredFieldDataList: List<FieldData>) :
+class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumerationItem: EnumerationItem, val fieldList: List<Field>, val filteredFieldDataList: List<FieldData>) :
     RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
 {
     private var context: Context? = null
+
     private lateinit var blockAdapter: BlockAdapter
     private lateinit var checkboxOptionAdapter: CheckboxOptionAdapter
 
@@ -159,7 +160,7 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
                         listOfLists.add( blockFieldDataList )
                     }
 
-                    blockAdapter = BlockAdapter( config, listOfLists )
+                    blockAdapter = BlockAdapter( editMode, config, listOfLists )
 
                     val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
                     recyclerView.adapter = blockAdapter
@@ -182,8 +183,14 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
                 editText.setText( fieldData.textValue )
                 val requiredTextView = frameLayout.findViewById<TextView>(R.id.required_text_view)
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
+
                 editText.doAfterTextChanged {
                     fieldData.textValue = it.toString()
+                }
+
+                if (!editMode)
+                {
+                    editText.inputType = InputType.TYPE_NULL
                 }
             }
 
@@ -215,6 +222,11 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
                         fieldData.numberValue = it.toString().toDouble()
                     }
                 }
+
+                if (!editMode)
+                {
+                    editText.inputType = InputType.TYPE_NULL
+                }
             }
 
             FieldType.Date -> {
@@ -222,6 +234,11 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
 
                 var date = Date()
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
+
+                if (!editMode)
+                {
+                    editText.inputType = InputType.TYPE_NULL
+                }
 
                 fieldData.dateValue?.let {
                     date = Date( it )
@@ -233,19 +250,22 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
 
                 val editView = frameLayout.findViewById<View>(R.id.edit_view)
 
-                editView.setOnClickListener {
+                if (editMode)
+                {
+                    editView.setOnClickListener {
 
-                    fieldData.dateValue?.let {
-                        date = Date( it )
-                    }
+                        fieldData.dateValue?.let {
+                            date = Date( it )
+                        }
 
-                    if (!field.date && field.time)
-                    {
-                        TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
-                    }
-                    else
-                    {
-                        DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, fieldData, editText,this )
+                        if (!field.date && field.time)
+                        {
+                            TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
+                        }
+                        else
+                        {
+                            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, fieldData, editText,this )
+                        }
                     }
                 }
             }
@@ -273,15 +293,22 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
                     spinner.setSelection( data.size-1 )
                 }
 
-                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+                if (!editMode)
                 {
-                    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                    spinner.isEnabled = false
+                }
+                else
+                {
+                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
                     {
-                        fieldData.dropdownIndex = position
-                    }
+                        override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
+                        {
+                            fieldData.dropdownIndex = position
+                        }
 
-                    override fun onNothingSelected(parent: AdapterView<*>)
-                    {
+                        override fun onNothingSelected(parent: AdapterView<*>)
+                        {
+                        }
                     }
                 }
             }
@@ -295,7 +322,7 @@ class AddHouseholdAdapter(val config: Config, val enumerationItem: EnumerationIt
 
                 val recyclerView = frameLayout.findViewById<RecyclerView>(R.id.recycler_view)
 
-                checkboxOptionAdapter = CheckboxOptionAdapter( fieldData.fieldDataOptions )
+                checkboxOptionAdapter = CheckboxOptionAdapter( editMode, fieldData.fieldDataOptions )
                 recyclerView.adapter = checkboxOptionAdapter
                 recyclerView.itemAnimator = DefaultItemAnimator()
                 recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );

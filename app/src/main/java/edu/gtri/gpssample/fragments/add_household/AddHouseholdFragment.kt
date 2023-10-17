@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -80,11 +81,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             this.editMode = editMode
         }
 
-        if (!editMode)
-        {
-            binding.saveButton.visibility = View.GONE
-        }
-
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
         }
@@ -116,7 +112,19 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             enumerationItem = it
         }
 
-        if (enumerationItem.id != null)
+        if (!editMode)
+        {
+            binding.deleteImageView.visibility = View.GONE
+            binding.saveButton.visibility = View.GONE
+            binding.subaddressEditText.inputType = InputType.TYPE_NULL
+
+            if (location.imageFileName.isEmpty())
+            {
+                binding.addPhotoImageView.visibility = View.GONE
+            }
+        }
+
+        if (editMode && enumerationItem.id != null)
         {
             binding.addMultiButton.visibility = View.VISIBLE
 
@@ -188,7 +196,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-        addHouseholdAdapter = AddHouseholdAdapter( config, enumerationItem, study.fields, filteredFieldDataList )
+        addHouseholdAdapter = AddHouseholdAdapter( editMode, config, enumerationItem, study.fields, filteredFieldDataList )
         binding.recyclerView.adapter = addHouseholdAdapter
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
