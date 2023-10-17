@@ -75,7 +75,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
 
         if (!this::manageEnumerationTeamsAdapter.isInitialized)
         {
-            manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( study.enumerationTeams )
+            manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( enumArea.enumerationTeams )
         }
 
         manageEnumerationTeamsAdapter.didSelectTeam = this::didSelectTeam
@@ -104,7 +104,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumerationTeam )
 
         enumerationTeam.id?.let {
-            study.selectedEnumerationTeamId = it
+            enumArea.selectedEnumerationTeamId = it
         }
 
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
@@ -124,8 +124,8 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
     override fun didSelectRightButton(tag: Any?)
     {
         val enumerationTeam = tag as EnumerationTeam
-        study.enumerationTeams.remove(enumerationTeam)
-        manageEnumerationTeamsAdapter.updateTeams(study.enumerationTeams)
+        enumArea.enumerationTeams.remove(enumerationTeam)
+        manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
         DAO.enumerationTeamDAO.deleteTeam( enumerationTeam )
     }
 

@@ -134,6 +134,7 @@ class PerformEnumerationFragment : Fragment(),
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
+            Log.d( "xxx", enumArea.name )
         }
 
         sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.let {

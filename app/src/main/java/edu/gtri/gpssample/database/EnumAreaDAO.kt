@@ -43,6 +43,11 @@ class EnumAreaDAO(private var dao: DAO)
                 DAO.locationDAO.createOrUpdateLocation(location, enumArea)
             }
 
+            for (enumerationTeam in enumArea.enumerationTeams)
+            {
+                DAO.enumerationTeamDAO.createOrUpdateTeam( enumerationTeam )
+            }
+
             return enumArea
         } ?: return null
     }
@@ -65,8 +70,9 @@ class EnumAreaDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
+        val selectedEnumerationTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_ID))
 
-        return EnumArea( id, creationDate, name )
+        return EnumArea( id, creationDate, name, selectedEnumerationTeamId )
     }
 
     fun exists( enumArea: EnumArea ): Boolean
@@ -97,7 +103,7 @@ class EnumAreaDAO(private var dao: DAO)
         db.close()
     }
 
-    private fun getEnumArea( id: Int ): EnumArea?
+    fun getEnumArea( id: Int ): EnumArea?
     {
         var enumArea: EnumArea? = null
         val db = dao.writableDatabase
@@ -108,6 +114,11 @@ class EnumAreaDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             enumArea = createEnumArea( cursor )
+            enumArea.id?.let { id ->
+                enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
+                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+                enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
+            }
         }
 
         cursor.close()
@@ -131,6 +142,7 @@ class EnumAreaDAO(private var dao: DAO)
                 enumArea.id?.let { id ->
                     enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                     enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+                    enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
                     enumAreas.add( enumArea )
                 }
             }
@@ -157,6 +169,7 @@ class EnumAreaDAO(private var dao: DAO)
             enumArea.id?.let { id ->
                 enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
                 enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+                enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
                 enumAreas.add( enumArea )
             }
         }

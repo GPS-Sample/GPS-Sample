@@ -42,13 +42,24 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableConfig)
 
+            val createTableEnumArea = ("CREATE TABLE " +
+                    TABLE_ENUM_AREA + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_CONFIG_ID + " INTEGER" + "," +
+                    COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
+                    COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableEnumArea)
+
             val createTableStudy = ("CREATE TABLE " +
                     TABLE_STUDY + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_NAME + " TEXT" + "," +
                     COLUMN_CONFIG_ID + " INTEGER" + "," +
-                    COLUMN_ENUMERATION_TEAM_ID + " INTEGER" + "," +
                     COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
                     COLUMN_STUDY_TOTAL_POPULATION_SIZE + " INTEGER" + "," +
 
@@ -59,7 +70,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     // this needs to be a look up table
                     COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableStudy)
@@ -165,16 +175,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableFilterOperator)
 
-            val createTableEnumArea = ("CREATE TABLE " +
-                    TABLE_ENUM_AREA + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_CONFIG_ID + " INTEGER" + "," +
-                    COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
-                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
-                    ")")
-            db.execSQL(createTableEnumArea)
-
             val createTableSampleArea = ("CREATE TABLE " +
                     TABLE_SAMPLE_AREA + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -188,9 +188,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_ENUMERATION_TEAM + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_STUDY_ID + " INTEGER" + "," +
+                    COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                     COLUMN_ENUMERATION_TEAM_NAME + " TEXT" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableEnumerationTeam)
 
