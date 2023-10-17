@@ -55,21 +55,21 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
             study = it
         }
 
-        if (study.selectedCollectionTeamId > 0) // if teamId is valid, then filter out all teams except this one
-        {
-            val teams = study.collectionTeams.filter { collectionTeam ->
-                collectionTeam.id?.let { id ->
-                    id == study.selectedCollectionTeamId
-                } ?: false
-            }
-
-            if (teams.isNotEmpty())
-            {
-                val collectionTeams = ArrayList<CollectionTeam>()
-                collectionTeams.add( teams[0] )
-                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
-            }
-        }
+//        if (study.selectedCollectionTeamId > 0) // if teamId is valid, then filter out all teams except this one
+//        {
+//            val teams = study.collectionTeams.filter { collectionTeam ->
+//                collectionTeam.id?.let { id ->
+//                    id == study.selectedCollectionTeamId
+//                } ?: false
+//            }
+//
+//            if (teams.isNotEmpty())
+//            {
+//                val collectionTeams = ArrayList<CollectionTeam>()
+//                collectionTeams.add( teams[0] )
+//                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
+//            }
+//        }
 
         if (!this::manageCollectionTeamsAdapter.isInitialized)
         {
