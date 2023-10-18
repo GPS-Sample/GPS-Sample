@@ -59,21 +59,6 @@ class LocationDAO(private var dao: DAO)
             } ?: return null
         }
 
-        if (location.imageFileName.isNotEmpty() && location.imageData.isNotEmpty())
-        {
-            // base64 decode the bitmap
-            val byteArray = Base64.getDecoder().decode( location.imageData )
-            val byteArrayInputStream = ByteArrayInputStream(byteArray)
-            val bitmap = BitmapFactory.decodeStream(byteArrayInputStream)
-
-            // write the file
-            val file = File(location.imageFileName)
-            val fileOutputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-            fileOutputStream.flush()
-            fileOutputStream.close()
-        }
-
         return location
     }
 
@@ -150,7 +135,6 @@ class LocationDAO(private var dao: DAO)
         values.put( DAO.COLUMN_LOCATION_IS_LANDMARK, location.isLandmark.toInt())
         values.put( DAO.COLUMN_LOCATION_DESCRIPTION, location.description)
         values.put( DAO.COLUMN_LOCATION_IMAGE_DATA, location.imageData)
-        values.put( DAO.COLUMN_LOCATION_IMAGE_FILE_NAME, location.imageFileName)
     }
 
     @SuppressLint("Range")
@@ -165,7 +149,6 @@ class LocationDAO(private var dao: DAO)
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_DESCRIPTION))
         val imageData = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_DATA))
-        val imageFileName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_FILE_NAME))
         val isMultiFamilyValue = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY))
 
         var isMultiFamily: Boolean? = null
@@ -174,7 +157,7 @@ class LocationDAO(private var dao: DAO)
             isMultiFamily = it.toBoolean()
         }
 
-        return Location( id, creationDate, uuid, LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageData, imageFileName, isMultiFamily, ArrayList<EnumerationItem>())
+        return Location( id, creationDate, uuid, LocationTypeConverter.fromIndex(locationTypeId), latitude, longitude, isLandmark, description, imageData, isMultiFamily, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?

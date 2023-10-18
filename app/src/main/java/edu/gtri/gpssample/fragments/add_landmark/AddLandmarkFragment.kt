@@ -100,11 +100,14 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             binding.lastUpdatedLayout.visibility = View.GONE
         }
 
-        if (location.imageFileName.isNotEmpty())
+        if (location.imageData.isNotEmpty())
         {
             try
             {
-                val bitmap = BitmapFactory.decodeFile(location.imageFileName)
+                // base64 decode the bitmap
+                val byteArray = Base64.getDecoder().decode( location.imageData )
+                val byteArrayInputStream = ByteArrayInputStream(byteArray)
+                val bitmap = BitmapFactory.decodeStream(byteArrayInputStream)
                 binding.landmarkImageView.setImageBitmap(bitmap)
             }
             catch( ex: Exception )
@@ -128,11 +131,7 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         binding.saveButton.setOnClickListener {
             location.description = binding.descriptionEditText.text.toString()
-
-            sharedViewModel.currentConfiguration?.value?.let {config ->
-                sharedViewModel.updateConfiguration()
-            }
-
+            DAO.locationDAO.updateLocation( location, enumArea )
             findNavController().popBackStack()
         }
     }
@@ -175,15 +174,6 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         try
         {
-            val imageFileName = UUID.randomUUID().toString() + ".png"
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-            val file = File(root, imageFileName)
-            val fileOutputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-            fileOutputStream.flush()
-            fileOutputStream.close()
-            location.imageFileName = file.absolutePath
-
             // base64 encode the bitmap
             val byteArrayOutputStream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)

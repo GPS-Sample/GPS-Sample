@@ -118,7 +118,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.saveButton.visibility = View.GONE
             binding.subaddressEditText.inputType = InputType.TYPE_NULL
 
-            if (location.imageFileName.isEmpty())
+            if (location.imageData.isEmpty())
             {
                 binding.addPhotoImageView.visibility = View.GONE
             }
@@ -244,13 +244,13 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.addPhotoImageView.setOnClickListener {
-            if (location.imageFileName.isEmpty())
+            if (location.imageData.isEmpty())
             {
                 resultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
             }
             else
             {
-                ImageDialog( activity!!, location.imageFileName, this )
+                ImageDialog( activity!!, location.imageData, this )
             }
         }
 
@@ -379,6 +379,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
         }
 
+        DAO.locationDAO.updateLocation( location, enumArea )
+
         config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
 
         val enumAreaId = enumArea.id
@@ -405,7 +407,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 {
                     val bitmap = result.data?.extras?.get("data") as Bitmap
                     saveBitmap( bitmap )
-                    ImageDialog( activity!!, location.imageFileName, this )
+                    ImageDialog( activity!!, location.imageData, this )
                 }
             }
         }
@@ -415,15 +417,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         try
         {
-            val imageFileName = UUID.randomUUID().toString() + ".png"
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-            val file = File(root, imageFileName)
-            val fileOutputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-            fileOutputStream.flush()
-            fileOutputStream.close()
-            location.imageFileName = file.absolutePath
-
             // base64 encode the bitmap
             val byteArrayOutputStream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
@@ -439,7 +432,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     override fun shouldDeleteImage()
     {
         location.imageData = ""
-        location.imageFileName = ""
     }
 
     override fun onDestroyView()

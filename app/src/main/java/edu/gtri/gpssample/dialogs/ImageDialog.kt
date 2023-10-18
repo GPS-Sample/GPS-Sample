@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.widget.*
 import edu.gtri.gpssample.R
+import java.io.ByteArrayInputStream
+import java.util.*
 
 class ImageDialog
 {
@@ -18,7 +20,7 @@ class ImageDialog
     {
     }
 
-    constructor(context: Context?, imageFileName: String, delegate: ImageDialogDelegate )
+    constructor(context: Context?, imageData: String, delegate: ImageDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -44,8 +46,12 @@ class ImageDialog
             alertDialog.dismiss()
         }
 
+        // base64 decode the bitmap
+        val byteArray = Base64.getDecoder().decode( imageData )
+        val byteArrayInputStream = ByteArrayInputStream(byteArray)
+        val bitmap = BitmapFactory.decodeStream(byteArrayInputStream)
+
         val imageView = view.findViewById<ImageView>( R.id.image_view )
-        val bitmap = BitmapFactory.decodeFile(imageFileName)
         imageView.setImageBitmap(bitmap)
     }
 }
