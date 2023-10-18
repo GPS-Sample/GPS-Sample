@@ -330,7 +330,7 @@ class PerformEnumerationFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in enumArea.locations)
+            for (location in enumerationTeam.locations)
             {
                 if (location.isLandmark)
                 {
