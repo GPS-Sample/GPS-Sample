@@ -330,7 +330,7 @@ class PerformEnumerationFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in enumerationTeam.locations)
+            for (location in enumArea.locations)
             {
                 if (location.isLandmark)
                 {
@@ -344,20 +344,24 @@ class PerformEnumerationFragment : Fragment(),
 
                     // not sure why this click is handled by the non location marker click listener?
 
-//                    pointAnnotationManager.apply {
-//                        addClickListener(
-//                            OnPointAnnotationClickListener { pointAnnotation ->
-//                                pointHashMap[pointAnnotation.id]?.let { location ->
-//                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-//                                    sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
-//                                    findNavController().navigate(R.id.action_navigate_to_AddLocationFragment)
-//                                }
-//                                true
-//                            }
-//                        )
-//                    }
+                    pointAnnotationManager.apply {
+                        addClickListener(
+                            OnPointAnnotationClickListener { pointAnnotation ->
+                                pointHashMap[pointAnnotation.id]?.let { location ->
+                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+                                    sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+                                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                                }
+                                true
+                            }
+                        )
+                    }
                 }
-                else
+            }
+
+            for (location in enumerationTeam.locations)
+            {
+                if (!location.isLandmark)
                 {
                     var isMultiHousehold = false
 
@@ -408,15 +412,7 @@ class PerformEnumerationFragment : Fragment(),
                                 pointHashMap[pointAnnotation.id]?.let { location ->
                                     sharedViewModel.locationViewModel.setCurrentLocation(location)
                                     sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
-
-                                    if (location.isLandmark)
-                                    {
-                                        findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                                    }
-                                    else
-                                    {
-                                        navigateToAddHouseholdFragment()
-                                    }
+                                    navigateToAddHouseholdFragment()
                                 }
                                 true
                             }
