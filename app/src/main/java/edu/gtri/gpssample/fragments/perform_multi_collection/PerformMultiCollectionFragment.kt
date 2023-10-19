@@ -80,7 +80,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem)
     {
-        (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
+        (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid + ":" + enumerationItem.subAddress
         sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
         LaunchSurveyDialog( activity, this@PerformMultiCollectionFragment)
     }

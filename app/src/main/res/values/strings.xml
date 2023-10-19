@@ -275,7 +275,8 @@
     <string name="simple_random_sampling_label">"Total Sample Size Across All Clusters"</string>
     <string name="cluster_sampling_label">"Sample Size Per Cluster"</string>
     <string name="show_enumeration_info">Show Enumeration Info</string>
-    <string name="please_enter_a_name">Oops! Please enter a name for this field.</string>
+    <string name="please_enter_a_name">Please enter a name for this field.</string>
+    <string name="please_enter_a_subaddress">Please enter a unique sub-address.</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

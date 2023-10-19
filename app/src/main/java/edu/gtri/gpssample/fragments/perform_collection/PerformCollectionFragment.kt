@@ -347,7 +347,7 @@ class PerformCollectionFragment : Fragment(),
         location?.let { location ->
             sharedViewModel.locationViewModel.setCurrentLocation(location)
             sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
-            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
+            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid + ":undefined"
             LaunchSurveyDialog( activity, this)
         }
     }
