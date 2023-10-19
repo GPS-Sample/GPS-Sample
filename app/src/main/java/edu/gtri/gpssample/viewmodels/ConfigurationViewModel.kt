@@ -365,6 +365,7 @@ class ConfigurationViewModel : ViewModel()
                         if (ea.id == enumAreaId)
                         {
                             config.enumAreas.removeAt(i)
+                            config.enumAreas.add(enumArea)
                             found = true
                         }
                     }
@@ -374,8 +375,6 @@ class ConfigurationViewModel : ViewModel()
                     }
                 }
             }
-
-            config.enumAreas.add(enumArea)
         }
     }
 }

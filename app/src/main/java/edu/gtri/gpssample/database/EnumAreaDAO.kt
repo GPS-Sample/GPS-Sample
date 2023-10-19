@@ -62,6 +62,7 @@ class EnumAreaDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
         values.put( DAO.COLUMN_CONFIG_ID, config.id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
+        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, enumArea.selectedEnumerationTeamId )
     }
 
     @SuppressLint("Range")

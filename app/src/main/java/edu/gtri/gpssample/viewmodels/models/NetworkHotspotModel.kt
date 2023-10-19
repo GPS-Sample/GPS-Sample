@@ -225,8 +225,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                         }
 
                         // replace the enumArea from currentConfig with this one
-//                        sharedViewModel?.replaceEnumArea(enumArea)
-//                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
+                        sharedViewModel?.replaceEnumArea(enumArea)
+                        sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                     }
                 }
             }
