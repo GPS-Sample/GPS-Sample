@@ -12,57 +12,38 @@ class LatLonDAO(private var dao: DAO)
     {
         if (exists( latLon ))
         {
-            if (geoArea is SampleArea)
-            {
-                // add the existing LatLon to the LatLon - SampleArea connector table
-                latLon.id?.let { latLonId ->
-                    geoArea.id?.let{ sampleAreaId->
-                        val values = ContentValues()
-                        putLatLonSampleArea( latLonId, sampleAreaId, values)
-                        dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA_LAT_LON, null, values)
-                    }
-                }
-            }
-            else
-            {
-                updateLatLon( latLon )
-            }
+            updateLatLon( latLon )
         }
         else
         {
             val values = ContentValues()
-
             putLatLon( latLon, values )
-
             latLon.id = dao.writableDatabase.insert(DAO.TABLE_LAT_LON, null, values).toInt()
-            latLon.id?.let { id ->
+        }
 
-                // insert into conenctor
-
-                geoArea?.let { geoArea ->
-                    values.clear()
-
-                    when (geoArea) {
-                        is EnumArea ->
-                        {
-                            geoArea.id?.let{ geo_area_id->
-                                putLatLonEnumArea( id, geo_area_id, values)
-                                dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA_LAT_LON, null, values)
-                            }
-                        }
-                        is SampleArea ->
-                        {
-                            geoArea.id?.let{ geo_area_id->
-                                putLatLonSampleArea( id, geo_area_id, values)
-                                dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA_LAT_LON, null, values)
-                            }
-                        }
-                        else -> {
+        latLon.id?.let { id ->
+            geoArea?.let { geoArea ->
+                val values = ContentValues()
+                when (geoArea) {
+                    is EnumArea ->
+                    {
+                        geoArea.id?.let{ geo_area_id->
+                            putLatLonEnumArea( id, geo_area_id, values)
+                            dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA_LAT_LON, null, values)
                         }
                     }
+                    is SampleArea ->
+                    {
+                        geoArea.id?.let{ geo_area_id->
+                            putLatLonSampleArea( id, geo_area_id, values)
+                            dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA_LAT_LON, null, values)
+                        }
+                    }
+                    else -> {
+                    }
                 }
-            } ?: return null
-        }
+            }
+        } ?: return null
 
         return latLon
     }
