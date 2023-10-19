@@ -34,7 +34,7 @@
             android:layout_marginEnd="10dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/dismiss" />
+            android:text="@string/save" />
 
         <Button
             android:id="@+id/delete_button"
