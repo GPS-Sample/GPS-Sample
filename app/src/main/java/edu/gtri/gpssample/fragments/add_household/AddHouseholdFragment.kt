@@ -131,7 +131,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.addMultiButton.setOnClickListener {
                 if (enumerationItem.subAddress.isEmpty())
                 {
-                    Toast.makeText(activity!!.applicationContext, "Please set the subaddress field, then save this enumeration item.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, context?.getString(R.string.please_enter_a_subaddress), Toast.LENGTH_SHORT).show()
                 }
                 else
                 {
@@ -202,7 +202,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        val components = location.uuid.split("-" )
+        val components = enumerationItem.uuid.split("-" )
 
         binding.UUIDEditText.setText( components[0] )
         binding.subaddressEditText.setText( enumerationItem.subAddress )
@@ -267,7 +267,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
             if (isMultiFamily && binding.subaddressEditText.text.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, "The Subaddress must be defined for a multi family location.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.please_enter_a_subaddress), Toast.LENGTH_SHORT).show()
             }
             else
             {

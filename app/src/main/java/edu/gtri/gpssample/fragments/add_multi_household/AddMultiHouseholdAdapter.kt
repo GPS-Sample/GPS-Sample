@@ -42,7 +42,7 @@ class AddMultiHouseholdAdapter(var location: Location, var enumerationItems: Lis
 
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( location.uuid )
+        holder.nameTextView.setText( enumerationItem.uuid )
         holder.dateTextView.setText( enumerationItem.subAddress )
 
         holder.itemView.setOnClickListener {
