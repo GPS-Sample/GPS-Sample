@@ -25,39 +25,33 @@ class LocationDAO(private var dao: DAO)
         if (exists( location ))
         {
             updateLocation( location, geoArea )
-
-            for (enumerationItem in location.enumerationItems)
-            {
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
-            }
         }
         else
         {
             val values = ContentValues()
             putLocation( location, geoArea, values )
-
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
-            location.id?.let { id ->
-
-                if (geoArea is EnumArea)
-                {
-                    updateConnectorTable( location, geoArea )
-                }
-                else if (geoArea is SampleArea)
-                {
-                    updateConnectorTable( location, geoArea )
-                }
-
-                for (enumerationItem in location.enumerationItems)
-                {
-                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
-                    for (fieldData in enumerationItem.fieldDataList)
-                    {
-                        DAO.fieldDataDAO.createOrUpdateFieldData(fieldData, enumerationItem)
-                    }
-                }
-            } ?: return null
         }
+
+        location.id?.let { id ->
+            if (geoArea is EnumArea)
+            {
+                updateConnectorTable( location, geoArea )
+            }
+            else if (geoArea is SampleArea)
+            {
+                updateConnectorTable( location, geoArea )
+            }
+
+            for (enumerationItem in location.enumerationItems)
+            {
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
+                for (fieldData in enumerationItem.fieldDataList)
+                {
+                    DAO.fieldDataDAO.createOrUpdateFieldData(fieldData, enumerationItem)
+                }
+            }
+        } ?: return null
 
         return location
     }
