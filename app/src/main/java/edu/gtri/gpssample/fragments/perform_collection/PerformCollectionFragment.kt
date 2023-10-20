@@ -325,7 +325,7 @@ class PerformCollectionFragment : Fragment(),
                                             }
                                             else
                                             {
-                                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
+                                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid + ":undefined"
                                                 LaunchSurveyDialog( activity, this@PerformCollectionFragment)
                                             }
                                         }
