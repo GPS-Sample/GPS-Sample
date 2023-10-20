@@ -327,6 +327,7 @@
         <action
             android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
             app:destination="@id/NetworkConnectionDialogFragment" />
+
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
@@ -338,6 +339,10 @@
         <action
             android:id="@+id/action_navigate_to_AddHouseholdFragment"
             app:destination="@id/AddHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
     </fragment>
 
     <fragment

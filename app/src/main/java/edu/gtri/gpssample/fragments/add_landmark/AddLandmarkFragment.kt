@@ -131,7 +131,21 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         binding.saveButton.setOnClickListener {
             location.description = binding.descriptionEditText.text.toString()
+
             DAO.locationDAO.updateLocation( location, enumArea )
+
+            val enumAreaId = enumArea.id
+
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+
+            sharedViewModel.updateConfiguration()
+
+            enumAreaId?.let {
+                DAO.enumAreaDAO.getEnumArea(it)?.let {
+                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea(it)
+                }
+            }
+
             findNavController().popBackStack()
         }
     }
