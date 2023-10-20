@@ -82,9 +82,19 @@ class LocationDAO(private var dao: DAO)
 
     fun importLocation( location: Location, geoArea : GeoArea )
     {
-        for (enumerationItem in location.enumerationItems)
+        if (exists(location))
         {
-            DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, geoArea )
+            updateLocation( location, geoArea )
+
+            for (enumerationItem in location.enumerationItems)
+            {
+                DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, geoArea )
+            }
+        }
+        else
+        {
+            location.id = null
+            createOrUpdateLocation( location, geoArea )
         }
     }
 

@@ -175,6 +175,27 @@ class PerformEnumerationFragment : Fragment(),
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
+        pointAnnotationManager.apply {
+            addClickListener(
+                OnPointAnnotationClickListener { pointAnnotation ->
+                    pointHashMap[pointAnnotation.id]?.let { location ->
+                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+                        sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
+
+                        if (location.isLandmark)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                        }
+                        else
+                        {
+                            navigateToAddHouseholdFragment()
+                        }
+                    }
+                    true
+                }
+            )
+        }
+
         binding.mapView.gestures.addOnMapClickListener(this )
 
         binding.legendTextView.setOnClickListener {
@@ -293,6 +314,8 @@ class PerformEnumerationFragment : Fragment(),
 
         allPointAnnotations.clear()
 
+        pointHashMap.clear()
+
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -330,7 +353,7 @@ class PerformEnumerationFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in enumerationTeam.locations)
+            for (location in enumArea.locations)
             {
                 if (location.isLandmark)
                 {
@@ -340,21 +363,6 @@ class PerformEnumerationFragment : Fragment(),
                     pointAnnotation?.let {
                         pointHashMap[pointAnnotation.id] = location
                         allPointAnnotations.add( pointAnnotation )
-                    }
-
-                    // not sure why this click is handled by the non location marker click listener?
-
-                    pointAnnotationManager.apply {
-                        addClickListener(
-                            OnPointAnnotationClickListener { pointAnnotation ->
-                                pointHashMap[pointAnnotation.id]?.let { location ->
-                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-                                    sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
-                                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                                }
-                                true
-                            }
-                        )
                     }
                 }
             }
@@ -404,19 +412,6 @@ class PerformEnumerationFragment : Fragment(),
                     pointAnnotation?.let {
                         pointHashMap[pointAnnotation.id] = location
                         allPointAnnotations.add( pointAnnotation )
-                    }
-
-                    pointAnnotationManager.apply {
-                        addClickListener(
-                            OnPointAnnotationClickListener { pointAnnotation ->
-                                pointHashMap[pointAnnotation.id]?.let { location ->
-                                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-                                    sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
-                                    navigateToAddHouseholdFragment()
-                                }
-                                true
-                            }
-                        )
                     }
                 }
             }

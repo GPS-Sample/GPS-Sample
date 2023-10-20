@@ -163,6 +163,50 @@ class PerformCollectionFragment : Fragment(),
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+
+        pointAnnotationManager.apply {
+            addClickListener(
+                OnPointAnnotationClickListener { pointAnnotation ->
+                    locationHashMap[pointAnnotation.id]?.let { location ->
+                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+                        if (location.isLandmark)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                        }
+                        else
+                        {
+                            var count = 0
+
+                            for (enumerationItem in location.enumerationItems)
+                            {
+                                if (enumerationItem.samplingState == SamplingState.Sampled)
+                                {
+                                    count += 1
+
+                                    // This is really only necessary here for the enumerationItems.size == 1 case
+                                    // For size > 1, this will get set in the multiCollectionFragment
+                                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                                }
+                            }
+
+                            if (count > 1)
+                            {
+                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment)
+                            }
+                            else
+                            {
+                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid + ":undefined"
+                                LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+                            }
+                        }
+                    }
+                    true
+                }
+            )
+        }
+
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
         }
@@ -211,6 +255,7 @@ class PerformCollectionFragment : Fragment(),
         }
 
         allPointAnnotations.clear()
+        locationHashMap.clear()
 
         for (sampleArea in study.sampleAreas)
         {
@@ -247,6 +292,20 @@ class PerformCollectionFragment : Fragment(),
                         .build()
 
                     binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                }
+
+                for (location in sampleArea.locations)
+                {
+                    if (location.isLandmark)
+                    {
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+
+                        pointAnnotation?.let {
+                            locationHashMap[pointAnnotation.id] = location
+                            allPointAnnotations.add( pointAnnotation )
+                        }
+                    }
                 }
 
                 for (location in collectionTeam.locations)
@@ -297,41 +356,6 @@ class PerformCollectionFragment : Fragment(),
                             pointAnnotation?.let { pointAnnotation ->
                                 allPointAnnotations.add( pointAnnotation )
                                 locationHashMap[pointAnnotation.id] = location
-                            }
-
-                            pointAnnotationManager.apply {
-                                addClickListener(
-                                    OnPointAnnotationClickListener { pointAnnotation ->
-                                        locationHashMap[pointAnnotation.id]?.let { location ->
-                                            sharedViewModel.locationViewModel.setCurrentLocation(location)
-
-                                            var count = 0
-
-                                            for (enumerationItem in location.enumerationItems)
-                                            {
-                                                if (enumerationItem.samplingState == SamplingState.Sampled)
-                                                {
-                                                    count += 1
-
-                                                    // This is really only necessary here for the enumerationItems.size == 1 case
-                                                    // For size > 1, this will get set in the multiCollectionFragment
-                                                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-                                                }
-                                            }
-
-                                            if (count > 1)
-                                            {
-                                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment)
-                                            }
-                                            else
-                                            {
-                                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid + ":undefined"
-                                                LaunchSurveyDialog( activity, this@PerformCollectionFragment)
-                                            }
-                                        }
-                                        true
-                                    }
-                                )
                             }
                         }
                     }

@@ -312,7 +312,11 @@ class CreateEnumerationAreaFragment : Fragment(),
                     isMultiFamily = it
                 }
 
-                if (!isMultiFamily)
+                if (location.isLandmark)
+                {
+                    resourceId = R.drawable.location_blue
+                }
+                else if (!isMultiFamily)
                 {
                     if (location.enumerationItems.isNotEmpty())
                     {
@@ -383,9 +387,14 @@ class CreateEnumerationAreaFragment : Fragment(),
                         pointAnnotationManager?.apply {
                             addClickListener(
                                 OnPointAnnotationClickListener { pointAnnotation ->
-                                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                        "${resources.getString(R.string.delete_household_message)}?",
-                                        resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@CreateEnumerationAreaFragment)
+                                    pointHashMap[pointAnnotation.id]?.let { location ->
+                                        if (!location.isLandmark)
+                                        {
+                                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                                                "${resources.getString(R.string.delete_household_message)}?",
+                                                resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@CreateEnumerationAreaFragment)
+                                        }
+                                    }
                                     true
                                 }
                             )
