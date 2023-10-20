@@ -409,7 +409,9 @@ class PerformCollectionFragment : Fragment(),
                 Role.DataCollector.toString() ->
                 {
                     sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                    sharedNetworkViewModel.networkClientModel.currentStudy = study
+                    sharedViewModel.createStudyModel.currentStudy?.value?.let {
+                        sharedNetworkViewModel.networkClientModel.currentStudy = it
+                    }
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                     getResult.launch(intent)
                 }
@@ -495,25 +497,9 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
-
-                config.studies = DAO.studyDAO.getStudies(config)
-
-                for (study in config.studies)
-                {
-                    study.id?.let { studyId ->
-                        if (studyId == config.selectedStudyId)
-                        {
-                            this.study = study
-                        }
-                    }
+                DAO.studyDAO.getStudy( study.id!! )?.let {
+                    sharedViewModel.createStudyModel.setStudy( it )
                 }
-
-                sharedViewModel.updateConfiguration()
-
-//                DAO.studyDAO.createOrUpdateStudy( study )?.let {
-//                    study = it
-//                    sharedViewModel.createStudyModel.setStudy( study )
-//                }
 
                 refreshMap()
             }
