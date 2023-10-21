@@ -28,9 +28,13 @@ class LocationDAO(private var dao: DAO)
         }
         else
         {
+            location.id = null
             val values = ContentValues()
             putLocation( location, geoArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
+            location.id?.let {
+                Log.d( "xxx", "new Location id = ${it}")
+            }
         }
 
         location.id?.let { id ->
@@ -100,11 +104,17 @@ class LocationDAO(private var dao: DAO)
 
     fun exists( location: Location ): Boolean
     {
-        location.id?.let { id ->
-            getLocation( id )?.let {
+        val locations = getLocations()
+
+        for (existingLocation in locations)
+        {
+            if (location.uuid == existingLocation.uuid)
+            {
                 return true
-            } ?: return false
-        } ?: return false
+            }
+        }
+
+        return false
     }
 
     fun updateLocation( location: Location, geoArea: GeoArea )

@@ -219,9 +219,34 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     Log.d( "xxx", payload )
 
                     enumArea?.let { enumArea ->
-                        for (location in enumArea.locations)
-                        {
-                            DAO.locationDAO.importLocation( location, enumArea )
+                        val team = enumArea.enumerationTeams.find { it.id == enumArea.selectedEnumerationTeamId }
+                        team?.let { team ->
+
+                            // only import locations from the selected team
+                            for (location in team.locations)
+                            {
+                                DAO.locationDAO.importLocation( location, enumArea )
+
+                                // find out if the location exists in the current team
+
+                                DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamId )?.let { currentTeam ->
+                                    var found = false
+
+                                    for (teamLocation in currentTeam.locations)
+                                    {
+                                        if (teamLocation.uuid == location.uuid)
+                                        {
+                                            found = true
+                                        }
+                                    }
+
+                                    if (!found)
+                                    {
+                                        team.locations.add( location )
+                                        DAO.enumerationTeamDAO.createOrUpdateTeam( team )
+                                    }
+                                }
+                            }
                         }
 
                         enumArea.id?.let {
@@ -247,9 +272,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                             DAO.locationDAO.importLocation( location, sampleArea )
                         }
                     }
-
-//                    sharedViewModel?.replaceEnumArea(enumArea)
-//                    sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea( enumArea )
                 }
             }
         }

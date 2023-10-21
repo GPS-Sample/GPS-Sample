@@ -18,6 +18,7 @@ class CollectionTeamDAO(private var dao: DAO)
         }
         else
         {
+            collectionTeam.id = null
             val values = ContentValues()
             putTeam( collectionTeam, values )
             collectionTeam.id = dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM, null, values).toInt()
@@ -141,7 +142,7 @@ class CollectionTeamDAO(private var dao: DAO)
         return collectionTeam
     }
 
-    fun getTeams(): ArrayList<CollectionTeam>
+    fun getCollectionTeams(): ArrayList<CollectionTeam>
     {
         val collectionTeam = ArrayList<CollectionTeam>()
         val db = dao.writableDatabase
