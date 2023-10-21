@@ -19,13 +19,12 @@ class EnumerationItemDAO(private var dao: DAO)
         }
         else
         {
+            enumerationItem.id = null
             val values = ContentValues()
-
             putEnumerationItem( enumerationItem, location, values )
-
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
             enumerationItem.id?.let { id ->
-                Log.d( "xxx", "new location id = ${id}")
+                Log.d( "xxx", "new enumerationItem id = ${id}")
                 enumerationItem.fieldDataList?.let { fieldDataList ->
                     for (fieldData in fieldDataList)
                     {
@@ -71,11 +70,17 @@ class EnumerationItemDAO(private var dao: DAO)
 
     fun exists( enumerationItem: EnumerationItem ): Boolean
     {
-        enumerationItem.id?.let { id ->
-            getEnumerationItem( id )?.let {
+        val enumerationItems = getEnumerationItems()
+
+        for (existingEnumerationItem in enumerationItems)
+        {
+            if (enumerationItem.uuid == existingEnumerationItem.uuid)
+            {
                 return true
-            } ?: return false
-        } ?: return false
+            }
+        }
+
+        return false
     }
 
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
