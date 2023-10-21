@@ -46,25 +46,11 @@ class EnumerationItemDAO(private var dao: DAO)
             enumerationItem.id = null // force the new item be created
             createOrUpdateEnumerationItem( enumerationItem, location )
         }
-        else
+        else if (enumerationItem.creationDate > existingEnumerationItem.creationDate)
         {
-            var shouldDelete = false
-
-            if (geoArea is EnumArea && (existingEnumerationItem.enumerationState==EnumerationState.Undefined || existingEnumerationItem.enumerationState==EnumerationState.Incomplete))
-            {
-                shouldDelete = true
-            }
-            else if (geoArea is SampleArea && existingEnumerationItem.collectionState==CollectionState.Incomplete)
-            {
-                shouldDelete = true
-            }
-
-            if (shouldDelete)
-            {
-                delete( existingEnumerationItem )
-                enumerationItem.id = null // force the new item be created
-                createOrUpdateEnumerationItem( enumerationItem, location )
-            }
+            delete( existingEnumerationItem )
+            enumerationItem.id = null // force the new item be created
+            createOrUpdateEnumerationItem( enumerationItem, location )
         }
     }
 

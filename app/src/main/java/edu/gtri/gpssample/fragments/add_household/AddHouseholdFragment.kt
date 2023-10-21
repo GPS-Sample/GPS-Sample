@@ -367,6 +367,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         enumerationItem.notes = notes
+        enumerationItem.creationDate = Date().time
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
         if (enumerationItem.id == null)

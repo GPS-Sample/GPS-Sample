@@ -511,8 +511,10 @@ class PerformCollectionFragment : Fragment(),
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
             sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
-                sampledItem.collectionState = CollectionState.Complete
+
                 sampledItem.notes = notes
+                sampledItem.creationDate = Date().time
+                sampledItem.collectionState = CollectionState.Complete
 
                 if (incompleteReason.isNotEmpty())
                 {
