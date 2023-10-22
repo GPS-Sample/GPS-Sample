@@ -136,7 +136,23 @@ class CreateEnumerationTeamFragment : Fragment(),
             }
 
             enumArea.id?.let { enumAreaId ->
-                val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumAreaId, binding.teamNameEditText.text.toString(), locations ))
+
+                val polygon = ArrayList<LatLon>()
+
+                intersectionPolygon?.points?.map { points ->
+                    points.map { point ->
+                        polygon.add( LatLon( point.latitude(), point.longitude()))
+                    }
+                }
+
+                if (polygon.isEmpty())
+                {
+                    enumArea.vertices.map {
+                        polygon.add( LatLon( it.latitude, it.longitude ))
+                    }
+                }
+
+                val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumAreaId, binding.teamNameEditText.text.toString(), polygon, locations ))
 
                 enumerationTeam?.let { team ->
                     enumArea.enumerationTeams.add(team)

@@ -135,7 +135,7 @@ class LatLonDAO(private var dao: DAO)
 
     fun getLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>
     {
-        var latLons = ArrayList<LatLon>()
+        val latLons = ArrayList<LatLon>()
         val db = dao.writableDatabase
         val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_ENUM_AREA_LAT_LON} ELL WHERE" +
                 " ELL.${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
@@ -160,6 +160,48 @@ class LatLonDAO(private var dao: DAO)
         val db = dao.writableDatabase
         val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_SAMPLE_AREA_LAT_LON} ELL WHERE" +
                 " ELL.${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleAreaId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val latlon = createLatLon(cursor)
+
+            latLons.add( latlon )
+        }
+
+        cursor.close()
+        db.close()
+
+        return latLons
+    }
+
+    fun getLatLonsWithEnumerationTeamId( teamId: Int ): ArrayList<LatLon>
+    {
+        val latLons = ArrayList<LatLon>()
+        val db = dao.writableDatabase
+        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_ENUMERATION_TEAM_LAT_LON} ELL WHERE" +
+                " ELL.${DAO.COLUMN_ENUMERATION_TEAM_ID} = $teamId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val latlon = createLatLon(cursor)
+
+            latLons.add( latlon )
+        }
+
+        cursor.close()
+        db.close()
+
+        return latLons
+    }
+
+    fun getLatLonsWithCollectionTeamId( teamId: Int ): ArrayList<LatLon>
+    {
+        val latLons = ArrayList<LatLon>()
+        val db = dao.writableDatabase
+        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_COLLECTION_TEAM_LAT_LON} ELL WHERE" +
+                " ELL.${DAO.COLUMN_COLLECTION_TEAM_ID} = $teamId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
         val cursor = db.rawQuery(query, null)
 
         while (cursor.moveToNext())

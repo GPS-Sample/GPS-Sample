@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.database.models.CollectionTeam
+import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.database.models.Study
 
@@ -27,6 +28,13 @@ class CollectionTeamDAO(private var dao: DAO)
             } ?: return null
         }
 
+        collectionTeam.id?.let {
+            for (latLon in collectionTeam.polygon)
+            {
+                DAO.latLonDAO.createOrUpdateLatLon(latLon,null)
+            }
+        }
+
         updateConnectorTable( collectionTeam )
 
         return collectionTeam
@@ -35,6 +43,16 @@ class CollectionTeamDAO(private var dao: DAO)
     fun updateConnectorTable( collectionTeam: CollectionTeam)
     {
         collectionTeam.id?.let { collectionTeamId ->
+            for (latLon in collectionTeam.polygon)
+            {
+                latLon.id?.let { latLonId ->
+                    val values = ContentValues()
+                    values.put( DAO.COLUMN_LAT_LON_ID, latLonId )
+                    values.put( DAO.COLUMN_COLLECTION_TEAM_ID, collectionTeamId )
+                    dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM_LAT_LON, null, values)
+                }
+            }
+
             for (location in collectionTeam.locations)
             {
                 location.id?.let { locationId ->
@@ -76,8 +94,9 @@ class CollectionTeamDAO(private var dao: DAO)
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
 
-        val collectionTeam = CollectionTeam(id, creationDate, study_id, name, ArrayList<Location>())
+        val collectionTeam = CollectionTeam(id, creationDate, study_id, name, ArrayList<LatLon>(), ArrayList<Location>())
 
+        collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( id )
         collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
 
         return collectionTeam

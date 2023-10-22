@@ -136,7 +136,22 @@ class CreateCollectionTeamFragment : Fragment(),
             }
 
             study.id?.let { studyId ->
-                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( studyId, binding.teamNameEditText.text.toString(), locations ))
+
+                val polygon = ArrayList<LatLon>()
+
+                intersectionPolygon?.points?.map { points ->
+                    points.map { point ->
+                        polygon.add( LatLon( point.latitude(), point.longitude()))
+                    }
+                }
+
+                if (polygon.isEmpty())
+                {
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_team_boundary), Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( studyId, binding.teamNameEditText.text.toString(), polygon, locations ))
 
                 collectionTeam?.let { team ->
                     study.collectionTeams.add(team)

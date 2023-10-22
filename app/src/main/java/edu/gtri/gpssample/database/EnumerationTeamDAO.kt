@@ -25,6 +25,13 @@ class EnumerationTeamDAO(private var dao: DAO)
             } ?: return null
         }
 
+        enumerationTeam.id?.let {
+            for (latLon in enumerationTeam.polygon)
+            {
+                DAO.latLonDAO.createOrUpdateLatLon(latLon,null)
+            }
+        }
+
         updateConnectorTable( enumerationTeam )
 
         return enumerationTeam
@@ -33,6 +40,16 @@ class EnumerationTeamDAO(private var dao: DAO)
     fun updateConnectorTable( enumerationTeam: EnumerationTeam )
     {
         enumerationTeam.id?.let { enumerationTeamId ->
+            for (latLon in enumerationTeam.polygon)
+            {
+                latLon.id?.let { latLonId ->
+                    val values = ContentValues()
+                    values.put( DAO.COLUMN_LAT_LON_ID, latLonId )
+                    values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, enumerationTeamId )
+                    dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM_LAT_LON, null, values)
+                }
+            }
+
             for (location in enumerationTeam.locations)
             {
                 location.id?.let { locationId ->
@@ -74,8 +91,9 @@ class EnumerationTeamDAO(private var dao: DAO)
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
 
-        val enumerationTeam = EnumerationTeam(id, creationDate, enumAreaId, name, ArrayList<Location>())
+        val enumerationTeam = EnumerationTeam(id, creationDate, enumAreaId, name, ArrayList<LatLon>(), ArrayList<Location>())
 
+        enumerationTeam.polygon = DAO.latLonDAO.getLatLonsWithEnumerationTeamId( id )
         enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
 
         return enumerationTeam
