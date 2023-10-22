@@ -11,10 +11,12 @@ data class CollectionTeam(
     var creationDate: Long,
     var studyId: Int,
     var name: String,
+    var polygon: ArrayList<LatLon>,
     var locations: ArrayList<Location>
 )
 {
-    constructor( studyId: Int,  name: String, locations: ArrayList<Location>) : this(null, Date().time, studyId, name, locations )
+    constructor( studyId: Int,  name: String, polygon: ArrayList<LatLon>, locations: ArrayList<Location>)
+            : this(null, Date().time, studyId, name, polygon, locations )
 
     fun pack() : String
     {

@@ -319,13 +319,13 @@ class PerformEnumerationFragment : Fragment(),
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-        enumArea.vertices.map {
+        enumerationTeam.polygon.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
         pointList.add( points )
 
-        if (pointList.isNotEmpty())
+        if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
             val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000" )
 

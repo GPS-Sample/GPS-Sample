@@ -345,6 +345,28 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableSampleAreaLatLon)
 
+            val createTableEnumerationTeamLatLon = ("CREATE TABLE " +
+                    TABLE_ENUMERATION_TEAM_LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_ENUMERATION_TEAM_ID + " INTEGER " + "," +
+                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
+                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_ID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_ENUMERATION_TEAM_ID, $COLUMN_LAT_LON_ID)" +
+                    ")")
+            db.execSQL(createTableEnumerationTeamLatLon)
+
+            val createTableCollectionTeamLatLon = ("CREATE TABLE " +
+                    TABLE_COLLECTION_TEAM_LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_COLLECTION_TEAM_ID + " INTEGER " + "," +
+                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
+                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_ID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_COLLECTION_TEAM_ID, $COLUMN_LAT_LON_ID)" +
+                    ")")
+            db.execSQL(createTableCollectionTeamLatLon)
+
         }catch(ex: Exception)
         {
             Log.d("xxx", "the problem ${ex.toString()}")
@@ -374,6 +396,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA_LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM_LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
 
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
@@ -555,7 +579,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // connector tables for lat lon
         const val TABLE_ENUM_AREA_LAT_LON = "enum_area_lat_lon"
         const val TABLE_SAMPLE_AREA_LAT_LON = "sample_area_lat_lon"
-//        const val TABLE_TEAM_LAT_LON = "team_lat_lon"
+        const val TABLE_ENUMERATION_TEAM_LAT_LON = "enumeration_team_lat_lon"
+        const val TABLE_COLLECTION_TEAM_LAT_LON = "collection_team_lat_lon"
 
         // DAO's
         lateinit var userDAO: UserDAO

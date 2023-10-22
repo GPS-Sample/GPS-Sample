@@ -11,9 +11,11 @@ data class EnumerationTeam(
     var creationDate: Long,
     var enumerAreaId: Int,
     var name: String,
+    var polygon: ArrayList<LatLon>,
     var locations: ArrayList<Location>)
 {
-    constructor( enumAreaId: Int,  name: String, locations: ArrayList<Location> ) : this(null, Date().time, enumAreaId, name, locations )
+    constructor( enumAreaId: Int,  name: String, polygon: ArrayList<LatLon>, locations: ArrayList<Location> )
+            : this(null, Date().time, enumAreaId, name, polygon, locations )
 
     fun pack() : String
     {
