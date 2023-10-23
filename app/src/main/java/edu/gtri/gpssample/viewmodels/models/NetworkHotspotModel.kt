@@ -21,10 +21,7 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.NetworkMode
 import edu.gtri.gpssample.constants.NetworkStatus
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.SampleArea
-import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
@@ -222,12 +219,21 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                         val team = enumArea.enumerationTeams.find { it.id == enumArea.selectedEnumerationTeamId }
                         team?.let { team ->
 
+                            val newLocations = ArrayList<Location>()
+
                             // only import locations from the selected team
                             for (location in team.locations)
                             {
                                 DAO.locationDAO.importLocation( location, enumArea )
 
-                                // find out if the location exists in the current team
+                                // find out if the location exists in the local version of the selected team
+
+                                val enumerationTeam = DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamId )
+
+                                if (enumerationTeam == null)
+                                {
+                                    DAO.enumerationTeamDAO.createOrUpdateTeam( team )
+                                }
 
                                 DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamId )?.let { currentTeam ->
                                     var found = false
@@ -242,10 +248,15 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
 
                                     if (!found)
                                     {
-                                        team.locations.add( location )
-                                        DAO.enumerationTeamDAO.createOrUpdateTeam( team )
+                                        newLocations.add( location )
                                     }
                                 }
+                            }
+
+                            for (location in newLocations)
+                            {
+                                team.locations.add( location )
+                                DAO.enumerationTeamDAO.createOrUpdateTeam( team )
                             }
                         }
 
