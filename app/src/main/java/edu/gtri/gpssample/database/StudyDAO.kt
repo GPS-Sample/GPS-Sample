@@ -74,10 +74,9 @@ class StudyDAO(private var dao: DAO)
             }
 
             // add filters
-            for(filter in study.filters)
-            {
-                DAO.filterDAO.createOrUpdateFilter(filter, study)
-                // filter must have a filter rule
+//            for(filter in study.filters)
+//            {
+//                DAO.filterDAO.createOrUpdateFilter(filter, study)
 //                if(filter.filterRules.size > 0)
 //                {
 //                    study.id?.let { id ->
@@ -85,7 +84,7 @@ class StudyDAO(private var dao: DAO)
 //                        DAO.filterDAO.createOrUpdateFilter(filter, study)
 //                    }
 //                }
-            }
+//            }
         }
 
         return study
