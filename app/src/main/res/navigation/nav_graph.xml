@@ -349,6 +349,10 @@
         android:id="@+id/PerformMultiCollectionFragment"
         android:name="edu.gtri.gpssample.fragments.perform_multi_collection.PerformMultiCollectionFragment"
         tools:layout="@layout/fragment_perform_multi_collection">
+
+        <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
     </fragment>
 
     <fragment
