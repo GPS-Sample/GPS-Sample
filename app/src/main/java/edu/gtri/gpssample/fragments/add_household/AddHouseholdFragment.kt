@@ -321,6 +321,12 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
         else
         {
+            if (enumerationItem.id == null)
+            {
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                location.enumerationItems.add(enumerationItem)
+            }
+
             for (fieldData in enumerationItem.fieldDataList)
             {
                 fieldData.field?.let { field ->
@@ -370,15 +376,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         enumerationItem.creationDate = Date().time
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
-        if (enumerationItem.id == null)
-        {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-            location.enumerationItems.add(enumerationItem)
-        }
-        else
-        {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-        }
+        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
 
         DAO.locationDAO.updateLocation( location, enumArea )
 
