@@ -11,19 +11,28 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.*
+import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
+import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
+import com.mapbox.maps.plugin.gestures.OnMoveListener
+import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -153,6 +162,7 @@ class PerformCollectionFragment : Fragment(),
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
+                    initLocationComponent()
                     refreshMap()
                 }
             }
@@ -535,6 +545,65 @@ class PerformCollectionFragment : Fragment(),
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
         sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+    }
+
+    private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
+//        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
+    }
+
+    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
+        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
+        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
+    }
+
+    private val onMoveListener = object : OnMoveListener {
+        override fun onMoveBegin(detector: MoveGestureDetector) {
+            onCameraTrackingDismissed()
+        }
+
+        override fun onMove(detector: MoveGestureDetector): Boolean {
+            return false
+        }
+
+        override fun onMoveEnd(detector: MoveGestureDetector) {}
+    }
+
+    private fun initLocationComponent()
+    {
+        val locationComponentPlugin = binding.mapView.location
+
+        locationComponentPlugin.updateSettings {
+            this.enabled = true
+            this.locationPuck = LocationPuck2D(
+                bearingImage = AppCompatResources.getDrawable(
+                    activity!!,
+                    com.mapbox.maps.R.drawable.mapbox_user_puck_icon,
+                ),
+                shadowImage = AppCompatResources.getDrawable(
+                    activity!!,
+                    com.mapbox.maps.R.drawable.mapbox_user_icon_shadow,
+                ),
+                scaleExpression = interpolate {
+                    linear()
+                    zoom()
+                    stop {
+                        literal(0.0)
+                        literal(0.6)
+                    }
+                    stop {
+                        literal(20.0)
+                        literal(1.0)
+                    }
+                }.toJson()
+            )
+        }
+    }
+
+    private fun onCameraTrackingDismissed()
+    {
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
     }
 
     override fun onDestroyView()
