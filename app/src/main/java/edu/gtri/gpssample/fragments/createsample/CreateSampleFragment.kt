@@ -113,6 +113,30 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                 study.sampleAreas.add( sampleArea )
             }
         }
+        else
+        {
+            var shouldClear = false
+
+            for (sampleArea in study.sampleAreas)
+            {
+                if (sampleArea.id == null)
+                {
+                    shouldClear = true
+                    break
+                }
+            }
+
+            if (shouldClear)
+            {
+                study.sampleAreas.clear()
+
+                for (enumArea in config.enumAreas)
+                {
+                    val sampleArea = SampleArea(enumArea)
+                    study.sampleAreas.add( sampleArea )
+                }
+            }
+        }
 
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
