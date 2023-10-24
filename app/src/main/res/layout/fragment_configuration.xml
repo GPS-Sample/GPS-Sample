@@ -251,7 +251,6 @@
             android:layout_marginTop="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:visibility="@{viewModel.currentUserRole == Role.Admin ? View.VISIBLE : View.GONE}"
             android:text="@string/export_configuration" />
 
         <Button
@@ -261,7 +260,6 @@
             android:layout_margin="20dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:visibility="@{(viewModel.currentUserRole != Role.Enumerator)  ? View.VISIBLE : View.GONE}"
             android:text="@string/import_field_data" />
     </LinearLayout>
 </layout>
