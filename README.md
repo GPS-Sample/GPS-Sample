@@ -1,6 +1,3 @@
-GPSSample Global Beta Launch: 26 October 2023
-
-
 What is GPSSample App?
 GPSSample is an Android-based mobile application to facilitate rapid statistical sampling and navigation back to selected locations in the field when conducting household surveys and rapid assessments. The app is designed to streamline the enumeration and statistical sampling process and can be used in areas with limited internet and cell phone connectivity.
 
