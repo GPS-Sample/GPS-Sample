@@ -21,4 +21,25 @@ Your use case: What are your ideal use cases for GPSSample? Please reach out and
 
 Technical Specifications: Android 8+ mobile app, handshakes with existing survey tool – ODK (ex), uses Mapbox basemaps, QR code 	data transfer, data export to local device, encrypted
 Sampling Methods: Simple random sample, cluster-based sample
-Advantages: Open Source, designed for use in low resource settings, can add clusters or draw them, leverages existing data
+Advantages: Open Source, designed for use in low resource settings, can add clusters or draw them, leverages existing 
+data
+
+CDC Core Project team		GTRI Project Team
+Lead: Amber Dismer (vic3@cdc.gov)
+	Megan Denham (megan.denham@gtri.gatech.edu)
+
+Joel Adegoke (ngo4@cdc.gov)
+	Dianna King (dianna.king@gtri.gatech.edu)
+
+Louie Rosencrans (lor1@cdc.gov)
+	GTRI Software development engineers
+Ben Nygren (ghz8@cdc.gov)
+	Russell Mitchell (russell.mitchell@gtri.gatech.edu)
+
+Monica Shah (hyy9@cdc.gov)
+	Brian Parise (brian.parise@gtri.gatech.edu)
+
+Amy Lang (uyf7@cdc.gov) 
+	
+![image](https://github.com/GPS-Sample/GPS-Sample/assets/5808223/c45cf926-bfd8-4358-98db-3ff15e4e772a)
+
