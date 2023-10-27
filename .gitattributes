@@ -1,3 +1,2 @@
 *.docx filter=lfs diff=lfs merge=lfs -text
 Documents/GlobalLaunch/GPSSample_FAQ_rev2.docx filter=lfs diff=lfs merge=lfs -text
-*.mp4 filter=lfs diff=lfs merge=lfs -text
