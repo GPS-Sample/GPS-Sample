@@ -28,7 +28,7 @@ class LocationDAO(private var dao: DAO)
         }
         else
         {
-            location.id = null
+//            location.id = null
             val values = ContentValues()
             putLocation( location, geoArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
@@ -86,8 +86,12 @@ class LocationDAO(private var dao: DAO)
 
     fun importLocation( location: Location, geoArea : GeoArea )
     {
-        if (exists(location))
+        val existingLocation = getLocation( location.uuid )
+
+        if (existingLocation != null)
         {
+            // make sure that the location id is based on the existing, id not the import id
+            location.id = existingLocation.id
             updateLocation( location, geoArea )
 
             for (enumerationItem in location.enumerationItems)

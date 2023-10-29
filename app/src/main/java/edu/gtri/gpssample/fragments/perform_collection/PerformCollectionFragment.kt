@@ -533,9 +533,7 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
-                DAO.studyDAO.getStudy( study.id!! )?.let {
-                    sharedViewModel.createStudyModel.setStudy( it )
-                }
+                study.sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
 
                 refreshMap()
             }
