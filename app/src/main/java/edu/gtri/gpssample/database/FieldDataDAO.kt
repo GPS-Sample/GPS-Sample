@@ -25,10 +25,9 @@ class FieldDataDAO(private var dao: DAO)
         }
         else
         {
+            fieldData.id = null
             val values = ContentValues()
-
             putFieldData( fieldData, values, enumerationItem )
-
             fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
             fieldData.id?.let { id ->
                 Log.d( "xxx", "new fieldData id = ${id}")
@@ -68,13 +67,19 @@ class FieldDataDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER, fieldData.blockNumber )
     }
 
-    fun exists( fieldData: FieldData): Boolean
+    fun exists( fieldData: FieldData ): Boolean
     {
-        fieldData.id?.let { id ->
-            getFieldData( id )?.let {
+        val fieldDataList = getFieldData()
+
+        for (existingFieldData in fieldDataList)
+        {
+            if (existingFieldData.uuid == fieldData.uuid)
+            {
                 return true
-            } ?: return false
-        } ?: return false
+            }
+        }
+
+        return false
     }
 
     @SuppressLint("Range")
