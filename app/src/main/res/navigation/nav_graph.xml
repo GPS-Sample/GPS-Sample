@@ -83,6 +83,10 @@
         <action
             android:id="@+id/action_navigate_to_ClientFragment"
             app:destination="@id/ClientFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_MapFragment"
+            app:destination="@id/MapFragment" />
     </fragment>
 
     <!--ConfigurationFragment-->
@@ -403,6 +407,12 @@
         android:id="@+id/HotspotFragment"
         android:name="edu.gtri.gpssample.fragments.hotspot.HotspotFragment"
         tools:layout="@layout/fragment_hotspot">
+    </fragment>
+
+    <fragment
+        android:id="@+id/MapFragment"
+        android:name="edu.gtri.gpssample.fragments.map.MapFragment"
+        tools:layout="@layout/fragment_map">
     </fragment>
 
     <dialog
