@@ -21,22 +21,38 @@ class LatLonDAO(private var dao: DAO)
             latLon.id = dao.writableDatabase.insert(DAO.TABLE_LAT_LON, null, values).toInt()
         }
 
-        latLon.id?.let { id ->
+        latLon.id?.let { latLonId ->
             geoArea?.let { geoArea ->
                 val values = ContentValues()
                 when (geoArea) {
                     is EnumArea ->
                     {
                         geoArea.id?.let{ geo_area_id->
-                            putLatLonEnumArea( id, geo_area_id, values)
-                            dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA_LAT_LON, null, values)
+                            val db = dao.writableDatabase
+                            val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA_LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_ID} = $latLonId AND ${DAO.COLUMN_ENUM_AREA_ID} = $geo_area_id"
+                            val cursor = db.rawQuery(query, null)
+                            if (cursor.count == 0)
+                            {
+                                putLatLonEnumArea( latLonId, geo_area_id, values)
+                                dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA_LAT_LON, null, values)
+                            }
+                            cursor.close()
+                            db.close()
                         }
                     }
                     is SampleArea ->
                     {
                         geoArea.id?.let{ geo_area_id->
-                            putLatLonSampleArea( id, geo_area_id, values)
-                            dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA_LAT_LON, null, values)
+                            val db = dao.writableDatabase
+                            val query = "SELECT * FROM ${DAO.TABLE_SAMPLE_AREA_LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_ID} = $latLonId AND ${DAO.COLUMN_SAMPLE_AREA_ID} = $geo_area_id"
+                            val cursor = db.rawQuery(query, null)
+                            if (cursor.count == 0)
+                            {
+                                putLatLonSampleArea( latLonId, geo_area_id, values)
+                                dao.writableDatabase.insert(DAO.TABLE_SAMPLE_AREA_LAT_LON, null, values)
+                            }
+                            cursor.close()
+                            db.close()
                         }
                     }
                     else -> {
