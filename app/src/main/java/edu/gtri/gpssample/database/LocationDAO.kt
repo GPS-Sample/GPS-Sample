@@ -64,10 +64,18 @@ class LocationDAO(private var dao: DAO)
     {
         location.id?.let { locationId ->
             enumArea.id?.let { enumAreaId ->
-                val values = ContentValues()
-                values.put( DAO.COLUMN_LOCATION_ID, locationId )
-                values.put( DAO.COLUMN_ENUM_AREA_ID, enumAreaId )
-                dao.writableDatabase.insert(DAO.TABLE_LOCATION__ENUM_AREA, null, values)
+                val db = dao.writableDatabase
+                val query = "SELECT * FROM ${DAO.TABLE_LOCATION__ENUM_AREA} WHERE ${DAO.COLUMN_LOCATION_ID} = $locationId AND ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
+                val cursor = db.rawQuery(query, null)
+                if (cursor.count == 0)
+                {
+                    val values = ContentValues()
+                    values.put( DAO.COLUMN_LOCATION_ID, locationId )
+                    values.put( DAO.COLUMN_ENUM_AREA_ID, enumAreaId )
+                    dao.writableDatabase.insert(DAO.TABLE_LOCATION__ENUM_AREA, null, values)
+                }
+                cursor.close()
+                db.close()
             }
         }
     }
@@ -76,10 +84,18 @@ class LocationDAO(private var dao: DAO)
     {
         location.id?.let { locationId ->
             sampleArea.id?.let { sampleAreaId ->
-                val values = ContentValues()
-                values.put( DAO.COLUMN_LOCATION_ID, locationId )
-                values.put( DAO.COLUMN_SAMPLE_AREA_ID, sampleAreaId )
-                val id = dao.writableDatabase.insert(DAO.TABLE_LOCATION__SAMPLE_AREA, null, values)
+                val db = dao.writableDatabase
+                val query = "SELECT * FROM ${DAO.TABLE_LOCATION__SAMPLE_AREA} WHERE ${DAO.COLUMN_LOCATION_ID} = $locationId AND ${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleAreaId"
+                val cursor = db.rawQuery(query, null)
+                if (cursor.count == 0)
+                {
+                    val values = ContentValues()
+                    values.put( DAO.COLUMN_LOCATION_ID, locationId )
+                    values.put( DAO.COLUMN_SAMPLE_AREA_ID, sampleAreaId )
+                    dao.writableDatabase.insert(DAO.TABLE_LOCATION__SAMPLE_AREA, null, values)
+                }
+                cursor.close()
+                db.close()
             }
         }
     }
@@ -128,6 +144,7 @@ class LocationDAO(private var dao: DAO)
         val args: Array<String> = arrayOf(location.id!!.toString())
         val values = ContentValues()
 
+        Log.d( "xxx", "update location id = $location.id!!")
         putLocation( location, geoArea, values )
 
         db.update(DAO.TABLE_LOCATION, values, whereClause, args )
