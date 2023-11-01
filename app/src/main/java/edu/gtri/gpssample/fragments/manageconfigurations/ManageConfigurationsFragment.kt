@@ -61,8 +61,25 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         sharedNetworkViewModel.currentFragment = this
         sharedNetworkViewModel.networkClientModel.configurationDelegate = this
         sharedNetworkViewModel.manageConfigurationNetworkDelegate = this
+
+        setHasOptionsMenu(true)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.cache_map_tiles ->
+                findNavController().navigate(R.id.action_navigate_to_MapFragment)
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentManageConfigurationsBinding.inflate(inflater, container, false)

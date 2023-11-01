@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="edu.gtri.gpssample.MainActivity">
     <item
-        android:id="@+id/action_add_configuration"
-        android:title="Add Configuration"
+        android:id="@+id/cache_map_tiles"
+        android:title="Map"
         app:showAsAction="never" />
 </menu>
