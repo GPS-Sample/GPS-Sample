@@ -17,29 +17,69 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataDAO(private var dao: DAO)
 {
-    fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem ) : FieldData?
+    private var batchEnumerationItem: EnumerationItem? = null
+    private val fieldDataList = ArrayList<FieldData>()
+
+    fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem, batch: Boolean = false ) : FieldData?
     {
         if (exists( fieldData ))
         {
             updateFieldData( fieldData )
+            Log.d( "xxx", "update fieldData id = ${fieldData.id!!}")
         }
         else
         {
             fieldData.id = null
-            val values = ContentValues()
-            putFieldData( fieldData, values, enumerationItem )
-            fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
-            fieldData.id?.let { id ->
-                Log.d( "xxx", "new fieldData id = ${id}")
-            } ?: return null
-        }
-
-        for (fieldDataOption in fieldData.fieldDataOptions)
-        {
-            DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+            if (batch)
+            {
+                fieldDataList.add( fieldData )
+                batchEnumerationItem = enumerationItem
+            }
+            else
+            {
+                val values = ContentValues()
+                putFieldData( fieldData, values, enumerationItem )
+                fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
+                fieldData.id?.let { id ->
+                    Log.d( "xxx", "new fieldData id = ${id}")
+                    for (fieldDataOption in fieldData.fieldDataOptions)
+                    {
+                        DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+                    }
+                } ?: return null
+            }
         }
 
         return fieldData
+    }
+
+    fun performBatchUpdate()
+    {
+        val db = dao.writableDatabase
+
+        db.beginTransaction()
+        for (fieldData in fieldDataList)
+        {
+            val values = ContentValues()
+            putFieldData( fieldData, values, batchEnumerationItem )
+            fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
+            fieldData.id?.let { id ->
+                Log.d( "xxx", "new fieldData id = ${id}")
+            }
+        }
+        db.endTransaction()
+
+        for (fieldData in fieldDataList)
+        {
+            for (fieldDataOption in fieldData.fieldDataOptions)
+            {
+                DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+            }
+        }
+
+        db.close()
+
+        fieldDataList.clear()
     }
 
     fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)
