@@ -5,6 +5,7 @@ import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.TimeFormat
 import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.utils.EncryptionUtil
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -55,7 +56,8 @@ data class Config(
         }
     fun pack() : String
     {
-        return Json.encodeToString( this )
+        val jsonString = Json.encodeToString( this )
+        return  EncryptionUtil.Encrypt(jsonString)
     }
 
     companion object
@@ -65,7 +67,11 @@ data class Config(
             try
             {
                 Log.d("XXXXXXXXX", "ABOUT TO UNPACK")
-                return Json.decodeFromString<Config>( message )
+                val decrypted = EncryptionUtil.Decrypt(message)
+                decrypted?.let {decrypted ->
+                    return Json.decodeFromString<Config>( decrypted )
+                }
+
             }
             catch( ex: Exception )
             {
