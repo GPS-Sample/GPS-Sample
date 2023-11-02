@@ -27,6 +27,7 @@ import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
 import edu.gtri.gpssample.services.NetworkMonitorService
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
+import edu.gtri.gpssample.utils.EncryptionUtil
 import edu.gtri.gpssample.utils.NetworkConnectionStatus
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
         setupActionBarWithNavController(navController, appBarConfiguration)
 
 
-
+        EncryptionUtil.createKeys()
 
 
        // Maybe there's a way to configure this better?

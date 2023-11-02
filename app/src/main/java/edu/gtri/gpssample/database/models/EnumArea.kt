@@ -1,5 +1,7 @@
 package edu.gtri.gpssample.database.models
 
+import android.util.Log
+import edu.gtri.gpssample.utils.EncryptionUtil
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -35,7 +37,8 @@ data class EnumArea (
 
     fun pack() : String
     {
-        return Json.encodeToString( this )
+        val jsonString = Json.encodeToString( this )
+        return EncryptionUtil.Encrypt(jsonString)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -54,9 +57,15 @@ data class EnumArea (
         {
             try
             {
-                return Json.decodeFromString<EnumArea>( string )
+                val decrypted = EncryptionUtil.Decrypt(string)
+                decrypted?.let { decrypted ->
+                    return Json.decodeFromString<EnumArea>(decrypted)
+                }
             }
-            catch (e: Exception) {}
+            catch (ex: Exception)
+            {
+                Log.d( "xxXXx", ex.stackTrace.toString())
+            }
 
             return null;
         }
