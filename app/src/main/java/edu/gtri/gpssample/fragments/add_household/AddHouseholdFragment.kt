@@ -365,8 +365,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                     }
                 }
 
-                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem, true )
             }
+
+            DAO.fieldDataDAO.performBatchUpdate()
 
             enumerationItem.incompleteReason = ""
             enumerationItem.enumerationState = EnumerationState.Enumerated

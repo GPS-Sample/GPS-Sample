@@ -24,6 +24,7 @@ class LocationDAO(private var dao: DAO)
     {
         if (exists( location ))
         {
+            Log.d( "xxx", "update location id = ${location.id!!}")
             updateLocation( location, geoArea )
         }
         else
@@ -50,10 +51,6 @@ class LocationDAO(private var dao: DAO)
             for (enumerationItem in location.enumerationItems)
             {
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
-                for (fieldData in enumerationItem.fieldDataList)
-                {
-                    DAO.fieldDataDAO.createOrUpdateFieldData(fieldData, enumerationItem)
-                }
             }
         } ?: return null
 
@@ -144,7 +141,6 @@ class LocationDAO(private var dao: DAO)
         val args: Array<String> = arrayOf(location.id!!.toString())
         val values = ContentValues()
 
-        Log.d( "xxx", "update location id = $location.id!!")
         putLocation( location, geoArea, values )
 
         db.update(DAO.TABLE_LOCATION, values, whereClause, args )
