@@ -12,53 +12,57 @@ import javax.crypto.spec.SecretKeySpec
 object EncryptionUtil {
 
     const val secretKey = "B08DC45F248BA92F28AA35AC6C157BBD9CC8A3DE"
-    const val salt = "Y2Jma25sRkRMS1NHekNWTE0="
-    const val iv = "c2xTT0lua0ZWbHdvZWlTTGs="
+    const val salt = "c2xTT0lua0ZWbHdvZWlTTGs="
+    const val iv = "Y2Jma25sRkRMS1NHekNWTA=="
 
-//    fun createKeys()
-//    {
-//        val secret = "GPS_SAMPLE CDC GTRI"
-//        val digest = MessageDigest.getInstance("SHA-1")
-//        val result = digest.digest(secret.toByteArray(Charsets.UTF_8))
-//        val sb = StringBuilder()
-//        for (b in result) {
-//            sb.append(String.format("%02X", b))
-//        }
-//        val hashedPassword = sb.toString()
-//
-//
-//
-//        val saltString = "slSOInkFVlwoeiSLk"
-//        val encodedSaltString: String = Base64.encodeToString(saltString.toByteArray(), 0)
-//
-//        val ivString = "cbfknlFDLKSGzCVLM"
-//        val encodedIvString: String = Base64.encodeToString(ivString.toByteArray(), 0)
-//
-//
-//        Log.d("XXXXXXX", "secret key ${hashedPassword}")
-//        Log.d("XXXXXXX","iv key ${encodedIvString}")
-//        Log.d("XXXXXXX","salt string ${encodedSaltString}")
-//    }
+    fun createKeys()
+    {
+        val secret = "GPS_SAMPLE CDC GTRI"
+        val digest = MessageDigest.getInstance("SHA-1")
+        val result = digest.digest(secret.toByteArray(Charsets.UTF_8))
+        val sb = StringBuilder()
+        for (b in result) {
+            sb.append(String.format("%02X", b))
+        }
+        val hashedPassword = sb.toString()
+
+
+
+        val saltString = "slSOInkFVlwoeiSLk"
+        val encodedSaltString: String = Base64.encodeToString(saltString.toByteArray(), 0)
+
+        val ivString = "cbfknlFDLKSGzCVL"
+        val encodedIvString: String = Base64.encodeToString(ivString.toByteArray(), 0)
+
+
+        Log.d("XXXXXXX", "secret key ${hashedPassword}")
+        Log.d("XXXXXXX","iv key ${encodedIvString}")
+        Log.d("XXXXXXX","salt string ${encodedSaltString}")
+    }
 
 
     fun Encrypt(strToEncrypt: String) :  String
     {
-        try
-        {
+        try {
             val ivParameterSpec = IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
 
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val spec =  PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 10000, 256)
+            val spec =
+                PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 10000, 256)
             val tmp = factory.generateSecret(spec)
-            val secretKey =  SecretKeySpec(tmp.encoded, "AES")
+            val secretKey = SecretKeySpec(tmp.encoded, "AES")
 
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
-            return Base64.encodeToString(cipher.doFinal(strToEncrypt.toByteArray(Charsets.UTF_8)), Base64.DEFAULT)
-        }
-        catch (e: Exception)
-        {
-            println("Error while encrypting: $e")
+
+
+            return Base64.encodeToString(
+                cipher.doFinal(strToEncrypt.toByteArray(Charsets.UTF_8)),
+                Base64.DEFAULT
+            )
+        } catch (e: Exception) {
+            Log.d("XXXXX", "ERROR ${e.message}")
+
         }
         return ""
     }
@@ -68,7 +72,6 @@ object EncryptionUtil {
         {
 
             val ivParameterSpec =  IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
-
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
             val spec =  PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 10000, 256)
             val tmp = factory.generateSecret(spec);

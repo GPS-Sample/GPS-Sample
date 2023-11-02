@@ -57,6 +57,7 @@ data class Config(
     fun pack() : String
     {
         val jsonString = Json.encodeToString( this )
+       // return  jsonString//EncryptionUtil.Encrypt(jsonString)
         return  EncryptionUtil.Encrypt(jsonString)
     }
 
