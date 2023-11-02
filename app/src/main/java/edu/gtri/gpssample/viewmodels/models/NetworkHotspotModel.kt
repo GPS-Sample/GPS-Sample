@@ -275,14 +275,16 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     val study = Study.unpack( payload )
 
                     Log.d( "xxx", payload )
-
-                    for (sampleArea in study.sampleAreas)
-                    {
-                        for (location in sampleArea.locations)
+                    study?.let{ study ->
+                        for (sampleArea in study.sampleAreas)
                         {
-                            DAO.locationDAO.importLocation( location, sampleArea )
+                            for (location in sampleArea.locations)
+                            {
+                                DAO.locationDAO.importLocation( location, sampleArea )
+                            }
                         }
                     }
+
                 }
             }
         }
