@@ -67,6 +67,7 @@ class FieldDataDAO(private var dao: DAO)
                 Log.d( "xxx", "new fieldData id = ${id}")
             }
         }
+        db.setTransactionSuccessful()
         db.endTransaction()
 
         for (fieldData in fieldDataList)
