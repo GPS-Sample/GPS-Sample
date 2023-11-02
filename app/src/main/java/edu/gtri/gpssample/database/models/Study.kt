@@ -1,8 +1,10 @@
 package edu.gtri.gpssample.database.models
 
+import android.util.Log
 import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.utils.EncryptionUtil
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -38,7 +40,8 @@ data class Study(
 
     fun pack() : String
     {
-        return Json.encodeToString( this )
+        val jsonString = Json.encodeToString( this )
+        return  EncryptionUtil.Encrypt(jsonString)
     }
 
     fun equals(compare : Study) : Boolean
@@ -57,9 +60,20 @@ data class Study(
 
     companion object
     {
-        fun unpack( message: String ) : Study
+        fun unpack( message: String ) : Study?
         {
-            return Json.decodeFromString<Study>( message )
+            try
+            {
+                val decrypted = EncryptionUtil.Decrypt(message)
+                decrypted?.let {decrypted ->
+                    return Json.decodeFromString<Study>( decrypted )
+                }
+            }
+            catch (ex: Exception)
+            {
+                Log.d( "xxXXx", ex.stackTrace.toString())
+            }
+            return null
         }
     }
 }
