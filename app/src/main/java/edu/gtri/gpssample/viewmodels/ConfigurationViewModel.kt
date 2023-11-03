@@ -61,9 +61,12 @@ class ConfigurationViewModel : ViewModel()
     val dateFormats : Array<String>
         get() = DateFormatConverter.array
 
+    private var _centerOnCurrentLocation : MutableLiveData<Boolean>? = null
+
     private var _currentZoomLevel : MutableLiveData<Double>? = null
 
     var currentZoomLevel : LiveData<Double>? = _currentZoomLevel
+    var centerOnCurrentLocation : LiveData<Boolean>? = _centerOnCurrentLocation
 
     fun setCurrentZoomLevel( zoomLevel: Double )
     {
@@ -71,7 +74,11 @@ class ConfigurationViewModel : ViewModel()
         currentZoomLevel = _currentZoomLevel
     }
 
-
+    fun setCenterOnCurrentLocation( value: Boolean )
+    {
+        _centerOnCurrentLocation = MutableLiveData( value )
+        centerOnCurrentLocation = _centerOnCurrentLocation
+    }
 
     val distanceFormatPosition : MutableLiveData<Int>
         get() = _distanceFormatPosition
