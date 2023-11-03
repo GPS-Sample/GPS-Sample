@@ -17,8 +17,7 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataDAO(private var dao: DAO)
 {
-    private var batchEnumerationItem: EnumerationItem? = null
-    private val fieldDataList = ArrayList<FieldData>()
+    private val hashMap = HashMap<EnumerationItem,FieldData>()
 
     fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem, batch: Boolean = false ) : FieldData?
     {
@@ -32,8 +31,7 @@ class FieldDataDAO(private var dao: DAO)
             fieldData.id = null
             if (batch)
             {
-                fieldDataList.add( fieldData )
-                batchEnumerationItem = enumerationItem
+                hashMap.put( enumerationItem, fieldData )
             }
             else
             {
@@ -58,29 +56,28 @@ class FieldDataDAO(private var dao: DAO)
         val db = dao.writableDatabase
 
         db.beginTransaction()
-        for (fieldData in fieldDataList)
+
+        for (enumerationItem in hashMap.keys)
         {
-            val values = ContentValues()
-            putFieldData( fieldData, values, batchEnumerationItem )
-            fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
-            fieldData.id?.let { id ->
-                Log.d( "xxx", "new fieldData id = ${id}")
+            hashMap[enumerationItem]?.let { fieldData ->
+                val values = ContentValues()
+                putFieldData( fieldData, values, enumerationItem )
+                fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
+                fieldData.id?.let { id ->
+                    Log.d( "xxx", "new fieldData id = ${id}")
+                    for (fieldDataOption in fieldData.fieldDataOptions)
+                    {
+                        DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+                    }
+                }
             }
         }
+
         db.setTransactionSuccessful()
         db.endTransaction()
-
-        for (fieldData in fieldDataList)
-        {
-            for (fieldDataOption in fieldData.fieldDataOptions)
-            {
-                DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
-            }
-        }
-
         db.close()
 
-        fieldDataList.clear()
+        hashMap.clear()
     }
 
     fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)

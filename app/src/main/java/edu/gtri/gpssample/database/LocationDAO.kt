@@ -52,6 +52,9 @@ class LocationDAO(private var dao: DAO)
             {
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
             }
+
+            DAO.fieldDataDAO.performBatchUpdate()
+
         } ?: return null
 
         return location
