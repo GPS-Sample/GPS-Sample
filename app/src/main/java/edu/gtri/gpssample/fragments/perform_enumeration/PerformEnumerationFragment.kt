@@ -78,7 +78,6 @@ class PerformEnumerationFragment : Fragment(),
     private var gpsLocation: Point? = null
 
     private var dropMode = false
-    private var showCurrentLocation = true
 
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
@@ -202,9 +201,18 @@ class PerformEnumerationFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
-        binding.centerOnLocationButton.setOnClickListener {
-            showCurrentLocation = !showCurrentLocation
-            if (showCurrentLocation)
+        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
+        if (centerOnCurrentLocation == null)
+        {
+            sharedViewModel.setCenterOnCurrentLocation( false )
+        }
+
+        binding.addHouseholdButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
+        sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+            if (centerOnCurrentLocation)
             {
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
@@ -214,8 +222,20 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
-        binding.addHouseholdButton.backgroundTintList?.let {
-            defaultColorList = it
+        binding.centerOnLocationButton.setOnClickListener {
+            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+                if (centerOnCurrentLocation)
+                {
+                    sharedViewModel.setCenterOnCurrentLocation( false )
+                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                }
+                else
+                {
+                    sharedViewModel.setCenterOnCurrentLocation( true )
+                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                }
+                refreshMap()
+            }
         }
 
         binding.addHouseholdButton.setOnClickListener {
@@ -727,10 +747,12 @@ class PerformEnumerationFragment : Fragment(),
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
         sharedViewModel.locationViewModel.setCurrentLocationUpdateTime(Date())
         gpsLocation = point
-        if (showCurrentLocation)
-        {
-            binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
-            binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
+        sharedViewModel.centerOnCurrentLocation?.value?.let {
+            if (it)
+            {
+                binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
+                binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
+            }
         }
     }
 
