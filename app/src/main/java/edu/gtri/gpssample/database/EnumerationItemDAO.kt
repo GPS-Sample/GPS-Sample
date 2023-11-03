@@ -28,9 +28,8 @@ class EnumerationItemDAO(private var dao: DAO)
                 enumerationItem.fieldDataList?.let { fieldDataList ->
                     for (fieldData in fieldDataList)
                     {
-                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem, true )
                     }
-//                    DAO.fieldDataDAO.performBatchUpdate()
                 }
             } ?: return null
         }
