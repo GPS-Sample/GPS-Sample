@@ -56,6 +56,7 @@ data class Config(
         }
     fun pack() : String
     {
+       // return Json.encodeToString( this )
         val jsonString = Json.encodeToString( this )
         return  EncryptionUtil.Encrypt(jsonString)
     }
@@ -66,19 +67,10 @@ data class Config(
         {
             try
             {
-                val config = Json.decodeFromString<Config>( message )
-
-                if (config != null)
-                {
-                    return config
-                }
-                else
-                {
-                    Log.d("XXXXXXXXX", "ABOUT TO UNPACK")
-                    val decrypted = EncryptionUtil.Decrypt(message)
-                    decrypted?.let {decrypted ->
-                        return Json.decodeFromString<Config>( decrypted )
-                    }
+                Log.d("XXXXXXXXX", "ABOUT TO UNPACK")
+                val decrypted = EncryptionUtil.Decrypt(message)
+                decrypted?.let {decrypted ->
+                    return Json.decodeFromString<Config>( decrypted )
                 }
             }
             catch( ex: Exception )
