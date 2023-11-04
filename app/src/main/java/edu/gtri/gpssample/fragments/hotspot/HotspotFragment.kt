@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
@@ -12,7 +13,10 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.databinding.FragmentHotspotBinding
+import edu.gtri.gpssample.dialogs.InfoDialog
+import edu.gtri.gpssample.utils.NetworkConnectionStatus
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import edu.gtri.gpssample.viewmodels.models.NetworkHotspotModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +28,8 @@ private const val ARG_PARAM2 = "param2"
  * Use the [HotspotFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class HotspotFragment : Fragment() {
+class HotspotFragment : Fragment(), NetworkHotspotModel.NetworkHotspotDelegate
+{
     private var _binding: FragmentHotspotBinding? = null
     private val binding get() = _binding!!
 
@@ -36,7 +41,7 @@ class HotspotFragment : Fragment() {
             val networkVm : NetworkViewModel by activityViewModels()
             sharedNetworkViewModel = networkVm
             sharedNetworkViewModel.currentFragment = this
-
+            sharedNetworkViewModel.networkHotspotModel.delegate = this
     }
 
     override fun onCreateView(
@@ -88,5 +93,18 @@ class HotspotFragment : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun didStartImport()
+    {
+        activity!!.runOnUiThread {
+            binding.doneButton.isEnabled = false
+        }
+    }
+    override fun didFinishImport()
+    {
+        activity!!.runOnUiThread {
+            binding.doneButton.isEnabled = true
+        }
     }
 }
