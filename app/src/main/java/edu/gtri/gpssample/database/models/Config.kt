@@ -56,39 +56,30 @@ data class Config(
         }
     fun pack() : String
     {
-        return Json.encodeToString( this )
-//        return  EncryptionUtil.Encrypt(jsonString)
+       // return Json.encodeToString( this )
+        val jsonString = Json.encodeToString( this )
+        return  EncryptionUtil.Encrypt(jsonString)
     }
 
     companion object
     {
         fun unpack( message: String ) : Config?
         {
-            return Json.decodeFromString<Config>( message )
+            try
+            {
+                Log.d("XXXXXXXXX", "ABOUT TO UNPACK")
+                val decrypted = EncryptionUtil.Decrypt(message)
+                decrypted?.let {decrypted ->
+                    return Json.decodeFromString<Config>( decrypted )
+                }
 
-//            try
-//            {
-//                val config = Json.decodeFromString<Config>( message )
-//
-//                if (config != null)
-//                {
-//                    return config
-//                }
-//                else
-//                {
-//                    Log.d("XXXXXXXXX", "ABOUT TO UNPACK")
-//                    val decrypted = EncryptionUtil.Decrypt(message)
-//                    decrypted?.let {decrypted ->
-//                        return Json.decodeFromString<Config>( decrypted )
-//                    }
-//                }
-//            }
-//            catch( ex: Exception )
-//            {
-//                Log.d( "xxXXx", ex.stackTrace.toString())
-//            }
-//
-//            return null
+            }
+            catch( ex: Exception )
+            {
+                Log.d( "xxXXx", ex.stackTrace.toString())
+            }
+
+            return null
         }
     }
 }
