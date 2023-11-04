@@ -72,7 +72,6 @@ data class Config(
                 decrypted?.let {decrypted ->
                     return Json.decodeFromString<Config>( decrypted )
                 }
-
             }
             catch( ex: Exception )
             {
