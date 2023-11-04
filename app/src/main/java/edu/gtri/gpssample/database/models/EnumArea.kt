@@ -37,8 +37,8 @@ data class EnumArea (
 
     fun pack() : String
     {
-        val jsonString = Json.encodeToString( this )
-        return EncryptionUtil.Encrypt(jsonString)
+        return Json.encodeToString( this )
+//        return EncryptionUtil.Encrypt(jsonString)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -55,19 +55,20 @@ data class EnumArea (
     {
         fun unpack( string: String ) : EnumArea?
         {
-            try
-            {
-                val decrypted = EncryptionUtil.Decrypt(string)
-                decrypted?.let { decrypted ->
-                    return Json.decodeFromString<EnumArea>(decrypted)
-                }
-            }
-            catch (ex: Exception)
-            {
-                Log.d( "xxXXx", ex.stackTrace.toString())
-            }
-
-            return null;
+            return Json.decodeFromString<EnumArea>(string)
+//            try
+//            {
+//                val decrypted = EncryptionUtil.Decrypt(string)
+//                decrypted?.let { decrypted ->
+//                    return Json.decodeFromString<EnumArea>(decrypted)
+//                }
+//            }
+//            catch (ex: Exception)
+//            {
+//                Log.d( "xxXXx", ex.stackTrace.toString())
+//            }
+//
+//            return null;
         }
     }
 }
