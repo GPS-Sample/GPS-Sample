@@ -38,10 +38,17 @@ import java.net.Socket
 
 const val hotspotMessageTemplate = "SSID:"
 const val kNetworkTimeout = 5 //seconds
-class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
-    GPSSampleWifiManager.HotspotDelegate {
-    override val type = NetworkMode.NetworkHotspot
+class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSampleWifiManager.HotspotDelegate
+{
+    interface NetworkHotspotDelegate
+    {
+        fun didStartImport()
+        fun didFinishImport()
+    }
 
+    var delegate : NetworkHotspotDelegate? = null
+
+    override val type = NetworkMode.NetworkHotspot
 
     interface NetworkCreationDelegate
     {
@@ -216,6 +223,10 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     Log.d( "xxx", payload )
 
                     enumArea?.let { enumArea ->
+                        delegate?.let {
+                            it.didStartImport()
+                        }
+
                         val team = enumArea.enumerationTeams.find { it.id == enumArea.selectedEnumerationTeamId }
                         team?.let { team ->
 
@@ -264,6 +275,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                             DAO.enumAreaDAO.getEnumArea(it)?.let {
                                 sharedViewModel?.replaceEnumArea(it)
                                 sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea(it)
+                                delegate?.let {
+                                    it.didFinishImport()
+                                }
                             }
                         }
                     }
@@ -275,7 +289,12 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                     val study = Study.unpack( payload )
 
                     Log.d( "xxx", payload )
+
                     study?.let{ study ->
+                        delegate?.let {
+                            it.didStartImport()
+                        }
+
                         for (sampleArea in study.sampleAreas)
                         {
                             for (location in sampleArea.locations)
@@ -283,8 +302,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate,
                                 DAO.locationDAO.importLocation( location, sampleArea )
                             }
                         }
-                    }
 
+                        delegate?.let {
+                            it.didFinishImport()
+                        }
+                    }
                 }
             }
         }
