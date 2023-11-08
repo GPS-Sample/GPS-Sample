@@ -29,7 +29,7 @@ class LocationDAO(private var dao: DAO)
         }
         else
         {
-            location.id = null
+//            location.id = null
             val values = ContentValues()
             putLocation( location, geoArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()

@@ -16,7 +16,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         }
         else
         {
-            enumerationTeam.id = null
+//            enumerationTeam.id = null
             val values = ContentValues()
             putTeam( enumerationTeam, values )
             enumerationTeam.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM, null, values).toInt()
