@@ -29,8 +29,8 @@ class ConfigDAO(private var dao: DAO)
             config.id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
             config.id?.let { id ->
                 Log.d( "xxx", "new config id = ${id}")
-                createOrUpdateStudies(config)
                 createOrUpdateEnumAreas(config)
+                createOrUpdateStudies(config)
                 return config
             } ?: return null
         }
@@ -161,7 +161,8 @@ class ConfigDAO(private var dao: DAO)
         if (!exists( config ))
         {
             createConfig(config)
-        }else
+        }
+        else
         {
             val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
@@ -170,8 +171,8 @@ class ConfigDAO(private var dao: DAO)
                 val values = ContentValues()
                 putConfig( config, values )
                 db.update(DAO.TABLE_CONFIG, values, whereClause, args )
-                createOrUpdateStudies(config)
                 createOrUpdateEnumAreas(config)
+                createOrUpdateStudies(config)
                 db.close()
             }
         }
