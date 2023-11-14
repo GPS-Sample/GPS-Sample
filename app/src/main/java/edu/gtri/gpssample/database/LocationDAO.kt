@@ -118,6 +118,10 @@ class LocationDAO(private var dao: DAO)
         else
         {
             location.id = null
+            for (enumerationItem in location.enumerationItems)
+            {
+                enumerationItem.id = null
+            }
             createOrUpdateLocation( location, geoArea )
         }
     }
