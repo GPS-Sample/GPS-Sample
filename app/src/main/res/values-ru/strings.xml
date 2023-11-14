@@ -113,6 +113,7 @@
     <string name="sample_size">"Размер выборки"</string>
     <string name="filter_name">"Имя фильтра"</string>
     <string name="rule_name">"Имя правила"</string>
+    <string name="total_sample_size">"Общий размер выборки по всем кластерам"</string>
     <string name="manage_studies">"Управление исследованиями"</string>
     <string name="manage_samples">"Управление выборками"</string>
     <string name="create_sample">"Создать выборку"</string>
@@ -251,6 +252,32 @@
     <string name="enum_saved_doc">"В директорию Документы сохранен файл Перепись."</string>
     <string name="config_saved_doc">"Конфигурация сохранена в каталоге Документы."</string>
     <string name="nobody_home">"Никто не дома"</string>
+    <string name="export_enum_data">"Экспорт данных переписи населения"</string>
+    <string name="delete_landmark_message">""Вы уверены"</string>
+    <string name="subaddress">"Субадрес"</string>
+    <string name="sampled">"Выборочный"</string>
+    <string name="completed_enumeration">"Завершенное перечисление"</string>
+    <string name="incomplete_enumeration">"Неполный сбор"</string>
+    <string name="incomplete_collection">"Неполная коллекция"</string>
+    <string name="completed_collection">"Завершенный сбор"</string>
+    <string name="is_multi_family">"Является ли это место проживания многосемейным?"</string>
+    <string name="multi_families">"Многосемейные"</string>
+    <string name="dismiss">"Удалить"</string>
+    <string name="delete">"Удалить"</string>
+    <string name="launching_odk_collect_application">"Запуск приложения ODK Collect..."</string>
+    <string name="filters">"Фильтры (объединяет правила)"</string>
+    <string name="new_location">"Идентифицировать местоположение"</string>
+    <string name="delete_configuration">"Текущая конфигурация будет заменена импортом.  Желаете ли вы продолжить?"</string>
+    <string name="total_population">"Общий размер популяции"</string>
+    <string name="enter_the_total_population_size">"Введите общий размер популяции."</string>
+    <string name="total_population_size_error">"Размер генеральной совокупности должен быть больше 0"</string>
+    <string name="sample_size_error">"Размер выборки должен быть больше 0"</string>
+    <string name="simple_random_sampling_label">"Общий размер выборки по всем кластерам"</string>
+    <string name="cluster_sampling_label">"Размер выборки для каждого кластера"</string>
+    <string name="show_enumeration_info">"Показать информацию о населенном пункте"</string>
+    <string name="please_enter_a_name">""Пожалуйста"</string>
+    <string name="please_enter_a_subaddress">"Укажите уникальный субадрес."</string>
+    <string name="please_select_team_boundary">"Seleccione o limite da equipa."</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

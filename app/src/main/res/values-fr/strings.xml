@@ -113,6 +113,7 @@
     <string name="sample_size">"Taille de l'échantillon"</string>
     <string name="filter_name">"Nom du filtre"</string>
     <string name="rule_name">"Nom de la règle"</string>
+    <string name="total_sample_size">"Taille totale de l'échantillon pour toutes les grappes"</string>
     <string name="manage_studies">"Gérer les études"</string>
     <string name="manage_samples">"Gérer les échantillons"</string>
     <string name="create_sample">"Créer un échantillon"</string>
@@ -251,6 +252,32 @@
     <string name="enum_saved_doc">"L'énumération a été sauvegardée dans le répertoire Documents."</string>
     <string name="config_saved_doc">"Configuration a été sauvegardé dans le répertoire Documents."</string>
     <string name="nobody_home">"Personne à la maison"</string>
+    <string name="export_enum_data">"Exporter des données de recensement"</string>
+    <string name="delete_landmark_message">"Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?"</string>
+    <string name="subaddress">"Sous-adresse"</string>
+    <string name="sampled">"Échantillonné"</string>
+    <string name="completed_enumeration">"Dénombrement terminé"</string>
+    <string name="incomplete_enumeration">"Dénombrement incomplet"</string>
+    <string name="incomplete_collection">"Collecte incomplète"</string>
+    <string name="completed_collection">"Collecte complète"</string>
+    <string name="is_multi_family">"S'agit-il d'un site multifamilial ?"</string>
+    <string name="multi_families">"Familles multiples"</string>
+    <string name="dismiss">"Supprimer"</string>
+    <string name="delete">"Supprimer"</string>
+    <string name="launching_odk_collect_application">"Lancement de l'application ODK Collect..."</string>
+    <string name="filters">"Filtres (combine des règles)"</string>
+    <string name="new_location">"Identifier le lieu"</string>
+    <string name="delete_configuration">"La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?"</string>
+    <string name="total_population">"Taille totale de la population"</string>
+    <string name="enter_the_total_population_size">"Saisissez la taille totale de la population"</string>
+    <string name="total_population_size_error">"La taille totale de la population doit être supérieure à 0"</string>
+    <string name="sample_size_error">"La taille de l'échantillon doit être supérieure à 0"</string>
+    <string name="simple_random_sampling_label">"Taille totale de l'échantillon pour toutes les grappes"</string>
+    <string name="cluster_sampling_label">"Taille de l'échantillon par grappe"</string>
+    <string name="show_enumeration_info">"Afficher les informations sur le dénombrement"</string>
+    <string name="please_enter_a_name">"Veuillez saisir un nom pour ce champ."</string>
+    <string name="please_enter_a_subaddress">"Veuillez saisir une sous-adresse unique."</string>
+    <string name="please_select_team_boundary">"seleccione el límite del equipo.""</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
