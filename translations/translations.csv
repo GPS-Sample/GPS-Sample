@@ -132,7 +132,6 @@ field,Field,Campo,Champ,Campo,Поле
 operator,Operator,Operador,Opérateur de fonction,Operador,Оператор
 enter_value,Enter Value,Ingrese valor,Entrez la valeur,Insirar valor,Введите значение
 value,Value,Valor,Valeur,Valor,Значение
-filters,Filters,Filtros,Filtres,Filtros,Фильтры
 rule,Rule,Regla,Règle,Regra,Правило
 connector,Connector,Conector,Connecteur,Conector,Коннектор
 sampling_method,Sampling Method,Método de muestreo,Méthode d'échantillonnage,Método de amostragem,Метод выборки
@@ -148,7 +147,7 @@ delete_sample,Delete Sample,Eliminar muestra,Supprimer l'échantillon,Eliminar a
 manage_supervisors,Manage Supervisors,Administrar supervisores,Gérer les superviseurs,Gerir supervisores,Управление супервизорами
 home,Home,Pantalla de inicio,Écran d'accueil,Início,Главная
 manage_enumeration_areas,Manage Enumeration Areas,Administrar áreas de enumeración,Gérer les zones de dénombrement,Gerir áreas de enumeração,Управление участками переписи
-please_confirm,Please Confirm,"Por favor, confirme","SVP, confirmez","Por favor, confirme","Пожалуйста, подтвердите"
+please_confirm,Please Confirm,"Por favor, confirme","SVP, confirmez","Por favor, confirmar","Пожалуйста, подтвердите"
 import_enumeration,Import Enumeration Data,Importar datos de enumeración,Importez les données d'énumération,Importar dados de enumeração,Импорт данных перечисления
 export_configuration,Export Configuration,Exportar configuración,Exportez la configuration,Exportar configuração,Экспорт конфигурации
 delete_study_message,Are you sure you want to permanently delete this study?,¿Está seguro de que desea eliminar permanentemente este estudio?,Êtes-vous sûr de vouloir supprimer définitivement cette étude ?,Tem a certeza de que deseja eliminar permanentemente este estudo?,"Вы уверены, что хотите безвозвратно удалить это исследование?"
@@ -177,7 +176,7 @@ survey,Survey,Encuesta,Enquête,Questionário,Опрос
 undefined,Undefined,Sin definir,Non défini,Indefinido,Неопределенный
 enter_name,Please enter a name,"Por favor, introduzca un nombre",Veuillez saisir un nom,"Por favor, insira um nome","Пожалуйста, введите имя"
 desired_gps_position,Please enter the minimum desired GPS precision,"Por favor, introduzca la precisión GPS mínima deseada",Veuillez saisir la précision GPS minimale souhaitée,"Por favor, insira a precisão GPS mínima pretendida",Введите минимальную желаемую точность GPS
-import_configuration,Import Configuration,Configuración de importación,Configuration de l'importation,Configuração de importação,Конфигурация импорта
+import_configuration,Import Configuration,Configuración de importación,Configuration de l'importation,Importar configuração,Конфигурация импорта
 select_import_method,Select an import method,Seleccione un método de importación,Sélectionnez une méthode d'importation,Selecione um método de importação,Выберите метод импорта
 select_configuration,Select a configuration,Seleccione una configuración,Sélectionner une configuration,Selecione uma configuração,Выберите конфигурацию
 home_not_exist,Home does not exist,La hogar no existe ,Le domicile n'existe pas,O agregado familiar não existe,Дом не существует
@@ -239,7 +238,6 @@ select_rule,Select Rule,Seleccionar regla,Sélectionnez une règle,Selecionar re
 teams,Teams,Equipos,Équipes,Equipas,Команды
 select_location,Select Location,Seleccionar ubicación,Sélectionnez le lieu,Selecionar localização,Выбрать местоположение
 current_location,Current,Actual,Actuel,Atual,Текущее
-new_location,New Location,Nueva ubicación,Nouveau lieu,Nova localização,Новое местоположение
 tap_the_map,Tap on the map to add a new location,Pulse en el mapa para añadir una nueva ubicación,Tapez sur la carte pour ajouter un nouveau lieu,Toque no mapa para adicionar uma nova localização,"Нажмите на карту, чтобы добавить новое местоположение"
 complete,Complete,Completar,Complet,Completar,Завершить
 reason_incomplete_label,Reason Incomplete,Razón Incompleto,Motif Incomplet,Razão Incompleto,Причина незавершенности
@@ -280,3 +278,29 @@ you_don_t_have_any_samples_for_this_study,You do not have any samples for this s
 enum_saved_doc,Enumeration has been saved to the Documents directory.,Enumeración se ha guardado en el directorio Documentos.,L'énumération a été sauvegardée dans le répertoire Documents.,A enumeração foi guardada no diretório Documentos.,В директорию Документы сохранен файл Перепись.
 config_saved_doc,Configuration has been saved to the Documents directory.,La configuración se ha guardado en el directorio Documentos.,Configuration a été sauvegardé dans le répertoire Documents.,A configuração foi guardada no diretório Documentos.,Конфигурация сохранена в каталоге Документы.
 nobody_home,Nobody home,Nadie en casa,Personne à la maison,Ninguém em casa,Никто не дома
+export_enum_data,Export Enumeration Data,Exportar datos de enumeración,Exporter des données de recensement,Exportar dados de enumeração,Экспорт данных переписи населения
+delete_landmark_message,Are you sure you want to permanently delete this landmark?,¿Está seguro de que desea eliminar definitivamente este hito?,Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?,Tem a certeza de que pretende eliminar permanentemente esta referência?,"Вы уверены, что хотите безвозвратно удалить этот ориентир?"
+subaddress,Subaddress,Subdirección,Sous-adresse,Sub-endereço,Субадрес
+sampled,Sampled,Muestreo,Échantillonné,Amostragem,Выборочный
+completed_enumeration,Completed Enumeration,Enumeración completada,Dénombrement terminé,Enumeração concluída,Завершенное перечисление
+incomplete_enumeration,Incomplete Enumeration,Enumeración incompleta,Dénombrement incomplet,Enumeração Incompleta,Неполный сбор
+incomplete_collection,Incomplete Collection,Colección incompleta,Collecte incomplète,Recolha incompleta,Неполная коллекция
+completed_collection,Completed Collection,Recogida completa,Collecte complète,Recolha Completa,Завершенный сбор
+is_multi_family,Is this a multi family location?,¿Se trata de una ubicación multifamiliar?,S'agit-il d'un site multifamilial ?,Este é um local multifamiliar?,Является ли это место проживания многосемейным?
+multi_families,Multi Families,Multifamiliar,Familles multiples,Multifamiliar,Многосемейные
+dismiss,Dismiss,Descartar,Supprimer,Excluir,Удалить
+delete,Delete,Borrar,Supprimer,Eliminar,Удалить
+launching_odk_collect_application,Launching ODK Collect Application...,Lanzamiento de la aplicación ODK Collect...,Lancement de l'application ODK Collect...,Iniciar a aplicação ODK Collect...,Запуск приложения ODK Collect...
+filters,Filters (combines rules),Filtros (combina reglas),Filtres (combine des règles),Filtros (combina regras),Фильтры (объединяет правила)
+new_location,Identify Location,Identificar ubicación,Identifier le lieu,Identificar a localização,Идентифицировать местоположение
+delete_configuration,The current configuration will be replaced by the import.  Would you like to proceed?,La configuración actual será reemplazada por la importación.  ¿Desea continuar?,La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?,A configuração atual será substituída pela importação. Deseja prosseguir? ,Текущая конфигурация будет заменена импортом.  Желаете ли вы продолжить?
+total_population,Total Population Size,Tamaño total de la población,Taille totale de la population,Tamanho total da população,Общий размер популяции
+enter_the_total_population_size,Enter the total population size,Introduzca el tamaño total de la población,Saisissez la taille totale de la population,Introduza o tamanho total da população,Введите общий размер популяции.
+total_population_size_error,The total population size must be greater than 0,El tamaño total de la población debe ser superior a 0,La taille totale de la population doit être supérieure à 0,O tamanho total da população tem de ser superior a 0,Размер генеральной совокупности должен быть больше 0
+sample_size_error,The sample size must be greater than 0,El tamaño de la muestra debe ser superior a 0,La taille de l'échantillon doit être supérieure à 0,O tamanho da amostra deve ser maior que 0,Размер выборки должен быть больше 0
+simple_random_sampling_label,Total Sample Size Across All Clusters,Tamaño total de la muestra en todas las agrupaciones,Taille totale de l'échantillon pour toutes les grappes,Tamanho total da amostra em todos os clusters,Общий размер выборки по всем кластерам
+cluster_sampling_label,Sample Size Per Cluster,Tamaño de la muestra por conglomerado,Taille de l'échantillon par grappe,Tamanho da amostra por agrupamento,Размер выборки для каждого кластера
+show_enumeration_info,Show Enumeration Info,Mostrar información de enumeración,Afficher les informations sur le dénombrement,Mostrar informações de enumeração,Показать информацию о населенном пункте
+please_enter_a_name,Please enter a name for this field.,Introduzca un nombre para este campo.,Veuillez saisir un nom pour ce champ.,Introduza um nome para este campo.,"Пожалуйста, введите имя для этого поля."
+please_enter_a_subaddress,Please enter a unique sub-address.,Introduzca una subdirección única.,Veuillez saisir une sous-adresse unique.,Introduza um sub-endereço único.,Укажите уникальный субадрес.
+please_select_team_boundary,Please select the team boundary.,"Por favor, seleccione el límite del equipo.",Veuillez sélectionner le périmètre de l'équipe.,Seleccione o limite da equipa.,"Пожалуйста, выберите границу группы."

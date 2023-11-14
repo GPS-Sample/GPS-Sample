@@ -113,6 +113,7 @@
     <string name="sample_size">"Tamanho da amostra"</string>
     <string name="filter_name">"Nome do filtro"</string>
     <string name="rule_name">"Nome da regra"</string>
+    <string name="total_sample_size">"Tamanho total da amostra em todos os conglomerados"</string>
     <string name="manage_studies">"Gerir estudos"</string>
     <string name="manage_samples">"Gerir amostras"</string>
     <string name="create_sample">"Criar amostra"</string>
@@ -149,7 +150,7 @@
     <string name="undefined">"Indefinido"</string>
     <string name="enter_name">"Veuillez saisir un nom"</string>
     <string name="desired_gps_position">"Veuillez saisir la précision GPS minimale souhaitée"</string>
-    <string name="import_configuration">"Configuração de importação"</string>
+    <string name="import_configuration">"Importar configuração"</string>
     <string name="select_import_method">"Selecione um método de importação"</string>
     <string name="select_configuration">"Selecione uma configuração"</string>
     <string name="home_not_exist">"O agregado familiar não existe"</string>
@@ -251,6 +252,32 @@
     <string name="enum_saved_doc">"A enumeração foi guardada no diretório Documentos."</string>
     <string name="config_saved_doc">"A configuração foi guardada no diretório Documentos."</string>
     <string name="nobody_home">"Ninguém em casa"</string>
+    <string name="export_enum_data">"Exportar dados de enumeração"</string>
+    <string name="delete_landmark_message">"Tem a certeza de que pretende eliminar permanentemente esta referência?"</string>
+    <string name="subaddress">"Sub-endereço"</string>
+    <string name="sampled">"Amostragem"</string>
+    <string name="completed_enumeration">"Enumeração concluída"</string>
+    <string name="incomplete_enumeration">"Enumeração Incompleta"</string>
+    <string name="incomplete_collection">"Recolha incompleta"</string>
+    <string name="completed_collection">"Recolha Completa"</string>
+    <string name="is_multi_family">"Este é um local multifamiliar?"</string>
+    <string name="multi_families">"Multifamiliar"</string>
+    <string name="dismiss">"Excluir"</string>
+    <string name="delete">"Eliminar"</string>
+    <string name="launching_odk_collect_application">"Iniciar a aplicação ODK Collect..."</string>
+    <string name="filters">"Filtros (combina regras)"</string>
+    <string name="new_location">"Identificar a localização"</string>
+    <string name="delete_configuration">"A configuração atual será substituída pela importação. Deseja prosseguir?"</string>
+    <string name="total_population">"Tamanho total da população"</string>
+    <string name="enter_the_total_population_size">"Introduza o tamanho total da população"</string>
+    <string name="total_population_size_error">"O tamanho total da população tem de ser superior a 0"</string>
+    <string name="sample_size_error">"O tamanho da amostra deve ser maior que 0"</string>
+    <string name="simple_random_sampling_label">"Tamanho total da amostra em todos os clusters"</string>
+    <string name="cluster_sampling_label">"Tamanho da amostra por agrupamento"</string>
+    <string name="show_enumeration_info">"Mostrar informações de enumeração"</string>
+    <string name="please_enter_a_name">"Introduza um nome para este campo."</string>
+    <string name="please_enter_a_subaddress">"Introduza um sub-endereço único."</string>
+    <string name="please_select_team_boundary">"Veuillez sélectionner le périmètre de l'équipe."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

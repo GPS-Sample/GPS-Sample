@@ -113,6 +113,7 @@
     <string name="sample_size">"Sample Size"</string>
     <string name="filter_name">"Filter Name"</string>
     <string name="rule_name">"Rule Name"</string>
+    <string name="total_sample_size">"Total Sample Size Across All Clusters"</string>
     <string name="manage_studies">"Manage Studies"</string>
     <string name="manage_samples">"Manage Samples"</string>
     <string name="create_sample">"Create Sample"</string>
@@ -251,34 +252,32 @@
     <string name="enum_saved_doc">"Enumeration has been saved to the Documents directory."</string>
     <string name="config_saved_doc">"Configuration has been saved to the Documents directory."</string>
     <string name="nobody_home">"Nobody home"</string>
-
     <string name="export_enum_data">"Export Enumeration Data"</string>
     <string name="delete_landmark_message">"Are you sure you want to permanently delete this landmark?"</string>
-    <string name="subaddress">Subaddress</string>
-    <string name="sampled">Sampled</string>
-    <string name="completed_enumeration">Completed Enumeration</string>
-    <string name="incomplete_enumeration">Incomplete Enumeration</string>
-    <string name="incomplete_collection">Incomplete Collection</string>
-    <string name="completed_collection">Completed Collection</string>
-    <string name="is_multi_family">Is this a multi family location?</string>
-    <string name="multi_families">Multi Families</string>
-    <string name="dismiss">Dismiss</string>
-    <string name="delete">Delete</string>
-    <string name="launching_odk_collect_application">Launching ODK Collect Application...</string>
+    <string name="subaddress">"Subaddress"</string>
+    <string name="sampled">"Sampled"</string>
+    <string name="completed_enumeration">"Completed Enumeration"</string>
+    <string name="incomplete_enumeration">"Incomplete Enumeration"</string>
+    <string name="incomplete_collection">"Incomplete Collection"</string>
+    <string name="completed_collection">"Completed Collection"</string>
+    <string name="is_multi_family">"Is this a multi family location?"</string>
+    <string name="multi_families">"Multi Families"</string>
+    <string name="dismiss">"Dismiss"</string>
+    <string name="delete">"Delete"</string>
+    <string name="launching_odk_collect_application">"Launching ODK Collect Application..."</string>
     <string name="filters">"Filters (combines rules)"</string>
     <string name="new_location">"Identify Location"</string>
-    <string name="delete_configuration">The current configuration will be replaced by the import.  Would you like to proceed?</string>
-    <string name="total_population">Total Population Size</string>
-    <string name="enter_the_total_population_size">Enter the total population size</string>
+    <string name="delete_configuration">"The current configuration will be replaced by the import.  Would you like to proceed?"</string>
+    <string name="total_population">"Total Population Size"</string>
+    <string name="enter_the_total_population_size">"Enter the total population size"</string>
     <string name="total_population_size_error">"The total population size must be greater than 0"</string>
     <string name="sample_size_error">"The sample size must be greater than 0"</string>
     <string name="simple_random_sampling_label">"Total Sample Size Across All Clusters"</string>
     <string name="cluster_sampling_label">"Sample Size Per Cluster"</string>
-    <string name="show_enumeration_info">Show Enumeration Info</string>
-    <string name="please_enter_a_name">Please enter a name for this field.</string>
-    <string name="please_enter_a_subaddress">Please enter a unique sub-address.</string>
-    <string name="please_select_team_boundary">Please select the team boundary.</string>
-
+    <string name="show_enumeration_info">"Show Enumeration Info"</string>
+    <string name="please_enter_a_name">"Please enter a name for this field."</string>
+    <string name="please_enter_a_subaddress">"Please enter a unique sub-address."</string>
+    <string name="please_select_team_boundary">"Please select the team boundary."</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
