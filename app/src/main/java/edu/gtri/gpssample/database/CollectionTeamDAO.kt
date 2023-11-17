@@ -46,20 +46,32 @@ class CollectionTeamDAO(private var dao: DAO)
             for (latLon in collectionTeam.polygon)
             {
                 latLon.id?.let { latLonId ->
-                    val values = ContentValues()
-                    values.put( DAO.COLUMN_LAT_LON_ID, latLonId )
-                    values.put( DAO.COLUMN_COLLECTION_TEAM_ID, collectionTeamId )
-                    dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM_LAT_LON, null, values)
+                    val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_ID} = $latLonId AND ${DAO.COLUMN_COLLECTION_TEAM_ID} = $collectionTeamId"
+                    val cursor = dao.writableDatabase.rawQuery(query, null)
+                    if (cursor.count == 0)
+                    {
+                        val values = ContentValues()
+                        values.put( DAO.COLUMN_LAT_LON_ID, latLonId )
+                        values.put( DAO.COLUMN_COLLECTION_TEAM_ID, collectionTeamId )
+                        dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM__LAT_LON, null, values)
+                    }
+                    cursor.close()
                 }
             }
 
             for (location in collectionTeam.locations)
             {
                 location.id?.let { locationId ->
-                    val values = ContentValues()
-                    values.put( DAO.COLUMN_LOCATION_ID, locationId )
-                    values.put( DAO.COLUMN_COLLECTION_TEAM_ID, collectionTeamId )
-                    dao.writableDatabase.insert(DAO.TABLE_LOCATION__COLLECTION_TEAM, null, values)
+                    val query = "SELECT * FROM ${DAO.TABLE_LOCATION__COLLECTION_TEAM} WHERE ${DAO.COLUMN_LOCATION_ID} = $locationId AND ${DAO.COLUMN_COLLECTION_TEAM_ID} = $collectionTeamId"
+                    val cursor = dao.writableDatabase.rawQuery(query, null)
+                    if (cursor.count == 0)
+                    {
+                        val values = ContentValues()
+                        values.put( DAO.COLUMN_LOCATION_ID, locationId )
+                        values.put( DAO.COLUMN_COLLECTION_TEAM_ID, collectionTeamId )
+                        dao.writableDatabase.insert(DAO.TABLE_LOCATION__COLLECTION_TEAM, null, values)
+                    }
+                    cursor.close()
                 }
             }
         }
@@ -104,8 +116,6 @@ class CollectionTeamDAO(private var dao: DAO)
 
     fun updateTeam( collectionTeam: CollectionTeam)
     {
-        val db = dao.writableDatabase
-
         collectionTeam.id?.let { id ->
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args: Array<String> = arrayOf(id.toString())
@@ -113,18 +123,15 @@ class CollectionTeamDAO(private var dao: DAO)
 
             putTeam( collectionTeam, values )
 
-            db.update(DAO.TABLE_COLLECTION_TEAM, values, whereClause, args )
+            dao.writableDatabase.update(DAO.TABLE_COLLECTION_TEAM, values, whereClause, args )
         }
-
-        db.close()
     }
 
     fun getTeam( id: Int ): CollectionTeam?
     {
         var collectionTeam: CollectionTeam? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -134,7 +141,6 @@ class CollectionTeamDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return collectionTeam
     }
@@ -142,11 +148,10 @@ class CollectionTeamDAO(private var dao: DAO)
     fun getCollectionTeams( study: Study ): ArrayList<CollectionTeam>
     {
         val collectionTeam = ArrayList<CollectionTeam>()
-        val db = dao.writableDatabase
 
         study.id?.let { id ->
             val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_STUDY_ID} = $id"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -156,17 +161,14 @@ class CollectionTeamDAO(private var dao: DAO)
             cursor.close()
         }
 
-        db.close()
-
         return collectionTeam
     }
 
     fun getCollectionTeams(): ArrayList<CollectionTeam>
     {
         val collectionTeam = ArrayList<CollectionTeam>()
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -174,18 +176,15 @@ class CollectionTeamDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return collectionTeam
     }
 
     fun deleteTeam(collectionTeam: CollectionTeam)
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(collectionTeam.id.toString())
 
-        db.delete(DAO.TABLE_COLLECTION_TEAM, whereClause, args)
-        db.close()
+        dao.writableDatabase.delete(DAO.TABLE_COLLECTION_TEAM, whereClause, args)
     }
 }

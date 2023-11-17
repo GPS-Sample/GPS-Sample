@@ -64,8 +64,6 @@ class FieldDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun updateField( field: Field, study : Study )
     {
-        val db = dao.writableDatabase
-
         field.id?.let{ id ->
             Log.d( "xxx", "update field id ${id}")
 
@@ -75,10 +73,8 @@ class FieldDAO(private var dao: DAO)
 
             putField( field, study, values )
 
-            db.update(DAO.TABLE_FIELD, values, whereClause, args )
+            dao.writableDatabase.update(DAO.TABLE_FIELD, values, whereClause, args )
         }
-
-        db.close()
     }
 
     //--------------------------------------------------------------------------
@@ -115,9 +111,8 @@ class FieldDAO(private var dao: DAO)
     fun getField( id : Int ): Field?
     {
         var field: Field? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD} where id=${id}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -127,7 +122,6 @@ class FieldDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return field
     }
@@ -136,9 +130,8 @@ class FieldDAO(private var dao: DAO)
     fun getFields(study : Study): ArrayList<Field>
     {
         val fields = ArrayList<Field>()
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD} where study_id=${study.id}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -150,7 +143,6 @@ class FieldDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return fields
     }
@@ -159,9 +151,8 @@ class FieldDAO(private var dao: DAO)
     fun getFields(): List<Field>
     {
         val fields = ArrayList<Field>()
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -169,7 +160,6 @@ class FieldDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return fields
     }
@@ -177,11 +167,9 @@ class FieldDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteField( field: Field )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(field.id.toString())
 
-        db.delete(DAO.TABLE_FIELD, whereClause, args)
-        db.close()
+        dao.writableDatabase.delete(DAO.TABLE_FIELD, whereClause, args)
     }
 }

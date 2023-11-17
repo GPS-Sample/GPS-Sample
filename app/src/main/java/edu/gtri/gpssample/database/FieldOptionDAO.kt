@@ -53,8 +53,6 @@ class FieldOptionDAO(private var dao: DAO)
 
     fun updateFieldOption( fieldOption: FieldOption )
     {
-        val db = dao.writableDatabase
-
         fieldOption.id?.let{ id ->
             Log.d( "xxx", "update fieldOption id ${id}")
 
@@ -64,10 +62,8 @@ class FieldOptionDAO(private var dao: DAO)
 
             putFieldOption( fieldOption, values )
 
-            db.update(DAO.TABLE_FIELD_OPTION, values, whereClause, args )
+            dao.writableDatabase.update(DAO.TABLE_FIELD_OPTION, values, whereClause, args )
         }
-
-        db.close()
     }
 
     fun exists( fieldOption: FieldOption): Boolean
@@ -91,9 +87,8 @@ class FieldOptionDAO(private var dao: DAO)
     fun getFieldOption( id : Int ): FieldOption?
     {
         var fieldOption: FieldOption? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD_OPTION} where id=${id}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -102,7 +97,6 @@ class FieldOptionDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return fieldOption
     }
@@ -111,11 +105,10 @@ class FieldOptionDAO(private var dao: DAO)
     fun getFieldOptions( field: Field ) : ArrayList<FieldOption>
     {
         val fieldOptions = ArrayList<FieldOption>()
-        val db = dao.writableDatabase
 
         field.id?.let { fieldId ->
             val query = "SELECT * FROM ${DAO.TABLE_FIELD__FIELD_OPTION} where ${DAO.COLUMN_FIELD_ID}=${fieldId}"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -129,18 +122,14 @@ class FieldOptionDAO(private var dao: DAO)
             cursor.close()
         }
 
-        db.close()
-
         return fieldOptions
     }
 
     fun deleteFieldOption( fieldOption: FieldOption )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(fieldOption.id.toString())
 
-        db.delete(DAO.TABLE_FIELD_OPTION, whereClause, args)
-        db.close()
+        dao.writableDatabase.delete(DAO.TABLE_FIELD_OPTION, whereClause, args)
     }
 }

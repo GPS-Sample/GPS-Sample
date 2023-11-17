@@ -53,9 +53,7 @@ class FieldDataDAO(private var dao: DAO)
 
     fun performBatchUpdate()
     {
-        val db = dao.writableDatabase
-
-        db.beginTransaction()
+        dao.writableDatabase.beginTransaction()
 
         for (enumerationItem in hashMap.keys)
         {
@@ -73,9 +71,8 @@ class FieldDataDAO(private var dao: DAO)
             }
         }
 
-        db.setTransactionSuccessful()
-        db.endTransaction()
-        db.close()
+        dao.writableDatabase.setTransactionSuccessful()
+        dao.writableDatabase.endTransaction()
 
         hashMap.clear()
     }
@@ -141,7 +138,6 @@ class FieldDataDAO(private var dao: DAO)
 
     fun updateFieldData( fieldData: FieldData )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         fieldData.id?.let { id ->
             val args: Array<String> = arrayOf(id.toString())
@@ -149,17 +145,15 @@ class FieldDataDAO(private var dao: DAO)
 
             putFieldData( fieldData, values, null )
 
-            db.update(DAO.TABLE_FIELD_DATA, values, whereClause, args )
-            db.close()
+            dao.writableDatabase.update(DAO.TABLE_FIELD_DATA, values, whereClause, args )
         }
     }
 
     fun getFieldData( id: Int ): FieldData?
     {
         var fieldData: FieldData? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -169,7 +163,6 @@ class FieldDataDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return fieldData
     }
@@ -201,12 +194,11 @@ class FieldDataDAO(private var dao: DAO)
 
     fun getFieldDataList( enumerationItem: EnumerationItem ): ArrayList<FieldData>
     {
-        var fieldDataList = ArrayList<FieldData>()
-        val db = dao.writableDatabase
+        val fieldDataList = ArrayList<FieldData>()
 
         enumerationItem.id?.let { id ->
             val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $id"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -218,18 +210,15 @@ class FieldDataDAO(private var dao: DAO)
             cursor.close()
         }
 
-        db.close()
-
         return fieldDataList
     }
 
     fun getFieldData(): ArrayList<FieldData>
     {
-        var fieldDataList = ArrayList<FieldData>()
-        val db = dao.writableDatabase
+        val fieldDataList = ArrayList<FieldData>()
 
         val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -237,8 +226,6 @@ class FieldDataDAO(private var dao: DAO)
         }
 
         cursor.close()
-
-        db.close()
 
         return fieldDataList
     }
@@ -248,12 +235,10 @@ class FieldDataDAO(private var dao: DAO)
         fieldData.id?.let {id ->
             Log.d( "xxx", "deleting fieldData with id $id" )
 
-            val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(id.toString())
 
-            db.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
-            db.close()
+            dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
         }
     }
 
