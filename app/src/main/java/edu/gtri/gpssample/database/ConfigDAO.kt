@@ -84,10 +84,9 @@ class ConfigDAO(private var dao: DAO)
     {
         var config: Config? = null
 
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_ID} = $id"
 
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -101,7 +100,6 @@ class ConfigDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return config
     }
@@ -133,10 +131,9 @@ class ConfigDAO(private var dao: DAO)
     fun getConfigs(): List<Config>
     {
         val configs = ArrayList<Config>()
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
 
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
         while (cursor.moveToNext())
         {
             val config = buildConfig( cursor )
@@ -150,7 +147,6 @@ class ConfigDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return configs
     }
@@ -164,16 +160,14 @@ class ConfigDAO(private var dao: DAO)
         }
         else
         {
-            val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             config.id?.let { id ->
                 val args: Array<String> = arrayOf(id.toString())
                 val values = ContentValues()
                 putConfig( config, values )
-                db.update(DAO.TABLE_CONFIG, values, whereClause, args )
+                dao.writableDatabase.update(DAO.TABLE_CONFIG, values, whereClause, args )
                 createOrUpdateEnumAreas(config)
                 createOrUpdateStudies(config)
-                db.close()
             }
         }
     }
@@ -185,11 +179,10 @@ class ConfigDAO(private var dao: DAO)
         config.id?.let{id ->
 
             // remove all studies from connector table
-            var db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_CONFIG_ID} = ?"
             val args = arrayOf(id.toString())
 
-            db.delete(DAO.TABLE_CONFIG_STUDY, whereClause, args)
+            dao.writableDatabase.delete(DAO.TABLE_CONFIG_STUDY, whereClause, args)
 
             // add studies
             for(study in config.studies)
@@ -229,11 +222,9 @@ class ConfigDAO(private var dao: DAO)
             DAO.enumAreaDAO.delete( enumArea )
         }
 
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(config.id.toString())
 
-        db.delete(DAO.TABLE_CONFIG, whereClause, args)
-        db.close()
+        dao.writableDatabase.delete(DAO.TABLE_CONFIG, whereClause, args)
     }
 }

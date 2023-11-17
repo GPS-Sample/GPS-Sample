@@ -324,7 +324,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val y = db.execSQL(createTableLatLon)
 
             val createTableEnumAreaLatLon = ("CREATE TABLE " +
-                    TABLE_ENUM_AREA_LAT_LON + "(" +
+                    TABLE_ENUM_AREA__LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER " + "," +
                     COLUMN_LAT_LON_ID + " INTEGER " + "," +
@@ -335,7 +335,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             db.execSQL(createTableEnumAreaLatLon)
 
             val createTableSampleAreaLatLon = ("CREATE TABLE " +
-                    TABLE_SAMPLE_AREA_LAT_LON + "(" +
+                    TABLE_SAMPLE_AREA__LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_SAMPLE_AREA_ID + " INTEGER " + "," +
                     COLUMN_LAT_LON_ID + " INTEGER " + "," +
@@ -346,7 +346,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             db.execSQL(createTableSampleAreaLatLon)
 
             val createTableEnumerationTeamLatLon = ("CREATE TABLE " +
-                    TABLE_ENUMERATION_TEAM_LAT_LON + "(" +
+                    TABLE_ENUMERATION_TEAM__LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_ENUMERATION_TEAM_ID + " INTEGER " + "," +
                     COLUMN_LAT_LON_ID + " INTEGER " + "," +
@@ -357,7 +357,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             db.execSQL(createTableEnumerationTeamLatLon)
 
             val createTableCollectionTeamLatLon = ("CREATE TABLE " +
-                    TABLE_COLLECTION_TEAM_LAT_LON + "(" +
+                    TABLE_COLLECTION_TEAM__LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_COLLECTION_TEAM_ID + " INTEGER " + "," +
                     COLUMN_LAT_LON_ID + " INTEGER " + "," +
@@ -394,10 +394,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA_LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA_LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM_LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM_LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
 
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
@@ -577,10 +577,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LON = "lon"
 
         // connector tables for lat lon
-        const val TABLE_ENUM_AREA_LAT_LON = "enum_area_lat_lon"
-        const val TABLE_SAMPLE_AREA_LAT_LON = "sample_area_lat_lon"
-        const val TABLE_ENUMERATION_TEAM_LAT_LON = "enumeration_team_lat_lon"
-        const val TABLE_COLLECTION_TEAM_LAT_LON = "collection_team_lat_lon"
+        const val TABLE_ENUM_AREA__LAT_LON = "enum_area_lat_lon"
+        const val TABLE_SAMPLE_AREA__LAT_LON = "sample_area_lat_lon"
+        const val TABLE_ENUMERATION_TEAM__LAT_LON = "enumeration_team_lat_lon"
+        const val TABLE_COLLECTION_TEAM__LAT_LON = "collection_team_lat_lon"
 
         // DAO's
         lateinit var userDAO: UserDAO
@@ -640,8 +640,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_LAT_LON, null, null)
                 db.delete(TABLE_LOCATION, null, null)
                 db.delete(TABLE_ENUMERATION_ITEM, null, null)
-                db.delete(TABLE_ENUM_AREA_LAT_LON, null, null)
-                db.delete(TABLE_SAMPLE_AREA_LAT_LON, null, null)
+                db.delete(TABLE_ENUM_AREA__LAT_LON, null, null)
+                db.delete(TABLE_SAMPLE_AREA__LAT_LON, null, null)
             }
         }
 
