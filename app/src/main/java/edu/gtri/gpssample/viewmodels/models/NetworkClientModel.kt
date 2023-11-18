@@ -325,7 +325,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 networkRequestBuilder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
                 //networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-                networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                //networkRequestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
                 networkRequestBuilder.setNetworkSpecifier(wifiNetworkSpecifier)
 
                 val networkRequest = networkRequestBuilder.build()
@@ -336,6 +336,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 CoroutineScope(Dispatchers.IO +  SupervisorJob()).launch {
                     networkErrorCheck()
                 }
+
             }
         } else {
             _networkConnected.postValue(NetworkStatus.NetworkConnected)

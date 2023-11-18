@@ -397,6 +397,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
         // if the qrCode isn't generated
         if(generatedQRCode == null) {
+
+
             val jsonObject = JSONObject()
             jsonObject.put(Keys.kSSID.toString(), hotspot.hotspotSSID.value)
             jsonObject.put(Keys.kPass.toString(), hotspot.hotspotSSIDPassword.value)
@@ -429,17 +431,15 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             _creationDelegate?.didComplete(false)
         }
     }
-    fun done(v : View)
-    {
 
-    }
     fun shutdown()
     {
         try{
             if(hotspotStarted)
             {
-                hotspot.stopHotSpot()
                 tcpServer.shutdown()
+                hotspot.stopHotSpot()
+
 
                 _serverCreated.value = NetworkStatus.None
                 _networkCreated.value = NetworkStatus.None

@@ -37,6 +37,7 @@ class FieldDataDAO(private var dao: DAO)
             {
                 val values = ContentValues()
                 putFieldData( fieldData, values, enumerationItem )
+
                 fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
                 fieldData.id?.let { id ->
                     Log.d( "xxx", "new fieldData id = ${id}")

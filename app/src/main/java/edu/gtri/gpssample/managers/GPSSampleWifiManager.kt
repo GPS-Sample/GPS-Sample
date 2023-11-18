@@ -55,7 +55,10 @@ class GPSSampleWifiManager//( val fragment: Fragment )
     {
        // udpBroadcaster.closeSocket()
 
-        localOnlyHotspotReservation?.close()
+        localOnlyHotspotReservation?.let {localOnlyHotspotReservation ->
+            localOnlyHotspotReservation.close()
+
+        }
         _hotspotStarted = false
     }
 
@@ -72,6 +75,16 @@ class GPSSampleWifiManager//( val fragment: Fragment )
 
                 wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
                 {
+                    override fun onFailed(reason: Int) {
+                        super.onFailed(reason)
+                        // do somthing
+                        Log.d("HOTSPOT", "THIS FAILED")
+                    }
+
+                    override fun onStopped() {
+                        super.onStopped()
+                        Log.d("HOTSPOT", "Stopped")
+                    }
                     override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
                     {
                         super.onStarted(reservation)
