@@ -69,15 +69,13 @@ class RuleDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun updateRule( rule: Rule )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(rule.id.toString())
         val values = ContentValues()
 
         putRule( rule, values )
 
-        db.update(DAO.TABLE_RULE, values, whereClause, args )
-        db.close()
+        dao.writableDatabase.update(DAO.TABLE_RULE, values, whereClause, args )
     }
 
     @SuppressLint("Range")
@@ -101,9 +99,8 @@ class RuleDAO(private var dao: DAO)
 
     fun getRule( id: Int ) : Rule?
     {
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_ID} = ${id}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -111,16 +108,14 @@ class RuleDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return null
     }
 
     fun getRuleByUUID(uuid : String) : Rule?
     {
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = ${uuid}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -128,7 +123,6 @@ class RuleDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return null
     }
@@ -137,9 +131,8 @@ class RuleDAO(private var dao: DAO)
     {
         val rules = ArrayList<Rule>()
 
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_RULE}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -151,7 +144,6 @@ class RuleDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return rules
     }
@@ -161,9 +153,8 @@ class RuleDAO(private var dao: DAO)
         val rules = ArrayList<Rule>()
 
         field.id?.let { id ->
-            val db = dao.writableDatabase
             val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_FIELD_ID} = '${id}'"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -174,7 +165,6 @@ class RuleDAO(private var dao: DAO)
             }
 
             cursor.close()
-            db.close()
         }
 
         return rules
@@ -208,12 +198,9 @@ class RuleDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteRule( rule: Rule )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(rule.id.toString())
 
-        db.delete(DAO.TABLE_RULE, whereClause, args)
-        db.close()
+        dao.writableDatabase.delete(DAO.TABLE_RULE, whereClause, args)
     }
-
 }

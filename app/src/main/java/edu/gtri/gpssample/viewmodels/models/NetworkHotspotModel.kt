@@ -266,7 +266,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                             for (location in newLocations)
                             {
-                                team.locations.add( location )
                                 DAO.enumerationTeamDAO.createOrUpdateTeam( team )
                             }
                         }

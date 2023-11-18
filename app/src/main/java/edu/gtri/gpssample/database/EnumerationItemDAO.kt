@@ -19,7 +19,7 @@ class EnumerationItemDAO(private var dao: DAO)
         }
         else
         {
-            enumerationItem.id = null
+//            enumerationItem.id = null
             val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
@@ -71,15 +71,13 @@ class EnumerationItemDAO(private var dao: DAO)
 
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(enumerationItem.id!!.toString())
         val values = ContentValues()
 
         putEnumerationItem( enumerationItem, location, values )
 
-        db.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
-        db.close()
+        dao.writableDatabase.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
     }
 
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
@@ -133,10 +131,9 @@ class EnumerationItemDAO(private var dao: DAO)
     private fun getEnumerationItem( uuid: String ) : EnumerationItem?
     {
         var enumerationItem : EnumerationItem? = null
-        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -145,7 +142,6 @@ class EnumerationItemDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return enumerationItem
     }
@@ -153,11 +149,10 @@ class EnumerationItemDAO(private var dao: DAO)
     fun getEnumerationItems( location: Location ) : ArrayList<EnumerationItem>
     {
         val enumerationItems = ArrayList<EnumerationItem>()
-        val db = dao.writableDatabase
 
         location.id?.let { id ->
             val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_LOCATION_ID} = $id"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -169,18 +164,15 @@ class EnumerationItemDAO(private var dao: DAO)
             cursor.close()
         }
 
-        db.close()
-
         return enumerationItems
     }
 
     fun getEnumerationItems() : ArrayList<EnumerationItem>
     {
         val enumerationItems = ArrayList<EnumerationItem>()
-        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -190,8 +182,6 @@ class EnumerationItemDAO(private var dao: DAO)
 
         cursor.close()
 
-        db.close()
-
         return enumerationItems
     }
 
@@ -199,9 +189,8 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         var enumerationItem: EnumerationItem? = null
 
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -210,7 +199,6 @@ class EnumerationItemDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return enumerationItem
     }
@@ -227,12 +215,10 @@ class EnumerationItemDAO(private var dao: DAO)
                 DAO.fieldDataDAO.delete( fieldData)
             }
 
-            val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(id.toString())
 
-            db.delete(DAO.TABLE_ENUMERATION_ITEM, whereClause, args)
-            db.close()
+            dao.writableDatabase.delete(DAO.TABLE_ENUMERATION_ITEM, whereClause, args)
         }
     }
 }

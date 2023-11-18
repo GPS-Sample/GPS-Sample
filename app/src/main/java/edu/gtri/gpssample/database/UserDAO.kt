@@ -34,9 +34,8 @@ class UserDAO(private var dao: DAO)
     fun getUser( id: Int ): User?
     {
         var user: User? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -46,7 +45,6 @@ class UserDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return user
     }
@@ -55,9 +53,8 @@ class UserDAO(private var dao: DAO)
     fun getUser( name: String, pin: String ): User?
     {
         var user: User? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_USER_NAME} = '$name' AND ${COLUMN_USER_PIN} = $pin"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -67,7 +64,6 @@ class UserDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return user
     }
@@ -76,9 +72,8 @@ class UserDAO(private var dao: DAO)
     fun getUser( name: String ): User?
     {
         var user: User? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_USER_NAME} = '$name'"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -88,7 +83,6 @@ class UserDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return user
     }
@@ -111,24 +105,21 @@ class UserDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun updateUser( user: User )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(user.id!!.toString())
         val values = ContentValues()
 
         putUser( user, values )
 
-        db.update(DAO.TABLE_USER, values, whereClause, args )
-        db.close()
+        dao.writableDatabase.update(DAO.TABLE_USER, values, whereClause, args )
     }
 
     //--------------------------------------------------------------------------
     fun getUsers(): List<User>
     {
         val users = ArrayList<User>()
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_USER}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -136,7 +127,6 @@ class UserDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return users
     }

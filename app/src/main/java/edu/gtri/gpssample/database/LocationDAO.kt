@@ -29,7 +29,7 @@ class LocationDAO(private var dao: DAO)
         }
         else
         {
-            location.id = null
+//            location.id = null
             val values = ContentValues()
             putLocation( location, geoArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
@@ -64,9 +64,8 @@ class LocationDAO(private var dao: DAO)
     {
         location.id?.let { locationId ->
             enumArea.id?.let { enumAreaId ->
-                val db = dao.writableDatabase
                 val query = "SELECT * FROM ${DAO.TABLE_LOCATION__ENUM_AREA} WHERE ${DAO.COLUMN_LOCATION_ID} = $locationId AND ${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId"
-                val cursor = db.rawQuery(query, null)
+                val cursor = dao.writableDatabase.rawQuery(query, null)
                 if (cursor.count == 0)
                 {
                     val values = ContentValues()
@@ -75,7 +74,6 @@ class LocationDAO(private var dao: DAO)
                     dao.writableDatabase.insert(DAO.TABLE_LOCATION__ENUM_AREA, null, values)
                 }
                 cursor.close()
-                db.close()
             }
         }
     }
@@ -84,9 +82,8 @@ class LocationDAO(private var dao: DAO)
     {
         location.id?.let { locationId ->
             sampleArea.id?.let { sampleAreaId ->
-                val db = dao.writableDatabase
                 val query = "SELECT * FROM ${DAO.TABLE_LOCATION__SAMPLE_AREA} WHERE ${DAO.COLUMN_LOCATION_ID} = $locationId AND ${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleAreaId"
-                val cursor = db.rawQuery(query, null)
+                val cursor = dao.writableDatabase.rawQuery(query, null)
                 if (cursor.count == 0)
                 {
                     val values = ContentValues()
@@ -95,7 +92,6 @@ class LocationDAO(private var dao: DAO)
                     dao.writableDatabase.insert(DAO.TABLE_LOCATION__SAMPLE_AREA, null, values)
                 }
                 cursor.close()
-                db.close()
             }
         }
     }
@@ -118,6 +114,10 @@ class LocationDAO(private var dao: DAO)
         else
         {
             location.id = null
+            for (enumerationItem in location.enumerationItems)
+            {
+                enumerationItem.id = null
+            }
             createOrUpdateLocation( location, geoArea )
         }
     }
@@ -139,15 +139,13 @@ class LocationDAO(private var dao: DAO)
 
     fun updateLocation( location: Location, geoArea: GeoArea )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args: Array<String> = arrayOf(location.id!!.toString())
         val values = ContentValues()
 
         putLocation( location, geoArea, values )
 
-        db.update(DAO.TABLE_LOCATION, values, whereClause, args )
-        db.close()
+        dao.writableDatabase.update(DAO.TABLE_LOCATION, values, whereClause, args )
     }
 
     fun putLocation( location: Location, geoArea : GeoArea, values: ContentValues)
@@ -197,10 +195,9 @@ class LocationDAO(private var dao: DAO)
     fun getLocation( uuid: String ) : Location?
     {
         var location : Location? = null
-        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -209,7 +206,6 @@ class LocationDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return location
     }
@@ -218,9 +214,8 @@ class LocationDAO(private var dao: DAO)
     {
         var location: Location? = null
 
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -230,7 +225,6 @@ class LocationDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return location
     }
@@ -239,11 +233,10 @@ class LocationDAO(private var dao: DAO)
     {
         val locations = ArrayList<Location>()
 
-        val db = dao.writableDatabase
         enumerationTeam.id?.let { id ->
             val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__ENUMERATION_TEAM} ELL WHERE" +
                     " ELL.${DAO.COLUMN_ENUMERATION_TEAM_ID} = $id AND LL.ID = ELL.${DAO.COLUMN_LOCATION_ID}"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -254,8 +247,6 @@ class LocationDAO(private var dao: DAO)
 
             cursor.close()
         }
-
-        db.close()
 
         return locations
     }
@@ -264,11 +255,10 @@ class LocationDAO(private var dao: DAO)
     {
         val locations = ArrayList<Location>()
 
-        val db = dao.writableDatabase
         collectionTeam.id?.let { id ->
             val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__COLLECTION_TEAM} ELL WHERE" +
                     " ELL.${DAO.COLUMN_COLLECTION_TEAM_ID} = $id AND LL.ID = ELL.${DAO.COLUMN_LOCATION_ID}"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -279,8 +269,6 @@ class LocationDAO(private var dao: DAO)
 
             cursor.close()
         }
-
-        db.close()
 
         return locations
     }
@@ -290,10 +278,9 @@ class LocationDAO(private var dao: DAO)
         val locations = ArrayList<Location>()
 
         enumArea.id?.let { enumAreaId ->
-            val db = dao.writableDatabase
             val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__ENUM_AREA} ELL WHERE" +
                     " ELL.${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND LL.ID = ELL.${DAO.COLUMN_LOCATION_ID}"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -303,7 +290,6 @@ class LocationDAO(private var dao: DAO)
             }
 
             cursor.close()
-            db.close()
         }
 
         return locations
@@ -314,10 +300,9 @@ class LocationDAO(private var dao: DAO)
         val locations = ArrayList<Location>()
 
         sampleArea.id?.let { sampleAreaId ->
-            val db = dao.writableDatabase
             val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__SAMPLE_AREA} ELL WHERE" +
                     " ELL.${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleAreaId AND LL.ID = ELL.${DAO.COLUMN_LOCATION_ID}"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -327,7 +312,6 @@ class LocationDAO(private var dao: DAO)
             }
 
             cursor.close()
-            db.close()
         }
 
         return locations
@@ -336,10 +320,9 @@ class LocationDAO(private var dao: DAO)
     fun getLocations() : ArrayList<Location>
     {
         val locations = ArrayList<Location>()
-        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_LOCATION}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -349,8 +332,6 @@ class LocationDAO(private var dao: DAO)
         }
 
         cursor.close()
-
-        db.close()
 
         return locations
     }
@@ -365,12 +346,10 @@ class LocationDAO(private var dao: DAO)
 //                DAO.enumerationItemDAO.delete( enumerationItem )
 //            }
 
-            val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(id.toString())
 
-            db.delete(DAO.TABLE_LOCATION, whereClause, args)
-            db.close()
+            dao.writableDatabase.delete(DAO.TABLE_LOCATION, whereClause, args)
         }
     }
 }

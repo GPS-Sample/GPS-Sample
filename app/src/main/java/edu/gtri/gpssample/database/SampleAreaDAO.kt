@@ -41,7 +41,8 @@ class SampleAreaDAO(private var dao: DAO)
 
             for (location in sampleArea.locations)
             {
-                DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
+                DAO.locationDAO.updateConnectorTable( location, sampleArea )
+//                DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
             }
 
             return sampleArea
@@ -83,8 +84,6 @@ class SampleAreaDAO(private var dao: DAO)
 
     fun updateSampleArea( sampleArea: SampleArea, study: Study )
     {
-        val db = dao.writableDatabase
-
         sampleArea.id?.let{ id ->
             Log.d( "xxx", "update sampleArea id ${id}")
 
@@ -94,18 +93,15 @@ class SampleAreaDAO(private var dao: DAO)
 
             putSampleArea( sampleArea, study, values )
 
-            db.update(DAO.TABLE_SAMPLE_AREA, values, whereClause, args )
+            dao.writableDatabase.update(DAO.TABLE_SAMPLE_AREA, values, whereClause, args )
         }
-
-        db.close()
     }
 
     private fun getSampleArea( id: Int ): SampleArea?
     {
         var sampleArea: SampleArea? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_SAMPLE_AREA} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -114,7 +110,6 @@ class SampleAreaDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return sampleArea
     }
@@ -123,11 +118,9 @@ class SampleAreaDAO(private var dao: DAO)
     {
         val sampleAreas = ArrayList<SampleArea>()
 
-        val db = dao.writableDatabase
-
         study.id?.let { id ->
             val query = "SELECT * FROM ${DAO.TABLE_SAMPLE_AREA} WHERE ${DAO.COLUMN_STUDY_ID} = $id"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -136,8 +129,6 @@ class SampleAreaDAO(private var dao: DAO)
 
             cursor.close()
         }
-
-        db.close()
 
         return sampleAreas
     }
@@ -151,12 +142,10 @@ class SampleAreaDAO(private var dao: DAO)
 //                DAO.enumerationTeamDAO.deleteTeam( it )
 //            }
 
-            val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(sampleAreaId.toString())
 
-            db.delete(DAO.TABLE_SAMPLE_AREA, whereClause, args)
-            db.close()
+            dao.writableDatabase.delete(DAO.TABLE_SAMPLE_AREA, whereClause, args)
         }
     }
 }

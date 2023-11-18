@@ -123,9 +123,8 @@ class StudyDAO(private var dao: DAO)
     fun getStudy( id: Int ): Study?
     {
         var study: Study? = null
-        val db = dao.writableDatabase
         val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -141,7 +140,6 @@ class StudyDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return study
     }
@@ -173,14 +171,13 @@ class StudyDAO(private var dao: DAO)
     fun getStudies( config: Config ): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
-        val db = dao.writableDatabase
 
         config.id?.let { id ->
             val query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
                     "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_ID} = conn.${DAO.COLUMN_STUDY_ID} and "  +
                     "conn.${DAO.COLUMN_CONFIG_ID} = ${id}"
 
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -195,19 +192,16 @@ class StudyDAO(private var dao: DAO)
             cursor.close()
         }
 
-        db.close()
-
         return studies
     }
 
     fun getStudies(): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
-        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_STUDY}"
 
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -216,14 +210,12 @@ class StudyDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return studies
     }
 
     fun updateStudy( study: Study )
     {
-        val db = dao.writableDatabase
         val whereClause = "${DAO.COLUMN_ID} = ?"
         study.id?.let { id ->
             Log.d( "xxx", "update study id ${id}")
@@ -233,9 +225,7 @@ class StudyDAO(private var dao: DAO)
 
             putStudy( study, values )
 
-            db.update(DAO.TABLE_STUDY, values, whereClause, args )
-            // TODO: ADD in abilty to save study areas
-            db.close()
+            dao.writableDatabase.update(DAO.TABLE_STUDY, values, whereClause, args )
         }
     }
 
@@ -265,13 +255,10 @@ class StudyDAO(private var dao: DAO)
                 DAO.fieldDAO.deleteField( field )
             }
 
-            val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(study.id.toString())
 
-            db.delete(DAO.TABLE_STUDY, whereClause, args)
-            db.close()
+            dao.writableDatabase.delete(DAO.TABLE_STUDY, whereClause, args)
         }
-
     }
 }

@@ -87,8 +87,6 @@ class EnumAreaDAO(private var dao: DAO)
 
     fun updateEnumArea( enumArea: EnumArea, config : Config )
     {
-        val db = dao.writableDatabase
-
         enumArea.id?.let{ id ->
             Log.d( "xxx", "update enumArea id ${id}")
 
@@ -98,18 +96,15 @@ class EnumAreaDAO(private var dao: DAO)
 
             putEnumArea( enumArea, config, values )
 
-            db.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
+            dao.writableDatabase.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
         }
-
-        db.close()
     }
 
     fun getEnumArea( id: Int ): EnumArea?
     {
         var enumArea: EnumArea? = null
-        val db = dao.writableDatabase
         val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
@@ -123,7 +118,6 @@ class EnumAreaDAO(private var dao: DAO)
         }
 
         cursor.close()
-        db.close()
 
         return enumArea
     }
@@ -131,11 +125,10 @@ class EnumAreaDAO(private var dao: DAO)
     fun getEnumAreas( config: Config ): ArrayList<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
-        val db = dao.writableDatabase
 
         config.id?.let { id ->
             val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_ID} = $id"
-            val cursor = db.rawQuery(query, null)
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
             while (cursor.moveToNext())
             {
@@ -151,18 +144,15 @@ class EnumAreaDAO(private var dao: DAO)
             cursor.close()
         }
 
-        db.close()
-
         return enumAreas
     }
 
     fun getEnumAreas(): ArrayList<EnumArea>
     {
         val enumAreas = ArrayList<EnumArea>()
-        val db = dao.writableDatabase
 
         val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA}"
-        val cursor = db.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
@@ -176,8 +166,6 @@ class EnumAreaDAO(private var dao: DAO)
         }
 
         cursor.close()
-
-        db.close()
 
         return enumAreas
     }
@@ -196,12 +184,10 @@ class EnumAreaDAO(private var dao: DAO)
                 DAO.locationDAO.delete( it )
             }
 
-            val db = dao.writableDatabase
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(enumAreaId.toString())
 
-            db.delete(DAO.TABLE_ENUM_AREA, whereClause, args)
-            db.close()
+            dao.writableDatabase.delete(DAO.TABLE_ENUM_AREA, whereClause, args)
         }
     }
 }
