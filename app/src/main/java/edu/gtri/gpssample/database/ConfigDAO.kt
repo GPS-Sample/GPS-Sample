@@ -29,6 +29,10 @@ class ConfigDAO(private var dao: DAO)
             config.id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
             config.id?.let { id ->
                 Log.d( "xxx", "new config id = ${id}")
+                for (latLon in config.mapTileRegion)
+                {
+                    DAO.latLonDAO.createOrUpdateLatLon( latLon, null, config )
+                }
                 createOrUpdateEnumAreas(config)
                 createOrUpdateStudies(config)
                 return config
@@ -93,9 +97,10 @@ class ConfigDAO(private var dao: DAO)
             cursor.moveToNext()
             config = buildConfig( cursor )
 
-            config.id?.let{id ->
+            config.id?.let{ id ->
                 config.studies = DAO.studyDAO.getStudies(config)
                 config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+                config.mapTileRegion = DAO.latLonDAO.getLatLonsWithConfigId( id )
             }
         }
 
@@ -141,6 +146,7 @@ class ConfigDAO(private var dao: DAO)
             config.id?.let{id ->
                 config.studies = DAO.studyDAO.getStudies(config)
                 config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+                config.mapTileRegion = DAO.latLonDAO.getLatLonsWithConfigId( id )
             }
 
             configs.add( config)

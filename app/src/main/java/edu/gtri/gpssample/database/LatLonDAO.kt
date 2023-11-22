@@ -8,7 +8,7 @@ import edu.gtri.gpssample.database.models.*
 
 class LatLonDAO(private var dao: DAO)
 {
-    fun createOrUpdateLatLon(latLon: LatLon, geoArea : GeoArea? ) : LatLon?
+    fun createOrUpdateLatLon( latLon: LatLon, geoArea : GeoArea?, config: Config? ) : LatLon?
     {
         if (exists( latLon ))
         {
@@ -22,6 +22,20 @@ class LatLonDAO(private var dao: DAO)
         }
 
         latLon.id?.let { latLonId ->
+            config?.let { config ->
+                config.id?.let{ config_id->
+                    val query = "SELECT * FROM ${DAO.TABLE_CONFIG__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_ID} = $latLonId AND ${DAO.COLUMN_CONFIG_ID} = $config_id"
+                    val cursor = dao.writableDatabase.rawQuery(query, null)
+                    if (cursor.count == 0)
+                    {
+                        val values = ContentValues()
+                        putLatLonConfig( latLonId, config_id, values)
+                        dao.writableDatabase.insert(DAO.TABLE_CONFIG__LAT_LON, null, values)
+                    }
+                    cursor.close()
+                }
+            }
+
             geoArea?.let { geoArea ->
                 val values = ContentValues()
                 when (geoArea) {
@@ -64,6 +78,12 @@ class LatLonDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_LAT_LON_ID, llID )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, teamId )
+    }
+
+    private fun putLatLonConfig(llID : Int, configId: Int, values : ContentValues)
+    {
+        values.put( DAO.COLUMN_LAT_LON_ID, llID )
+        values.put( DAO.COLUMN_CONFIG_ID, configId )
     }
 
     private fun putLatLonEnumArea(llID : Int, enumAreaId: Int, values : ContentValues)
@@ -137,6 +157,25 @@ class LatLonDAO(private var dao: DAO)
         cursor.close()
 
         return latLon
+    }
+
+    fun getLatLonsWithConfigId( configId: Int ): ArrayList<LatLon>
+    {
+        val latLons = ArrayList<LatLon>()
+        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_CONFIG__LAT_LON} ELL WHERE" +
+                " ELL.${DAO.COLUMN_CONFIG_ID} = $configId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val latlon = createLatLon(cursor)
+
+            latLons.add( latlon )
+        }
+
+        cursor.close()
+
+        return latLons
     }
 
     fun getLatLonsWithEnumAreaId( enumAreaId: Int ): ArrayList<LatLon>

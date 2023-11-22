@@ -36,7 +36,7 @@ class SampleAreaDAO(private var dao: DAO)
 
             for (latLon in sampleArea.vertices)
             {
-                DAO.latLonDAO.createOrUpdateLatLon(latLon, sampleArea)
+                DAO.latLonDAO.createOrUpdateLatLon(latLon, sampleArea, null)
             }
 
             for (location in sampleArea.locations)

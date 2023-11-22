@@ -36,15 +36,16 @@ data class Config(
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
     var selectedStudyId: Int,
-    var selectedEnumAreaId: Int)
+    var selectedEnumAreaId: Int,
+    var mapTileRegion: ArrayList<LatLon>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, allowManualLocationEntry: Boolean)
             : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry,
-                                    ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1)
+                                    ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1, ArrayList<LatLon>())
     constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int, allowManualLocationEntry: Boolean, selectedStudyId: Int, selectedEnumAreaId: Int)
             : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry,
-        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId)
+        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId, ArrayList<LatLon>())
 
     var minimumGPSPrecision : String
         get() = minGpsPrecision.toString()

@@ -28,7 +28,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         enumerationTeam.id?.let {
             for (latLon in enumerationTeam.polygon)
             {
-                DAO.latLonDAO.createOrUpdateLatLon(latLon,null)
+                DAO.latLonDAO.createOrUpdateLatLon(latLon,null, null)
             }
         }
 

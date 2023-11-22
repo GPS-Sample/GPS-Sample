@@ -43,6 +43,7 @@ class InputDialog
         val cancelButton = view!!.findViewById<Button>(R.id.cancel_button)
         cancelButton.setOnClickListener {
             alertDialog.dismiss()
+            delegate.didEnterText( "", tag )
         }
 
         val saveButton = view.findViewById<Button>(R.id.save_button)

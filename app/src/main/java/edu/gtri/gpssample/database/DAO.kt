@@ -323,6 +323,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             val y = db.execSQL(createTableLatLon)
 
+            val createTableConfigLatLon = ("CREATE TABLE " +
+                    TABLE_CONFIG__LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CONFIG_ID + " INTEGER " + "," +
+                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_CONFIG_ID, $COLUMN_LAT_LON_ID)" +
+                    ")")
+            db.execSQL(createTableConfigLatLon)
+
             val createTableEnumAreaLatLon = ("CREATE TABLE " +
                     TABLE_ENUM_AREA__LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -395,6 +406,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM__LAT_LON")
@@ -577,6 +589,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LON = "lon"
 
         // connector tables for lat lon
+        const val TABLE_CONFIG__LAT_LON = "config_lat_lon"
         const val TABLE_ENUM_AREA__LAT_LON = "enum_area_lat_lon"
         const val TABLE_SAMPLE_AREA__LAT_LON = "sample_area_lat_lon"
         const val TABLE_ENUMERATION_TEAM__LAT_LON = "enumeration_team_lat_lon"
@@ -640,6 +653,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_LAT_LON, null, null)
                 db.delete(TABLE_LOCATION, null, null)
                 db.delete(TABLE_ENUMERATION_ITEM, null, null)
+                db.delete(TABLE_CONFIG__LAT_LON, null, null)
                 db.delete(TABLE_ENUM_AREA__LAT_LON, null, null)
                 db.delete(TABLE_SAMPLE_AREA__LAT_LON, null, null)
             }

@@ -35,12 +35,12 @@ class MapboxManager(
         return null
     }
 
-    fun addPolygon( points: List<List<Point>>, fillColor: String ) : PolygonAnnotation?
+    fun addPolygon( points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : PolygonAnnotation?
     {
         val polygonAnnotationOptions = PolygonAnnotationOptions()
-            .withPoints(points)
+            .withPoints( points )
             .withFillColor( fillColor )
-            .withFillOpacity(0.25 )
+            .withFillOpacity( fillOpacity )
 
         polygonAnnotationManager?.let { polygonAnnotationManager ->
             return polygonAnnotationManager.create(polygonAnnotationOptions)
@@ -49,14 +49,14 @@ class MapboxManager(
         return null
     }
 
-    fun addPolyline( points: List<Point> ) : PolylineAnnotation?
+    fun addPolyline( points: List<Point>, color: String ) : PolylineAnnotation?
     {
         val outlinePoints = ArrayList<Point>(points)
         outlinePoints.add( outlinePoints[0] )
 
         val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
             .withPoints(outlinePoints)
-            .withLineColor("#ff0000")
+            .withLineColor(color)
             .withLineWidth(4.0)
 
         polylineAnnotationManager?.let { polylineAnnotationManager ->
