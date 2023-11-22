@@ -204,7 +204,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:gravity="center_vertical"
-                    android:text="@string/enumeration_area"
+                    android:text="@string/enumeration_areas"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
