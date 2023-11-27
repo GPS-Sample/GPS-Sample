@@ -20,7 +20,7 @@ import kotlin.collections.ArrayList
 
 class LocationDAO(private var dao: DAO)
 {
-    fun createOrUpdateLocation( location: Location, geoArea : GeoArea) : Location?
+    fun createOrUpdateLocation( location: Location, geoArea : GeoArea ) : Location?
     {
         if (exists( location ))
         {
@@ -29,7 +29,6 @@ class LocationDAO(private var dao: DAO)
         }
         else
         {
-//            location.id = null
             val values = ContentValues()
             putLocation( location, geoArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
@@ -50,10 +49,10 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem(enumerationItem, location)
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, true )
             }
 
-//            DAO.fieldDataDAO.performBatchUpdate()
+            DAO.enumerationItemDAO.performBatchUpdate()
 
         } ?: return null
 
@@ -108,8 +107,10 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
-                DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, geoArea )
+                DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, geoArea, true )
             }
+
+            DAO.enumerationItemDAO.performBatchUpdate()
         }
         else
         {
