@@ -208,7 +208,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             {
                 config?.let {config->
                     val packedConfig = config.pack()
-                    Log.d( "xxx", packedConfig )
 
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
                     socket.outputStream.write(response.toByteArray())
@@ -219,8 +218,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             {
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload )
-
-                    Log.d( "xxx", payload )
 
                     enumArea?.let { enumArea ->
                         delegate?.let {
@@ -286,8 +283,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             {
                 message.payload?.let { payload ->
                     val study = Study.unpack( payload )
-
-                    Log.d( "xxx", payload )
 
                     study?.let{ study ->
                         delegate?.let {

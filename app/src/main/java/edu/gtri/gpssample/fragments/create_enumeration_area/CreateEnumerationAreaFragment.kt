@@ -529,22 +529,24 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (tag != null)
         {
-            try
-            {
+            Thread {
                 val uri = tag as Uri
 
-                Thread {
-                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                val inputStream = activity!!.getContentResolver().openInputStream(uri)
 
-                    inputStream?.let { inputStream ->
+                inputStream?.let { inputStream ->
+                    try
+                    {
                         parseGeoJson( inputStream.bufferedReader().readText(), name )
                     }
-                }.start()
-            }
-            catch( ex: java.lang.Exception )
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
-            }
+                    catch( ex: Exception)
+                    {
+                        activity!!.runOnUiThread {
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }.start()
         }
         else
         {
