@@ -531,7 +531,7 @@ class PerformCollectionFragment : Fragment(),
                     sampledItem.collectionState = CollectionState.Incomplete
                 }
 
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location, false )
 
                 study.sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
 

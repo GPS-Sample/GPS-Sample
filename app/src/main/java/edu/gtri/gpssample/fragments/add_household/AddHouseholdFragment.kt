@@ -389,12 +389,12 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         if (enumerationItem.id == null)
         {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, false )
             location.enumerationItems.add(enumerationItem)
         }
         else
         {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, false )
         }
 
 //        DAO.fieldDataDAO.performBatchUpdate()
