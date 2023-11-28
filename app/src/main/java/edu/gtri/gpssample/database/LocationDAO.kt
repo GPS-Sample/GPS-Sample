@@ -49,11 +49,8 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, true )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
             }
-
-            DAO.enumerationItemDAO.performBatchUpdate()
-
         } ?: return null
 
         return location
@@ -107,10 +104,8 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
-                DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, geoArea, true )
+                DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, geoArea )
             }
-
-            DAO.enumerationItemDAO.performBatchUpdate()
         }
         else
         {

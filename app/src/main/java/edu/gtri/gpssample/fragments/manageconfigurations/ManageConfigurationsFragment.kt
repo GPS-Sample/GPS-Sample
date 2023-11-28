@@ -361,7 +361,13 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     override fun configurationReceived(config: Config) {
         runBlocking(Dispatchers.Main) {
 
+            DAO.instance().writableDatabase.beginTransaction()
+
             val saved = DAO.configDAO.createConfig(config)
+
+            DAO.instance().writableDatabase.setTransactionSuccessful()
+            DAO.instance().writableDatabase.endTransaction()
+
             saved?.let { config ->
                 sharedViewModel.configurations.add(config)
                 sharedViewModel.setCurrentConfig(config)

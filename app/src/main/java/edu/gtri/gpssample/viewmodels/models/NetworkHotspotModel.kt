@@ -220,6 +220,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     val enumArea = EnumArea.unpack( payload )
 
                     enumArea?.let { enumArea ->
+
+                        DAO.instance().writableDatabase.beginTransaction()
+
                         delegate?.let {
                             it.didStartImport()
                         }
@@ -267,6 +270,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                             }
                         }
 
+                        DAO.instance().writableDatabase.setTransactionSuccessful()
+                        DAO.instance().writableDatabase.endTransaction()
+
                         enumArea.id?.let {
                             DAO.enumAreaDAO.getEnumArea(it)?.let {
                                 sharedViewModel?.replaceEnumArea(it)
@@ -285,6 +291,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     val study = Study.unpack( payload )
 
                     study?.let{ study ->
+
+                        DAO.instance().writableDatabase.beginTransaction()
+
                         delegate?.let {
                             it.didStartImport()
                         }
@@ -296,6 +305,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                                 DAO.locationDAO.importLocation( location, sampleArea )
                             }
                         }
+
+                        DAO.instance().writableDatabase.setTransactionSuccessful()
+                        DAO.instance().writableDatabase.endTransaction()
 
                         delegate?.let {
                             it.didFinishImport()

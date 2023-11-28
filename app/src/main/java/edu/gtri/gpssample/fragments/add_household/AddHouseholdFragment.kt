@@ -389,31 +389,13 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         if (enumerationItem.id == null)
         {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, false )
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
             location.enumerationItems.add(enumerationItem)
         }
         else
         {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location, false )
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
         }
-
-//        DAO.fieldDataDAO.performBatchUpdate()
-
-//        DAO.locationDAO.updateLocation( location, enumArea )
-
-//        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-//
-//        val enumAreaId = enumArea.id
-//
-//        sharedViewModel.updateConfiguration()
-//
-//        enumAreaId?.let {
-//            val enumArea = DAO.enumAreaDAO.getEnumArea( it )
-//
-//            enumArea?.let {
-//                sharedViewModel.enumAreaViewModel.setCurrentEnumArea(it)
-//            }
-//        }
 
         findNavController().popBackStack()
     }
