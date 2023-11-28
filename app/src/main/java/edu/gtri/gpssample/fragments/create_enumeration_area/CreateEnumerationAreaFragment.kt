@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.create_enumeration_area
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -668,7 +669,28 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
-        if (name.isNotEmpty())
+        if (tag != null)
+        {
+            Thread {
+                val uri = tag as Uri
+
+                val inputStream = activity!!.getContentResolver().openInputStream(uri)
+
+                inputStream?.let { inputStream ->
+                    try
+                    {
+                        parseGeoJson( inputStream.bufferedReader().readText(), name )
+                    }
+                    catch( ex: Exception)
+                    {
+                        activity!!.runOnUiThread {
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }.start()
+        }
+        else if (name.isNotEmpty())
         {
             val vertices = ArrayList<LatLon>()
 
@@ -733,40 +755,22 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
         {
-            val uri = data?.data
-
-            uri?.let { uri ->
-
-                try
-                {
-                    Thread {
-                        val inputStream = activity!!.getContentResolver().openInputStream(uri)
-
-                        inputStream?.let { inputStream ->
-                            parseGeoJson( inputStream.bufferedReader().readText())
-                        }
-                    }.start()
-                }
-                catch( ex: java.lang.Exception )
-                {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
-                }
+            data?.data?.let { uri ->
+                InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", uri, this, false )
             }
         }
     }
 
-    fun parseGeoJson( text: String )
+    fun parseGeoJson( text: String, nameKey: String )
     {
-        Log.d( "xxx", text )
-
-        var points = ArrayList<Point>()
+        val points = ArrayList<Point>()
         val featureCollection = FeatureCollection.fromJson( text )
 
         featureCollection.forEach { feature ->
 
-            var name = resources.getString(R.string.undefined)
+            var name = "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}"
 
-            feature.getStringProperty("ClusterL")?.let {
+            feature.getStringProperty(nameKey)?.let {
                 name = it
             }
 

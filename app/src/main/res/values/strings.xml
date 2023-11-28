@@ -278,6 +278,9 @@
     <string name="please_enter_a_name">"Please enter a name for this field."</string>
     <string name="please_enter_a_subaddress">"Please enter a unique sub-address."</string>
     <string name="please_select_team_boundary">"Please select the team boundary."</string>
+
+    <string name="enum_area_name_property">"Enter the value of the Enumeration Area Name property"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

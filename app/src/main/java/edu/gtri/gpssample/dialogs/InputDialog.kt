@@ -17,7 +17,7 @@ class InputDialog
     {
     }
 
-    constructor( context: Context, title: String, text: String?, tag: Any?, delegate: InputDialogDelegate )
+    constructor( context: Context, title: String, text: String?, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -50,7 +50,7 @@ class InputDialog
 
         saveButton.setOnClickListener {
 
-            if (editText.text.toString().length > 0)
+            if (!required || (required && editText.text.toString().length > 0))
             {
                 alertDialog.dismiss()
 
