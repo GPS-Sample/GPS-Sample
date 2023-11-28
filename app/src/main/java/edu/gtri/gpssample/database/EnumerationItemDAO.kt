@@ -11,7 +11,7 @@ import edu.gtri.gpssample.database.models.*
 
 class EnumerationItemDAO(private var dao: DAO)
 {
-    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location) : EnumerationItem?
+    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
     {
         if (exists( enumerationItem ))
         {
@@ -19,7 +19,6 @@ class EnumerationItemDAO(private var dao: DAO)
         }
         else
         {
-//            enumerationItem.id = null
             val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()

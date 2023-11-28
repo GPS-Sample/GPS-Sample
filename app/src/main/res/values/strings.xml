@@ -80,7 +80,6 @@
     <string name="define_enumeration_area">"Define Enumeration Area"</string>
     <string name="define_sampling_method">"Define Sampling Method"</string>
     <string name="studies">"Studies"</string>
-    <string name="enumeration_area">"Enumeration Areas"</string>
     <string name="barcode_result">"Barcode detected"</string>
     <string name="error_scanner_cancelled">"Code scanner is cancelled."</string>
     <string name="error_camera_permission_not_granted">"Camera permission is not granted."</string>
@@ -242,7 +241,6 @@
     <string name="status">"Status"</string>
     <string name="description">"Description"</string>
     <string name="add_image">"Add Image"</string>
-    <string name="enumeration_areas">"Enumeration Areas"</string>
     <string name="enter_team_name">"Enter Team Name"</string>
     <string name="assign_households">"Assign Households"</string>
     <string name="sampling_type">"Sampling Type"</string>
@@ -278,6 +276,8 @@
     <string name="please_enter_a_name">"Please enter a name for this field."</string>
     <string name="please_enter_a_subaddress">"Please enter a unique sub-address."</string>
     <string name="please_select_team_boundary">"Please select the team boundary."</string>
+    <string name="enumeration_areas">"Enumeration Areas"</string>
+    <string name="enumeration_area">"Enumeration Area"</string>
 
     <string name="enum_area_name_property">"Enter the value of the Enumeration Area Name property"</string>
 

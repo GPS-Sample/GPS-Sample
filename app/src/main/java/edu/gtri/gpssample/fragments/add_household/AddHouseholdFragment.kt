@@ -309,67 +309,76 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
+        // first, validate the required inputs
+
+        for (fieldData in enumerationItem.fieldDataList) {
+            fieldData.field?.let { field ->
+                if (field.required) {
+                    when (field.type) {
+                        FieldType.Text -> {
+                            if (fieldData.textValue.isEmpty()) {
+                                Toast.makeText(
+                                    activity!!.applicationContext,
+                                    "${context?.getString(R.string.oops)} ${field.name} ${
+                                        context?.getString(R.string.field_is_required)
+                                    }",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return
+                            }
+                        }
+                        FieldType.Number -> {
+                            if (fieldData.numberValue == null) {
+                                Toast.makeText(
+                                    activity!!.applicationContext,
+                                    "${context?.getString(R.string.oops)} ${field.name} ${
+                                        context?.getString(R.string.field_is_required)
+                                    }",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return
+                            }
+                        }
+                        FieldType.Date -> {
+                            if (fieldData.dateValue == null) {
+                                Toast.makeText(
+                                    activity!!.applicationContext,
+                                    "${context?.getString(R.string.oops)} ${field.name} ${
+                                        context?.getString(R.string.field_is_required)
+                                    }",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return
+                            }
+                        }
+                        FieldType.Checkbox -> {
+                            if (fieldData.fieldDataOptions.isEmpty()) {
+                                Toast.makeText(
+                                    activity!!.applicationContext,
+                                    "${context?.getString(R.string.oops)} ${field.name} ${
+                                        context?.getString(R.string.field_is_required)
+                                    }",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return
+                            }
+                        }
+                        else -> {
+                        }
+                    }
+                }
+            }
+        }
+
+        // Next, save the enumerationItem
+
         if (incompleteReason.isNotEmpty())
         {
-            for (fieldData in enumerationItem.fieldDataList)
-            {
-                DAO.fieldDataDAO.updateFieldData( fieldData )
-            }
-
             enumerationItem.incompleteReason = incompleteReason
             enumerationItem.enumerationState = EnumerationState.Incomplete
         }
         else
         {
-            if (enumerationItem.id == null)
-            {
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-                location.enumerationItems.add(enumerationItem)
-            }
-
-            for (fieldData in enumerationItem.fieldDataList)
-            {
-                fieldData.field?.let { field ->
-                    if (field.required)
-                    {
-                        when (field.type)
-                        {
-                            FieldType.Text -> {
-                                if (fieldData.textValue.isEmpty()) {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                    return
-                                }
-                            }
-                            FieldType.Number -> {
-                                if (fieldData.numberValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                    return
-                                }
-                            }
-                            FieldType.Date -> {
-                                if (fieldData.dateValue == null) {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                    return
-                                }
-                            }
-                            FieldType.Checkbox -> {
-                                if (fieldData.fieldDataOptions.isEmpty())
-                                {
-                                    Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
-                                    return
-                                }
-                            }
-                            else -> {
-                            }
-                        }
-                    }
-                }
-
-                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
-            }
-
-//            DAO.fieldDataDAO.performBatchUpdate()
-
             enumerationItem.incompleteReason = ""
             enumerationItem.enumerationState = EnumerationState.Enumerated
         }
@@ -378,22 +387,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         enumerationItem.creationDate = Date().time
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
-        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-
-        DAO.locationDAO.updateLocation( location, enumArea )
-
-        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-
-        val enumAreaId = enumArea.id
-
-        sharedViewModel.updateConfiguration()
-
-        enumAreaId?.let {
-            val enumArea = DAO.enumAreaDAO.getEnumArea( it )
-
-            enumArea?.let {
-                sharedViewModel.enumAreaViewModel.setCurrentEnumArea(it)
-            }
+        if (enumerationItem.id == null)
+        {
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+            location.enumerationItems.add(enumerationItem)
+        }
+        else
+        {
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
         }
 
         findNavController().popBackStack()

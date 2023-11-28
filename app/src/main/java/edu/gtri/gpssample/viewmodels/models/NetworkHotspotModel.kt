@@ -208,7 +208,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             {
                 config?.let {config->
                     val packedConfig = config.pack()
-                    Log.d( "xxx", packedConfig )
 
                     val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
                     socket.outputStream.write(response.toByteArray())
@@ -220,9 +219,10 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload )
 
-                    Log.d( "xxx", payload )
-
                     enumArea?.let { enumArea ->
+
+                        DAO.instance().writableDatabase.beginTransaction()
+
                         delegate?.let {
                             it.didStartImport()
                         }
@@ -270,6 +270,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                             }
                         }
 
+                        DAO.instance().writableDatabase.setTransactionSuccessful()
+                        DAO.instance().writableDatabase.endTransaction()
+
                         enumArea.id?.let {
                             DAO.enumAreaDAO.getEnumArea(it)?.let {
                                 sharedViewModel?.replaceEnumArea(it)
@@ -287,9 +290,10 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 message.payload?.let { payload ->
                     val study = Study.unpack( payload )
 
-                    Log.d( "xxx", payload )
-
                     study?.let{ study ->
+
+                        DAO.instance().writableDatabase.beginTransaction()
+
                         delegate?.let {
                             it.didStartImport()
                         }
@@ -301,6 +305,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                                 DAO.locationDAO.importLocation( location, sampleArea )
                             }
                         }
+
+                        DAO.instance().writableDatabase.setTransactionSuccessful()
+                        DAO.instance().writableDatabase.endTransaction()
 
                         delegate?.let {
                             it.didFinishImport()
