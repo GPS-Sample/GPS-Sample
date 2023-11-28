@@ -17,8 +17,6 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataDAO(private var dao: DAO)
 {
-    private val hashMap = HashMap<EnumerationItem,FieldData>()
-
     fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem ) : FieldData?
     {
         if (exists( fieldData ))
@@ -43,32 +41,6 @@ class FieldDataDAO(private var dao: DAO)
         }
 
         return fieldData
-    }
-
-    fun performBatchUpdate()
-    {
-        dao.writableDatabase.beginTransaction()
-
-        for (enumerationItem in hashMap.keys)
-        {
-            hashMap[enumerationItem]?.let { fieldData ->
-                val values = ContentValues()
-                putFieldData( fieldData, values, enumerationItem )
-                fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
-                fieldData.id?.let { id ->
-                    Log.d( "xxx", "new fieldData id = ${id}")
-                    for (fieldDataOption in fieldData.fieldDataOptions)
-                    {
-                        DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
-                    }
-                }
-            }
-        }
-
-        dao.writableDatabase.setTransactionSuccessful()
-        dao.writableDatabase.endTransaction()
-
-        hashMap.clear()
     }
 
     fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)

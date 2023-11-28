@@ -11,15 +11,7 @@ import edu.gtri.gpssample.database.models.*
 
 class EnumerationItemDAO(private var dao: DAO)
 {
-    data class EnumerationItemForLocation (
-        val enumerationItem: EnumerationItem,
-        val location: Location)
-    {
-    }
-
-    val batchedItems = ArrayList<EnumerationItemForLocation>()
-
-    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location, batch: Boolean ) : EnumerationItem?
+    fun createOrUpdateEnumerationItem( enumerationItem: EnumerationItem, location : Location ) : EnumerationItem?
     {
         if (exists( enumerationItem ))
         {
@@ -27,59 +19,37 @@ class EnumerationItemDAO(private var dao: DAO)
         }
         else
         {
-            if (batch)
-            {
-                batchedItems.add( EnumerationItemForLocation( enumerationItem, location ))
-            }
-            else
-            {
-                val values = ContentValues()
-                putEnumerationItem( enumerationItem, location, values )
-                enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
-                enumerationItem.id?.let { id ->
-                    Log.d( "xxx", "new enumerationItem id = ${id}")
-                    enumerationItem.fieldDataList?.let { fieldDataList ->
-                        for (fieldData in fieldDataList)
-                        {
-                            DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
-                        }
+            val values = ContentValues()
+            putEnumerationItem( enumerationItem, location, values )
+            enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
+            enumerationItem.id?.let { id ->
+                Log.d( "xxx", "new enumerationItem id = ${id}")
+                enumerationItem.fieldDataList?.let { fieldDataList ->
+                    for (fieldData in fieldDataList)
+                    {
+                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
                     }
-                } ?: return null
-            }
+                }
+            } ?: return null
         }
 
         return enumerationItem
     }
 
-    fun performBatchUpdate()
-    {
-        dao.writableDatabase.beginTransaction()
-
-        for (batchedItem in batchedItems)
-        {
-            createOrUpdateEnumerationItem( batchedItem.enumerationItem, batchedItem.location, false )
-        }
-
-        dao.writableDatabase.setTransactionSuccessful()
-        dao.writableDatabase.endTransaction()
-
-        batchedItems.clear()
-    }
-
-    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, geoArea: GeoArea, batch: Boolean )
+    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, geoArea: GeoArea )
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 
         if (existingEnumerationItem == null)
         {
             enumerationItem.id = null // force the new item be created
-            createOrUpdateEnumerationItem( enumerationItem, location, batch )
+            createOrUpdateEnumerationItem( enumerationItem, location )
         }
         else if (enumerationItem.creationDate > existingEnumerationItem.creationDate)
         {
             delete( existingEnumerationItem )
             enumerationItem.id = null // force the new item be created
-            createOrUpdateEnumerationItem( enumerationItem, location, batch )
+            createOrUpdateEnumerationItem( enumerationItem, location )
         }
     }
 

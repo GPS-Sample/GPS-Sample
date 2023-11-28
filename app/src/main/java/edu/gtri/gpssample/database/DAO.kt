@@ -603,7 +603,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // creation/access methods
 
-        private var instance: DAO? = null
+        private var _instance: DAO? = null
+
+        public fun instance() : DAO
+        {
+            return _instance!!
+        }
 
         fun showAll()
         {
@@ -623,7 +628,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         fun deleteAll()
         {
-            instance?.let {
+            _instance?.let {
                 val db = it.writableDatabase
                 db.delete(TABLE_CONFIG, null, null )
                 db.delete(TABLE_STUDY, null, null)
@@ -647,30 +652,30 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         fun createSharedInstance( context: Context ): DAO
         {
-            if (instance == null)
+            if (_instance == null)
             {
-                instance = DAO( context, null, null, DATABASE_VERSION )
+                _instance = DAO( context, null, null, DATABASE_VERSION )
 
-                userDAO = UserDAO( instance!! )
-                configDAO = ConfigDAO( instance!! )
-                studyDAO = StudyDAO( instance!! )
-                fieldDAO = FieldDAO( instance!! )
-                fieldOptionDAO = FieldOptionDAO( instance!! )
-                ruleDAO = RuleDAO( instance!! )
-                filterDAO = FilterDAO( instance!! )
+                userDAO = UserDAO( _instance!! )
+                configDAO = ConfigDAO( _instance!! )
+                studyDAO = StudyDAO( _instance!! )
+                fieldDAO = FieldDAO( _instance!! )
+                fieldOptionDAO = FieldOptionDAO( _instance!! )
+                ruleDAO = RuleDAO( _instance!! )
+                filterDAO = FilterDAO( _instance!! )
               //  filterRuleDAO = FilterRuleDAO( instance!! )
-                enumAreaDAO = EnumAreaDAO( instance!! )
-                sampleAreaDAO = SampleAreaDAO( instance!! )
-                enumerationTeamDAO = EnumerationTeamDAO( instance!! )
-                collectionTeamDAO = CollectionTeamDAO( instance!! )
-                fieldDataDAO = FieldDataDAO( instance!! )
-                fieldDataOptionDAO = FieldDataOptionDAO( instance!! )
-                latLonDAO = LatLonDAO( instance!!)
-                locationDAO = LocationDAO( instance!!)
-                enumerationItemDAO = EnumerationItemDAO( instance!!)
+                enumAreaDAO = EnumAreaDAO( _instance!! )
+                sampleAreaDAO = SampleAreaDAO( _instance!! )
+                enumerationTeamDAO = EnumerationTeamDAO( _instance!! )
+                collectionTeamDAO = CollectionTeamDAO( _instance!! )
+                fieldDataDAO = FieldDataDAO( _instance!! )
+                fieldDataOptionDAO = FieldDataOptionDAO( _instance!! )
+                latLonDAO = LatLonDAO( _instance!!)
+                locationDAO = LocationDAO( _instance!!)
+                enumerationItemDAO = EnumerationItemDAO( _instance!!)
             }
 
-            return instance!!
+            return _instance!!
         }
 
         private const val DATABASE_VERSION = 235
