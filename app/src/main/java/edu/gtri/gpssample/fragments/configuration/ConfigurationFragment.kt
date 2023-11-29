@@ -291,6 +291,10 @@ class ConfigurationFragment : Fragment(),
         }
     }
 
+    override fun didCancelText( tag: Any? )
+    {
+    }
+
     override fun didEnterText( name: String, tag: Any? )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->

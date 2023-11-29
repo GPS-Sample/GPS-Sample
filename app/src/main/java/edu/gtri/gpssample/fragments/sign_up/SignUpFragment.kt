@@ -143,6 +143,10 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
         }
     }
 
+    override fun didCancelText( tag: Any? )
+    {
+    }
+
     override fun didEnterText( name: String, tag: Any? )
     {
         binding.otherQuestionTextView.text = name

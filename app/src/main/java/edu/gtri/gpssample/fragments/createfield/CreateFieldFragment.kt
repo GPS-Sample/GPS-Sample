@@ -254,6 +254,10 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFieldFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
+    override fun didCancelText( tag: Any? )
+    {
+    }
+
     override fun didEnterText( name: String, tag: Any? )
     {
         tag?.let {

@@ -69,6 +69,7 @@
             android:id="@+id/toolbar_layout"
             android:orientation="horizontal"
             android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_width="match_parent"
@@ -119,6 +120,10 @@
                 android:insetBottom="0dp"
                 android:background="@drawable/location_bubble" />
 
+            <Space
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"/>
             <Button
                 android:id="@+id/help_button"
                 android:layout_width="50dp"
