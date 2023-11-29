@@ -29,12 +29,12 @@ class ConfigDAO(private var dao: DAO)
             config.id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
             config.id?.let { id ->
                 Log.d( "xxx", "new config id = ${id}")
-//                for (latLon in config.mapTileRegion)
-//                {
-//                    DAO.latLonDAO.createOrUpdateLatLon( latLon, null, config )
-//                }
                 createOrUpdateEnumAreas(config)
                 createOrUpdateStudies(config)
+                for (mapTileRegion in config.mapTileRegions)
+                {
+                    DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( mapTileRegion, config )
+                }
                 return config
             } ?: return null
         }
@@ -98,9 +98,9 @@ class ConfigDAO(private var dao: DAO)
             config = buildConfig( cursor )
 
             config.id?.let{ id ->
-                config.studies = DAO.studyDAO.getStudies(config)
-                config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-//                config.mapTileRegion = DAO.latLonDAO.getLatLonsWithConfigId( id )
+                config.studies = DAO.studyDAO.getStudies( config )
+                config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+                config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
             }
         }
 
@@ -144,9 +144,9 @@ class ConfigDAO(private var dao: DAO)
             val config = buildConfig( cursor )
 
             config.id?.let{id ->
-                config.studies = DAO.studyDAO.getStudies(config)
-                config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-//                config.mapTileRegion = DAO.latLonDAO.getLatLonsWithConfigId( id )
+                config.studies = DAO.studyDAO.getStudies( config )
+                config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+                config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
             }
 
             configs.add( config)
@@ -226,6 +226,12 @@ class ConfigDAO(private var dao: DAO)
         for (enumArea in enumAreas)
         {
             DAO.enumAreaDAO.delete( enumArea )
+        }
+
+        val mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
+        for (mapTileRegion in mapTileRegions)
+        {
+            DAO.mapTileRegionDAO.delete( mapTileRegion )
         }
 
         val whereClause = "${DAO.COLUMN_ID} = ?"

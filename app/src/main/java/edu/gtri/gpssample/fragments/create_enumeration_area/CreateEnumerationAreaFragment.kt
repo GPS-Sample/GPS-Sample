@@ -786,12 +786,14 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (tag is MapTileRegion)
         {
             config.mapTileRegions.remove( tag )
+            DAO.mapTileRegionDAO.delete( tag )
         }
         else if (tag is EnumArea)
         {
             unsavedEnumAreas.remove( tag )
             config.enumAreas.remove( tag )
             DAO.enumAreaDAO.delete( tag )
+            Log.d( "xxx", "deleted?" )
         }
         else if (tag is PointAnnotation)
         {
@@ -848,6 +850,12 @@ class CreateEnumerationAreaFragment : Fragment(),
                         }
 
                         unsavedEnumAreas.add(enumArea)
+
+                        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                        val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                        val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+                        config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
                     }
                     is Point -> {
                         val point = geometry as Point

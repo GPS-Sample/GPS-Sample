@@ -378,6 +378,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableCollectionTeamLatLon)
 
+            val createTableMapTileRegion = ("CREATE TABLE " +
+                    TABLE_MAP_TILE_REGION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CONFIG_ID + " INTEGER" + "," +
+                    COLUMN_NORTH_EAST_LAT + " REAL" + "," +
+                    COLUMN_NORTH_EAST_LON + " REAL" + "," +
+                    COLUMN_SOUTH_WEST_LAT + " REAL" + "," +
+                    COLUMN_SOUTH_WEST_LON + " REAL" + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableMapTileRegion)
+
         }catch(ex: Exception)
         {
             Log.d("xxx", "the problem ${ex.toString()}")
@@ -411,6 +423,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
 
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUM_AREA")
@@ -581,6 +594,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_DATA_OPTION_NAME = "field_data_option_name"
         const val COLUMN_FIELD_DATA_OPTION_VALUE = "field_data_option_value"
 
+        const val TABLE_MAP_TILE_REGION = "map_tile_region"
+        const val COLUMN_NORTH_EAST_LAT = "north_east_lat"
+        const val COLUMN_NORTH_EAST_LON = "north_east_lon"
+        const val COLUMN_SOUTH_WEST_LAT = "south_west_lat"
+        const val COLUMN_SOUTH_WEST_LON = "south_west_lon"
+
         // connector table, fieldData to fieldDataOption
         const val TABLE_FIELD_DATA__FIELD_DATA_OPTION = "field_data__field_data_option"
 
@@ -613,6 +632,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var latLonDAO: LatLonDAO
         lateinit var locationDAO: LocationDAO
         lateinit var enumerationItemDAO: EnumerationItemDAO
+        lateinit var mapTileRegionDAO: MapTileRegionDAO
 
         // creation/access methods
 
@@ -684,9 +704,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 collectionTeamDAO = CollectionTeamDAO( _instance!! )
                 fieldDataDAO = FieldDataDAO( _instance!! )
                 fieldDataOptionDAO = FieldDataOptionDAO( _instance!! )
-                latLonDAO = LatLonDAO( _instance!!)
-                locationDAO = LocationDAO( _instance!!)
-                enumerationItemDAO = EnumerationItemDAO( _instance!!)
+                latLonDAO = LatLonDAO( _instance!! )
+                locationDAO = LocationDAO( _instance!! )
+                enumerationItemDAO = EnumerationItemDAO( _instance!! )
+                mapTileRegionDAO = MapTileRegionDAO( _instance!! )
             }
 
             return _instance!!
