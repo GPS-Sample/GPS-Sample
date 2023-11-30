@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.create_enumeration_area
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -57,8 +58,10 @@ class CreateEnumerationAreaFragment : Fragment(),
     OnMapClickListener,
     View.OnTouchListener,
     OnCameraChangeListener,
+    InputDialog.InputDialogDelegate,
+    MapboxManager.MapTileCacheDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
-    InputDialog.InputDialogDelegate
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
@@ -78,10 +81,11 @@ class CreateEnumerationAreaFragment : Fragment(),
     private val pointHashMap = HashMap<Long,Location>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
     private lateinit var defaultColorList : ColorStateList
+    private var busyIndicatorDialog: BusyIndicatorDialog? = null
+    private var allPointAnnotations = ArrayList<PointAnnotation>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
-    private var allPointAnnotations = ArrayList<PointAnnotation>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -170,7 +174,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         else if (obj is MapTileRegion)
                         {
                             ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                "Are you sure you want to delete this Map Tile Region?",
+                                resources.getString(R.string.delete_map_tile_region),
                                 resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
                         }
 
@@ -240,7 +244,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         binding.overlayView.setOnTouchListener(this)
 
-        binding.mapTileCacheButton.setOnClickListener {
+        binding.mapTileRegionButton.setOnClickListener {
             dropMode = false
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
@@ -248,26 +252,25 @@ class CreateEnumerationAreaFragment : Fragment(),
             {
                 createMapTileCache = false
                 binding.overlayView.visibility = View.GONE
-                binding.mapTileCacheButton.setBackgroundTintList(defaultColorList);
+                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
             }
             else
             {
                 createMapTileCache = true
                 polyLinePoints.clear()
-//                for (latLon in config.mapTileRegion)
-//                {
-//                    DAO.latLonDAO.delete(latLon)
-//                }
-//                config.mapTileRegion.clear()
-//                refreshMap()
                 if (this::polylineAnnotation.isInitialized)
                 {
                     polylineAnnotation.points = polyLinePoints
                     polylineAnnotationManager.update(polylineAnnotation)
                 }
                 binding.overlayView.visibility = View.VISIBLE
-                binding.mapTileCacheButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                binding.mapTileRegionButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
+        }
+
+        binding.mapTileCacheButton.setOnClickListener {
+            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+            MapboxManager.loadStylePack( activity!!, this )
         }
 
         binding.addHouseholdButton.backgroundTintList?.let {
@@ -636,7 +639,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 {
                     createMapTileCache = false
                     binding.overlayView.visibility = View.GONE
-                    binding.mapTileCacheButton.setBackgroundTintList(defaultColorList);
+                    binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
 
                     val vertices = ArrayList<LatLon>()
 
@@ -812,6 +815,48 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         refreshMap()
+    }
+
+    override fun stylePackLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+            }
+        }
+    }
+
+    override fun tilePacksLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                }
+            }
+        }
+    }
+
+    override fun didPressCancelButton()
+    {
+        MapboxManager.cancelStylePackDownload()
+        MapboxManager.cancelTilePackDownload()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)

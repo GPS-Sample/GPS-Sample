@@ -280,6 +280,17 @@
     <string name="enumeration_area">"Enumeration Area"</string>
 
     <string name="enum_area_name_property">"Enter the value of the Enumeration Area Name property"</string>
+    <string name="downloading_map_tiles">Downloading Map Tiles...</string>
+    <string name="style_pack_download_failed">Map Style Pack Download Failed</string>
+    <string name="tile_pack_download_failed">Map Tile Pack Download Failed</string>
+    <string name="download_map_tiles_now">Would you like to download map tiles now?</string>
+    <string name="delete_map_tile_region">Are you sure you want to delete this Map Tile Region?</string>
+    <string name="import_enumeration_area">Import Enumeration Area</string>
+    <string name="create_enumeration_area">Create Enumeration Area</string>
+    <string name="add_household">Add Household</string>
+    <string name="define_map_tile_cache_region">Define map tile cache region</string>
+    <string name="download_map_tiles">Download map tiles</string>
+    <string name="center_on_location">Center on location</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

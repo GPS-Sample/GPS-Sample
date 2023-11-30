@@ -8,10 +8,13 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import com.mapbox.bindgen.Value
+import com.mapbox.common.*
 import com.mapbox.geojson.Point
-import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.*
 import com.mapbox.maps.plugin.annotation.generated.*
-import edu.gtri.gpssample.database.*
+import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.models.MapTileRegion
 
 class MapboxManager(
     var context: Context,
@@ -20,6 +23,12 @@ class MapboxManager(
     var polylineAnnotationManager: PolylineAnnotationManager?
 )
 {
+    interface MapTileCacheDelegate
+    {
+        fun stylePackLoaded( error: String )
+        fun tilePacksLoaded( error: String )
+    }
+
     fun addMarker( point: Point, @DrawableRes resourceId: Int ) : PointAnnotation?
     {
         val pointAnnotationOptions = PointAnnotationOptions().withPoint( point )
@@ -91,4 +100,140 @@ class MapboxManager(
             bitmap
         }
     }
+
+    companion object
+    {
+        private val STYLE_PACK_METADATA = "STYLE_PACK_METADATA"
+        private val TILE_REGION_METADATA = "TILE_REGION_METADATA"
+
+        private var stylePackCancelable: Cancelable? = null
+        private var tileRegionsCancelable = ArrayList<Cancelable>()
+
+        fun loadStylePack( context: Context, delegate: MapTileCacheDelegate )
+        {
+            val stylePackLoadOptions = StylePackLoadOptions.Builder()
+                .glyphsRasterizationMode(GlyphsRasterizationMode.IDEOGRAPHS_RASTERIZED_LOCALLY)
+                .metadata(Value(STYLE_PACK_METADATA))
+                .build()
+
+            val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+
+            stylePackCancelable = offlineManager.loadStylePack(
+                Style.OUTDOORS,
+                stylePackLoadOptions,
+                { progress ->
+                },
+                { expected ->
+                    if (expected.isValue) {
+                        expected.value?.let { stylePack ->
+                            // Style pack download finished successfully
+                            Log.d( "xxx", "Style Pack download finished")
+                            delegate.stylePackLoaded("")
+                        }
+                    }
+                    expected.error?.let {
+                        // Handle errors that occurred during the style pack download.
+                        Log.d( "xxx", it.message )
+                        delegate.stylePackLoaded( it.message )
+                    }
+                }
+            )
+        }
+
+        fun loadTilePacks( context: Context, mapTileRegions: ArrayList<MapTileRegion>, delegate: MapTileCacheDelegate )
+        {
+            val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+
+            val tilesetDescriptor = offlineManager.createTilesetDescriptor(
+                TilesetDescriptorOptions.Builder()
+                    .styleURI(Style.OUTDOORS)
+                    .minZoom(0)
+                    .maxZoom(16)
+                    .build()
+            )
+
+            // You need to keep a reference of the created tileStore and keep it during the download process.
+            // You are also responsible for initializing the TileStore properly, including setting the proper access token.
+            val tileStore = TileStore.create().also {
+                // Set default access token for the created tile store instance
+                it.setOption(
+                    TileStoreOptions.MAPBOX_ACCESS_TOKEN,
+                    TileDataDomain.MAPS,
+                    Value(context.resources.getString(R.string.mapbox_access_token))
+                )
+            }
+
+            tileRegionsCancelable.clear()
+            var numLeft = mapTileRegions.size
+            var id = 0
+
+            for (mapTileRegion in mapTileRegions)
+            {
+                id += 1
+
+                val points = java.util.ArrayList<Point>()
+                points.add( Point.fromLngLat( mapTileRegion.southWest.longitude, mapTileRegion.southWest.latitude ))
+                points.add( Point.fromLngLat( mapTileRegion.northEast.longitude, mapTileRegion.southWest.latitude ))
+                points.add( Point.fromLngLat( mapTileRegion.northEast.longitude, mapTileRegion.northEast.latitude ))
+                points.add( Point.fromLngLat( mapTileRegion.southWest.longitude, mapTileRegion.northEast.latitude ))
+                points.add( Point.fromLngLat( mapTileRegion.southWest.longitude, mapTileRegion.southWest.latitude ))
+
+                val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                pointList.add( points )
+                val geometry = com.mapbox.geojson.Polygon.fromLngLats(pointList as List<MutableList<Point>>)
+
+                val tileRegionCancelable = tileStore.loadTileRegion(
+                    id.toString(),
+                    TileRegionLoadOptions.Builder()
+                        .geometry(geometry)
+                        .descriptors(listOf(tilesetDescriptor))
+                        .metadata(Value(TILE_REGION_METADATA))
+                        .acceptExpired(true)
+                        .networkRestriction(NetworkRestriction.NONE)
+                        .build(),
+                    { progress ->
+                        Log.d( "xxx", "Downloaded ${progress.completedResourceCount} of ${progress.requiredResourceCount} map resources")
+                        // Handle the download progress
+                    }
+                ) { expected ->
+                    if (expected.isValue) {
+                        // Tile region download finishes successfully
+                        Log.d( "xxx", "Tile Region download finished")
+                        numLeft -= 1
+                        if (numLeft == 0)
+                        {
+                            delegate.tilePacksLoaded("")
+                        }
+                    }
+                    expected.error?.let {
+                        // Handle errors that occurred during the tile region download.
+                        Log.d( "xxx", it.message )
+                        cancelTilePackDownload()
+                        delegate.tilePacksLoaded( it.message )
+                    }
+                }
+
+                tileRegionsCancelable.add( tileRegionCancelable )
+            }
+        }
+
+        fun cancelStylePackDownload()
+        {
+            stylePackCancelable?.let {
+                it.cancel()
+                stylePackCancelable = null
+            }
+        }
+
+        fun cancelTilePackDownload()
+        {
+            for (tileRegionCancelable in tileRegionsCancelable)
+            {
+                tileRegionCancelable.cancel()
+            }
+
+            tileRegionsCancelable.clear()
+        }
+    }
 }
+

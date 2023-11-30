@@ -22,7 +22,9 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
+import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -32,11 +34,14 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
 class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate,
-        NetworkClientModel.ConfigurationDelegate,
-        NetworkViewModel.ManageConfigurationNetworkDelegate
+    MapboxManager.MapTileCacheDelegate,
+    NetworkClientModel.ConfigurationDelegate,
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
+    NetworkViewModel.ManageConfigurationNetworkDelegate
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
+    private var busyIndicatorDialog: BusyIndicatorDialog? = null
 
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
@@ -351,14 +356,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         }
     }
 
-    override fun onDestroyView()
+    override fun configurationReceived(config: Config)
     {
-        super.onDestroyView()
-
-        _binding = null
-    }
-
-    override fun configurationReceived(config: Config) {
         runBlocking(Dispatchers.Main) {
 
             DAO.instance().writableDatabase.beginTransaction()
@@ -378,101 +377,169 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     override fun didReceiveConfiguration(complete: Boolean)
     {
-        if(complete)
+        if (complete)
         {
-            if (user.role == Role.Enumerator.toString())
-            {
-                if(sharedViewModel.configurations.size > 0)
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (config.mapTileRegions.size > 0)
                 {
-                    sharedViewModel.currentConfiguration?.value?.let{ config->
-
-                        // find the selected Enum Area
-                        val enumAreas = config.enumAreas.filter {
-                            it.id?.let { id ->
-                                id == config.selectedEnumAreaId
-                            } ?: false
-                        }
-
-                        // find the selected study
-                        val studies = config.studies.filter {
-                            it.id?.let { id ->
-                                id == config.selectedStudyId
-                            } ?: false
-                        }
-
-                        if (enumAreas.isNotEmpty() && studies.isNotEmpty())
-                        {
-                            val enumArea = enumAreas[0]
-                            val study = studies[0]
-
-                            // find the selected enumeration Team
-                            val enumTeams = enumArea.enumerationTeams.filter { enumTeam ->
-                                enumTeam.id?.let { id ->
-                                    id == enumArea.selectedEnumerationTeamId
-                                } ?: false
-                            }
-
-                            if (enumTeams.isNotEmpty())
-                            {
-                                val enumTeam = enumTeams[0]
-
-                                sharedViewModel.createStudyModel.setStudy( study )
-                                sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
-                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                                findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
-                            }
-                        }
-                    }
+                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                    MapboxManager.loadStylePack( activity!!, this )
+                }
+                else
+                {
+                    navigateBasedOnRole()
                 }
             }
-            else if (user.role == Role.DataCollector.toString())
+        }
+    }
+
+    override fun stylePackLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
             {
-                if(sharedViewModel.configurations.size > 0)
-                {
-                    sharedViewModel.currentConfiguration?.value?.let{ config->
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
+                    navigateBasedOnRole()
+                }
+            }
+            else
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+                }
+            }
+        }
+    }
 
-                        // find the selected Enum Area
-                        val enumAreas = config.enumAreas.filter {
-                            it.id?.let { id ->
-                                id == config.selectedEnumAreaId
+    override fun tilePacksLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                }
+            }
+
+            navigateBasedOnRole()
+        }
+    }
+
+    override fun didPressCancelButton()
+    {
+        MapboxManager.cancelStylePackDownload()
+        MapboxManager.cancelTilePackDownload()
+    }
+
+    fun navigateBasedOnRole()
+    {
+        if (user.role == Role.Enumerator.toString())
+        {
+            if(sharedViewModel.configurations.size > 0)
+            {
+                sharedViewModel.currentConfiguration?.value?.let{ config->
+
+                    // find the selected Enum Area
+                    val enumAreas = config.enumAreas.filter {
+                        it.id?.let { id ->
+                            id == config.selectedEnumAreaId
+                        } ?: false
+                    }
+
+                    // find the selected study
+                    val studies = config.studies.filter {
+                        it.id?.let { id ->
+                            id == config.selectedStudyId
+                        } ?: false
+                    }
+
+                    if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+                    {
+                        val enumArea = enumAreas[0]
+                        val study = studies[0]
+
+                        // find the selected enumeration Team
+                        val enumTeams = enumArea.enumerationTeams.filter { enumTeam ->
+                            enumTeam.id?.let { id ->
+                                id == enumArea.selectedEnumerationTeamId
                             } ?: false
                         }
 
-                        // find the selected study
-                        val studies = config.studies.filter {
-                            it.id?.let { id ->
-                                id == config.selectedStudyId
-                            } ?: false
-                        }
-
-                        if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+                        if (enumTeams.isNotEmpty())
                         {
-                            val study = studies[0]
-                            val enumArea = enumAreas[0]
-                            val sampleArea = study.sampleAreas[0]
+                            val enumTeam = enumTeams[0]
 
-                            // find the selected collection Team
-                            val collectionTeams = study.collectionTeams.filter { collectionTeam ->
-                                collectionTeam.id?.let { id ->
-                                    id == study.selectedCollectionTeamId
-                                } ?: false
-                            }
-
-                            if (collectionTeams.isNotEmpty())
-                            {
-                                val collectionTeam = collectionTeams[0]
-
-                                sharedViewModel.createStudyModel.setStudy( study )
-                                sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
-                                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
-                                samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-
-                                findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
-                            }
+                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
+                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                         }
                     }
                 }
             }
         }
+        else if (user.role == Role.DataCollector.toString())
+        {
+            if(sharedViewModel.configurations.size > 0)
+            {
+                sharedViewModel.currentConfiguration?.value?.let{ config->
+
+                    // find the selected Enum Area
+                    val enumAreas = config.enumAreas.filter {
+                        it.id?.let { id ->
+                            id == config.selectedEnumAreaId
+                        } ?: false
+                    }
+
+                    // find the selected study
+                    val studies = config.studies.filter {
+                        it.id?.let { id ->
+                            id == config.selectedStudyId
+                        } ?: false
+                    }
+
+                    if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+                    {
+                        val study = studies[0]
+                        val enumArea = enumAreas[0]
+
+                        // find the selected collection Team
+                        val collectionTeams = study.collectionTeams.filter { collectionTeam ->
+                            collectionTeam.id?.let { id ->
+                                id == study.selectedCollectionTeamId
+                            } ?: false
+                        }
+
+                        if (collectionTeams.isNotEmpty())
+                        {
+                            val collectionTeam = collectionTeams[0]
+
+                            sharedViewModel.createStudyModel.setStudy( study )
+                            sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
+                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                            samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+                            findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+
+        _binding = null
     }
 }
