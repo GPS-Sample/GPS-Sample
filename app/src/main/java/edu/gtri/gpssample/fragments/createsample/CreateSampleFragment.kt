@@ -208,8 +208,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
             if (pointList.isNotEmpty())
             {
-                mapboxManager.addPolygon(pointList,"#000000")
-                mapboxManager.addPolyline( pointList[0] )
+                mapboxManager.addPolygon(pointList,"#000000", 0.25)
+                mapboxManager.addPolyline( pointList[0], "#ff0000" )
 
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                     val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)

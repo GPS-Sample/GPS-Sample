@@ -8,9 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.R
-import com.mapbox.maps.Style
+import com.mapbox.maps.*
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.gestures.OnMoveListener
@@ -120,11 +118,11 @@ class MapFragment : Fragment()
             this.locationPuck = LocationPuck2D(
                 bearingImage = AppCompatResources.getDrawable(
                     activity!!,
-                    R.drawable.mapbox_user_puck_icon,
+                    com.mapbox.maps.R.drawable.mapbox_user_puck_icon,
                 ),
                 shadowImage = AppCompatResources.getDrawable(
                     activity!!,
-                    R.drawable.mapbox_user_icon_shadow,
+                    com.mapbox.maps.R.drawable.mapbox_user_icon_shadow,
                 ),
                 scaleExpression = interpolate {
                     linear()

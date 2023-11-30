@@ -31,7 +31,7 @@ class CollectionTeamDAO(private var dao: DAO)
         collectionTeam.id?.let {
             for (latLon in collectionTeam.polygon)
             {
-                DAO.latLonDAO.createOrUpdateLatLon(latLon,null)
+                DAO.latLonDAO.createOrUpdateLatLon(latLon,null, null)
             }
         }
 

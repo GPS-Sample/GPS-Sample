@@ -31,6 +31,10 @@ class ConfigDAO(private var dao: DAO)
                 Log.d( "xxx", "new config id = ${id}")
                 createOrUpdateEnumAreas(config)
                 createOrUpdateStudies(config)
+                for (mapTileRegion in config.mapTileRegions)
+                {
+                    DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( mapTileRegion, config )
+                }
                 return config
             } ?: return null
         }
@@ -93,9 +97,10 @@ class ConfigDAO(private var dao: DAO)
             cursor.moveToNext()
             config = buildConfig( cursor )
 
-            config.id?.let{id ->
-                config.studies = DAO.studyDAO.getStudies(config)
-                config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+            config.id?.let{ id ->
+                config.studies = DAO.studyDAO.getStudies( config )
+                config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+                config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
             }
         }
 
@@ -139,8 +144,9 @@ class ConfigDAO(private var dao: DAO)
             val config = buildConfig( cursor )
 
             config.id?.let{id ->
-                config.studies = DAO.studyDAO.getStudies(config)
-                config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+                config.studies = DAO.studyDAO.getStudies( config )
+                config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+                config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
             }
 
             configs.add( config)
@@ -220,6 +226,12 @@ class ConfigDAO(private var dao: DAO)
         for (enumArea in enumAreas)
         {
             DAO.enumAreaDAO.delete( enumArea )
+        }
+
+        val mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
+        for (mapTileRegion in mapTileRegions)
+        {
+            DAO.mapTileRegionDAO.delete( mapTileRegion )
         }
 
         val whereClause = "${DAO.COLUMN_ID} = ?"

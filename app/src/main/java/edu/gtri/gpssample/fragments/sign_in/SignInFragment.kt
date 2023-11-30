@@ -161,6 +161,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SignInFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
+    override fun didCancelText( tag: Any? )
+    {
+    }
+
     override fun didEnterText( text: String, tag: Any? )
     {
         val userName = binding.nameEditText.text.toString()

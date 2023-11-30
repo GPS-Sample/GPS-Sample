@@ -323,6 +323,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             val y = db.execSQL(createTableLatLon)
 
+            val createTableConfigLatLon = ("CREATE TABLE " +
+                    TABLE_CONFIG__LAT_LON + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CONFIG_ID + " INTEGER " + "," +
+                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
+                    "UNIQUE ($COLUMN_CONFIG_ID, $COLUMN_LAT_LON_ID)" +
+                    ")")
+            db.execSQL(createTableConfigLatLon)
+
             val createTableEnumAreaLatLon = ("CREATE TABLE " +
                     TABLE_ENUM_AREA__LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -367,6 +378,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableCollectionTeamLatLon)
 
+            val createTableMapTileRegion = ("CREATE TABLE " +
+                    TABLE_MAP_TILE_REGION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_CONFIG_ID + " INTEGER" + "," +
+                    COLUMN_NORTH_EAST_LAT + " REAL" + "," +
+                    COLUMN_NORTH_EAST_LON + " REAL" + "," +
+                    COLUMN_SOUTH_WEST_LAT + " REAL" + "," +
+                    COLUMN_SOUTH_WEST_LON + " REAL" + "," +
+                    "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableMapTileRegion)
+
         }catch(ex: Exception)
         {
             Log.d("xxx", "the problem ${ex.toString()}")
@@ -395,10 +418,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
 
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUM_AREA")
@@ -569,6 +594,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_DATA_OPTION_NAME = "field_data_option_name"
         const val COLUMN_FIELD_DATA_OPTION_VALUE = "field_data_option_value"
 
+        const val TABLE_MAP_TILE_REGION = "map_tile_region"
+        const val COLUMN_NORTH_EAST_LAT = "north_east_lat"
+        const val COLUMN_NORTH_EAST_LON = "north_east_lon"
+        const val COLUMN_SOUTH_WEST_LAT = "south_west_lat"
+        const val COLUMN_SOUTH_WEST_LON = "south_west_lon"
+
         // connector table, fieldData to fieldDataOption
         const val TABLE_FIELD_DATA__FIELD_DATA_OPTION = "field_data__field_data_option"
 
@@ -577,6 +608,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LON = "lon"
 
         // connector tables for lat lon
+        const val TABLE_CONFIG__LAT_LON = "config_lat_lon"
         const val TABLE_ENUM_AREA__LAT_LON = "enum_area_lat_lon"
         const val TABLE_SAMPLE_AREA__LAT_LON = "sample_area_lat_lon"
         const val TABLE_ENUMERATION_TEAM__LAT_LON = "enumeration_team_lat_lon"
@@ -600,6 +632,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var latLonDAO: LatLonDAO
         lateinit var locationDAO: LocationDAO
         lateinit var enumerationItemDAO: EnumerationItemDAO
+        lateinit var mapTileRegionDAO: MapTileRegionDAO
 
         // creation/access methods
 
@@ -645,6 +678,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.delete(TABLE_LAT_LON, null, null)
                 db.delete(TABLE_LOCATION, null, null)
                 db.delete(TABLE_ENUMERATION_ITEM, null, null)
+                db.delete(TABLE_CONFIG__LAT_LON, null, null)
                 db.delete(TABLE_ENUM_AREA__LAT_LON, null, null)
                 db.delete(TABLE_SAMPLE_AREA__LAT_LON, null, null)
             }
@@ -670,9 +704,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 collectionTeamDAO = CollectionTeamDAO( _instance!! )
                 fieldDataDAO = FieldDataDAO( _instance!! )
                 fieldDataOptionDAO = FieldDataOptionDAO( _instance!! )
-                latLonDAO = LatLonDAO( _instance!!)
-                locationDAO = LocationDAO( _instance!!)
-                enumerationItemDAO = EnumerationItemDAO( _instance!!)
+                latLonDAO = LatLonDAO( _instance!! )
+                locationDAO = LocationDAO( _instance!! )
+                enumerationItemDAO = EnumerationItemDAO( _instance!! )
+                mapTileRegionDAO = MapTileRegionDAO( _instance!! )
             }
 
             return _instance!!

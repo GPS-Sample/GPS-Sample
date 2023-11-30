@@ -280,13 +280,13 @@ class PerformCollectionFragment : Fragment(),
 
             if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
             {
-                val polygonAnnotation = mapboxManager.addPolygon(pointList,"#000000")
+                val polygonAnnotation = mapboxManager.addPolygon(pointList,"#000000", 0.25)
 
                 polygonAnnotation?.let {
                     allPolygonAnnotations.add( it )
                 }
 
-                val polylineAnnotation = mapboxManager.addPolyline(pointList[0])
+                val polylineAnnotation = mapboxManager.addPolyline(pointList[0],"#ff0000")
 
                 polylineAnnotation?.let {
                     allPolylineAnnotations.add( it )

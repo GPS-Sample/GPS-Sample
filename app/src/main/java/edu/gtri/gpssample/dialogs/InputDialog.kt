@@ -10,6 +10,7 @@ class InputDialog
 {
     interface InputDialogDelegate
     {
+        fun didCancelText( tag: Any? )
         fun didEnterText( text: String, tag: Any? )
     }
 
@@ -43,6 +44,7 @@ class InputDialog
         val cancelButton = view!!.findViewById<Button>(R.id.cancel_button)
         cancelButton.setOnClickListener {
             alertDialog.dismiss()
+            delegate.didCancelText( tag )
         }
 
         val saveButton = view.findViewById<Button>(R.id.save_button)

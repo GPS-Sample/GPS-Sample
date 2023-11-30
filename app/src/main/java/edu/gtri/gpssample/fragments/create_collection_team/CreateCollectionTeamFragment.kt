@@ -185,8 +185,8 @@ class CreateCollectionTeamFragment : Fragment(),
 
             if (pointList.isNotEmpty())
             {
-                mapboxManager.addPolygon(pointList,"#000000")
-                mapboxManager.addPolyline( pointList[0] )
+                mapboxManager.addPolygon(pointList,"#000000", 0.25)
+                mapboxManager.addPolyline( pointList[0], "#ff0000" )
 
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                     val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
@@ -291,7 +291,7 @@ class CreateCollectionTeamFragment : Fragment(),
                             {
                                 val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                 pointList.add( vertices )
-                                intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000")
+                                intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000", 0.25)
 
                                 for (location in sampleArea.locations)
                                 {

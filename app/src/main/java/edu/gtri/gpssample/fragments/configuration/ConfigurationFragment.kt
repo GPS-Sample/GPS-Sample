@@ -195,8 +195,8 @@ class ConfigurationFragment : Fragment(),
 
                 pointList.add( points )
 
-                mapboxManager.addPolygon( pointList, "#000000" )
-                mapboxManager.addPolyline( pointList[0] )
+                mapboxManager.addPolygon( pointList, "#000000", 0.25 )
+                mapboxManager.addPolyline( pointList[0], "#ff0000" )
 
             }
 
@@ -289,6 +289,10 @@ class ConfigurationFragment : Fragment(),
                 }
             }
         }
+    }
+
+    override fun didCancelText( tag: Any? )
+    {
     }
 
     override fun didEnterText( name: String, tag: Any? )
