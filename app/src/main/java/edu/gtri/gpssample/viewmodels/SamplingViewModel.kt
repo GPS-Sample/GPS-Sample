@@ -128,6 +128,61 @@ class SamplingViewModel : ViewModel()
         return SamplingState.None
     }
 
+    fun validateRule(rule : Rule, fieldData : FieldData) : Boolean
+    {
+        var validRule = false
+        fieldData.field?.let{field->
+            when (field.type) {
+                FieldType.Number -> {
+                    // we allow for all of the rule operators
+                    // convert string to int
+                    try {
+
+                        val ruleNumber = rule.value.toDouble()
+                        fieldData.numberValue?.let { number ->
+                            rule?.operator?.let { operator ->
+                                when (operator) {
+                                    Operator.Equal -> {
+
+                                        val epsilon = 0.000001
+                                        validRule =
+                                            Math.abs(number - ruleNumber) < epsilon
+
+                                    }
+                                    Operator.GreaterThan -> {
+                                        validRule = (number > ruleNumber)
+                                    }
+                                    Operator.GreaterThanOrEqual -> {
+                                        validRule = (number >= ruleNumber)
+                                    }
+                                    Operator.LessThanOrEqual -> {
+                                        validRule = (number <= ruleNumber)
+                                    }
+                                    Operator.LessThan -> {
+                                        validRule = (number < ruleNumber)
+                                    }
+                                    Operator.NotEqual -> {
+                                        validRule = (number != ruleNumber)
+                                    }
+                                    else->{
+                                        validRule = false
+                                    }
+                                }
+                            }
+                        }
+                    }catch (ex : Exception){
+                        Log.d("XXXXXX", ex.toString())
+                    }
+
+                }
+                else -> {
+                    validRule = fieldData.textValue?.equals(rule.value) ?: false
+                }
+            }
+        }
+
+        return validRule
+    }
     fun beginSampling(view : View) : SamplingState
     {
         val validSamples : ArrayList<EnumerationItem> = ArrayList()
@@ -140,7 +195,86 @@ class SamplingViewModel : ViewModel()
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
                 {
-                    validSamples.add(sampleItem)
+                    // add in filters
+                    var validSample = false
+                    for (filter in study.filters)
+                    {
+                        var validRule = false
+                        var validFilterOperator = false
+                        filter.rule?.let{rule ->
+                            rule.field?.let{field ->
+                                Log.d("XXXXXXXX", "the field ${field.name}")
+                                for (fieldData in sampleItem.fieldDataList)
+                                {
+                                    Log.d("XXXXX", "field name ${field.name} == fielddata name ${fieldData.field?.name}")
+                                    if( fieldData.field?.name.equals( field.name))
+                                    {
+                                        validRule = validateRule(rule, fieldData)
+                                    }
+                                }
+                            }
+                            var filterOperator : FilterOperator? = rule.filterOperator
+                            while(filterOperator != null)
+                            {
+                                var validNextRule = false
+
+                                // check each rule
+                                filterOperator?.let{fo ->
+                                    fo.rule?.let{nextRule ->
+                                        // check next rule
+                                        nextRule.field?.let{field ->
+                                            Log.d("XXXXXXXX", "the field ${field.name}")
+                                            for (fieldData in sampleItem.fieldDataList)
+                                            {
+                                                if( fieldData.field?.name.equals( field.name))
+                                                {
+                                                    validNextRule = validateRule(nextRule, fieldData)
+                                                    // check the operator
+                                                    if(validNextRule)
+                                                    {
+                                                        when(fo.conenctor)
+                                                        {
+                                                            Connector.AND->{
+                                                                validFilterOperator = (validRule && validNextRule)
+                                                            }
+                                                            Connector.OR->{
+                                                                validFilterOperator = (validRule || validNextRule)
+                                                            }
+                                                            Connector.NOT->{
+                                                                validFilterOperator = (validRule && !validNextRule)
+                                                            }
+                                                            else->{
+                                                                validFilterOperator = false
+                                                            }
+                                                        }
+                                                    }
+                                                    if(!validNextRule || !validFilterOperator)
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        // check constraint
+                                        filterOperator = nextRule.filterOperator
+                                    }
+                                }?:run{
+                                    filterOperator = null
+                                }
+
+                            }
+                        }
+                        validSample = validRule && validFilterOperator
+                        if(!validSample)
+                        {
+                            break;
+                        }
+                    }
+                    if(validSample)
+                    {
+                        validSamples.add(sampleItem)
+                    }
+
                 }
             }
 
