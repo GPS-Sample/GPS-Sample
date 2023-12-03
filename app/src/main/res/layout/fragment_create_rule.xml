@@ -130,6 +130,8 @@
 
                 <EditText
                     android:id="@+id/value_edit_text"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
