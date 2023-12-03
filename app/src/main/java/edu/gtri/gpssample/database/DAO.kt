@@ -414,6 +414,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
@@ -426,6 +427,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
 
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__SAMPLE_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUMERATION_TEAM")
@@ -713,6 +715,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 235
+        private const val DATABASE_VERSION = 241
     }
 }
