@@ -206,12 +206,7 @@ class ConfigurationViewModel : ViewModel()
 
     fun setCurrentConfig(config : Config)
     {
-        _actualConfig = config
-        _currentConfiguration?.let {
-            it.value = _actualConfig!!
-        }?: run{
-            _currentConfiguration = MutableLiveData(_actualConfig!!)
-        }
+        _currentConfiguration = MutableLiveData(config)
     }
 
     fun deleteConfig(config : Config)
