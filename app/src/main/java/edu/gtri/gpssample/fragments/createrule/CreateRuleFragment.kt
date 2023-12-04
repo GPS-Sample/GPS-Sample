@@ -38,16 +38,16 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         sharedViewModel.createRuleModel.fragment = this
         sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                rule.field?.let{field->
+                rule.field?.let{ field->
                     for (i in 0..study.fields.size-1)
                     {
-                        if (study.fields[i].id == field.id)
+                        if (study.fields[i].uuid == field.uuid)
                         {
                             sharedViewModel.createRuleModel.ruleFieldPosition.value = i
+                            break
                         }
                     }
                 }
-
             }
         }
 

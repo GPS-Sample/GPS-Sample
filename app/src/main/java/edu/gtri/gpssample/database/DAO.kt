@@ -79,7 +79,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_STUDY_ID + " INTEGER NOT NULL" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER NOT NULL" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableStudyEnumArea)
@@ -97,6 +97,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableField = ("CREATE TABLE " +
                     TABLE_FIELD + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_UUID + " TEXT" + "," +
                     COLUMN_STUDY_ID + " INTEGER" + "," +
                     COLUMN_FIELD_NAME + " TEXT" + "," +
                     COLUMN_FIELD_BLOCK_CONTAINER + " INTEGER" + "," +
@@ -129,7 +130,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_FIELD_ID + " INTEGER" + "," +
                     COLUMN_FIELD_OPTION_ID + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_OPTION_ID) REFERENCES $TABLE_FIELD_OPTION($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableField__FieldOption)
@@ -310,7 +311,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_FIELD_DATA_ID + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_OPTION_ID + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_FIELD_DATA_ID) REFERENCES $TABLE_FIELD_DATA($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_FIELD_DATA_ID) REFERENCES $TABLE_FIELD_DATA($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_DATA_OPTION_ID) REFERENCES $TABLE_FIELD_DATA_OPTION($COLUMN_ID)" +
                     ")")
             val x = db.execSQL(createTableFieldData__FieldDataOption)
@@ -389,10 +390,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     "FOREIGN KEY($COLUMN_CONFIG_ID) REFERENCES $TABLE_CONFIG($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableMapTileRegion)
-
-        }catch(ex: Exception)
+        }
+        catch(ex: Exception)
         {
-            Log.d("xxx", "the problem ${ex.toString()}")
+            Log.d("xxx", ex.stackTraceToString())
         }
     }
 
@@ -715,6 +716,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 241
+        private const val DATABASE_VERSION = 246
     }
 }

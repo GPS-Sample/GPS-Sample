@@ -6,13 +6,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
+import kotlin.collections.ArrayList
 
 // NOTE!!
 // This class defines the Field questions and is a part of the study
 
 @Serializable
 data class Field(
-    var id : Int? = null,
+    var id: Int? = null,
+    var uuid: String,
     var name: String,
     var type: FieldType,
     var fieldBlockContainer: Boolean,
@@ -25,7 +28,7 @@ data class Field(
     var fieldOptions: ArrayList<FieldOption>)
 {
     constructor(name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, date: Boolean, time: Boolean)
-            : this(null,  name, type, false, null, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
+            : this(null, UUID.randomUUID().toString(), name, type, false, null, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
 
     fun copy() : Field
     {

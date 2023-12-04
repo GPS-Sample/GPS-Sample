@@ -45,6 +45,7 @@ class FieldDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, field.id )
         }
 
+        values.put( DAO.COLUMN_UUID, field.uuid )
         values.put( DAO.COLUMN_STUDY_ID, study.id )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
@@ -92,6 +93,7 @@ class FieldDAO(private var dao: DAO)
     private fun  buildField(cursor: Cursor ): Field
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val typeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
         val fieldBlockContainer = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_BLOCK_CONTAINER)).toBoolean()
@@ -104,7 +106,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(id, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
+        return Field(id, uuid, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
     }
 
     //--------------------------------------------------------------------------

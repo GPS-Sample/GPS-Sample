@@ -273,12 +273,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         DAO.instance().writableDatabase.setTransactionSuccessful()
                         DAO.instance().writableDatabase.endTransaction()
 
-                        enumArea.id?.let {
-                            DAO.enumAreaDAO.getEnumArea(it)?.let {
-                                sharedViewModel?.replaceEnumArea(it)
-                                sharedViewModel?.enumAreaViewModel?.setCurrentEnumArea(it)
-                                delegate?.let {
-                                    it.didFinishImport()
+                        delegate?.let {
+                            it.didFinishImport()
+                        }
+
+                        sharedViewModel?.currentConfiguration?.value?.let { config ->
+                            config.id?.let {
+                                DAO.configDAO.getConfig( it )?.let { config ->
+                                    sharedViewModel?.setCurrentConfig(config)
                                 }
                             }
                         }
@@ -312,6 +314,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         delegate?.let {
                             it.didFinishImport()
                         }
+
+                        sharedViewModel?.currentConfiguration?.value?.let { config ->
+                            config.id?.let {
+                                DAO.configDAO.getConfig( it )?.let { config ->
+                                    sharedViewModel?.setCurrentConfig(config)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -333,8 +343,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
     }
 
     override fun clientConnected(socket: Socket) {
-
-
     }
 
     override fun didCreateHotspot(success : Boolean, serverIp : InetAddress?)
