@@ -82,7 +82,9 @@ class CreateEnumerationAreaFragment : Fragment(),
     private val unsavedEnumAreas = ArrayList<EnumArea>()
     private lateinit var defaultColorList : ColorStateList
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
+    private val unsavedMapTileRegions = ArrayList<MapTileRegion>()
     private var allPointAnnotations = ArrayList<PointAnnotation>()
+    private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
@@ -157,32 +159,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
-
-        if (editMode)
-        {
-            polygonAnnotationManager?.apply {
-                addClickListener(
-                    OnPolygonAnnotationClickListener { polygonAnnotation ->
-                        val obj = polygonHashMap[polygonAnnotation.id]
-
-                        if (obj is EnumArea)
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                "${resources.getString(R.string.delete_enum_area_message)} ${obj.name}?",
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
-                        }
-                        else if (obj is MapTileRegion)
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                resources.getString(R.string.delete_map_tile_region),
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
-                        }
-
-                        true
-                    }
-                )
-            }
-        }
 
         binding.mapView.gestures.addOnMapClickListener(this )
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
@@ -306,6 +282,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         binding.saveButton.setOnClickListener {
             config.enumAreas.addAll( unsavedEnumAreas )
+            config.mapTileRegions.addAll( unsavedMapTileRegions )
             findNavController().popBackStack()
         }
     }
@@ -356,9 +333,37 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         allPointAnnotations.clear()
 
-//        removeAllPolygonOnClickListeners()
+        removeAllPolygonOnClickListeners()
 
-        for (mapTileRegion in config.mapTileRegions)
+        if (editMode)
+        {
+            polygonAnnotationManager?.apply {
+                addClickListener(
+                    OnPolygonAnnotationClickListener { polygonAnnotation ->
+                        val obj = polygonHashMap[polygonAnnotation.id]
+
+                        if (obj is EnumArea)
+                        {
+                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                                "${resources.getString(R.string.delete_enum_area_message)} ${obj.name}?",
+                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
+                        }
+                        else if (obj is MapTileRegion)
+                        {
+                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                                resources.getString(R.string.delete_map_tile_region),
+                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
+                        }
+
+                        true
+                    }
+                )
+            }
+        }
+
+        val allMapTileRegions = getAllMapTileRegions()
+
+        for (mapTileRegion in allMapTileRegions)
         {
             addPolygon( mapTileRegion )
         }
@@ -496,6 +501,13 @@ class CreateEnumerationAreaFragment : Fragment(),
         return allEnumAreas
     }
 
+    fun getAllMapTileRegions() : ArrayList<MapTileRegion>
+    {
+        val allMapTileRegions = ArrayList<MapTileRegion>()
+        allMapTileRegions.addAll( config.mapTileRegions )
+        allMapTileRegions.addAll( unsavedMapTileRegions )
+        return allMapTileRegions
+    }
     fun createLocation( latLng: LatLng )
     {
         var enumArea = findEnumAreaOfLocation( config.enumAreas, latLng )
@@ -608,8 +620,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
-    private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
-
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
         p1?.let { p1 ->
@@ -661,7 +671,9 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                     val deleteList = ArrayList<MapTileRegion>()
 
-                    for (mtr in config.mapTileRegions)
+                    val allMapTileRegions = getAllMapTileRegions()
+
+                    for (mtr in allMapTileRegions)
                     {
                         val points2 = ArrayList<Coordinate>()
                         points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
@@ -678,10 +690,17 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                     for (mtr in deleteList)
                     {
-                        config.mapTileRegions.remove( mtr )
+                        if (config.mapTileRegions.contains( mtr ))
+                        {
+                            config.mapTileRegions.remove( mtr )
+                        }
+                        else if (unsavedMapTileRegions.contains( mtr ))
+                        {
+                            unsavedMapTileRegions.remove( mtr )
+                        }
                     }
 
-                    config.mapTileRegions.add( mapTileRegion )
+                    unsavedMapTileRegions.add( mapTileRegion )
 
                     polyLinePoints.clear()
                     polylineAnnotation.points = polyLinePoints
@@ -770,7 +789,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
             val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
-            config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
+            unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
 
             polyLinePoints.clear()
             polylineAnnotation.points = polyLinePoints
@@ -789,6 +808,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (tag is MapTileRegion)
         {
             config.mapTileRegions.remove( tag )
+            unsavedMapTileRegions.remove( tag )
             DAO.mapTileRegionDAO.delete( tag )
         }
         else if (tag is EnumArea)
@@ -796,7 +816,6 @@ class CreateEnumerationAreaFragment : Fragment(),
             unsavedEnumAreas.remove( tag )
             config.enumAreas.remove( tag )
             DAO.enumAreaDAO.delete( tag )
-            Log.d( "xxx", "deleted?" )
         }
         else if (tag is PointAnnotation)
         {
