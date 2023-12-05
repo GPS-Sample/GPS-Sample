@@ -47,6 +47,7 @@ data class Rule(
     {
         return this.name
     }
+    
     companion object
     {
         fun unpack( message: String ) : Rule

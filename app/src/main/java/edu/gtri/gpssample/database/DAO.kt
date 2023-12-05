@@ -172,7 +172,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CONNECTOR +  " INTEGER " + "," +
                     COLUMN_FILTER_ID + " INTEGER NOT NULL " + "," +
                     COLUMN_FIRST_RULE_ID+   " INTEGER NOT NULL " + "," +
-                    COLUMN_SECOND_RULE_ID +  " INTEGER NOT NULL " + "," +
+                    COLUMN_SECOND_RULE_ID +  " INTEGER " + "," +
                     "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIRST_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
                     "FOREIGN KEY($COLUMN_SECOND_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
@@ -721,6 +721,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 255
+        private const val DATABASE_VERSION = 259
     }
 }

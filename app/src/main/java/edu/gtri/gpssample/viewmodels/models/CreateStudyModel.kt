@@ -244,7 +244,7 @@ class CreateStudyModel {
                     config.studies.add(study)
 
                 }
-                DAO.studyDAO.createOrUpdateStudy(study)
+               // DAO.studyDAO.createOrUpdateStudy(study)
             }
         }
     }
