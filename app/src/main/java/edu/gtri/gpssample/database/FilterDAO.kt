@@ -13,7 +13,7 @@ import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
 
-data class RawFilterOperator(var rule1 :Int , var rule2 : Int?, var connector : Int)
+data class RawFilterOperator(var id : Int, var rule1 :Int , var rule2 : Int?, var connector : Int)
 
 class FilterDAO(private var dao: DAO)
 {
@@ -240,11 +240,11 @@ class FilterDAO(private var dao: DAO)
 
             while (cursor.moveToNext())
             {
-
+                val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
                 val firstRuleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIRST_RULE_ID))
                 val secondRuleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SECOND_RULE_ID))
                 val connectorId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONNECTOR))
-                val rawFilterOperator = RawFilterOperator(firstRuleId, secondRuleId, connectorId)
+                val rawFilterOperator = RawFilterOperator(id, firstRuleId, secondRuleId, connectorId)
                 rawFilterOperators.add(rawFilterOperator)
             }
             cursor.close()
@@ -270,39 +270,29 @@ class FilterDAO(private var dao: DAO)
                     rule2 = DAO.ruleDAO.getRule(rule2Id)
 
                 }
-                
-                // now we have two rules
-                // loop through the raw rules again
-                // rule1 can be rule2 or rule2 can be rule 1
-
-//                var containsRule1 = false
-//                var containsRule2 = false
-//                for(rule in rules)
-//                {
-//                    if(rule.id == rule1.id)
-//                    {
-//                        rule1 = rule
-//                    }
-//                    rule2?.let{r2->
-//                        if(r2.id == rule.id)
-//                        {
-//                            rule2 = rule
-//                        }
-//                    }
-//                }
-//
-//
-//
-//                rule1?.let{rule1->
-//                    // see if it's already there.  if so, this is a copy, ditch it and grab the  one
-//                    // in the list
-//                    for(rule in rules)
-//                    {
-//
-//                    }
-
+                if(startRule == null)
+                {
+                    startRule = rule1
+                    startRule?.let{rule->
+                        rule.filterOperator = FilterOperator(rfo.id,
+                            ConnectorConverter.fromIndex(rfo.connector), rule2)
+                    }
+                }else
+                {
+                    // if the start rule is rule 2, then add connector and replace
+                    rule2?.let{rule2->
+                        if(rule2.id!! == startRule!!.id!!)
+                        {
+                            rule1!!.filterOperator = FilterOperator(rfo.id,
+                                ConnectorConverter.fromIndex(rfo.connector), startRule)
+                            startRule = rule1
+                        }    
+                    }
 
                 }
+
+
+
             }
         }
 
