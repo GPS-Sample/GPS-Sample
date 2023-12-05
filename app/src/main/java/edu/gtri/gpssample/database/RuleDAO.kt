@@ -32,13 +32,45 @@ class RuleDAO(private var dao: DAO)
         return rule
     }
 
+
+    @SuppressLint("Range")
+    fun findRuleId(rule : Rule) : Int?
+    {
+        rule.field?.let { field ->
+            // look for the field cause it may exist and the copy doesn't have the id
+            val field_id = DAO.fieldDAO.findFieldId(field)
+            field.id = field_id
+
+            // look for the rule by it's pieces then return the id
+
+            field.id?.let { field_id ->
+                rule.operator?.let { operator ->
+                    val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_RULE} WHERE " +
+                            "${DAO.COLUMN_FIELD_ID} = ${field_id} AND ${DAO.COLUMN_RULE_NAME} = '${rule.name}' " +
+                            "AND ${DAO.COLUMN_OPERATOR_ID} = '${OperatorConverter.toIndex(operator)}' AND " +
+                            "${DAO.COLUMN_RULE_VALUE} = '${rule.value}'"
+
+                    val cursor = dao.writableDatabase.rawQuery(query, null)
+
+                    while (cursor.moveToNext()) {
+                        return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+                    }
+
+                }
+
+            }
+        }
+        return null
+    }
     //--------------------------------------------------------------------------
     fun exists( rule: Rule ): Boolean
     {
+
         rule.id?.let { id ->
             getRule( id )?.let {
                 return true
-            } ?: return false
+            } ?:return false
+
         } ?: return false
     }
 

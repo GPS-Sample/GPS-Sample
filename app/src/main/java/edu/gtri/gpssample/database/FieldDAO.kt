@@ -6,9 +6,11 @@ import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
+import edu.gtri.gpssample.constants.OperatorConverter
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldOption
+import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
@@ -78,6 +80,29 @@ class FieldDAO(private var dao: DAO)
         }
     }
 
+    @SuppressLint("Range")
+    fun findFieldId(field : Field) : Int?
+    {
+        // look for the rule by it's pieces then return the id
+        field.id?.let{ fieldId ->
+            return fieldId
+
+        }?: run{
+            val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_FIELD} WHERE " +
+                    "${DAO.COLUMN_UUID} = '${field.uuid}' " +
+                    "AND ${DAO.COLUMN_FIELD_NAME} = '${field.name}'"
+
+            val cursor = dao.writableDatabase.rawQuery(query, null)
+
+            while (cursor.moveToNext())
+            {
+                return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+            }
+
+        }
+
+        return null
+    }
     //--------------------------------------------------------------------------
     fun exists( field: Field ): Boolean
     {

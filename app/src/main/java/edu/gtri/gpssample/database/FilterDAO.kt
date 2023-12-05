@@ -28,45 +28,98 @@ class FilterDAO(private var dao: DAO)
 
             putFilter( filter,study, values )
             filter.id = dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values).toInt()
-            filter.id?.let { id ->
-            // now traverse the rule - filter operator chain
+            filter.id?.let{id ->
                 filter.rule?.let{rule ->
-                    traverseRuleChain(rule, study)
+                    traverseRuleChain(rule, filter)
                 }
-            } ?: return null
+
+//                filter.rule?.let{rule ->
+//                    // add the rule if it doesn't exist
+//
+//
+//                //DAO.ruleDAO.createOrUpdateRule(rule)
+//                }
+            }
+//            filter.id?.let { id ->
+//            // now traverse the rule - filter operator chain
+//                filter.rule?.let{rule ->
+//                    traverseRuleChain(rule, study)
+//                }
+//            } ?: return null
         }
 
         return filter
     }
 
-    fun traverseRuleChain(rule : Rule?, study : Study)
+    fun ruleCheck(rule : Rule)
     {
-        rule?.let{rule ->
-            // By the time we get here the rule should have been saved in the database
-            rule.id?.let{rule_id ->
-                rule.filterOperator?.let{filterOperator ->
-                    // find the id of the connector copy
-                    val values = ContentValues()
-                    putFilterOperator(filterOperator, values)
-                    filterOperator.id?.let{id ->
-                        // update, else insert
-                        val whereClause = "${DAO.COLUMN_ID} = ?"
-                        val args: Array<String> = arrayOf(id.toString())
-                        val values = ContentValues()
+        if(rule.id == null)
+        {
+            // check if the rule is in the db.  it may not have an id, from the copy
+            // but may still exist
+            rule.id = DAO.ruleDAO.findRuleId(rule)
 
-                        dao.writableDatabase.update(DAO.TABLE_FILTEROPERATOR, values, whereClause, args )
-                    }?: run{
-                        filterOperator.id = dao.writableDatabase.insert(DAO.TABLE_FILTEROPERATOR,
-                            null, values).toInt()
-
-                    }
-                    traverseRuleChain(filterOperator.rule, study)
-                }
-            }?: run{
-                Log.d("xxxxxx", "NO ID")
+            if (rule.id == null)
+            {
+                // not there so we insert into the db
+                DAO.ruleDAO.createOrUpdateRule(rule)
             }
+
         }
     }
+    fun traverseRuleChain(rule: Rule, filter: Filter)
+    {
+        ruleCheck(rule)
+        // now insert into connector table
+        rule.filterOperator?.let{filterOperator ->
+            filterOperator.rule?.let{secondRule ->
+                ruleCheck(secondRule)
+                addFilterOperator(rule, filter )
+                traverseRuleChain(secondRule, filter)
+                // the filter operator numst have a rule, otherwise this doesn't make sense
+
+            }
+        }
+
+    }
+
+    private fun putFilterOperator( filter: Filter, rule : Rule, values: ContentValues )
+    {
+        val index = SampleTypeConverter.toIndex(filter.samplingType)
+        filter.id?.let{filterId ->
+            rule.filterOperator?.let{filterOperator ->
+                filterOperator.id?.let { id ->
+                    Log.d( "xxx", "existing filter id = ${id}")
+                    values.put( DAO.COLUMN_ID, id )
+                }
+
+
+                rule.id?.let{firstRuleId ->
+                    filterOperator.rule?.let{secondRule ->
+                        secondRule.id?.let{secondRuleId ->
+                            values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.conenctor))
+                            // values.put( DAO.COLUMN_STUDY_ID, study.id )
+
+                            values.put(DAO.COLUMN_FILTER_ID, filter.id!!)
+                            values.put( DAO.COLUMN_FIRST_RULE_ID, firstRuleId )
+                            values.put( DAO.COLUMN_SECOND_RULE_ID, secondRuleId )
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+    }
+    fun addFilterOperator(rule : Rule, filter : Filter)
+    {
+        val values = ContentValues()
+
+        putFilterOperator( filter, rule, values )
+        rule.filterOperator?.id = dao.writableDatabase.insert(DAO.TABLE_FILTEROPERATOR, null, values).toInt()
+    }
+
     //--------------------------------------------------------------------------
     fun exists( filter: Filter, study : Study ): Boolean
     {
@@ -77,21 +130,21 @@ class FilterDAO(private var dao: DAO)
         } ?: return false
     }
 
-    private fun putFilterOperator(filterOperator: FilterOperator, values: ContentValues)
-    {
-        filterOperator.id?.let{id->
-            values.put(DAO.COLUMN_ID, id)
-        }
-        values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.conenctor))
-        filterOperator.rule?.id?.let{rule_id ->
-            values.put(DAO.COLUMN_RULE_ID, rule_id)
-        }?: run{
-            filterOperator.rule?.let{rule ->
-                DAO.ruleDAO.createOrUpdateRule(rule)
-                values.put(DAO.COLUMN_RULE_ID, rule.id)
-            }
-        }
-    }
+//    private fun putFilterOperator(filterOperator: FilterOperator, values: ContentValues)
+//    {
+//        filterOperator.id?.let{id->
+//            values.put(DAO.COLUMN_ID, id)
+//        }
+//        values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.conenctor))
+//        filterOperator.rule?.id?.let{rule_id ->
+//            values.put(DAO.COLUMN_RULE_ID, rule_id)
+//        }?: run{
+//            filterOperator.rule?.let{rule ->
+//                DAO.ruleDAO.createOrUpdateRule(rule)
+//                values.put(DAO.COLUMN_RULE_ID, rule.id)
+//            }
+//        }
+//    }
     //--------------------------------------------------------------------------
     private fun putFilter( filter: Filter, study: Study, values: ContentValues )
     {
@@ -106,14 +159,14 @@ class FilterDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FILTER_NAME, filter.name )
         values.put( DAO.COLUMN_FILTER_SAMPLE_SIZE, filter.sampleSize )
         values.put( DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX, index )
-        filter.rule?.let{rule ->
-            rule.id?.let{id ->
-                values.put(DAO.COLUMN_RULE_ID, id)
-            } ?: run {
-                DAO.ruleDAO.createOrUpdateRule(rule)
-                values.put(DAO.COLUMN_RULE_ID, rule.id!!)
-            }
-        }
+//        filter.rule?.let{rule ->
+//            rule.id?.let{id ->
+//                values.put(DAO.COLUMN_RULE_ID, id)
+//            } ?: run {
+//                DAO.ruleDAO.createOrUpdateRule(rule)
+//                values.put(DAO.COLUMN_RULE_ID, rule.id!!)
+//            }
+//        }
     }
 
     //--------------------------------------------------------------------------

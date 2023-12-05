@@ -161,18 +161,21 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FILTER_NAME + " TEXT" + "," +
                     COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
                     COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
-                    COLUMN_RULE_ID + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+
                     ")")
             db.execSQL(createTableFilter)
 
             val createTableFilterOperator = ("CREATE TABLE " +
                     TABLE_FILTEROPERATOR + " (" +
                     COLUMN_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT " + "," +
-                    COLUMN_CONNECTOR +  " INTEGER NOT NULL" + "," +
-                    COLUMN_RULE_ID +  " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
+                    COLUMN_CONNECTOR +  " INTEGER " + "," +
+                    COLUMN_FILTER_ID + " INTEGER NOT NULL " + "," +
+                    COLUMN_FIRST_RULE_ID+   " INTEGER NOT NULL " + "," +
+                    COLUMN_SECOND_RULE_ID +  " INTEGER NOT NULL " + "," +
+                    "FOREIGN KEY($COLUMN_FILTER_ID) REFERENCES $TABLE_FILTER($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_FIRST_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_SECOND_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableFilterOperator)
 
@@ -540,6 +543,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // FilterOperator
         const val TABLE_FILTEROPERATOR = "filteroperator"
         const val COLUMN_CONNECTOR = "connector"
+        const val COLUMN_FIRST_RULE_ID = "first_rule_id"
+        const val COLUMN_SECOND_RULE_ID = "second_rule_id"
 
         // EnumArea Table
         const val TABLE_ENUM_AREA = "enum_area"
@@ -716,6 +721,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 246
+        private const val DATABASE_VERSION = 255
     }
 }
