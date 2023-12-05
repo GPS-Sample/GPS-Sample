@@ -286,7 +286,7 @@ class FilterDAO(private var dao: DAO)
                             rule1!!.filterOperator = FilterOperator(rfo.id,
                                 ConnectorConverter.fromIndex(rfo.connector), startRule)
                             startRule = rule1
-                        }    
+                        }
                     }
 
                 }
