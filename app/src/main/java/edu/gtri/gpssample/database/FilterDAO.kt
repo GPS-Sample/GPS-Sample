@@ -13,10 +13,12 @@ import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
 
-data class RawFilterOperator(var id : Int, var rule1 :Int , var rule2 : Int?, var connector : Int)
+data class RawFilterOperator(var id : Int, var order : Int, var rule1 :Int , var rule2 : Int?, var connector : Int)
 
 class FilterDAO(private var dao: DAO)
 {
+    private val kFilterOperatorOrderUndefined = 0
+
     //--------------------------------------------------------------------------
     fun createOrUpdateFilter( filter: Filter, study : Study ) : Filter?
     {
@@ -33,7 +35,8 @@ class FilterDAO(private var dao: DAO)
             filter.id?.let{id ->
                 filter.rule?.let{rule ->
                     rule.filterOperator?.let{filterOperator ->
-                        traverseRuleChain(rule, filter)
+                        var filterOperatorOrder = kFilterOperatorOrderUndefined
+                        traverseRuleChain(rule, filter, filterOperatorOrder)
                     }?: run {
                         addEmptyFilterOperator(rule, filter)
                     }
@@ -75,7 +78,7 @@ class FilterDAO(private var dao: DAO)
         }
     }
 
-    fun addEmptyFilterOperator(rule: Rule, filter : Filter)
+    private fun addEmptyFilterOperator(rule: Rule, filter : Filter)
     {
         ruleCheck(rule)
         filter.id?.let { filterId ->
@@ -83,7 +86,7 @@ class FilterDAO(private var dao: DAO)
                 val values = ContentValues()
                 values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(Connector.NONE))
                 // values.put( DAO.COLUMN_STUDY_ID, study.id )
-
+                values.put(DAO.COLUMN_FILTEROPERATOR_ORDER, 1)
                 values.put(DAO.COLUMN_FILTER_ID, filterId)
                 values.put( DAO.COLUMN_FIRST_RULE_ID, ruleId )
                 dao.writableDatabase.insert(DAO.TABLE_FILTEROPERATOR, null, values)
@@ -91,15 +94,18 @@ class FilterDAO(private var dao: DAO)
 
         }
     }
-    fun traverseRuleChain(rule: Rule, filter: Filter)
+    private fun traverseRuleChain(rule: Rule, filter: Filter, filterOperatorOrder : Int)
     {
+        // when adding a new rule chain, increase the order by 1
+        val currentOrder = filterOperatorOrder + 1
+
         ruleCheck(rule)
         // now insert into connector table
         rule.filterOperator?.let{filterOperator ->
             filterOperator.rule?.let{secondRule ->
                 ruleCheck(secondRule)
-                addFilterOperator(rule, filter )
-                traverseRuleChain(secondRule, filter)
+                addFilterOperator(rule, filter, currentOrder )
+                traverseRuleChain(secondRule, filter, currentOrder)
                 // the filter operator numst have a rule, otherwise this doesn't make sense
 
             }
@@ -107,7 +113,7 @@ class FilterDAO(private var dao: DAO)
 
     }
 
-    private fun putFilterOperator( filter: Filter, rule : Rule, values: ContentValues )
+    private fun putFilterOperator( filter: Filter, rule : Rule, order : Int, values: ContentValues )
     {
         val index = SampleTypeConverter.toIndex(filter.samplingType)
         filter.id?.let{filterId ->
@@ -123,7 +129,7 @@ class FilterDAO(private var dao: DAO)
                         secondRule.id?.let{secondRuleId ->
                             values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.conenctor))
                             // values.put( DAO.COLUMN_STUDY_ID, study.id )
-
+                            values.put(DAO.COLUMN_FILTEROPERATOR_ORDER, order)
                             values.put(DAO.COLUMN_FILTER_ID, filter.id!!)
                             values.put( DAO.COLUMN_FIRST_RULE_ID, firstRuleId )
                             values.put( DAO.COLUMN_SECOND_RULE_ID, secondRuleId )
@@ -136,11 +142,11 @@ class FilterDAO(private var dao: DAO)
         }
 
     }
-    fun addFilterOperator(rule : Rule, filter : Filter)
+    fun addFilterOperator(rule : Rule, filter : Filter, filterOperatorOrder: Int)
     {
         val values = ContentValues()
 
-        putFilterOperator( filter, rule, values )
+        putFilterOperator( filter, rule, filterOperatorOrder, values )
         rule.filterOperator?.id = dao.writableDatabase.insert(DAO.TABLE_FILTEROPERATOR, null, values).toInt()
     }
 
@@ -216,7 +222,7 @@ class FilterDAO(private var dao: DAO)
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
         val filter = Filter( id, name, type, sampleSize )
         findFieldOperators(filter)
-        //buildRuleChain(filter, cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_RULE_ID)), study)
+
         return filter
     }
 
@@ -234,106 +240,82 @@ class FilterDAO(private var dao: DAO)
         // build the raw id list so we can sort it
         var rawFilterOperators = ArrayList<RawFilterOperator>()
 
-        filter.id?.let{ filterId ->
-            val query = "SELECT * FROM ${DAO.TABLE_FILTEROPERATOR} WHERE ${DAO.COLUMN_FILTER_ID} = ${filterId}"
+        filter.id?.let { filterId ->
+            val query =
+                "SELECT * FROM ${DAO.TABLE_FILTEROPERATOR} WHERE ${DAO.COLUMN_FILTER_ID} = ${filterId} ORDER BY ${DAO.COLUMN_FILTEROPERATOR_ORDER} DESC"
             val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            while (cursor.moveToNext())
-            {
+            while (cursor.moveToNext()) {
                 val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+                val order = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTEROPERATOR_ORDER))
                 val firstRuleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIRST_RULE_ID))
                 val secondRuleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SECOND_RULE_ID))
                 val connectorId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONNECTOR))
-                val rawFilterOperator = RawFilterOperator(id, firstRuleId, secondRuleId, connectorId)
+                val rawFilterOperator =
+                    RawFilterOperator(id, order, firstRuleId, secondRuleId, connectorId)
                 rawFilterOperators.add(rawFilterOperator)
             }
             cursor.close()
 
 
             // alg:
+            // load the filter operator as a list of RawFilterOperators ordered by operator_order
+            // use those to load all rules.
+            // loop through the filter operators again
+            // create the filter operator object and chain pulling
+            // the rule from the loaded rule list
 
-            // find rules, see if they are already in the list.  if so, use the ones that are
-            // there.  if not add to structure.  we want a chain that starts with a single rule
-            // since this can come in out of order we need to do a weird sorting
-            // if a rule is in the list and it is the second rule for another rule, remove it from the list
+            var rulesMap = HashMap<Int, Rule>()
 
-
-            var rules = ArrayList<Rule>()
             // now loop through to create the rule stack
-            var startRule : Rule? = null
-            for(rfo in rawFilterOperators)
-            {
-                // get the first rule
-                var rule1 = DAO.ruleDAO.getRule(rfo.rule1)
-                var rule2 : Rule? = null
-                rfo.rule2?.let{rule2Id->
-                    rule2 = DAO.ruleDAO.getRule(rule2Id)
+            var firstRule: Rule? = null
 
-                }
-                if(startRule == null)
-                {
-                    startRule = rule1
-                    startRule?.let{rule->
-                        rule.filterOperator = FilterOperator(rfo.id,
-                            ConnectorConverter.fromIndex(rfo.connector), rule2)
+            for (rfo in rawFilterOperators) {
+
+                //build a list of rules
+                // don't reload the rule from the database
+                if (!rulesMap.keys.contains(rfo.rule1)) {
+                    var rule1 = DAO.ruleDAO.getRule(rfo.rule1)
+                    rule1?.let { rule1 ->
+                        rulesMap.put(rule1.id!!, rule1)
+
                     }
-                }else
-                {
-                    // if the start rule is rule 2, then add connector and replace
-                    rule2?.let{rule2->
-                        if(rule2.id!! == startRule!!.id!!)
-                        {
-                            rule1!!.filterOperator = FilterOperator(rfo.id,
-                                ConnectorConverter.fromIndex(rfo.connector), startRule)
-                            startRule = rule1
+                }
+                rfo.rule2?.let { rule2Id ->
+                    // don't reload the rule from the database
+                    if (!rulesMap.keys.contains(rule2Id)) {
+                        var rule2 = DAO.ruleDAO.getRule(rule2Id)
+                        rule2?.let { rule2 ->
+                            rulesMap.put(rule2.id!!, rule2)
                         }
                     }
-
                 }
 
-
+            }
+            // loop through again
+            for(rfo in rawFilterOperators)
+            {
+                // build up the ruleset
+                var rule1 = rulesMap[rfo.rule1]
+                var connector = ConnectorConverter.fromIndex(rfo.connector)
+                if(connector != Connector.NONE)
+                {
+                    rfo.rule2?.let{rule2Id->
+                        val rule2 = rulesMap[rule2Id]
+                        rule1?.filterOperator = FilterOperator(rfo.id, rfo.order, connector, rule2 )
+                    }
+                }
+                if(firstRule == null )
+                {
+                    firstRule = rule1
+                }
 
             }
+            // put the rule in the filter
+            filter.rule = firstRule
         }
 
-
     }
-
-//    private fun buildRuleChain(filter : Filter, rule_id : Int, study : Study)
-//    {
-//        // find rule in list of rules in study
-//        for(rule in study.rules)
-//        {
-//            if(rule.id == rule_id)
-//            {
-//                filter.rule = rule
-//                // traverse the chain
-//                 getFilterOperator(rule)
-//            }
-//        }
-//    }
-//    @SuppressLint("Range")
-//    private fun getFilterOperator(rule : Rule?)
-//    {
-//        rule?.id?.let{rule_id ->
-//            val query = "SELECT * FROM ${DAO.TABLE_FILTEROPERATOR}  " +
-//                    "WHERE ${DAO.COLUMN_RULE_ID} = ${rule?.id} "
-//
-//            val cursor = dao.writableDatabase.rawQuery(query, null)
-//
-//            while (cursor.moveToNext())
-//            {
-//                val id = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_ID}"))
-//                val connector = ConnectorConverter.fromIndex(cursor.getInt(cursor.
-//                                getColumnIndex("${DAO.COLUMN_CONNECTOR}")))
-//                val rule = DAO.ruleDAO.getRule(cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_RULE_ID}")))
-//                val filterOperator =  FilterOperator(id, connector, rule)
-//                filterOperator?.let{filterOperator ->
-//                    getFilterOperator(filterOperator.rule)
-//                }
-//            }
-//        }
-//    }
 
     fun getFilter(id : Int, study : Study) : Filter?
     {
@@ -364,12 +346,6 @@ class FilterDAO(private var dao: DAO)
         {
             val filter = buildFilter(cursor, study)
             filter?.let{filter->
-
-                // build filter rules from filter operator
-                // find all filter operators
-                // need to sort and build the chain
-
-                //filter.filterRules = DAO.filterRuleDAO.getFilterRules( filter )
                 filters.add( filter)
             }
         }

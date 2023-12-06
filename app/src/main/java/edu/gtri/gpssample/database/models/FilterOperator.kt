@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class FilterOperator (
     var id : Int? = null,
+    var order : Int,
     var conenctor : Connector,
     var rule: Rule?
     ){

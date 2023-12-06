@@ -169,6 +169,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFilterOperator = ("CREATE TABLE " +
                     TABLE_FILTEROPERATOR + " (" +
                     COLUMN_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT " + "," +
+                    COLUMN_FILTEROPERATOR_ORDER + " INTEGER NOT NULL " + "," +
                     COLUMN_CONNECTOR +  " INTEGER " + "," +
                     COLUMN_FILTER_ID + " INTEGER NOT NULL " + "," +
                     COLUMN_FIRST_RULE_ID+   " INTEGER NOT NULL " + "," +
@@ -542,6 +543,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // FilterOperator
         const val TABLE_FILTEROPERATOR = "filteroperator"
+        const val COLUMN_FILTEROPERATOR_ORDER = "operator_order"
         const val COLUMN_CONNECTOR = "connector"
         const val COLUMN_FIRST_RULE_ID = "first_rule_id"
         const val COLUMN_SECOND_RULE_ID = "second_rule_id"
@@ -721,6 +723,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 259
+        private const val DATABASE_VERSION = 262
     }
 }

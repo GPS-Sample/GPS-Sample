@@ -168,7 +168,7 @@ class CreateFilterRuleModel {
             _secondRule?.value?.let{secondRule ->
                 Log.d("xxxxx", "we can stitch together")
                 // build operator
-                val operator = FilterOperator(null, currentConnector, secondRule)
+                val operator = FilterOperator(null, 0, currentConnector, secondRule)
                 // add add operator to first rule
                 currentRule.filterOperator = operator
             }

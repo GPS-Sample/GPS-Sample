@@ -220,7 +220,7 @@ class CreateStudyModel {
         val study = Study(
             "",
             SamplingMethod.None,
-            0,
+            1,
             SampleType.None
         )
         _currentStudy = MutableLiveData(study)
