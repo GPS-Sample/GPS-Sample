@@ -15,6 +15,7 @@ import com.mapbox.maps.*
 import com.mapbox.maps.plugin.annotation.generated.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.MapTileRegion
+import java.util.concurrent.atomic.AtomicInteger
 
 class MapboxManager(
     var context: Context,
@@ -27,6 +28,7 @@ class MapboxManager(
     {
         fun stylePackLoaded( error: String )
         fun tilePacksLoaded( error: String )
+        fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     }
 
     fun addMarker( point: Point, @DrawableRes resourceId: Int ) : PointAnnotation?
@@ -163,13 +165,15 @@ class MapboxManager(
                 )
             }
 
-            tileRegionsCancelable.clear()
-            var numLeft = mapTileRegions.size
             var id = 0
+            tileRegionsCancelable.clear()
+            val numRegionsLeft = AtomicInteger(mapTileRegions.size)
 
             for (mapTileRegion in mapTileRegions)
             {
                 id += 1
+
+                Log.d( "xxx", "downloading region ${id}")
 
                 val points = java.util.ArrayList<Point>()
                 points.add( Point.fromLngLat( mapTileRegion.southWest.longitude, mapTileRegion.southWest.latitude ))
@@ -192,17 +196,15 @@ class MapboxManager(
                         .networkRestriction(NetworkRestriction.NONE)
                         .build(),
                     { progress ->
-                        Log.d( "xxx", "Downloaded ${progress.completedResourceCount} of ${progress.requiredResourceCount} map resources")
-                        // Handle the download progress
+                        Log.d( "xxx", " ${progress.completedResourceCount} / ${progress.requiredResourceCount}" )
+                        delegate.mapLoadProgress( progress.completedResourceCount, progress.requiredResourceCount )
                     }
                 ) { expected ->
                     if (expected.isValue) {
-                        // Tile region download finishes successfully
-                        Log.d( "xxx", "Tile Region download finished")
-                        numLeft -= 1
-                        if (numLeft == 0)
+                        if (numRegionsLeft.decrementAndGet() <= 0)
                         {
                             delegate.tilePacksLoaded("")
+                            Log.d( "xxx", "Tile Regions download finished")
                         }
                     }
                     expected.error?.let {

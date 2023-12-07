@@ -380,15 +380,17 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         if (complete)
         {
             sharedViewModel.currentConfiguration?.value?.let { config ->
-                if (config.mapTileRegions.size > 0)
-                {
-                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                    MapboxManager.loadStylePack( activity!!, this )
-                }
-                else
-                {
-                    navigateBasedOnRole()
-                }
+                navigateBasedOnRole()
+
+//                if (config.mapTileRegions.size > 0)
+//                {
+//                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+//                    MapboxManager.loadStylePack( activity!!, this )
+//                }
+//                else
+//                {
+//                    navigateBasedOnRole()
+//                }
             }
         }
     }
@@ -409,6 +411,15 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
                 }
+            }
+        }
+    }
+
+    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
+    {
+        busyIndicatorDialog?.let {
+            activity!!.runOnUiThread {
+                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
             }
         }
     }

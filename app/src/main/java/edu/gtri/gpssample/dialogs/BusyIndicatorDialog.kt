@@ -16,6 +16,7 @@ class BusyIndicatorDialog
     }
 
     lateinit var alertDialog: AlertDialog
+    lateinit var textView: TextView
 
     constructor( context: Context?, text: String, delegate: BusyIndicatorDialogDelegate )
     {
@@ -31,7 +32,7 @@ class BusyIndicatorDialog
         alertDialog.setCancelable(false)
         alertDialog.show()
 
-        val textView = view.findViewById<TextView>(R.id.text_view)
+        textView = view.findViewById<TextView>(R.id.text_view)
         textView.text = text
 
         val cancelButton = view.findViewById<Button>(R.id.cancel_button)
@@ -40,5 +41,10 @@ class BusyIndicatorDialog
             alertDialog.dismiss()
             delegate.didPressCancelButton()
         }
+    }
+
+    fun updateProgress( text: String )
+    {
+        textView.text = text
     }
 }

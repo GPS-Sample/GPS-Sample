@@ -245,8 +245,11 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.mapTileCacheButton.setOnClickListener {
-            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-            MapboxManager.loadStylePack( activity!!, this )
+            if (getAllMapTileRegions().isNotEmpty())
+            {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                MapboxManager.loadStylePack( activity!!, this )
+            }
         }
 
         binding.addHouseholdButton.backgroundTintList?.let {
@@ -848,7 +851,16 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
             else
             {
-                MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+                MapboxManager.loadTilePacks( activity!!, getAllMapTileRegions(), this )
+            }
+        }
+    }
+
+    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
+    {
+        busyIndicatorDialog?.let {
+            activity!!.runOnUiThread {
+                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
             }
         }
     }
