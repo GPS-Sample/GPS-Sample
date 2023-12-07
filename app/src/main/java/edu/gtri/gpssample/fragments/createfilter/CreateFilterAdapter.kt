@@ -19,7 +19,7 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
     private var context: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
     lateinit var shouldEditFilterRule: ((rule: Rule) -> Unit)
-    lateinit var shouldDeleteFilterRule: ((rule: Rule) -> Unit)
+    lateinit var shouldDeleteFilterRule: ((rule: Rule, previousRule : Rule?) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -72,6 +72,11 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
         holder.itemView.isSelected = false
 
         val rule = filterRules!!.get(holder.adapterPosition)
+        var previousRule : Rule? = null
+        if(holder.adapterPosition > 0)
+        {
+            previousRule = filterRules!!.get(holder.adapterPosition - 1)
+        }
 
         rule?.let { rule ->
             if (position == 0 && rule.filterOperator == null)
@@ -91,7 +96,7 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
         }
 
         holder.deleteButton.setOnClickListener {
-            shouldDeleteFilterRule( rule )
+            shouldDeleteFilterRule( rule, previousRule )
         }
     }
 }

@@ -25,6 +25,7 @@ class FilterDAO(private var dao: DAO)
         if (exists( filter, study ))
         {
             updateFilter( filter, study )
+            deleteAllFilterOperators(filter)
         }
         else
         {
@@ -32,30 +33,18 @@ class FilterDAO(private var dao: DAO)
 
             putFilter( filter,study, values )
             filter.id = dao.writableDatabase.insert(DAO.TABLE_FILTER, null, values).toInt()
-            filter.id?.let{id ->
-                filter.rule?.let{rule ->
-                    rule.filterOperator?.let{filterOperator ->
-                        var filterOperatorOrder = kFilterOperatorOrderUndefined
-                        traverseRuleChain(rule, filter, filterOperatorOrder)
-                    }?: run {
-                        addEmptyFilterOperator(rule, filter)
-                    }
+        }
 
+        filter.id?.let{id ->
+            filter.rule?.let{rule ->
+                rule.filterOperator?.let{filterOperator ->
+                    var filterOperatorOrder = kFilterOperatorOrderUndefined
+                    traverseRuleChain(rule, filter, filterOperatorOrder)
+                }?: run {
+                    addEmptyFilterOperator(rule, filter)
                 }
 
-//                filter.rule?.let{rule ->
-//                    // add the rule if it doesn't exist
-//
-//
-//                //DAO.ruleDAO.createOrUpdateRule(rule)
-//                }
             }
-//            filter.id?.let { id ->
-//            // now traverse the rule - filter operator chain
-//                filter.rule?.let{rule ->
-//                    traverseRuleChain(rule, study)
-//                }
-//            } ?: return null
         }
 
         return filter
@@ -380,9 +369,19 @@ class FilterDAO(private var dao: DAO)
     //--------------------------------------------------------------------------
     fun deleteFilter( filter: Filter )
     {
+        deleteAllFilterOperators(filter)
+        // delete the filterOperators
         val whereClause = "${DAO.COLUMN_ID} = ?"
         val args = arrayOf(filter.id.toString())
 
         dao.writableDatabase.delete(DAO.TABLE_FILTER, whereClause, args)
+    }
+
+    private fun deleteAllFilterOperators(filter : Filter)
+    {
+        val whereClause = "${DAO.COLUMN_FILTER_ID} = ?"
+        val args = arrayOf(filter.id.toString())
+        dao.writableDatabase.delete(DAO.TABLE_FILTEROPERATOR, whereClause, args)
+
     }
 }

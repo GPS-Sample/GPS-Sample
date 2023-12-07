@@ -90,6 +90,7 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
         binding.addRuleButton.setOnClickListener {
             val bundle = Bundle()
             sharedViewModel.createNewFilterRule()
+
             findNavController().navigate(R.id.action_navigate_to_SelectRuleDialogFragment, bundle)
 
 //            SelectRuleDialogFragment().show(
@@ -147,15 +148,17 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
     }
 
     private var selectedFilterRule: Rule? = null
+    private var previousSelectedFilterRule: Rule? = null
 
     fun shouldEditFilterRule( filterRule: Rule )
     {
        // SelectRuleDialog( activity!!, study_uuid, filter.uuid, filterRule,this )
     }
 
-    fun shouldDeleteFilterRule( filterRule: Rule )
+    fun shouldDeleteFilterRule( filterRule: Rule, previousRule: Rule? )
     {
         selectedFilterRule = filterRule
+        previousSelectedFilterRule = previousRule
         ConfirmationDialog( activity!!, resources.getString(R.string.please_confirm),
             "Are you sure you want to delete this Filter Rule?", "No", "Yes", 0, this )
     }
@@ -166,7 +169,28 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
 
     override fun didSelectRightButton(tag: Any?)
     {
-        selectedFilterRule?.let {
+        selectedFilterRule?.let {rule->
+            previousSelectedFilterRule?.let{previousRule->
+                rule.filterOperator?.rule?.let{operatorRule->
+                    // attach operatorrule to previous filteroperator
+                    previousRule.filterOperator?.let{previousFilterOperator->
+                        previousFilterOperator.rule = operatorRule
+                        sharedViewModel.createFilterModel.currentFilter?.value?.let{filter->
+                            createFilterAdapter.updateRules(filter.rule)
+                        }
+                    }
+
+                }
+            }?:run{
+                //filter
+                sharedViewModel.createFilterModel.currentFilter?.value?.let{filter->
+                    filter.rule = null
+                    createFilterAdapter.updateRules(null)
+                }
+            }
+            // look at filter operator
+            // if operator has a rule,
+
            // DAO.filterRuleDAO.deleteFilterRule( it )
             // val filterRules = DAO.filterRuleDAO.getFilterRules( study_uuid, filter.uuid )
             // createFilterAdapter.updateFilterRules( filterRules )

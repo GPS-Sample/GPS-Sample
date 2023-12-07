@@ -324,6 +324,7 @@ class ConfigurationViewModel : ViewModel()
 
     }
 
+
     fun createNewFilterRule()
     {
         createFilterModel.currentFilter?.value?.let { filter ->
