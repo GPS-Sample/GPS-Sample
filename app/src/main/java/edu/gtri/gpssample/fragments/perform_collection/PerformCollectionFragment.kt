@@ -295,7 +295,7 @@ class PerformCollectionFragment : Fragment(),
                 {
                     ConfirmationDialog( activity, resources.getString(R.string.export_configuration) , resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                 }
-                Role.DataCollector.toString() ->
+                Role.Enumerator.toString(), Role.DataCollector.toString() ->
                 {
                     ConfirmationDialog( activity, resources.getString(R.string.export_collection_data), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                 }
@@ -466,6 +466,7 @@ class PerformCollectionFragment : Fragment(),
                 payload = config.pack()
             }
 
+            Role.Enumerator.toString(),
             Role.DataCollector.toString() ->
             {
                 name = "SampleArea"
@@ -507,6 +508,7 @@ class PerformCollectionFragment : Fragment(),
                     startHotspot(view)
                 }
 
+                Role.Enumerator.toString(),
                 Role.DataCollector.toString() ->
                 {
                     sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
