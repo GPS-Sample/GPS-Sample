@@ -13,31 +13,37 @@ import kotlin.math.min
 class ConfigDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createConfig( config: Config ) : Config?
+    fun createOrUpdateConfig( config: Config ) : Config?
     {
         if (exists( config ))
         {
-            // if we need to handle the update case here,
-            // let's change the name to createOrUpdateConfig and do the update here
-            Log.d( "xxx", "Oops! config with id ${config.id!!} already exists")
-            return null
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            config.id?.let { id ->
+                val args: Array<String> = arrayOf(id.toString())
+                val values = ContentValues()
+                putConfig( config, values )
+                dao.writableDatabase.update(DAO.TABLE_CONFIG, values, whereClause, args )
+                createOrUpdateEnumAreas(config)
+                createOrUpdateStudies(config)
+            }
         }
         else
         {
             val values = ContentValues()
             putConfig( config, values )
             config.id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
-            config.id?.let { id ->
-                Log.d( "xxx", "new config id = ${id}")
-                createOrUpdateEnumAreas(config)
-                createOrUpdateStudies(config)
-                for (mapTileRegion in config.mapTileRegions)
-                {
-                    DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( mapTileRegion, config )
-                }
-                return config
-            } ?: return null
         }
+
+        config.id?.let { id ->
+            createOrUpdateEnumAreas(config)
+            createOrUpdateStudies(config)
+            for (mapTileRegion in config.mapTileRegions)
+            {
+                DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( mapTileRegion, config )
+            }
+        } ?: return null
+
+        return config
     }
 
     //--------------------------------------------------------------------------
@@ -155,27 +161,6 @@ class ConfigDAO(private var dao: DAO)
         cursor.close()
 
         return configs
-    }
-
-    //--------------------------------------------------------------------------
-    fun updateConfig( config: Config )
-    {
-        if (!exists( config ))
-        {
-            createConfig(config)
-        }
-        else
-        {
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            config.id?.let { id ->
-                val args: Array<String> = arrayOf(id.toString())
-                val values = ContentValues()
-                putConfig( config, values )
-                dao.writableDatabase.update(DAO.TABLE_CONFIG, values, whereClause, args )
-                createOrUpdateEnumAreas(config)
-                createOrUpdateStudies(config)
-            }
-        }
     }
 
     private fun createOrUpdateStudies(config : Config)

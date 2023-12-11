@@ -43,9 +43,7 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.InfoDialog
-import edu.gtri.gpssample.dialogs.MapLegendDialog
+import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -60,13 +58,15 @@ class PerformEnumerationFragment : Fragment(),
     OnMapClickListener,
     OnCameraChangeListener,
     InfoDialog.InfoDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate
+    MapboxManager.MapTileCacheDelegate,
+    ConfirmationDialog.ConfirmationDialogDelegate,
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private lateinit var user: User
-    private lateinit var enumerationTeam: EnumerationTeam
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
+    private lateinit var enumerationTeam: EnumerationTeam
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
@@ -75,15 +75,14 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
-    private var gpsLocation: Point? = null
-
-    private var dropMode = false
-
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
 
+    private var dropMode = false
+    private var gpsLocation: Point? = null
     private val pointHashMap = HashMap<Long,Location>()
     private val polygonHashMap = HashMap<Long,EnumArea>()
+    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
@@ -151,7 +150,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.recyclerView.adapter = performEnumerationAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + enumerationTeam.name + " team)"
+        binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " team)"
 
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
@@ -165,7 +164,6 @@ class PerformEnumerationFragment : Fragment(),
 
         val locationComponentPlugin = binding.mapView.location
         locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.addOnMoveListener(onMoveListener)
         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
@@ -201,6 +199,14 @@ class PerformEnumerationFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
+        binding.mapTileCacheButton.setOnClickListener {
+            if (config.mapTileRegions.isNotEmpty())
+            {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                MapboxManager.loadStylePack( activity!!, this )
+            }
+        }
+
         val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
         if (centerOnCurrentLocation == null)
         {
@@ -220,6 +226,10 @@ class PerformEnumerationFragment : Fragment(),
             {
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
+        }
+
+        binding.helpButton.setOnClickListener {
+            PerformEnumerationHelpDialog( activity!! )
         }
 
         binding.centerOnLocationButton.setOnClickListener {
@@ -740,10 +750,6 @@ class PerformEnumerationFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-    private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
-//        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
-    }
-
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
         sharedViewModel.locationViewModel.setCurrentLocationUpdateTime(Date())
         gpsLocation = point
@@ -802,8 +808,58 @@ class PerformEnumerationFragment : Fragment(),
     private fun onCameraTrackingDismissed()
     {
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+    }
+
+    override fun stylePackLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+            }
+        }
+    }
+
+    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
+    {
+        busyIndicatorDialog?.let {
+            activity!!.runOnUiThread {
+                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
+            }
+        }
+    }
+
+    override fun tilePacksLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                }
+            }
+        }
+    }
+
+    override fun didPressCancelButton()
+    {
+        MapboxManager.cancelStylePackDownload()
+        MapboxManager.cancelTilePackDownload()
     }
 
     override fun onDestroyView()
@@ -811,7 +867,6 @@ class PerformEnumerationFragment : Fragment(),
         super.onDestroyView()
 
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)
 
         _binding = null
