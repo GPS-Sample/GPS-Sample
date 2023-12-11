@@ -2,10 +2,7 @@ package edu.gtri.gpssample.fragments.main
 
 import android.Manifest
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -62,6 +59,33 @@ class MainFragment : Fragment()
         activity!!.setTitle( "GPSSample" )
 
         binding.versionTextView.text = BuildConfig.VERSION_NAME
+
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)
+
+        userName?.let {
+            DAO.userDAO.getUser(userName)?.let { user ->
+                when (user.role)
+                {
+                    Role.Enumerator.toString() ->
+                    {
+                        binding.enumeratorButton.isChecked = true
+                        binding.adminButton.visibility = View.GONE
+                        binding.supervisorButton.visibility = View.GONE
+                        binding.dataCollectorButton.visibility = View.GONE
+                        binding.signUpTextView.visibility = View.GONE
+                    }
+                    Role.DataCollector.toString() ->
+                    {
+                        binding.dataCollectorButton.isChecked = true
+                        binding.adminButton.visibility = View.GONE
+                        binding.supervisorButton.visibility = View.GONE
+                        binding.enumeratorButton.visibility = View.GONE
+                        binding.signUpTextView.visibility = View.GONE
+                    }
+                }
+            }
+        }
 
         binding.signInButton.setOnClickListener {
             val bundle = Bundle()
@@ -123,7 +147,6 @@ class MainFragment : Fragment()
         {
             getRuntimePermissions()
         }
-
     }
 
     override fun onResume()
