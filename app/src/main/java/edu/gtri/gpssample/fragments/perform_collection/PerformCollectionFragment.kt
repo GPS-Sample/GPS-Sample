@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.perform_collection
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -53,9 +54,11 @@ import java.util.*
 
 class PerformCollectionFragment : Fragment(),
     OnCameraChangeListener,
-    AdditionalInfoDialog.AdditionalInfoDialogDelegate,
+    MapboxManager.MapTileCacheDelegate,
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
+    AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var user: User
@@ -64,6 +67,7 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var collectionTeam: CollectionTeam
+    private lateinit var defaultColorList : ColorStateList
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
@@ -74,8 +78,9 @@ class PerformCollectionFragment : Fragment(),
 
     private var enumAreaId = 0
     private val binding get() = _binding!!
-    private val locationHashMap = java.util.HashMap<Long, Location>()
+    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
+    private val locationHashMap = java.util.HashMap<Long, Location>()
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
@@ -144,6 +149,14 @@ class PerformCollectionFragment : Fragment(),
             {
                 if (enumurationItem.samplingState == SamplingState.Sampled)
                 {
+                    // FIX THIS!!!
+                    // why is the locationId NOT set?
+                    if (enumurationItem.locationId < 0)
+                    {
+                        location.id?.let {
+                            enumurationItem.locationId = it
+                        }
+                    }
                     enumerationItems.add( enumurationItem )
                 }
             }
@@ -167,6 +180,11 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
         )
+
+        val locationComponentPlugin = binding.mapView.location
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapView.gestures.addOnMoveListener(onMoveListener)
+        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
@@ -217,8 +235,57 @@ class PerformCollectionFragment : Fragment(),
             )
         }
 
+        binding.mapTileCacheButton.setOnClickListener {
+            if (config.mapTileRegions.isNotEmpty())
+            {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                MapboxManager.loadStylePack( activity!!, this )
+            }
+        }
+
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
+        }
+
+        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
+        if (centerOnCurrentLocation == null)
+        {
+            sharedViewModel.setCenterOnCurrentLocation( false )
+        }
+
+        binding.mapTileCacheButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
+        sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+            if (centerOnCurrentLocation)
+            {
+                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else
+            {
+                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+            }
+        }
+
+        binding.helpButton.setOnClickListener {
+            PerformCollectionHelpDialog( activity!! )
+        }
+
+        binding.centerOnLocationButton.setOnClickListener {
+            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+                if (centerOnCurrentLocation)
+                {
+                    sharedViewModel.setCenterOnCurrentLocation( false )
+                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                }
+                else
+                {
+                    sharedViewModel.setCenterOnCurrentLocation( true )
+                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                }
+                refreshMap()
+            }
         }
 
         binding.exportButton.setOnClickListener {
@@ -545,13 +612,14 @@ class PerformCollectionFragment : Fragment(),
         sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
-    private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
-//        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
-    }
-
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
-        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
+        sharedViewModel.centerOnCurrentLocation?.value?.let {
+            if (it)
+            {
+                binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
+                binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
+            }
+        }
     }
 
     private val onMoveListener = object : OnMoveListener {
@@ -600,8 +668,58 @@ class PerformCollectionFragment : Fragment(),
     private fun onCameraTrackingDismissed()
     {
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+    }
+
+    override fun stylePackLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+            }
+        }
+    }
+
+    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
+    {
+        busyIndicatorDialog?.let {
+            activity!!.runOnUiThread {
+                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
+            }
+        }
+    }
+
+    override fun tilePacksLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                }
+            }
+        }
+    }
+
+    override fun didPressCancelButton()
+    {
+        MapboxManager.cancelStylePackDownload()
+        MapboxManager.cancelTilePackDownload()
     }
 
     override fun onDestroyView()

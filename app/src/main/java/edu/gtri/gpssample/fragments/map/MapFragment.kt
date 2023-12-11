@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
@@ -17,17 +19,27 @@ import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListene
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.databinding.FragmentMapBinding
+import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
+import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import edu.gtri.gpssample.R
 
-class MapFragment : Fragment()
+class MapFragment : Fragment(), MapboxManager.MapTileCacheDelegate, BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
     private var centerOnLocation = true
+    private var busyIndicatorDialog: BusyIndicatorDialog? = null
+
     private lateinit var defaultColorList : ColorStateList
+    private lateinit var sharedViewModel: ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+        val vm : ConfigurationViewModel by activityViewModels()
+        sharedViewModel = vm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -63,6 +75,14 @@ class MapFragment : Fragment()
         locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.addOnMoveListener(onMoveListener)
         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (config.mapTileRegions.size > 0)
+                {
+                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                    MapboxManager.loadStylePack( activity!!, this )
+                }
+        }
 
         binding.centerOnLocationButton.setOnClickListener {
             centerOnLocation = !centerOnLocation
@@ -137,6 +157,59 @@ class MapFragment : Fragment()
                     }
                 }.toJson()
             )
+        }
+    }
+
+    override fun didPressCancelButton()
+    {
+        MapboxManager.cancelStylePackDownload()
+        MapboxManager.cancelTilePackDownload()
+    }
+
+    override fun stylePackLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(edu.gtri.gpssample.R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+                }
+            }
+        }
+    }
+
+    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
+    {
+        busyIndicatorDialog?.let {
+            activity!!.runOnUiThread {
+                it.updateProgress(resources.getString(edu.gtri.gpssample.R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
+            }
+        }
+    }
+
+    override fun tilePacksLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(edu.gtri.gpssample.R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                }
+            }
         }
     }
 
