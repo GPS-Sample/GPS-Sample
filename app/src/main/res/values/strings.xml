@@ -291,6 +291,7 @@
     <string name="define_map_tile_cache_region">Define map tile cache region</string>
     <string name="download_map_tiles">Download map tiles</string>
     <string name="center_on_location">Center on location</string>
+    <string name="less_than_equal">"Less Than Or Equal"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

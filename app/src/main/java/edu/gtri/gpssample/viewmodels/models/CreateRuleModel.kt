@@ -37,12 +37,12 @@ class CreateRuleModel {
                 val array: Array<String> = Array(englishArray.size)
                 { i ->
                     when (i) {
-
                         0 -> fragment.getString(R.string.equal)
                         1 -> fragment.getString(R.string.not_equal)
                         2 -> fragment.getString(R.string.less_than)
                         3 -> fragment.getString(R.string.greater_than)
-                        4 -> fragment.getString(R.string.greater_than_equal)
+                        4 -> fragment.getString(R.string.less_than_equal)
+                        5 -> fragment.getString(R.string.greater_than_equal)
                         else -> String()
                     }
                 }

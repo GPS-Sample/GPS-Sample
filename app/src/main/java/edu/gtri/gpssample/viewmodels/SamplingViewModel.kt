@@ -183,7 +183,21 @@ class SamplingViewModel : ViewModel()
 
         return validRule
     }
-    fun beginSampling(view : View) : SamplingState
+    fun beginSampling(view : View)
+    {
+        currentStudy?.value?.let { study ->
+            when( study.samplingMethod )
+            {
+                SamplingMethod.SimpleRandom -> performSimpleRandomSampling()
+                SamplingMethod.Cluster -> performClusterSampling()
+                else -> {}
+            }
+
+            setSampleAreasForMap(mapboxManager,pointAnnotationManager)
+        }
+    }
+
+    fun performSimpleRandomSampling()
     {
         val validSamples : ArrayList<EnumerationItem> = ArrayList()
 
@@ -219,68 +233,81 @@ class SamplingViewModel : ViewModel()
                                     }
                                 }
                             }
-                            var filterOperator : FilterOperator? = rule.filterOperator
-                            while(filterOperator != null)
-                            {
-                                var validNextRule = false
 
-                                // check each rule
-                                filterOperator?.let{fo ->
-                                    fo.rule?.let{nextRule ->
-                                        // check next rule
-                                        nextRule.field?.let{field ->
-                                            Log.d("XXXXXXXX", "the field ${field.name}")
-                                            for (fieldData in sampleItem.fieldDataList)
-                                            {
-                                                if( fieldData.field?.name.equals( field.name))
+                            var filterOperator : FilterOperator? = rule.filterOperator
+
+                            if (filterOperator == null)
+                            {
+                                if (validRule)
+                                {
+                                    validSamples.add(sampleItem)
+                                }
+                            }
+                            else
+                            {
+                                while(filterOperator != null)
+                                {
+                                    var validNextRule = false
+
+                                    // check each rule
+                                    filterOperator?.let{fo ->
+                                        fo.rule?.let{nextRule ->
+                                            // check next rule
+                                            nextRule.field?.let{field ->
+                                                Log.d("XXXXXXXX", "the field ${field.name}")
+                                                for (fieldData in sampleItem.fieldDataList)
                                                 {
-                                                    validNextRule = validateRule(nextRule, fieldData)
-                                                    // check the operator
-                                                    if(validNextRule)
+                                                    if( fieldData.field?.name.equals( field.name))
                                                     {
-                                                        when(fo.conenctor)
+                                                        validNextRule = validateRule(nextRule, fieldData)
+                                                        // check the operator
+                                                        if(validNextRule)
                                                         {
-                                                            Connector.AND->{
-                                                                validFilterOperator = (validRule && validNextRule)
-                                                            }
-                                                            Connector.OR->{
-                                                                validFilterOperator = (validRule || validNextRule)
-                                                            }
-                                                            Connector.NOT->{
-                                                                validFilterOperator = (validRule && !validNextRule)
-                                                            }
-                                                            else->{
-                                                                validFilterOperator = false
+                                                            when(fo.conenctor)
+                                                            {
+                                                                Connector.AND->{
+                                                                    validFilterOperator = (validRule && validNextRule)
+                                                                }
+                                                                Connector.OR->{
+                                                                    validFilterOperator = (validRule || validNextRule)
+                                                                }
+                                                                Connector.NOT->{
+                                                                    validFilterOperator = (validRule && !validNextRule)
+                                                                }
+                                                                else->{
+                                                                    validFilterOperator = false
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                    if(!validNextRule || !validFilterOperator)
-                                                    {
-                                                        break;
+                                                        if(!validNextRule || !validFilterOperator)
+                                                        {
+                                                            break;
+                                                        }
                                                     }
                                                 }
                                             }
+                                            // check constraint
+                                            filterOperator = nextRule.filterOperator
                                         }
-                                        // check constraint
-                                        filterOperator = nextRule.filterOperator
+                                    }?:run{
+                                        filterOperator = null
                                     }
-                                }?:run{
-                                    filterOperator = null
                                 }
-
                             }
                         }
+
                         validSample = validRule && validFilterOperator
+
                         if(!validSample)
                         {
                             break;
                         }
                     }
+
                     if(validSample)
                     {
                         validSamples.add(sampleItem)
                     }
-
                 }
             }
 
@@ -323,9 +350,35 @@ class SamplingViewModel : ViewModel()
                 }
             }
         }
+    }
 
-        setSampleAreasForMap(mapboxManager,pointAnnotationManager)
+    fun performClusterSampling()
+    {
+        currentStudy?.value?.let { study ->
+            for (sampleArea in study.sampleAreas)
+            {
+                _currentSampledItemsForSampling.clear()
 
-        return SamplingState.None
+                for (location in sampleArea.locations)
+                {
+                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                    {
+                        currentStudy?.value?.let{ study->
+                            for (sampledItem in location.enumerationItems)
+                            {
+                                if(!_currentSampledItemsForSampling.contains(sampledItem))
+                                {
+                                    _currentSampledItemsForSampling.add(sampledItem)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // generate sample for each cluster
+
+                performSimpleRandomSampling()
+            }
+        }
     }
 }
