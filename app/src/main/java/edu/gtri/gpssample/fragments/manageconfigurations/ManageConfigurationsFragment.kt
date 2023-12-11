@@ -337,11 +337,10 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         val config = Config.unpack( text )
                         config?.let { config ->
 
-                            DAO.configDAO.createConfig( config )
+                            DAO.configDAO.createOrUpdateConfig( config )
 
-                            sharedViewModel.configurations.add(config)
+                            sharedViewModel.initializeConfigurations()
                             sharedViewModel.setCurrentConfig( config )
-
                             manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
 
                             didReceiveConfiguration(true )
@@ -362,15 +361,15 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
             DAO.instance().writableDatabase.beginTransaction()
 
-            val saved = DAO.configDAO.createConfig(config)
+            val savedConfig = DAO.configDAO.createOrUpdateConfig(config)
 
             DAO.instance().writableDatabase.setTransactionSuccessful()
             DAO.instance().writableDatabase.endTransaction()
 
-            saved?.let { config ->
-                sharedViewModel.configurations.add(config)
-                sharedViewModel.setCurrentConfig(config)
-                manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+            savedConfig?.let { savedConfig ->
+                sharedViewModel.initializeConfigurations()
+                sharedViewModel.setCurrentConfig( savedConfig )
+                manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
             }
         }
     }

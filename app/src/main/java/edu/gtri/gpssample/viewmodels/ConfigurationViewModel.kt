@@ -188,7 +188,7 @@ class ConfigurationViewModel : ViewModel()
             configurations.add(configuration)
 
             // write to database
-            DAO.configDAO.createConfig(configuration)
+            DAO.configDAO.createOrUpdateConfig(configuration)
         }
     }
 
@@ -196,7 +196,7 @@ class ConfigurationViewModel : ViewModel()
     {
         _currentConfiguration?.value?.let{configuration ->
             // write to database
-            DAO.configDAO.updateConfig(configuration)
+            DAO.configDAO.createOrUpdateConfig(configuration)
             if(!configurations.contains(configuration))
             {
                 configurations.add(configuration)
