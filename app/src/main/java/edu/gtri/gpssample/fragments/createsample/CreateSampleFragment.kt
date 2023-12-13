@@ -172,13 +172,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                 {
                     DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
 
-                    for (location in sampleArea.locations)
-                    {
-                        DAO.locationDAO.updateConnectorTable( location, sampleArea )
-                    }
-
-                    // we should not have to do this anymore
-//                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
+//                    for (location in sampleArea.locations)
+//                    {
+//                        DAO.locationDAO.updateConnectorTable( location, sampleArea )
+//                    }
                 }
             }
 

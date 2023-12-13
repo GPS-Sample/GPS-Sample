@@ -41,8 +41,8 @@ class SampleAreaDAO(private var dao: DAO)
 
             for (location in sampleArea.locations)
             {
-                DAO.locationDAO.updateConnectorTable( location, sampleArea )
-//                DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
+//                DAO.locationDAO.updateConnectorTable( location, sampleArea )
+                DAO.locationDAO.createOrUpdateLocation( location, sampleArea )
             }
 
             return sampleArea
