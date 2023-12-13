@@ -173,6 +173,18 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+    override fun onBackPressed()
+    {
+        if (supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.backStackEntryCount == 1)
+        {
+            finish()
+        }
+        else
+        {
+            super.onBackPressed()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         Log.d("xxx", "MainActivity.onDestroy")
