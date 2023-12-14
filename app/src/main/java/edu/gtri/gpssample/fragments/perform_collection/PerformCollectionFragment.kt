@@ -225,7 +225,7 @@ class PerformCollectionFragment : Fragment(),
                             }
                             else
                             {
-                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid + ":undefined"
+                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                 LaunchSurveyDialog( activity, this@PerformCollectionFragment)
                             }
                         }
@@ -448,7 +448,7 @@ class PerformCollectionFragment : Fragment(),
         location?.let { location ->
             sharedViewModel.locationViewModel.setCurrentLocation(location)
             sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
-            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid + ":undefined"
+            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
             LaunchSurveyDialog( activity, this)
         }
     }
