@@ -304,11 +304,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         if (tag == kDeleteTag)
         {
-            for (config in sharedViewModel.configurations)
-            {
-                sharedViewModel.deleteConfig( config )
-                manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
-            }
+            DAO.deleteAll()
+            sharedViewModel.configurations.clear()
+            manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
 
             ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
                 resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code),

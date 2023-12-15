@@ -412,7 +412,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTERRULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTEROPERATOR")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA")
@@ -430,7 +429,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
-
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUM_AREA")
@@ -536,11 +534,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FILTER_SAMPLE_SIZE = "filter_sample_size"
         const val COLUMN_FILTER_SAMPLE_TYPE_INDEX = "filter_sample_type_index"
 
-        // FilterRule Table
-        const val TABLE_FILTERRULE = "filterrule"
-        const val COLUMN_FILTERRULE_ORDER = "filterrule_order"
-        const val COLUMN_FILTERRULE_CONNECTOR_INDEX = "filterrule_connector_index"
-
         // FilterOperator
         const val TABLE_FILTEROPERATOR = "filteroperator"
         const val COLUMN_FILTEROPERATOR_ORDER = "operator_order"
@@ -632,7 +625,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var fieldOptionDAO: FieldOptionDAO
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
-        //lateinit var filterRuleDAO: FilterRuleDAO
         lateinit var enumAreaDAO: EnumAreaDAO
         lateinit var sampleAreaDAO: SampleAreaDAO
         lateinit var enumerationTeamDAO: EnumerationTeamDAO
@@ -673,24 +665,36 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         {
             _instance?.let {
                 val db = it.writableDatabase
-                db.delete(TABLE_CONFIG, null, null )
-                db.delete(TABLE_STUDY, null, null)
-                db.delete(TABLE_CONFIG_STUDY, null, null)
-                db.delete(TABLE_STUDY_ENUM_AREA, null, null)
-                db.delete(TABLE_FIELD, null, null)
-                db.delete(TABLE_FIELD_DATA, null, null)
-                db.delete(TABLE_RULE, null, null)
-                db.delete(TABLE_FILTER, null, null)
-                db.delete(TABLE_ENUM_AREA, null, null)
-                db.delete(TABLE_SAMPLE_AREA, null, null)
-                db.delete(TABLE_ENUMERATION_TEAM, null, null)
-                db.delete(TABLE_COLLECTION_TEAM, null, null)
-                db.delete(TABLE_LAT_LON, null, null)
-                db.delete(TABLE_LOCATION, null, null)
-                db.delete(TABLE_ENUMERATION_ITEM, null, null)
-                db.delete(TABLE_CONFIG__LAT_LON, null, null)
-                db.delete(TABLE_ENUM_AREA__LAT_LON, null, null)
-                db.delete(TABLE_SAMPLE_AREA__LAT_LON, null, null)
+                db.execSQL("DELETE FROM $TABLE_CONFIG")
+                db.execSQL("DELETE FROM $TABLE_STUDY")
+                db.execSQL("DELETE FROM $TABLE_CONFIG_STUDY")
+                db.execSQL("DELETE FROM $TABLE_STUDY_ENUM_AREA")
+                db.execSQL("DELETE FROM $TABLE_FIELD")
+                db.execSQL("DELETE FROM $TABLE_RULE")
+                db.execSQL("DELETE FROM $TABLE_FILTER")
+                db.execSQL("DELETE FROM $TABLE_FILTEROPERATOR")
+                db.execSQL("DELETE FROM $TABLE_ENUM_AREA")
+                db.execSQL("DELETE FROM $TABLE_SAMPLE_AREA")
+                db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM")
+                db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM")
+                db.execSQL("DELETE FROM $TABLE_FIELD_DATA")
+                db.execSQL("DELETE FROM $TABLE_FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $TABLE_LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_LOCATION")
+                db.execSQL("DELETE FROM $TABLE_ENUMERATION_ITEM")
+                db.execSQL("DELETE FROM $TABLE_SAMPLE_AREA__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_CONFIG__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_ENUM_AREA__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_FIELD_OPTION")
+                db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
+                db.execSQL("DELETE FROM $TABLE_FIELD__FIELD_OPTION")
+                db.execSQL("DELETE FROM $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $TABLE_LOCATION__ENUM_AREA")
+                db.execSQL("DELETE FROM $TABLE_LOCATION__SAMPLE_AREA")
+                db.execSQL("DELETE FROM $TABLE_LOCATION__ENUMERATION_TEAM")
+                db.execSQL("DELETE FROM $TABLE_LOCATION__COLLECTION_TEAM")
             }
         }
 
@@ -707,7 +711,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 fieldOptionDAO = FieldOptionDAO( _instance!! )
                 ruleDAO = RuleDAO( _instance!! )
                 filterDAO = FilterDAO( _instance!! )
-              //  filterRuleDAO = FilterRuleDAO( instance!! )
                 enumAreaDAO = EnumAreaDAO( _instance!! )
                 sampleAreaDAO = SampleAreaDAO( _instance!! )
                 enumerationTeamDAO = EnumerationTeamDAO( _instance!! )
@@ -723,6 +726,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 263
+        private const val DATABASE_VERSION = 265
     }
 }
