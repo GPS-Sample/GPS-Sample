@@ -18,6 +18,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
@@ -26,6 +27,7 @@ import edu.gtri.gpssample.databinding.FragmentPerformMultiCollectionBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.ArrayList
 
 class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurveyDialogDelegate, AdditionalInfoDialog.AdditionalInfoDialogDelegate
 {
@@ -59,7 +61,17 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
             location = it
         }
 
-        performMultiCollectionAdapter = PerformMultiCollectionAdapter( location.enumerationItems )
+        val enumerationItems = ArrayList<EnumerationItem>()
+
+        for (enumurationItem in location.enumerationItems)
+        {
+            if (enumurationItem.samplingState == SamplingState.Sampled)
+            {
+                enumerationItems.add( enumurationItem )
+            }
+        }
+
+        performMultiCollectionAdapter = PerformMultiCollectionAdapter( enumerationItems )
         performMultiCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -80,7 +92,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem)
     {
-        (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid + ":" + enumerationItem.subAddress
+        (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
         sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
         LaunchSurveyDialog( activity, this@PerformMultiCollectionFragment)
     }
@@ -130,7 +142,17 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
                     sampledItem.collectionState = CollectionState.Incomplete
                 }
 
-                performMultiCollectionAdapter.updateEnumerationItems( location.enumerationItems )
+                val enumerationItems = ArrayList<EnumerationItem>()
+
+                for (enumurationItem in location.enumerationItems)
+                {
+                    if (enumurationItem.samplingState == SamplingState.Sampled)
+                    {
+                        enumerationItems.add( enumurationItem )
+                    }
+                }
+
+                performMultiCollectionAdapter.updateEnumerationItems( enumerationItems )
 
                 DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
             }

@@ -225,7 +225,7 @@ class PerformCollectionFragment : Fragment(),
                             }
                             else
                             {
-                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid + ":undefined"
+                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                 LaunchSurveyDialog( activity, this@PerformCollectionFragment)
                             }
                         }
@@ -336,104 +336,104 @@ class PerformCollectionFragment : Fragment(),
 
         for (sampleArea in study.sampleAreas)
         {
-            val points = java.util.ArrayList<Point>()
-            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-
-            collectionTeam.polygon.map {
-                points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-            }
-
-            pointList.add( points )
-
-            if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
+            for (location in sampleArea.locations)
             {
-                val polygonAnnotation = mapboxManager.addPolygon(pointList,"#000000", 0.25)
-
-                polygonAnnotation?.let {
-                    allPolygonAnnotations.add( it )
-                }
-
-                val polylineAnnotation = mapboxManager.addPolyline(pointList[0],"#ff0000")
-
-                polylineAnnotation?.let {
-                    allPolylineAnnotations.add( it )
-                }
-
-                val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-                currentZoomLevel?.let { currentZoomLevel ->
-                    val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
-                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(currentZoomLevel)
-                        .center(point)
-                        .build()
-
-                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
-                }
-
-                for (location in sampleArea.locations)
+                if (location.isLandmark)
                 {
-                    if (location.isLandmark)
-                    {
-                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                    val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
 
-                        pointAnnotation?.let {
-                            locationHashMap[pointAnnotation.id] = location
-                            allPointAnnotations.add( pointAnnotation )
-                        }
+                    pointAnnotation?.let {
+                        locationHashMap[pointAnnotation.id] = location
+                        allPointAnnotations.add( pointAnnotation )
                     }
                 }
+            }
+        }
 
-                for (location in collectionTeam.locations)
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+
+        collectionTeam.polygon.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
+        {
+            val polygonAnnotation = mapboxManager.addPolygon(pointList,"#000000", 0.25)
+
+            polygonAnnotation?.let {
+                allPolygonAnnotations.add( it )
+            }
+
+            val polylineAnnotation = mapboxManager.addPolyline(pointList[0],"#ff0000")
+
+            polylineAnnotation?.let {
+                allPolylineAnnotations.add( it )
+            }
+
+            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+            currentZoomLevel?.let { currentZoomLevel ->
+                val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(currentZoomLevel)
+                    .center(point)
+                    .build()
+
+                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            }
+
+            for (location in collectionTeam.locations)
+            {
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                    var resourceId = 0
+                    var isMultiFamily = false
+
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
+                    }
+
+                    if (!isMultiFamily)
                     {
-                        var resourceId = 0
-                        var isMultiFamily = false
+                        val sampledItem = location.enumerationItems[0]
 
-                        location.isMultiFamily?.let {
-                            isMultiFamily = it
-                        }
-
-                        if (!isMultiFamily)
+                        if (sampledItem.samplingState == SamplingState.Sampled)
                         {
-                            val sampledItem = location.enumerationItems[0]
-
+                            resourceId = if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                        }
+                    }
+                    else
+                    {
+                        for (sampledItem in location.enumerationItems)
+                        {
                             if (sampledItem.samplingState == SamplingState.Sampled)
                             {
-                                resourceId = if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
-                            }
-                        }
-                        else
-                        {
-                            for (sampledItem in location.enumerationItems)
-                            {
-                                if (sampledItem.samplingState == SamplingState.Sampled)
+                                if (sampledItem.collectionState == CollectionState.Incomplete)
                                 {
-                                    if (sampledItem.collectionState == CollectionState.Incomplete)
-                                    {
-                                        resourceId = R.drawable.multi_home_orange
-                                        break
-                                    }
-                                    else if (sampledItem.collectionState == CollectionState.Complete)
-                                    {
-                                        resourceId = R.drawable.multi_home_purple
-                                    }
+                                    resourceId = R.drawable.multi_home_orange
+                                    break
+                                }
+                                else if (sampledItem.collectionState == CollectionState.Complete)
+                                {
+                                    resourceId = R.drawable.multi_home_purple
                                 }
                             }
                         }
+                    }
 
-                        if (resourceId > 0)
-                        {
-                            // one point per location!
-                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                    if (resourceId > 0)
+                    {
+                        // one point per location!
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
-                            pointAnnotation?.let { pointAnnotation ->
-                                allPointAnnotations.add( pointAnnotation )
-                                locationHashMap[pointAnnotation.id] = location
-                            }
+                        pointAnnotation?.let { pointAnnotation ->
+                            allPointAnnotations.add( pointAnnotation )
+                            locationHashMap[pointAnnotation.id] = location
                         }
                     }
                 }
@@ -448,7 +448,7 @@ class PerformCollectionFragment : Fragment(),
         location?.let { location ->
             sharedViewModel.locationViewModel.setCurrentLocation(location)
             sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
-            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid + ":undefined"
+            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
             LaunchSurveyDialog( activity, this)
         }
     }

@@ -259,20 +259,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.saveButton.setOnClickListener {
-            var isMultiFamily = false
-
-            location.isMultiFamily?.let {
-                isMultiFamily = it
-            }
-
-            if (isMultiFamily && binding.subaddressEditText.text.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.please_enter_a_subaddress), Toast.LENGTH_SHORT).show()
-            }
-            else
-            {
-                AdditionalInfoDialog( activity, enumerationItem.incompleteReason, enumerationItem.notes, this)
-            }
+            AdditionalInfoDialog( activity, enumerationItem.incompleteReason, enumerationItem.notes, this)
         }
     }
 
