@@ -28,10 +28,56 @@
             android:layout_height="40dp"
             android:gravity="center_vertical|center_horizontal"
             android:layout_gravity="top|start"
-            android:text="Legend"
+            android:text="@string/legend"
             android:layout_marginTop="30dp"
             android:layout_marginStart="10dp"
             android:textColor="@color/mapbox_gray"
+            android:textSize="15sp"
+            android:textStyle="normal" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:textColor="@color/black"
+                android:text="@string/accuracy"
+                android:textSize="15sp"
+                android:textStyle="normal" />
+
+            <TextView
+                android:id="@+id/accuracy_label_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:textColor="@color/blue"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/accuracy_value_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="normal" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/location_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_gravity="bottom|end"
+            android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="normal" />
     </FrameLayout>

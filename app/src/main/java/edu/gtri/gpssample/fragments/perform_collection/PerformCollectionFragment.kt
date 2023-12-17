@@ -1,7 +1,9 @@
 package edu.gtri.gpssample.fragments.perform_collection
 
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -31,9 +33,7 @@ import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -181,9 +181,6 @@ class PerformCollectionFragment : Fragment(),
             }
         )
 
-        val locationComponentPlugin = binding.mapView.location
-        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.gestures.addOnMoveListener(onMoveListener)
         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
@@ -624,21 +621,59 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
-    private val onMoveListener = object : OnMoveListener {
-        override fun onMoveBegin(detector: MoveGestureDetector) {
-            onCameraTrackingDismissed()
+    private val locationConsumer = object : LocationConsumer
+    {
+        override fun onBearingUpdated(vararg bearing: Double, options: (ValueAnimator.() -> Unit)?) {
         }
 
-        override fun onMove(detector: MoveGestureDetector): Boolean {
-            return false
+        override fun onLocationUpdated(vararg location: Point, options: (ValueAnimator.() -> Unit)?) {
+            if (location.size > 0)
+            {
+                val point = location.last()
+                binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
+                sharedViewModel.locationViewModel.setCurrentLocationUpdateTime(Date())
+            }
         }
 
-        override fun onMoveEnd(detector: MoveGestureDetector) {}
+        override fun onPuckBearingAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
+        }
+
+        override fun onPuckLocationAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
+        }
+    }
+
+    private val onIndicatorAccurracyRadiusChangedListener = OnIndicatorAccuracyRadiusChangedListener {
+        val accuracy = it.toInt()
+
+        if (accuracy > config.minGpsPrecision)
+        {
+            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
+            binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
+        }
+        else
+        {
+            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
+            binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
+        }
+
+        binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
     }
 
     private fun initLocationComponent()
     {
         val locationComponentPlugin = binding.mapView.location
+
+        locationComponentPlugin.enabled = true
+        locationComponentPlugin.getLocationProvider()?.registerLocationConsumer( locationConsumer )
+        locationComponentPlugin.addOnIndicatorPositionChangedListener( onIndicatorPositionChangedListener )
+
+        val locationComponentPlugin2 = binding.mapView.location2
+        locationComponentPlugin2.enabled = true
+        locationComponentPlugin2.addOnIndicatorAccuracyRadiusChangedListener( onIndicatorAccurracyRadiusChangedListener )
+
+        locationComponentPlugin2.updateSettings2 {
+            this.showAccuracyRing = true
+        }
 
         locationComponentPlugin.updateSettings {
             this.enabled = true
@@ -665,12 +700,6 @@ class PerformCollectionFragment : Fragment(),
                 }.toJson()
             )
         }
-    }
-
-    private fun onCameraTrackingDismissed()
-    {
-        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
     }
 
     override fun stylePackLoaded( error: String )
@@ -728,6 +757,8 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onDestroyView()
 
+        binding.mapView.location.getLocationProvider()?.unRegisterLocationConsumer( locationConsumer )
+        binding.mapView.location.removeOnIndicatorPositionChangedListener( onIndicatorPositionChangedListener )
         _binding = null
     }
 }

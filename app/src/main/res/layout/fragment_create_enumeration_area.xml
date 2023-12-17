@@ -39,7 +39,7 @@
                 android:layout_height="40dp"
                 android:gravity="center_vertical|center_horizontal"
                 android:layout_gravity="top|left"
-                android:text="Legend"
+                android:text="@string/legend"
                 android:layout_marginTop="30dp"
                 android:layout_marginStart="10dp"
                 android:textColor="@color/mapbox_gray"

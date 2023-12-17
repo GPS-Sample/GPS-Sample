@@ -292,6 +292,11 @@
     <string name="download_map_tiles">Download map tiles</string>
     <string name="center_on_location">Center on location</string>
     <string name="less_than_equal">"Less Than Or Equal"</string>
+    <string name="gps_accuracy_error">"GPS accuracy is less than the required accuracy."</string>
+    <string name="accuracy">"Accuracy : "</string>
+    <string name="good">"GOOD"</string>
+    <string name="poor">"POOR"</string>
+    <string name="legend">Legend</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
