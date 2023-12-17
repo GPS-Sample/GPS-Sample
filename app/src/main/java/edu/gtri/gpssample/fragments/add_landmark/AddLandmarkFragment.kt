@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -64,8 +65,11 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
-            findNavController().navigate(R.id.action_navigate_to_MainFragment)
+            // app was closed to make room for the camera app, force re-start
+            val x = 0
+            val y = 1/x
+//            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
+//            findNavController().navigate(R.id.action_navigate_to_MainFragment)
             return
         }
 
@@ -134,17 +138,17 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             DAO.locationDAO.updateLocation( location, enumArea )
 
-            val enumAreaId = enumArea.id
-
-            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-
-            sharedViewModel.updateConfiguration()
-
-            enumAreaId?.let {
-                DAO.enumAreaDAO.getEnumArea(it)?.let {
-                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea(it)
-                }
-            }
+//            val enumAreaId = enumArea.id
+//
+//            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
+//
+//            sharedViewModel.updateConfiguration()
+//
+//            enumAreaId?.let {
+//                DAO.enumAreaDAO.getEnumArea(it)?.let {
+//                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea(it)
+//                }
+//            }
 
             findNavController().popBackStack()
         }

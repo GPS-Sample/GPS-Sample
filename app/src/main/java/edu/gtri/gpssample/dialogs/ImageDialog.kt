@@ -31,7 +31,7 @@ class ImageDialog
 
         val alertDialog = builder.create()
 
-        alertDialog.setCancelable(false)
+        alertDialog.setCancelable(true)
         alertDialog.show()
 
         val dismissButton = view.findViewById<Button>(R.id.dismiss_button)

@@ -12,6 +12,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -55,7 +56,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onCreate(savedInstanceState)
 
-        Log.d( "xxx", "AddHouseholdFragment.onCreate" )
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
 
@@ -68,7 +68,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        Log.d( "xxx", "AddHouseholdFragment.onCreateView" )
         _binding = FragmentAddHouseholdBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -87,8 +86,11 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         if (!this::config.isInitialized)
         {
-            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
-            findNavController().navigate(R.id.action_navigate_to_MainFragment)
+            // app was closed to make room for the camera app, force re-start
+            val x = 0
+            val y = 1/x
+//            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
+//            findNavController().navigate(R.id.action_navigate_to_MainFragment)
             return
         }
 
@@ -383,6 +385,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         {
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
         }
+
+        DAO.locationDAO.updateLocation( location, enumArea )
 
         findNavController().popBackStack()
     }
