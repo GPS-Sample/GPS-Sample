@@ -150,9 +150,10 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             if(study.fields.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.create_field_rule_message), Toast.LENGTH_SHORT).show()
-            }else
+            }
+            else
             {
-                sharedViewModel.createRuleModel.createNewRule()
+                sharedViewModel.createRuleModel.createNewRule(study)
                 findNavController().navigate( R.id.action_navigate_to_CreateRuleFragment )
             }
         }

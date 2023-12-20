@@ -19,6 +19,8 @@ import java.util.*
 class CreateRuleModel {
     private var _ruleFieldPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _ruleOperatorPosition : MutableLiveData<Int> = MutableLiveData(0)
+
+    private var _dropdownPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _currentRule : MutableLiveData<Rule>? = null
 
     var fragment : Fragment? = null
@@ -28,6 +30,9 @@ class CreateRuleModel {
 
     val ruleOperationPosition : MutableLiveData<Int>
         get() = _ruleOperatorPosition
+
+    val dropdownPosition : MutableLiveData<Int>
+        get() = _dropdownPosition
 
     val operators : Array<String>
         get(){
@@ -49,10 +54,7 @@ class CreateRuleModel {
                 return array
             }
             return englishArray
-
         }
-
-
 
     fun addRule(study : Study)
     {
@@ -84,29 +86,24 @@ class CreateRuleModel {
 
     fun deleteRule(rule:Rule, study : Study)
     {
-
-            study.rules.remove(rule)
-            DAO.ruleDAO.deleteRule(rule)
+        study.rules.remove(rule)
+        DAO.ruleDAO.deleteRule(rule)
     }
 
-    fun createNewRule() : Boolean
+    fun createNewRule(study: Study) : Boolean
     {
         val newRule = Rule(null,  null, "", "" , Operator.None, null)
+        if (study.fields.isNotEmpty())
+        {
+            newRule.field = study.fields[0]
+        }
         _currentRule = MutableLiveData(newRule)
         currentRule = _currentRule
 
         return true
     }
 
-    fun onRuleFieldSelected(study : Study, position: Int,)
-    {
-        currentRule?.value?.let{ rule ->
-            val field = study.fields[position]
-            rule.field = field
-        }
-    }
-
-    fun onRuleOperatorSelected(study : Study, position: Int,)
+    fun onRuleOperatorSelected(study : Study, position: Int)
     {
         currentRule?.value?.let{rule ->
             rule.operator = OperatorConverter.fromArrayPosition(position)
