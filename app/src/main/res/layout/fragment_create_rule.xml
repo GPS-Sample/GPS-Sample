@@ -88,8 +88,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.createStudyModel.fieldList}"
-                        android:selectedItemPosition="@={viewModel.createRuleModel.ruleFieldPosition}"
-                        android:onItemSelected="@{viewModel::onRuleFieldSelected}"/>
+                        android:selectedItemPosition="@={viewModel.createRuleModel.ruleFieldPosition}"/>
                 </FrameLayout>
 
                 <TextView
@@ -128,17 +127,31 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                <EditText
-                    android:id="@+id/value_edit_text"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:hint="@string/enter_value"
-                    android:text="@={viewModel.createRuleModel.currentRule.value}"/>
+                    android:background="@drawable/spinner_frame">
 
+                    <EditText
+                        android:id="@+id/value_edit_text"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:hint="@string/enter_value"
+                        android:text="@={viewModel.createRuleModel.currentRule.value}"/>
+
+                    <Spinner
+                        android:visibility="gone"
+                        android:id="@+id/value_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:selectedItemPosition="@={viewModel.createRuleModel.dropdownPosition}"/>
+                </FrameLayout>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>
 

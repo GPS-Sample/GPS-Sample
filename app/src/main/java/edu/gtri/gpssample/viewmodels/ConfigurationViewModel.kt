@@ -292,13 +292,7 @@ class ConfigurationViewModel : ViewModel()
             createRuleModel.deleteSelectedRule(study)
         }
     }
-    fun onRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
-    {
-         createStudyModel.currentStudy?.value?.let{study ->
-             createRuleModel.onRuleFieldSelected(study, position)
-        }
 
-    }
     fun onRuleOperatorSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         createStudyModel.currentStudy?.value?.let{study ->

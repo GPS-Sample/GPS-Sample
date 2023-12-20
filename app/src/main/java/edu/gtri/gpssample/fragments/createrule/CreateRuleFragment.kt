@@ -20,7 +20,9 @@ import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.ArrayList
 
 class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -36,24 +38,6 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
         sharedViewModel.createRuleModel.fragment = this
-        sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
-            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                rule.field?.let{ field->
-                    for (i in 0..study.fields.size-1)
-                    {
-                        if (study.fields[i].uuid == field.uuid)
-                        {
-                            sharedViewModel.createRuleModel.ruleFieldPosition.value = i
-                            break
-                        }
-                    }
-                }
-            }
-        }
-
-        sharedViewModel.createRuleModel.currentRule?.value?.operator?.let { operator ->
-            sharedViewModel.createRuleModel.ruleOperationPosition?.value = OperatorConverter.toIndex( operator )
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -66,6 +50,7 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -76,6 +61,108 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             // Assign the fragment
             createRuleFragment = this@CreateRuleFragment
             this.executePendingBindings()
+        }
+
+        // for an existing rule, figure out which field was selected
+
+        sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                rule.field?.let{ field->
+                    for (i in 0..study.fields.size-1)
+                    {
+                        if (study.fields[i].uuid == field.uuid)
+                        {
+                            sharedViewModel.createRuleModel.ruleFieldPosition.value = i
+
+                            if (field.type == FieldType.Dropdown)
+                            {
+                                binding.valueEditText.visibility = View.GONE
+                                binding.valueSpinner.visibility = View.VISIBLE
+
+                                val items = ArrayList<String>()
+
+                                for (j in 0..field.fieldOptions.size-1)
+                                {
+                                    val fieldOption = field.fieldOptions[j]
+                                    items.add( fieldOption.name )
+
+                                    if (rule.value == fieldOption.name)
+                                    {
+                                        sharedViewModel.createRuleModel.dropdownPosition.value = j
+                                    }
+                                }
+
+                                binding.valueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                            }
+
+                            break
+                        }
+                    }
+                }
+            }
+        }
+
+        sharedViewModel.createRuleModel.currentRule?.value?.operator?.let { operator ->
+            sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( operator )
+        }
+
+        binding.fieldSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+            {
+                sharedViewModel.createRuleModel.currentRule?.value?.let{ rule ->
+                    sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                        val field = study.fields[position]
+                        rule.field = field
+                        if (field.type == FieldType.Dropdown)
+                        {
+                            binding.valueEditText.visibility = View.GONE
+                            binding.valueSpinner.visibility = View.VISIBLE
+
+                             val items = ArrayList<String>()
+
+                            for (j in 0..field.fieldOptions.size-1)
+                            {
+                                val fieldOption = field.fieldOptions[j]
+                                items.add( fieldOption.name )
+
+                                if (rule.value == fieldOption.name)
+                                {
+                                    sharedViewModel.createRuleModel.dropdownPosition.value = j
+                                }
+                            }
+
+                            binding.valueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                        }
+                        else
+                        {
+                            binding.valueSpinner.visibility = View.GONE
+                            binding.valueEditText.visibility = View.VISIBLE
+                        }
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>)
+            {
+            }
+        }
+
+        binding.valueSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+            {
+                sharedViewModel.createRuleModel.currentRule?.value?.let{ rule ->
+                    rule.field?.let { field ->
+                        val fieldOption = field.fieldOptions[position]
+                        rule.value = fieldOption.name
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>)
+            {
+            }
         }
 
         binding.deleteImageView.setOnClickListener {

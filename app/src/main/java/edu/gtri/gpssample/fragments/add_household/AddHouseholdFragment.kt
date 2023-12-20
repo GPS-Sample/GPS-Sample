@@ -302,6 +302,12 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         for (fieldData in enumerationItem.fieldDataList) {
             fieldData.field?.let { field ->
+                if (field.type == FieldType.Dropdown)
+                {
+                    fieldData.dropdownIndex?.let {
+                        fieldData.textValue = field.fieldOptions[it].name
+                    }
+                }
                 if (field.required) {
                     when (field.type) {
                         FieldType.Text -> {
