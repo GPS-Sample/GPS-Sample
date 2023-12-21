@@ -227,6 +227,16 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                             it.didStartImport()
                         }
 
+                        // first, import landmarks
+                        for (location in enumArea.locations)
+                        {
+                            if (location.isLandmark)
+                            {
+                                DAO.locationDAO.importLocation( location, enumArea )
+                            }
+                        }
+
+                        // next, import HH's
                         val team = enumArea.enumerationTeams.find { it.id == enumArea.selectedEnumerationTeamId }
                         team?.let { team ->
 

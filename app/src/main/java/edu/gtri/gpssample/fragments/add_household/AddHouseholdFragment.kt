@@ -46,6 +46,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     private lateinit var location: Location
     private lateinit var enumArea : EnumArea
     private lateinit var locationUpdateTime: Date
+    private lateinit var enumTeam: EnumerationTeam
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
@@ -100,6 +101,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
             enumArea = it
+        }
+
+        sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.let {
+            enumTeam = it
         }
 
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
@@ -392,7 +397,25 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
         }
 
-        DAO.locationDAO.updateLocation( location, enumArea )
+        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+
+        sharedViewModel.initializeConfigurations()
+
+        DAO.configDAO.getConfig( config.id!! )?.let {
+            sharedViewModel.setCurrentConfig( it )
+        }
+
+        DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
+            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+        }
+
+        DAO.studyDAO.getStudy( study.id!! )?.let {
+            sharedViewModel.createStudyModel.setStudy( it )
+        }
+
+        DAO.enumerationTeamDAO.getTeam( enumTeam.id!! )?.let {
+            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
+        }
 
         findNavController().popBackStack()
     }
