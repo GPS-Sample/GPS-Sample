@@ -68,7 +68,6 @@ data class Config(
         {
             try
             {
-                Log.d("XXXXXXXXX", "ABOUT TO UNPACK")
                 val decrypted = EncryptionUtil.Decrypt(message)
                 decrypted?.let {decrypted ->
                     return Json.decodeFromString<Config>( decrypted )
