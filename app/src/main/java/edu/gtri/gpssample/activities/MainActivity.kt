@@ -105,10 +105,6 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-
-        EncryptionUtil.createKeys()
-
-
        // Maybe there's a way to configure this better?
         val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         when (currentNightMode) {
