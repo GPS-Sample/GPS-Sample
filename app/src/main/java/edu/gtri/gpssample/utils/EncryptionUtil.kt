@@ -38,6 +38,13 @@ object EncryptionUtil {
         Log.d("XXXXXXX", "secret key ${hashedPassword}")
         Log.d("XXXXXXX","iv key ${encodedIvString}")
         Log.d("XXXXXXX","salt string ${encodedSaltString}")
+
+        Log.d("XXXXXXXXXX", "---------- BIG TEST ")
+        val encrypted = Encrypt("ENCRYPT TEST")
+        Log.d("XXXXXXXXXX", "Encrypted $encrypted")
+        val decrypted = Decrypt(encrypted)
+        Log.d("XXXXXXXXXX", "Decrypted $decrypted")
+        Log.d("XXXXXXXXXX", "DONE!!")
     }
 
 
@@ -45,10 +52,12 @@ object EncryptionUtil {
     {
         try {
             val ivParameterSpec = IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
-
+            val saltString = "slSOInkFVlwoeiSLk"
+           // val factory = SecretKeyFactory.getInstance("PBEWithMD5AndDES")
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
             val spec =
-                PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 10000, 256)
+                PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 10000, 128)
+
             val tmp = factory.generateSecret(spec)
             val secretKey = SecretKeySpec(tmp.encoded, "AES")
 
@@ -72,8 +81,10 @@ object EncryptionUtil {
         {
 
             val ivParameterSpec =  IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
+           // val factory = SecretKeyFactory.getInstance("PBEWithMD5AndDES")
+
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val spec =  PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 10000, 256)
+            val spec =  PBEKeySpec(secretKey.toCharArray(), Base64.decode(salt, Base64.DEFAULT), 10000, 128)
             val tmp = factory.generateSecret(spec);
             val secretKey =  SecretKeySpec(tmp.encoded, "AES")
 
