@@ -91,7 +91,7 @@
                 android:layout_margin="5dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:background="@drawable/draw" />
+                android:background="@drawable/add_location_blue" />
 
             <Button
                 android:id="@+id/add_household_button"

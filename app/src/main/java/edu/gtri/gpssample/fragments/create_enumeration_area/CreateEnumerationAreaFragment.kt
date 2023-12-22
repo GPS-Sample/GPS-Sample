@@ -72,7 +72,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var editMode = false
-    private var dropMode = false
+    private var addHousehold = false
     private var createEnumArea = false
     private var createMapTileCache = false
     private val binding get() = _binding!!
@@ -87,6 +87,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
+    private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -165,6 +166,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         binding.centerOnLocationButton.setOnClickListener {
             showCurrentLocation = !showCurrentLocation
+
             if (showCurrentLocation)
             {
                 val locationComponentPlugin = binding.mapView.location
@@ -183,8 +185,11 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
-            dropMode = false
-            createEnumArea = false
+            if (createEnumArea || addHousehold || createMapTileCache)
+            {
+                return@setOnClickListener
+            }
+
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
             val intent = Intent()
@@ -195,25 +200,39 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.createEnumAreaButton.setOnClickListener {
-            dropMode = false
-            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+            if (addHousehold || createMapTileCache)
+            {
+                return@setOnClickListener
+            }
 
             if (createEnumArea)
             {
                 createEnumArea = false
-                binding.overlayView.visibility = View.GONE
-                binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+
+                if (droppedPointAnnotations.size > 2)
+                {
+                    InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
+                    binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                    binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+                }
+                else
+                {
+                    droppedPointAnnotations.map { pointAnnotation ->
+                        pointAnnotation?.let{ pointAnnotation ->
+                            pointAnnotationManager.delete( pointAnnotation )
+                        }
+                    }
+
+                    droppedPointAnnotations.clear()
+                    binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                    binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+                }
             }
             else
             {
+                droppedPointAnnotations.clear()
                 createEnumArea = true
-                polyLinePoints.clear()
-                if (this::polylineAnnotation.isInitialized)
-                {
-                    polylineAnnotation.points = polyLinePoints
-                    polylineAnnotationManager.update(polylineAnnotation)
-                }
-                binding.overlayView.visibility = View.VISIBLE
+                binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
                 binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
         }
@@ -221,8 +240,10 @@ class CreateEnumerationAreaFragment : Fragment(),
         binding.overlayView.setOnTouchListener(this)
 
         binding.mapTileRegionButton.setOnClickListener {
-            dropMode = false
-            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+            if (createEnumArea || addHousehold)
+            {
+                return@setOnClickListener
+            }
 
             if (createMapTileCache)
             {
@@ -245,6 +266,11 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.mapTileCacheButton.setOnClickListener {
+            if (createEnumArea || addHousehold || createMapTileCache)
+            {
+                return@setOnClickListener
+            }
+
             if (getAllMapTileRegions().isNotEmpty())
             {
                 busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
@@ -257,15 +283,19 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.addHouseholdButton.setOnClickListener {
-            createEnumArea = false
-            if (dropMode)
+            if (createEnumArea || createMapTileCache)
             {
-                dropMode = false
+                return@setOnClickListener
+            }
+
+            if (addHousehold)
+            {
+                addHousehold = false
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
             else
             {
-                dropMode = true
+                addHousehold = true
                 removeAllPolygonOnClickListeners()
                 binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
@@ -300,9 +330,14 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (editMode)
         {
-            if (dropMode)
+            if (createEnumArea)
             {
-                dropMode = false
+                droppedPointAnnotations.add( mapboxManager.addMarker( point, R.drawable.location_blue ))
+                return true
+            }
+            else if (addHousehold)
+            {
+                addHousehold = false
                 createLocation( LatLng( point.latitude(), point.longitude()))
                 refreshMap()
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
@@ -641,76 +676,66 @@ class CreateEnumerationAreaFragment : Fragment(),
                 polylineAnnotation.points = polyLinePoints
                 polylineAnnotationManager.update(polylineAnnotation)
 
-                if (createEnumArea)
-                {
-                    createEnumArea = false
-                    binding.overlayView.visibility = View.GONE
-                    binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
-                    InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
+                createMapTileCache = false
+                binding.overlayView.visibility = View.GONE
+                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
+
+                val vertices = ArrayList<LatLon>()
+
+                val points1 = ArrayList<Coordinate>()
+
+                polylineAnnotation.points.map { point ->
+                    vertices.add( LatLon( point.latitude(), point.longitude()))
+                    points1.add( Coordinate( point.longitude(), point.latitude()))
                 }
-                else
+
+                val latLngBounds = GeoUtils.findGeobounds(vertices)
+                val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+                val mapTileRegion = MapTileRegion( northEast, southWest )
+
+                val geometryFactory = GeometryFactory()
+                val geometry1 = geometryFactory.createPolygon(points1.toTypedArray())
+
+                val deleteList = ArrayList<MapTileRegion>()
+
+                val allMapTileRegions = getAllMapTileRegions()
+
+                for (mtr in allMapTileRegions)
                 {
-                    createMapTileCache = false
-                    binding.overlayView.visibility = View.GONE
-                    binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-
-                    val vertices = ArrayList<LatLon>()
-
-                    val points1 = ArrayList<Coordinate>()
-
-                    polylineAnnotation.points.map { point ->
-                        vertices.add( LatLon( point.latitude(), point.longitude()))
-                        points1.add( Coordinate( point.longitude(), point.latitude()))
-                    }
-
-                    val latLngBounds = GeoUtils.findGeobounds(vertices)
-                    val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                    val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-                    val mapTileRegion = MapTileRegion( northEast, southWest )
-
-                    val geometryFactory = GeometryFactory()
-                    val geometry1 = geometryFactory.createPolygon(points1.toTypedArray())
-
-                    val deleteList = ArrayList<MapTileRegion>()
-
-                    val allMapTileRegions = getAllMapTileRegions()
-
-                    for (mtr in allMapTileRegions)
+                    val points2 = ArrayList<Coordinate>()
+                    points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
+                    points2.add( Coordinate( mtr.northEast.longitude, mtr.southWest.latitude ))
+                    points2.add( Coordinate( mtr.northEast.longitude, mtr.northEast.latitude ))
+                    points2.add( Coordinate( mtr.southWest.longitude, mtr.northEast.latitude ))
+                    points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
+                    val geometry2 = geometryFactory.createPolygon(points2.toTypedArray())
+                    if (geometry1.contains( geometry2 ))
                     {
-                        val points2 = ArrayList<Coordinate>()
-                        points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
-                        points2.add( Coordinate( mtr.northEast.longitude, mtr.southWest.latitude ))
-                        points2.add( Coordinate( mtr.northEast.longitude, mtr.northEast.latitude ))
-                        points2.add( Coordinate( mtr.southWest.longitude, mtr.northEast.latitude ))
-                        points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
-                        val geometry2 = geometryFactory.createPolygon(points2.toTypedArray())
-                        if (geometry1.contains( geometry2 ))
-                        {
-                            deleteList.add( mtr )
-                        }
+                        deleteList.add( mtr )
                     }
-
-                    for (mtr in deleteList)
-                    {
-                        if (config.mapTileRegions.contains( mtr ))
-                        {
-                            config.mapTileRegions.remove( mtr )
-                        }
-                        else if (unsavedMapTileRegions.contains( mtr ))
-                        {
-                            unsavedMapTileRegions.remove( mtr )
-                        }
-                    }
-
-                    unsavedMapTileRegions.add( mapTileRegion )
-
-                    polyLinePoints.clear()
-                    polylineAnnotation.points = polyLinePoints
-                    polylineAnnotationManager.update(polylineAnnotation)
-
-                    refreshMap()
                 }
+
+                for (mtr in deleteList)
+                {
+                    if (config.mapTileRegions.contains( mtr ))
+                    {
+                        config.mapTileRegions.remove( mtr )
+                    }
+                    else if (unsavedMapTileRegions.contains( mtr ))
+                    {
+                        unsavedMapTileRegions.remove( mtr )
+                    }
+                }
+
+                unsavedMapTileRegions.add( mapTileRegion )
+
+                polyLinePoints.clear()
+                polylineAnnotation.points = polyLinePoints
+                polylineAnnotationManager.update(polylineAnnotation)
+
+                refreshMap()
             }
             else
             {
@@ -739,11 +764,12 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun didCancelText( tag: Any? )
     {
-        polyLinePoints.clear()
-        polylineAnnotation.points = polyLinePoints
-        polylineAnnotationManager.update(polylineAnnotation)
-
-        refreshMap()
+        droppedPointAnnotations.map { pointAnnotation ->
+            pointAnnotation?.let{ pointAnnotation ->
+                pointAnnotationManager.delete( pointAnnotation )
+            }
+        }
+        droppedPointAnnotations.clear()
     }
 
     override fun didEnterText( name: String, tag: Any? )
@@ -771,10 +797,15 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else
         {
+            createEnumArea = false
+
             val vertices = ArrayList<LatLon>()
 
-            polylineAnnotation.points.map { point ->
-                vertices.add( LatLon( point.latitude(), point.longitude()))
+            droppedPointAnnotations.map { pointAnnotation ->
+                pointAnnotation?.let{ pointAnnotation ->
+                    vertices.add( LatLon( pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
+                    pointAnnotationManager.delete( pointAnnotation )
+                }
             }
 
             if (name.isEmpty())
@@ -793,10 +824,6 @@ class CreateEnumerationAreaFragment : Fragment(),
             val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
             unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
-
-            polyLinePoints.clear()
-            polylineAnnotation.points = polyLinePoints
-            polylineAnnotationManager.update(polylineAnnotation)
 
             refreshMap()
         }
