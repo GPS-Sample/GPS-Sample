@@ -19,7 +19,7 @@ class LaunchSurveyDialog
     {
     }
 
-    constructor( context: Context?, delegate: LaunchSurveyDialogDelegate )
+    constructor( context: Context?, gpsAccuracyIsGood: Boolean, delegate: LaunchSurveyDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -58,6 +58,12 @@ class LaunchSurveyDialog
 
         cancelButton.setOnClickListener {
             alertDialog.dismiss()
+        }
+
+        if (!gpsAccuracyIsGood)
+        {
+            launchButton.isEnabled = false
+            incompleteButton.isEnabled = false
         }
     }
 }

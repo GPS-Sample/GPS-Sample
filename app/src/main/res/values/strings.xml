@@ -296,6 +296,7 @@
     <string name="accuracy">"Accuracy : "</string>
     <string name="good">"GOOD"</string>
     <string name="poor">"POOR"</string>
+    <string name="unknown">UNKNOWN</string>
     <string name="legend">Legend</string>
 
     <string-array name="forgot_pin_questions">

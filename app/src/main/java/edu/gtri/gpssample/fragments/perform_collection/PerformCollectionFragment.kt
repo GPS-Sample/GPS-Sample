@@ -78,6 +78,7 @@ class PerformCollectionFragment : Fragment(),
 
     private var enumAreaId = 0
     private val binding get() = _binding!!
+    private var currentGPSAccuracy: Int? = null
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
     private val locationHashMap = java.util.HashMap<Long, Location>()
@@ -218,12 +219,15 @@ class PerformCollectionFragment : Fragment(),
 
                             if (count > 1)
                             {
-                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment)
+                                val bundle = Bundle()
+                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.toString(), gpsAccuracyIsGood())
+
+                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
                             }
                             else
                             {
                                 (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
-                                LaunchSurveyDialog( activity, this@PerformCollectionFragment)
+                                LaunchSurveyDialog( activity, gpsAccuracyIsGood(), this@PerformCollectionFragment)
                             }
                         }
                     }
@@ -446,7 +450,7 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.locationViewModel.setCurrentLocation(location)
             sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
             (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
-            LaunchSurveyDialog( activity, this)
+            LaunchSurveyDialog( activity, gpsAccuracyIsGood(), this)
         }
     }
 
@@ -646,7 +650,6 @@ class PerformCollectionFragment : Fragment(),
             {
                 val point = location.last()
                 binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
-                sharedViewModel.locationViewModel.setCurrentLocationUpdateTime(Date())
             }
         }
 
@@ -659,19 +662,29 @@ class PerformCollectionFragment : Fragment(),
 
     private val onIndicatorAccurracyRadiusChangedListener = OnIndicatorAccuracyRadiusChangedListener {
         val accuracy = it.toInt()
+        currentGPSAccuracy = accuracy
 
-        if (accuracy > config.minGpsPrecision)
+        if (accuracy <= config.minGpsPrecision)
         {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
+            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
             binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
         }
         else
         {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
+            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
             binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
         }
 
         binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
+    }
+
+    private fun gpsAccuracyIsGood(): Boolean
+    {
+        currentGPSAccuracy?.let {
+            return (it <= config.minGpsPrecision)
+        }
+
+        return false
     }
 
     private fun initLocationComponent()

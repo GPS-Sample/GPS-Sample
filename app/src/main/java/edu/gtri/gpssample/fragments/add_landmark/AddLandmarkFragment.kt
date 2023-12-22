@@ -92,18 +92,6 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
         binding.descriptionEditText.setText( location.description )
 
-        if (sharedViewModel.locationViewModel.isLocationUpdateTimeValid.value == true)
-        {
-            sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let { date ->
-                val dt = (Date().time - date.time) / 1000.0
-                binding.lastUpdatedEditText.setText( "${dt} seconds ago" )
-            } ?: {binding.lastUpdatedEditText.setText( "Undefined" )}
-        }
-        else
-        {
-            binding.lastUpdatedLayout.visibility = View.GONE
-        }
-
         if (location.imageData.isNotEmpty())
         {
             try

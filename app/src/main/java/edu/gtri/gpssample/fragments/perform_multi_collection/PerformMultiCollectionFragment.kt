@@ -35,6 +35,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performMultiCollectionAdapter: PerformMultiCollectionAdapter
 
+    private var gpsAccuracyIsGood = false
     private var _binding: FragmentPerformMultiCollectionBinding? = null
     private val binding get() = _binding!!
 
@@ -56,6 +57,10 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        arguments?.getBoolean(Keys.kGpsAccuracyIsGood.toString())?.let { gpsAccuracyIsGood ->
+            this.gpsAccuracyIsGood = gpsAccuracyIsGood
+        }
 
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
             location = it
@@ -94,7 +99,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     {
         (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
         sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-        LaunchSurveyDialog( activity, this@PerformMultiCollectionFragment)
+        LaunchSurveyDialog( activity, gpsAccuracyIsGood, this@PerformMultiCollectionFragment)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -116,7 +121,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     {
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.toString(), false )
-        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
     }
 
     override fun didSelectCancelButton()

@@ -80,6 +80,7 @@ class PerformEnumerationFragment : Fragment(),
 
     private var dropMode = false
     private var gpsLocation: Point? = null
+    private var currentGPSAccuracy: Int? = null
     private val pointHashMap = HashMap<Long,Location>()
     private val polygonHashMap = HashMap<Long,EnumArea>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
@@ -175,7 +176,6 @@ class PerformEnumerationFragment : Fragment(),
 
                     pointHashMap[pointAnnotation.id]?.let { location ->
                         sharedViewModel.locationViewModel.setCurrentLocation(location)
-                        sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
 
                         if (location.isLandmark)
                         {
@@ -254,14 +254,21 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            if (config.allowManualLocationEntry)
+            if (gpsAccuracyIsGood())
             {
-                ConfirmationDialog( activity, resources.getString(R.string.select_location),
-                    "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
+                if (config.allowManualLocationEntry)
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.select_location),
+                        "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
+                }
+                else
+                {
+                    didSelectLeftButton( kAddHouseholdTag )
+                }
             }
             else
             {
-                didSelectLeftButton( kAddHouseholdTag )
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -272,16 +279,20 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            gpsLocation?.let { point ->
-                val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), true, "")
-                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-                enumArea.locations.add(location)
-
-                sharedViewModel.locationViewModel.setCurrentLocation(location)
-                sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
-
-                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+            if (gpsAccuracyIsGood())
+            {
+                gpsLocation?.let { point ->
+                    val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), true, "")
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                    enumArea.locations.add(location)
+                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+            }
+            else
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+            }
         }
 
         binding.exportButton.setOnClickListener {
@@ -314,6 +325,15 @@ class PerformEnumerationFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    private fun gpsAccuracyIsGood(): Boolean
+    {
+        currentGPSAccuracy?.let {
+            return (it <= config.minGpsPrecision)
+        }
+
+        return false
     }
 
     private fun refreshMap()
@@ -508,18 +528,10 @@ class PerformEnumerationFragment : Fragment(),
             enumArea.locations.add(location)
 
             sharedViewModel.locationViewModel.setCurrentLocation(location)
-            sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
 
-            if (location.isLandmark)
-            {
-                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-            }
-            else
-            {
-                enumerationTeam.locations.add(location)
-                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-                navigateToAddHouseholdFragment()
-            }
+            enumerationTeam.locations.add(location)
+            DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+            navigateToAddHouseholdFragment()
 
             return true
         }
@@ -541,7 +553,6 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         sharedViewModel.locationViewModel.setCurrentLocation(location)
-        sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
 
         if (location.isLandmark)
         {
@@ -556,12 +567,12 @@ class PerformEnumerationFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
-        if (tag is Point)
+        if (tag is Point) // HH is too close to an existing HH, don't add it
         {
             return
         }
 
-        if (tag == kSelectHouseholdTag)
+        if (tag == kSelectHouseholdTag) // HH is not multifamily
         {
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                 location.isMultiFamily = false
@@ -571,7 +582,7 @@ class PerformEnumerationFragment : Fragment(),
             return
         }
 
-        if (tag == kAddHouseholdTag)
+        if (tag == kAddHouseholdTag)  // use current location
         {
             gpsLocation?.let { point ->
                 enumArea.locations.map{
@@ -589,19 +600,10 @@ class PerformEnumerationFragment : Fragment(),
                 enumArea.locations.add(location)
 
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
-                sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
 
-                if (location.isLandmark)
-                {
-                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                }
-                else
-                {
-                    enumerationTeam.locations.add(location)
-                    DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-                    navigateToAddHouseholdFragment()
-                }
-
+                enumerationTeam.locations.add(location)
+                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+                navigateToAddHouseholdFragment()
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
 
             return
@@ -646,7 +648,6 @@ class PerformEnumerationFragment : Fragment(),
             enumArea.locations.add(location)
 
             sharedViewModel.locationViewModel.setCurrentLocation(location)
-            sharedViewModel.locationViewModel.setIsLocationUpdateTimeValid(false)
 
             if (location.isLandmark)
             {
@@ -768,7 +769,6 @@ class PerformEnumerationFragment : Fragment(),
                 val point = location.last()
                 binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
                 gpsLocation = point
-                sharedViewModel.locationViewModel.setCurrentLocationUpdateTime(Date())
             }
         }
 
@@ -781,15 +781,16 @@ class PerformEnumerationFragment : Fragment(),
 
     private val onIndicatorAccurracyRadiusChangedListener = OnIndicatorAccuracyRadiusChangedListener {
         val accuracy = it.toInt()
+        currentGPSAccuracy = accuracy
 
-        if (accuracy > config.minGpsPrecision)
+        if (accuracy <= config.minGpsPrecision)
         {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
+            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
             binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
         }
         else
         {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
+            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
             binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
         }
 
