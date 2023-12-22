@@ -45,7 +45,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     private lateinit var config: Config
     private lateinit var location: Location
     private lateinit var enumArea : EnumArea
-    private lateinit var locationUpdateTime: Date
     private lateinit var enumTeam: EnumerationTeam
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -109,10 +108,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
             location = it
-        }
-
-        sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let {
-            locationUpdateTime = it
         }
 
         sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let {
@@ -215,18 +210,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.subaddressEditText.setText( enumerationItem.subAddress )
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
-
-        if (sharedViewModel.locationViewModel.isLocationUpdateTimeValid.value == true)
-        {
-            sharedViewModel.locationViewModel.currentLocationUpdateTime?.value?.let { date ->
-                val dt = (Date().time - date.time) / 1000.0
-                binding.lastUpdatedEditText.setText( "${dt} seconds ago" )
-            } ?: {binding.lastUpdatedEditText.setText( "Undefined" )}
-        }
-        else
-        {
-            binding.lastUpdatedLayout.visibility = View.GONE
-        }
 
         binding.hideAdditionalInfoImageView.setOnClickListener {
             binding.hideAdditionalInfoImageView.visibility = View.GONE

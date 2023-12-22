@@ -10,20 +10,10 @@ import java.util.*
 class LocationViewModel
 {
     private var _currentLocation : MutableLiveData<Location>? = null
-    private var _currentLocationUpdateTime : MutableLiveData<Date>? = null
     private var _currentEnumerationItem : MutableLiveData<EnumerationItem>? = null
-    private var _isLocationUpdateTimeValid : MutableLiveData<Boolean> = MutableLiveData(false)
 
     var currentLocation : LiveData<Location>? = _currentLocation
-    var currentLocationUpdateTime : LiveData<Date>? = _currentLocationUpdateTime
-    var isLocationUpdateTimeValid : LiveData<Boolean> = _isLocationUpdateTimeValid
     var currentEnumerationItem : LiveData<EnumerationItem>? = _currentEnumerationItem
-
-    fun setIsLocationUpdateTimeValid( value: Boolean )
-    {
-        _isLocationUpdateTimeValid = MutableLiveData(value)
-        isLocationUpdateTimeValid = _isLocationUpdateTimeValid
-    }
 
     fun setCurrentLocation(location: Location)
     {
@@ -35,14 +25,5 @@ class LocationViewModel
     {
         _currentEnumerationItem = MutableLiveData(enumerationItem)
         currentEnumerationItem = _currentEnumerationItem
-    }
-
-    fun setCurrentLocationUpdateTime(date: Date?)
-    {
-        date?.let {
-            _currentLocationUpdateTime = MutableLiveData(it)
-        } ?: {_currentLocationUpdateTime = null}
-
-        currentLocationUpdateTime = _currentLocationUpdateTime
     }
 }
