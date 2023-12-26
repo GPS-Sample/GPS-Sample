@@ -45,12 +45,6 @@ class StudyDAO(private var dao: DAO)
         }
 
         study.id?.let { id ->
-
-            for (sampleArea in study.sampleAreas)
-            {
-                DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
-            }
-
             for (collectionTeam in study.collectionTeams)
             {
                 DAO.collectionTeamDAO.createOrUpdateTeam( collectionTeam )
@@ -155,8 +149,6 @@ class StudyDAO(private var dao: DAO)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
 
         val study = Study( id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType, selectedCollectionTeamId )
-
-        study.sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
 
         return study
     }

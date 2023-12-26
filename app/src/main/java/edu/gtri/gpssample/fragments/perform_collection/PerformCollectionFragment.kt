@@ -76,7 +76,6 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
-    private var enumAreaId = 0
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
@@ -122,9 +121,6 @@ class PerformCollectionFragment : Fragment(),
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
             enumArea = enum_area
-            enumArea.id?.let {id ->
-                enumAreaId = id
-            }
         }
 
         sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
@@ -335,9 +331,9 @@ class PerformCollectionFragment : Fragment(),
         allPointAnnotations.clear()
         locationHashMap.clear()
 
-        for (sampleArea in study.sampleAreas)
+        for (enumArea in config.enumAreas)
         {
-            for (location in sampleArea.locations)
+            for (location in enumArea.locations)
             {
                 if (location.isLandmark)
                 {
@@ -513,9 +509,7 @@ class PerformCollectionFragment : Fragment(),
                 Role.DataCollector.toString() ->
                 {
                     sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                    sharedViewModel.createStudyModel.currentStudy?.value?.let {
-                        sharedNetworkViewModel.networkClientModel.currentStudy = it
-                    }
+                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                     getResult.launch(intent)
                 }
@@ -603,22 +597,23 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
-//                study.sampleAreas = DAO.sampleAreaDAO.getSampleAreas( study )
-
                 sharedViewModel.initializeConfigurations()
 
                 DAO.configDAO.getConfig( config.id!! )?.let {
                     sharedViewModel.setCurrentConfig( it )
                 }
 
+                Log.d( "xxx", enumArea.id.toString())
+                Log.d( "xxx", collectionTeam.id.toString())
+
                 DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
-                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+                    enumArea = it
+                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                 }
 
                 DAO.studyDAO.getStudy( study.id!! )?.let {
                     sharedViewModel.createStudyModel.setStudy( it )
                 }
-
 
                 refreshMap()
             }

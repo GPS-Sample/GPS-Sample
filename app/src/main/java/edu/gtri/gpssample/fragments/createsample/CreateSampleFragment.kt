@@ -67,7 +67,9 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         sharedViewModel.currentFragment = this
 
         samplingViewModel = samplingVm
+        samplingViewModel.currentConfig = sharedViewModel.currentConfiguration
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+        samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -105,39 +107,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             this.study = study
         }
 
-        if (study.sampleAreas.isEmpty())
-        {
-            for (enumArea in config.enumAreas)
-            {
-                val sampleArea = SampleArea(enumArea)
-                study.sampleAreas.add( sampleArea )
-            }
-        }
-        else
-        {
-            var shouldClear = false
-
-            for (sampleArea in study.sampleAreas)
-            {
-                if (sampleArea.id == null)
-                {
-                    shouldClear = true
-                    break
-                }
-            }
-
-            if (shouldClear)
-            {
-                study.sampleAreas.clear()
-
-                for (enumArea in config.enumAreas)
-                {
-                    val sampleArea = SampleArea(enumArea)
-                    study.sampleAreas.add( sampleArea )
-                }
-            }
-        }
-
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
         }
@@ -166,17 +135,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         }
 
         binding.nextButton.setOnClickListener {
-            for (sampleArea in study.sampleAreas)
-            {
-                if (sampleArea.id == null)
-                {
-                    DAO.sampleAreaDAO.createOrUpdateSampleArea( sampleArea, study )
-
-//                    for (location in sampleArea.locations)
-//                    {
-//                        DAO.locationDAO.updateConnectorTable( location, sampleArea )
-//                    }
-                }
+            sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
             }
 
             findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
@@ -192,12 +152,12 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
     fun refreshMap()
     {
-        for (sampleArea in study.sampleAreas)
+        for (enumArea in config.enumAreas)
         {
             val points = java.util.ArrayList<Point>()
             val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-            sampleArea.vertices.map {
+            enumArea.vertices.map {
                 points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
             }
 
@@ -209,7 +169,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                 mapboxManager.addPolyline( pointList[0], "#ff0000" )
 
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
+                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                     val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                     val cameraPosition = CameraOptions.Builder()
                         .zoom(currentZoomLevel)

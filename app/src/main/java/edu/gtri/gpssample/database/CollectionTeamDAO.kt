@@ -85,6 +85,7 @@ class CollectionTeamDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_CREATION_DATE, collectionTeam.creationDate )
+        values.put( DAO.COLUMN_ENUM_AREA_ID, collectionTeam.enumAreaId )
         values.put( DAO.COLUMN_STUDY_ID, collectionTeam.studyId )
         values.put( DAO.COLUMN_COLLECTION_TEAM_NAME, collectionTeam.name )
     }
@@ -103,10 +104,11 @@ class CollectionTeamDAO(private var dao: DAO)
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val enum_area_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
 
-        val collectionTeam = CollectionTeam(id, creationDate, study_id, name, ArrayList<LatLon>(), ArrayList<Location>())
+        val collectionTeam = CollectionTeam(id, creationDate, enum_area_id, study_id, name, ArrayList<LatLon>(), ArrayList<Location>())
 
         collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( id )
         collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
