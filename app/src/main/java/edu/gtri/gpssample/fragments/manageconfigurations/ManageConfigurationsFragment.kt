@@ -499,6 +499,15 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         {
                             val collectionTeam = collectionTeams[0]
 
+                            // find the selected Enum Area
+                            val enumAreas = config.enumAreas.filter {
+                                it.id?.let { id ->
+                                    id == collectionTeam.enumAreaId
+                                } ?: false
+                            }
+
+                            val enumArea = enumAreas[0]
+
                             sharedViewModel.createStudyModel.setStudy( study )
                             sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
@@ -524,13 +533,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             {
                 sharedViewModel.currentConfiguration?.value?.let{ config->
 
-                    // find the selected Enum Area
-                    val enumAreas = config.enumAreas.filter {
-                        it.id?.let { id ->
-                            id == config.selectedEnumAreaId
-                        } ?: false
-                    }
-
                     // find the selected study
                     val studies = config.studies.filter {
                         it.id?.let { id ->
@@ -538,10 +540,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         } ?: false
                     }
 
-                    if (enumAreas.isNotEmpty() && studies.isNotEmpty())
+                    if (studies.isNotEmpty())
                     {
                         val study = studies[0]
-                        val enumArea = enumAreas[0]
 
                         // find the selected collection Team
                         val collectionTeams = study.collectionTeams.filter { collectionTeam ->
@@ -553,6 +554,15 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                         if (collectionTeams.isNotEmpty())
                         {
                             val collectionTeam = collectionTeams[0]
+
+                            // find the selected Enum Area
+                            val enumAreas = config.enumAreas.filter {
+                                it.id?.let { id ->
+                                    id == collectionTeam.enumAreaId
+                                } ?: false
+                            }
+
+                            val enumArea = enumAreas[0]
 
                             sharedViewModel.createStudyModel.setStudy( study )
                             sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )

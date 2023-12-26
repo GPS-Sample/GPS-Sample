@@ -36,7 +36,7 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, geoArea: GeoArea )
+    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, enumArea: EnumArea )
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 

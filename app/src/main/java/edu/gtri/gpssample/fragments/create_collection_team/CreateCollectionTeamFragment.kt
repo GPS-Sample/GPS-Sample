@@ -42,6 +42,7 @@ class CreateCollectionTeamFragment : Fragment(),
     View.OnTouchListener
 {
     private lateinit var study: Study
+    private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var polylineAnnotation: PolylineAnnotation
@@ -77,6 +78,10 @@ class CreateCollectionTeamFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        sharedViewModel.currentConfiguration?.value?.let {_config ->
+            config = _config
+        }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {_study ->
             study = _study
@@ -135,6 +140,38 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
+            var isValid = true
+            var selectedEnumAreaId = 0
+
+            for (location in locations)
+            {
+                for (enumArea in config.enumAreas)
+                {
+                    for (loc in enumArea.locations)
+                    {
+                        if (location.id!! == loc.id!!)
+                        {
+                            if (selectedEnumAreaId == 0)
+                            {
+                                selectedEnumAreaId = enumArea.id!!
+                                break
+                            }
+                            else if (enumArea.id!! != selectedEnumAreaId)
+                            {
+                                isValid = false
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (selectedEnumAreaId == 0 || !isValid)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.multiple_enum_areas_selected), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             study.id?.let { studyId ->
 
                 val polygon = ArrayList<LatLon>()
@@ -151,7 +188,7 @@ class CreateCollectionTeamFragment : Fragment(),
                     return@setOnClickListener
                 }
 
-                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( studyId, binding.teamNameEditText.text.toString(), polygon, locations ))
+                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( selectedEnumAreaId, studyId, binding.teamNameEditText.text.toString(), polygon, locations ))
 
                 collectionTeam?.let { team ->
                     study.collectionTeams.add(team)
@@ -172,12 +209,12 @@ class CreateCollectionTeamFragment : Fragment(),
 
     fun refreshMap()
     {
-        for (sampleArea in study.sampleAreas)
+        for (enumArea in config.enumAreas)
         {
             val points = java.util.ArrayList<Point>()
             val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-            sampleArea.vertices.map {
+            enumArea.vertices.map {
                 points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
             }
 
@@ -189,7 +226,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 mapboxManager.addPolyline( pointList[0], "#ff0000" )
 
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    val latLngBounds = GeoUtils.findGeobounds(sampleArea.vertices)
+                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                     val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                     val cameraPosition = CameraOptions.Builder()
                         .zoom(currentZoomLevel)
@@ -199,7 +236,7 @@ class CreateCollectionTeamFragment : Fragment(),
                     binding.mapView.getMapboxMap().setCamera(cameraPosition)
                 }
 
-                for (location in sampleArea.locations)
+                for (location in enumArea.locations)
                 {
                     if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                     {
@@ -250,13 +287,13 @@ class CreateCollectionTeamFragment : Fragment(),
             {
                 locations.clear()
 
-                for (sampleArea in study.sampleAreas)
+                for (enumArea in config.enumAreas)
                 {
                     val points1 = ArrayList<Coordinate>()
                     val points2 = ArrayList<Coordinate>()
 
                     // convert ArrayList<LatLon> to ArrayList<Coordinate>
-                    sampleArea.vertices.map {
+                    enumArea.vertices.map {
                         points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
                     }
 
@@ -293,7 +330,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                 pointList.add( vertices )
                                 intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000", 0.25)
 
-                                for (location in sampleArea.locations)
+                                for (location in enumArea.locations)
                                 {
                                     val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
                                     if (polygon.contains(geometry3))

@@ -11,14 +11,14 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class EnumArea (
-    override var id : Int? = null,
+    var id : Int? = null,
     var uuid : String,
     var creationDate: Long,
     var name: String,
     var selectedEnumerationTeamId: Int,
     var vertices: ArrayList<LatLon>,
     var locations: ArrayList<Location>,
-    var enumerationTeams: ArrayList<EnumerationTeam>) : GeoArea()
+    var enumerationTeams: ArrayList<EnumerationTeam>)
 {
     constructor( id: Int, creationDate: Long, name: String, selectedEnumerationTeamId: Int)
             : this(id, UUID.randomUUID().toString(), creationDate, name, selectedEnumerationTeamId, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>())

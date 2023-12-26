@@ -298,6 +298,7 @@
     <string name="poor">"POOR"</string>
     <string name="unknown">UNKNOWN</string>
     <string name="legend">Legend</string>
+    <string name="multiple_enum_areas_selected">Teams are not allowed to encompass multiple enumeration areas</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

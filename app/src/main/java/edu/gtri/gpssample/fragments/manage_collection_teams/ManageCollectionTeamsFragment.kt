@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageCollectionTeamsBinding
@@ -73,7 +74,49 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
 
         if (!this::manageCollectionTeamsAdapter.isInitialized)
         {
-            manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( study.collectionTeams )
+            if (study.samplingMethod == SamplingMethod.SimpleRandom)
+            {
+                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( study.collectionTeams )
+            }
+            else
+            {
+                val collectionTeams = ArrayList<CollectionTeam>()
+
+                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                    for (collectionTeam in study.collectionTeams)
+                    {
+                        if (collectionTeam.enumAreaId == enumArea.id!!)
+                        {
+                            collectionTeams.add( collectionTeam )
+                        }
+                    }
+                }
+
+                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
+            }
+        }
+        else
+        {
+            if (study.samplingMethod == SamplingMethod.SimpleRandom)
+            {
+                manageCollectionTeamsAdapter.updateTeams( study.collectionTeams )
+            }
+            else
+            {
+                val collectionTeams = ArrayList<CollectionTeam>()
+
+                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                    for (collectionTeam in study.collectionTeams)
+                    {
+                        if (collectionTeam.enumAreaId == enumArea.id!!)
+                        {
+                            collectionTeams.add( collectionTeam )
+                        }
+                    }
+                }
+
+                manageCollectionTeamsAdapter.updateTeams( collectionTeams )
+            }
         }
 
         manageCollectionTeamsAdapter.didSelectTeam = this::didSelectTeam

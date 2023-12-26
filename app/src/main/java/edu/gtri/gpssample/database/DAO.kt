@@ -204,8 +204,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_ID + " INTEGER" + "," +
+                    COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                     COLUMN_COLLECTION_TEAM_NAME + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableCollectionTeam)
 
@@ -626,7 +628,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var ruleDAO: RuleDAO
         lateinit var filterDAO: FilterDAO
         lateinit var enumAreaDAO: EnumAreaDAO
-        lateinit var sampleAreaDAO: SampleAreaDAO
         lateinit var enumerationTeamDAO: EnumerationTeamDAO
         lateinit var collectionTeamDAO: CollectionTeamDAO
         lateinit var fieldDataDAO: FieldDataDAO
@@ -712,7 +713,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 ruleDAO = RuleDAO( _instance!! )
                 filterDAO = FilterDAO( _instance!! )
                 enumAreaDAO = EnumAreaDAO( _instance!! )
-                sampleAreaDAO = SampleAreaDAO( _instance!! )
                 enumerationTeamDAO = EnumerationTeamDAO( _instance!! )
                 collectionTeamDAO = CollectionTeamDAO( _instance!! )
                 fieldDataDAO = FieldDataDAO( _instance!! )
@@ -726,6 +726,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 265
+        private const val DATABASE_VERSION = 267
     }
 }

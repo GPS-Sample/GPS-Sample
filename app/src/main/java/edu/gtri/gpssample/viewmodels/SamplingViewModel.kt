@@ -23,9 +23,19 @@ class SamplingViewModel : ViewModel()
 
     private var _currentFragment : Fragment? = null
     private var _currentStudy : MutableLiveData<Study>? = null
+    private var _currentConfig : MutableLiveData<Config>? = null
+    private var _currentEnumArea : MutableLiveData<EnumArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
+
+    var currentConfig : LiveData<Config>?
+        get(){
+            return _currentConfig
+        }
+        set(value){
+            _currentConfig = MutableLiveData(value?.value)
+        }
 
     var currentStudy : LiveData<Study>?
         get(){
@@ -33,6 +43,14 @@ class SamplingViewModel : ViewModel()
         }
         set(value){
             _currentStudy = MutableLiveData(value?.value)
+        }
+
+    var currentEnumArea : LiveData<EnumArea>?
+        get(){
+            return _currentEnumArea
+        }
+        set(value){
+            _currentEnumArea = MutableLiveData(value?.value)
         }
 
     val samplingMethod: String
@@ -61,64 +79,51 @@ class SamplingViewModel : ViewModel()
 
         allPointAnnotations.clear()
 
-        currentStudy?.value?.let { study ->
-            for (sampleArea in study.sampleAreas)
+        currentConfig?.value?.let { config ->
+            for (enumArea in config.enumAreas)
             {
-                for (location in sampleArea.locations)
+                for (location in enumArea.locations)
                 {
                     if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                     {
-                        currentStudy?.value?.let{ study->
+                        var resourceId: Int
+                        var isMultiFamily = false
 
-                            var resourceId: Int
-                            var isMultiFamily = false
+                        location.isMultiFamily?.let {
+                            isMultiFamily = it
+                        }
 
-                            location.isMultiFamily?.let {
-                                isMultiFamily = it
-                            }
+                        if (!isMultiFamily)
+                        {
+                            val sampledItem = location.enumerationItems[0]
 
-                            if (!isMultiFamily)
+                            resourceId = when(sampledItem.samplingState)
                             {
-                                val sampledItem = location.enumerationItems[0]
-
-                                if(!_currentSampledItemsForSampling.contains(sampledItem))
-                                {
-                                    _currentSampledItemsForSampling.add(sampledItem)
-                                }
-
-                                resourceId = when(sampledItem.samplingState)
-                                {
-                                    SamplingState.None       -> R.drawable.home_black
-                                    SamplingState.NotSampled -> R.drawable.home_green
-                                    SamplingState.Sampled    -> R.drawable.home_blue
-                                    SamplingState.Resampled  -> R.drawable.home_blue
-                                    SamplingState.Invalid    -> R.drawable.home_red
-                                }
+                                SamplingState.None       -> R.drawable.home_black
+                                SamplingState.NotSampled -> R.drawable.home_green
+                                SamplingState.Sampled    -> R.drawable.home_blue
+                                SamplingState.Resampled  -> R.drawable.home_blue
+                                SamplingState.Invalid    -> R.drawable.home_red
                             }
-                            else
+                        }
+                        else
+                        {
+                            resourceId = R.drawable.multi_home_green
+
+                            for (sampledItem in location.enumerationItems)
                             {
-                                resourceId = R.drawable.multi_home_green
-
-                                for (sampledItem in location.enumerationItems)
+                                if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
-                                    if(!_currentSampledItemsForSampling.contains(sampledItem))
-                                    {
-                                        _currentSampledItemsForSampling.add(sampledItem)
-                                    }
-
-                                    if (sampledItem.samplingState == SamplingState.Sampled)
-                                    {
-                                        resourceId = R.drawable.multi_home_blue
-                                    }
+                                    resourceId = R.drawable.multi_home_blue
                                 }
                             }
+                        }
 
-                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
-                            pointAnnotation?.let { pointAnnotation ->
-                                allPointAnnotations.add( pointAnnotation )
-                            }
+                        pointAnnotation?.let { pointAnnotation ->
+                            allPointAnnotations.add( pointAnnotation )
                         }
                     }
                 }
@@ -188,8 +193,37 @@ class SamplingViewModel : ViewModel()
         currentStudy?.value?.let { study ->
             when( study.samplingMethod )
             {
-                SamplingMethod.SimpleRandom -> performSimpleRandomSampling()
-                SamplingMethod.Cluster -> performClusterSampling()
+                SamplingMethod.SimpleRandom ->
+                {
+                    currentConfig?.value?.let { config ->
+                        for (enumArea in config.enumAreas) {
+                            for (location in enumArea.locations) {
+                                if (!location.isLandmark && location.enumerationItems.isNotEmpty()) {
+                                    var isMultiFamily = false
+
+                                    location.isMultiFamily?.let {
+                                        isMultiFamily = it
+                                    }
+
+                                    for (enumerationItem in location.enumerationItems)
+                                    {
+                                        if (!_currentSampledItemsForSampling.contains(enumerationItem)) {
+                                            _currentSampledItemsForSampling.add(enumerationItem)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    performSimpleRandomSampling()
+                }
+
+                SamplingMethod.Cluster ->
+                {
+                    // TODO: init currentSampledItemsForSampling
+                    performClusterSampling()
+                }
                 else -> {}
             }
 
@@ -354,31 +388,27 @@ class SamplingViewModel : ViewModel()
 
     fun performClusterSampling()
     {
-        currentStudy?.value?.let { study ->
-            for (sampleArea in study.sampleAreas)
-            {
-                _currentSampledItemsForSampling.clear()
+        currentEnumArea?.value?.let { enumArea ->
 
-                for (location in sampleArea.locations)
+            _currentSampledItemsForSampling.clear()
+
+            for (location in enumArea.locations)
+            {
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                    for (sampledItem in location.enumerationItems)
                     {
-                        currentStudy?.value?.let{ study->
-                            for (sampledItem in location.enumerationItems)
-                            {
-                                if(!_currentSampledItemsForSampling.contains(sampledItem))
-                                {
-                                    _currentSampledItemsForSampling.add(sampledItem)
-                                }
-                            }
+                        if(!_currentSampledItemsForSampling.contains(sampledItem))
+                        {
+                            _currentSampledItemsForSampling.add(sampledItem)
                         }
                     }
                 }
-
-                // generate sample for each cluster
-
-                performSimpleRandomSampling()
             }
+
+            // generate sample this cluster
+
+            performSimpleRandomSampling()
         }
     }
 }

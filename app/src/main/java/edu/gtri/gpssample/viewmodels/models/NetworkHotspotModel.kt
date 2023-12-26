@@ -300,9 +300,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             NetworkCommand.NetworkSampleAreaExport ->
             {
                 message.payload?.let { payload ->
-                    val study = Study.unpack( payload )
+                    val enumArea = EnumArea.unpack( payload )
 
-                    study?.let{ study ->
+                    enumArea?.let{ enumArea ->
 
                         DAO.instance().writableDatabase.beginTransaction()
 
@@ -310,12 +310,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                             it.didStartImport()
                         }
 
-                        for (sampleArea in study.sampleAreas)
+                        for (location in enumArea.locations)
                         {
-                            for (location in sampleArea.locations)
-                            {
-                                DAO.locationDAO.importLocation( location, sampleArea )
-                            }
+                            DAO.locationDAO.importLocation( location, enumArea )
                         }
 
                         DAO.instance().writableDatabase.setTransactionSuccessful()
