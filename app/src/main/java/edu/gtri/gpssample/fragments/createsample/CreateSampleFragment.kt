@@ -29,6 +29,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -134,8 +135,44 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
         }
 
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+            if (study.samplingMethod == SamplingMethod.SimpleRandom)
+            {
+                for (enumArea in config.enumAreas)
+                {
+                    for (location in enumArea.locations)
+                    {
+                        for (enumerationItem in location.enumerationItems)
+                        {
+                            if (enumerationItem.samplingState == SamplingState.Sampled)
+                            {
+                                binding.sampleButton.visibility = View.GONE
+                            }
+                        }
+                    }
+                }
+            }
+            else if (study.samplingMethod == SamplingMethod.Cluster)
+            {
+                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                    for (location in enumArea.locations)
+                    {
+                        for (enumerationItem in location.enumerationItems)
+                        {
+                            if (enumerationItem.samplingState == SamplingState.Sampled)
+                            {
+                                binding.sampleButton.visibility = View.GONE
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         binding.nextButton.setOnClickListener {
-            sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+
+            for (enumArea in config.enumAreas)
+            {
                 DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
             }
 

@@ -43,6 +43,7 @@ class CreateCollectionTeamFragment : Fragment(),
 {
     private lateinit var study: Study
     private lateinit var config: Config
+    private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var polylineAnnotation: PolylineAnnotation
@@ -81,6 +82,10 @@ class CreateCollectionTeamFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let {_config ->
             config = _config
+        }
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {_enumArea ->
+            enumArea = _enumArea
         }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {_study ->
@@ -140,38 +145,6 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            var isValid = true
-            var selectedEnumAreaId = 0
-
-            for (location in locations)
-            {
-                for (enumArea in config.enumAreas)
-                {
-                    for (loc in enumArea.locations)
-                    {
-                        if (location.id!! == loc.id!!)
-                        {
-                            if (selectedEnumAreaId == 0)
-                            {
-                                selectedEnumAreaId = enumArea.id!!
-                                break
-                            }
-                            else if (enumArea.id!! != selectedEnumAreaId)
-                            {
-                                isValid = false
-                                break
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (selectedEnumAreaId == 0 || !isValid)
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.multiple_enum_areas_selected), Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             study.id?.let { studyId ->
 
                 val polygon = ArrayList<LatLon>()
@@ -188,7 +161,7 @@ class CreateCollectionTeamFragment : Fragment(),
                     return@setOnClickListener
                 }
 
-                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( selectedEnumAreaId, studyId, binding.teamNameEditText.text.toString(), polygon, locations ))
+                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.id!!, studyId, binding.teamNameEditText.text.toString(), polygon, locations ))
 
                 collectionTeam?.let { team ->
                     study.collectionTeams.add(team)
@@ -209,62 +182,59 @@ class CreateCollectionTeamFragment : Fragment(),
 
     fun refreshMap()
     {
-        for (enumArea in config.enumAreas)
-        {
-            val points = java.util.ArrayList<Point>()
-            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-            enumArea.vertices.map {
-                points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        enumArea.vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        if (pointList.isNotEmpty())
+        {
+            mapboxManager.addPolygon(pointList,"#000000", 0.25)
+            mapboxManager.addPolyline( pointList[0], "#ff0000" )
+
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(currentZoomLevel)
+                    .center(point)
+                    .build()
+
+                binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            pointList.add( points )
-
-            if (pointList.isNotEmpty())
+            for (location in enumArea.locations)
             {
-                mapboxManager.addPolygon(pointList,"#000000", 0.25)
-                mapboxManager.addPolyline( pointList[0], "#ff0000" )
-
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(currentZoomLevel)
-                        .center(point)
-                        .build()
-
-                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
-                }
-
-                for (location in enumArea.locations)
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
-                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                    var isMultiFamily = false
+
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
+                    }
+
+                    if (!isMultiFamily)
                     {
-                        var isMultiFamily = false
+                        val sampledItem = location.enumerationItems[0]
 
-                        location.isMultiFamily?.let {
-                            isMultiFamily = it
+                        if (sampledItem.samplingState == SamplingState.Sampled) {
+                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                            mapboxManager.addMarker( point, R.drawable.home_black )
                         }
-
-                        if (!isMultiFamily)
+                    }
+                    else
+                    {
+                        for (sampledItem in location.enumerationItems)
                         {
-                            val sampledItem = location.enumerationItems[0]
-
-                            if (sampledItem.samplingState == SamplingState.Sampled) {
-                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                mapboxManager.addMarker( point, R.drawable.home_black )
-                            }
-                        }
-                        else
-                        {
-                            for (sampledItem in location.enumerationItems)
+                            if (sampledItem.samplingState == SamplingState.Sampled)
                             {
-                                if (sampledItem.samplingState == SamplingState.Sampled)
-                                {
-                                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                    mapboxManager.addMarker( point, R.drawable.multi_home_black )
-                                    break
-                                }
+                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                                mapboxManager.addMarker( point, R.drawable.multi_home_black )
+                                break
                             }
                         }
                     }
@@ -287,64 +257,61 @@ class CreateCollectionTeamFragment : Fragment(),
             {
                 locations.clear()
 
-                for (enumArea in config.enumAreas)
-                {
-                    val points1 = ArrayList<Coordinate>()
-                    val points2 = ArrayList<Coordinate>()
+                val points1 = ArrayList<Coordinate>()
+                val points2 = ArrayList<Coordinate>()
 
-                    // convert ArrayList<LatLon> to ArrayList<Coordinate>
-                    enumArea.vertices.map {
-                        points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
-                    }
+                // convert ArrayList<LatLon> to ArrayList<Coordinate>
+                enumArea.vertices.map {
+                    points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                }
 
-                    // close the polygon
-                    points1.add( points1[0])
+                // close the polygon
+                points1.add( points1[0])
 
-                    // create a copy of the newly drawn polyline
-                    val polyList = ArrayList<Point>( polyLinePoints )
+                // create a copy of the newly drawn polyline
+                val polyList = ArrayList<Point>( polyLinePoints )
 
-                    // close the polygon
-                    polyList.add( polyLinePoints[0])
+                // close the polygon
+                polyList.add( polyLinePoints[0])
 
-                    // convert ArrayList<Point> to ArrayList<Coordinate>
-                    polyList.map {
-                        points2.add( Coordinate( it.longitude(), it.latitude()))
-                    }
+                // convert ArrayList<Point> to ArrayList<Coordinate>
+                polyList.map {
+                    points2.add( Coordinate( it.longitude(), it.latitude()))
+                }
 
-                    // compute the intersection of points1 & points2
-                    val geometryFactory = GeometryFactory()
-                    val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
-                    val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
+                // compute the intersection of points1 & points2
+                val geometryFactory = GeometryFactory()
+                val geometry1: Geometry = geometryFactory.createPolygon(points1.toTypedArray())
+                val geometry2: Geometry = geometryFactory.createPolygon(points2.toTypedArray())
 
-                    try {
-                        geometry1.intersection(geometry2)?.let { polygon ->
-                            val vertices = ArrayList<Point>()
+                try {
+                    geometry1.intersection(geometry2)?.let { polygon ->
+                        val vertices = ArrayList<Point>()
 
-                            polygon.boundary?.coordinates?.map {
-                                vertices.add( Point.fromLngLat(it.x, it.y))
-                            }
+                        polygon.boundary?.coordinates?.map {
+                            vertices.add( Point.fromLngLat(it.x, it.y))
+                        }
 
-                            if (vertices.isNotEmpty())
+                        if (vertices.isNotEmpty())
+                        {
+                            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                            pointList.add( vertices )
+                            intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000", 0.25)
+
+                            for (location in enumArea.locations)
                             {
-                                val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-                                pointList.add( vertices )
-                                intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000", 0.25)
-
-                                for (location in enumArea.locations)
+                                val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                                if (polygon.contains(geometry3))
                                 {
-                                    val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
-                                    if (polygon.contains(geometry3))
-                                    {
-                                        locations.add( location )
-                                    }
+                                    locations.add( location )
                                 }
                             }
                         }
                     }
-                    catch( ex: Exception )
-                    {
-                        Log.d( "xxx", ex.stackTrace.toString())
-                    }
+                }
+                catch( ex: Exception )
+                {
+                    Log.d( "xxx", ex.stackTrace.toString())
                 }
 
                 polyLinePoints.clear()

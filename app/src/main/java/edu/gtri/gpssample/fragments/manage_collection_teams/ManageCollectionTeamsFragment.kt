@@ -56,67 +56,25 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
             study = it
         }
 
-//        if (study.selectedCollectionTeamId > 0) // if teamId is valid, then filter out all teams except this one
-//        {
-//            val teams = study.collectionTeams.filter { collectionTeam ->
-//                collectionTeam.id?.let { id ->
-//                    id == study.selectedCollectionTeamId
-//                } ?: false
-//            }
-//
-//            if (teams.isNotEmpty())
-//            {
-//                val collectionTeams = ArrayList<CollectionTeam>()
-//                collectionTeams.add( teams[0] )
-//                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
-//            }
-//        }
+        val collectionTeams = ArrayList<CollectionTeam>()
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            for (collectionTeam in study.collectionTeams)
+            {
+                if (collectionTeam.enumAreaId == enumArea.id!!)
+                {
+                    collectionTeams.add( collectionTeam )
+                }
+            }
+        }
 
         if (!this::manageCollectionTeamsAdapter.isInitialized)
         {
-            if (study.samplingMethod == SamplingMethod.SimpleRandom)
-            {
-                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( study.collectionTeams )
-            }
-            else
-            {
-                val collectionTeams = ArrayList<CollectionTeam>()
-
-                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    for (collectionTeam in study.collectionTeams)
-                    {
-                        if (collectionTeam.enumAreaId == enumArea.id!!)
-                        {
-                            collectionTeams.add( collectionTeam )
-                        }
-                    }
-                }
-
-                manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
-            }
+            manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
         }
         else
         {
-            if (study.samplingMethod == SamplingMethod.SimpleRandom)
-            {
-                manageCollectionTeamsAdapter.updateTeams( study.collectionTeams )
-            }
-            else
-            {
-                val collectionTeams = ArrayList<CollectionTeam>()
-
-                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    for (collectionTeam in study.collectionTeams)
-                    {
-                        if (collectionTeam.enumAreaId == enumArea.id!!)
-                        {
-                            collectionTeams.add( collectionTeam )
-                        }
-                    }
-                }
-
-                manageCollectionTeamsAdapter.updateTeams( collectionTeams )
-            }
+            manageCollectionTeamsAdapter.updateTeams( collectionTeams )
         }
 
         manageCollectionTeamsAdapter.didSelectTeam = this::didSelectTeam
