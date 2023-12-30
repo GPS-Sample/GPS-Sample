@@ -43,8 +43,20 @@ object GeoUtils {
 
     fun isCloseTo( latLng1: LatLng, latLng2: LatLng): HaversineCheck
     {
+        val distance = distanceBetween( latLng1, latLng2 )
 
+        val haversineCheck = HaversineCheck(distance, false, latLng1, latLng2)
 
+        if(distance < kMinimumDistance)
+        {
+            haversineCheck.withinBounds = true
+        }
+
+        return haversineCheck
+    }
+
+    fun distanceBetween( latLng1: LatLng, latLng2: LatLng ) : Double
+    {
         val lat1Rad = latLng1.latitude * degreeConversion
         val lat2Rad = latLng2.latitude * degreeConversion
         val lon1Rad = latLng1.longitude * degreeConversion
@@ -56,12 +68,7 @@ object GeoUtils {
         val a : Double = (sinDLat * sinDLat)  + (cos(lat1Rad) * cos(lat2Rad) * (sinDLon * sinDLon))
 
         val ssrt : Double = asin(sqrt(a))
-        val distance : Double = 2.0 * earthRadius * ssrt
-        val haversineCheck = HaversineCheck(distance, false, latLng1, latLng2)
-        if(distance < kMinimumDistance)
-        {
-            haversineCheck.withinBounds = true
-        }
-        return haversineCheck
+
+        return 2.0 * earthRadius * ssrt
     }
 }

@@ -79,8 +79,8 @@ class PerformEnumerationFragment : Fragment(),
     private val binding get() = _binding!!
 
     private var dropMode = false
-    private var gpsLocation: Point? = null
     private var currentGPSAccuracy: Int? = null
+    private var currentGPSLocation: Point? = null
     private val pointHashMap = HashMap<Long,Location>()
     private val polygonHashMap = HashMap<Long,EnumArea>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
@@ -183,7 +183,7 @@ class PerformEnumerationFragment : Fragment(),
                         }
                         else
                         {
-                            navigateToAddHouseholdFragment()
+                            navigateToAddHouseholdFragment( getEditMode( location ))
                         }
                     }
 
@@ -281,7 +281,7 @@ class PerformEnumerationFragment : Fragment(),
 
             if (gpsAccuracyIsGood())
             {
-                gpsLocation?.let { point ->
+                currentGPSLocation?.let { point ->
                     val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), true, "")
                     DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                     enumArea.locations.add(location)
@@ -334,6 +334,21 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         return false
+    }
+
+    private fun getEditMode( location: Location ) : Boolean
+    {
+        var editMode = false
+
+        if (gpsAccuracyIsGood())
+        {
+            currentGPSLocation?.let { point ->
+                val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
+                editMode = distance <= config.minGpsPrecision
+            }
+        }
+
+        return editMode
     }
 
     private fun refreshMap()
@@ -467,8 +482,11 @@ class PerformEnumerationFragment : Fragment(),
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
-    fun navigateToAddHouseholdFragment()
+    fun navigateToAddHouseholdFragment( editMode: Boolean = true )
     {
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.toString(), editMode )
+
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
             if (location.enumerationItems.isEmpty())
@@ -482,26 +500,26 @@ class PerformEnumerationFragment : Fragment(),
                 if (location.isMultiFamily == null)
                 {
                     sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                 }
                 else
                 {
                     location.isMultiFamily?.let { isMultiFamily ->
                         if (isMultiFamily)
                         {
-                            findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                            findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
                         }
                         else
                         {
                             sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                         }
                     }
                 }
             }
             else
             {
-                findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
             }
         }
     }
@@ -560,7 +578,7 @@ class PerformEnumerationFragment : Fragment(),
         }
         else
         {
-            navigateToAddHouseholdFragment()
+            navigateToAddHouseholdFragment( getEditMode( location ))
         }
     }
 
@@ -584,7 +602,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (tag == kAddHouseholdTag)  // use current location
         {
-            gpsLocation?.let { point ->
+            currentGPSLocation?.let { point ->
                 enumArea.locations.map{
                     val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
                     if (haversineCheck.withinBounds)
@@ -768,7 +786,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 val point = location.last()
                 binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
-                gpsLocation = point
+                currentGPSLocation = point
             }
         }
 

@@ -78,6 +78,7 @@ class PerformCollectionFragment : Fragment(),
 
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
+    private var currentGPSLocation: Point? = null
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
     private val locationHashMap = java.util.HashMap<Long, Location>()
@@ -216,14 +217,14 @@ class PerformCollectionFragment : Fragment(),
                             if (count > 1)
                             {
                                 val bundle = Bundle()
-                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.toString(), gpsAccuracyIsGood())
+                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.toString(), gpsAccuracyIsGood() && gpsLocationIsGood( location ))
 
                                 findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
                             }
                             else
                             {
                                 (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
-                                LaunchSurveyDialog( activity, gpsAccuracyIsGood(), this@PerformCollectionFragment)
+                                LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
                             }
                         }
                     }
@@ -446,7 +447,7 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.locationViewModel.setCurrentLocation(location)
             sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
             (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
-            LaunchSurveyDialog( activity, gpsAccuracyIsGood(), this)
+            LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
         }
     }
 
@@ -645,6 +646,7 @@ class PerformCollectionFragment : Fragment(),
             {
                 val point = location.last()
                 binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
+                currentGPSLocation = point
             }
         }
 
@@ -680,6 +682,21 @@ class PerformCollectionFragment : Fragment(),
         }
 
         return false
+    }
+
+    private fun gpsLocationIsGood( location: Location ) : Boolean
+    {
+        var editMode = false
+
+        if (gpsAccuracyIsGood())
+        {
+            currentGPSLocation?.let { point ->
+                val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
+                editMode = distance <= config.minGpsPrecision
+            }
+        }
+
+        return editMode
     }
 
     private fun initLocationComponent()
