@@ -292,7 +292,8 @@
     <string name="download_map_tiles">Download map tiles</string>
     <string name="center_on_location">Center on location</string>
     <string name="less_than_equal">"Less Than Or Equal"</string>
-    <string name="gps_accuracy_error">"GPS accuracy is less than the required accuracy."</string>
+    <string name="gps_accuracy_error">"GPS accuracy is less than the required accuracy"</string>
+    <string name="gps_location_error">"You are currently too far away from this location"</string>
     <string name="accuracy">"Accuracy : "</string>
     <string name="good">"GOOD"</string>
     <string name="poor">"POOR"</string>

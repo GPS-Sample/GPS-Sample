@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddMultiHouseholdBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -22,6 +23,7 @@ class AddMultiHouseholdFragment : Fragment()
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addMultiHouseholdAdapter: AddMultiHouseholdAdapter
 
+    private var editMode = true
     private var _binding: FragmentAddMultiHouseholdBinding? = null
     private val binding get() = _binding!!
 
@@ -44,6 +46,15 @@ class AddMultiHouseholdFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
+        arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
+            this.editMode = editMode
+        }
+
+        if (!editMode)
+        {
+            binding.addButton.visibility = View.GONE
+        }
+
         sharedViewModel.locationViewModel.currentLocation?.value?.let {
             location = it
         }
@@ -61,7 +72,8 @@ class AddMultiHouseholdFragment : Fragment()
         }
 
         binding.backButton.setOnClickListener {
-            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+            findNavController().popBackStack()
+//            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
         }
     }
 
@@ -74,6 +86,8 @@ class AddMultiHouseholdFragment : Fragment()
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
     {
         sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.toString(), editMode )
         findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
     }
 
