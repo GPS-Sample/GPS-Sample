@@ -183,7 +183,7 @@ class PerformEnumerationFragment : Fragment(),
                         }
                         else
                         {
-                            navigateToAddHouseholdFragment( getEditMode( location ))
+                            navigateToAddHouseholdFragment()
                         }
                     }
 
@@ -336,7 +336,7 @@ class PerformEnumerationFragment : Fragment(),
         return false
     }
 
-    private fun getEditMode( location: Location ) : Boolean
+    private fun gpsLocationIsGood( location: Location ) : Boolean
     {
         var editMode = false
 
@@ -482,18 +482,25 @@ class PerformEnumerationFragment : Fragment(),
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
-    fun navigateToAddHouseholdFragment( editMode: Boolean = true )
+    fun navigateToAddHouseholdFragment()
     {
-        val bundle = Bundle()
-        bundle.putBoolean( Keys.kEditMode.toString(), editMode )
-
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+
+            val bundle = Bundle()
+            bundle.putBoolean( Keys.kEditMode.toString(), gpsLocationIsGood( location ))
 
             if (location.enumerationItems.isEmpty())
             {
-                sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
+                if (gpsLocationIsGood( location ))
+                {
+                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
 
-                ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
+                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
+                }
+                else
+                {
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                }
             }
             else if (location.enumerationItems.size == 1)
             {
@@ -542,14 +549,22 @@ class PerformEnumerationFragment : Fragment(),
             }
 
             val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false, "")
-            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-            enumArea.locations.add(location)
 
-            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            if (gpsLocationIsGood( location ))
+            {
+                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                enumArea.locations.add(location)
 
-            enumerationTeam.locations.add(location)
-            DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-            navigateToAddHouseholdFragment()
+                sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+                enumerationTeam.locations.add(location)
+                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+                navigateToAddHouseholdFragment()
+            }
+            else
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+            }
 
             return true
         }
@@ -578,7 +593,7 @@ class PerformEnumerationFragment : Fragment(),
         }
         else
         {
-            navigateToAddHouseholdFragment( getEditMode( location ))
+            navigateToAddHouseholdFragment()
         }
     }
 
@@ -594,7 +609,9 @@ class PerformEnumerationFragment : Fragment(),
         {
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                 location.isMultiFamily = false
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.toString(), gpsLocationIsGood( location ))
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
             }
 
             return
@@ -614,6 +631,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false, "")
+
                 DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                 enumArea.locations.add(location)
 
@@ -667,16 +685,9 @@ class PerformEnumerationFragment : Fragment(),
 
             sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-            if (location.isLandmark)
-            {
-                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-            }
-            else
-            {
-                enumerationTeam.locations.add(location)
-                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-                navigateToAddHouseholdFragment()
-            }
+            enumerationTeam.locations.add(location)
+            DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+            navigateToAddHouseholdFragment()
         }
         else
         {
@@ -686,7 +697,9 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                         location.isMultiFamily = true
-                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                        val bundle = Bundle()
+                        bundle.putBoolean( Keys.kEditMode.toString(), gpsLocationIsGood( location ))
+                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
                     }
                 }
 
