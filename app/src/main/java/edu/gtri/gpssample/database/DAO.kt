@@ -307,6 +307,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableFieldDataOption = ("CREATE TABLE " +
                     TABLE_FIELD_DATA_OPTION + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_UUID + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_NAME + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_VALUE + " INTEGER" +
                     ")")
@@ -726,6 +727,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 267
+        private const val DATABASE_VERSION = 268
     }
 }

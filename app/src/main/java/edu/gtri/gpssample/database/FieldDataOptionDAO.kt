@@ -18,6 +18,7 @@ class FieldDataOptionDAO(private var dao: DAO)
         }
         else
         {
+            fieldDataOption.id = null
             val values = ContentValues()
             putFieldDataOption( fieldDataOption, values )
             fieldDataOption.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA_OPTION, null, values).toInt()
@@ -49,6 +50,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, fieldDataOption.id )
         }
 
+        values.put( DAO.COLUMN_UUID, fieldDataOption.uuid )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_NAME, fieldDataOption.name )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_VALUE, fieldDataOption.value )
     }
@@ -70,10 +72,8 @@ class FieldDataOptionDAO(private var dao: DAO)
 
     fun exists( fieldDataOption: FieldDataOption): Boolean
     {
-        fieldDataOption.id?.let { id ->
-            getFieldDataOption( id )?.let {
-                return true
-            } ?: return false
+        getFieldDataOption( fieldDataOption.uuid )?.let {
+            return true
         } ?: return false
     }
 
@@ -81,16 +81,34 @@ class FieldDataOptionDAO(private var dao: DAO)
     private fun  buildFieldDataOption(cursor: Cursor): FieldDataOption
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_NAME))
         val value = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_VALUE)).toBoolean()
 
-        return FieldDataOption(id, name, value)
+        return FieldDataOption(id, uuid, name, value)
     }
 
     fun getFieldDataOption( id : Int ): FieldDataOption?
     {
         var fieldDataOption: FieldDataOption? = null
         val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION} where id=${id}"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            fieldDataOption = buildFieldDataOption( cursor )
+        }
+
+        cursor.close()
+
+        return fieldDataOption
+    }
+
+    fun getFieldDataOption( uuid: String ): FieldDataOption?
+    {
+        var fieldDataOption: FieldDataOption? = null
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA_OPTION} where id='${uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -128,11 +146,13 @@ class FieldDataOptionDAO(private var dao: DAO)
         return fieldDataOptions
     }
 
-    fun deleteFieldDataOption( fieldDataOption: FieldDataOption)
+    fun delete( fieldDataOption: FieldDataOption)
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(fieldDataOption.id.toString())
+        fieldDataOption.id?.let { id ->
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args = arrayOf(id.toString())
 
-        dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA_OPTION, whereClause, args)
+            dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA_OPTION, whereClause, args)
+        }
     }
 }

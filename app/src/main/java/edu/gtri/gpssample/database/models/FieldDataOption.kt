@@ -4,14 +4,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
 
 @Serializable
 data class FieldDataOption(
     var id : Int? = null,
+    var uuid : String,
     var name : String,
     var value: Boolean )
 {
-    constructor(name: String, value: Boolean) : this( null, name, value )
+    constructor(name: String, value: Boolean) : this( null, UUID.randomUUID().toString(), name, value )
 
     fun pack() : String
     {
