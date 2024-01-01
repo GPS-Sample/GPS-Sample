@@ -4,11 +4,13 @@ import android.Manifest
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -31,19 +33,10 @@ class MainFragment : Fragment()
 {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
-    private lateinit var networkStatusBroadcastReceiver: NetworkStatusBroadcastReceiver
-    private lateinit var intentFilter : IntentFilter
-    private var  networkConnectionStatus: NetworkConnectionStatus = NetworkConnectionStatus.UNKNOWN_STATUS
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-
-//        networkStatusBroadcastReceiver = NetworkStatusBroadcastReceiver( ::updateConnectionStatus)
-//
-//        intentFilter = IntentFilter()
-//        intentFilter.addAction(NETWORK_SERVICE_STATUS_KEY)
-//        activity?.registerReceiver(networkStatusBroadcastReceiver, intentFilter)
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -52,6 +45,7 @@ class MainFragment : Fragment()
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
@@ -157,10 +151,8 @@ class MainFragment : Fragment()
 
     private fun allRuntimePermissionsGranted(): Boolean {
         for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
-            permission?.let {
-                if (!isPermissionGranted(activity as AppCompatActivity, it)) {
-                    return false
-                }
+            if (!isPermissionGranted(activity as AppCompatActivity, permission)) {
+                return false
             }
         }
         return true
@@ -169,10 +161,8 @@ class MainFragment : Fragment()
     private fun getRuntimePermissions() {
         val permissionsToRequest = ArrayList<String>()
         for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
-            permission?.let {
-                if (!isPermissionGranted(activity as AppCompatActivity, it)) {
-                    permissionsToRequest.add(permission)
-                }
+            if (!isPermissionGranted(activity as AppCompatActivity, permission)) {
+                permissionsToRequest.add(permission)
             }
         }
 
@@ -204,21 +194,23 @@ class MainFragment : Fragment()
 
     companion object
     {
-        private const val OBJECT_DETECTION = "Object Detection"
-        private const val BARCODE_SCANNING = "Barcode Scanning"
-
-        private const val STATE_SELECTED_MODEL = "selected_model"
         private const val PERMISSION_REQUESTS = 1
 
         private val REQUIRED_RUNTIME_PERMISSIONS =
             arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.CHANGE_WIFI_STATE,
-                Manifest.permission.CHANGE_NETWORK_STATE,
+                Manifest.permission.INTERNET,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA,
+                Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.CHANGE_NETWORK_STATE,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.CHANGE_WIFI_STATE,
+                Manifest.permission.CHANGE_WIFI_MULTICAST_STATE,
+                Manifest.permission.UPDATE_DEVICE_STATS,
+                Manifest.permission.NEARBY_WIFI_DEVICES
             )
     }
 }
