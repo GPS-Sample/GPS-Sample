@@ -58,9 +58,8 @@ class FieldDataDAO(private var dao: DAO)
         }
 
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
-
-        values.put(DAO.COLUMN_FIELD_NAME, fieldData.name)
-        values.put(DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(fieldData.type))
+        values.put( DAO.COLUMN_FIELD_NAME, fieldData.name )
+        values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(fieldData.type))
         values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
         values.put( DAO.COLUMN_FIELD_DATA_NUMBER_VALUE, fieldData.numberValue )
         values.put( DAO.COLUMN_FIELD_DATA_DATE_VALUE, fieldData.dateValue )
@@ -70,17 +69,9 @@ class FieldDataDAO(private var dao: DAO)
 
     fun exists( fieldData: FieldData ): Boolean
     {
-        val fieldDataList = getFieldData()
-
-        for (existingFieldData in fieldDataList)
-        {
-            if (existingFieldData.uuid == fieldData.uuid)
-            {
-                return true
-            }
-        }
-
-        return false
+        getFieldData( fieldData.uuid )?.let {
+            return true
+        } ?: return false
     }
 
     @SuppressLint("Range")
@@ -89,7 +80,6 @@ class FieldDataDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
-
         val field = DAO.fieldDAO.getField(field_id)
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val type = FieldTypeConverter.fromIndex(cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX)))
@@ -133,30 +123,23 @@ class FieldDataDAO(private var dao: DAO)
         return fieldData
     }
 
-//    fun getOrCreateFieldData( field_id: Int, enumerationItem: EnumerationItem  ): FieldData
-//    {
-//        var fieldData: FieldData? = null
-//        val db = dao.writableDatabase
-//        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_FIELD_ID} = $field_id AND ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $enumerationItem.id"
-//        val cursor = db.rawQuery(query, null)
-//
-//        if (cursor.count > 0)
-//        {
-//            cursor.moveToNext()
-//            fieldData = createFieldData( cursor )
-//        }
-//        else
-//        {
-//            val field = DAO.fieldDAO.getField(field_id)
-//            fieldData = FieldData( field!! )
-//            createOrUpdateFieldData( fieldData, enumerationItem )
-//        }
-//
-//        cursor.close()
-//        db.close()
-//
-//        return fieldData
-//    }
+    fun getFieldData( uuid: String ): FieldData?
+    {
+        var fieldData: FieldData? = null
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ID}='$uuid'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            fieldData = createFieldData( cursor )
+            fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
+        }
+
+        cursor.close()
+
+        return fieldData
+    }
 
     fun getFieldDataList( enumerationItem: EnumerationItem ): ArrayList<FieldData>
     {
@@ -198,23 +181,18 @@ class FieldDataDAO(private var dao: DAO)
 
     fun delete( fieldData: FieldData )
     {
-        fieldData.id?.let {id ->
+        fieldData.id?.let { id ->
             Log.d( "xxx", "deleting fieldData with id $id" )
+
+            for (fieldDataOption in fieldData.fieldDataOptions)
+            {
+                DAO.fieldDataOptionDAO.delete(fieldDataOption)
+            }
 
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(id.toString())
 
             dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
-        }
-    }
-
-    fun deleteAllFields( enumerationItem: EnumerationItem )
-    {
-        val fieldDataList = getFieldDataList( enumerationItem )
-
-        for (fieldData in fieldDataList)
-        {
-            delete( fieldData )
         }
     }
 }
