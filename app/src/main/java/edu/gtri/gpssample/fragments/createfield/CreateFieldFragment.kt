@@ -89,7 +89,7 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -209,15 +209,25 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         }
 
         binding.saveButton.setOnClickListener {
-            saveField()
             sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
-                if (currentField.fieldBlockUUID == null)
+
+                // Date type must be selected!
+                if (currentField.type == FieldType.Date && !currentField.date && !currentField.time)
                 {
-                    findNavController().popBackStack()
+                    Toast.makeText(activity!!.applicationContext, resources.getString( R.string.select_date_type), Toast.LENGTH_LONG).show()
                 }
                 else
                 {
-                    findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                    saveField()
+
+                    if (currentField.fieldBlockUUID == null)
+                    {
+                        findNavController().popBackStack()
+                    }
+                    else
+                    {
+                        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                    }
                 }
             }
         }

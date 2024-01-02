@@ -12,8 +12,9 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.utils.DateUtils
 import java.lang.Integer.min
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.roundToInt
 
 class SamplingViewModel : ViewModel()
@@ -138,21 +139,60 @@ class SamplingViewModel : ViewModel()
         var validRule = false
         fieldData.field?.let{field->
             when (field.type) {
-                FieldType.Number -> {
+                FieldType.Number, FieldType.Date -> {
                     // we allow for all of the rule operators
                     // convert string to int
                     try {
+                        var ruleNumber = rule.value.toDouble()
 
-                        val ruleNumber = rule.value.toDouble()
+                        if (field.type == FieldType.Date)
+                        {
+                            // unix time is stored as a string in the rule.value property
+                            val ruleUnixTime = ruleNumber.toLong()
+
+                            // default to use both date & time fields of the Date for comparison
+                            ruleNumber = ruleUnixTime.toDouble()
+
+                            val ruleDate = Date( ruleUnixTime )
+
+                            // if date not checked, clear the date so that comparison is based only on time
+                            if (!field.date)
+                            {
+                                ruleNumber = DateUtils.clearDate(( ruleDate )).time.toDouble()
+                            }
+
+                            // if time not checked, clear the time so that comparison is based only on date
+                            if (!field.time) {
+                                ruleNumber = DateUtils.clearTime(( ruleDate )).time.toDouble()
+                            }
+
+                            fieldData.dateValue?.let { fieldUnixTime ->
+                                // this is sort of a hack, the fieldUnixTime is saved in the fieldData.numberValue
+                                // so that the code below this block works as is.  should probably make a fun out of the
+                                // code block below and pass the number value
+                                fieldData.numberValue = fieldUnixTime.toDouble()
+
+                                val fieldDate = Date( fieldUnixTime )
+
+                                if (!field.date)
+                                {
+                                    fieldData.numberValue = DateUtils.clearDate(( fieldDate )).time.toDouble()
+                                }
+                                if (!field.time)
+                                {
+                                    fieldData.numberValue = DateUtils.clearTime(( fieldDate )).time.toDouble()
+                                }
+                            }
+                        }
+
+                        // this is the code block mentioned above
                         fieldData.numberValue?.let { number ->
-                            rule?.operator?.let { operator ->
+                            rule.operator?.let { operator ->
                                 when (operator) {
                                     Operator.Equal -> {
 
                                         val epsilon = 0.000001
-                                        validRule =
-                                            Math.abs(number - ruleNumber) < epsilon
-
+                                        validRule = Math.abs(number - ruleNumber) < epsilon
                                     }
                                     Operator.GreaterThan -> {
                                         validRule = (number > ruleNumber)

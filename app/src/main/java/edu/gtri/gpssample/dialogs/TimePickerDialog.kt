@@ -15,10 +15,10 @@ class TimePickerDialog
 {
     interface TimePickerDialogDelegate
     {
-        fun didSelectTime(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+        fun didSelectTime(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
     }
 
-    constructor(context: Context, title: String, date: Date, field: Field, fieldData: FieldData, editText: EditText, delegate: TimePickerDialogDelegate )
+    constructor(context: Context, title: String, date: Date, field: Field, fieldData: FieldData?, editText: EditText?, delegate: TimePickerDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 

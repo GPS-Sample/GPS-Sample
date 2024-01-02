@@ -285,12 +285,16 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
         }
     }
 
-    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
     {
         if (field.date && !field.time)
         {
-            fieldData.dateValue = date.time
-            displayDate( date, field, fieldData, editText )
+            fieldData?.let{ fieldData ->
+                fieldData.dateValue = date.time
+                editText?.let { editText ->
+                    displayDate( date, field, fieldData, editText )
+                }
+            }
         }
         else
         {
@@ -298,9 +302,13 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
         }
     }
 
-    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
     {
-        fieldData.dateValue = date.time
-        displayDate( date, field, fieldData, editText )
+        fieldData?.let { fieldData ->
+            fieldData.dateValue = date.time
+            editText?.let { editText ->
+                displayDate( date, field, fieldData, editText )
+            }
+        }
     }
 }

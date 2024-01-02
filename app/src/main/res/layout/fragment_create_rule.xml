@@ -135,7 +135,8 @@
                     android:background="@drawable/spinner_frame">
 
                     <EditText
-                        android:id="@+id/value_edit_text"
+                        android:visibility="gone"
+                        android:id="@+id/text_value_edit_text"
                         android:imeOptions="actionDone"
                         android:inputType="text"
                         android:layout_width="match_parent"
@@ -147,10 +148,20 @@
 
                     <Spinner
                         android:visibility="gone"
-                        android:id="@+id/value_spinner"
+                        android:id="@+id/dropdown_value_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:selectedItemPosition="@={viewModel.createRuleModel.dropdownPosition}"/>
+
+                    <TextView
+                        android:id="@+id/date_value_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
                 </FrameLayout>
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>

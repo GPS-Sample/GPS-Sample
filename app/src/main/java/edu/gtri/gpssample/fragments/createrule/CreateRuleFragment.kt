@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,20 +17,29 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.databinding.FragmentCreateRuleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.TimePickerDialog
+import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.util.ArrayList
+import java.util.*
 
-class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class CreateRuleFragment : Fragment(),
+    DatePickerDialog.DatePickerDialogDelegate,
+    TimePickerDialog.TimePickerDialogDelegate,
+    ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var rule: Rule? = null
-
     private var _binding: FragmentCreateRuleBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var config: Config
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -63,6 +73,10 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             this.executePendingBindings()
         }
 
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            this.config = config
+        }
+
         // for an existing rule, figure out which field was selected
 
         sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
@@ -74,10 +88,17 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
                         {
                             sharedViewModel.createRuleModel.ruleFieldPosition.value = i
 
-                            if (field.type == FieldType.Dropdown)
+                            if (field.type == FieldType.Text || field.type == FieldType.Number)
                             {
-                                binding.valueEditText.visibility = View.GONE
-                                binding.valueSpinner.visibility = View.VISIBLE
+                                binding.textValueEditText.visibility = View.VISIBLE
+                                binding.dropdownValueSpinner.visibility = View.GONE
+                                binding.dateValueTextView.visibility = View.GONE
+                            }
+                            else if (field.type == FieldType.Dropdown)
+                            {
+                                binding.textValueEditText.visibility = View.GONE
+                                binding.dropdownValueSpinner.visibility = View.VISIBLE
+                                binding.dateValueTextView.visibility = View.GONE
 
                                 val items = ArrayList<String>()
 
@@ -92,7 +113,28 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
                                     }
                                 }
 
-                                binding.valueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                                binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                            }
+                            else if (field.type == FieldType.Date)
+                            {
+                                binding.textValueEditText.visibility = View.GONE
+                                binding.dropdownValueSpinner.visibility = View.GONE
+                                binding.dateValueTextView.visibility = View.VISIBLE
+
+                                rule.value.toLongOrNull()?.let { unixTime ->
+                                    if (field.date && !field.time)
+                                    {
+                                        binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
+                                    }
+                                    else if (field.time && !field.date)
+                                    {
+                                        binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat ))
+                                    }
+                                    else
+                                    {
+                                        binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
+                                    }
+                                }
                             }
 
                             break
@@ -114,10 +156,18 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
                     sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
                         val field = study.fields[position]
                         rule.field = field
-                        if (field.type == FieldType.Dropdown)
+
+                        if (field.type == FieldType.Text || field.type == FieldType.Number)
                         {
-                            binding.valueEditText.visibility = View.GONE
-                            binding.valueSpinner.visibility = View.VISIBLE
+                            binding.textValueEditText.visibility = View.VISIBLE
+                            binding.dropdownValueSpinner.visibility = View.GONE
+                            binding.dateValueTextView.visibility = View.GONE
+                        }
+                        else if (field.type == FieldType.Dropdown)
+                        {
+                            binding.textValueEditText.visibility = View.GONE
+                            binding.dropdownValueSpinner.visibility = View.VISIBLE
+                            binding.dateValueTextView.visibility = View.GONE
 
                              val items = ArrayList<String>()
 
@@ -132,12 +182,13 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
                                 }
                             }
 
-                            binding.valueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                            binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
                         }
-                        else
+                        else if (field.type == FieldType.Date)
                         {
-                            binding.valueSpinner.visibility = View.GONE
-                            binding.valueEditText.visibility = View.VISIBLE
+                            binding.textValueEditText.visibility = View.GONE
+                            binding.dropdownValueSpinner.visibility = View.GONE
+                            binding.dateValueTextView.visibility = View.VISIBLE
                         }
                     }
                 }
@@ -148,7 +199,23 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
             }
         }
 
-        binding.valueSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        binding.dateValueTextView.setOnClickListener {
+            sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+                rule.field?.let { field ->
+                    val date = Date()
+                    if (field.time && !field.date)
+                    {
+                        TimePickerDialog(context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, null, null, this)
+                    }
+                    else
+                    {
+                        DatePickerDialog(context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, null, null, this)
+                    }
+                }
+            }
+        }
+
+        binding.dropdownValueSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
@@ -194,16 +261,16 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         {
             if (field.integerOnly)
             {
-                binding.valueEditText.inputType = InputType.TYPE_CLASS_NUMBER
+                binding.textValueEditText.inputType = InputType.TYPE_CLASS_NUMBER
             }
             else
             {
-                binding.valueEditText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                binding.textValueEditText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             }
         }
         else
         {
-            binding.valueEditText.inputType = InputType.TYPE_CLASS_TEXT
+            binding.textValueEditText.inputType = InputType.TYPE_CLASS_TEXT
         }
     }
 
@@ -239,6 +306,40 @@ class CreateRuleFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDele
         }
 
         findNavController().popBackStack()
+    }
+
+    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
+    {
+        sharedViewModel.createRuleModel.currentRule?.value?.let{ rule ->
+            val unixTime = date.time
+            rule.value = unixTime.toString()
+
+            Log.d( "xxx", Date( unixTime ).toString())
+
+            binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
+
+            if (field.time)
+            {
+                TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
+            }
+        }
+    }
+
+    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
+    {
+        sharedViewModel.createRuleModel.currentRule?.value?.let{ rule ->
+            val unixTime = date.time
+            rule.value = unixTime.toString()
+
+            if (field.date && field.time)
+            {
+                binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
+            }
+            else if (field.time)
+            {
+                binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat))
+            }
+        }
     }
 
     override fun onDestroyView()
