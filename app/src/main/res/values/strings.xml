@@ -299,6 +299,8 @@
     <string name="poor">"POOR"</string>
     <string name="unknown">UNKNOWN</string>
     <string name="legend">Legend</string>
+    <string name="select_date_type">"Please select the Date type"</string>
+
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

@@ -17,10 +17,10 @@ class DatePickerDialog
 {
     interface DatePickerDialogDelegate
     {
-        fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText )
+        fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText? )
     }
 
-    constructor(context: Context, title: String, date: Date, field: Field, fieldData: FieldData, editText: EditText, delegate: DatePickerDialogDelegate )
+    constructor(context: Context, title: String, date: Date, field: Field, fieldData: FieldData?, editText: EditText?, delegate: DatePickerDialogDelegate )
     {
         val inflater = LayoutInflater.from(context)
 

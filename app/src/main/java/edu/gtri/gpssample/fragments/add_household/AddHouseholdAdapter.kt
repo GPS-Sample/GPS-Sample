@@ -22,6 +22,7 @@ import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.fragments.createfield.CreateFieldCheckboxAdapter
+import edu.gtri.gpssample.utils.DateUtils
 import java.util.*
 
 class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumerationItem: EnumerationItem, val fieldList: List<Field>, val filteredFieldDataList: List<FieldData>) :
@@ -338,65 +339,19 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         }
     }
 
-    fun dateString(date: Date?): String
-    {
-        val calendar = Calendar.getInstance()
-        calendar.time = date
-
-        val day = calendar[Calendar.DAY_OF_MONTH]
-        val month = calendar[Calendar.MONTH] + 1
-        val year = calendar[Calendar.YEAR]
-
-        when (config.dateFormat)
-        {
-            DateFormat.DayMonthYear -> return "${day}/${month}/${year}"
-            DateFormat.MonthDayYear -> return "${month}/${day}/${year}"
-            DateFormat.YearMonthDay -> return "${year}/${month}/${day}"
-            else -> return "${day}/${month}/${year}"
-        }
-    }
-
-    fun timeString(date: Date?): String
-    {
-        val calendar = Calendar.getInstance()
-        calendar.time = date
-
-        var hour = calendar[Calendar.HOUR_OF_DAY]
-        val minute = calendar[Calendar.MINUTE]
-
-        var meridiem = "am"
-
-        if (config.timeFormat == TimeFormat.twelveHour)
-        {
-            if (hour >= 12) {
-                meridiem = "pm"
-                if (hour > 12) {
-                    hour -= 12
-                }
-            }
-        }
-
-        when (config.timeFormat)
-        {
-            TimeFormat.twelveHour -> return String.format("%d:%02d %s", hour, minute, meridiem)
-            TimeFormat.twentyFourHour -> return String.format("%d:%02d", hour, minute)
-            else -> return String.format("%d:%02d %s", hour, minute, meridiem)
-        }
-    }
-
     fun displayDate( date: Date, field: Field, fieldData: FieldData, editText: EditText )
     {
         if (field.date && !field.time)
         {
-            editText.setText( dateString( date ))
+            editText.setText( DateUtils.dateString( date, config.dateFormat ))
         }
-        else if (!field.date && field.time)
+        else if (field.time && !field.date)
         {
-            editText.setText( timeString( date ))
+            editText.setText( DateUtils.timeString( date, config.timeFormat ))
         }
         else
         {
-            editText.setText( date.toString())
+            editText.setText( DateUtils.dateTimeString( date, config.dateFormat, config.timeFormat ))
         }
     }
 
@@ -420,12 +375,16 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         return filteredFieldList
     }
 
-    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
     {
         if (field.date && !field.time)
         {
-            fieldData.dateValue = date.time
-            displayDate( date, field, fieldData, editText )
+            fieldData?.let { fieldData ->
+                fieldData.dateValue = date.time
+                editText?.let { editText ->
+                    displayDate( date, field, fieldData, editText )
+                }
+            }
         }
         else
         {
@@ -433,9 +392,13 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         }
     }
 
-    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData, editText: EditText)
+    override fun didSelectTime(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
     {
-        fieldData.dateValue = date.time
-        displayDate( date, field, fieldData, editText )
+        fieldData?.let { fieldData ->
+            fieldData.dateValue = date.time
+            editText?.let { editText ->
+                displayDate( date, field, fieldData, editText )
+            }
+        }
     }
 }
