@@ -92,7 +92,7 @@ class CreateRuleModel {
 
     fun createNewRule(study: Study) : Boolean
     {
-        val newRule = Rule(null,  null, "", "" , Operator.None, null)
+        val newRule = Rule(null,  null, "", "" , Operator.Equal, null)
         if (study.fields.isNotEmpty())
         {
             newRule.field = study.fields[0]
@@ -106,7 +106,7 @@ class CreateRuleModel {
     fun onRuleOperatorSelected(study : Study, position: Int)
     {
         currentRule?.value?.let{rule ->
-            rule.operator = OperatorConverter.fromArrayPosition(position)
+            rule.operator = OperatorConverter.fromIndex(position)
         }
     }
 }
