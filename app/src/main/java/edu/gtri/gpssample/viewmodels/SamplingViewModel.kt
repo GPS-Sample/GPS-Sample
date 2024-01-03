@@ -162,7 +162,8 @@ class SamplingViewModel : ViewModel()
                             }
 
                             // if time not checked, clear the time so that comparison is based only on date
-                            if (!field.time) {
+                            if (!field.time)
+                            {
                                 ruleNumber = DateUtils.clearTime(( ruleDate )).time.toDouble()
                             }
 
@@ -190,7 +191,6 @@ class SamplingViewModel : ViewModel()
                             rule.operator?.let { operator ->
                                 when (operator) {
                                     Operator.Equal -> {
-
                                         val epsilon = 0.000001
                                         validRule = Math.abs(number - ruleNumber) < epsilon
                                     }
