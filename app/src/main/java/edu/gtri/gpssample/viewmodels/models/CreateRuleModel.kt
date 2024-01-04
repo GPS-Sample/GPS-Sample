@@ -48,6 +48,7 @@ class CreateRuleModel {
                         3 -> fragment.getString(R.string.greater_than)
                         4 -> fragment.getString(R.string.less_than_equal)
                         5 -> fragment.getString(R.string.greater_than_equal)
+                        6 -> fragment.getString(R.string.contains)
                         else -> String()
                     }
                 }

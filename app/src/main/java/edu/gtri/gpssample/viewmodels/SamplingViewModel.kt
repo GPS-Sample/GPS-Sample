@@ -139,6 +139,25 @@ class SamplingViewModel : ViewModel()
         var validRule = false
         fieldData.field?.let{field->
             when (field.type) {
+                FieldType.Checkbox ->
+                {
+                    validRule = true
+                    for (ruleOption in rule.fieldDataOptions)
+                    {
+                        for (fieldOption in fieldData.fieldDataOptions)
+                        {
+                            if (ruleOption.value && ruleOption.name == fieldOption.name)
+                            {
+                                if (validRule == true)
+                                {
+                                    validRule = fieldOption.value
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+
                 FieldType.Number, FieldType.Date -> {
                     // we allow for all of the rule operators
                     // convert string to int

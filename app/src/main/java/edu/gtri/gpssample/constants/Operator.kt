@@ -7,12 +7,13 @@ enum class Operator(val format : String) {
     GreaterThan("GreaterThan"),
     LessThanOrEqual("LessThanOrEqual"),
     GreaterThanOrEqual("GreaterThanOrEqual"),
+    Contains( "Contains" ),
 }
 
 
 object OperatorConverter
 {
-    val array : Array<String> = Array(6){ i ->
+    val array : Array<String> = Array(7){ i ->
         when(i)
         {
             0 -> Operator.Equal.format
@@ -21,6 +22,7 @@ object OperatorConverter
             3 -> Operator.GreaterThan.format
             4 -> Operator.LessThanOrEqual.format
             5 -> Operator.GreaterThanOrEqual.format
+            6 -> Operator.Contains.format
             else -> String()
         }
     }
@@ -35,6 +37,7 @@ object OperatorConverter
             Operator.GreaterThan -> 3
             Operator.LessThanOrEqual -> 4
             Operator.GreaterThanOrEqual -> 5
+            Operator.Contains -> 6
             else -> 0
         }
     }
@@ -49,6 +52,7 @@ object OperatorConverter
             3 -> Operator.GreaterThan
             4 -> Operator.LessThanOrEqual
             5 -> Operator.GreaterThanOrEqual
+            6 -> Operator.Contains
             else -> Operator.Equal
         }
     }
@@ -63,6 +67,7 @@ object OperatorConverter
             Operator.GreaterThan.format -> Operator.GreaterThan
             Operator.LessThanOrEqual.format -> Operator.LessThanOrEqual
             Operator.GreaterThanOrEqual.format -> Operator.GreaterThanOrEqual
+            Operator.Contains.format -> Operator.Contains
             else -> Operator.Equal
         }
     }

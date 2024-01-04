@@ -321,7 +321,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     "FOREIGN KEY($COLUMN_FIELD_DATA_ID) REFERENCES $TABLE_FIELD_DATA($COLUMN_ID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_DATA_OPTION_ID) REFERENCES $TABLE_FIELD_DATA_OPTION($COLUMN_ID)" +
                     ")")
-            val x = db.execSQL(createTableFieldData__FieldDataOption)
+            db.execSQL(createTableFieldData__FieldDataOption)
+
+            val createTableRule__FieldDataOption = ("CREATE TABLE " +
+                    TABLE_RULE__FIELD_DATA_OPTION + "(" +
+                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_RULE_ID + " INTEGER" + "," +
+                    COLUMN_FIELD_DATA_OPTION_ID + " INTEGER" + "," +
+                    "FOREIGN KEY($COLUMN_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_ID)" + "," +
+                    "FOREIGN KEY($COLUMN_FIELD_DATA_OPTION_ID) REFERENCES $TABLE_FIELD_DATA_OPTION($COLUMN_ID)" +
+                    ")")
+            db.execSQL(createTableRule__FieldDataOption)
 
             val createTableLatLon = ("CREATE TABLE " +
                     TABLE_LAT_LON + "(" +
@@ -434,6 +444,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE__FIELD_DATA_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__SAMPLE_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUMERATION_TEAM")
@@ -609,6 +620,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // connector table, fieldData to fieldDataOption
         const val TABLE_FIELD_DATA__FIELD_DATA_OPTION = "field_data__field_data_option"
 
+        // connector table, rule to fieldDataOption
+        const val TABLE_RULE__FIELD_DATA_OPTION = "rule__field_data_option"
+
         const val TABLE_LAT_LON = "lat_lon"
         const val COLUMN_LAT = "lat"
         const val COLUMN_LON = "lon"
@@ -693,6 +707,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
                 db.execSQL("DELETE FROM $TABLE_FIELD__FIELD_OPTION")
                 db.execSQL("DELETE FROM $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $TABLE_RULE__FIELD_DATA_OPTION")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__ENUM_AREA")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__SAMPLE_AREA")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__ENUMERATION_TEAM")
@@ -727,6 +742,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 268
+        private const val DATABASE_VERSION = 269
     }
 }
