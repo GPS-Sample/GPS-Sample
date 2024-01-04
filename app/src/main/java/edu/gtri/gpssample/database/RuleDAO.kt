@@ -11,7 +11,6 @@ import edu.gtri.gpssample.database.models.Study
 
 class RuleDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateRule( rule: Rule ) : Rule?
     {
         if (exists( rule ))
@@ -21,13 +20,17 @@ class RuleDAO(private var dao: DAO)
         else
         {
             val values = ContentValues()
-
             putRule( rule, values )
             rule.id = dao.writableDatabase.insert(DAO.TABLE_RULE, null, values).toInt()
-            rule.id?.let { id ->
-                Log.d( "xxx", "new rule id = ${id}")
-            } ?: return null
         }
+
+        rule.id?.let { id ->
+            Log.d( "xxx", "rule id = ${id}")
+            for (fieldDataOption in rule.fieldDataOptions)
+            {
+                DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, rule )
+            }
+        } ?: return null
 
         return rule
     }
@@ -62,10 +65,8 @@ class RuleDAO(private var dao: DAO)
         }
         return null
     }
-    //--------------------------------------------------------------------------
     fun exists( rule: Rule ): Boolean
     {
-
         rule.id?.let { id ->
             getRule( id )?.let {
                 return true
@@ -74,11 +75,8 @@ class RuleDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     private fun putRule( rule: Rule, values: ContentValues )
     {
-       // val operatorId = OperatorConverter.toIndex(rule.operator)
-
         rule.id?.let { id ->
             Log.d( "xxx", "existing filter id = ${id}")
             values.put( DAO.COLUMN_ID, id )
@@ -95,10 +93,8 @@ class RuleDAO(private var dao: DAO)
             }
             values.put( DAO.COLUMN_RULE_VALUE, rule.value )
         }
-
     }
 
-    //--------------------------------------------------------------------------
     fun updateRule( rule: Rule )
     {
         val whereClause = "${DAO.COLUMN_ID} = ?"
@@ -136,22 +132,10 @@ class RuleDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            return buildRule( cursor )
-        }
-
-        cursor.close()
-
-        return null
-    }
-
-    fun getRuleByUUID(uuid : String) : Rule?
-    {
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = ${uuid}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            return buildRule( cursor )
+            buildRule( cursor )?.let { rule ->
+                rule.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( rule )
+                return rule
+            }
         }
 
         cursor.close()
@@ -170,9 +154,9 @@ class RuleDAO(private var dao: DAO)
         {
             val rule = buildRule( cursor )
             rule?.let{rule->
+                rule.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( rule )
                 rules.add( rule)
             }
-
         }
 
         cursor.close()
@@ -192,6 +176,7 @@ class RuleDAO(private var dao: DAO)
             {
                 val rule = buildRule( cursor )
                 rule?.let{rule->
+                    rule.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( rule )
                     rules.add( rule)
                 }
             }
@@ -202,32 +187,6 @@ class RuleDAO(private var dao: DAO)
         return rules
     }
 
-
-//    fun getRules( study: Study ) : ArrayList<Rule>
-//    {
-//        val rules = ArrayList<Rule>()
-//
-//        study.id?.let { id ->
-//            val db = dao.writableDatabase
-//            val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_STUDY_ID} = '${id}'"
-//            val cursor = db.rawQuery(query, null)
-//
-//            while (cursor.moveToNext())
-//            {
-//                val rule = buildRule( cursor )
-//                rule?.let{rule->
-//                    rules.add( rule)
-//                }
-//            }
-//
-//            cursor.close()
-//            db.close()
-//        }
-//
-//        return rules
-//    }
-
-    //--------------------------------------------------------------------------
     fun deleteRule( rule: Rule )
     {
         val whereClause = "${DAO.COLUMN_ID} = ?"

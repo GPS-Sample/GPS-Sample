@@ -273,7 +273,6 @@
     <string name="simple_random_sampling_label">"Total Sample Size Across All Clusters"</string>
     <string name="cluster_sampling_label">"Sample Size Per Cluster"</string>
     <string name="show_enumeration_info">"Show Enumeration Info"</string>
-    <string name="please_enter_a_name">"Please enter a name for this field."</string>
     <string name="please_enter_a_subaddress">"Please enter a unique sub-address."</string>
     <string name="please_select_team_boundary">"Please select the team boundary."</string>
     <string name="enumeration_areas">"Enumeration Areas"</string>
@@ -299,7 +298,9 @@
     <string name="poor">"POOR"</string>
     <string name="unknown">UNKNOWN</string>
     <string name="legend">Legend</string>
-    <string name="select_date_type">"Please select the Date type"</string>
+    <string name="select_date_type">Please select the Date type</string>
+    <string name="contains">Contains</string>
+    <string name="please_enter_a_name">"Please enter a name"</string>
 
 
     <string-array name="forgot_pin_questions">

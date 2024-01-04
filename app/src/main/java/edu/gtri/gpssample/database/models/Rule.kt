@@ -17,17 +17,18 @@ data class Rule(
     var name: String,
     var value: String,
     var operator : Operator?,
-    var filterOperator: FilterOperator?
+    var filterOperator: FilterOperator?,
+    var fieldDataOptions : ArrayList<FieldDataOption>
     )
 {
     constructor( field: Field, name: String, value: String, operator: Operator)
-            : this(null, UUID.randomUUID().toString(), field, name, value, operator, null)
+            : this(null, UUID.randomUUID().toString(), field, name, value, operator, null, ArrayList<FieldDataOption>())
 
     constructor( field: Field, name: String, value: String)
-            : this(null, UUID.randomUUID().toString(), field, name, value, null, null)
+            : this(null, UUID.randomUUID().toString(), field, name, value, null, null, ArrayList<FieldDataOption>())
 
     constructor(id : Int?, field: Field?, name: String, value: String, operator: Operator, filterOperator: FilterOperator?)
-            : this(id, UUID.randomUUID().toString(), field, name, value, operator, filterOperator)
+            : this(id, UUID.randomUUID().toString(), field, name, value, operator, filterOperator, ArrayList<FieldDataOption>())
 
     fun pack() : String
     {
