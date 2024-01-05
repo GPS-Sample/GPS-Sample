@@ -22,16 +22,16 @@ class EnumerationItemDAO(private var dao: DAO)
             val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
-            enumerationItem.id?.let { id ->
-                Log.d( "xxx", "new enumerationItem id = ${id}")
-                enumerationItem.fieldDataList?.let { fieldDataList ->
-                    for (fieldData in fieldDataList)
-                    {
-                        DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
-                    }
-                }
-            } ?: return null
         }
+
+        enumerationItem.id?.let { id ->
+            enumerationItem.fieldDataList?.let { fieldDataList ->
+                for (fieldData in fieldDataList)
+                {
+                    DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
+                }
+            }
+        } ?: return null
 
         return enumerationItem
     }
