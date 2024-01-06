@@ -339,7 +339,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_LAT + " REAL" + "," +
                     COLUMN_LON + " REAL" +
                     ")")
-            val y = db.execSQL(createTableLatLon)
+            db.execSQL(createTableLatLon)
 
             val createTableConfigLatLon = ("CREATE TABLE " +
                     TABLE_CONFIG__LAT_LON + "(" +
@@ -677,41 +677,49 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             Log.d( "xxx", "enumerationItems: ${DAO.enumerationItemDAO.getEnumerationItems()}")
         }
 
-        fun deleteAll()
+        fun deleteAll( includingUserTable: Boolean = false )
         {
             _instance?.let {
                 val db = it.writableDatabase
+
+                if (includingUserTable)
+                {
+                    db.execSQL("DELETE FROM $TABLE_USER")
+                }
+
+                db.execSQL("DELETE FROM $TABLE_USER")
                 db.execSQL("DELETE FROM $TABLE_CONFIG")
+                db.execSQL("DELETE FROM $TABLE_ENUM_AREA")
                 db.execSQL("DELETE FROM $TABLE_STUDY")
-                db.execSQL("DELETE FROM $TABLE_CONFIG_STUDY")
                 db.execSQL("DELETE FROM $TABLE_STUDY_ENUM_AREA")
+                db.execSQL("DELETE FROM $TABLE_CONFIG_STUDY")
                 db.execSQL("DELETE FROM $TABLE_FIELD")
+                db.execSQL("DELETE FROM $TABLE_FIELD_OPTION")
+                db.execSQL("DELETE FROM $TABLE_FIELD__FIELD_OPTION")
                 db.execSQL("DELETE FROM $TABLE_RULE")
                 db.execSQL("DELETE FROM $TABLE_FILTER")
                 db.execSQL("DELETE FROM $TABLE_FILTEROPERATOR")
-                db.execSQL("DELETE FROM $TABLE_ENUM_AREA")
                 db.execSQL("DELETE FROM $TABLE_SAMPLE_AREA")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM")
-                db.execSQL("DELETE FROM $TABLE_FIELD_DATA")
-                db.execSQL("DELETE FROM $TABLE_FIELD_DATA_OPTION")
-                db.execSQL("DELETE FROM $TABLE_LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_LOCATION")
-                db.execSQL("DELETE FROM $TABLE_ENUMERATION_ITEM")
-                db.execSQL("DELETE FROM $TABLE_SAMPLE_AREA__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_CONFIG__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_ENUM_AREA__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_FIELD_OPTION")
-                db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
-                db.execSQL("DELETE FROM $TABLE_FIELD__FIELD_OPTION")
-                db.execSQL("DELETE FROM $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
-                db.execSQL("DELETE FROM $TABLE_RULE__FIELD_DATA_OPTION")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__ENUM_AREA")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__SAMPLE_AREA")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__ENUMERATION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__COLLECTION_TEAM")
+                db.execSQL("DELETE FROM $TABLE_ENUMERATION_ITEM")
+                db.execSQL("DELETE FROM $TABLE_FIELD_DATA")
+                db.execSQL("DELETE FROM $TABLE_FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $TABLE_RULE__FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $TABLE_LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_CONFIG__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_ENUM_AREA__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_SAMPLE_AREA__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM__LAT_LON")
+                db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
+                db.close()
             }
         }
 
@@ -742,6 +750,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 269
+        private const val DATABASE_VERSION = 270
     }
 }

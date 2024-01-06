@@ -132,6 +132,8 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
                 editor.putString( Keys.kUserName.toString(), name )
                 editor.commit()
 
+                DAO.deleteAll( true )
+
                 val user = User( name, pin1, role, question, answer, false )
                 user.id = DAO.userDAO.createUser( user )
 
