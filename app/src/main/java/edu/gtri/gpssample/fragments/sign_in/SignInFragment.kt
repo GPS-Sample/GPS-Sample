@@ -147,6 +147,8 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
                     activity!!.setTitle( "GPSSample - ${user.role}" )
 
+                    sharedViewModel.initializeConfigurations()
+
                     val bundle = Bundle()
                     bundle.putString(Keys.kRole.toString(), expectedRole.toString())
                     findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)

@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var udpBroadcastReceiverService: UDPBroadcastReceiverService
-    private lateinit var configurationViewModel : ConfigurationViewModel
     private lateinit var networkViewModel : NetworkViewModel
     lateinit var networkMonitorService: NetworkMonitorService
 
@@ -76,24 +75,19 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
     {
         super.onCreate(savedInstanceState)
 
-        Log.d( "xxx", "MainActivity.onCreate" )
-
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
-        configurationViewModel = viewModel
         val networkVm : NetworkViewModel by viewModels()
         networkViewModel = networkVm
 
         if (savedInstanceState == null)
         {
             DAO.createSharedInstance(applicationContext)
-            configurationViewModel.initializeConfigurations()
         }
         else
         {
             // TODO: Figure out how to save the ViewModel state in onSaveInstanceState restore the state here...
             DAO.createSharedInstance(applicationContext)
-            configurationViewModel.initializeConfigurations()
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

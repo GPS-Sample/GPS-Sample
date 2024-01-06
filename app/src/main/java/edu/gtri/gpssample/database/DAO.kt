@@ -687,7 +687,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     db.execSQL("DELETE FROM $TABLE_USER")
                 }
 
-                db.execSQL("DELETE FROM $TABLE_USER")
                 db.execSQL("DELETE FROM $TABLE_CONFIG")
                 db.execSQL("DELETE FROM $TABLE_ENUM_AREA")
                 db.execSQL("DELETE FROM $TABLE_STUDY")
