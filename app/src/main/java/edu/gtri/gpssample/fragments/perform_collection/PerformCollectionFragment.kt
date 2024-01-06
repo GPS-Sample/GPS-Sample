@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,6 +62,11 @@ class PerformCollectionFragment : Fragment(),
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
+    companion object
+    {
+        const val LaunchSurveyRequest = "LaunchSurveyRequest"
+    }
+
     private lateinit var user: User
     private lateinit var study: Study
     private lateinit var config: Config
@@ -90,6 +96,10 @@ class PerformCollectionFragment : Fragment(),
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+        setFragmentResultListener( LaunchSurveyRequest ) { key, bundle ->
+            SurveyLaunchNotificationDialog( activity!!, this )
+        }
 
         val vm : ConfigurationViewModel by activityViewModels()
         val networkVm : NetworkViewModel by activityViewModels()
@@ -574,6 +584,7 @@ class PerformCollectionFragment : Fragment(),
     {
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.toString(), false )
+        bundle.putBoolean( Keys.kCollectionMode.toString(), true )
         findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
     }
 
@@ -792,6 +803,7 @@ class PerformCollectionFragment : Fragment(),
         MapboxManager.cancelStylePackDownload()
         MapboxManager.cancelTilePackDownload()
     }
+
 
     override fun onDestroyView()
     {

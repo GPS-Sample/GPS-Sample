@@ -321,7 +321,6 @@
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="10dp"
                 android:insetTop="0dp"
@@ -329,12 +328,24 @@
                 android:text="@string/cancel" />
 
             <Button
+                android:visibility="gone"
+                android:id="@+id/launch_survey_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Launch Survey" />
+
+            <Button
                 android:id="@+id/save_button"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="20dp"
                 android:insetTop="0dp"
