@@ -22,23 +22,21 @@ class FieldDataDAO(private var dao: DAO)
         if (exists( fieldData ))
         {
             updateFieldData( fieldData )
-            Log.d( "xxx", "update fieldData id = ${fieldData.id!!}")
         }
         else
         {
             fieldData.id = null
             val values = ContentValues()
             putFieldData( fieldData, values, enumerationItem )
-
             fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
-            fieldData.id?.let { id ->
-                Log.d( "xxx", "new fieldData id = ${id}")
-                for (fieldDataOption in fieldData.fieldDataOptions)
-                {
-                    DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
-                }
-            } ?: return null
         }
+
+        fieldData.id?.let { id ->
+            for (fieldDataOption in fieldData.fieldDataOptions)
+            {
+                DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+            }
+        } ?: return null
 
         return fieldData
     }
@@ -126,7 +124,7 @@ class FieldDataDAO(private var dao: DAO)
     fun getFieldData( uuid: String ): FieldData?
     {
         var fieldData: FieldData? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ID}='$uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_UUID}='$uuid'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)

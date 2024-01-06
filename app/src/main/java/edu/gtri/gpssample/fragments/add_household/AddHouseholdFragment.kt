@@ -13,23 +13,23 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.finishAffinity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.EnumerationState
-import edu.gtri.gpssample.constants.FieldType
-import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.ImageDialog
+import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -78,6 +78,13 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
             this.editMode = editMode
+        }
+
+        arguments?.getBoolean(Keys.kCollectionMode.toString())?.let { collectionMode ->
+            if (collectionMode)
+            {
+                binding.launchSurveyButton.visibility = View.VISIBLE
+            }
         }
 
         sharedViewModel.currentConfiguration?.value?.let {
@@ -245,6 +252,11 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.cancelButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.launchSurveyButton.setOnClickListener {
+            setFragmentResult(PerformCollectionFragment.LaunchSurveyRequest, Bundle())
             findNavController().popBackStack()
         }
 

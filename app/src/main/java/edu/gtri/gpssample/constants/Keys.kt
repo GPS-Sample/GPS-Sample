@@ -14,5 +14,6 @@ enum class Keys {
     kConfigName,
     kEnumArea_id,
     kSamplingMethod,
+    kCollectionMode,
     kGpsAccuracyIsGood
 }

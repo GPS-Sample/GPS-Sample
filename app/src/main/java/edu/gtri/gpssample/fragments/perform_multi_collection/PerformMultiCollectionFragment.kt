@@ -121,6 +121,7 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     {
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.toString(), false )
+        bundle.putBoolean( Keys.kCollectionMode.toString(), true )
         findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
     }
 

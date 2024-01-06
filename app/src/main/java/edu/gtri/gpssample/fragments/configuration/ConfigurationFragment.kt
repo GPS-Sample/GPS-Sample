@@ -268,6 +268,7 @@ class ConfigurationFragment : Fragment(),
                 {
                     kDeleteTag -> {
                         sharedViewModel.deleteConfig(config)
+                        DAO.deleteAll()
                         findNavController().popBackStack()
                     }
 
