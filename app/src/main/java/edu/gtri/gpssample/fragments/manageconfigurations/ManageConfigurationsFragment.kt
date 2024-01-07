@@ -42,6 +42,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
+    private var configurations = ArrayList<Config>()
 
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
@@ -81,9 +82,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.initializeConfigurations()
+        configurations = DAO.configDAO.getConfigs()
 
-        manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Config>())
+        manageConfigurationsAdapter = ManageConfigurationsAdapter(configurations)
         manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -108,8 +109,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         binding.importButton.setOnClickListener {
 
-            if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())
-                && (sharedViewModel.configurations.size > 0))
+            if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()) && (configurations.size > 0))
             {
                 ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
                     resources.getString(R.string.delete_configuration),
@@ -128,9 +128,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageConfigurationsFragment.value.toString() + ": " + this.javaClass.simpleName
-
-        // get this from the view controller
-        manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -176,9 +173,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     fun navigateToEnumeration()
     {
-        if (sharedViewModel.configurations.size > 0)
+        if (configurations.size > 0)
         {
-            val config = sharedViewModel.configurations[0]
+            val config = configurations[0]
             sharedViewModel.setCurrentConfig( config )
 
             // find the selected Enum Area
@@ -221,9 +218,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     fun navigateToCollection() : Boolean
     {
-        if(sharedViewModel.configurations.size > 0)
+        if(configurations.size > 0)
         {
-            val config = sharedViewModel.configurations[0]
+            val config = configurations[0]
             sharedViewModel.setCurrentConfig( config )
 
             // find the selected Enum Area
@@ -286,9 +283,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
 
                 sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
-
-//                findNavController().navigate(R.id.action_navigate_to_NetworkConnectionDialogFragment)
-                // need to pass this into the network view model
             }
         }
 
@@ -308,8 +302,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         if (tag == kDeleteTag)
         {
             DAO.deleteAll()
-            sharedViewModel.configurations.clear()
-            manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+            configurations.clear()
+            manageConfigurationsAdapter.updateConfigurations(configurations)
 
             ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
                 resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code),
@@ -346,9 +340,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
                             DAO.configDAO.createOrUpdateConfig( config )
 
-                            sharedViewModel.initializeConfigurations()
                             sharedViewModel.setCurrentConfig( config )
-                            manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
+                            configurations = DAO.configDAO.getConfigs()
+                            manageConfigurationsAdapter.updateConfigurations( configurations )
 
                             didReceiveConfiguration(true )
                         } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
@@ -374,9 +368,9 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             DAO.instance().writableDatabase.endTransaction()
 
             savedConfig?.let { savedConfig ->
-                sharedViewModel.initializeConfigurations()
+                configurations = DAO.configDAO.getConfigs()
                 sharedViewModel.setCurrentConfig( savedConfig )
-                manageConfigurationsAdapter.updateConfigurations( sharedViewModel.configurations )
+                manageConfigurationsAdapter.updateConfigurations( configurations )
             }
         }
     }
@@ -461,7 +455,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     {
         if (user.role == Role.Enumerator.toString())
         {
-            if(sharedViewModel.configurations.size > 0)
+            if(configurations.size > 0)
             {
                 sharedViewModel.currentConfiguration?.value?.let{ config->
 
@@ -532,7 +526,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         }
         else if (user.role == Role.DataCollector.toString())
         {
-            if(sharedViewModel.configurations.size > 0)
+            if(configurations.size > 0)
             {
                 sharedViewModel.currentConfiguration?.value?.let{ config->
 
