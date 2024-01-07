@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,10 +27,15 @@ import edu.gtri.gpssample.databinding.FragmentAddMultiHouseholdBinding
 import edu.gtri.gpssample.databinding.FragmentPerformMultiCollectionBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
+import edu.gtri.gpssample.dialogs.SurveyLaunchNotificationDialog
+import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.ArrayList
 
-class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurveyDialogDelegate, AdditionalInfoDialog.AdditionalInfoDialogDelegate
+class PerformMultiCollectionFragment : Fragment(),
+    LaunchSurveyDialog.LaunchSurveyDialogDelegate,
+    AdditionalInfoDialog.AdditionalInfoDialogDelegate,
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var location: Location
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -42,6 +48,10 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+        setFragmentResultListener(PerformCollectionFragment.LaunchSurveyRequest) { key, bundle ->
+            SurveyLaunchNotificationDialog( activity!!, this )
+        }
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
@@ -162,6 +172,16 @@ class PerformMultiCollectionFragment : Fragment(), LaunchSurveyDialog.LaunchSurv
 
                 DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun shouldLaunchODK()
+    {
+        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.type = "vnd.android.cursor.dir/vnd.odk.form"
+            odk_result.launch(intent)
         }
     }
 
