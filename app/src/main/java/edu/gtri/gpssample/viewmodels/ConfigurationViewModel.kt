@@ -21,7 +21,6 @@ import edu.gtri.gpssample.viewmodels.models.*
 class ConfigurationViewModel : ViewModel()
 {
     private val unavailable = "Unavailable"
-    private var _configurations : ArrayList<Config> = ArrayList()
 
     private var _distanceFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _timeFormatPosition : MutableLiveData<Int> = MutableLiveData(0)
@@ -48,9 +47,6 @@ class ConfigurationViewModel : ViewModel()
     // Exposed LiveData each screen being controlled by the view model
     val currentConfiguration : LiveData<Config>?
         get() = _currentConfiguration
-
-    val configurations : ArrayList<Config>
-        get() = _configurations
 
     val distanceFormats : Array<String>
         get() = DistanceFormatConverter.array
@@ -166,15 +162,6 @@ class ConfigurationViewModel : ViewModel()
     }
 
     // Configuration
-    fun initializeConfigurations()
-    {
-        configurations.clear()
-        val dbConfigs = DAO.configDAO.getConfigs()
-        for(config in dbConfigs)
-        {
-            configurations.add(config)
-        }
-    }
     fun createNewConfiguration()
     {
         val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 0, false )
@@ -184,23 +171,15 @@ class ConfigurationViewModel : ViewModel()
 
     fun saveNewConfiguration()
     {
-        _currentConfiguration?.value?.let{configuration ->
-            configurations.add(configuration)
-
-            // write to database
+        _currentConfiguration?.value?.let{ configuration ->
             DAO.configDAO.createOrUpdateConfig(configuration)
         }
     }
 
     fun updateConfiguration()
     {
-        _currentConfiguration?.value?.let{configuration ->
-            // write to database
+        _currentConfiguration?.value?.let{ configuration ->
             DAO.configDAO.createOrUpdateConfig(configuration)
-            if(!configurations.contains(configuration))
-            {
-                configurations.add(configuration)
-            }
         }
     }
 
@@ -212,7 +191,6 @@ class ConfigurationViewModel : ViewModel()
     fun deleteConfig(config : Config)
     {
         DAO.configDAO.deleteConfig( config )
-        configurations.remove(config)
     }
 
     // Study

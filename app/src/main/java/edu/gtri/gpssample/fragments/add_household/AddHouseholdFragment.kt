@@ -394,8 +394,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
-        sharedViewModel.initializeConfigurations()
-
         DAO.configDAO.getConfig( config.id!! )?.let {
             sharedViewModel.setCurrentConfig( it )
         }

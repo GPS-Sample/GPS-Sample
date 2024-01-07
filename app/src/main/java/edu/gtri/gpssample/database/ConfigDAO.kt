@@ -139,7 +139,7 @@ class ConfigDAO(private var dao: DAO)
     }
 
     //--------------------------------------------------------------------------
-    fun getConfigs(): List<Config>
+    fun getConfigs(): ArrayList<Config>
     {
         val configs = ArrayList<Config>()
         val query = "SELECT * FROM ${DAO.TABLE_CONFIG}"

@@ -609,8 +609,6 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
-                sharedViewModel.initializeConfigurations()
-
                 DAO.configDAO.getConfig( config.id!! )?.let {
                     sharedViewModel.setCurrentConfig( it )
                 }
