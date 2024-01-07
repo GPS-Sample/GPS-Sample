@@ -37,18 +37,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
     private lateinit var expectedRole: String
     private var _binding: FragmentSignInBinding? = null
     private val binding get() = _binding!!
-    private lateinit var sharedViewModel: ConfigurationViewModel
-    private lateinit var samplingViewModel: SamplingViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-
-        val vm : ConfigurationViewModel by activityViewModels()
-        val samplingVm : SamplingViewModel by activityViewModels()
-
-        sharedViewModel = vm
-        samplingViewModel = samplingVm
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -146,8 +138,6 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                     binding.pinEditText.setText("")
 
                     activity!!.setTitle( "GPSSample - ${user.role}" )
-
-                    sharedViewModel.initializeConfigurations()
 
                     val bundle = Bundle()
                     bundle.putString(Keys.kRole.toString(), expectedRole.toString())

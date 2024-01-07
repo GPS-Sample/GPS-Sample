@@ -70,21 +70,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_main, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        when (item.itemId)
-        {
-            R.id.cache_map_tiles ->
-                findNavController().navigate(R.id.action_navigate_to_MapFragment)
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentManageConfigurationsBinding.inflate(inflater, container, false)
@@ -95,6 +80,8 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        sharedViewModel.initializeConfigurations()
 
         manageConfigurationsAdapter = ManageConfigurationsAdapter(listOf<Config>())
         manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
@@ -144,6 +131,22 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
         // get this from the view controller
         manageConfigurationsAdapter.updateConfigurations(sharedViewModel.configurations)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.cache_map_tiles ->
+                findNavController().navigate(R.id.action_navigate_to_MapFragment)
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun didSelectConfig( config: Config )
