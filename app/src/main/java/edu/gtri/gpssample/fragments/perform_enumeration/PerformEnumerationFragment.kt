@@ -133,7 +133,6 @@ class PerformEnumerationFragment : Fragment(),
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
-            Log.d( "xxx", enumArea.name )
         }
 
         sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.let {
@@ -714,7 +713,6 @@ class PerformEnumerationFragment : Fragment(),
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
                             val packedConfig = config.pack()
-                            Log.d( "xxx", packedConfig )
 
                             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
                             val file = File(root, "Configuration.${Date().time}.json")
@@ -729,7 +727,6 @@ class PerformEnumerationFragment : Fragment(),
                         Role.Enumerator.toString() ->
                         {
                             val packedEnumArea = enumArea.pack()
-                            Log.d( "xxx", packedEnumArea )
 
                             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
                             val file = File(root, "EnumArea.${Date().time}.json")

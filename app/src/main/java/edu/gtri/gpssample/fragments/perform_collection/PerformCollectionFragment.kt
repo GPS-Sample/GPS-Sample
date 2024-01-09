@@ -477,13 +477,10 @@ class PerformCollectionFragment : Fragment(),
             Role.Enumerator.toString(),
             Role.DataCollector.toString() ->
             {
-                name = "SampleArea"
-//                payload = sampleArea.pack()
-                Toast.makeText(activity!!.applicationContext, "TODO! Finish this!", Toast.LENGTH_SHORT).show()
+                name = "EnumArea"
+                payload = enumArea.pack()
             }
         }
-
-        Log.d( "xxx", payload )
 
         val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
         val file = File(root, "${name}.${Date().time}.json")
@@ -612,9 +609,6 @@ class PerformCollectionFragment : Fragment(),
                 DAO.configDAO.getConfig( config.id!! )?.let {
                     sharedViewModel.setCurrentConfig( it )
                 }
-
-                Log.d( "xxx", enumArea.id.toString())
-                Log.d( "xxx", collectionTeam.id.toString())
 
                 DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
                     enumArea = it
