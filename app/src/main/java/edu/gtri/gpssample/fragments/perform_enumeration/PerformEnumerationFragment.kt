@@ -729,7 +729,7 @@ class PerformEnumerationFragment : Fragment(),
                             val packedEnumArea = enumArea.pack()
 
                             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                            val file = File(root, "EnumArea.${Date().time}.json")
+                            val file = File(root, "Enumeration.${Date().time}.json")
                             val writer = FileWriter(file)
                             writer.append(packedEnumArea)
                             writer.flush()

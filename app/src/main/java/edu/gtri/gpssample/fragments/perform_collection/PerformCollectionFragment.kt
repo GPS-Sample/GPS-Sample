@@ -465,20 +465,23 @@ class PerformCollectionFragment : Fragment(),
     {
         var payload: String = ""
         var name: String = ""
+        var message: String = ""
 
         when(user.role) {
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
-                name = "Config"
+                name = "Configuration"
                 payload = config.pack()
+                resources.getString(R.string.config_saved_doc)
             }
 
             Role.Enumerator.toString(),
             Role.DataCollector.toString() ->
             {
-                name = "EnumArea"
+                name = "Collection"
                 payload = enumArea.pack()
+                resources.getString(R.string.collection_saved_doc)
             }
         }
 
@@ -489,7 +492,7 @@ class PerformCollectionFragment : Fragment(),
         writer.flush()
         writer.close()
 
-        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity!!.applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
