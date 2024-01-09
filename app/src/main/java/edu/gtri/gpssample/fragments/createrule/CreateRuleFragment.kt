@@ -292,7 +292,7 @@ class CreateRuleFragment : Fragment(),
         binding.saveButton.setOnClickListener {
             if (rule.name.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.please_enter_a_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

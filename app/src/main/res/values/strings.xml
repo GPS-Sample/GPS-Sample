@@ -300,7 +300,6 @@
     <string name="legend">Legend</string>
     <string name="select_date_type">Please select the Date type</string>
     <string name="contains">Contains</string>
-    <string name="please_enter_a_name">"Please enter a name"</string>
     <string name="collection_saved_doc">"Collection has been saved to the Documents directory."</string>
     <string name="invalid_operator">"The selected operator is not valid for the selected rule"</string>
 

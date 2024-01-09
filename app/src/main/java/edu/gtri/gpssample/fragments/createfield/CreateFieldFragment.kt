@@ -239,7 +239,7 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         binding.addAnotherButton.setOnClickListener {
             if (binding.fieldNameEditText.text.isEmpty())
             {
-                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.please_enter_a_name), Toast.LENGTH_LONG).show()
+                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.enter_name), Toast.LENGTH_LONG).show()
             }
             else
             {
