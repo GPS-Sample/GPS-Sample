@@ -473,7 +473,7 @@ class PerformCollectionFragment : Fragment(),
             {
                 name = "Configuration"
                 payload = config.pack()
-                resources.getString(R.string.config_saved_doc)
+                message = resources.getString(R.string.config_saved_doc)
             }
 
             Role.Enumerator.toString(),
@@ -481,7 +481,7 @@ class PerformCollectionFragment : Fragment(),
             {
                 name = "Collection"
                 payload = enumArea.pack()
-                resources.getString(R.string.collection_saved_doc)
+                message = resources.getString(R.string.collection_saved_doc)
             }
         }
 
