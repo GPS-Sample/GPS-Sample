@@ -278,6 +278,30 @@
     <string name="please_enter_a_name">"Veuillez saisir un nom pour ce champ."</string>
     <string name="please_enter_a_subaddress">"Veuillez saisir une sous-adresse unique."</string>
     <string name="please_select_team_boundary">"seleccione el límite del equipo.""</string>
+    <string name="enum_area_name_property">"Saisir la valeur de la propriété Nom de la zone d'énumération"</string>
+    <string name="downloading_map_tiles">"Téléchargement des tuiles de carte..."</string>
+    <string name="style_pack_download_failed">"Échec du téléchargement du Map Style Pack"</string>
+    <string name="tile_pack_download_failed">"Le téléchargement du Map Tile Pack a échoué"</string>
+    <string name="download_map_tiles_now">"Voulez-vous télécharger les tuiles de carte maintenant ?"</string>
+    <string name="delete_map_tile_region">"Êtes-vous sûr de vouloir supprimer cette région de tuiles de carte ?"</string>
+    <string name="import_enumeration_area">"Importez une zone de dénombrement"</string>
+    <string name="create_enumeration_area">"Créez une zone de dénombrement"</string>
+    <string name="add_household">"Ajoutez un ménage"</string>
+    <string name="define_map_tile_cache_region">"Définir la région de cache des tuiles de la carte"</string>
+    <string name="download_map_tiles">"Téléchargez les tuiles de la carte"</string>
+    <string name="center_on_location">"Centrez sur l'emplacement"</string>
+    <string name="less_than_equal">"Inférieur ou égal"</string>
+    <string name="gps_accuracy_error">"La précision du GPS est inférieure à la précision requise"</string>
+    <string name="gps_location_error">"Vous êtes actuellement trop loin de cet emplacement"</string>
+    <string name="accuracy">"Précision :"</string>
+    <string name="good">"BON"</string>
+    <string name="poor">"MAUVAIS"</string>
+    <string name="unknown">"INCONNU"</string>
+    <string name="legend">"Légende"</string>
+    <string name="select_date_type">"Veuillez sélectionner le type de date"</string>
+    <string name="contains">"Contient"</string>
+    <string name="collection_saved_doc">"La collection a été enregistrée dans le répertoire Documents"</string>
+    <string name="invalid_operator">"L'opérateur sélectionné n'est pas valide pour la règle sélectionnée"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

@@ -13,6 +13,8 @@ enum class Keys {
     kStudyName,
     kConfigName,
     kEnumArea_id,
+    kIsOnBoarding,
+    kTermsAccepted,
     kSamplingMethod,
     kCollectionMode,
     kGpsAccuracyIsGood

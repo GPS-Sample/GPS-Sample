@@ -80,6 +80,7 @@
     <string name="define_enumeration_area">"Define Enumeration Area"</string>
     <string name="define_sampling_method">"Define Sampling Method"</string>
     <string name="studies">"Studies"</string>
+    <string name="enumeration_area">"Enumeration Areas"</string>
     <string name="barcode_result">"Barcode detected"</string>
     <string name="error_scanner_cancelled">"Code scanner is cancelled."</string>
     <string name="error_camera_permission_not_granted">"Camera permission is not granted."</string>
@@ -241,6 +242,7 @@
     <string name="status">"Status"</string>
     <string name="description">"Description"</string>
     <string name="add_image">"Add Image"</string>
+    <string name="enumeration_areas">"Enumeration Areas"</string>
     <string name="enter_team_name">"Enter Team Name"</string>
     <string name="assign_households">"Assign Households"</string>
     <string name="sampling_type">"Sampling Type"</string>
@@ -273,35 +275,37 @@
     <string name="simple_random_sampling_label">"Total Sample Size Across All Clusters"</string>
     <string name="cluster_sampling_label">"Sample Size Per Cluster"</string>
     <string name="show_enumeration_info">"Show Enumeration Info"</string>
+    <string name="please_enter_a_name">"Please enter a name for this field."</string>
     <string name="please_enter_a_subaddress">"Please enter a unique sub-address."</string>
     <string name="please_select_team_boundary">"Please select the team boundary."</string>
-    <string name="enumeration_areas">"Enumeration Areas"</string>
-    <string name="enumeration_area">"Enumeration Area"</string>
-
     <string name="enum_area_name_property">"Enter the value of the Enumeration Area Name property"</string>
-    <string name="downloading_map_tiles">Downloading Map Tiles...</string>
-    <string name="style_pack_download_failed">Map Style Pack Download Failed</string>
-    <string name="tile_pack_download_failed">Map Tile Pack Download Failed</string>
-    <string name="download_map_tiles_now">Would you like to download map tiles now?</string>
-    <string name="delete_map_tile_region">Are you sure you want to delete this Map Tile Region?</string>
-    <string name="import_enumeration_area">Import Enumeration Area</string>
-    <string name="create_enumeration_area">Create Enumeration Area</string>
-    <string name="add_household">Add Household</string>
-    <string name="define_map_tile_cache_region">Define map tile cache region</string>
-    <string name="download_map_tiles">Download map tiles</string>
-    <string name="center_on_location">Center on location</string>
+    <string name="downloading_map_tiles">"Downloading Map Tiles..."</string>
+    <string name="style_pack_download_failed">"Map Style Pack Download Failed"</string>
+    <string name="tile_pack_download_failed">"Map Tile Pack Download Failed"</string>
+    <string name="download_map_tiles_now">"Would you like to download map tiles now?"</string>
+    <string name="delete_map_tile_region">"Are you sure you want to delete this Map Tile Region?"</string>
+    <string name="import_enumeration_area">"Import Enumeration Area"</string>
+    <string name="create_enumeration_area">"Create Enumeration Area"</string>
+    <string name="add_household">"Add Household"</string>
+    <string name="define_map_tile_cache_region">"Define map tile cache region"</string>
+    <string name="download_map_tiles">"Download map tiles"</string>
+    <string name="center_on_location">"Center on location"</string>
     <string name="less_than_equal">"Less Than Or Equal"</string>
     <string name="gps_accuracy_error">"GPS accuracy is less than the required accuracy"</string>
     <string name="gps_location_error">"You are currently too far away from this location"</string>
-    <string name="accuracy">"Accuracy : "</string>
+    <string name="accuracy">"Accuracy :"</string>
     <string name="good">"GOOD"</string>
     <string name="poor">"POOR"</string>
-    <string name="unknown">UNKNOWN</string>
-    <string name="legend">Legend</string>
-    <string name="select_date_type">Please select the Date type</string>
-    <string name="contains">Contains</string>
-    <string name="collection_saved_doc">"Collection has been saved to the Documents directory."</string>
+    <string name="unknown">"UNKNOWN"</string>
+    <string name="legend">"Legend"</string>
+    <string name="select_date_type">"Please select the Date type"</string>
+    <string name="contains">"Contains"</string>
+    <string name="collection_saved_doc">"Collection has been saved to the Documents directory"</string>
     <string name="invalid_operator">"The selected operator is not valid for the selected rule"</string>
+    <string name="about_gpssample">About GPSSample</string>
+    <string name="privacy_statement">Privacy Statement</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="show_map">Show Map</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
@@ -313,7 +317,7 @@
         <item>"Other Question"</item>
     </string-array>
     <string-array name="distance_formats">
-        <item>"Meters / KiloMeters"</item>
+        <item>"Meters / Kilometers"</item>
         <item>"Feet / Miles"</item>
     </string-array>
     <string-array name="time_formats">

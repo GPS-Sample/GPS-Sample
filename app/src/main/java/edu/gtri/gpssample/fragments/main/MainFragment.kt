@@ -55,6 +55,17 @@ class MainFragment : Fragment()
         binding.versionTextView.text = BuildConfig.VERSION_NAME
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+
+        val termsAccepted = sharedPreferences.getBoolean( Keys.kTermsAccepted.toString(), false )
+
+        if (!termsAccepted)
+        {
+            val bundle = Bundle()
+            bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
+            findNavController().navigate(R.id.action_navigate_to_AboutFragment,bundle)
+            return
+        }
+
         val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)
 
         userName?.let {
