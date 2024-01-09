@@ -303,6 +303,11 @@
     <string name="collection_saved_doc">"Collection has been saved to the Documents directory."</string>
     <string name="invalid_operator">"The selected operator is not valid for the selected rule"</string>
 
+    <string name="about_gpssample">About GPSSample</string>
+    <string name="privacy_statement">Privacy Statement</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="show_map">Show Map</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

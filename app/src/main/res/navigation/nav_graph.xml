@@ -19,6 +19,10 @@
         <action
             android:id="@+id/action_navigate_to_SignInFragment"
             app:destination="@id/SignInFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_AboutFragment"
+            app:destination="@id/AboutFragment"/>
     </fragment>
 
     <!--SignUpFragment-->
@@ -87,6 +91,19 @@
         <action
             android:id="@+id/action_navigate_to_MapFragment"
             app:destination="@id/MapFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_AboutFragment"
+            app:destination="@id/AboutFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_TermsFragment"
+            app:destination="@id/TermsFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_PrivacyFragment"
+            app:destination="@id/PrivacyFragment"/>
+
     </fragment>
 
     <!--ConfigurationFragment-->
@@ -413,6 +430,36 @@
         android:id="@+id/MapFragment"
         android:name="edu.gtri.gpssample.fragments.map.MapFragment"
         tools:layout="@layout/fragment_map">
+    </fragment>
+
+    <fragment
+        android:id="@+id/AboutFragment"
+        android:name="edu.gtri.gpssample.fragments.about_fragment.AboutFragment"
+        tools:layout="@layout/fragment_about">
+
+        <action
+            android:id="@+id/action_navigate_to_TermsFragment"
+            app:destination="@id/TermsFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/TermsFragment"
+        android:name="edu.gtri.gpssample.fragments.terms_fragment.TermsFragment"
+        tools:layout="@layout/fragment_terms">
+
+        <action
+            android:id="@+id/action_navigate_to_PrivacyFragment"
+            app:destination="@id/PrivacyFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/PrivacyFragment"
+        android:name="edu.gtri.gpssample.fragments.privacy_fragment.PrivacyFragment"
+        tools:layout="@layout/fragment_about">
+
+        <action
+            android:id="@+id/action_navigate_to_MainFragment"
+            app:popUpTo="@id/MainFragment"/>
     </fragment>
 
     <dialog
