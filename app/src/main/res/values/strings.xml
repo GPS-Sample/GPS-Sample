@@ -302,6 +302,7 @@
     <string name="contains">Contains</string>
     <string name="please_enter_a_name">"Please enter a name"</string>
     <string name="collection_saved_doc">"Collection has been saved to the Documents directory."</string>
+    <string name="invalid_operator">"The selected operator is not valid for the selected rule"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
