@@ -465,25 +465,25 @@ class PerformCollectionFragment : Fragment(),
     {
         var payload: String = ""
         var name: String = ""
+        var message: String = ""
 
         when(user.role) {
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
-                name = "Config"
+                name = "Configuration"
                 payload = config.pack()
+                message = resources.getString(R.string.config_saved_doc)
             }
 
             Role.Enumerator.toString(),
             Role.DataCollector.toString() ->
             {
-                name = "SampleArea"
-//                payload = sampleArea.pack()
-                Toast.makeText(activity!!.applicationContext, "TODO! Finish this!", Toast.LENGTH_SHORT).show()
+                name = "Collection"
+                payload = enumArea.pack()
+                message = resources.getString(R.string.collection_saved_doc)
             }
         }
-
-        Log.d( "xxx", payload )
 
         val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
         val file = File(root, "${name}.${Date().time}.json")
@@ -492,7 +492,7 @@ class PerformCollectionFragment : Fragment(),
         writer.flush()
         writer.close()
 
-        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity!!.applicationContext, message, Toast.LENGTH_SHORT).show()
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -612,9 +612,6 @@ class PerformCollectionFragment : Fragment(),
                 DAO.configDAO.getConfig( config.id!! )?.let {
                     sharedViewModel.setCurrentConfig( it )
                 }
-
-                Log.d( "xxx", enumArea.id.toString())
-                Log.d( "xxx", collectionTeam.id.toString())
 
                 DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
                     enumArea = it
