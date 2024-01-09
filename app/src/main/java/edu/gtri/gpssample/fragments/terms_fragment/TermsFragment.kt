@@ -45,7 +45,7 @@ class TermsFragment : Fragment()
             {
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
-                findNavController().navigate(R.id.action_navigate_to_PrivacyFragment)
+                findNavController().navigate(R.id.action_navigate_to_PrivacyFragment,bundle)
             }
             else
             {
