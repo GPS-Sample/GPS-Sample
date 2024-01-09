@@ -278,6 +278,30 @@
     <string name="please_enter_a_name">""Пожалуйста"</string>
     <string name="please_enter_a_subaddress">"Укажите уникальный субадрес."</string>
     <string name="please_select_team_boundary">"Seleccione o limite da equipa."</string>
+    <string name="enum_area_name_property">""Введите значение свойства ""Имя области перечисления"".""</string>
+    <string name="downloading_map_tiles">"Загрузка плиток карты..."</string>
+    <string name="style_pack_download_failed">"Загрузка пакета стилей карты не удалась"</string>
+    <string name="tile_pack_download_failed">"Загрузка пакета плиток карты не удалась"</string>
+    <string name="download_map_tiles_now">"Вы хотите загрузить плитки карты сейчас?"</string>
+    <string name="delete_map_tile_region">""Вы уверены"</string>
+    <string name="import_enumeration_area">"Импортировать область перечисления"</string>
+    <string name="create_enumeration_area">"Создать область переписи населения"</string>
+    <string name="add_household">"Добавить домохозяйство"</string>
+    <string name="define_map_tile_cache_region">"Определить регион кэширования картографических плиток"</string>
+    <string name="download_map_tiles">"Загрузить плитки карты"</string>
+    <string name="center_on_location">"Центрирование по местоположению"</string>
+    <string name="less_than_equal">"Меньше или равно"</string>
+    <string name="gps_accuracy_error">"Точность GPS меньше требуемой точности"</string>
+    <string name="gps_location_error">"Вы находитесь слишком далеко от этого места"</string>
+    <string name="accuracy">"Точность :"</string>
+    <string name="good">"ХОРОШО"</string>
+    <string name="poor">"ПЛОХО"</string>
+    <string name="unknown">"НЕИЗВЕСТНО"</string>
+    <string name="legend">"Легенда"</string>
+    <string name="select_date_type">""Пожалуйста"</string>
+    <string name="contains">"Содержит"</string>
+    <string name="collection_saved_doc">"Коллекция была сохранена в каталоге Документы"</string>
+    <string name="invalid_operator">"Выбранный оператор не действителен для выбранного правила"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

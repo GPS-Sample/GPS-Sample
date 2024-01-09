@@ -278,6 +278,30 @@
     <string name="please_enter_a_name">"Introduzca un nombre para este campo."</string>
     <string name="please_enter_a_subaddress">"Introduzca una subdirección única."</string>
     <string name="please_select_team_boundary">""Por favor"</string>
+    <string name="enum_area_name_property">"Introduzca el valor de la propiedad Nombre del área de enumeración"</string>
+    <string name="downloading_map_tiles">"Descargando Mosaicos de Mapa..."</string>
+    <string name="style_pack_download_failed">"Fallo en la descarga del paquete de estilos de mapa"</string>
+    <string name="tile_pack_download_failed">"Descarga fallida del paquete de mosaicos de mapa"</string>
+    <string name="download_map_tiles_now">"¿Desea descargar los mosaicos de mapa ahora?"</string>
+    <string name="delete_map_tile_region">"¿Está seguro de que desea eliminar esta Región de Baldosas de Mapa?"</string>
+    <string name="import_enumeration_area">"Importar área de enumeración"</string>
+    <string name="create_enumeration_area">"Crear área de enumeración"</string>
+    <string name="add_household">"Añadir hogar"</string>
+    <string name="define_map_tile_cache_region">"Definir región de caché de map tiles"</string>
+    <string name="download_map_tiles">"Descargar mosaicos de mapa"</string>
+    <string name="center_on_location">"Centrar en ubicación"</string>
+    <string name="less_than_equal">"Menor o igual que"</string>
+    <string name="gps_accuracy_error">"La precisión del GPS es inferior a la requerida"</string>
+    <string name="gps_location_error">"Se encuentra demasiado lejos de esta ubicación"</string>
+    <string name="accuracy">"Precisión :"</string>
+    <string name="good">"BUENA"</string>
+    <string name="poor">"POBRE"</string>
+    <string name="unknown">"DESCONOCIDO"</string>
+    <string name="legend">"Leyenda"</string>
+    <string name="select_date_type">"Seleccione el tipo de fecha"</string>
+    <string name="contains">"Contiene"</string>
+    <string name="collection_saved_doc">"La colección se ha guardado en el directorio Documentos"</string>
+    <string name="invalid_operator">"El operador seleccionado no es válido para la regla seleccionada"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

@@ -22,7 +22,7 @@ forgot_pin_questions,Last 4 digits of cell phone #,Últimas 4 cifras del número
 forgot_pin_questions,Favorite Food,Comida favorita,Votre aliment/nourriture favorit(e),Comida favorita,Любимая еда
 forgot_pin_questions,Birth Month,Mes de nacimiento,Mois de naissance,Mês de nascimento,Месяц рождения
 forgot_pin_questions,Other Question,Otra pregunta,Autre question,Outra pergunta,Другой вопрос
-distance_formats,Meters / KiloMeters,Metros / Kilómetros,Mètres / Kilomètres,Metros / Quilômetros ,Метры / километры
+distance_formats,Meters / Kilometers,Metros / Kilómetros,Mètres / Kilomètres,Metros / Quilômetros ,Метры / километры
 distance_formats,Feet / Miles,Pies / Millas,Pieds / Miles,Pés / Milhas,Футы / Мили
 time_formats,12 hour (AM/PM),12 horas (AM/PM),12 heures (AM/PM),12 horas (AM/PM),12 часов (AM/PM)
 time_formats,24 hour,24 horas,24 heures,24 horas,24 часа
@@ -304,3 +304,27 @@ show_enumeration_info,Show Enumeration Info,Mostrar información de enumeración
 please_enter_a_name,Please enter a name for this field.,Introduzca un nombre para este campo.,Veuillez saisir un nom pour ce champ.,Introduza um nome para este campo.,"Пожалуйста, введите имя для этого поля."
 please_enter_a_subaddress,Please enter a unique sub-address.,Introduzca una subdirección única.,Veuillez saisir une sous-adresse unique.,Introduza um sub-endereço único.,Укажите уникальный субадрес.
 please_select_team_boundary,Please select the team boundary.,"Por favor, seleccione el límite del equipo.",Veuillez sélectionner le périmètre de l'équipe.,Seleccione o limite da equipa.,"Пожалуйста, выберите границу группы."
+enum_area_name_property,Enter the value of the Enumeration Area Name property,Introduzca el valor de la propiedad Nombre del área de enumeración,Saisir la valeur de la propriété Nom de la zone d'énumération,Introduzir o valor da propriedade Nome da área de enumeração,"Введите значение свойства ""Имя области перечисления""."
+downloading_map_tiles,Downloading Map Tiles...,Descargando Mosaicos de Mapa...,Téléchargement des tuiles de carte...,Descarregamento de Map Tiles...,Загрузка плиток карты...
+style_pack_download_failed,Map Style Pack Download Failed,Fallo en la descarga del paquete de estilos de mapa,Échec du téléchargement du Map Style Pack,Falha no download do pacote de estilos de mapa,Загрузка пакета стилей карты не удалась
+tile_pack_download_failed,Map Tile Pack Download Failed,Descarga fallida del paquete de mosaicos de mapa,Le téléchargement du Map Tile Pack a échoué,Falha na transferência do pacote de mosaicos de mapas,Загрузка пакета плиток карты не удалась
+download_map_tiles_now,Would you like to download map tiles now?,¿Desea descargar los mosaicos de mapa ahora?,Voulez-vous télécharger les tuiles de carte maintenant ?,Gostaria de descarregar agora as peças do mapa?,Вы хотите загрузить плитки карты сейчас?
+delete_map_tile_region,Are you sure you want to delete this Map Tile Region?,¿Está seguro de que desea eliminar esta Región de Baldosas de Mapa?,Êtes-vous sûr de vouloir supprimer cette région de tuiles de carte ?,Tem a certeza de que pretende apagar esta Região de Map Tile?,"Вы уверены, что хотите удалить этот регион картографических плиток?"
+import_enumeration_area,Import Enumeration Area,Importar área de enumeración,Importez une zone de dénombrement,Importar área de enumeração,Импортировать область перечисления
+create_enumeration_area,Create Enumeration Area,Crear área de enumeración,Créez une zone de dénombrement,Criar área de enumeração,Создать область переписи населения
+add_household,Add Household,Añadir hogar,Ajoutez un ménage,Adicionar agregado familiar,Добавить домохозяйство
+define_map_tile_cache_region,Define map tile cache region,Definir región de caché de map tiles,Définir la région de cache des tuiles de la carte,Definir região de cache de mosaicos,Определить регион кэширования картографических плиток
+download_map_tiles,Download map tiles,Descargar mosaicos de mapa,Téléchargez les tuiles de la carte,Descarregar mosaicos do mapa,Загрузить плитки карты
+center_on_location,Center on location,Centrar en ubicación,Centrez sur l'emplacement,Centrar na localização,Центрирование по местоположению
+less_than_equal,Less Than Or Equal,Menor o igual que,Inférieur ou égal,Menor que ou igual,Меньше или равно
+gps_accuracy_error,GPS accuracy is less than the required accuracy,La precisión del GPS es inferior a la requerida,La précision du GPS est inférieure à la précision requise,A precisão do GPS é inferior à precisão exigida,Точность GPS меньше требуемой точности
+gps_location_error,You are currently too far away from this location,Se encuentra demasiado lejos de esta ubicación,Vous êtes actuellement trop loin de cet emplacement,Está atualmente demasiado longe desta localização,Вы находитесь слишком далеко от этого места
+accuracy,Accuracy : ,Precisión : ,Précision : ,Precisão : ,Точность : 
+good,GOOD,BUENA,BON,BOA,ХОРОШО
+poor,POOR,POBRE,MAUVAIS,RUIM,ПЛОХО
+unknown,UNKNOWN,DESCONOCIDO,INCONNU,DESCONHECIDA,НЕИЗВЕСТНО
+legend,Legend,Leyenda,Légende,Legenda,Легенда
+select_date_type,Please select the Date type,Seleccione el tipo de fecha,Veuillez sélectionner le type de date,Seleccione o tipo de data,"Пожалуйста, выберите тип даты"
+contains,Contains,Contiene,Contient,Contém,Содержит
+collection_saved_doc,Collection has been saved to the Documents directory,La colección se ha guardado en el directorio Documentos,La collection a été enregistrée dans le répertoire Documents,A coleção foi guardada no diretório Documentos,Коллекция была сохранена в каталоге Документы
+invalid_operator,The selected operator is not valid for the selected rule,El operador seleccionado no es válido para la regla seleccionada,L'opérateur sélectionné n'est pas valide pour la règle sélectionnée,O operador selecionado não é válido para a regra selecionada,Выбранный оператор не действителен для выбранного правила

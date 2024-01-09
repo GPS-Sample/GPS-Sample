@@ -278,6 +278,30 @@
     <string name="please_enter_a_name">"Introduza um nome para este campo."</string>
     <string name="please_enter_a_subaddress">"Introduza um sub-endereço único."</string>
     <string name="please_select_team_boundary">"Veuillez sélectionner le périmètre de l'équipe."</string>
+    <string name="enum_area_name_property">"Introduzir o valor da propriedade Nome da área de enumeração"</string>
+    <string name="downloading_map_tiles">"Descarregamento de Map Tiles..."</string>
+    <string name="style_pack_download_failed">"Falha no download do pacote de estilos de mapa"</string>
+    <string name="tile_pack_download_failed">"Falha na transferência do pacote de mosaicos de mapas"</string>
+    <string name="download_map_tiles_now">"Gostaria de descarregar agora as peças do mapa?"</string>
+    <string name="delete_map_tile_region">"Tem a certeza de que pretende apagar esta Região de Map Tile?"</string>
+    <string name="import_enumeration_area">"Importar área de enumeração"</string>
+    <string name="create_enumeration_area">"Criar área de enumeração"</string>
+    <string name="add_household">"Adicionar agregado familiar"</string>
+    <string name="define_map_tile_cache_region">"Definir região de cache de mosaicos"</string>
+    <string name="download_map_tiles">"Descarregar mosaicos do mapa"</string>
+    <string name="center_on_location">"Centrar na localização"</string>
+    <string name="less_than_equal">"Menor que ou igual"</string>
+    <string name="gps_accuracy_error">"A precisão do GPS é inferior à precisão exigida"</string>
+    <string name="gps_location_error">"Está atualmente demasiado longe desta localização"</string>
+    <string name="accuracy">"Precisão :"</string>
+    <string name="good">"BOA"</string>
+    <string name="poor">"RUIM"</string>
+    <string name="unknown">"DESCONHECIDA"</string>
+    <string name="legend">"Legenda"</string>
+    <string name="select_date_type">"Seleccione o tipo de data"</string>
+    <string name="contains">"Contém"</string>
+    <string name="collection_saved_doc">"A coleção foi guardada no diretório Documentos"</string>
+    <string name="invalid_operator">"O operador selecionado não é válido para a regra selecionada"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
