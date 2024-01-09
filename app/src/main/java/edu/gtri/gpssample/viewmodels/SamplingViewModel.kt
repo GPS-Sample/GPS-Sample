@@ -137,23 +137,104 @@ class SamplingViewModel : ViewModel()
     fun validateRule(rule : Rule, fieldData : FieldData) : Boolean
     {
         var validRule = false
+
         fieldData.field?.let{field->
             when (field.type) {
                 FieldType.Checkbox ->
                 {
                     validRule = true
-                    for (ruleOption in rule.fieldDataOptions)
-                    {
-                        for (fieldOption in fieldData.fieldDataOptions)
+
+                    rule.operator.let { operator ->
+                        when (operator)
                         {
-                            if (ruleOption.value && ruleOption.name == fieldOption.name)
+                            Operator.Contains ->
                             {
-                                if (validRule == true)
+                                for (ruleOption in rule.fieldDataOptions)
                                 {
-                                    validRule = fieldOption.value
+                                    for (fieldOption in fieldData.fieldDataOptions)
+                                    {
+                                        if (ruleOption.value && ruleOption.name == fieldOption.name)
+                                        {
+                                            if (validRule)
+                                            {
+                                                validRule = fieldOption.value
+                                            }
+                                            break
+                                        }
+                                    }
                                 }
-                                break
                             }
+
+                            Operator.Equal ->
+                            {
+                                var actualRuleName = ""
+                                var expectedRuleName = ""
+
+                                // find the single ruleOption that was checked
+                                for (ruleOption in rule.fieldDataOptions)
+                                {
+                                    if (ruleOption.value)
+                                    {
+                                        expectedRuleName = ruleOption.name
+                                        break
+                                    }
+                                }
+
+                                // find the field options that were checked
+                                // if more than one, then set not valid
+                                for (fieldOption in fieldData.fieldDataOptions)
+                                {
+                                    if (fieldOption.value)
+                                    {
+                                        if (actualRuleName.isEmpty())
+                                        {
+                                            actualRuleName = fieldOption.name
+                                        }
+                                        else
+                                        {
+                                            validRule = false
+                                        }
+                                    }
+                                }
+
+                                // if we found a single rule that was checked
+                                // verify that it's the expected rule
+                                if (validRule && actualRuleName != expectedRuleName)
+                                {
+                                    validRule = false
+                                }
+                            }
+
+                            Operator.NotEqual ->
+                            {
+                                var actualRuleName = ""
+                                var expectedRuleName = ""
+
+                                // find the single ruleOption that was checked
+                                for (ruleOption in rule.fieldDataOptions)
+                                {
+                                    if (ruleOption.value)
+                                    {
+                                        expectedRuleName = ruleOption.name
+                                        break
+                                    }
+                                }
+
+                                // find the field option that matches the expected
+                                // verify that the field option is Not checked
+                                for (fieldOption in fieldData.fieldDataOptions)
+                                {
+                                    if (fieldOption.name == expectedRuleName)
+                                    {
+                                        if (fieldOption.value)
+                                        {
+                                            validRule = false
+                                        }
+                                    }
+                                }
+                            }
+
+                            else -> {}
                         }
                     }
                 }
@@ -237,8 +318,40 @@ class SamplingViewModel : ViewModel()
                     }catch (ex : Exception){
                         Log.d("XXXXXX", ex.toString())
                     }
-
                 }
+
+                FieldType.Text ->
+                {
+                    rule.operator?.let { operator ->
+                        if (operator == Operator.Equal)
+                        {
+                            validRule = fieldData.textValue.equals(rule.value) ?: false
+                        }
+                        else if (operator == Operator.NotEqual)
+                        {
+                            validRule = !(fieldData.textValue.equals(rule.value) ?: false)
+                        }
+                        else if (operator == Operator.Contains)
+                        {
+                            validRule = rule.value.contains( fieldData.textValue)
+                        }
+                    }
+                }
+
+                FieldType.Dropdown ->
+                {
+                    rule.operator?.let { operator ->
+                        if (operator == Operator.Equal)
+                        {
+                            validRule = fieldData.textValue.equals(rule.value) ?: false
+                        }
+                        else if (operator == Operator.NotEqual)
+                        {
+                            validRule = !(fieldData.textValue.equals(rule.value) ?: false)
+                        }
+                    }
+                }
+
                 else -> {
                     validRule = fieldData.textValue?.equals(rule.value) ?: false
                 }

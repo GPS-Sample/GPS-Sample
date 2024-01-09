@@ -293,12 +293,64 @@ class CreateRuleFragment : Fragment(),
             if (rule.name.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, context?.getString(R.string.please_enter_a_name), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            else
-            {
-                sharedViewModel.addRule()
-                findNavController().popBackStack()
+
+            rule.operator?.let { operator ->
+                rule.field?.let { field ->
+                    when (field.type)
+                    {
+                        FieldType.Text,
+                        FieldType.Checkbox ->
+                        {
+                            when (operator)
+                            {
+                                Operator.LessThan,
+                                Operator.GreaterThan,
+                                Operator.LessThanOrEqual,
+                                Operator.GreaterThanOrEqual ->
+                                {
+                                    Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                                else -> {}
+                            }
+                        }
+
+                        FieldType.Number,
+                        FieldType.Date ->
+                        {
+                            if (operator == Operator.Contains)
+                            {
+                                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                return@setOnClickListener
+                            }
+                        }
+
+                        FieldType.Dropdown ->
+                        {
+                            when (operator)
+                            {
+                                Operator.Contains,
+                                Operator.LessThan,
+                                Operator.GreaterThan,
+                                Operator.LessThanOrEqual,
+                                Operator.GreaterThanOrEqual ->
+                                {
+                                    Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                    return@setOnClickListener
+                                }
+                                else -> {}
+                            }
+                        }
+
+                        else -> {}
+                    }
+                }
             }
+
+            sharedViewModel.addRule()
+            findNavController().popBackStack()
         }
     }
 
