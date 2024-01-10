@@ -306,6 +306,7 @@
     <string name="privacy_statement">Privacy Statement</string>
     <string name="terms_and_conditions">Terms and Conditions</string>
     <string name="show_map">Show Map</string>
+    <string name="number_of_residents">Number of Residents</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

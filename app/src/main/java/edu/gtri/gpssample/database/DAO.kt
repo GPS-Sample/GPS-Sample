@@ -61,7 +61,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_STUDY_NAME + " TEXT" + "," +
                     COLUMN_CONFIG_ID + " INTEGER" + "," +
                     COLUMN_COLLECTION_TEAM_ID + " INTEGER" + "," +
-                    COLUMN_STUDY_TOTAL_POPULATION_SIZE + " INTEGER" + "," +
 
                     // this needs to be a look up table
                     COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
@@ -108,6 +107,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_PII + " BOOLEAN" + "," +
                     COLUMN_FIELD_REQUIRED + " BOOLEAN" + "," +
                     COLUMN_FIELD_INTEGER_ONLY + " BOOLEAN" + "," +
+                    COLUMN_FIELD_NUMBER_OF_RESIDENTS + " BOOLEAN" + "," +
                     COLUMN_FIELD_DATE + " BOOLEAN" + "," +
                     COLUMN_FIELD_TIME + " BOOLEAN" + "," +
                     COLUMN_FIELD_OPTION_1 + " TEXT" + "," +
@@ -511,7 +511,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_STUDY = "study"
         const val COLUMN_STUDY_NAME = "study_name"
         const val COLUMN_STUDY_SAMPLING_METHOD_INDEX = "study_sampling_method_index"
-        const val COLUMN_STUDY_TOTAL_POPULATION_SIZE = "study_total_population_size"
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
 
@@ -524,6 +523,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_FIELD_PII = "field_pii"
         const val COLUMN_FIELD_REQUIRED = "field_required"
         const val COLUMN_FIELD_INTEGER_ONLY = "field_integer_only"
+        const val COLUMN_FIELD_NUMBER_OF_RESIDENTS = "field_number_of_residents"
         const val COLUMN_FIELD_DATE = "field_date"
         const val COLUMN_FIELD_TIME = "field_time"
         const val COLUMN_FIELD_OPTION_1 = "field_option_1"
@@ -749,6 +749,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 270
+        private const val DATABASE_VERSION = 272
     }
 }

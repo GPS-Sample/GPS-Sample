@@ -429,10 +429,8 @@ class SamplingViewModel : ViewModel()
                         var validFilterOperator = false
                         filter.rule?.let{rule ->
                             rule.field?.let{field ->
-                                Log.d("XXXXXXXX", "the field ${field.name}")
                                 for (fieldData in sampleItem.fieldDataList)
                                 {
-                                    Log.d("XXXXX", "field name ${field.name} == fielddata name ${fieldData.field?.name}")
                                     if( fieldData.field?.name.equals( field.name))
                                     {
                                         validRule = validateRule(rule, fieldData)
@@ -460,7 +458,6 @@ class SamplingViewModel : ViewModel()
                                         fo.rule?.let{nextRule ->
                                             // check next rule
                                             nextRule.field?.let{field ->
-                                                Log.d("XXXXXXXX", "the field ${field.name}")
                                                 for (fieldData in sampleItem.fieldDataList)
                                                 {
                                                     if( fieldData.field?.name.equals( field.name))
@@ -532,7 +529,7 @@ class SamplingViewModel : ViewModel()
                     }
                     SampleType.PercentTotal ->
                     {
-                        sampleSize = (study.sampleSize.toDouble() / 100.0 * study.totalPopulationSize.toDouble()).roundToInt()
+                        sampleSize = (study.sampleSize.toDouble() / 100.0 * totalPopulation().toDouble()).roundToInt()
                     }
                     else -> {}
                 }
@@ -556,6 +553,40 @@ class SamplingViewModel : ViewModel()
                 }
             }
         }
+    }
+
+    fun totalPopulation() : Int
+    {
+        var total = 0
+
+        currentConfig?.value?.let { config ->
+            for (enumArea in config.enumAreas)
+            {
+                for (location in enumArea.locations)
+                {
+                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                    {
+                        for (enumerationItem in location.enumerationItems)
+                        {
+                            if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                            {
+                                for (fieldData in enumerationItem.fieldDataList)
+                                {
+                                    fieldData.field?.let { field ->
+                                        if (field.type == FieldType.Number && field.numberOfResidents)
+                                        {
+                                            total += 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return total
     }
 
     fun performClusterSampling()

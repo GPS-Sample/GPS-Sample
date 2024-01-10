@@ -23,12 +23,13 @@ data class Field(
     var pii: Boolean,
     var required: Boolean,
     var integerOnly: Boolean,
+    var numberOfResidents: Boolean,
     var date: Boolean,
     var time: Boolean,
     var fieldOptions: ArrayList<FieldOption>)
 {
-    constructor(name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, date: Boolean, time: Boolean)
-            : this(null, UUID.randomUUID().toString(), name, type, false, null, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
+    constructor(name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, numberOfResidents: Boolean, date: Boolean, time: Boolean)
+            : this(null, UUID.randomUUID().toString(), name, type, false, null, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
 
     fun copy() : Field
     {

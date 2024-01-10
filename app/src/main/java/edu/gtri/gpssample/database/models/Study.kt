@@ -17,7 +17,6 @@ data class Study(
     var id : Int? = null,
     var creationDate: Long,
     var name: String,
-    var totalPopulationSize: Int,
     var samplingMethod: SamplingMethod,
     var sampleSize: Int,
     var sampleType : SampleType,
@@ -29,11 +28,11 @@ data class Study(
 )
 {
     constructor(name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
-            : this(null, Date().time, name, 0, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<CollectionTeam>(), -1)
+            : this(null, Date().time, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<CollectionTeam>(), -1)
 
-    constructor(id: Int, creationDate: Long, name: String, totalPopulationSize: Int, samplingMethod: SamplingMethod,
+    constructor(id: Int, creationDate: Long, name: String, samplingMethod: SamplingMethod,
                 sampleSize: Int, sampleType: SampleType, selectedCollectionTeamId: Int )
-            : this(id, creationDate, name, totalPopulationSize, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(),
+            : this(id, creationDate, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(),
         ArrayList<CollectionTeam>(), selectedCollectionTeamId)
 
     fun pack() : String
