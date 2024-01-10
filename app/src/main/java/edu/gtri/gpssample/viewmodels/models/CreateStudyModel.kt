@@ -30,7 +30,6 @@ class CreateStudyModel {
 
     var fragment : Fragment? = null
     var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
-    var totalPopulationVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
 
     val samplingMethodPosition : MutableLiveData<Int>
         get() = _samplingMethodPosition
@@ -127,21 +126,6 @@ class CreateStudyModel {
             }
         }
 
-    var  totalPopulationSize : String
-        get(){
-            currentStudy?.value?.let{ study ->
-                return study.totalPopulationSize.toString()
-            }
-            return ""
-        }
-        set(value) {
-            currentStudy?.value?.let{ study ->
-                value.toIntOrNull()?.let{ size ->
-                    study.totalPopulationSize = size
-                }
-            }
-        }
-
     constructor()
 
     fun getFields() : Array<String>
@@ -202,15 +186,6 @@ class CreateStudyModel {
             val sampleType : String = SampleTypeConverter.array[position]
             _currentStudy?.value?.let { study ->
                 study.sampleType = SampleTypeConverter.fromString(sampleType)
-
-                if (study.sampleType == SampleType.PercentTotal)
-                {
-                    totalPopulationVisibility.set(true)
-                }
-                else
-                {
-                    totalPopulationVisibility.set(false)
-                }
             }
         }
     }

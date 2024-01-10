@@ -53,6 +53,7 @@
                 android:textSize="22sp" />
 
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/info_button"
                 android:layout_width="25dp"
                 android:layout_height="25dp"

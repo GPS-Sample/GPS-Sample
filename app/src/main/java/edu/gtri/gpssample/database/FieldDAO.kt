@@ -56,6 +56,7 @@ class FieldDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
         values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
         values.put( DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
+        values.put( DAO.COLUMN_FIELD_NUMBER_OF_RESIDENTS, field.numberOfResidents )
         values.put( DAO.COLUMN_FIELD_DATE, field.date )
         values.put( DAO.COLUMN_FIELD_TIME, field.time )
 
@@ -126,12 +127,13 @@ class FieldDAO(private var dao: DAO)
         val pii = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_PII)).toBoolean()
         val required = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_REQUIRED)).toBoolean()
         val integerOnly = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
+        val numberOfResidents = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_NUMBER_OF_RESIDENTS)).toBoolean()
         val date = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATE)).toBoolean()
         val time = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TIME)).toBoolean()
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(id, uuid, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, date, time, ArrayList<FieldOption>())
+        return Field(id, uuid, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
     }
 
     //--------------------------------------------------------------------------

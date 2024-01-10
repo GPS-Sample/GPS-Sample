@@ -233,12 +233,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             return
         }
 
-        if (study.sampleType == SampleType.PercentTotal && study.totalPopulationSize == 0)
-        {
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.total_population_size_error), Toast.LENGTH_SHORT).show()
-            return
-        }
-
         sharedViewModel.addStudy()
 
         findNavController().popBackStack()

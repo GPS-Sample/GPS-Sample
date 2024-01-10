@@ -38,14 +38,14 @@ class CreateFieldModel
 
     fun createNewField()
     {
-        val newField = Field( "", FieldType.Text, false, false, false, false, false)
+        val newField = Field( "", FieldType.Text, false, false, false, false, false, false)
         _currentField = MutableLiveData(newField)
         currentField = _currentField
     }
 
     fun createNewField( fieldBlockUUID: String )
     {
-        val newField = Field( "", FieldType.Text, false, false, false, false, false)
+        val newField = Field( "", FieldType.Text, false, false, false, false, false, false)
         newField.fieldBlockUUID = fieldBlockUUID
         _currentField = MutableLiveData(newField)
         currentField = _currentField
@@ -125,12 +125,21 @@ class CreateFieldModel
             field.integerOnly = isChecked
         }
     }
+
+    fun onFieldNumberOfResidentsSelected(buttonView : CompoundButton, isChecked : Boolean)
+    {
+        currentField?.value?.let{field ->
+            field.numberOfResidents = isChecked
+        }
+    }
+
     fun onFieldDateSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
         currentField?.value?.let{field ->
             field.date = isChecked
         }
     }
+
     fun onFieldTimeSelected(buttonView : CompoundButton, isChecked : Boolean)
     {
         currentField?.value?.let{field ->

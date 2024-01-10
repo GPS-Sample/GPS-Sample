@@ -145,31 +145,6 @@
             </FrameLayout>
         </LinearLayout>
 
-        <TextView
-            android:visibility="@{viewModel.createStudyModel.totalPopulationVisibility ? View.VISIBLE : View.GONE}"
-            android:id="@+id/total_population_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/total_population"
-            android:textSize="17sp"
-            android:textColor="@color/primary_textcolor" />
-
-        <EditText
-            android:visibility="@{viewModel.createStudyModel.totalPopulationVisibility ? View.VISIBLE : View.GONE}"
-            android:id="@+id/total_population_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="@string/enter_the_total_population_size"
-            android:imeOptions="actionDone"
-            android:text="@={viewModel.createStudyModel.totalPopulationSize}"
-            android:inputType="number"/>
-
         <ExpandableListView
             android:id="@+id/expandable_list_view"
             android:layout_width="match_parent"
