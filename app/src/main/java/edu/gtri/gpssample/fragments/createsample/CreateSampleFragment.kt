@@ -152,6 +152,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                             if (enumerationItem.samplingState == SamplingState.Sampled)
                             {
                                 binding.sampleButton.visibility = View.GONE
+                                binding.nextButton.setText( resources.getString( R.string.next ))
                             }
                         }
                     }
@@ -168,6 +169,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                             if (enumerationItem.samplingState == SamplingState.Sampled)
                             {
                                 binding.sampleButton.visibility = View.GONE
+                                binding.nextButton.setText( resources.getString( R.string.next ))
                             }
                         }
                     }
