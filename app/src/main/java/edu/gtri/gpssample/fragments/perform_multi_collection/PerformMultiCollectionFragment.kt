@@ -42,6 +42,7 @@ class PerformMultiCollectionFragment : Fragment(),
     private lateinit var performMultiCollectionAdapter: PerformMultiCollectionAdapter
 
     private var gpsAccuracyIsGood = false
+    private var gpsLocationIsGood = false
     private var _binding: FragmentPerformMultiCollectionBinding? = null
     private val binding get() = _binding!!
 
@@ -50,7 +51,16 @@ class PerformMultiCollectionFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener(PerformCollectionFragment.LaunchSurveyRequest) { key, bundle ->
-            SurveyLaunchNotificationDialog( activity!!, this )
+            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                if (gpsAccuracyIsGood && gpsLocationIsGood)
+                {
+                    SurveyLaunchNotificationDialog( activity!!, this )
+                }
+                else
+                {
+                    LaunchSurveyDialog( activity, gpsAccuracyIsGood && gpsLocationIsGood, this@PerformMultiCollectionFragment)
+                }
+            }
         }
 
         val vm : ConfigurationViewModel by activityViewModels()
@@ -70,6 +80,10 @@ class PerformMultiCollectionFragment : Fragment(),
 
         arguments?.getBoolean(Keys.kGpsAccuracyIsGood.toString())?.let { gpsAccuracyIsGood ->
             this.gpsAccuracyIsGood = gpsAccuracyIsGood
+        }
+
+        arguments?.getBoolean(Keys.kGpsLocationIsGood.toString())?.let { gpsLocationIsGood ->
+            this.gpsLocationIsGood = gpsLocationIsGood
         }
 
         sharedViewModel.locationViewModel.currentLocation?.value?.let {

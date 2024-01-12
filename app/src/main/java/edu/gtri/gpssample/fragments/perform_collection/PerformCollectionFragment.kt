@@ -98,7 +98,16 @@ class PerformCollectionFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener( LaunchSurveyRequest ) { key, bundle ->
-            SurveyLaunchNotificationDialog( activity!!, this )
+            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                if (gpsAccuracyIsGood() && gpsLocationIsGood( location ))
+                {
+                    SurveyLaunchNotificationDialog( activity!!, this )
+                }
+                else
+                {
+                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
+                }
+            }
         }
 
         val vm : ConfigurationViewModel by activityViewModels()
@@ -227,7 +236,8 @@ class PerformCollectionFragment : Fragment(),
                             if (count > 1)
                             {
                                 val bundle = Bundle()
-                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.toString(), gpsAccuracyIsGood() && gpsLocationIsGood( location ))
+                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.toString(), gpsAccuracyIsGood())
+                                bundle.putBoolean( Keys.kGpsLocationIsGood.toString(), gpsLocationIsGood( location ))
 
                                 findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
                             }
