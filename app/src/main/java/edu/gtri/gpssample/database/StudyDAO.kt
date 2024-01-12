@@ -97,7 +97,6 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX, index )
     }
 
-    //--------------------------------------------------------------------------
     fun exists( study: Study ): Boolean
     {
         study.id?.let { id ->
@@ -105,30 +104,6 @@ class StudyDAO(private var dao: DAO)
                 return true
             } ?: return false
         } ?: return false
-    }
-
-    fun getStudy( id: Int ): Study?
-    {
-        var study: Study? = null
-        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            study = buildStudy( cursor )
-            // now get fields
-            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
-
-            // now get rules
-
-            // now get filters
-        }
-
-        cursor.close()
-
-        return study
     }
 
     @SuppressLint("Range")
@@ -151,7 +126,27 @@ class StudyDAO(private var dao: DAO)
         return study
     }
 
-    //--------------------------------------------------------------------------
+    fun getStudy( id: Int ): Study?
+    {
+        var study: Study? = null
+        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_ID} = $id"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+
+            study = buildStudy( cursor )
+            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+            study.filters.addAll(DAO.filterDAO.getFilters(study))
+            study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
+        }
+
+        cursor.close()
+
+        return study
+    }
+
     fun getStudies( config: Config ): ArrayList<Study>
     {
         val studies = ArrayList<Study>()
@@ -168,7 +163,6 @@ class StudyDAO(private var dao: DAO)
                 val study = buildStudy( cursor )
                 studies.add( study )
                 study.fields = DAO.fieldDAO.getFields(study)
-               // study.rules = DAO.ruleDAO.getRules(study)
                 study.filters.addAll(DAO.filterDAO.getFilters(study))
                 study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             }
@@ -190,6 +184,9 @@ class StudyDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val study = buildStudy( cursor )
+            study.fields = DAO.fieldDAO.getFields(study)
+            study.filters.addAll(DAO.filterDAO.getFilters(study))
+            study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             studies.add( study )
         }
 
@@ -213,7 +210,6 @@ class StudyDAO(private var dao: DAO)
         }
     }
 
-    //--------------------------------------------------------------------------
     fun deleteStudy( study: Study )
     {
         study.id?.let{ id ->

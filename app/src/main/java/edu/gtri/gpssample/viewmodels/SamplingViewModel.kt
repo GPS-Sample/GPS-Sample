@@ -411,6 +411,7 @@ class SamplingViewModel : ViewModel()
             for (sampleItem in _currentSampledItemsForSampling)
             {
                 sampleItem.samplingState = SamplingState.NotSampled
+                sampleItem.creationDate = Date().time
 
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
@@ -548,6 +549,7 @@ class SamplingViewModel : ViewModel()
                         }
 
                         sampledIndices.add(rnds)
+                        validSamples[rnds].creationDate = Date().time
                         validSamples[rnds].samplingState = SamplingState.Sampled
                     }
                 }

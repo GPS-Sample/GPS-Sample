@@ -20,6 +20,7 @@ class EnumerationItemDAO(private var dao: DAO)
         else
         {
             val values = ContentValues()
+            enumerationItem.id = null
             putEnumerationItem( enumerationItem, location, values )
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
         }
@@ -48,7 +49,6 @@ class EnumerationItemDAO(private var dao: DAO)
         else if (enumerationItem.creationDate > existingEnumerationItem.creationDate)
         {
             delete( existingEnumerationItem )
-            enumerationItem.id = null // force the new item be created
             createOrUpdateEnumerationItem( enumerationItem, location )
         }
     }
@@ -70,13 +70,13 @@ class EnumerationItemDAO(private var dao: DAO)
 
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(enumerationItem.id!!.toString())
-        val values = ContentValues()
+        val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 
-        putEnumerationItem( enumerationItem, location, values )
-
-        dao.writableDatabase.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
+        if (existingEnumerationItem != null && enumerationItem.creationDate > existingEnumerationItem.creationDate)
+        {
+            delete( existingEnumerationItem )
+            createOrUpdateEnumerationItem( enumerationItem, location )
+        }
     }
 
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
