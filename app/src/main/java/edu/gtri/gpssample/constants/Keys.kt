@@ -17,5 +17,6 @@ enum class Keys {
     kTermsAccepted,
     kSamplingMethod,
     kCollectionMode,
-    kGpsAccuracyIsGood
+    kGpsAccuracyIsGood,
+    kGpsLocationIsGood
 }
