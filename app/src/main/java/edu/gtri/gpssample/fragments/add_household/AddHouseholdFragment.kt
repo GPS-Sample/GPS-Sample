@@ -280,14 +280,24 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         location.enumerationItems.remove(enumerationItem)
         enumArea.locations.remove(location)
 
-        sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.locations?.remove(location)
-
         DAO.locationDAO.delete( location )
         DAO.enumerationItemDAO.delete( enumerationItem )
 
-//        config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-//        sharedViewModel.updateConfiguration()
-//        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(config.enumAreas[0])
+        DAO.configDAO.getConfig( config.id!! )?.let {
+            sharedViewModel.setCurrentConfig( it )
+        }
+
+        DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
+            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+        }
+
+        DAO.studyDAO.getStudy( study.id!! )?.let {
+            sharedViewModel.createStudyModel.setStudy( it )
+        }
+
+        DAO.enumerationTeamDAO.getTeam( enumTeam.id!! )?.let {
+            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
+        }
 
         findNavController().popBackStack()
     }

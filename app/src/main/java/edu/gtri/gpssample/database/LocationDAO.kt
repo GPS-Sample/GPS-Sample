@@ -30,6 +30,7 @@ class LocationDAO(private var dao: DAO)
         else
         {
             val values = ContentValues()
+            location.id = null
             putLocation( location, enumArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
             location.id?.let {
@@ -42,6 +43,7 @@ class LocationDAO(private var dao: DAO)
 
             for (enumerationItem in location.enumerationItems)
             {
+                enumerationItem.locationId = id
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
             }
         } ?: return null
@@ -71,7 +73,7 @@ class LocationDAO(private var dao: DAO)
     {
         val existingLocation = getLocation( location.uuid )
 
-        if (existingLocation != null)
+        if (existingLocation != null) 
         {
             // make sure that the location id is based on the existing, id not the import id
             location.id = existingLocation.id
