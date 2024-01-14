@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.util.Log
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Location
 
 class EnumAreaDAO(private var dao: DAO)
 {
@@ -40,11 +41,28 @@ class EnumAreaDAO(private var dao: DAO)
 
             for (location in enumArea.locations)
             {
+                // location id's may be update here
                 DAO.locationDAO.createOrUpdateLocation(location, enumArea)
             }
 
+            // re-align the team locations, since the location id's may have been updated (above)
             for (enumerationTeam in enumArea.enumerationTeams)
             {
+                val locations = ArrayList<Location>()
+
+                for ( teamLocation in enumerationTeam.locations)
+                {
+                    for (location in enumArea.locations)
+                    {
+                        if (teamLocation.uuid == location.uuid)
+                        {
+                            locations.add( location )
+                        }
+                    }
+                }
+
+                enumerationTeam.locations = locations
+
                 DAO.enumerationTeamDAO.createOrUpdateTeam( enumerationTeam )
             }
 
