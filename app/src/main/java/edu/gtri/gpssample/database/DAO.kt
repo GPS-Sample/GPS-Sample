@@ -192,6 +192,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableEnumerationTeam = ("CREATE TABLE " +
                     TABLE_ENUMERATION_TEAM + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_UUID + " TEXT" + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                     COLUMN_ENUMERATION_TEAM_NAME + " TEXT" + "," +
@@ -202,6 +203,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableCollectionTeam = ("CREATE TABLE " +
                     TABLE_COLLECTION_TEAM + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_UUID + " TEXT" + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_ID + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
@@ -671,7 +673,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             Log.d( "xxx", "filters: ${DAO.filterDAO.getFilters()}")
             Log.d( "xxx", "fieldData: ${DAO.fieldDataDAO.getFieldData()}")
             Log.d( "xxx", "enumAreas: ${DAO.enumAreaDAO.getEnumAreas()}")
-            Log.d( "xxx", "teams: ${DAO.enumerationTeamDAO.getTeams()}")
+            Log.d( "xxx", "teams: ${DAO.enumerationTeamDAO.getEnumerationTeams()}")
             Log.d( "xxx", "latLons: ${DAO.latLonDAO.getLatLons()}")
             Log.d( "xxx", "locations: ${DAO.locationDAO.getLocations()}")
             Log.d( "xxx", "enumerationItems: ${DAO.enumerationItemDAO.getEnumerationItems()}")
@@ -783,6 +785,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 272
+        private const val DATABASE_VERSION = 273
     }
 }

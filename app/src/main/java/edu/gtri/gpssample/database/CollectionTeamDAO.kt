@@ -19,7 +19,6 @@ class CollectionTeamDAO(private var dao: DAO)
         }
         else
         {
-//            collectionTeam.id = null
             val values = ContentValues()
             putTeam( collectionTeam, values )
             collectionTeam.id = dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM, null, values).toInt()
@@ -84,6 +83,7 @@ class CollectionTeamDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_UUID, collectionTeam.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, collectionTeam.creationDate )
         values.put( DAO.COLUMN_ENUM_AREA_ID, collectionTeam.enumAreaId )
         values.put( DAO.COLUMN_STUDY_ID, collectionTeam.studyId )
@@ -92,23 +92,28 @@ class CollectionTeamDAO(private var dao: DAO)
 
     fun exists(collectionTeam: CollectionTeam): Boolean
     {
-        collectionTeam.id?.let { id ->
-            getTeam( id )?.let {
+        for (existingCollectionTeam in getCollectionTeams())
+        {
+            if (existingCollectionTeam.uuid == collectionTeam.uuid)
+            {
                 return true
-            } ?: return false
-        } ?: return false
+            }
+        }
+
+        return false
     }
 
     @SuppressLint("Range")
     private fun createTeam(cursor: Cursor): CollectionTeam
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val enum_area_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val study_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
 
-        val collectionTeam = CollectionTeam(id, creationDate, enum_area_id, study_id, name, ArrayList<LatLon>(), ArrayList<Location>())
+        val collectionTeam = CollectionTeam(id, uuid, creationDate, enum_area_id, study_id, name, ArrayList<LatLon>(), ArrayList<Location>())
 
         collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( id )
         collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )

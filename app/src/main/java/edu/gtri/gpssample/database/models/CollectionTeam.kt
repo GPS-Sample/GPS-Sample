@@ -8,6 +8,7 @@ import java.util.*
 @kotlinx.serialization.Serializable
 data class CollectionTeam(
     var id : Int? = null,
+    var uuid : String,
     var creationDate: Long,
     var enumAreaId: Int,
     var studyId: Int,
@@ -17,7 +18,7 @@ data class CollectionTeam(
 )
 {
     constructor( enumAreaId: Int, studyId: Int,  name: String, polygon: ArrayList<LatLon>, locations: ArrayList<Location>)
-            : this(null, Date().time, enumAreaId, studyId, name, polygon, locations )
+            : this(null, UUID.randomUUID().toString(), Date().time, enumAreaId, studyId, name, polygon, locations )
 
     fun pack() : String
     {
