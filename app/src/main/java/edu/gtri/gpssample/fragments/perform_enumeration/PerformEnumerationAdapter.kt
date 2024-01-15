@@ -48,6 +48,9 @@ class PerformEnumerationAdapter(var locations: List<Location>) : RecyclerView.Ad
         holder.nameTextView.setText( location.uuid )
         holder.dateTextView.setText( Date(location.creationDate).toString())
 
+        // temp debug data, delete this!
+        holder.dateTextView.setText( location.id.toString())
+
         holder.itemView.setOnClickListener {
             didSelectLocation(location)
         }

@@ -19,6 +19,7 @@ class CollectionTeamDAO(private var dao: DAO)
         }
         else
         {
+            collectionTeam.id = null
             val values = ContentValues()
             putTeam( collectionTeam, values )
             collectionTeam.id = dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM, null, values).toInt()

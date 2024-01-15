@@ -41,27 +41,23 @@ class EnumAreaDAO(private var dao: DAO)
 
             for (location in enumArea.locations)
             {
-                // location id's may be update here
+                // location id's may be updated here
                 DAO.locationDAO.createOrUpdateLocation(location, enumArea)
             }
 
-            // re-align the team locations, since the location id's may have been updated (above)
             for (enumerationTeam in enumArea.enumerationTeams)
             {
-                val locations = ArrayList<Location>()
-
-                for ( teamLocation in enumerationTeam.locations)
+                // update the team location id's, if necc.
+                for (teamLocation in enumerationTeam.locations)
                 {
-                    for (location in enumArea.locations)
+                    for (location in DAO.locationDAO.getLocations())
                     {
-                        if (teamLocation.uuid == location.uuid)
+                        if (teamLocation.uuid == location.uuid && teamLocation.id != location.id)
                         {
-                            locations.add( location )
+                            teamLocation.id = location.id
                         }
                     }
                 }
-
-                enumerationTeam.locations = locations
 
                 DAO.enumerationTeamDAO.createOrUpdateTeam( enumerationTeam )
             }

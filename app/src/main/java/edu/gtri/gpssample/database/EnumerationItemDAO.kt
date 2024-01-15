@@ -19,8 +19,8 @@ class EnumerationItemDAO(private var dao: DAO)
         }
         else
         {
-            val values = ContentValues()
             enumerationItem.id = null
+            val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
         }

@@ -29,8 +29,8 @@ class LocationDAO(private var dao: DAO)
         }
         else
         {
-            val values = ContentValues()
             location.id = null
+            val values = ContentValues()
             putLocation( location, enumArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
             location.id?.let {
@@ -278,7 +278,7 @@ class LocationDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val location = createLocation( cursor )
-           // location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+           location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
 
