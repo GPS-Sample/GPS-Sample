@@ -72,12 +72,6 @@ class LatLonDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumAreaId )
     }
 
-    private fun putLatLonSampleArea(llID : Int, sampleAreaId: Int, values : ContentValues)
-    {
-        values.put( DAO.COLUMN_LAT_LON_ID, llID )
-        values.put( DAO.COLUMN_SAMPLE_AREA_ID, sampleAreaId )
-    }
-
     private fun putLatLon(latLon: LatLon, values: ContentValues)
     {
         latLon.id?.let { id ->
@@ -163,25 +157,6 @@ class LatLonDAO(private var dao: DAO)
         val latLons = ArrayList<LatLon>()
         val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_ENUM_AREA__LAT_LON} ELL WHERE" +
                 " ELL.${DAO.COLUMN_ENUM_AREA_ID} = $enumAreaId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val latlon = createLatLon(cursor)
-
-            latLons.add( latlon )
-        }
-
-        cursor.close()
-
-        return latLons
-    }
-
-    fun getLatLonsWithSampleAreaId( sampleAreaId: Int ): ArrayList<LatLon>
-    {
-        val latLons = ArrayList<LatLon>()
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_SAMPLE_AREA__LAT_LON} ELL WHERE" +
-                " ELL.${DAO.COLUMN_SAMPLE_AREA_ID} = $sampleAreaId AND LL.ID = ELL.${DAO.COLUMN_LAT_LON_ID}"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

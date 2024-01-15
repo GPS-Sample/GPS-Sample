@@ -180,15 +180,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableFilterOperator)
 
-            val createTableSampleArea = ("CREATE TABLE " +
-                    TABLE_SAMPLE_AREA + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_STUDY_ID + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_ID) REFERENCES $TABLE_STUDY($COLUMN_ID)" +
-                    ")")
-            db.execSQL(createTableSampleArea)
-
             val createTableEnumerationTeam = ("CREATE TABLE " +
                     TABLE_ENUMERATION_TEAM + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -238,17 +229,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     "UNIQUE ($COLUMN_LOCATION_ID, $COLUMN_ENUM_AREA_ID)" +
                     ")")
             db.execSQL(createTableLocationEnumArea)
-
-            val createTableLocationSampleArea = ("CREATE TABLE " +
-                    TABLE_LOCATION__SAMPLE_AREA + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_LOCATION_ID + " INTEGER" + "," +
-                    COLUMN_SAMPLE_AREA_ID + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_SAMPLE_AREA_ID) REFERENCES $TABLE_SAMPLE_AREA($COLUMN_ID)" + "," +
-                    "UNIQUE ($COLUMN_LOCATION_ID, $COLUMN_SAMPLE_AREA_ID)" +
-                    ")")
-            db.execSQL(createTableLocationSampleArea)
 
             val createTableLocationEnumerationTeam = ("CREATE TABLE " +
                     TABLE_LOCATION__ENUMERATION_TEAM + "(" +
@@ -365,17 +345,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableEnumAreaLatLon)
 
-            val createTableSampleAreaLatLon = ("CREATE TABLE " +
-                    TABLE_SAMPLE_AREA__LAT_LON + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_SAMPLE_AREA_ID + " INTEGER " + "," +
-                    COLUMN_LAT_LON_ID + " INTEGER " + "," +
-                    "FOREIGN KEY($COLUMN_SAMPLE_AREA_ID) REFERENCES $TABLE_SAMPLE_AREA($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_LAT_LON_ID) REFERENCES $TABLE_LAT_LON($COLUMN_ID)" + "," +
-                    "UNIQUE ($COLUMN_SAMPLE_AREA_ID, $COLUMN_LAT_LON_ID)" +
-                    ")")
-            db.execSQL(createTableSampleAreaLatLon)
-
             val createTableEnumerationTeamLatLon = ("CREATE TABLE " +
                     TABLE_ENUMERATION_TEAM__LAT_LON + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
@@ -429,7 +398,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTEROPERATOR")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
@@ -437,7 +405,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_SAMPLE_AREA__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM__LAT_LON")
@@ -448,7 +415,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE__FIELD_DATA_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUM_AREA")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__SAMPLE_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUMERATION_TEAM")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__COLLECTION_TEAM")
 
@@ -476,7 +442,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RULE_ID = "rule_id"
         const val COLUMN_FILTER_ID = "filter_id"
         const val COLUMN_ENUM_AREA_ID = "enum_area_id"
-        const val COLUMN_SAMPLE_AREA_ID = "sample_area_id"
         const val COLUMN_ENUMERATION_TEAM_ID = "enumeration_team_id"
         const val COLUMN_COLLECTION_TEAM_ID = "collection_team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
@@ -561,8 +526,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_ENUM_AREA = "enum_area"
         const val COLUMN_ENUM_AREA_NAME = "enum_area_name"
 
-        const val TABLE_SAMPLE_AREA = "sample_area"
-
         // EnumerationTeam Table
         const val TABLE_ENUMERATION_TEAM = "enumeration_team"
         const val COLUMN_ENUMERATION_TEAM_NAME = "enumeration_team_name"
@@ -583,9 +546,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         // connector table, location to EnumArea
         const val TABLE_LOCATION__ENUM_AREA = "location__enum_area"
-
-        // connector table, location to SampleArea
-        const val TABLE_LOCATION__SAMPLE_AREA = "location__sample_area"
 
         // connector table, location to EnumerationTeam
         const val TABLE_LOCATION__ENUMERATION_TEAM = "location__enumeration_team"
@@ -632,7 +592,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // connector tables for lat lon
         const val TABLE_CONFIG__LAT_LON = "config_lat_lon"
         const val TABLE_ENUM_AREA__LAT_LON = "enum_area_lat_lon"
-        const val TABLE_SAMPLE_AREA__LAT_LON = "sample_area_lat_lon"
         const val TABLE_ENUMERATION_TEAM__LAT_LON = "enumeration_team_lat_lon"
         const val TABLE_COLLECTION_TEAM__LAT_LON = "collection_team_lat_lon"
 
@@ -700,12 +659,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_RULE")
                 db.execSQL("DELETE FROM $TABLE_FILTER")
                 db.execSQL("DELETE FROM $TABLE_FILTEROPERATOR")
-                db.execSQL("DELETE FROM $TABLE_SAMPLE_AREA")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_LOCATION")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__ENUM_AREA")
-                db.execSQL("DELETE FROM $TABLE_LOCATION__SAMPLE_AREA")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__ENUMERATION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_LOCATION__COLLECTION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_ITEM")
@@ -716,7 +673,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_CONFIG__LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_ENUM_AREA__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_SAMPLE_AREA__LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM__LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM__LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
@@ -733,12 +689,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_RULE'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FILTER'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FILTEROPERATOR'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_SAMPLE_AREA'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_COLLECTION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION__ENUM_AREA'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION__SAMPLE_AREA'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION__ENUMERATION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION__COLLECTION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_ITEM'")
@@ -749,7 +703,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_CONFIG__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUM_AREA__LAT_LON'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_SAMPLE_AREA__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_TEAM__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_COLLECTION_TEAM__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_MAP_TILE_REGION'")
