@@ -47,6 +47,25 @@ class StudyDAO(private var dao: DAO)
         study.id?.let { id ->
             for (collectionTeam in study.collectionTeams)
             {
+                // update the team location id's, if necc.
+                for (teamLocation in collectionTeam.locations)
+                {
+                    for (location in DAO.locationDAO.getLocations())
+                    {
+                        if (teamLocation.uuid == location.uuid && teamLocation.id != location.id)
+                        {
+                            for (enumerationItem in teamLocation.enumerationItems)
+                            {
+                                if (enumerationItem.locationId != location.id)
+                                {
+                                    enumerationItem.locationId = location.id!!
+                                }
+                            }
+                            teamLocation.id = location.id
+                        }
+                    }
+                }
+
                 DAO.collectionTeamDAO.createOrUpdateTeam( collectionTeam )
             }
 
@@ -60,11 +79,6 @@ class StudyDAO(private var dao: DAO)
             for (rule in study.rules)
             {
                 DAO.ruleDAO.createOrUpdateRule( rule )
-            }
-
-            for(rule in study.rules)
-            {
-                Log.d("XXXXXXX", "the id ${rule.id}")
             }
 
             // add filters

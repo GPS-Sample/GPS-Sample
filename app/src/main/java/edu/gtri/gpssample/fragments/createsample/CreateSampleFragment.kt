@@ -68,6 +68,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         sharedViewModel.currentFragment = this
 
         samplingViewModel = samplingVm
+        samplingViewModel.currentFragment = this
         samplingViewModel.currentConfig = sharedViewModel.currentConfiguration
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
         samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
@@ -161,8 +162,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             else if (study.samplingMethod == SamplingMethod.Cluster)
             {
                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    val locations = DAO.locationDAO.getLocations( enumArea )
-                    for (location in locations)
+                    for (location in DAO.locationDAO.getLocations( enumArea ))
                     {
                         for (enumerationItem in location.enumerationItems)
                         {
@@ -178,7 +178,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         }
 
         if (binding.sampleButton.visibility == View.VISIBLE) {
-            // Clear the sample state from the unsaved enumeration items
+            // Clear the sample state from the unsaved enumeration items.
             // SampleState may be set to Sampled if you generate
             // a sample, then hit the back button, instead of the next button
             for (enumArea in config.enumAreas) {
@@ -243,6 +243,11 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
         sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+    }
+
+    fun sampleGenerated()
+    {
+        binding.sampleButton.visibility = View.GONE
     }
 
     override fun onDestroyView()

@@ -16,7 +16,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         }
         else
         {
-//            enumerationTeam.id = null
+            enumerationTeam.id = null
             val values = ContentValues()
             putTeam( enumerationTeam, values )
             enumerationTeam.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM, null, values).toInt()
@@ -81,6 +81,7 @@ class EnumerationTeamDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_UUID, enumerationTeam.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumerationTeam.creationDate )
         values.put( DAO.COLUMN_ENUM_AREA_ID, enumerationTeam.enumerAreaId )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
@@ -88,22 +89,27 @@ class EnumerationTeamDAO(private var dao: DAO)
 
     fun exists(enumerationTeam: EnumerationTeam ): Boolean
     {
-        enumerationTeam.id?.let { id ->
-            getTeam( id )?.let {
+        for (existingEnumerationTeam in getEnumerationTeams())
+        {
+            if (existingEnumerationTeam.uuid == enumerationTeam.uuid)
+            {
                 return true
-            } ?: return false
-        } ?: return false
+            }
+        }
+
+        return false
     }
 
     @SuppressLint("Range")
     private fun createTeam(cursor: Cursor): EnumerationTeam
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
 
-        val enumerationTeam = EnumerationTeam(id, creationDate, enumAreaId, name, ArrayList<LatLon>(), ArrayList<Location>())
+        val enumerationTeam = EnumerationTeam(id, uuid, creationDate, enumAreaId, name, ArrayList<LatLon>(), ArrayList<Location>())
 
         enumerationTeam.polygon = DAO.latLonDAO.getLatLonsWithEnumerationTeamId( id )
         enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
@@ -161,7 +167,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         return enumerationTeams
     }
 
-    fun getTeams(): ArrayList<EnumerationTeam>
+    fun getEnumerationTeams(): ArrayList<EnumerationTeam>
     {
         val enumerationTeams = ArrayList<EnumerationTeam>()
         val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM}"

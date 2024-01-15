@@ -11,6 +11,7 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
+import edu.gtri.gpssample.fragments.createsample.CreateSampleFragment
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.DateUtils
 import java.lang.Integer.min
@@ -22,13 +23,14 @@ class SamplingViewModel : ViewModel()
     private lateinit var mapboxManager: MapboxManager
     private lateinit var pointAnnotationManager: PointAnnotationManager
 
-    private var _currentFragment : Fragment? = null
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentConfig : MutableLiveData<Config>? = null
     private var _currentEnumArea : MutableLiveData<EnumArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
+
+    var currentFragment : Fragment? = null
 
     var currentConfig : LiveData<Config>?
         get(){
@@ -58,8 +60,7 @@ class SamplingViewModel : ViewModel()
         get()
         {
             currentStudy?.value?.let{study ->
-                Log.d( "xxx", study.samplingMethod.format)
-                _currentFragment?.let{fragment ->
+                currentFragment?.let{fragment ->
                     return SamplingMethodConverter.internationalString(study.samplingMethod, fragment)
                 }
 
@@ -551,6 +552,11 @@ class SamplingViewModel : ViewModel()
                         sampledIndices.add(rnds)
                         validSamples[rnds].creationDate = Date().time
                         validSamples[rnds].samplingState = SamplingState.Sampled
+                    }
+
+                    val fragment = currentFragment as? CreateSampleFragment
+                    fragment?.let {
+                        it.sampleGenerated()
                     }
                 }
             }
