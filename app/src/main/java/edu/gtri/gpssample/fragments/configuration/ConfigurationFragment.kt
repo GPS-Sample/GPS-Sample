@@ -304,6 +304,7 @@ class ConfigurationFragment : Fragment(),
             Log.d( "xxx", packedConfig )
 
             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            root.mkdirs()
             val file = File(root, "$name.${Date().time}.json")
             val writer = FileWriter(file)
             writer.append(packedConfig)
