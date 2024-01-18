@@ -613,6 +613,10 @@ class PerformCollectionFragment : Fragment(),
                 sampledItem.creationDate = Date().time
                 sampledItem.collectionState = CollectionState.Complete
 
+                (activity!!.application as MainApplication).user?.let { user ->
+                    sampledItem.collectorName = user.name
+                }
+
                 if (incompleteReason.isNotEmpty())
                 {
                     sampledItem.collectionState = CollectionState.Incomplete

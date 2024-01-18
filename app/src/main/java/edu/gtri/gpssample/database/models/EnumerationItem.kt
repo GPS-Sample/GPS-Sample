@@ -18,6 +18,8 @@ data class EnumerationItem(
     var creationDate: Long,
     var uuid : String,
     var subAddress : String,
+    var enumeratorName : String,
+    var collectorName : String,
     var enumerationState : EnumerationState,
     var samplingState : SamplingState,
     var collectionState : CollectionState,
@@ -26,10 +28,7 @@ data class EnumerationItem(
     var fieldDataList : ArrayList<FieldData>,
     var locationId : Int )
 {
-    constructor() : this(null,  Date().time, UUID.randomUUID().toString(), "", EnumerationState.Undefined, SamplingState.NotSampled, CollectionState.Incomplete, "", "", ArrayList<FieldData>(), -1)
-
-//    constructor(id: Int, subAddress: String, enumerationState: EnumerationState, samplingState: SamplingState, collectionState: CollectionState, incompleteReason: String, notes: String, location: Location ) :
-//            this( id,  Date().time, UUID.randomUUID().toString(), subAddress, enumerationState, samplingState, collectionState, incompleteReason, notes, ArrayList<FieldData>(), location )
+    constructor() : this(null,  Date().time, UUID.randomUUID().toString(), "", "", "", EnumerationState.Undefined, SamplingState.NotSampled, CollectionState.Incomplete, "", "", ArrayList<FieldData>(), -1)
 
     fun pack() : String
     {

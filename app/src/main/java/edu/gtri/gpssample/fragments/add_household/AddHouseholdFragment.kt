@@ -392,6 +392,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         enumerationItem.creationDate = Date().time
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
+        (activity!!.application as MainApplication).user?.let { user ->
+            enumerationItem.enumeratorName = user.name
+        }
+
         if (enumerationItem.id == null)
         {
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
