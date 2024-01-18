@@ -41,6 +41,8 @@ class PrivacyFragment : Fragment()
             binding.nextButton.setText(resources.getString(R.string.back))
         }
 
+        binding.webView.loadUrl("file:///android_asset/about.html")
+
         binding.nextButton.setOnClickListener {
             if (isOnBoarding)
             {

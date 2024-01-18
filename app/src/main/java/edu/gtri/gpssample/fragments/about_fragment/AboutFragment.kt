@@ -1,11 +1,10 @@
 package edu.gtri.gpssample.fragments.about_fragment
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
@@ -41,6 +40,8 @@ class AboutFragment : Fragment()
         {
             binding.nextButton.setText(resources.getString(R.string.back))
         }
+
+        binding.webView.loadUrl("file:///android_asset/about.html")
 
         binding.nextButton.setOnClickListener {
             if (isOnBoarding)

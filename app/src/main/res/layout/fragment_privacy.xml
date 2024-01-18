@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.privacy_fragment.PrivacyFragment">
+    tools:context=".fragments.about_fragment.AboutFragment">
 
     <TextView
         android:text="@string/privacy_statement"
@@ -17,22 +17,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <TextView
-        android:padding="20dp"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_margin="20dp"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp">
-    </TextView>
+    </WebView>
 
     <Button
         android:id="@+id/next_button"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_centerInParent="true"
         android:layout_margin="20dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:layout_centerInParent="true"
         android:text="@string/next" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
