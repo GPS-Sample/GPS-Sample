@@ -107,6 +107,17 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)
         }
 
+        binding.createButton.setOnClickListener {
+
+            if (configurations.isNotEmpty())
+            {
+                sharedViewModel.setCurrentConfig( configurations[0])
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.toString(), true )
+                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+            }
+        }
+
         binding.importButton.setOnClickListener {
 
             if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()) && (configurations.size > 0))

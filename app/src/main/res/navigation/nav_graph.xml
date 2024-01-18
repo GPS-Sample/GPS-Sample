@@ -104,6 +104,10 @@
             android:id="@+id/action_navigate_to_PrivacyFragment"
             app:destination="@id/PrivacyFragment"/>
 
+        <action
+            android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
+            app:destination="@id/CreateEnumerationAreaFragment"/>
+
     </fragment>
 
     <!--ConfigurationFragment-->
