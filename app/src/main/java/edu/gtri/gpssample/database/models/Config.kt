@@ -48,7 +48,20 @@ data class Config(
         ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId, ArrayList<MapTileRegion>())
 
     var minimumGPSPrecision : String
-        get() = minGpsPrecision.toString()
+        get() {
+            if (distanceFormat == DistanceFormat.Meters)
+            {
+                return "${minGpsPrecision} meters"
+            }
+            else if (distanceFormat == DistanceFormat.Feet)
+            {
+                return "${minGpsPrecision} feet"
+            }
+            else
+            {
+                return minGpsPrecision.toString()
+            }
+        }
         set(value){
             value.toIntOrNull()?.let {
                 minGpsPrecision = it

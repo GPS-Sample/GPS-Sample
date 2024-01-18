@@ -633,6 +633,8 @@ class PerformCollectionFragment : Fragment(),
                     sharedViewModel.createStudyModel.setStudy( it )
                 }
 
+                performCollectionAdapter.notifyDataSetChanged()
+
                 refreshMap()
             }
         }
