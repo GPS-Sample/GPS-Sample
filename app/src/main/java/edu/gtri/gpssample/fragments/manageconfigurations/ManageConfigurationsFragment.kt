@@ -175,7 +175,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     fun navigateToEnumeration()
     {
-        if (configurations.size > 0)
+        if (configurations.isNotEmpty())
         {
             val config = configurations[0]
             sharedViewModel.setCurrentConfig( config )
@@ -185,6 +185,13 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 it.id?.let { id ->
                     id == config.selectedEnumAreaId
                 } ?: false
+            }
+
+            if (enumAreas.isEmpty())
+            {
+                binding.createButton.visibility = View.VISIBLE
+                binding.exportButton.visibility = View.VISIBLE
+                return
             }
 
             // find the selected study
@@ -460,6 +467,12 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             if(configurations.size > 0)
             {
                 sharedViewModel.currentConfiguration?.value?.let{ config->
+
+                    if (config.enumAreas.isEmpty())
+                    {
+                        binding.createButton.visibility = View.VISIBLE
+                        binding.exportButton.visibility = View.VISIBLE
+                    }
 
                     // find the selected Enum Area
                     val enumAreas = config.enumAreas.filter {
