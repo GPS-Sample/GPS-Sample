@@ -20,8 +20,8 @@ data class EnumArea (
     var locations: ArrayList<Location>,
     var enumerationTeams: ArrayList<EnumerationTeam>)
 {
-    constructor( id: Int, creationDate: Long, name: String, selectedEnumerationTeamId: Int)
-            : this(id, UUID.randomUUID().toString(), creationDate, name, selectedEnumerationTeamId, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>())
+    constructor( id: Int, uuid: String, creationDate: Long, name: String, selectedEnumerationTeamId: Int)
+            : this(id, uuid, creationDate, name, selectedEnumerationTeamId, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>())
 
     constructor( name: String, vertices: ArrayList<LatLon>)
             : this(null, UUID.randomUUID().toString(), Date().time, name, -1, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>())

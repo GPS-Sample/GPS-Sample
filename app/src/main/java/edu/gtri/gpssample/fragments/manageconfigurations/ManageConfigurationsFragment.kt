@@ -20,6 +20,7 @@ import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
@@ -33,9 +34,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
-class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate,
+class ManageConfigurationsFragment : Fragment(),
     MapboxManager.MapTileCacheDelegate,
     NetworkClientModel.ConfigurationDelegate,
+    ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     NetworkViewModel.ManageConfigurationNetworkDelegate
 {
@@ -52,6 +54,7 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
 
     private val kImportTag = 1
     private val kDeleteTag = 2
+    private val kExportTag = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -91,14 +94,21 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         binding.recyclerView.adapter = manageConfigurationsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        val _user = (activity!!.application as MainApplication).user
-
-        _user?.let { user ->
+        (activity!!.application as MainApplication).user?.let { user ->
             this.user = user
 
             if (user.role != Role.Admin.toString())
             {
                 binding.addButton.visibility = View.GONE
+            }
+
+            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty())
+            {
+                if (configurations[0].selectedEnumAreaId < 0)
+                {
+                    binding.createButton.visibility = View.VISIBLE
+                    binding.exportButton.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -116,6 +126,11 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 bundle.putBoolean( Keys.kEditMode.toString(), true )
                 findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
             }
+        }
+
+        binding.exportButton.setOnClickListener {
+            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message),
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
         binding.importButton.setOnClickListener {
@@ -196,13 +211,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 it.id?.let { id ->
                     id == config.selectedEnumAreaId
                 } ?: false
-            }
-
-            if (enumAreas.isEmpty())
-            {
-                binding.createButton.visibility = View.VISIBLE
-                binding.exportButton.visibility = View.VISIBLE
-                return
             }
 
             // find the selected study
@@ -315,6 +323,18 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
             getResult.launch(intent)
         }
+        else if (tag == kExportTag)
+        {
+            view?.let { view ->
+                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin )
+
+                sharedViewModel.currentConfiguration?.value?.let {
+                    sharedNetworkViewModel.setCurrentConfig(it)
+                }
+
+                sharedNetworkViewModel.createHotspot(view)
+            }
+        }
     }
 
     override fun didSelectRightButton(tag: Any?)
@@ -329,13 +349,16 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
                 resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code),
                 resources.getString(R.string.file_system), kImportTag, this)
         }
-        else
+        else if (tag == kImportTag)
         {
             val intent = Intent()
                 .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
 
             startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), 1023)
+        }
+        else if (tag == kExportTag)
+        {
         }
     }
 
@@ -400,6 +423,13 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
         if (complete)
         {
             sharedViewModel.currentConfiguration?.value?.let { config ->
+
+                if (config.selectedEnumAreaId < 0)
+                {
+                    binding.createButton.visibility = View.VISIBLE
+                    binding.exportButton.visibility = View.VISIBLE
+                }
+
                 navigateBasedOnRole()
 
 //                if (config.mapTileRegions.size > 0)
@@ -478,12 +508,6 @@ class ManageConfigurationsFragment : Fragment(), ConfirmationDialog.Confirmation
             if(configurations.size > 0)
             {
                 sharedViewModel.currentConfiguration?.value?.let{ config->
-
-                    if (config.enumAreas.isEmpty())
-                    {
-                        binding.createButton.visibility = View.VISIBLE
-                        binding.exportButton.visibility = View.VISIBLE
-                    }
 
                     // find the selected Enum Area
                     val enumAreas = config.enumAreas.filter {

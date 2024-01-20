@@ -19,6 +19,7 @@ class EnumAreaDAO(private var dao: DAO)
         }
         else
         {
+            enumArea.id = null
             val values = ContentValues()
             putEnumArea( enumArea, config, values )
             enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
@@ -73,6 +74,7 @@ class EnumAreaDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_UUID, enumArea.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
         values.put( DAO.COLUMN_CONFIG_ID, config.id )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
@@ -83,19 +85,18 @@ class EnumAreaDAO(private var dao: DAO)
     private fun createEnumArea(cursor: Cursor): EnumArea
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
         val selectedEnumerationTeamId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_ID))
 
-        return EnumArea( id, creationDate, name, selectedEnumerationTeamId )
+        return EnumArea( id, uuid, creationDate, name, selectedEnumerationTeamId )
     }
 
     fun exists( enumArea: EnumArea ): Boolean
     {
-        enumArea.id?.let { id ->
-            getEnumArea( id )?.let {
-                return true
-            } ?: return false
+        getEnumArea( enumArea.uuid )?.let {
+            return true
         } ?: return false
     }
 
@@ -118,6 +119,28 @@ class EnumAreaDAO(private var dao: DAO)
     {
         var enumArea: EnumArea? = null
         val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_ID} = $id"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            enumArea = createEnumArea( cursor )
+            enumArea.id?.let { id ->
+                enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
+                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
+                enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
+            }
+        }
+
+        cursor.close()
+
+        return enumArea
+    }
+
+    fun getEnumArea( uuid: String ): EnumArea?
+    {
+        var enumArea: EnumArea? = null
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)

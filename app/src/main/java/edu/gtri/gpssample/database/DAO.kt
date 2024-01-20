@@ -45,6 +45,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableEnumArea = ("CREATE TABLE " +
                     TABLE_ENUM_AREA + "(" +
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_UUID + " TEXT" + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_CONFIG_ID + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
@@ -742,6 +743,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 274
+        private const val DATABASE_VERSION = 275
     }
 }
