@@ -168,6 +168,7 @@ class ManageConfigurationsFragment : Fragment(),
             R.id.about -> findNavController().navigate(R.id.action_navigate_to_AboutFragment)
             R.id.terms -> findNavController().navigate(R.id.action_navigate_to_TermsFragment)
             R.id.privacy -> findNavController().navigate(R.id.action_navigate_to_PrivacyFragment)
+            R.id.eula -> findNavController().navigate(R.id.action_navigate_to_EulaFragment)
             R.id.cache_map_tiles -> findNavController().navigate(R.id.action_navigate_to_MapFragment)
         }
 

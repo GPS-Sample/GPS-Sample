@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.privacy_fragment
+package edu.gtri.gpssample.fragments.eula_fragment
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -9,11 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.databinding.FragmentPrivacyBinding
+import edu.gtri.gpssample.databinding.FragmentEulaBinding
 
-class PrivacyFragment : Fragment()
+class EulaFragment : Fragment()
 {
-    private var _binding: FragmentPrivacyBinding? = null
+    private var _binding: FragmentEulaBinding? = null
     private val binding get() = _binding!!
     private var isOnBoarding = false
 
@@ -24,7 +24,7 @@ class PrivacyFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentPrivacyBinding.inflate(inflater, container, false)
+        _binding = FragmentEulaBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -41,14 +41,12 @@ class PrivacyFragment : Fragment()
             binding.nextButton.setText(resources.getString(R.string.back))
         }
 
-        binding.webView.loadUrl("file:///android_asset/privacy.html")
+        binding.webView.loadUrl("file:///android_asset/eula.html")
 
         binding.nextButton.setOnClickListener {
             if (isOnBoarding)
             {
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
-                findNavController().navigate(R.id.action_navigate_to_EulaFragment,bundle)
+                findNavController().navigate(R.id.action_navigate_to_MainFragment)
             }
             else
             {

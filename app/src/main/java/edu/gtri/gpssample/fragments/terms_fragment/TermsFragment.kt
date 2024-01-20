@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.fragments.terms_fragment
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,11 +41,16 @@ class TermsFragment : Fragment()
             binding.nextButton.setText(resources.getString(R.string.back))
         }
 
-        binding.webView.loadUrl("file:///android_asset/about.html")
+        binding.webView.loadUrl("file:///android_asset/terms.html")
 
         binding.nextButton.setOnClickListener {
             if (isOnBoarding)
             {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean(Keys.kTermsAccepted.toString(), true)
+                editor.commit()
+
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
                 findNavController().navigate(R.id.action_navigate_to_PrivacyFragment,bundle)

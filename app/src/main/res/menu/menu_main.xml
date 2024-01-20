@@ -19,6 +19,11 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/eula"
+        android:title="@string/end_user_license_agreement"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/cache_map_tiles"
         android:title="@string/show_map"
         app:showAsAction="never"/>

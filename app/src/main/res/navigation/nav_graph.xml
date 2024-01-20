@@ -105,6 +105,10 @@
             app:destination="@id/PrivacyFragment"/>
 
         <action
+            android:id="@+id/action_navigate_to_EulaFragment"
+            app:destination="@id/EulaFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
             app:destination="@id/CreateEnumerationAreaFragment"/>
 
@@ -460,6 +464,16 @@
         android:id="@+id/PrivacyFragment"
         android:name="edu.gtri.gpssample.fragments.privacy_fragment.PrivacyFragment"
         tools:layout="@layout/fragment_about">
+
+        <action
+            android:id="@+id/action_navigate_to_EulaFragment"
+            app:destination="@id/EulaFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/EulaFragment"
+        android:name="edu.gtri.gpssample.fragments.eula_fragment.EulaFragment"
+        tools:layout="@layout/fragment_eula">
 
         <action
             android:id="@+id/action_navigate_to_MainFragment"
