@@ -102,14 +102,11 @@ class ManageConfigurationsFragment : Fragment(),
                 binding.addButton.visibility = View.GONE
             }
 
-            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty())
-            {
-                if (configurations[0].selectedEnumAreaId < 0)
-                {
-                    binding.createButton.visibility = View.VISIBLE
-                    binding.exportButton.visibility = View.VISIBLE
-                }
-            }
+//            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+//            {
+//                binding.createButton.visibility = View.VISIBLE
+//                binding.exportButton.visibility = View.VISIBLE
+//            }
         }
 
         binding.addButton.setOnClickListener {
@@ -425,11 +422,11 @@ class ManageConfigurationsFragment : Fragment(),
         {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                if (config.selectedEnumAreaId < 0)
-                {
-                    binding.createButton.visibility = View.VISIBLE
-                    binding.exportButton.visibility = View.VISIBLE
-                }
+//                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+//                {
+//                    binding.createButton.visibility = View.VISIBLE
+//                    binding.exportButton.visibility = View.VISIBLE
+//                }
 
                 navigateBasedOnRole()
 
