@@ -109,6 +109,10 @@
             app:destination="@id/EulaFragment"/>
 
         <action
+            android:id="@+id/action_navigate_to_CodeFragment"
+            app:destination="@id/CodeFragment"/>
+
+        <action
             android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
             app:destination="@id/CreateEnumerationAreaFragment"/>
 
@@ -474,6 +478,16 @@
         android:id="@+id/EulaFragment"
         android:name="edu.gtri.gpssample.fragments.eula_fragment.EulaFragment"
         tools:layout="@layout/fragment_eula">
+
+        <action
+            android:id="@+id/action_navigate_to_CodeFragment"
+            app:destination="@id/CodeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/CodeFragment"
+        android:name="edu.gtri.gpssample.fragments.code_fragment.CodeFragment"
+        tools:layout="@layout/fragment_code">
 
         <action
             android:id="@+id/action_navigate_to_MainFragment"

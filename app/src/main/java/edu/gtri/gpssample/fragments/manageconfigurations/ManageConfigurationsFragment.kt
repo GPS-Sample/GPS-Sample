@@ -102,14 +102,11 @@ class ManageConfigurationsFragment : Fragment(),
                 binding.addButton.visibility = View.GONE
             }
 
-            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty())
-            {
-                if (configurations[0].selectedEnumAreaId < 0)
-                {
-                    binding.createButton.visibility = View.VISIBLE
-                    binding.exportButton.visibility = View.VISIBLE
-                }
-            }
+//            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+//            {
+//                binding.createButton.visibility = View.VISIBLE
+//                binding.exportButton.visibility = View.VISIBLE
+//            }
         }
 
         binding.addButton.setOnClickListener {
@@ -169,6 +166,7 @@ class ManageConfigurationsFragment : Fragment(),
             R.id.terms -> findNavController().navigate(R.id.action_navigate_to_TermsFragment)
             R.id.privacy -> findNavController().navigate(R.id.action_navigate_to_PrivacyFragment)
             R.id.eula -> findNavController().navigate(R.id.action_navigate_to_EulaFragment)
+            R.id.code -> findNavController().navigate(R.id.action_navigate_to_CodeFragment)
             R.id.cache_map_tiles -> findNavController().navigate(R.id.action_navigate_to_MapFragment)
         }
 
@@ -425,11 +423,11 @@ class ManageConfigurationsFragment : Fragment(),
         {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                if (config.selectedEnumAreaId < 0)
-                {
-                    binding.createButton.visibility = View.VISIBLE
-                    binding.exportButton.visibility = View.VISIBLE
-                }
+//                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+//                {
+//                    binding.createButton.visibility = View.VISIBLE
+//                    binding.exportButton.visibility = View.VISIBLE
+//                }
 
                 navigateBasedOnRole()
 
