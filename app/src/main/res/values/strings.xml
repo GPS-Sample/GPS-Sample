@@ -308,6 +308,7 @@
     <string name="show_map">Show Map</string>
     <string name="number_of_residents">Number of Residents</string>
     <string name="end_user_license_agreement">End User License Agreement</string>
+    <string name="code_of_conduct">Code of Conduct</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

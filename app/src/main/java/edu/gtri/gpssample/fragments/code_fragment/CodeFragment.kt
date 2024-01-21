@@ -1,6 +1,5 @@
-package edu.gtri.gpssample.fragments.eula_fragment
+package edu.gtri.gpssample.fragments.code_fragment
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.databinding.FragmentEulaBinding
+import edu.gtri.gpssample.databinding.FragmentCodeBinding
 
-class EulaFragment : Fragment()
+class CodeFragment : Fragment()
 {
-    private var _binding: FragmentEulaBinding? = null
+    private var _binding: FragmentCodeBinding? = null
     private val binding get() = _binding!!
     private var isOnBoarding = false
 
@@ -24,7 +23,7 @@ class EulaFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentEulaBinding.inflate(inflater, container, false)
+        _binding = FragmentCodeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -41,14 +40,12 @@ class EulaFragment : Fragment()
             binding.nextButton.setText(resources.getString(R.string.back))
         }
 
-        binding.webView.loadUrl("file:///android_asset/eula.html")
+        binding.webView.loadUrl("file:///android_asset/code.html")
 
         binding.nextButton.setOnClickListener {
             if (isOnBoarding)
             {
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
-                findNavController().navigate(R.id.action_navigate_to_CodeFragment,bundle)
+                findNavController().navigate(R.id.action_navigate_to_MainFragment)
             }
             else
             {
