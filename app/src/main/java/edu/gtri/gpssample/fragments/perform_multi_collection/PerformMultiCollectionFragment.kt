@@ -30,7 +30,7 @@ import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.dialogs.SurveyLaunchNotificationDialog
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.util.ArrayList
+import java.util.*
 
 class PerformMultiCollectionFragment : Fragment(),
     LaunchSurveyDialog.LaunchSurveyDialogDelegate,
@@ -164,13 +164,20 @@ class PerformMultiCollectionFragment : Fragment(),
 
             sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
 
-                sampledItem.collectionState = CollectionState.Complete
                 sampledItem.notes = notes
+                sampledItem.creationDate = Date().time
+                sampledItem.collectionState = CollectionState.Complete
+
+                (activity!!.application as MainApplication).user?.let { user ->
+                    sampledItem.collectorName = user.name
+                }
 
                 if (incompleteReason.isNotEmpty())
                 {
                     sampledItem.collectionState = CollectionState.Incomplete
                 }
+
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
                 val enumerationItems = ArrayList<EnumerationItem>()
 
@@ -183,8 +190,6 @@ class PerformMultiCollectionFragment : Fragment(),
                 }
 
                 performMultiCollectionAdapter.updateEnumerationItems( enumerationItems )
-
-                DAO.enumerationItemDAO.updateEnumerationItem( sampledItem, location )
             }
         }
     }
