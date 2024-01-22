@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import java.util.*
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
     : SQLiteOpenHelper( context, DATABASE_NAME, factory, DATABASE_VERSION )
@@ -713,6 +714,20 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_MAP_TILE_REGION'")
 
                 db.close()
+            }
+        }
+
+        fun updateCreationDate( oldDate: Long ) : Long
+        {
+            val newDate = Date().time
+
+            if (newDate > oldDate)
+            {
+                return newDate
+            }
+            else
+            {
+                return oldDate + 1
             }
         }
 

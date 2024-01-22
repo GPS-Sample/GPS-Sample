@@ -10,6 +10,7 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.fragments.createsample.CreateSampleFragment
 import edu.gtri.gpssample.managers.MapboxManager
@@ -412,7 +413,7 @@ class SamplingViewModel : ViewModel()
             for (sampleItem in _currentSampledItemsForSampling)
             {
                 sampleItem.samplingState = SamplingState.NotSampled
-                sampleItem.creationDate = Date().time
+                sampleItem.creationDate = DAO.updateCreationDate( sampleItem.creationDate )
 
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
@@ -550,7 +551,7 @@ class SamplingViewModel : ViewModel()
                         }
 
                         sampledIndices.add(rnds)
-                        validSamples[rnds].creationDate = Date().time
+                        validSamples[rnds].creationDate = DAO.updateCreationDate( validSamples[rnds].creationDate )
                         validSamples[rnds].samplingState = SamplingState.Sampled
                     }
 

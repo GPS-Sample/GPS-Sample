@@ -610,7 +610,7 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
 
                 sampledItem.notes = notes
-                sampledItem.creationDate = Date().time
+                sampledItem.creationDate = DAO.updateCreationDate( sampledItem.creationDate )
                 sampledItem.collectionState = CollectionState.Complete
 
                 (activity!!.application as MainApplication).user?.let { user ->
