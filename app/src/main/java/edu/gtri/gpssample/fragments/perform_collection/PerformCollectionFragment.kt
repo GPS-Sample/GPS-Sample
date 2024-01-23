@@ -68,9 +68,6 @@ class PerformCollectionFragment : Fragment(),
     }
 
     private lateinit var user: User
-    private lateinit var study: Study
-    private lateinit var config: Config
-    private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var collectionTeam: CollectionTeam
     private lateinit var defaultColorList : ColorStateList
@@ -131,18 +128,6 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            this.config = config
-        }
-
-        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-            this.study = study
-        }
-
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enum_area ->
-            enumArea = enum_area
-        }
-
         sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
             collectionTeam = it
         }
@@ -186,7 +171,9 @@ class PerformCollectionFragment : Fragment(),
         binding.recyclerView.adapter = performCollectionAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
 
-        binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + collectionTeam.name + " team)"
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+            binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + collectionTeam.name + " team)"
+        }
 
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
@@ -254,10 +241,12 @@ class PerformCollectionFragment : Fragment(),
         }
 
         binding.mapTileCacheButton.setOnClickListener {
-            if (config.mapTileRegions.isNotEmpty())
-            {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapboxManager.loadStylePack( activity!!, this )
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (config.mapTileRegions.isNotEmpty())
+                {
+                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                    MapboxManager.loadStylePack( activity!!, this )
+                }
             }
         }
 
@@ -352,18 +341,20 @@ class PerformCollectionFragment : Fragment(),
         allPointAnnotations.clear()
         locationHashMap.clear()
 
-        for (enumArea in config.enumAreas)
-        {
-            for (location in enumArea.locations)
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            for (enumArea in config.enumAreas)
             {
-                if (location.isLandmark)
+                for (location in enumArea.locations)
                 {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                    if (location.isLandmark)
+                    {
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
 
-                    pointAnnotation?.let {
-                        locationHashMap[pointAnnotation.id] = location
-                        allPointAnnotations.add( pointAnnotation )
+                        pointAnnotation?.let {
+                            locationHashMap[pointAnnotation.id] = location
+                            allPointAnnotations.add( pointAnnotation )
+                        }
                     }
                 }
             }
@@ -481,17 +472,21 @@ class PerformCollectionFragment : Fragment(),
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
-                name = "Configuration"
-                payload = config.pack()
-                message = resources.getString(R.string.config_saved_doc)
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    name = "Configuration"
+                    payload = config.pack()
+                    message = resources.getString(R.string.config_saved_doc)
+                }
             }
 
             Role.Enumerator.toString(),
             Role.DataCollector.toString() ->
             {
-                name = "Collection"
-                payload = enumArea.pack()
-                message = resources.getString(R.string.collection_saved_doc)
+                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                    name = "Collection"
+                    payload = enumArea.pack()
+                    message = resources.getString(R.string.collection_saved_doc)
+                }
             }
         }
 
@@ -511,7 +506,9 @@ class PerformCollectionFragment : Fragment(),
     {
         // Launch connection screen
         view?.let{ view ->
-            sharedNetworkViewModel.setCurrentConfig(config)
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                sharedNetworkViewModel.setCurrentConfig(config)
+            }
 
             when(user.role)
             {
@@ -530,11 +527,14 @@ class PerformCollectionFragment : Fragment(),
                 Role.Enumerator.toString(),
                 Role.DataCollector.toString() ->
                 {
-                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
-                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                    getResult.launch(intent)
+                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                        sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                        getResult.launch(intent)
+                    }
                 }
+                else -> {}
             }
         }
     }
@@ -624,17 +624,22 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
-                DAO.configDAO.getConfig( config.id!! )?.let {
-                    sharedViewModel.setCurrentConfig( it )
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    DAO.configDAO.getConfig( config.id!! )?.let {
+                        sharedViewModel.setCurrentConfig( it )
+                    }
                 }
 
-                DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
-                    enumArea = it
-                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
+                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                    DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
+                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+                    }
                 }
 
-                DAO.studyDAO.getStudy( study.id!! )?.let {
-                    sharedViewModel.createStudyModel.setStudy( it )
+                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                    DAO.studyDAO.getStudy( study.id!! )?.let {
+                        sharedViewModel.createStudyModel.setStudy( it )
+                    }
                 }
 
                 performCollectionAdapter.notifyDataSetChanged()
@@ -684,15 +689,17 @@ class PerformCollectionFragment : Fragment(),
         val accuracy = it.toInt()
         currentGPSAccuracy = accuracy
 
-        if (accuracy <= config.minGpsPrecision)
-        {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
-            binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
-        }
-        else
-        {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
-            binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            if (accuracy <= config.minGpsPrecision)
+            {
+                binding.accuracyLabelTextView.text = resources.getString(R.string.good)
+                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
+            }
+            else
+            {
+                binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
+                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
+            }
         }
 
         binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
@@ -700,8 +707,10 @@ class PerformCollectionFragment : Fragment(),
 
     private fun gpsAccuracyIsGood(): Boolean
     {
-        currentGPSAccuracy?.let {
-            return (it <= config.minGpsPrecision)
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            currentGPSAccuracy?.let {
+                return (it <= config.minGpsPrecision)
+            }
         }
 
         return false
@@ -715,7 +724,9 @@ class PerformCollectionFragment : Fragment(),
         {
             currentGPSLocation?.let { point ->
                 val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
-                editMode = distance <= config.minGpsPrecision
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    editMode = distance <= config.minGpsPrecision
+                }
             }
         }
 
@@ -777,7 +788,9 @@ class PerformCollectionFragment : Fragment(),
             }
             else
             {
-                MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+                }
             }
         }
     }
