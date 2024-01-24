@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.create_enumeration_area
+package edu.gtri.gpssample.fragments.walk_enumeration_area
 
 import android.app.Activity
 import android.content.Intent
@@ -40,7 +40,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
+import edu.gtri.gpssample.databinding.FragmentWalkEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
@@ -54,7 +54,7 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
-class CreateEnumerationAreaFragment : Fragment(),
+class WalkEnumerationAreaFragment : Fragment(),
     OnMapClickListener,
     View.OnTouchListener,
     OnCameraChangeListener,
@@ -85,7 +85,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private val unsavedMapTileRegions = ArrayList<MapTileRegion>()
     private var allPointAnnotations = ArrayList<PointAnnotation>()
     private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
-    private var _binding: FragmentCreateEnumerationAreaBinding? = null
+    private var _binding: FragmentWalkEnumerationAreaBinding? = null
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
@@ -99,7 +99,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentCreateEnumerationAreaBinding.inflate( inflater, container, false)
+        _binding = FragmentWalkEnumerationAreaBinding.inflate( inflater, container, false)
         return binding.root
     }
 
@@ -115,7 +115,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             viewModel = this.viewModel
 
             // Assign the fragment
-            createEnumerationAreaFragment = this@CreateEnumerationAreaFragment
+            walkEnumerationAreaFragment = this@WalkEnumerationAreaFragment
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -323,7 +323,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.WalkEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onMapClick(point: com.mapbox.geojson.Point): Boolean
@@ -384,13 +384,13 @@ class CreateEnumerationAreaFragment : Fragment(),
                         {
                             ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
                                 "${resources.getString(R.string.delete_enum_area_message)} ${obj.name}?",
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
+                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@WalkEnumerationAreaFragment)
                         }
                         else if (obj is MapTileRegion)
                         {
                             ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
                                 resources.getString(R.string.delete_map_tile_region),
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
+                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@WalkEnumerationAreaFragment)
                         }
 
                         true
@@ -501,7 +501,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                                         {
                                             ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
                                                 "${resources.getString(R.string.delete_household_message)}?",
-                                                resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@CreateEnumerationAreaFragment)
+                                                resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@WalkEnumerationAreaFragment)
                                         }
                                     }
                                     true

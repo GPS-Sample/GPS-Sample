@@ -113,8 +113,8 @@
             app:destination="@id/CodeFragment"/>
 
         <action
-            android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
-            app:destination="@id/CreateEnumerationAreaFragment"/>
+            android:id="@+id/action_navigate_to_WalkEnumerationAreaFragment"
+            app:destination="@id/WalkEnumerationAreaFragment"/>
 
     </fragment>
 
@@ -191,6 +191,14 @@
         <action
             android:id="@+id/action_navigate_to_CreateConfigurationFragment"
             app:destination="@id/CreateConfigurationFragment" />
+    </fragment>
+
+    <!--WalkEnumerationAreaFragment-->
+
+    <fragment
+        android:id="@+id/WalkEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.walk_enumeration_area.WalkEnumerationAreaFragment"
+        tools:layout="@layout/fragment_walk_enumeration_area">
     </fragment>
 
     <!--CreateStudyFragment-->

@@ -102,11 +102,11 @@ class ManageConfigurationsFragment : Fragment(),
                 binding.addButton.visibility = View.GONE
             }
 
-//            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
-//            {
-//                binding.createButton.visibility = View.VISIBLE
-//                binding.exportButton.visibility = View.VISIBLE
-//            }
+            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+            {
+                binding.createButton.visibility = View.VISIBLE
+                binding.exportButton.visibility = View.VISIBLE
+            }
         }
 
         binding.addButton.setOnClickListener {
@@ -121,7 +121,7 @@ class ManageConfigurationsFragment : Fragment(),
                 sharedViewModel.setCurrentConfig( configurations[0])
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.toString(), true )
-                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
             }
         }
 
@@ -423,11 +423,11 @@ class ManageConfigurationsFragment : Fragment(),
         {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-//                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
-//                {
-//                    binding.createButton.visibility = View.VISIBLE
-//                    binding.exportButton.visibility = View.VISIBLE
-//                }
+                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+                {
+                    binding.createButton.visibility = View.VISIBLE
+                    binding.exportButton.visibility = View.VISIBLE
+                }
 
                 navigateBasedOnRole()
 
