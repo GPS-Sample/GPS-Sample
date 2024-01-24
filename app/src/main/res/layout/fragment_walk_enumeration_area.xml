@@ -46,12 +46,41 @@
                 android:textSize="15sp"
                 android:textStyle="normal" />
 
-            <View
-                android:visibility="gone"
-                android:id="@+id/overlay_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </View>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_gravity="top|end"
+                android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="@color/black"
+                    android:text="@string/accuracy"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/accuracy_label_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="@color/black"
+                    android:text="@string/unknown"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/accuracy_value_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+            </LinearLayout>
         </FrameLayout>
 
         <TextView
@@ -76,49 +105,22 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/import_button"
+                android:id="@+id/record_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="5dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:background="@drawable/import_blue" />
+                android:background="@drawable/record" />
 
             <Button
-                android:id="@+id/create_enum_area_button"
+                android:id="@+id/clear_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="5dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:background="@drawable/add_location_blue" />
-
-            <Button
-                android:id="@+id/add_household_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/add_house_blue" />
-
-            <Button
-                android:id="@+id/map_tile_region_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/crop" />
-
-            <Button
-                android:id="@+id/map_tile_cache_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:background="@drawable/cache" />
+                android:background="@drawable/clear" />
 
             <Button
                 android:id="@+id/center_on_location_button"
@@ -159,7 +161,7 @@
                 android:layout_margin="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="@string/cancel" />
+                android:text="@string/back" />
 
             <Button
                 android:id="@+id/save_button"

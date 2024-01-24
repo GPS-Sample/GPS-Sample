@@ -1,9 +1,11 @@
 package edu.gtri.gpssample.fragments.walk_enumeration_area
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Resources
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -32,9 +34,7 @@ import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -55,11 +55,8 @@ import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
 class WalkEnumerationAreaFragment : Fragment(),
-    OnMapClickListener,
-    View.OnTouchListener,
     OnCameraChangeListener,
     InputDialog.InputDialogDelegate,
-    MapboxManager.MapTileCacheDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
@@ -70,22 +67,19 @@ class WalkEnumerationAreaFragment : Fragment(),
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
+    private lateinit var defaultColorList : ColorStateList
 
-    private var editMode = false
-    private var addHousehold = false
+    private var isRecording = false
     private var createEnumArea = false
-    private var createMapTileCache = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
-    private val polygonHashMap = HashMap<Long,Any>()
-    private val pointHashMap = HashMap<Long,Location>()
+    private var currentGPSAccuracy: Int? = null
     private val unsavedEnumAreas = ArrayList<EnumArea>()
-    private lateinit var defaultColorList : ColorStateList
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private val unsavedMapTileRegions = ArrayList<MapTileRegion>()
     private var allPointAnnotations = ArrayList<PointAnnotation>()
-    private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
+    private var currentGPSLocation: com.mapbox.geojson.Point? = null
     private var _binding: FragmentWalkEnumerationAreaBinding? = null
+    private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
@@ -107,7 +101,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -126,17 +120,6 @@ class WalkEnumerationAreaFragment : Fragment(),
         {
             Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
             return
-        }
-
-        arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
-            this.editMode = editMode
-        }
-
-        if (!editMode)
-        {
-            binding.toolbarTitle.visibility = View.GONE
-            binding.toolbarLayout.visibility = View.GONE
-            binding.buttonLayout.visibility = View.GONE
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
@@ -161,8 +144,39 @@ class WalkEnumerationAreaFragment : Fragment(),
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
-        binding.mapView.gestures.addOnMapClickListener(this )
+        val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+            .withPoints(polyLinePoints)
+            .withLineColor("#ee4e8b")
+            .withLineWidth(5.0)
+
+        polylineAnnotation = polylineAnnotationManager.create(polylineAnnotationOptions)
+
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
+        binding.recordButton.setOnClickListener {
+            if (isRecording)
+            {
+                isRecording = false
+                binding.recordButton.setBackgroundResource( R.drawable.record )
+            }
+            else
+            {
+                isRecording = true
+                binding.recordButton.setBackgroundResource( R.drawable.pause )
+            }
+        }
+
+        binding.clearButton.setOnClickListener {
+            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), null, this@WalkEnumerationAreaFragment)
+        }
+
+        binding.centerOnLocationButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
 
         binding.centerOnLocationButton.setOnClickListener {
             showCurrentLocation = !showCurrentLocation
@@ -184,127 +198,6 @@ class WalkEnumerationAreaFragment : Fragment(),
             }
         }
 
-        binding.importButton.setOnClickListener {
-            if (createEnumArea || addHousehold || createMapTileCache)
-            {
-                return@setOnClickListener
-            }
-
-            binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-
-            val intent = Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-
-            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
-        }
-
-        binding.createEnumAreaButton.setOnClickListener {
-            if (addHousehold || createMapTileCache)
-            {
-                return@setOnClickListener
-            }
-
-            if (createEnumArea)
-            {
-                createEnumArea = false
-
-                if (droppedPointAnnotations.size > 2)
-                {
-                    InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
-                    binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
-                    binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
-                }
-                else
-                {
-                    droppedPointAnnotations.map { pointAnnotation ->
-                        pointAnnotation?.let{ pointAnnotation ->
-                            pointAnnotationManager.delete( pointAnnotation )
-                        }
-                    }
-
-                    droppedPointAnnotations.clear()
-                    binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
-                    binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
-                }
-            }
-            else
-            {
-                droppedPointAnnotations.clear()
-                createEnumArea = true
-                binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
-                binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-        }
-
-        binding.overlayView.setOnTouchListener(this)
-
-        binding.mapTileRegionButton.setOnClickListener {
-            if (createEnumArea || addHousehold)
-            {
-                return@setOnClickListener
-            }
-
-            if (createMapTileCache)
-            {
-                createMapTileCache = false
-                binding.overlayView.visibility = View.GONE
-                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-            }
-            else
-            {
-                createMapTileCache = true
-                polyLinePoints.clear()
-                if (this::polylineAnnotation.isInitialized)
-                {
-                    polylineAnnotation.points = polyLinePoints
-                    polylineAnnotationManager.update(polylineAnnotation)
-                }
-                binding.overlayView.visibility = View.VISIBLE
-                binding.mapTileRegionButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-        }
-
-        binding.mapTileCacheButton.setOnClickListener {
-            if (createEnumArea || addHousehold || createMapTileCache)
-            {
-                return@setOnClickListener
-            }
-
-            if (getAllMapTileRegions().isNotEmpty())
-            {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapboxManager.loadStylePack( activity!!, this )
-            }
-        }
-
-        binding.addHouseholdButton.backgroundTintList?.let {
-            defaultColorList = it
-        }
-
-        binding.addHouseholdButton.setOnClickListener {
-            if (createEnumArea || createMapTileCache)
-            {
-                return@setOnClickListener
-            }
-
-            if (addHousehold)
-            {
-                addHousehold = false
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-            }
-            else
-            {
-                addHousehold = true
-                removeAllPolygonOnClickListeners()
-                binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-        }
-
-        binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
-        }
-
         binding.helpButton.setOnClickListener {
             CreateEnumAreaHelpDialog( activity!! )
         }
@@ -314,9 +207,13 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
 
         binding.saveButton.setOnClickListener {
-            config.enumAreas.addAll( unsavedEnumAreas )
-            config.mapTileRegions.addAll( unsavedMapTileRegions )
-            findNavController().popBackStack()
+
+            isRecording = false
+            binding.recordButton.setBackgroundResource( R.drawable.record )
+
+            InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
+
+            refreshMap()
         }
     }
 
@@ -324,28 +221,6 @@ class WalkEnumerationAreaFragment : Fragment(),
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.WalkEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    override fun onMapClick(point: com.mapbox.geojson.Point): Boolean
-    {
-        if (editMode)
-        {
-            if (createEnumArea)
-            {
-                droppedPointAnnotations.add( mapboxManager.addMarker( point, R.drawable.location_blue ))
-                return true
-            }
-            else if (addHousehold)
-            {
-                addHousehold = false
-                createLocation( LatLng( point.latitude(), point.longitude()))
-                refreshMap()
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-                return true
-            }
-        }
-
-        return false
     }
 
     private fun refreshMap()
@@ -371,265 +246,11 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         allPointAnnotations.clear()
 
-        removeAllPolygonOnClickListeners()
-
-        if (editMode)
-        {
-            polygonAnnotationManager?.apply {
-                addClickListener(
-                    OnPolygonAnnotationClickListener { polygonAnnotation ->
-                        val obj = polygonHashMap[polygonAnnotation.id]
-
-                        if (obj is EnumArea)
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                "${resources.getString(R.string.delete_enum_area_message)} ${obj.name}?",
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@WalkEnumerationAreaFragment)
-                        }
-                        else if (obj is MapTileRegion)
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                resources.getString(R.string.delete_map_tile_region),
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@WalkEnumerationAreaFragment)
-                        }
-
-                        true
-                    }
-                )
-            }
-        }
-
-        val allMapTileRegions = getAllMapTileRegions()
-
-        for (mapTileRegion in allMapTileRegions)
-        {
-            addPolygon( mapTileRegion )
-        }
-
-        val allEnumAreas = getAllEnumAreas()
-
-        for (enumArea in allEnumAreas)
+        for (enumArea in unsavedEnumAreas)
         {
             addPolygon(enumArea)
-
-            for (location in enumArea.locations)
-            {
-                var resourceId = R.drawable.home_black
-                var isMultiFamily = false
-
-                location.isMultiFamily?.let {
-                    isMultiFamily = it
-                }
-
-                if (location.isLandmark)
-                {
-                    resourceId = R.drawable.location_blue
-                }
-                else if (!isMultiFamily)
-                {
-                    if (location.enumerationItems.isNotEmpty())
-                    {
-                        val enumerationItem = location.enumerationItems[0]
-
-                        if (enumerationItem.samplingState == SamplingState.Sampled)
-                        {
-                            resourceId = if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                        {
-                            resourceId = R.drawable.home_black
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            resourceId = R.drawable.home_red
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            resourceId = R.drawable.home_green
-                        }
-                    }
-                }
-                else
-                {
-                    for (enumerationItem in location.enumerationItems)
-                    {
-                        if (enumerationItem.samplingState == SamplingState.Sampled)
-                        {
-                            if (enumerationItem.collectionState == CollectionState.Incomplete)
-                            {
-                                resourceId = R.drawable.multi_home_orange
-                                break
-                            }
-                            else if (enumerationItem.collectionState == CollectionState.Complete)
-                            {
-                                resourceId = R.drawable.multi_home_purple
-                            }
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                        {
-                            resourceId = R.drawable.multi_home_black
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            resourceId = R.drawable.multi_home_red
-                            break
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            resourceId = R.drawable.multi_home_green
-                        }
-                    }
-                }
-
-                if (resourceId > 0)
-                {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    val pointAnnotation = mapboxManager.addMarker( point, resourceId )
-
-                    pointAnnotation?.let {
-                        pointHashMap[pointAnnotation.id] = location
-                        allPointAnnotations.add( pointAnnotation )
-                    }
-
-                    if (editMode)
-                    {
-                        pointAnnotationManager?.apply {
-                            addClickListener(
-                                OnPointAnnotationClickListener { pointAnnotation ->
-                                    pointHashMap[pointAnnotation.id]?.let { location ->
-                                        if (!location.isLandmark)
-                                        {
-                                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                                "${resources.getString(R.string.delete_household_message)}?",
-                                                resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@WalkEnumerationAreaFragment)
-                                        }
-                                    }
-                                    true
-                                }
-                            )
-                        }
-                    }
-                }
-            }
         }
 
-        if (allEnumAreas.isNotEmpty())
-        {
-            val enumArea = allEnumAreas[0]
-            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-
-            currentZoomLevel?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                val cameraPosition = CameraOptions.Builder()
-                    .zoom(currentZoomLevel)
-                    .center(point)
-                    .build()
-
-                binding.mapView.getMapboxMap().setCamera(cameraPosition)
-            }
-        }
-    }
-
-    fun getAllEnumAreas() : ArrayList<EnumArea>
-    {
-        val allEnumAreas = ArrayList<EnumArea>()
-        allEnumAreas.addAll( config.enumAreas )
-        allEnumAreas.addAll( unsavedEnumAreas )
-        return allEnumAreas
-    }
-
-    fun getAllMapTileRegions() : ArrayList<MapTileRegion>
-    {
-        val allMapTileRegions = ArrayList<MapTileRegion>()
-        allMapTileRegions.addAll( config.mapTileRegions )
-        allMapTileRegions.addAll( unsavedMapTileRegions )
-        return allMapTileRegions
-    }
-    fun createLocation( latLng: LatLng )
-    {
-        var enumArea = findEnumAreaOfLocation( config.enumAreas, latLng )
-
-        if (enumArea == null)
-        {
-            enumArea = findEnumAreaOfLocation( unsavedEnumAreas, latLng )
-        }
-
-        enumArea?.let{  enumArea ->
-            latLng?.let { latLng ->
-                val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false, "")
-                enumArea.locations.add(location)
-                refreshMap()
-            }
-        }
-    }
-
-    fun findEnumAreaOfLocation( enumAreas: ArrayList<EnumArea>, latLng: LatLng ) : EnumArea?
-    {
-        for (enumArea in enumAreas)
-        {
-            val points = ArrayList<Coordinate>()
-
-            enumArea.vertices.map {
-                points.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
-            }
-
-            points.add( points[0])
-
-            val geometryFactory = GeometryFactory()
-            val geometry: Geometry = geometryFactory.createPolygon(points.toTypedArray())
-
-            val coordinate = Coordinate( latLng.longitude, latLng.latitude )
-            val geometry1 = geometryFactory.createPoint( coordinate )
-            if (geometry.contains( geometry1 ))
-            {
-                return enumArea
-            }
-        }
-
-        return null
-    }
-
-    fun removeAllPolygonOnClickListeners()
-    {
-        polygonAnnotationManager?.apply {
-            polygonAnnotationManager.clickListeners.removeAll {
-                true
-            }
-        }
-    }
-
-    fun addPolygon( mapTileRegion: MapTileRegion )
-    {
-        val points = ArrayList<com.mapbox.geojson.Point>()
-        val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-
-        val vertices = ArrayList<LatLon>()
-
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
-
-        vertices.map {
-            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-        }
-
-        pointList.add( points )
-
-        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.0 )
-
-        polygonAnnotation?.let { polygonAnnotation ->
-            polygonHashMap[polygonAnnotation.id] = mapTileRegion
-            allPolygonAnnotations.add( polygonAnnotation)
-        }
-
-        // create the polygon border
-        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#000000" )
-
-        polylineAnnotation?.let { polylineAnnotation ->
-            allPolylineAnnotations.add( polylineAnnotation )
-        }
     }
 
     fun addPolygon( enumArea: EnumArea )
@@ -646,120 +267,15 @@ class WalkEnumerationAreaFragment : Fragment(),
         val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.25 )
 
         polygonAnnotation?.let { polygonAnnotation ->
-            polygonHashMap[polygonAnnotation.id] = enumArea
             allPolygonAnnotations.add( polygonAnnotation)
         }
 
         // create the polygon border
-        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#ff0000" )
+        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#000000" )
 
         polylineAnnotation?.let { polylineAnnotation ->
             allPolylineAnnotations.add( polylineAnnotation )
         }
-    }
-
-    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
-    {
-        p1?.let { p1 ->
-            if (p1.action == MotionEvent.ACTION_UP)
-            {
-                val points = ArrayList<Coordinate>()
-
-                // close the polygon
-                polyLinePoints.add( polyLinePoints[0])
-
-                // convert ArrayList<Point> to ArrayList<Coordinate>
-                polyLinePoints.map {
-                    points.add( Coordinate( it.longitude(), it.latitude()))
-                }
-
-                polylineAnnotation.points = polyLinePoints
-                polylineAnnotationManager.update(polylineAnnotation)
-
-                createMapTileCache = false
-                binding.overlayView.visibility = View.GONE
-                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-
-                val vertices = ArrayList<LatLon>()
-
-                val points1 = ArrayList<Coordinate>()
-
-                polylineAnnotation.points.map { point ->
-                    vertices.add( LatLon( point.latitude(), point.longitude()))
-                    points1.add( Coordinate( point.longitude(), point.latitude()))
-                }
-
-                val latLngBounds = GeoUtils.findGeobounds(vertices)
-                val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-                val mapTileRegion = MapTileRegion( northEast, southWest )
-
-                val geometryFactory = GeometryFactory()
-                val geometry1 = geometryFactory.createPolygon(points1.toTypedArray())
-
-                val deleteList = ArrayList<MapTileRegion>()
-
-                val allMapTileRegions = getAllMapTileRegions()
-
-                for (mtr in allMapTileRegions)
-                {
-                    val points2 = ArrayList<Coordinate>()
-                    points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
-                    points2.add( Coordinate( mtr.northEast.longitude, mtr.southWest.latitude ))
-                    points2.add( Coordinate( mtr.northEast.longitude, mtr.northEast.latitude ))
-                    points2.add( Coordinate( mtr.southWest.longitude, mtr.northEast.latitude ))
-                    points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
-                    val geometry2 = geometryFactory.createPolygon(points2.toTypedArray())
-                    if (geometry1.contains( geometry2 ))
-                    {
-                        deleteList.add( mtr )
-                    }
-                }
-
-                for (mtr in deleteList)
-                {
-                    if (config.mapTileRegions.contains( mtr ))
-                    {
-                        config.mapTileRegions.remove( mtr )
-                    }
-                    else if (unsavedMapTileRegions.contains( mtr ))
-                    {
-                        unsavedMapTileRegions.remove( mtr )
-                    }
-                }
-
-                unsavedMapTileRegions.add( mapTileRegion )
-
-                polyLinePoints.clear()
-                polylineAnnotation.points = polyLinePoints
-                polylineAnnotationManager.update(polylineAnnotation)
-
-                refreshMap()
-            }
-            else
-            {
-                val point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
-                polyLinePoints.add( point )
-
-                if (!this::polylineAnnotation.isInitialized)
-                {
-                    val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-                        .withPoints(polyLinePoints)
-                        .withLineColor("#ee4e8b")
-                        .withLineWidth(5.0)
-
-                    polylineAnnotation = polylineAnnotationManager.create(polylineAnnotationOptions)
-                }
-                else
-                {
-                    polylineAnnotation.points = polyLinePoints
-                    polylineAnnotationManager.update(polylineAnnotation)
-                }
-            }
-        }
-
-        return true
     }
 
     override fun didCancelText( tag: Any? )
@@ -774,59 +290,28 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
-        if (tag != null)
+        val vertices = ArrayList<LatLon>()
+
+        polyLinePoints.map {
+            vertices.add( LatLon( it.latitude(), it.longitude()))
+        }
+
+        polyLinePoints.clear()
+        polylineAnnotation.points = polyLinePoints
+        polylineAnnotationManager.update(polylineAnnotation)
+
+        if (name.isEmpty())
         {
-            Thread {
-                val uri = tag as Uri
-
-                val inputStream = activity!!.getContentResolver().openInputStream(uri)
-
-                inputStream?.let { inputStream ->
-                    try
-                    {
-                        parseGeoJson( inputStream.bufferedReader().readText(), name )
-                    }
-                    catch( ex: Exception)
-                    {
-                        activity!!.runOnUiThread {
-                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-            }.start()
+            val enumArea = EnumArea( "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
+            unsavedEnumAreas.add( enumArea )
         }
         else
         {
-            createEnumArea = false
-
-            val vertices = ArrayList<LatLon>()
-
-            droppedPointAnnotations.map { pointAnnotation ->
-                pointAnnotation?.let{ pointAnnotation ->
-                    vertices.add( LatLon( pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
-                    pointAnnotationManager.delete( pointAnnotation )
-                }
-            }
-
-            if (name.isEmpty())
-            {
-                val enumArea = EnumArea( "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
-                unsavedEnumAreas.add( enumArea )
-            }
-            else
-            {
-                val enumArea = EnumArea( name, vertices )
-                unsavedEnumAreas.add( enumArea )
-            }
-
-            val latLngBounds = GeoUtils.findGeobounds(vertices)
-            val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-            val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-            unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
-
-            refreshMap()
+            val enumArea = EnumArea( name, vertices )
+            unsavedEnumAreas.add( enumArea )
         }
+
+        refreshMap()
     }
 
     override fun didSelectLeftButton(tag: Any?)
@@ -835,80 +320,12 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     override fun didSelectRightButton(tag: Any?)
     {
-        if (tag is MapTileRegion)
-        {
-            config.mapTileRegions.remove( tag )
-            unsavedMapTileRegions.remove( tag )
-            DAO.mapTileRegionDAO.delete( tag )
-        }
-        else if (tag is EnumArea)
-        {
-            unsavedEnumAreas.remove( tag )
-            config.enumAreas.remove( tag )
-            DAO.enumAreaDAO.delete( tag )
-        }
-        else if (tag is PointAnnotation)
-        {
-            val pointAnnotation = tag as PointAnnotation
-            pointHashMap[pointAnnotation.id]?.let { location ->
-                val allEnumAreas = getAllEnumAreas()
-
-                val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( location.latitude, location.longitude ))
-
-                enumArea?.let {
-                    enumArea.locations.remove(location)
-                }
-
-                DAO.locationDAO.delete(location)
-            }
-        }
-
+        isRecording = false
+        polyLinePoints.clear()
+        polylineAnnotation.points = polyLinePoints
+        polylineAnnotationManager.update(polylineAnnotation)
+        binding.recordButton.setBackgroundResource( R.drawable.record )
         refreshMap()
-    }
-
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                MapboxManager.loadTilePacks( activity!!, getAllMapTileRegions(), this )
-            }
-        }
-    }
-
-    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
-    {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
-            }
-        }
-    }
-
-    override fun tilePacksLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
-            }
-        }
     }
 
     override fun didPressCancelButton()
@@ -926,96 +343,6 @@ class WalkEnumerationAreaFragment : Fragment(),
             data?.data?.let { uri ->
                 InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", uri, this, false )
             }
-        }
-    }
-
-    fun parseGeoJson( text: String, nameKey: String )
-    {
-        val points = ArrayList<Point>()
-        val featureCollection = FeatureCollection.fromJson( text )
-
-        featureCollection.forEach { feature ->
-
-            var name = "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}"
-
-            feature.getStringProperty(nameKey)?.let {
-                name = it
-            }
-
-            feature.geometry?.let { geometry ->
-                when( geometry ) {
-                    is MultiPolygon -> {
-                        val enumArea = EnumArea(name, ArrayList<LatLon>())
-                        val multiPolygon = geometry as MultiPolygon
-
-                        multiPolygon.coordinates[0][0].forEach { position ->
-                            enumArea.vertices.add( LatLon( position.latitude, position.longitude ))
-                        }
-
-                        unsavedEnumAreas.add(enumArea)
-
-                        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                        val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                        val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-                        config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
-                    }
-                    is Point -> {
-                        val point = geometry as Point
-                        points.add( point )
-                    }
-                    else -> {}
-                }
-            }
-        }
-
-        // figure out which enumArea contains each point
-
-        var count = 0
-
-        for (point in points)
-        {
-            Log.d( "xxx", "${count}/${points.size}")
-            count += 1
-
-            val allEnumAreas = ArrayList<EnumArea>()
-
-            if (config.enumAreas.isNotEmpty())
-            {
-                allEnumAreas.addAll( config.enumAreas)
-            }
-
-            if (unsavedEnumAreas.isNotEmpty())
-            {
-                allEnumAreas.addAll( unsavedEnumAreas )
-            }
-
-            for (enumArea in allEnumAreas)
-            {
-                val enumAreaPoints = ArrayList<Coordinate>()
-
-                enumArea.vertices.map {
-                    enumAreaPoints.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
-                }
-
-                val geometryFactory = GeometryFactory()
-                val geometry: Geometry = geometryFactory.createPolygon(enumAreaPoints.toTypedArray())
-
-                val coordinate = Coordinate( point.coordinates.longitude, point.coordinates.latitude )
-                val geometry1 = geometryFactory.createPoint( coordinate )
-                if (geometry.contains( geometry1 ))
-                {
-                    val location = Location( LocationType.Enumeration, point.coordinates.latitude, point.coordinates.longitude, false, "" )
-                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-
-                    enumArea.locations.add( location )
-                    break // found! assuming that it can only exist in a single EA, for now!
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            refreshMap()
         }
     }
 
@@ -1040,8 +367,74 @@ class WalkEnumerationAreaFragment : Fragment(),
         override fun onMoveEnd(detector: MoveGestureDetector) {}
     }
 
-    private fun initLocationComponent() {
+    private val onIndicatorAccurracyRadiusChangedListener = OnIndicatorAccuracyRadiusChangedListener {
+        val accuracy = it.toInt()
+        currentGPSAccuracy = accuracy
+
+        if (accuracy <= config.minGpsPrecision)
+        {
+            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
+            binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
+        }
+        else
+        {
+            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
+            binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
+        }
+
+        binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
+    }
+
+    private val locationConsumer = object : LocationConsumer
+    {
+        override fun onBearingUpdated(vararg bearing: Double, options: (ValueAnimator.() -> Unit)?) {
+        }
+
+        override fun onLocationUpdated(vararg location: com.mapbox.geojson.Point, options: (ValueAnimator.() -> Unit)?) {
+            if (isRecording && location.size > 0)
+            {
+                val point = location.last()
+
+//                if (polyLinePoints.size > 1)
+//                {
+//                    val last = polyLinePoints.last()
+//                    val distance = GeoUtils.distanceBetween( LatLng( last.latitude(), last.longitude()), LatLng(point.latitude(),point.longitude()))
+//                    if (distance < 5)
+//                    {
+//                        return
+//                    }
+//                }
+
+                currentGPSLocation = point
+                polyLinePoints.add( point )
+                polylineAnnotation.points = polyLinePoints
+                polylineAnnotationManager.update(polylineAnnotation)
+            }
+        }
+
+        override fun onPuckBearingAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
+        }
+
+        override fun onPuckLocationAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
+        }
+    }
+
+    private fun initLocationComponent()
+    {
         val locationComponentPlugin = binding.mapView.location
+
+        locationComponentPlugin.enabled = true
+        locationComponentPlugin.getLocationProvider()?.registerLocationConsumer( locationConsumer )
+        locationComponentPlugin.addOnIndicatorPositionChangedListener( onIndicatorPositionChangedListener )
+
+        val locationComponentPlugin2 = binding.mapView.location2
+        locationComponentPlugin2.enabled = true
+        locationComponentPlugin2.addOnIndicatorAccuracyRadiusChangedListener( onIndicatorAccurracyRadiusChangedListener )
+
+        locationComponentPlugin2.updateSettings2 {
+            this.showAccuracyRing = true
+        }
+
         locationComponentPlugin.updateSettings {
             this.enabled = true
             this.locationPuck = LocationPuck2D(
