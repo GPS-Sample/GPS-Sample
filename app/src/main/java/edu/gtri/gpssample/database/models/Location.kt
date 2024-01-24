@@ -14,6 +14,7 @@ data class Location(
     var creationDate: Long,
     var uuid : String,
     var type : LocationType,
+    var gpsAccuracy : Int,
     var latitude : Double,
     var longitude : Double,
     var isLandmark: Boolean,
@@ -22,8 +23,8 @@ data class Location(
     var isMultiFamily : Boolean?,
     var enumerationItems: ArrayList<EnumerationItem>)
 {
-    constructor(type: LocationType, latitude: Double, longitude: Double, isLandmark: Boolean, description: String ) :
-            this( null, Date().time, UUID.randomUUID().toString(), type, latitude, longitude, isLandmark, description,"", null, ArrayList<EnumerationItem>())
+    constructor(type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, isLandmark: Boolean, description: String ) :
+            this( null, Date().time, UUID.randomUUID().toString(), type, gpsAccuracy, latitude, longitude, isLandmark, description,"", null, ArrayList<EnumerationItem>())
 
     fun pack() : String
     {
