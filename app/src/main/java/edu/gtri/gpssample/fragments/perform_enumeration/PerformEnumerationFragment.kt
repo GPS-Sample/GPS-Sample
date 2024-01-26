@@ -280,13 +280,15 @@ class PerformEnumerationFragment : Fragment(),
 
             if (gpsAccuracyIsGood())
             {
-                currentGPSLocation?.let { point ->
-                    val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), true, "")
-                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-                    enumArea.locations.add(location)
-                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-                    findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+                currentGPSAccuracy?.let { accuracy ->
+                    currentGPSLocation?.let { point ->
+                        val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), true, "")
+                        DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                        enumArea.locations.add(location)
+                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+                        findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                    } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+                }
             }
             else
             {
@@ -547,7 +549,13 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
-            val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false, "")
+            var accuracy = -1
+
+            currentGPSAccuracy?.let {
+                accuracy = it
+            }
+
+            val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), false, "")
 
             if (gpsLocationIsGood( location ))
             {
@@ -629,7 +637,13 @@ class PerformEnumerationFragment : Fragment(),
                     }
                 }
 
-                val location = Location( LocationType.Enumeration, point.latitude(), point.longitude(), false, "")
+                var accuracy = -1
+
+                currentGPSAccuracy?.let {
+                    accuracy = it
+                }
+
+                val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), false, "")
 
                 DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                 enumArea.locations.add(location)
@@ -678,7 +692,13 @@ class PerformEnumerationFragment : Fragment(),
     {
         if (tag is Point)
         {
-            val location = Location( LocationType.Enumeration, tag.latitude(), tag.longitude(), false, "")
+            var accuracy = -1
+
+            currentGPSAccuracy?.let {
+                accuracy = it
+            }
+
+            val location = Location( LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), false, "")
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
 

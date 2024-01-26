@@ -557,7 +557,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         enumArea?.let{  enumArea ->
             latLng?.let { latLng ->
-                val location = Location( LocationType.Enumeration, latLng.latitude, latLng.longitude, false, "")
+                val location = Location( LocationType.Enumeration, -1, latLng.latitude, latLng.longitude, false, "")
                 enumArea.locations.add(location)
                 refreshMap()
             }
@@ -1005,7 +1005,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 val geometry1 = geometryFactory.createPoint( coordinate )
                 if (geometry.contains( geometry1 ))
                 {
-                    val location = Location( LocationType.Enumeration, point.coordinates.latitude, point.coordinates.longitude, false, "" )
+                    val location = Location( LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, false, "" )
                     DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
                     enumArea.locations.add( location )
