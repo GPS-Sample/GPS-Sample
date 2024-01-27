@@ -80,7 +80,7 @@ class AddMultiHouseholdFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddMultiHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem )

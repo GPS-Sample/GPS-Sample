@@ -80,7 +80,6 @@
     <string name="define_enumeration_area">"Define Enumeration Area"</string>
     <string name="define_sampling_method">"Define Sampling Method"</string>
     <string name="studies">"Studies"</string>
-    <string name="enumeration_area">"Enumeration Areas"</string>
     <string name="barcode_result">"Barcode detected"</string>
     <string name="error_scanner_cancelled">"Code scanner is cancelled."</string>
     <string name="error_camera_permission_not_granted">"Camera permission is not granted."</string>
@@ -309,6 +308,8 @@
     <string name="number_of_residents">Number of Residents</string>
     <string name="end_user_license_agreement">End User License Agreement</string>
     <string name="code_of_conduct">Code of Conduct</string>
+    <string name="clear_map">"Are you sure you want to clear the map?"</string>
+    <string name="enumeration_area">"Enumeration Area"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

@@ -323,7 +323,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     override fun onResume()
     {
         super.onResume()
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.DefineEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onMapClick(point: com.mapbox.geojson.Point): Boolean

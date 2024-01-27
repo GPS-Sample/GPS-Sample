@@ -19,9 +19,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -102,11 +100,11 @@ class ManageConfigurationsFragment : Fragment(),
                 binding.addButton.visibility = View.GONE
             }
 
-//            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
-//            {
-//                binding.createButton.visibility = View.VISIBLE
-//                binding.exportButton.visibility = View.VISIBLE
-//            }
+            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+            {
+                binding.createButton.visibility = View.VISIBLE
+                binding.exportButton.visibility = View.VISIBLE
+            }
         }
 
         binding.addButton.setOnClickListener {
@@ -121,7 +119,7 @@ class ManageConfigurationsFragment : Fragment(),
                 sharedViewModel.setCurrentConfig( configurations[0])
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.toString(), true )
-                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
             }
         }
 
@@ -212,6 +210,17 @@ class ManageConfigurationsFragment : Fragment(),
                 } ?: false
             }
 
+            var enumArea: EnumArea? = null
+
+            if (enumAreas.isNotEmpty())
+            {
+                enumArea = enumAreas[0]
+            }
+            else if (config.selectedEnumAreaId < 0 && config.enumAreas.isNotEmpty())
+            {
+                enumArea = config.enumAreas[0]
+            }
+
             // find the selected study
             val studies = config.studies.filter {
                 it.id?.let { id ->
@@ -219,11 +228,19 @@ class ManageConfigurationsFragment : Fragment(),
                 } ?: false
             }
 
-            if (enumAreas.isNotEmpty() && studies.isNotEmpty())
-            {
-                val enumArea = enumAreas[0]
-                val study = studies[0]
+            var study: Study? = null
 
+            if (studies.isNotEmpty())
+            {
+                study = studies[0]
+            }
+            else if (config.selectedStudyId < 0 && config.studies.isNotEmpty())
+            {
+                study = config.studies[0]
+            }
+
+            if (enumArea != null && study != null)
+            {
                 // find the selected enumeration Team
                 val enumTeams = enumArea.enumerationTeams.filter {
                     it.id?.let { id ->
@@ -231,9 +248,18 @@ class ManageConfigurationsFragment : Fragment(),
                     } ?: false
                 }
 
+                var enumTeam: EnumerationTeam? = null
+
                 if (enumTeams.isNotEmpty())
                 {
-                    val enumTeam = enumTeams[0]
+                    enumTeam = enumTeams[0]
+                }
+                else if (enumArea.selectedEnumerationTeamId < 0 && enumArea.enumerationTeams.isNotEmpty())
+                {
+                    enumTeam = enumArea.enumerationTeams[0]
+                }
+
+                enumTeam?.let { enumTeam ->
                     sharedViewModel.createStudyModel.setStudy( study )
                     sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
                     sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
@@ -423,11 +449,11 @@ class ManageConfigurationsFragment : Fragment(),
         {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-//                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
-//                {
-//                    binding.createButton.visibility = View.VISIBLE
-//                    binding.exportButton.visibility = View.VISIBLE
-//                }
+                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+                {
+                    binding.createButton.visibility = View.VISIBLE
+                    binding.exportButton.visibility = View.VISIBLE
+                }
 
                 navigateBasedOnRole()
 
