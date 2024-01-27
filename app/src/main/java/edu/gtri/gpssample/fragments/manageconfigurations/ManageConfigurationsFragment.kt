@@ -19,9 +19,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -212,6 +210,17 @@ class ManageConfigurationsFragment : Fragment(),
                 } ?: false
             }
 
+            var enumArea: EnumArea? = null
+
+            if (enumAreas.isNotEmpty())
+            {
+                enumArea = enumAreas[0]
+            }
+            else if (config.selectedEnumAreaId < 0 && config.enumAreas.isNotEmpty())
+            {
+                enumArea = config.enumAreas[0]
+            }
+
             // find the selected study
             val studies = config.studies.filter {
                 it.id?.let { id ->
@@ -219,11 +228,19 @@ class ManageConfigurationsFragment : Fragment(),
                 } ?: false
             }
 
-            if (enumAreas.isNotEmpty() && studies.isNotEmpty())
-            {
-                val study = studies[0]
-                val enumArea = enumAreas[0]
+            var study: Study? = null
 
+            if (studies.isNotEmpty())
+            {
+                study = studies[0]
+            }
+            else if (config.selectedStudyId < 0 && config.studies.isNotEmpty())
+            {
+                study = config.studies[0]
+            }
+
+            if (enumArea != null && study != null)
+            {
                 // find the selected enumeration Team
                 val enumTeams = enumArea.enumerationTeams.filter {
                     it.id?.let { id ->
@@ -231,9 +248,18 @@ class ManageConfigurationsFragment : Fragment(),
                     } ?: false
                 }
 
+                var enumTeam: EnumerationTeam? = null
+
                 if (enumTeams.isNotEmpty())
                 {
-                    val enumTeam = enumTeams[0]
+                    enumTeam = enumTeams[0]
+                }
+                else if (enumArea.selectedEnumerationTeamId < 0 && enumArea.enumerationTeams.isNotEmpty())
+                {
+                    enumTeam = enumArea.enumerationTeams[0]
+                }
+
+                enumTeam?.let { enumTeam ->
                     sharedViewModel.createStudyModel.setStudy( study )
                     sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
                     sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )

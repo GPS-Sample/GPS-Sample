@@ -347,11 +347,11 @@ class WalkEnumerationAreaFragment : Fragment(),
         {
             val p2 = polyLinePoints[i]
             val distance = GeoUtils.distanceBetween( LatLng( currentPoint.latitude(), currentPoint.longitude()), LatLng( p2.latitude(), p2.longitude()))
-            if (distance > 2)
-            {
+//            if (distance > 2)
+//            {
                 vertices.add( LatLon( p2.latitude(), p2.longitude()))
-                currentPoint = p2
-            }
+//                currentPoint = p2
+//            }
         }
 
         polyLinePoints.clear()
@@ -367,7 +367,8 @@ class WalkEnumerationAreaFragment : Fragment(),
                 name2 = "${resources.getString(R.string.enumeration_area)} 1"
             }
 
-            config.enumAreas.add( EnumArea( name2, vertices ))
+            val enumArea = EnumArea( name2, vertices )
+            config.enumAreas.add( enumArea )
 
             val latLngBounds = GeoUtils.findGeobounds(vertices)
             val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
@@ -375,7 +376,13 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
 
-            DAO.configDAO.createOrUpdateConfig( config )
+            DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
+                config.enumAreas[0].let { enumArea ->
+                    DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.id!!, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
+                        enumArea.enumerationTeams.add( enumerationTeam )
+                    }
+                }
+            }
 
             binding.saveButton.isEnabled = false
             binding.recordButton.isEnabled = false
