@@ -221,8 +221,8 @@ class ManageConfigurationsFragment : Fragment(),
 
             if (enumAreas.isNotEmpty() && studies.isNotEmpty())
             {
-                val enumArea = enumAreas[0]
                 val study = studies[0]
+                val enumArea = enumAreas[0]
 
                 // find the selected enumeration Team
                 val enumTeams = enumArea.enumerationTeams.filter {

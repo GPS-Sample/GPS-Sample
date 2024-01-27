@@ -70,12 +70,9 @@ class WalkEnumerationAreaFragment : Fragment(),
     private lateinit var defaultColorList : ColorStateList
 
     private var isRecording = false
-    private var createEnumArea = false
     private val binding get() = _binding!!
-    private var showCurrentLocation = false
+    private var showCurrentLocation = true
     private var currentGPSAccuracy: Int? = null
-    private val unsavedEnumAreas = ArrayList<EnumArea>()
-    private val unsavedMapTileRegions = ArrayList<MapTileRegion>()
     private var allPointAnnotations = ArrayList<PointAnnotation>()
     private var currentGPSLocation: com.mapbox.geojson.Point? = null
     private var _binding: FragmentWalkEnumerationAreaBinding? = null
@@ -120,6 +117,12 @@ class WalkEnumerationAreaFragment : Fragment(),
         {
             Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_not_found), Toast.LENGTH_SHORT).show()
             return
+        }
+
+        if (config.enumAreas.isNotEmpty())
+        {
+            binding.saveButton.isEnabled = false
+            binding.recordButton.isEnabled = false
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
@@ -176,6 +179,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         binding.centerOnLocationButton.backgroundTintList?.let {
             defaultColorList = it
+            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
         }
 
         binding.centerOnLocationButton.setOnClickListener {
@@ -208,12 +212,15 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         binding.saveButton.setOnClickListener {
 
-            isRecording = false
-            binding.recordButton.setBackgroundResource( R.drawable.record )
+            if (polyLinePoints.size > 2)
+            {
+                isRecording = false
+                binding.recordButton.setBackgroundResource( R.drawable.record )
 
-            InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
+                InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
 
-            refreshMap()
+                refreshMap()
+            }
         }
     }
 
@@ -246,11 +253,15 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         allPointAnnotations.clear()
 
-        for (enumArea in unsavedEnumAreas)
+        for (enumArea in config.enumAreas)
         {
             addPolygon(enumArea)
         }
 
+        for (mapTileRegion in config.mapTileRegions)
+        {
+            addPolygon( mapTileRegion )
+        }
     }
 
     fun addPolygon( enumArea: EnumArea )
@@ -265,6 +276,38 @@ class WalkEnumerationAreaFragment : Fragment(),
         pointList.add( points )
 
         val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.25 )
+
+        polygonAnnotation?.let { polygonAnnotation ->
+            allPolygonAnnotations.add( polygonAnnotation)
+        }
+
+        // create the polygon border
+        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#ff0000" )
+
+        polylineAnnotation?.let { polylineAnnotation ->
+            allPolylineAnnotations.add( polylineAnnotation )
+        }
+    }
+
+    fun addPolygon( mapTileRegion: MapTileRegion )
+    {
+        val points = ArrayList<com.mapbox.geojson.Point>()
+        val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+
+        val vertices = ArrayList<LatLon>()
+
+        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
+
+        vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.0 )
 
         polygonAnnotation?.let { polygonAnnotation ->
             allPolygonAnnotations.add( polygonAnnotation)
@@ -290,25 +333,52 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
+        // close the polygon
+        polyLinePoints.add( polyLinePoints[0] )
+
         val vertices = ArrayList<LatLon>()
 
-        polyLinePoints.map {
-            vertices.add( LatLon( it.latitude(), it.longitude()))
+        // filter points that are closer than 2 meters of each other
+        vertices.add( LatLon( polyLinePoints[0].latitude(), polyLinePoints[0].longitude()))
+
+        var currentPoint = polyLinePoints[0]
+
+        for (i in 1..polyLinePoints.size-1)
+        {
+            val p2 = polyLinePoints[i]
+            val distance = GeoUtils.distanceBetween( LatLng( currentPoint.latitude(), currentPoint.longitude()), LatLng( p2.latitude(), p2.longitude()))
+            if (distance > 2)
+            {
+                vertices.add( LatLon( p2.latitude(), p2.longitude()))
+                currentPoint = p2
+            }
         }
 
         polyLinePoints.clear()
         polylineAnnotation.points = polyLinePoints
         polylineAnnotationManager.update(polylineAnnotation)
 
-        if (name.isEmpty())
+        if (vertices.size > 2)
         {
-            val enumArea = EnumArea( "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
-            unsavedEnumAreas.add( enumArea )
-        }
-        else
-        {
-            val enumArea = EnumArea( name, vertices )
-            unsavedEnumAreas.add( enumArea )
+            var name2 = name
+
+            if (name2.isEmpty())
+            {
+                name2 = "${resources.getString(R.string.enumeration_area)} 1"
+            }
+
+            config.enumAreas.add( EnumArea( name2, vertices ))
+
+            val latLngBounds = GeoUtils.findGeobounds(vertices)
+            val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+            config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
+
+            DAO.configDAO.createOrUpdateConfig( config )
+
+            binding.saveButton.isEnabled = false
+            binding.recordButton.isEnabled = false
         }
 
         refreshMap()
@@ -325,6 +395,22 @@ class WalkEnumerationAreaFragment : Fragment(),
         polylineAnnotation.points = polyLinePoints
         polylineAnnotationManager.update(polylineAnnotation)
         binding.recordButton.setBackgroundResource( R.drawable.record )
+        binding.saveButton.isEnabled = true
+        binding.recordButton.isEnabled = true
+
+        if (config.enumAreas.isNotEmpty())
+        {
+            DAO.enumAreaDAO.delete( config.enumAreas[0] )
+            config.enumAreas.clear()
+        }
+
+        if (config.mapTileRegions.isNotEmpty())
+        {
+            DAO.mapTileRegionDAO.delete( config.mapTileRegions[0] )
+            config.mapTileRegions.clear()
+        }
+
+        DAO.configDAO.createOrUpdateConfig( config )
         refreshMap()
     }
 
@@ -394,16 +480,6 @@ class WalkEnumerationAreaFragment : Fragment(),
             if (isRecording && location.size > 0)
             {
                 val point = location.last()
-
-//                if (polyLinePoints.size > 1)
-//                {
-//                    val last = polyLinePoints.last()
-//                    val distance = GeoUtils.distanceBetween( LatLng( last.latitude(), last.longitude()), LatLng(point.latitude(),point.longitude()))
-//                    if (distance < 5)
-//                    {
-//                        return
-//                    }
-//                }
 
                 currentGPSLocation = point
                 polyLinePoints.add( point )
