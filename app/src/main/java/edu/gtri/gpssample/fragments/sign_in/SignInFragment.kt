@@ -73,25 +73,30 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         }
 
         binding.forgotPinTextView.setOnClickListener {
-
-            val user_name = binding.nameEditText.text.toString()
-
-            if (user_name.length > 0)
+            val userName = binding.nameEditText.text.toString()
+            if (userName.isEmpty())
             {
-                val user = DAO.userDAO.getUser(user_name)
-
-                user?.let {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                DAO.userDAO.getUser(userName)?.let {
                     InputDialog( activity!!, it.recoveryQuestion, "", null, this@SignInFragment )
-                }
+                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.resetPinTextView.setOnClickListener {
             val userName = binding.nameEditText.text.toString()
-            val user = DAO.userDAO.getUser(userName)
-
-            user?.let {
-                ResetPinDialog( activity!!, it.pin.toString(), this@SignInFragment )
+            if (userName.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                DAO.userDAO.getUser(binding.nameEditText.text.toString())?.let {
+                    ResetPinDialog( activity!!, it.pin.toString(), this@SignInFragment )
+                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -93,27 +94,6 @@ class MainFragment : Fragment()
         }
 
         binding.signInButton.setOnClickListener {
-            val bundle = Bundle()
-
-            if (binding.adminButton.isChecked) {
-                bundle.putString( Keys.kRole.toString(), Role.Admin.toString())
-            }
-            else if (binding.supervisorButton.isChecked) {
-                bundle.putString( Keys.kRole.toString(), Role.Supervisor.toString())
-            }
-            else if (binding.enumeratorButton.isChecked) {
-                bundle.putString( Keys.kRole.toString(), Role.Enumerator.toString())
-            }
-            else if (binding.dataCollectorButton.isChecked) {
-                bundle.putString( Keys.kRole.toString(), Role.DataCollector.toString())
-            }
-
-            binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
-
-            findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
-        }
-
-        binding.signUpTextView.setOnClickListener {
             var bundle: Bundle? = null
 
             if (binding.adminButton.isChecked) {
@@ -133,7 +113,41 @@ class MainFragment : Fragment()
                 bundle.putString( Keys.kRole.toString(), Role.DataCollector.toString())
             }
 
-            if (bundle != null)
+            if (bundle == null)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_a_role), Toast.LENGTH_SHORT).show()
+            }
+            else
+            {
+                findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
+            }
+        }
+
+        binding.signUpTextView.setOnClickListener {
+            var bundl: Bundle? = null
+
+            if (binding.adminButton.isChecked) {
+                bundl = Bundle()
+                bundl.putString( Keys.kRole.toString(), Role.Admin.toString())
+            }
+            else if (binding.supervisorButton.isChecked) {
+                bundl = Bundle()
+                bundl.putString( Keys.kRole.toString(), Role.Supervisor.toString())
+            }
+            else if (binding.enumeratorButton.isChecked) {
+                bundl = Bundle()
+                bundl.putString( Keys.kRole.toString(), Role.Enumerator.toString())
+            }
+            else if (binding.dataCollectorButton.isChecked) {
+                bundl = Bundle()
+                bundl.putString( Keys.kRole.toString(), Role.DataCollector.toString())
+            }
+
+            if (bundl == null)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_a_role), Toast.LENGTH_SHORT).show()
+            }
+            else
             {
                 binding.adminButton.isChecked = false
                 binding.supervisorButton.isChecked = false
@@ -142,9 +156,7 @@ class MainFragment : Fragment()
                 binding.signInButton.isEnabled = false
                 binding.signUpTextView.isEnabled = false
 
-                binding.signUpTextView.setTextColor( resources.getColor( R.color.light_gray, null))
-
-                findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundle)
+                findNavController().navigate(R.id.action_navigate_to_SignUpFragment, bundl)
             }
         }
 
