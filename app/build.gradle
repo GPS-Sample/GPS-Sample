@@ -14,8 +14,8 @@ android {
         applicationId "edu.gtri.gpssample"
         minSdk 26
         targetSdk 33
-        versionCode 6
-        versionName "1.0.0 #67"
+        versionCode 7
+        versionName "1.0.0 #68"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
