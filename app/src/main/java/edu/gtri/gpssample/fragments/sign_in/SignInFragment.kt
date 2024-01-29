@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.sign_in
 
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +26,7 @@ import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.databinding.FragmentSignInBinding
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.dialogs.ResetPinDialog
@@ -32,7 +35,7 @@ import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 
 
-class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDialog.ResetPinDialogDelegate
+class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDialog.ResetPinDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var expectedRole: String
     private var _binding: FragmentSignInBinding? = null
@@ -78,6 +81,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
             }
+            else if (userName == "@test-admin")
+            {
+                Toast.makeText(activity!!.applicationContext, "The PIN cannot be recovered for this account", Toast.LENGTH_SHORT).show()
+            }
             else
             {
                 DAO.userDAO.getUser(userName)?.let {
@@ -91,6 +98,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             if (userName.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_enter_your_user_name), Toast.LENGTH_SHORT).show()
+            }
+            else if (userName == "@test-admin")
+            {
+                Toast.makeText(activity!!.applicationContext, "The PIN cannot be reset for this account", Toast.LENGTH_SHORT).show()
             }
             else
             {
@@ -123,6 +134,14 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             val user = DAO.userDAO.getUser(userName, pin)
 
             user?.let { user ->
+
+                if (user.name == "@test-admin" && DAO.configDAO.getConfigs().isNotEmpty())
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.oops),
+                        "The test-admin is not allowed to view/edit a previously saved configuration.  Would you like to delete the saved configuration(s)?", resources.getString(R.string.no), resources.getString(R.string.yes), null, this@SignInFragment)
+                    return
+                }
+
                 if (user.role != expectedRole)
                 {
                     Toast.makeText(
@@ -145,7 +164,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                     activity!!.setTitle( "GPSSample - ${user.role}" )
 
                     val bundle = Bundle()
-                    bundle.putString(Keys.kRole.toString(), expectedRole.toString())
+                    bundle.putString(Keys.kRole.toString(), user.role.toString())
                     findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                 }
             }
@@ -187,6 +206,28 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         user?.let {
             it.pin = pin.toInt()
             DAO.userDAO.updateUser( it )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun didSelectLeftButton(tag: Any?)
+    {
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun didSelectRightButton(tag: Any?)
+    {
+        DAO.deleteAll( false )
+
+        val pin = binding.pinEditText.text.toString()
+        val userName = binding.nameEditText.text.toString()
+
+        DAO.userDAO.getUser(userName, pin)?.let { user ->
+            activity!!.setTitle( "GPSSample - ${user.role}" )
+
+            val bundle = Bundle()
+            bundle.putString(Keys.kRole.toString(), user.role.toString())
+            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
         }
     }
 

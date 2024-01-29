@@ -86,6 +86,12 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             var question = binding.questionSpinner.selectedItem as String
             val answer = binding.answerEditText.text.toString()
 
+            if (name == "@test-admin")
+            {
+                Toast.makeText(activity!!.applicationContext, "Invalid user name", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (name.length == 0)
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
