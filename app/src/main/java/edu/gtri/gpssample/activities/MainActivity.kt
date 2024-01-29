@@ -146,11 +146,8 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
                     InfoDialog( this, resources.getString(R.string.wifi_disabled),
                         resources.getString(R.string.wifi_disabled_message), resources.getString(R.string.ok), null, this)
                 }
-
             }
-
         }
-
     }
 
     override fun onResume() {

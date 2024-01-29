@@ -309,6 +309,7 @@
     <string name="end_user_license_agreement">End User License Agreement</string>
     <string name="code_of_conduct">Code of Conduct</string>
     <string name="clear_map">Are you sure you want to clear the map?</string>
+    <string name="delete_point">Are you sure you want to remove the last point?</string>
     <string name="enumeration_area">Enumeration Area</string>
     <string name="please_select_a_role">Please select a role</string>
     <string name="please_enter_your_user_name">Please enter your user name</string>

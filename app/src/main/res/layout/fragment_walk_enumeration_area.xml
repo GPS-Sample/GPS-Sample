@@ -105,22 +105,31 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/record_button"
+                android:id="@+id/add_point_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="5dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:background="@drawable/record" />
+                android:background="@drawable/add_location_blue" />
 
             <Button
-                android:id="@+id/clear_button"
+                android:id="@+id/delete_point_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="5dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:background="@drawable/clear" />
+
+            <Button
+                android:id="@+id/delete_everything_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:background="@drawable/delete_blue" />
 
             <Button
                 android:id="@+id/center_on_location_button"
@@ -132,6 +141,7 @@
                 android:background="@drawable/location_bubble" />
 
             <Space
+                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="50dp"/>

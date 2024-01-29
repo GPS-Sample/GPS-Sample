@@ -7,7 +7,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.LatLon
 import kotlin.math.*
 
-const val kMinimumDistance = 20.0
+const val kMinimumDistance = 10.0
 data class HaversineCheck(val distance : Double, var withinBounds : Boolean, val start : LatLng, val end : LatLng)
 {
     val minimumDistance = kMinimumDistance

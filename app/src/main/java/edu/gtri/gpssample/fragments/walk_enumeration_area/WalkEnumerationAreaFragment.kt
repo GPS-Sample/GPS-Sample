@@ -48,6 +48,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.github.dellisd.spatialk.geojson.FeatureCollection
 import io.github.dellisd.spatialk.geojson.MultiPolygon
 import io.github.dellisd.spatialk.geojson.Point
+import io.github.dellisd.spatialk.geojson.dsl.point
 import kotlinx.coroutines.launch
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
@@ -69,17 +70,21 @@ class WalkEnumerationAreaFragment : Fragment(),
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
     private lateinit var defaultColorList : ColorStateList
 
+    private var startPointAnnotation : PointAnnotation? = null
+
     private var isRecording = false
     private val binding get() = _binding!!
     private var showCurrentLocation = true
     private var currentGPSAccuracy: Int? = null
-    private var allPointAnnotations = ArrayList<PointAnnotation>()
     private var currentGPSLocation: com.mapbox.geojson.Point? = null
     private var _binding: FragmentWalkEnumerationAreaBinding? = null
     private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
     private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
+
+    private val kClearMapTag = 1
+    private val kDeletePointTag = 2
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -122,7 +127,8 @@ class WalkEnumerationAreaFragment : Fragment(),
         if (config.enumAreas.isNotEmpty())
         {
             binding.saveButton.isEnabled = false
-            binding.recordButton.isEnabled = false
+            binding.addPointButton.isEnabled = false
+            binding.deletePointButton.isEnabled = false
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
@@ -160,21 +166,28 @@ class WalkEnumerationAreaFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
-        binding.recordButton.setOnClickListener {
-            if (isRecording)
-            {
-                isRecording = false
-                binding.recordButton.setBackgroundResource( R.drawable.record )
-            }
-            else
-            {
-                isRecording = true
-                binding.recordButton.setBackgroundResource( R.drawable.pause )
+        binding.addPointButton.setOnClickListener {
+            currentGPSLocation?.let { point ->
+                polyLinePoints.add( point )
+                polylineAnnotation.points = polyLinePoints
+                polylineAnnotationManager.update(polylineAnnotation)
+
+                if (polyLinePoints.size == 1)
+                {
+                    startPointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                }
             }
         }
 
-        binding.clearButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), null, this@WalkEnumerationAreaFragment)
+        binding.deletePointButton.setOnClickListener {
+            if (polyLinePoints.size > 0)
+            {
+                ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_point), resources.getString(R.string.no), resources.getString(R.string.yes), kDeletePointTag, this@WalkEnumerationAreaFragment)
+            }
+        }
+
+        binding.deleteEverythingButton.setOnClickListener {
+            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), kClearMapTag, this@WalkEnumerationAreaFragment)
         }
 
         binding.centerOnLocationButton.backgroundTintList?.let {
@@ -215,7 +228,6 @@ class WalkEnumerationAreaFragment : Fragment(),
             if (polyLinePoints.size > 2)
             {
                 isRecording = false
-                binding.recordButton.setBackgroundResource( R.drawable.record )
 
                 InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
 
@@ -245,13 +257,6 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
 
         allPolylineAnnotations.clear()
-
-        for (pointAnnotation in allPointAnnotations)
-        {
-            pointAnnotationManager.delete( pointAnnotation )
-        }
-
-        allPointAnnotations.clear()
 
         for (enumArea in config.enumAreas)
         {
@@ -338,25 +343,19 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         val vertices = ArrayList<LatLon>()
 
-        // filter points that are closer than 2 meters of each other
-        vertices.add( LatLon( polyLinePoints[0].latitude(), polyLinePoints[0].longitude()))
-
-        var currentPoint = polyLinePoints[0]
-
-        for (i in 1..polyLinePoints.size-1)
+        for (point in polyLinePoints)
         {
-            val p2 = polyLinePoints[i]
-            val distance = GeoUtils.distanceBetween( LatLng( currentPoint.latitude(), currentPoint.longitude()), LatLng( p2.latitude(), p2.longitude()))
-//            if (distance > 2)
-//            {
-                vertices.add( LatLon( p2.latitude(), p2.longitude()))
-//                currentPoint = p2
-//            }
+            vertices.add( LatLon( point.latitude(), point.longitude()))
         }
 
         polyLinePoints.clear()
         polylineAnnotation.points = polyLinePoints
         polylineAnnotationManager.update(polylineAnnotation)
+
+        startPointAnnotation?.let {
+            pointAnnotationManager.delete( it )
+            startPointAnnotation = null
+        }
 
         if (vertices.size > 2)
         {
@@ -385,7 +384,8 @@ class WalkEnumerationAreaFragment : Fragment(),
             }
 
             binding.saveButton.isEnabled = false
-            binding.recordButton.isEnabled = false
+            binding.addPointButton.isEnabled = false
+            binding.deletePointButton.isEnabled = false
         }
 
         refreshMap()
@@ -397,27 +397,50 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     override fun didSelectRightButton(tag: Any?)
     {
-        isRecording = false
-        polyLinePoints.clear()
-        polylineAnnotation.points = polyLinePoints
-        polylineAnnotationManager.update(polylineAnnotation)
-        binding.recordButton.setBackgroundResource( R.drawable.record )
-        binding.saveButton.isEnabled = true
-        binding.recordButton.isEnabled = true
-
-        if (config.enumAreas.isNotEmpty())
+        if (tag == kClearMapTag)
         {
-            DAO.enumAreaDAO.delete( config.enumAreas[0] )
-            config.enumAreas.clear()
+            isRecording = false
+            polyLinePoints.clear()
+            polylineAnnotation.points = polyLinePoints
+            polylineAnnotationManager.update(polylineAnnotation)
+            binding.saveButton.isEnabled = true
+            binding.addPointButton.isEnabled = true
+            binding.deletePointButton.isEnabled = true
+
+            startPointAnnotation?.let {
+                pointAnnotationManager.delete( it )
+                startPointAnnotation = null
+            }
+
+            if (config.enumAreas.isNotEmpty())
+            {
+                DAO.enumAreaDAO.delete( config.enumAreas[0] )
+                config.enumAreas.clear()
+            }
+
+            if (config.mapTileRegions.isNotEmpty())
+            {
+                DAO.mapTileRegionDAO.delete( config.mapTileRegions[0] )
+                config.mapTileRegions.clear()
+            }
+
+            DAO.configDAO.createOrUpdateConfig( config )
+        }
+        else if (tag == kDeletePointTag)
+        {
+            polyLinePoints.removeLast()
+            polylineAnnotation.points = polyLinePoints
+            polylineAnnotationManager.update(polylineAnnotation)
+
+            if (polyLinePoints.isEmpty())
+            {
+                startPointAnnotation?.let {
+                    pointAnnotationManager.delete( it )
+                    startPointAnnotation = null
+                }
+            }
         }
 
-        if (config.mapTileRegions.isNotEmpty())
-        {
-            DAO.mapTileRegionDAO.delete( config.mapTileRegions[0] )
-            config.mapTileRegions.clear()
-        }
-
-        DAO.configDAO.createOrUpdateConfig( config )
         refreshMap()
     }
 
@@ -484,14 +507,9 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
 
         override fun onLocationUpdated(vararg location: com.mapbox.geojson.Point, options: (ValueAnimator.() -> Unit)?) {
-            if (isRecording && location.size > 0)
+            if (location.size > 0)
             {
-                val point = location.last()
-
-                currentGPSLocation = point
-                polyLinePoints.add( point )
-                polylineAnnotation.points = polyLinePoints
-                polylineAnnotationManager.update(polylineAnnotation)
+                currentGPSLocation = location.last()
             }
         }
 
