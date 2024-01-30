@@ -216,7 +216,7 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
 
         binding.helpButton.setOnClickListener {
-            CreateEnumAreaHelpDialog( activity!! )
+            WalkEnumerationHelpHelpDialog( activity!! )
         }
 
         binding.cancelButton.setOnClickListener {
