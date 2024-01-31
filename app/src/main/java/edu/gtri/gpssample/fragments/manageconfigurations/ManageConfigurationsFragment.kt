@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -23,6 +24,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -31,8 +33,13 @@ import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import java.io.File
+import java.io.FileWriter
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ManageConfigurationsFragment : Fragment(),
+    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     NetworkClientModel.ConfigurationDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
@@ -350,14 +357,15 @@ class ManageConfigurationsFragment : Fragment(),
         }
         else if (tag == kExportTag)
         {
-            view?.let { view ->
-                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin )
+            if (configurations.size == 1)
+            {
+                view?.let { view ->
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin )
 
-                sharedViewModel.currentConfiguration?.value?.let {
-                    sharedNetworkViewModel.setCurrentConfig(it)
+                    sharedNetworkViewModel.setCurrentConfig(configurations[0])
+
+                    sharedNetworkViewModel.createHotspot(view)
                 }
-
-                sharedNetworkViewModel.createHotspot(view)
             }
         }
     }
@@ -384,7 +392,29 @@ class ManageConfigurationsFragment : Fragment(),
         }
         else if (tag == kExportTag)
         {
+            if (configurations.size == 1) {
+                InputDialog( activity!!, resources.getString(R.string.filename_export_message), configurations[0].name, null, this@ManageConfigurationsFragment )
+            }
         }
+    }
+
+    override fun didCancelText( tag: Any? )
+    {
+    }
+
+    override fun didEnterText( name: String, tag: Any? )
+    {
+        val packedConfig = configurations[0].pack()
+        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+        root.mkdirs()
+        val file = File(root, "$name.${Date().time}.json")
+        val writer = FileWriter(file)
+        writer.append(packedConfig)
+        writer.flush()
+        writer.close()
+
+        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.configuration_documents_message),
+            Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
