@@ -16,6 +16,7 @@ class LatLonDAO(private var dao: DAO)
         }
         else
         {
+            latLon.id = null
             val values = ContentValues()
             putLatLon( latLon, values )
             latLon.id = dao.writableDatabase.insert(DAO.TABLE_LAT_LON, null, values).toInt()
@@ -78,16 +79,19 @@ class LatLonDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
+        values.put( DAO.COLUMN_UUID, latLon.uuid )
         values.put( DAO.COLUMN_LAT, latLon.latitude )
         values.put( DAO.COLUMN_LON, latLon.longitude )
     }
 
     fun exists( latLon: LatLon ): Boolean
     {
-        latLon.id?.let { id ->
-            getLatLon( id )?.let {
-                return true
-            } ?: return false
+        getLatLon( latLon.uuid )?.let {
+            if (latLon.id != it.id)
+            {
+                latLon.id = it.id
+            }
+            return true
         } ?: return false
     }
 
@@ -95,10 +99,11 @@ class LatLonDAO(private var dao: DAO)
     private fun createLatLon(cursor: Cursor): LatLon
     {
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LAT))
         val lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LON))
 
-        return LatLon( id, lat, lon )
+        return LatLon( id, uuid, lat, lon )
     }
 
     fun updateLatLon( latLon: LatLon )
@@ -120,6 +125,23 @@ class LatLonDAO(private var dao: DAO)
     {
         var latLon: LatLon? = null
         val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} where id=${id}"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            latLon = createLatLon( cursor )
+        }
+
+        cursor.close()
+
+        return latLon
+    }
+
+    fun getLatLon( uuid: String ): LatLon?
+    {
+        var latLon: LatLon? = null
+        val query = "SELECT * FROM ${DAO.TABLE_LAT_LON} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)

@@ -60,6 +60,7 @@ class EnumAreaDAO(private var dao: DAO)
                     }
                 }
 
+                enumerationTeam.enumerAreaId = id
                 DAO.enumerationTeamDAO.createOrUpdateTeam( enumerationTeam )
             }
 

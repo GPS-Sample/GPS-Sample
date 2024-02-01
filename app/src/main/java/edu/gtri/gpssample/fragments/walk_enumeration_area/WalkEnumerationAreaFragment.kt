@@ -83,6 +83,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
+    private val test = "test-1"
     private val kClearMapTag = 1
     private val kDeletePointTag = 2
 
@@ -168,13 +169,43 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         binding.addPointButton.setOnClickListener {
             currentGPSLocation?.let { point ->
-                polyLinePoints.add( point )
-                polylineAnnotation.points = polyLinePoints
-                polylineAnnotationManager.update(polylineAnnotation)
 
-                if (polyLinePoints.size == 1)
+                if (test == "test-1")
                 {
-                    startPointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                    createTest1Point(point)?.let {
+                        polyLinePoints.add( it )
+                        polylineAnnotation.points = polyLinePoints
+                        polylineAnnotationManager.update(polylineAnnotation)
+
+                        if (polyLinePoints.size == 1)
+                        {
+                            startPointAnnotation = mapboxManager.addMarker( it, R.drawable.location_blue )
+                        }
+                    }
+                }
+                else if (test == "test-2")
+                {
+                    createTest2Point(point)?.let {
+                        polyLinePoints.add( it )
+                        polylineAnnotation.points = polyLinePoints
+                        polylineAnnotationManager.update(polylineAnnotation)
+
+                        if (polyLinePoints.size == 1)
+                        {
+                            startPointAnnotation = mapboxManager.addMarker( it, R.drawable.location_blue )
+                        }
+                    }
+                }
+                else
+                {
+                    polyLinePoints.add( point )
+                    polylineAnnotation.points = polyLinePoints
+                    polylineAnnotationManager.update(polylineAnnotation)
+
+                    if (polyLinePoints.size == 1)
+                    {
+                        startPointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                    }
                 }
             }
         }
@@ -234,6 +265,54 @@ class WalkEnumerationAreaFragment : Fragment(),
                 refreshMap()
             }
         }
+    }
+
+    fun createTest1Point( point: com.mapbox.geojson.Point ) : com.mapbox.geojson.Point?
+    {
+        var p: com.mapbox.geojson.Point? = null
+
+        if (polyLinePoints.size == 0)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()+0.1 )
+        }
+        else if (polyLinePoints.size == 1)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()+0.1 )
+        }
+        else if (polyLinePoints.size == 2)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()-0.1 )
+        }
+        else if (polyLinePoints.size == 3)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()-0.1 )
+        }
+
+        return p
+    }
+
+    fun createTest2Point( point: com.mapbox.geojson.Point ) : com.mapbox.geojson.Point?
+    {
+        var p: com.mapbox.geojson.Point? = null
+
+        if (polyLinePoints.size == 0)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()+0.3 )
+        }
+        else if (polyLinePoints.size == 1)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()+0.3 )
+        }
+        else if (polyLinePoints.size == 2)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()+0.1 )
+        }
+        else if (polyLinePoints.size == 3)
+        {
+            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()+0.1 )
+        }
+
+        return p
     }
 
     override fun onResume()
