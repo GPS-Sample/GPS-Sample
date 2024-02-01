@@ -83,7 +83,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
-    private val test = "test-1"
+    private val test = "test-OFF"
     private val kClearMapTag = 1
     private val kDeletePointTag = 2
 
