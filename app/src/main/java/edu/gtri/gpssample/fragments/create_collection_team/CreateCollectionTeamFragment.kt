@@ -300,8 +300,9 @@ class CreateCollectionTeamFragment : Fragment(),
 
                             for (location in enumArea.locations)
                             {
+                                // add the location if it lies within the selection polygon
                                 val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
-                                if (polygon.contains(geometry3))
+                                if (geometry2.contains(geometry3))
                                 {
                                     locations.add( location )
                                 }
