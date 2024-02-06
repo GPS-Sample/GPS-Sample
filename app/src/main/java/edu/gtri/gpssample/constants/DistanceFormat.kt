@@ -2,7 +2,7 @@ package edu.gtri.gpssample.constants
 
 enum class DistanceFormat(val format : String) {
     None("None"),
-    Meters("Meters / KiloMeters"),
+    Meters("Meters / Kilometers"),
     Feet("Feet / Miles"),
 }
 
