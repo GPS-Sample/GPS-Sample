@@ -260,8 +260,6 @@
     <string name="incomplete_enumeration">"Dénombrement incomplet"</string>
     <string name="incomplete_collection">"Collecte incomplète"</string>
     <string name="completed_collection">"Collecte complète"</string>
-    <string name="is_multi_family">"S'agit-il d'un site multifamilial ?"</string>
-    <string name="multi_families">"Familles multiples"</string>
     <string name="dismiss">"Supprimer"</string>
     <string name="delete">"Supprimer"</string>
     <string name="launching_odk_collect_application">"Lancement de l'application ODK Collect..."</string>

@@ -260,8 +260,6 @@
     <string name="incomplete_enumeration">"Enumeração Incompleta"</string>
     <string name="incomplete_collection">"Recolha incompleta"</string>
     <string name="completed_collection">"Recolha Completa"</string>
-    <string name="is_multi_family">"Este é um local multifamiliar?"</string>
-    <string name="multi_families">"Multifamiliar"</string>
     <string name="dismiss">"Excluir"</string>
     <string name="delete">"Eliminar"</string>
     <string name="launching_odk_collect_application">"Iniciar a aplicação ODK Collect..."</string>
