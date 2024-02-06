@@ -232,8 +232,11 @@ class PerformCollectionFragment : Fragment(),
                             }
                             else
                             {
-                                (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
-                                LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
+                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
+                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
+                                }
                             }
                         }
                     }
@@ -454,13 +457,14 @@ class PerformCollectionFragment : Fragment(),
 
     private fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
     {
-        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
-
-        location?.let { location ->
-            sharedViewModel.locationViewModel.setCurrentLocation(location)
-            sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
-            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
-            LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            DAO.locationDAO.getLocation( enumerationItem.locationId )?.let { location ->
+                sharedViewModel.locationViewModel.setCurrentLocation(location)
+                sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
+                (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
+                (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
+            }
         }
     }
 
