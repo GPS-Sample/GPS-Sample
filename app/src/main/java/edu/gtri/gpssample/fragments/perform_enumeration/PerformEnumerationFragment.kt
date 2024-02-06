@@ -51,6 +51,8 @@ import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -735,15 +737,30 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 kExportTag -> {
+                    val user = (activity!!.application as MainApplication).user
+
+                    var userName = user!!.name.replace(" ", "" ).uppercase()
+
+                    if (userName.length > 4)
+                    {
+                        userName = userName.substring(0,4)
+                    }
+
+                    val role = user.role.toString().substring(0,2).uppercase()
+
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
+                    val dateTime = LocalDateTime.now().format(formatter)
+
+                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
+                    root.mkdirs()
+
                     when(user.role)
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
                             val packedConfig = config.pack()
-
-                            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                            root.mkdirs()
-                            val file = File(root, "Configuration.${Date().time}.json")
+                            val fileName = "C-${role}-${userName}-${dateTime!!}.json"
+                            val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedConfig)
                             writer.flush()
@@ -755,10 +772,9 @@ class PerformEnumerationFragment : Fragment(),
                         Role.Enumerator.toString() ->
                         {
                             val packedEnumArea = enumArea.pack()
-
-                            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
-                            root.mkdirs()
-                            val file = File(root, "Enumeration.${Date().time}.json")
+                            val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+                            val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}.json"
+                            val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedEnumArea)
                             writer.flush()

@@ -51,6 +51,8 @@ import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PerformCollectionFragment : Fragment(),
@@ -465,15 +467,30 @@ class PerformCollectionFragment : Fragment(),
     override fun didSelectRightButton(tag: Any?)
     {
         var payload: String = ""
-        var name: String = ""
         var message: String = ""
+        var fileName: String = ""
+
+        val user = (activity!!.application as MainApplication).user
+
+        var userName = user!!.name.replace(" ", "" ).uppercase()
+
+        if (userName.length > 4)
+        {
+            userName = userName.substring(0,4)
+        }
+
+        val role = user.role.toString().substring(0,2).uppercase()
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
+        val dateTime = LocalDateTime.now().format(formatter)
 
         when(user.role) {
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    name = "Configuration"
+
+                    fileName = "C-${role}-${userName}-${dateTime!!}.json"
                     payload = config.pack()
                     message = resources.getString(R.string.config_saved_doc)
                 }
@@ -483,16 +500,17 @@ class PerformCollectionFragment : Fragment(),
             Role.DataCollector.toString() ->
             {
                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                    name = "Collection"
+                    val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+                    fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}.json"
                     payload = enumArea.pack()
                     message = resources.getString(R.string.collection_saved_doc)
                 }
             }
         }
 
-        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
         root.mkdirs()
-        val file = File(root, "${name}.${Date().time}.json")
+        val file = File(root, fileName)
         val writer = FileWriter(file)
         writer.append(payload)
         writer.flush()

@@ -35,11 +35,12 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
 class ManageConfigurationsFragment : Fragment(),
-    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     NetworkClientModel.ConfigurationDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
@@ -392,29 +393,42 @@ class ManageConfigurationsFragment : Fragment(),
         }
         else if (tag == kExportTag)
         {
-            if (configurations.size == 1) {
-                InputDialog( activity!!, resources.getString(R.string.filename_export_message), configurations[0].name, null, this@ManageConfigurationsFragment )
+            if (configurations.size == 1)
+            {
+                exportToDevice()
             }
         }
     }
 
-    override fun didCancelText( tag: Any? )
-    {
-    }
-
-    override fun didEnterText( name: String, tag: Any? )
+    fun exportToDevice( )
     {
         val packedConfig = configurations[0].pack()
-        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+
+        val user = (activity!!.application as MainApplication).user
+
+        var userName = user!!.name.replace(" ", "" ).uppercase()
+
+        if (userName.length > 4)
+        {
+            userName = userName.substring(0,4)
+        }
+
+        val role = user.role.toString().substring(0,2).uppercase()
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
+        val dateTime = LocalDateTime.now().format(formatter)
+
+        val fileName = "C-${role}-${userName}-${dateTime!!}.json"
+
+        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
         root.mkdirs()
-        val file = File(root, "$name.${Date().time}.json")
+        val file = File(root, fileName)
         val writer = FileWriter(file)
         writer.append(packedConfig)
         writer.flush()
         writer.close()
 
-        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.configuration_documents_message),
-            Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
