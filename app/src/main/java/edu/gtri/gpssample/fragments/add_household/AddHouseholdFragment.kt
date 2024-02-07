@@ -218,6 +218,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
 
+        if (enumerationItem.id != null)
+        {
+            binding.hideAdditionalInfoImageView.visibility = View.GONE
+            binding.showAdditionalInfoImageView.visibility = View.VISIBLE
+            binding.defaultInfoLayout.visibility = View.GONE
+            binding.additionalInfoLayout.visibility = View.GONE
+        }
+
         binding.hideAdditionalInfoImageView.setOnClickListener {
             binding.hideAdditionalInfoImageView.visibility = View.GONE
             binding.showAdditionalInfoImageView.visibility = View.VISIBLE

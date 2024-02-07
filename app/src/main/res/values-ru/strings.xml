@@ -260,8 +260,6 @@
     <string name="incomplete_enumeration">"Неполный сбор"</string>
     <string name="incomplete_collection">"Неполная коллекция"</string>
     <string name="completed_collection">"Завершенный сбор"</string>
-    <string name="is_multi_family">"Является ли это место проживания многосемейным?"</string>
-    <string name="multi_families">"Многосемейные"</string>
     <string name="dismiss">"Удалить"</string>
     <string name="delete">"Удалить"</string>
     <string name="launching_odk_collect_application">"Запуск приложения ODK Collect..."</string>

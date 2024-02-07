@@ -11,8 +11,12 @@ class ODKLaunchedActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
 
+        val app = (this.application as? MainApplication)!!
+        val enumAreaName = app.currentEnumerationAreaName.replace(" ", "" ).uppercase()
+        val id = "${app.currentEnumerationItemUUID}:${enumAreaName}"
+
         val intent = Intent()
-        intent.putExtra("value", (this.application as? MainApplication)!!.currentEnumerationItemUUID)
+        intent.putExtra("value", id )
         setResult(RESULT_OK, intent)
 
         finish()

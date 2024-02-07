@@ -14,6 +14,7 @@ class MainApplication : Application()
     var user: User? = null
     var currentFragment = ""
     var currentEnumerationItemUUID = "9999"
+    var currentEnumerationAreaName = "9999"
 
     override fun onCreate()
     {

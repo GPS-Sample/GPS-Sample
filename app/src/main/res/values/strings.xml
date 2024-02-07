@@ -259,8 +259,6 @@
     <string name="incomplete_enumeration">"Incomplete Enumeration"</string>
     <string name="incomplete_collection">"Incomplete Collection"</string>
     <string name="completed_collection">"Completed Collection"</string>
-    <string name="is_multi_family">"Is this a multi family location?"</string>
-    <string name="multi_families">"Multi Families"</string>
     <string name="dismiss">"Dismiss"</string>
     <string name="delete">"Delete"</string>
     <string name="launching_odk_collect_application">"Launching ODK Collect Application..."</string>
@@ -314,6 +312,8 @@
     <string name="please_select_a_role">Please select a role</string>
     <string name="please_enter_your_user_name">Please enter your user name</string>
     <string name="user_name_not_found">User name not found</string>
+    <string name="multi_families">"Multi Households"</string>
+    <string name="is_multi_family">"Is this a multi household location?"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

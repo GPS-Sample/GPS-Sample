@@ -51,10 +51,12 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
 import java.io.FileWriter
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class ConfigurationFragment : Fragment(),
-    InputDialog.InputDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null
@@ -280,7 +282,7 @@ class ConfigurationFragment : Fragment(),
                     }
 
                     kExportTag -> {
-                        InputDialog( activity!!, resources.getString(R.string.filename_export_message), config.name, null, this@ConfigurationFragment )
+                        exportToDevice()
                     }
 
                     kTaskTag -> {
@@ -292,26 +294,36 @@ class ConfigurationFragment : Fragment(),
         }
     }
 
-    override fun didCancelText( tag: Any? )
-    {
-    }
-
-    override fun didEnterText( name: String, tag: Any? )
+    fun exportToDevice( )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
-
             val packedConfig = config.pack()
-            Log.d( "xxx", packedConfig )
 
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS)
+            val user = (activity!!.application as MainApplication).user
+
+            var userName = user!!.name.replace(" ", "" ).uppercase()
+
+            if (userName.length > 4)
+            {
+                userName = userName.substring(0,4)
+            }
+
+            val role = user.role.toString().substring(0,2).uppercase()
+
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
+            val dateTime = LocalDateTime.now().format(formatter)
+
+            val fileName = "C-${role}-${userName}-${dateTime!!}.json"
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
             root.mkdirs()
-            val file = File(root, "$name.${Date().time}.json")
+            val file = File(root, fileName)
             val writer = FileWriter(file)
             writer.append(packedConfig)
             writer.flush()
             writer.close()
 
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.configuration_documents_message),
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc),
                 Toast.LENGTH_SHORT).show()
         }
     }

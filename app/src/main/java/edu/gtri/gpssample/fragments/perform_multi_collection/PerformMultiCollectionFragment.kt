@@ -121,9 +121,12 @@ class PerformMultiCollectionFragment : Fragment(),
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem)
     {
-        (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
-        sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-        LaunchSurveyDialog( activity, gpsAccuracyIsGood, this@PerformMultiCollectionFragment)
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
+            (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+            LaunchSurveyDialog( activity, gpsAccuracyIsGood, this@PerformMultiCollectionFragment)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
