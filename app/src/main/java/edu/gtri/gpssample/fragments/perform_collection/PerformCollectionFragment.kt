@@ -235,6 +235,7 @@ class PerformCollectionFragment : Fragment(),
                                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
                                     LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
                                 }
                             }
@@ -463,6 +464,7 @@ class PerformCollectionFragment : Fragment(),
                 sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
                 (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
                 (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
                 LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
             }
         }
