@@ -21,7 +21,7 @@ class StudyDAO(private var dao: DAO)
         // if study exists and is modified, created a new one.
 
         study.id?.let{id ->
-            var testStudy = DAO.studyDAO.getStudy(id)
+            val testStudy = DAO.studyDAO.getStudy(id)
 
             if(study.equals( testStudy))
             {
@@ -66,7 +66,21 @@ class StudyDAO(private var dao: DAO)
                     }
                 }
 
-                DAO.collectionTeamDAO.createOrUpdateTeam( collectionTeam )
+                // the teamId may change, make sure that we update the study.selectedCollectionTeam, if necessary
+
+                val oldTeamId = collectionTeam.id
+
+                DAO.collectionTeamDAO.createOrUpdateTeam( collectionTeam )?.let { newTeam ->
+                    newTeam.id?.let { newTeamId ->
+                        oldTeamId?.let { oldTeamId ->
+                            if (study.selectedCollectionTeamId == oldTeamId)
+                            {
+                                study.selectedCollectionTeamId = newTeamId
+                                updateStudy( study )
+                            }
+                        }
+                    }
+                }
             }
 
             // add fields
@@ -86,7 +100,6 @@ class StudyDAO(private var dao: DAO)
             {
                 DAO.filterDAO.createOrUpdateFilter(filter, study);
             }
-
         }
 
         return study

@@ -15,7 +15,6 @@ class EnumAreaDAO(private var dao: DAO)
         if (exists( enumArea ))
         {
             updateEnumArea( enumArea, config )
-            updateEnumAreaElements(enumArea)
         }
         else
         {
@@ -23,25 +22,14 @@ class EnumAreaDAO(private var dao: DAO)
             val values = ContentValues()
             putEnumArea( enumArea, config, values )
             enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
-
-            updateEnumAreaElements(enumArea)
         }
 
-        return enumArea
-    }
-
-    private fun updateEnumAreaElements(enumArea : EnumArea) : EnumArea?
-    {
-        enumArea.id?.let {id ->
-            Log.d( "xxx", "new enumArea id = ${id}")
-
-            for (latLon in enumArea.vertices)
-            {
+        enumArea.id?.let { id ->
+            for (latLon in enumArea.vertices) {
                 DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea, null)
             }
 
-            for (location in enumArea.locations)
-            {
+            for (location in enumArea.locations) {
                 // location id's may be updated here
                 DAO.locationDAO.createOrUpdateLocation(location, enumArea)
             }
@@ -53,19 +41,32 @@ class EnumAreaDAO(private var dao: DAO)
                 {
                     for (location in DAO.locationDAO.getLocations())
                     {
-                        if (teamLocation.uuid == location.uuid && teamLocation.id != location.id)
-                        {
+                        if (teamLocation.uuid == location.uuid && teamLocation.id != location.id) {
                             teamLocation.id = location.id
                         }
                     }
                 }
 
                 enumerationTeam.enumerAreaId = id
-                DAO.enumerationTeamDAO.createOrUpdateTeam( enumerationTeam )
-            }
 
-            return enumArea
-        } ?: return null
+                // the teamId may change, make sure that we update the enumArea.selectedEnumerationTeam, if necessary
+
+                val oldTeamId = enumerationTeam.id
+
+                DAO.enumerationTeamDAO.createOrUpdateTeam(enumerationTeam)?.let { newTeam ->
+                    newTeam.id?.let { newTeamId ->
+                        oldTeamId?.let { oldTeamId ->
+                            if (enumArea.selectedEnumerationTeamId == oldTeamId) {
+                                enumArea.selectedEnumerationTeamId = newTeamId
+                                updateEnumArea(enumArea, config)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return enumArea
     }
 
     fun putEnumArea( enumArea: EnumArea, config : Config, values: ContentValues )
