@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
@@ -13,7 +12,7 @@ import edu.gtri.gpssample.database.models.EnumArea
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ManageEnumerationAreasAdapter.ViewHolder>()
+class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapter<ConfigurationAdapter.ViewHolder>()
 {
     override fun getItemCount() : Int {
         enumAreas?.let {enumAreas ->
@@ -36,7 +35,7 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
     {
         this.context = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_enum_area, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -51,7 +50,6 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
         val enumArea = enumAreas!!.get(holder.adapterPosition)
 
         holder.nameTextView.setText( enumArea.name )
-        holder.dateTextView.setText( Date( enumArea.creationDate ).toString())
 
         holder.itemView.setOnClickListener {
             didSelectEnumArea(enumArea)
@@ -61,6 +59,5 @@ class ManageEnumerationAreasAdapter(var enumAreas: List<EnumArea>?) : RecyclerVi
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
     }
 }

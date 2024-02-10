@@ -15,18 +15,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolygonOptions
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
@@ -38,20 +29,17 @@ import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
 import java.io.FileWriter
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -66,7 +54,7 @@ class ConfigurationFragment : Fragment(),
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
-    private lateinit var enumerationAreasAdapter: ManageEnumerationAreasAdapter
+    private lateinit var enumerationAreasAdapter: ConfigurationAdapter
 
     private val kDeleteTag = 1
     private val kExportTag = 2
@@ -104,6 +92,18 @@ class ConfigurationFragment : Fragment(),
 
             // Assign the fragment
             configurationFragment = this@ConfigurationFragment
+        }
+
+        binding.hideAdditionalInfoImageView.setOnClickListener {
+            binding.settingsLayout.visibility = View.GONE
+            binding.hideAdditionalInfoImageView.visibility = View.GONE
+            binding.showAdditionalInfoImageView.visibility = View.VISIBLE
+        }
+
+        binding.showAdditionalInfoImageView.setOnClickListener {
+            binding.settingsLayout.visibility = View.VISIBLE
+            binding.showAdditionalInfoImageView.visibility = View.GONE
+            binding.hideAdditionalInfoImageView.visibility = View.VISIBLE
         }
 
         binding.editImageView.setOnClickListener {
@@ -149,6 +149,9 @@ class ConfigurationFragment : Fragment(),
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
+
+            binding.configNameTextView.text = config.name
+
             studiesAdapter = StudiesAdapter(config.studies)
             studiesAdapter.didSelectStudy = this::didSelectStudy
 
@@ -159,7 +162,7 @@ class ConfigurationFragment : Fragment(),
                 sharedViewModel.createStudyModel.setStudy(config.studies[0])
             }
 
-            enumerationAreasAdapter = ManageEnumerationAreasAdapter( config.enumAreas )
+            enumerationAreasAdapter = ConfigurationAdapter( config.enumAreas )
             enumerationAreasAdapter.didSelectEnumArea = this::didSelectEnumArea
         }
 
@@ -337,7 +340,7 @@ class ConfigurationFragment : Fragment(),
                     study.id?.let { studyId ->
                         config.selectedStudyId = studyId
                         sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-                        ConfirmationDialog( activity, "${resources.getString(R.string.define_enumeration_area)} ${enumArea.name}", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
+                        ConfirmationDialog( activity, "", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
                     }
                 } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
             }
