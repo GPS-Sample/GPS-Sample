@@ -15,7 +15,7 @@ import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import java.util.*
 
-class AddMultiHouseholdAdapter(var location: Location, var enumerationItems: List<EnumerationItem>) : RecyclerView.Adapter<AddMultiHouseholdAdapter.ViewHolder>()
+class AddMultiHouseholdAdapter(var location: Location, var enumerationItems: List<EnumerationItem>, val enumAreaName: String) : RecyclerView.Adapter<AddMultiHouseholdAdapter.ViewHolder>()
 {
     override fun getItemCount() = enumerationItems.size
 
@@ -26,7 +26,7 @@ class AddMultiHouseholdAdapter(var location: Location, var enumerationItems: Lis
     {
         this.context = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
 
         viewHolder.itemView.isSelected = false
 
@@ -45,8 +45,12 @@ class AddMultiHouseholdAdapter(var location: Location, var enumerationItems: Lis
 
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( enumerationItem.uuid )
-        holder.dateTextView.setText( enumerationItem.subAddress )
+        holder.dateTextView.setText( enumerationItem.uuid )
+
+        if (enumerationItem.subAddress.isNotEmpty())
+        {
+            holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
+        }
 
         if (enumerationItem.enumerationState == EnumerationState.Enumerated)
         {

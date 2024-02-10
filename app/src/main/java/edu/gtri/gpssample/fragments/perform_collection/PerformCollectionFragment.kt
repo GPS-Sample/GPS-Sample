@@ -70,6 +70,7 @@ class PerformCollectionFragment : Fragment(),
     }
 
     private lateinit var user: User
+    private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var collectionTeam: CollectionTeam
     private lateinit var defaultColorList : ColorStateList
@@ -134,6 +135,10 @@ class PerformCollectionFragment : Fragment(),
             collectionTeam = it
         }
 
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
+        }
+
         val _user = (activity!!.application as? MainApplication)?.user
 
         _user?.let { user ->
@@ -166,7 +171,7 @@ class PerformCollectionFragment : Fragment(),
             }
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( enumerationItems )
+        performCollectionAdapter = PerformCollectionAdapter( enumerationItems, enumArea.name )
         performCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()

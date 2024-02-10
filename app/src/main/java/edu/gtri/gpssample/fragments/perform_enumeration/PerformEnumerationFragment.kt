@@ -145,7 +145,7 @@ class PerformEnumerationFragment : Fragment(),
             user = it
         }
 
-        performEnumerationAdapter = PerformEnumerationAdapter( ArrayList<Location>() )
+        performEnumerationAdapter = PerformEnumerationAdapter( ArrayList<Location>(), enumArea.name )
         performEnumerationAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()

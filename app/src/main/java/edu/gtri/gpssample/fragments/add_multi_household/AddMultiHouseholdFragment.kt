@@ -19,6 +19,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class AddMultiHouseholdFragment : Fragment()
 {
+    private lateinit var enumArea: EnumArea
     private lateinit var location: Location
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addMultiHouseholdAdapter: AddMultiHouseholdAdapter
@@ -59,7 +60,11 @@ class AddMultiHouseholdFragment : Fragment()
             location = it
         }
 
-        addMultiHouseholdAdapter = AddMultiHouseholdAdapter( location, location.enumerationItems )
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
+        }
+
+        addMultiHouseholdAdapter = AddMultiHouseholdAdapter( location, location.enumerationItems, enumArea.name )
         addMultiHouseholdAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()

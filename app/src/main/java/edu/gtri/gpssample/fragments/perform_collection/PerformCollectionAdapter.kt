@@ -16,7 +16,7 @@ import edu.gtri.gpssample.database.models.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
+class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val enumAreaName: String) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
 {
     override fun getItemCount() = enumerationItems.size
 
@@ -48,11 +48,12 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>) : Re
 
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-        holder.nameTextView.setText( enumerationItem.uuid )
-        holder.dateTextView.setText( enumerationItem.subAddress )
+        holder.dateTextView.setText( enumerationItem.uuid )
 
-        // temp debug data, delete this!
-        holder.dateTextView.setText( enumerationItem.locationId.toString())
+        if (enumerationItem.subAddress.isNotEmpty())
+        {
+            holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
+        }
 
         if (enumerationItem.collectionState == CollectionState.Complete)
         {
