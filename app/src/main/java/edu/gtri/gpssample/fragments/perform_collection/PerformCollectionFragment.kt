@@ -70,6 +70,7 @@ class PerformCollectionFragment : Fragment(),
     }
 
     private lateinit var user: User
+    private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var collectionTeam: CollectionTeam
     private lateinit var defaultColorList : ColorStateList
@@ -134,6 +135,10 @@ class PerformCollectionFragment : Fragment(),
             collectionTeam = it
         }
 
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
+        }
+
         val _user = (activity!!.application as? MainApplication)?.user
 
         _user?.let { user ->
@@ -166,7 +171,7 @@ class PerformCollectionFragment : Fragment(),
             }
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( enumerationItems )
+        performCollectionAdapter = PerformCollectionAdapter( enumerationItems, enumArea.name )
         performCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -235,6 +240,7 @@ class PerformCollectionFragment : Fragment(),
                                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
                                     LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
                                 }
                             }
@@ -463,6 +469,7 @@ class PerformCollectionFragment : Fragment(),
                 sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
                 (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
                 (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
                 LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
             }
         }
@@ -631,8 +638,9 @@ class PerformCollectionFragment : Fragment(),
 
             sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
 
-                sampledItem.notes = notes
-                sampledItem.creationDate = DAO.updateCreationDate( sampledItem.creationDate )
+                sampledItem.collectionNotes = notes
+                sampledItem.modificationDate = DAO.updateCreationDate( sampledItem.modificationDate )
+                sampledItem.collectionDate = sampledItem.modificationDate
                 sampledItem.collectionState = CollectionState.Complete
 
                 (activity!!.application as MainApplication).user?.let { user ->
@@ -642,6 +650,7 @@ class PerformCollectionFragment : Fragment(),
                 if (incompleteReason.isNotEmpty())
                 {
                     sampledItem.collectionState = CollectionState.Incomplete
+                    sampledItem.collectionIncompleteReason = incompleteReason
                 }
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )

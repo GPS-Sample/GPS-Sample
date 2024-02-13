@@ -124,6 +124,7 @@ class PerformMultiCollectionFragment : Fragment(),
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
             (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+            (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
             sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
             LaunchSurveyDialog( activity, gpsAccuracyIsGood, this@PerformMultiCollectionFragment)
         }
@@ -167,8 +168,9 @@ class PerformMultiCollectionFragment : Fragment(),
 
             sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
 
-                sampledItem.notes = notes
-                sampledItem.creationDate = DAO.updateCreationDate( sampledItem.creationDate )
+                sampledItem.collectionNotes = notes
+                sampledItem.modificationDate = DAO.updateCreationDate( sampledItem.modificationDate )
+                sampledItem.collectionDate = sampledItem.modificationDate
                 sampledItem.collectionState = CollectionState.Complete
 
                 (activity!!.application as MainApplication).user?.let { user ->

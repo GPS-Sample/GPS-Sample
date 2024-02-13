@@ -13,6 +13,7 @@ class MainApplication : Application()
 {
     var user: User? = null
     var currentFragment = ""
+    var currentSubAddress = "9999"
     var currentEnumerationItemUUID = "9999"
     var currentEnumerationAreaName = "9999"
 

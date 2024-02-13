@@ -100,13 +100,20 @@ class SamplingViewModel : ViewModel()
                         {
                             val sampledItem = location.enumerationItems[0]
 
-                            resourceId = when(sampledItem.samplingState)
+                            if (sampledItem.enumerationState == EnumerationState.Enumerated)
                             {
-                                SamplingState.None       -> R.drawable.home_black
-                                SamplingState.NotSampled -> R.drawable.home_green
-                                SamplingState.Sampled    -> R.drawable.home_blue
-                                SamplingState.Resampled  -> R.drawable.home_blue
-                                SamplingState.Invalid    -> R.drawable.home_red
+                                resourceId = R.drawable.home_green
+
+                                if (sampledItem.samplingState == SamplingState.Sampled)
+                                {
+                                    resourceId = R.drawable.home_blue
+                                }
+
+                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                                val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                                pointAnnotation?.let { pointAnnotation ->
+                                    allPointAnnotations.add( pointAnnotation )
+                                }
                             }
                         }
                         else
@@ -120,13 +127,12 @@ class SamplingViewModel : ViewModel()
                                     resourceId = R.drawable.multi_home_blue
                                 }
                             }
-                        }
 
-                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
-
-                        pointAnnotation?.let { pointAnnotation ->
-                            allPointAnnotations.add( pointAnnotation )
+                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                            val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                            pointAnnotation?.let { pointAnnotation ->
+                                allPointAnnotations.add( pointAnnotation )
+                            }
                         }
                     }
                 }
@@ -413,23 +419,27 @@ class SamplingViewModel : ViewModel()
             for (sampleItem in _currentSampledItemsForSampling)
             {
                 sampleItem.samplingState = SamplingState.NotSampled
-                sampleItem.creationDate = DAO.updateCreationDate( sampleItem.creationDate )
+                sampleItem.enumerationEligibleForSampling = false
+                sampleItem.modificationDate = DAO.updateCreationDate( sampleItem.modificationDate )
 
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
                 {
                     if (study.filters.isEmpty())
                     {
+                        sampleItem.enumerationEligibleForSampling = true
                         validSamples.add(sampleItem)
                         continue
                     }
 
                     // add in filters
                     var validSample = false
+
                     for (filter in study.filters)
                     {
                         var validRule = false
                         var validFilterOperator = false
+
                         filter.rule?.let{rule ->
                             rule.field?.let{field ->
                                 for (fieldData in sampleItem.fieldDataList)
@@ -441,12 +451,13 @@ class SamplingViewModel : ViewModel()
                                 }
                             }
 
-                            var filterOperator : FilterOperator? = rule.filterOperator
+                            var filterOperator = rule.filterOperator
 
                             if (filterOperator == null)
                             {
                                 if (validRule)
                                 {
+                                    sampleItem.enumerationEligibleForSampling = true
                                     validSamples.add(sampleItem)
                                 }
                             }
@@ -512,6 +523,7 @@ class SamplingViewModel : ViewModel()
 
                     if(validSample)
                     {
+                        sampleItem.enumerationEligibleForSampling = true
                         validSamples.add(sampleItem)
                     }
                 }
@@ -551,7 +563,7 @@ class SamplingViewModel : ViewModel()
                         }
 
                         sampledIndices.add(rnds)
-                        validSamples[rnds].creationDate = DAO.updateCreationDate( validSamples[rnds].creationDate )
+                        validSamples[rnds].modificationDate = DAO.updateCreationDate( validSamples[rnds].modificationDate )
                         validSamples[rnds].samplingState = SamplingState.Sampled
                     }
 

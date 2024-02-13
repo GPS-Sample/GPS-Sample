@@ -61,6 +61,8 @@ class ConfigDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
         values.put( DAO.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY, config.allowManualLocationEntry )
+        values.put( DAO.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED, config.subaddressIsrequired )
+        values.put( DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED, config.proximityWarningIsEnabled )
 
         // TODO: these should be from lookup tables
         val dateFormatIndex = DateFormatConverter.toIndex(config.dateFormat)
@@ -129,13 +131,15 @@ class ConfigDAO(private var dao: DAO)
         val timeFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX))
         val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
         val allowManualLocationEntry = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY)).toBoolean()
+        val subaddressIsRequired = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED)).toBoolean()
+        val proximityWarningIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED)).toBoolean()
 
         // TODO: these should be lookup tables
         val distanceFormat = DistanceFormatConverter.fromIndex(distanceFormatIndex)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry, selectedStudyId, selectedEnumAreaId )
+        return Config( id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry, subaddressIsRequired, proximityWarningIsEnabled, selectedStudyId, selectedEnumAreaId )
     }
 
     //--------------------------------------------------------------------------

@@ -15,20 +15,40 @@ import kotlin.collections.ArrayList
 @SerialName("EnumerationItem")
 data class EnumerationItem(
     var id : Int? = null,
-    var creationDate: Long,
+    var modificationDate: Long,
     var uuid : String,
     var subAddress : String,
     var enumeratorName : String,
-    var collectorName : String,
     var enumerationState : EnumerationState,
+    var enumerationDate: Long,
+    var enumerationIncompleteReason : String,
+    var enumerationNotes : String,
+    var enumerationEligibleForSampling : Boolean,
     var samplingState : SamplingState,
+    var collectorName : String,
     var collectionState : CollectionState,
-    var incompleteReason : String,
-    var notes : String,
+    var collectionDate: Long,
+    var collectionIncompleteReason : String,
+    var collectionNotes : String,
     var fieldDataList : ArrayList<FieldData>,
     var locationId : Int )
 {
-    constructor() : this(null,  Date().time, UUID.randomUUID().toString(), "", "", "", EnumerationState.Undefined, SamplingState.NotSampled, CollectionState.Incomplete, "", "", ArrayList<FieldData>(), -1)
+    constructor() : this(null,  Date().time, UUID.randomUUID().toString(),
+        "",
+        "",
+        EnumerationState.Undefined,
+        0,
+        "",
+        "",
+        false,
+        SamplingState.None,
+        "",
+        CollectionState.Incomplete,
+        0,
+        "",
+        "",
+        ArrayList<FieldData>(),
+        -1)
 
     fun pack() : String
     {

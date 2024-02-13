@@ -4,6 +4,10 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import edu.gtri.gpssample.constants.CollectionState
+import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.SamplingState
+import edu.gtri.gpssample.database.models.FieldData
 import java.util.*
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
@@ -36,6 +40,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" + "," +
                     COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY + " INTEGER" + "," +
+                    COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED + " INTEGER" + "," +
+                    COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                     COLUMN_STUDY_ID + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_ID) REFERENCES $TABLE_ENUM_AREA($COLUMN_ID)" + "," +
@@ -263,12 +269,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_LOCATION_ID + " INTEGER" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME + " TEXT" + "," +
-                    COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_ENUMERATION_DATE + " INTEGER" + "," +
+                    COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SAMPLING_STATE + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_COLLECTION_STATE + " TEXT" + "," +
-                    COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON + " TEXT" + "," +
-                    COLUMN_ENUMERATION_ITEM_NOTES + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_COLLECTION_DATE + " INTEGER" + "," +
+                    COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON + " TEXT" + "," +
+                    COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_ID) REFERENCES $TABLE_LOCATION($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableEnumerationItem)
@@ -475,6 +486,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
         const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
         const val COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY = "config_allow_manual_location_entry"
+        const val COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED = "config_subaddress_is_required"
+        const val COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED = "config_proximity_warning_is_enabled"
+
 
         // Study EnumArea connector table
         const val TABLE_STUDY_ENUM_AREA = "study_enum_area"
@@ -564,12 +578,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_ENUMERATION_ITEM = "enumeration_item"
         const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME = "enumeration_item_enumerator_name"
-        const val COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME = "enumeration_item_collector_name"
         const val COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE = "enumeration_item_enumeration_state"
+        const val COLUMN_ENUMERATION_ITEM_ENUMERATION_DATE = "enumeration_item_enumeration_date"
+        const val COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON = "enumeration_item_enumeration_incomplete_reason"
+        const val COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES = "enumeration_item_enumeration_notes"
+        const val COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING = "enumeration_item_enumeration_eligible_for_sampling"
         const val COLUMN_ENUMERATION_ITEM_SAMPLING_STATE = "enumeration_item_sampling_state"
+        const val COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME = "enumeration_item_collector_name"
         const val COLUMN_ENUMERATION_ITEM_COLLECTION_STATE = "enumeration_item_collection_state"
-        const val COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON = "enumeration_item_incomplete_reason"
-        const val COLUMN_ENUMERATION_ITEM_NOTES = "enumeration_item_notes"
+        const val COLUMN_ENUMERATION_ITEM_COLLECTION_DATE = "enumeration_item_collection_date"
+        const val COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON = "enumeration_item_collection_incomplete_reason"
+        const val COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES = "enumeration_item_collection_notes"
 
         const val TABLE_FIELD_DATA = "field_data"
         const val COLUMN_FIELD_DATA_TEXT_VALUE = "field_data_text_value"

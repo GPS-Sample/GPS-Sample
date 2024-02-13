@@ -33,18 +33,20 @@ data class Config(
     var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
     var allowManualLocationEntry: Boolean,
+    var subaddressIsrequired: Boolean,
+    var proximityWarningIsEnabled: Boolean,
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
     var selectedStudyId: Int,
     var selectedEnumAreaId: Int,
     var mapTileRegions: ArrayList<MapTileRegion>)
 {
-    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, allowManualLocationEntry: Boolean)
-            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry,
+    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, proximityWarningIsEnabled: Boolean)
+            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry, subaddressIsrequired, proximityWarningIsEnabled,
                                     ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1, ArrayList<MapTileRegion>())
     constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, allowManualLocationEntry: Boolean, selectedStudyId: Int, selectedEnumAreaId: Int)
-            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry,
+                minGpsPrecision: Int, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, proximityWarningIsEnabled: Boolean, selectedStudyId: Int, selectedEnumAreaId: Int)
+            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry, subaddressIsrequired, proximityWarningIsEnabled,
         ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId, ArrayList<MapTileRegion>())
 
     var minimumGPSPrecision : String
