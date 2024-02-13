@@ -13,7 +13,7 @@ class ODKLaunchedActivity : AppCompatActivity()
 
         val app = (this.application as? MainApplication)!!
         val enumAreaName = app.currentEnumerationAreaName.replace(" ", "" ).uppercase()
-        val id = "${enumAreaName}:${app.currentSubAddress}:${app.currentEnumerationItemUUID}"
+        val id = "${app.currentEnumerationItemUUID}:${enumAreaName}:${app.currentSubAddress}"
 
         val intent = Intent()
         intent.putExtra("value", id )

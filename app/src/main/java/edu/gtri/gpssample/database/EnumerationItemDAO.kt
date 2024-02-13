@@ -8,6 +8,7 @@ import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.*
+import edu.gtri.gpssample.extensions.toBoolean
 
 class EnumerationItemDAO(private var dao: DAO)
 {
@@ -46,7 +47,7 @@ class EnumerationItemDAO(private var dao: DAO)
             enumerationItem.id = null // force the new item be created
             createOrUpdateEnumerationItem( enumerationItem, location )
         }
-        else if (enumerationItem.creationDate > existingEnumerationItem.creationDate)
+        else if (enumerationItem.modificationDate > existingEnumerationItem.modificationDate)
         {
             delete( existingEnumerationItem )
             createOrUpdateEnumerationItem( enumerationItem, location )
@@ -72,7 +73,7 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 
-        if (existingEnumerationItem != null && enumerationItem.creationDate > existingEnumerationItem.creationDate)
+        if (existingEnumerationItem != null && enumerationItem.modificationDate > existingEnumerationItem.modificationDate)
         {
             delete( existingEnumerationItem )
             createOrUpdateEnumerationItem( enumerationItem, location )
@@ -82,21 +83,25 @@ class EnumerationItemDAO(private var dao: DAO)
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
     {
         enumerationItem.id?.let { id ->
-            Log.d( "xxx", "existing EnumerationItem id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
 
-        values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
+        values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.modificationDate )
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
+        values.put( DAO.COLUMN_LOCATION_ID, location.id)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME, enumerationItem.enumeratorName )
-        values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME, enumerationItem.collectorName )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE, enumerationItem.enumerationState.format )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_DATE, enumerationItem.enumerationDate )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON, enumerationItem.enumerationIncompleteReason )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES, enumerationItem.enumerationNotes )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING, enumerationItem.enumerationEligibleForSampling )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE, enumerationItem.samplingState.format )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME, enumerationItem.collectorName )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE, enumerationItem.collectionState.format )
-        values.put( DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON, enumerationItem.incompleteReason )
-        values.put( DAO.COLUMN_ENUMERATION_ITEM_NOTES, enumerationItem.notes )
-        values.put( DAO.COLUMN_LOCATION_ID, location.id)
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE, enumerationItem.collectionDate )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON, enumerationItem.collectionIncompleteReason )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES, enumerationItem.collectionNotes )
     }
 
     @SuppressLint("Range")
@@ -104,15 +109,20 @@ class EnumerationItemDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val locationId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_ID))
         val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
         val enumeratorName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME))
-        val collectorName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME))
         val enumerationState = EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE)))
+        val enumerationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_DATE))
+        val enumerationIncompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_INCOMPLETE_REASON))
+        val enumerationNotes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_NOTES))
+        val enumerationEligibleForSampling = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_ELIGIBLE_FOR_SAMPLING)).toBoolean()
         val samplingState = SamplingState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SAMPLING_STATE)))
+        val collectorName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTOR_NAME))
         val collectionState = CollectionState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_STATE)))
-        val incompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_INCOMPLETE_REASON))
-        val notes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_NOTES))
-        val locationId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_ID))
+        val collectionDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE))
+        val collectionIncompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON))
+        val collectionNotes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES))
 
         val fieldDataList = ArrayList<FieldData>()
 
@@ -122,12 +132,17 @@ class EnumerationItemDAO(private var dao: DAO)
             uuid,
             subAddress,
             enumeratorName,
-            collectorName,
             enumerationState,
+            enumerationDate,
+            enumerationIncompleteReason,
+            enumerationNotes,
+            enumerationEligibleForSampling,
             samplingState,
+            collectorName,
             collectionState,
-            incompleteReason,
-            notes,
+            collectionDate,
+            collectionIncompleteReason,
+            collectionNotes,
             fieldDataList,
             locationId
         )

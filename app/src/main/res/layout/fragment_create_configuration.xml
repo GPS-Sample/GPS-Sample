@@ -179,6 +179,54 @@
                         android:layout_marginEnd="20dp" />
                 </LinearLayout>
 
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:gravity="center_vertical"
+                        android:text="SubAddress is Required"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/subaddress_required_switch"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:checked="@={viewModel.currentConfiguration.subaddressIsrequired}"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:gravity="center_vertical"
+                        android:text="Proximity Warning Enabled"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/proximity_warning_enabled_switch"
+                        android:checked="@={viewModel.currentConfiguration.proximityWarningIsEnabled}"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp" />
+                </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />

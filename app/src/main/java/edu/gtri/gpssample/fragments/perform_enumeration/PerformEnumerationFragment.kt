@@ -548,13 +548,16 @@ class PerformEnumerationFragment : Fragment(),
             dropMode = false
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
-            enumArea.locations.map{
-                val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
-                if (haversineCheck.withinBounds)
-                {
-                    val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
-                    ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
-                    return true
+            if (config.proximityWarningIsEnabled)
+            {
+                enumArea.locations.map{
+                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                    if (haversineCheck.withinBounds)
+                    {
+                        val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                        ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                        return true
+                    }
                 }
             }
 
@@ -636,13 +639,17 @@ class PerformEnumerationFragment : Fragment(),
         if (tag == kAddHouseholdTag)  // use current location
         {
             currentGPSLocation?.let { point ->
-                enumArea.locations.map{
-                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
-                    if (haversineCheck.withinBounds)
-                    {
-                        val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
-                        ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
-                        return
+
+                if (config.proximityWarningIsEnabled)
+                {
+                    enumArea.locations.map{
+                        val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                        if (haversineCheck.withinBounds)
+                        {
+                            val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                            ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                            return
+                        }
                     }
                 }
 

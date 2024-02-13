@@ -168,8 +168,9 @@ class PerformMultiCollectionFragment : Fragment(),
 
             sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
 
-                sampledItem.notes = notes
-                sampledItem.creationDate = DAO.updateCreationDate( sampledItem.creationDate )
+                sampledItem.collectionNotes = notes
+                sampledItem.modificationDate = DAO.updateCreationDate( sampledItem.modificationDate )
+                sampledItem.collectionDate = sampledItem.modificationDate
                 sampledItem.collectionState = CollectionState.Complete
 
                 (activity!!.application as MainApplication).user?.let { user ->

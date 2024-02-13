@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.CollectionState
+import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.EnumArea
 import java.util.*
 import kotlin.collections.ArrayList
@@ -27,7 +30,6 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapte
 
     fun updateEnumAreas( areas: List<EnumArea>? )
     {
-
         this.enumAreas = areas
         notifyDataSetChanged()
     }
@@ -51,6 +53,33 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapte
 
         holder.nameTextView.setText( enumArea.name )
 
+        var sampledCount = 0
+        var enumerationCount = 0
+        var surveyedCount = 0
+
+        for (location in enumArea.locations)
+        {
+            for (enumItem in location.enumerationItems)
+            {
+                if (enumItem.enumerationState == EnumerationState.Enumerated)
+                {
+                    enumerationCount += 1
+                }
+                if (enumItem.samplingState == SamplingState.Sampled)
+                {
+                    sampledCount += 1
+                }
+                if (enumItem.collectionState == CollectionState.Complete)
+                {
+                    surveyedCount += 1
+                }
+            }
+        }
+
+        holder.enumeratedTextView.text = "$enumerationCount"
+        holder.sampledTextView.text = "$sampledCount"
+        holder.surveyedTextView.text = "$surveyedCount"
+
         holder.itemView.setOnClickListener {
             didSelectEnumArea(enumArea)
         }
@@ -59,5 +88,9 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapte
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
+        val enumeratedTextView : TextView = itemView.findViewById(R.id.number_enumerated_text_view)
+        val sampledTextView : TextView = itemView.findViewById(R.id.number_sampled_text_view)
+        val surveyedTextView : TextView = itemView.findViewById(R.id.number_surveyed_text_view)
+
     }
 }

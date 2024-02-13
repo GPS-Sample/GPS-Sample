@@ -24,10 +24,13 @@ import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManag
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.CollectionState
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
+import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
@@ -173,6 +176,50 @@ class ConfigurationFragment : Fragment(),
         binding.enumAreasRecycler.itemAnimator = DefaultItemAnimator()
         binding.enumAreasRecycler.adapter = enumerationAreasAdapter
         binding.enumAreasRecycler.layoutManager = LinearLayoutManager(activity )
+
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+
+            var sampledCount = 0
+            var enumerationCount = 0
+            var surveyedCount = 0
+            var eligibleCount = 0
+
+            binding.numberOfEnumerationAreasTextView.text = "${config.enumAreas.size}"
+
+            for (enumerationArea in config.enumAreas)
+            {
+                for (location in enumerationArea.locations)
+                {
+                    for (enumItem in location.enumerationItems)
+                    {
+                        if (enumItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            enumerationCount += 1
+                        }
+                        if (enumItem.enumerationEligibleForSampling)
+                        {
+                            eligibleCount += 1
+                        }
+                        if (enumItem.samplingState == SamplingState.Sampled)
+                        {
+                            sampledCount += 1
+                        }
+                        if (enumItem.collectionState == CollectionState.Complete)
+                        {
+                            surveyedCount += 1
+                        }
+                    }
+                }
+            }
+
+            val numRemaining = sampledCount - surveyedCount
+
+            binding.numberEnumeratedTextView.text = "$enumerationCount"
+            binding.numberEligibleTextView.text = "$eligibleCount"
+            binding.numberSampledTextView.text = "$sampledCount"
+            binding.numberSurveyedTextView.text = "$surveyedCount"
+            binding.numberRemainingTextView.text = "$numRemaining"
+        }
     }
 
     override fun onResume()

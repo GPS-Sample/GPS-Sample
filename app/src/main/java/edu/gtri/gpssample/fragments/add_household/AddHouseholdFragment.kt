@@ -178,12 +178,12 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-        if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
+        if (enumerationItem.enumerationIncompleteReason.isNotEmpty() || enumerationItem.enumerationNotes.isNotEmpty())
         {
             binding.additionalInfoLayout.visibility = View.VISIBLE
-            binding.incompleteCheckBox.isChecked = enumerationItem.incompleteReason.isNotEmpty()
-            binding.notesEditText.setText( enumerationItem.notes )
-            when (enumerationItem.incompleteReason)
+            binding.incompleteCheckBox.isChecked = enumerationItem.enumerationIncompleteReason.isNotEmpty()
+            binding.notesEditText.setText( enumerationItem.enumerationNotes )
+            when (enumerationItem.enumerationIncompleteReason)
             {
                 "Nobody home" -> binding.nobodyHomeButton.isChecked = true
                 "Home does not exist" -> binding.doesNotExistButton.isChecked = true
@@ -237,7 +237,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.showAdditionalInfoImageView.visibility = View.GONE
             binding.hideAdditionalInfoImageView.visibility = View.VISIBLE
             binding.defaultInfoLayout.visibility = View.VISIBLE
-            if (enumerationItem.incompleteReason.isNotEmpty() || enumerationItem.notes.isNotEmpty())
+            if (enumerationItem.enumerationIncompleteReason.isNotEmpty() || enumerationItem.enumerationNotes.isNotEmpty())
             {
                 binding.additionalInfoLayout.visibility = View.VISIBLE
             }
@@ -269,7 +269,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.saveButton.setOnClickListener {
-            AdditionalInfoDialog( activity, enumerationItem.incompleteReason, enumerationItem.notes, this)
+            AdditionalInfoDialog( activity, enumerationItem.enumerationIncompleteReason, enumerationItem.enumerationNotes, this)
         }
     }
 
@@ -318,6 +318,12 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         // first, validate the required inputs
 
+        if (config.subaddressIsrequired && binding.subaddressEditText.text.toString().isEmpty())
+        {
+            Toast.makeText(activity!!.applicationContext, "Subaddress is required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         for (fieldData in enumerationItem.fieldDataList) {
             fieldData.field?.let { field ->
                 if (field.type == FieldType.Dropdown)
@@ -330,49 +336,25 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                     when (field.type) {
                         FieldType.Text -> {
                             if (fieldData.textValue.isEmpty()) {
-                                Toast.makeText(
-                                    activity!!.applicationContext,
-                                    "${context?.getString(R.string.oops)} ${field.name} ${
-                                        context?.getString(R.string.field_is_required)
-                                    }",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}",Toast.LENGTH_SHORT).show()
                                 return
                             }
                         }
                         FieldType.Number -> {
                             if (fieldData.numberValue == null) {
-                                Toast.makeText(
-                                    activity!!.applicationContext,
-                                    "${context?.getString(R.string.oops)} ${field.name} ${
-                                        context?.getString(R.string.field_is_required)
-                                    }",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                 return
                             }
                         }
                         FieldType.Date -> {
                             if (fieldData.dateValue == null) {
-                                Toast.makeText(
-                                    activity!!.applicationContext,
-                                    "${context?.getString(R.string.oops)} ${field.name} ${
-                                        context?.getString(R.string.field_is_required)
-                                    }",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                 return
                             }
                         }
                         FieldType.Checkbox -> {
                             if (fieldData.fieldDataOptions.isEmpty()) {
-                                Toast.makeText(
-                                    activity!!.applicationContext,
-                                    "${context?.getString(R.string.oops)} ${field.name} ${
-                                        context?.getString(R.string.field_is_required)
-                                    }",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                 return
                             }
                         }
@@ -387,17 +369,18 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         if (incompleteReason.isNotEmpty())
         {
-            enumerationItem.incompleteReason = incompleteReason
+            enumerationItem.enumerationIncompleteReason = incompleteReason
             enumerationItem.enumerationState = EnumerationState.Incomplete
         }
         else
         {
-            enumerationItem.incompleteReason = ""
+            enumerationItem.enumerationIncompleteReason = ""
             enumerationItem.enumerationState = EnumerationState.Enumerated
         }
 
-        enumerationItem.notes = notes
-        enumerationItem.creationDate = DAO.updateCreationDate( enumerationItem.creationDate )
+        enumerationItem.enumerationNotes = notes
+        enumerationItem.modificationDate = DAO.updateCreationDate( enumerationItem.modificationDate )
+        enumerationItem.enumerationDate = enumerationItem.modificationDate
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
         (activity!!.application as MainApplication).user?.let { user ->
