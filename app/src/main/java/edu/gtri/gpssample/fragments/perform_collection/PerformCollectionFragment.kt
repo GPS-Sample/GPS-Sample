@@ -612,6 +612,12 @@ class PerformCollectionFragment : Fragment(),
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private val odk_result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val mainApplication = activity!!.application as MainApplication
+
+        mainApplication.currentSubAddress = mainApplication.defaultSubAddress
+        mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
+        mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
+
         AdditionalInfoDialog( activity, "", "", this)
     }
 

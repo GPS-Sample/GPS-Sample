@@ -11,12 +11,15 @@ import edu.gtri.gpssample.services.UDPBroadcastReceiverService
 
 class MainApplication : Application()
 {
+    val defaultSubAddress = "9999"
+    val defaultEnumerationAreaName = "9999"
+    val defaultEnumerationItemUUID = "999999999999999999999999999999999999"
+
     var user: User? = null
     var currentFragment = ""
-    var currentSubAddress = "9999"
-    var currentEnumerationItemUUID = "9999"
-    var currentEnumerationAreaName = "9999"
-
+    var currentSubAddress = defaultSubAddress
+    var currentEnumerationAreaName = defaultEnumerationAreaName
+    var currentEnumerationItemUUID = defaultEnumerationItemUUID
     override fun onCreate()
     {
         super.onCreate()
