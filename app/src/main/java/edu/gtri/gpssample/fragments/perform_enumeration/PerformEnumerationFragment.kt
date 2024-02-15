@@ -328,6 +328,34 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
         }
+
+        var sampledCount = 0
+        var enumerationCount = 0
+        var surveyedCount = 0
+
+        for (location in enumArea.locations)
+        {
+            for (enumItem in location.enumerationItems)
+            {
+                if (enumItem.enumerationState == EnumerationState.Enumerated)
+                {
+                    enumerationCount += 1
+                }
+                if (enumItem.samplingState == SamplingState.Sampled)
+                {
+                    sampledCount += 1
+                }
+                if (enumItem.collectionState == CollectionState.Complete)
+                {
+                    surveyedCount += 1
+                }
+            }
+        }
+
+        binding.listItemEnumArea.titleLayout.visibility = View.GONE
+        binding.listItemEnumArea.numberEnumeratedTextView.text = "$enumerationCount"
+        binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
+        binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
     }
 
     override fun onResume()
