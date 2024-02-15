@@ -213,14 +213,19 @@ class EnumAreaDAO(private var dao: DAO)
     {
         enumArea.id?.let {enumAreaId ->
 
-            // latLon's are dependent on EnumAreas
-//            DAO.latLonDAO.getAllLatLonsWithEnumAreaId(enumAreaId).map {
-//                DAO.latLonDAO.delete( it )
-//            }
+            for (vertice in enumArea.vertices)
+            {
+                DAO.latLonDAO.delete( vertice )
+            }
 
-            // locations's are dependent on EnumAreas
-            DAO.locationDAO.getLocations(enumArea).map {
-                DAO.locationDAO.delete( it )
+            for (enumerationTeam in enumArea.enumerationTeams)
+            {
+                DAO.enumerationTeamDAO.deleteTeam( enumerationTeam )
+            }
+
+            for (location in enumArea.locations)
+            {
+                DAO.locationDAO.delete( location )
             }
 
             val whereClause = "${DAO.COLUMN_ID} = ?"
