@@ -58,7 +58,6 @@ import java.util.*
 class PerformCollectionFragment : Fragment(),
     OnCameraChangeListener,
     MapboxManager.MapTileCacheDelegate,
-    LaunchSurveyDialog.LaunchSurveyDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
@@ -67,6 +66,7 @@ class PerformCollectionFragment : Fragment(),
     companion object
     {
         const val LaunchSurveyRequest = "LaunchSurveyRequest"
+        const val AdditionalInfoRequest = "AdditionalInfoRequest"
     }
 
     private lateinit var user: User
@@ -97,16 +97,20 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onCreate(savedInstanceState)
 
+        setFragmentResultListener( AdditionalInfoRequest ) { key, bundle ->
+            AdditionalInfoDialog( activity, "", "", this)
+        }
+
         setFragmentResultListener( LaunchSurveyRequest ) { key, bundle ->
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                 if (gpsAccuracyIsGood() && gpsLocationIsGood( location ))
                 {
                     SurveyLaunchNotificationDialog( activity!!, this )
                 }
-                else
-                {
-                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
-                }
+//                else
+//                {
+//                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
+//                }
             }
         }
 
@@ -241,7 +245,13 @@ class PerformCollectionFragment : Fragment(),
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
-                                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
+
+                                    val bundle = Bundle()
+                                    bundle.putBoolean( Keys.kEditMode.toString(), false )
+                                    bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+
+//                                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
                                 }
                             }
                         }
@@ -320,6 +330,11 @@ class PerformCollectionFragment : Fragment(),
             }
         }
 
+        updateSummaryInfo()
+    }
+
+    fun updateSummaryInfo()
+    {
         var sampledCount = 0
         var enumerationCount = 0
         var surveyedCount = 0
@@ -498,7 +513,13 @@ class PerformCollectionFragment : Fragment(),
                 (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
                 (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                 (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
-                LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
+
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.toString(), false )
+                bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+
+//                LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
             }
         }
     }
@@ -623,10 +644,10 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-    override fun launchSurveyButtonPressed()
-    {
-        SurveyLaunchNotificationDialog( activity!!, this )
-    }
+//    override fun launchSurveyButtonPressed()
+//    {
+//        SurveyLaunchNotificationDialog( activity!!, this )
+//    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun shouldLaunchODK()
@@ -649,18 +670,18 @@ class PerformCollectionFragment : Fragment(),
         AdditionalInfoDialog( activity, "", "", this)
     }
 
-    override fun markAsIncompleteButtonPressed()
-    {
-        AdditionalInfoDialog( activity, "", "", this)
-    }
-
-    override fun showInfoButtonPressed()
-    {
-        val bundle = Bundle()
-        bundle.putBoolean( Keys.kEditMode.toString(), false )
-        bundle.putBoolean( Keys.kCollectionMode.toString(), true )
-        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-    }
+//    override fun markAsIncompleteButtonPressed()
+//    {
+//        AdditionalInfoDialog( activity, "", "", this)
+//    }
+//
+//    override fun showInfoButtonPressed()
+//    {
+//        val bundle = Bundle()
+//        bundle.putBoolean( Keys.kEditMode.toString(), false )
+//        bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+//        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+//    }
 
     override fun didSelectCancelButton()
     {
@@ -708,6 +729,8 @@ class PerformCollectionFragment : Fragment(),
                 }
 
                 performCollectionAdapter.notifyDataSetChanged()
+
+                updateSummaryInfo()
 
                 refreshMap()
             }

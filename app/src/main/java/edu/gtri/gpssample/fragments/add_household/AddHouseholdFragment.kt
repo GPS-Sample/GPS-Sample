@@ -260,6 +260,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.cancelButton.setOnClickListener {
+            setFragmentResult(PerformCollectionFragment.AdditionalInfoRequest, Bundle())
             findNavController().popBackStack()
         }
 
