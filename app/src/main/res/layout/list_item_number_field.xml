@@ -10,7 +10,7 @@
         android:layout_margin="10dp"
         android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         card_view:cardCornerRadius="4dp">
 
         <LinearLayout
@@ -25,18 +25,22 @@
 
                 <TextView
                     android:id="@+id/title_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:gravity="center_vertical"
-                    android:text="@string/number" />
+                    android:textSize="17sp"
+                    android:textColor="@color/black"/>
 
                 <TextView
                     android:id="@+id/required_text_view"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:textColor="#ff0000"
+                    android:layout_marginEnd="20dp"
                     android:text="*" />
             </LinearLayout>
 
