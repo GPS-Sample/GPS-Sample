@@ -26,6 +26,7 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:id="@+id/title_layout"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -96,7 +97,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="20"
+                    android:text="0"
                     android:textSize="17sp"
                     android:textColor="@color/black" />
 
@@ -106,7 +107,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="10"
+                    android:text="0"
                     android:textSize="17sp"
                     android:textColor="@color/black" />
 
@@ -116,7 +117,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="10"
+                    android:text="0"
                     android:textSize="17sp"
                     android:textColor="@color/black" />
             </LinearLayout>

@@ -5,9 +5,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import java.util.*
@@ -49,6 +51,36 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
         if (location.enumerationItems.size > 0)
         {
+            location.isMultiFamily?.let { isMultiFamily ->
+                if (!isMultiFamily)
+                {
+                    if (location.enumerationItems[0].enumerationState == EnumerationState.Enumerated)
+                    {
+                        holder.checkImageView.visibility = View.VISIBLE
+                    }
+                    else
+                    {
+                        holder.checkImageView.visibility = View.GONE
+                    }
+                }
+                else
+                {
+                    var isComplete = true
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        isComplete = isComplete && (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                    }
+                    if (isComplete)
+                    {
+                        holder.checkImageView.visibility = View.VISIBLE
+                    }
+                    else
+                    {
+                        holder.checkImageView.visibility = View.GONE
+                    }
+                }
+            }
+
             if (location.enumerationItems[0].subAddress.isNotEmpty())
             {
                 holder.nameTextView.setText( "${enumAreaName} : ${location.enumerationItems[0].subAddress}" )
@@ -64,5 +96,6 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
     {
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
         val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
+        val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view)
     }
 }

@@ -457,8 +457,9 @@ class SamplingViewModel : ViewModel()
                             {
                                 if (validRule)
                                 {
-                                    sampleItem.enumerationEligibleForSampling = true
-                                    validSamples.add(sampleItem)
+                                    validFilterOperator = true
+//                                    sampleItem.enumerationEligibleForSampling = true
+//                                    validSamples.add(sampleItem)
                                 }
                             }
                             else
