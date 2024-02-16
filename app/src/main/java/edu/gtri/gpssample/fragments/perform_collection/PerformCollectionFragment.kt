@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
@@ -66,10 +67,8 @@ class PerformCollectionFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
-{
-    companion object
-    {
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate {
+    companion object {
         const val LaunchSurveyRequest = "LaunchSurveyRequest"
         const val AdditionalInfoRequest = "AdditionalInfoRequest"
     }
@@ -78,10 +77,10 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var collectionTeam: CollectionTeam
-    private lateinit var defaultColorList : ColorStateList
+    private lateinit var defaultColorList: ColorStateList
     private lateinit var samplingViewModel: SamplingViewModel
-    private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel : NetworkViewModel
+    private lateinit var sharedViewModel: ConfigurationViewModel
+    private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
@@ -98,30 +97,32 @@ class PerformCollectionFragment : Fragment(),
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 2
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
-        super.onCreate(savedInstanceState)
 
-        setFragmentResultListener( AdditionalInfoRequest ) { key, bundle ->
-            AdditionalInfoDialog( activity, "", "", this)
+    fun setFragmentResultListeners()
+    {
+        setFragmentResultListener(AdditionalInfoRequest) { key, bundle ->
+            AdditionalInfoDialog(activity, "", "", this)
         }
 
-        setFragmentResultListener( LaunchSurveyRequest ) { key, bundle ->
+        setFragmentResultListener(LaunchSurveyRequest) { key, bundle ->
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                if (gpsAccuracyIsGood() && gpsLocationIsGood( location ))
-                {
-                    SurveyLaunchNotificationDialog( activity!!, this )
+                if (gpsAccuracyIsGood() && gpsLocationIsGood(location)) {
+                    SurveyLaunchNotificationDialog(activity!!, this)
                 }
             }
         }
+    }
 
-        val vm : ConfigurationViewModel by activityViewModels()
-        val networkVm : NetworkViewModel by activityViewModels()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val vm: ConfigurationViewModel by activityViewModels()
+        val networkVm: NetworkViewModel by activityViewModels()
         sharedViewModel = vm
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
 
-        val samplingVm : SamplingViewModel by activityViewModels()
+        val samplingVm: SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
     }
@@ -255,6 +256,8 @@ class PerformCollectionFragment : Fragment(),
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
+
+                                    setFragmentResultListeners()
 
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.toString(), false )
@@ -527,6 +530,8 @@ class PerformCollectionFragment : Fragment(),
                 (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
                 (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                 (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
+
+                setFragmentResultListeners()
 
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.toString(), false )
