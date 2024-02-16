@@ -120,7 +120,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (currentZoomLevel == null)
         {
-            sharedViewModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
         sharedViewModel.currentConfiguration?.value?.let {

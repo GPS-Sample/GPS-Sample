@@ -165,7 +165,7 @@ class PerformCollectionFragment : Fragment(),
 
         if (currentZoomLevel == null)
         {
-            sharedViewModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
         val enumerationItems = ArrayList<EnumerationItem>()

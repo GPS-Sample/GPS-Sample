@@ -136,7 +136,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         if (currentZoomLevel == null)
         {
-            sharedViewModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
         binding.mapView.getMapboxMap().loadStyleUri(
@@ -160,8 +160,6 @@ class WalkEnumerationAreaFragment : Fragment(),
             .withLineWidth(5.0)
 
         polylineAnnotation = polylineAnnotationManager.create(polylineAnnotationOptions)
-
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
 
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
@@ -323,6 +321,8 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     private fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         for (polygonAnnotation in allPolygonAnnotations)
         {
             polygonAnnotationManager.delete( polygonAnnotation )
@@ -346,6 +346,8 @@ class WalkEnumerationAreaFragment : Fragment(),
         {
             addPolygon( mapTileRegion )
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun addPolygon( enumArea: EnumArea )

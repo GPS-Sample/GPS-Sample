@@ -107,6 +107,11 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        if (sharedViewModel.currentZoomLevel?.value == null)
+        {
+            sharedViewModel.setCurrentZoomLevel( 16.0 )
+        }
+
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -162,7 +167,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
         binding.mapView.gestures.addOnMapClickListener(this )
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
 
         binding.centerOnLocationButton.setOnClickListener {
             showCurrentLocation = !showCurrentLocation
@@ -350,6 +354,8 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     private fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         for (polygonAnnotation in allPolygonAnnotations)
         {
             polygonAnnotationManager.delete( polygonAnnotation )
@@ -529,6 +535,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun getAllEnumAreas() : ArrayList<EnumArea>
