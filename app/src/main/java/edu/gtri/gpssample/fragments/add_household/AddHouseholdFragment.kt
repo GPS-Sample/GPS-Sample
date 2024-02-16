@@ -84,6 +84,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             if (collectionMode)
             {
                 binding.launchSurveyButton.visibility = View.VISIBLE
+                binding.cancelButton.setText(resources.getString(R.string.mark_status))
             }
         }
 
