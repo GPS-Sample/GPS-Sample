@@ -107,10 +107,6 @@ class PerformCollectionFragment : Fragment(),
                 {
                     SurveyLaunchNotificationDialog( activity!!, this )
                 }
-//                else
-//                {
-//                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
-//                }
             }
         }
 
@@ -250,8 +246,6 @@ class PerformCollectionFragment : Fragment(),
                                     bundle.putBoolean( Keys.kEditMode.toString(), false )
                                     bundle.putBoolean( Keys.kCollectionMode.toString(), true )
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-
-//                                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
                                 }
                             }
                         }
@@ -339,21 +333,23 @@ class PerformCollectionFragment : Fragment(),
         var enumerationCount = 0
         var surveyedCount = 0
 
-        for (location in enumArea.locations)
-        {
-            for (enumItem in location.enumerationItems)
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            for (location in enumArea.locations)
             {
-                if (enumItem.enumerationState == EnumerationState.Enumerated)
+                for (enumItem in location.enumerationItems)
                 {
-                    enumerationCount += 1
-                }
-                if (enumItem.samplingState == SamplingState.Sampled)
-                {
-                    sampledCount += 1
-                }
-                if (enumItem.collectionState == CollectionState.Complete)
-                {
-                    surveyedCount += 1
+                    if (enumItem.enumerationState == EnumerationState.Enumerated)
+                    {
+                        enumerationCount += 1
+                    }
+                    if (enumItem.samplingState == SamplingState.Sampled)
+                    {
+                        sampledCount += 1
+                    }
+                    if (enumItem.collectionState == CollectionState.Complete)
+                    {
+                        surveyedCount += 1
+                    }
                 }
             }
         }
@@ -518,8 +514,6 @@ class PerformCollectionFragment : Fragment(),
                 bundle.putBoolean( Keys.kEditMode.toString(), false )
                 bundle.putBoolean( Keys.kCollectionMode.toString(), true )
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-
-//                LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
             }
         }
     }
@@ -644,11 +638,6 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-//    override fun launchSurveyButtonPressed()
-//    {
-//        SurveyLaunchNotificationDialog( activity!!, this )
-//    }
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun shouldLaunchODK()
     {
@@ -669,19 +658,6 @@ class PerformCollectionFragment : Fragment(),
 
         AdditionalInfoDialog( activity, "", "", this)
     }
-
-//    override fun markAsIncompleteButtonPressed()
-//    {
-//        AdditionalInfoDialog( activity, "", "", this)
-//    }
-//
-//    override fun showInfoButtonPressed()
-//    {
-//        val bundle = Bundle()
-//        bundle.putBoolean( Keys.kEditMode.toString(), false )
-//        bundle.putBoolean( Keys.kCollectionMode.toString(), true )
-//        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-//    }
 
     override fun didSelectCancelButton()
     {
