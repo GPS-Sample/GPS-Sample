@@ -312,9 +312,10 @@
     <string name="please_select_a_role">Please select a role</string>
     <string name="please_enter_your_user_name">Please enter your user name</string>
     <string name="user_name_not_found">User name not found</string>
-    <string name="multi_families">"Multi Households"</string>
-    <string name="is_multi_family">"Is this a multi household location?"</string>
-    <string name="sample">"Sample"</string>
+    <string name="multi_families">Multi Households</string>
+    <string name="is_multi_family">Is this a multi household location?</string>
+    <string name="sample">Sample</string>
+    <string name="mark_status">Mark Status</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

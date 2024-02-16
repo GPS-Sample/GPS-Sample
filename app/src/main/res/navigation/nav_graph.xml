@@ -343,6 +343,7 @@
         <action
             android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
             app:destination="@id/NetworkConnectionDialogFragment" />
+
         <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:popUpTo="@id/ManageConfigurationsFragment"/>
@@ -384,6 +385,12 @@
         <action
             android:id="@+id/action_navigate_to_AddLandmarkFragment"
             app:destination="@id/AddLandmarkFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_ConfigurationFragment"
+            app:destination="@id/ConfigurationFragment"
+            app:popUpToInclusive="false"
+            app:popUpTo="@id/ConfigurationFragment"/>
     </fragment>
 
     <fragment

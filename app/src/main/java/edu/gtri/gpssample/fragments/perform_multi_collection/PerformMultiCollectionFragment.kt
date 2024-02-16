@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -33,7 +34,6 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
 class PerformMultiCollectionFragment : Fragment(),
-    LaunchSurveyDialog.LaunchSurveyDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
@@ -50,15 +50,15 @@ class PerformMultiCollectionFragment : Fragment(),
     {
         super.onCreate(savedInstanceState)
 
+        setFragmentResultListener(PerformCollectionFragment.AdditionalInfoRequest) { key, bundle ->
+            AdditionalInfoDialog( activity, "", "", this)
+        }
+
         setFragmentResultListener(PerformCollectionFragment.LaunchSurveyRequest) { key, bundle ->
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                 if (gpsAccuracyIsGood && gpsLocationIsGood)
                 {
                     SurveyLaunchNotificationDialog( activity!!, this )
-                }
-                else
-                {
-                    LaunchSurveyDialog( activity, gpsAccuracyIsGood && gpsLocationIsGood, this@PerformMultiCollectionFragment)
                 }
             }
         }
@@ -126,31 +126,12 @@ class PerformMultiCollectionFragment : Fragment(),
             (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
             (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
             sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-            LaunchSurveyDialog( activity, gpsAccuracyIsGood, this@PerformMultiCollectionFragment)
+
+            val bundle = Bundle()
+            bundle.putBoolean( Keys.kEditMode.toString(), false )
+            bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun launchSurveyButtonPressed()
-    {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-            odk_result.launch(intent)
-        }
-    }
-
-    override fun markAsIncompleteButtonPressed()
-    {
-        AdditionalInfoDialog( activity, "", "", this)
-    }
-
-    override fun showInfoButtonPressed()
-    {
-        val bundle = Bundle()
-        bundle.putBoolean( Keys.kEditMode.toString(), false )
-        bundle.putBoolean( Keys.kCollectionMode.toString(), true )
-        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
     }
 
     override fun didSelectCancelButton()

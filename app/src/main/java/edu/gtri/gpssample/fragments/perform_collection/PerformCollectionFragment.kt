@@ -9,16 +9,22 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.*
@@ -61,10 +67,8 @@ class PerformCollectionFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
-{
-    companion object
-    {
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate {
+    companion object {
         const val LaunchSurveyRequest = "LaunchSurveyRequest"
         const val AdditionalInfoRequest = "AdditionalInfoRequest"
     }
@@ -73,10 +77,10 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var collectionTeam: CollectionTeam
-    private lateinit var defaultColorList : ColorStateList
+    private lateinit var defaultColorList: ColorStateList
     private lateinit var samplingViewModel: SamplingViewModel
-    private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var sharedNetworkViewModel : NetworkViewModel
+    private lateinit var sharedViewModel: ConfigurationViewModel
+    private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
@@ -93,34 +97,32 @@ class PerformCollectionFragment : Fragment(),
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 2
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
-        super.onCreate(savedInstanceState)
 
-        setFragmentResultListener( AdditionalInfoRequest ) { key, bundle ->
-            AdditionalInfoDialog( activity, "", "", this)
+    fun setFragmentResultListeners()
+    {
+        setFragmentResultListener(AdditionalInfoRequest) { key, bundle ->
+            AdditionalInfoDialog(activity, "", "", this)
         }
 
-        setFragmentResultListener( LaunchSurveyRequest ) { key, bundle ->
+        setFragmentResultListener(LaunchSurveyRequest) { key, bundle ->
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                if (gpsAccuracyIsGood() && gpsLocationIsGood( location ))
-                {
-                    SurveyLaunchNotificationDialog( activity!!, this )
+                if (gpsAccuracyIsGood() && gpsLocationIsGood(location)) {
+                    SurveyLaunchNotificationDialog(activity!!, this)
                 }
-//                else
-//                {
-//                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
-//                }
             }
         }
+    }
 
-        val vm : ConfigurationViewModel by activityViewModels()
-        val networkVm : NetworkViewModel by activityViewModels()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val vm: ConfigurationViewModel by activityViewModels()
+        val networkVm: NetworkViewModel by activityViewModels()
         sharedViewModel = vm
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
 
-        val samplingVm : SamplingViewModel by activityViewModels()
+        val samplingVm: SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
     }
@@ -128,12 +130,22 @@ class PerformCollectionFragment : Fragment(),
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentPerformCollectionBinding.inflate(inflater, container, false)
+
+        setHasOptionsMenu(true)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed()
+            {
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
+            }
+        })
 
         sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
             collectionTeam = it
@@ -150,6 +162,7 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+
         if (currentZoomLevel == null)
         {
             sharedViewModel.setCurrentZoomLevel( 14.0 )
@@ -203,8 +216,6 @@ class PerformCollectionFragment : Fragment(),
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
 
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
-
         pointAnnotationManager.apply {
             addClickListener(
                 OnPointAnnotationClickListener { pointAnnotation ->
@@ -246,12 +257,12 @@ class PerformCollectionFragment : Fragment(),
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
 
+                                    setFragmentResultListeners()
+
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.toString(), false )
                                     bundle.putBoolean( Keys.kCollectionMode.toString(), true )
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-
-//                                    LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this@PerformCollectionFragment)
                                 }
                             }
                         }
@@ -339,21 +350,23 @@ class PerformCollectionFragment : Fragment(),
         var enumerationCount = 0
         var surveyedCount = 0
 
-        for (location in enumArea.locations)
-        {
-            for (enumItem in location.enumerationItems)
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            for (location in enumArea.locations)
             {
-                if (enumItem.enumerationState == EnumerationState.Enumerated)
+                for (enumItem in location.enumerationItems)
                 {
-                    enumerationCount += 1
-                }
-                if (enumItem.samplingState == SamplingState.Sampled)
-                {
-                    sampledCount += 1
-                }
-                if (enumItem.collectionState == CollectionState.Complete)
-                {
-                    surveyedCount += 1
+                    if (enumItem.enumerationState == EnumerationState.Enumerated)
+                    {
+                        enumerationCount += 1
+                    }
+                    if (enumItem.samplingState == SamplingState.Sampled)
+                    {
+                        sampledCount += 1
+                    }
+                    if (enumItem.collectionState == CollectionState.Complete)
+                    {
+                        surveyedCount += 1
+                    }
                 }
             }
         }
@@ -373,6 +386,8 @@ class PerformCollectionFragment : Fragment(),
 
     fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         for (polygonAnnotation in allPolygonAnnotations)
         {
             polygonAnnotationManager.delete( polygonAnnotation )
@@ -502,6 +517,8 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     private fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
@@ -514,12 +531,12 @@ class PerformCollectionFragment : Fragment(),
                 (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                 (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
 
+                setFragmentResultListeners()
+
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.toString(), false )
                 bundle.putBoolean( Keys.kCollectionMode.toString(), true )
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-
-//                LaunchSurveyDialog( activity, gpsAccuracyIsGood() && gpsLocationIsGood( location ), this)
             }
         }
     }
@@ -644,11 +661,6 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel.createHotspot(view)
     }
 
-//    override fun launchSurveyButtonPressed()
-//    {
-//        SurveyLaunchNotificationDialog( activity!!, this )
-//    }
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun shouldLaunchODK()
     {
@@ -669,19 +681,6 @@ class PerformCollectionFragment : Fragment(),
 
         AdditionalInfoDialog( activity, "", "", this)
     }
-
-//    override fun markAsIncompleteButtonPressed()
-//    {
-//        AdditionalInfoDialog( activity, "", "", this)
-//    }
-//
-//    override fun showInfoButtonPressed()
-//    {
-//        val bundle = Bundle()
-//        bundle.putBoolean( Keys.kEditMode.toString(), false )
-//        bundle.putBoolean( Keys.kCollectionMode.toString(), true )
-//        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-//    }
 
     override fun didSelectCancelButton()
     {
@@ -917,6 +916,19 @@ class PerformCollectionFragment : Fragment(),
         MapboxManager.cancelTilePackDownload()
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            16908332-> // TODO: use R.id.?
+            {
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
+                return false
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun onDestroyView()
     {
