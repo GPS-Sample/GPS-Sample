@@ -89,10 +89,9 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             createSampleFragment = this@CreateSampleFragment
         }
 
-        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-        if (currentZoomLevel == null)
+        if (sharedViewModel.currentZoomLevel?.value == null)
         {
-            sharedViewModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
         return binding.root
@@ -129,8 +128,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                 }
             }
         )
-
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
 
         binding.infoButton.setOnClickListener{
             findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
@@ -210,6 +207,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
     fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         for (enumArea in config.enumAreas)
         {
             val points = java.util.ArrayList<Point>()
@@ -238,6 +237,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                 }
             }
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     override fun onCameraChanged(eventData: CameraChangedEventData)

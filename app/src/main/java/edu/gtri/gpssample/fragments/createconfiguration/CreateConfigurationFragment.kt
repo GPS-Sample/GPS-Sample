@@ -100,8 +100,15 @@ class CreateConfigurationFragment : Fragment(),
             }
 
             sharedViewModel.currentConfiguration?.value?.let {config ->
-                sharedViewModel.updateConfiguration()
-                findNavController().popBackStack()
+                if (config.minGpsPrecision == 0)
+                {
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.desired_gps_position), Toast.LENGTH_SHORT).show()
+                }
+                else
+                {
+                    sharedViewModel.updateConfiguration()
+                    findNavController().popBackStack()
+                }
             }
         }
 
