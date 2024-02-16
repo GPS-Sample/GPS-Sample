@@ -9,16 +9,21 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.*
@@ -124,12 +129,22 @@ class PerformCollectionFragment : Fragment(),
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentPerformCollectionBinding.inflate(inflater, container, false)
+
+        setHasOptionsMenu(true)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed()
+            {
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
+            }
+        })
 
         sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
             collectionTeam = it
@@ -896,6 +911,19 @@ class PerformCollectionFragment : Fragment(),
         MapboxManager.cancelTilePackDownload()
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            16908332-> // TODO: use R.id.?
+            {
+                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
+                return false
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun onDestroyView()
     {
