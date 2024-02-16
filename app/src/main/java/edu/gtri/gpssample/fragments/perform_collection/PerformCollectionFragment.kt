@@ -146,6 +146,7 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+
         if (currentZoomLevel == null)
         {
             sharedViewModel.setCurrentZoomLevel( 14.0 )
@@ -198,8 +199,6 @@ class PerformCollectionFragment : Fragment(),
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
-
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
 
         pointAnnotationManager.apply {
             addClickListener(
@@ -369,6 +368,8 @@ class PerformCollectionFragment : Fragment(),
 
     fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         for (polygonAnnotation in allPolygonAnnotations)
         {
             polygonAnnotationManager.delete( polygonAnnotation )
@@ -498,6 +499,8 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     private fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
