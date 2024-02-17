@@ -46,19 +46,29 @@ class PerformMultiCollectionFragment : Fragment(),
     private var _binding: FragmentPerformMultiCollectionBinding? = null
     private val binding get() = _binding!!
 
+    private val kFragmentResultListener = "PerformMultiCollectionFragment"
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
-        setFragmentResultListener(PerformCollectionFragment.AdditionalInfoRequest) { key, bundle ->
-            AdditionalInfoDialog( activity, "", "", this)
-        }
-
-        setFragmentResultListener(PerformCollectionFragment.LaunchSurveyRequest) { key, bundle ->
-            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                if (gpsAccuracyIsGood && gpsLocationIsGood)
+        setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
+            bundle.getString( Keys.kRequest.toString() )?.let { request ->
+                when (request)
                 {
-                    SurveyLaunchNotificationDialog( activity!!, this )
+                    Keys.kAdditionalInfoRequest.toString() ->
+                    {
+                        AdditionalInfoDialog(activity, "", "", this)
+                    }
+
+                    Keys.kLaunchSurveyRequest.toString() ->
+                    {
+                        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                            if (gpsAccuracyIsGood && gpsLocationIsGood) {
+                                SurveyLaunchNotificationDialog(activity!!, this)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -130,6 +140,7 @@ class PerformMultiCollectionFragment : Fragment(),
             val bundle = Bundle()
             bundle.putBoolean( Keys.kEditMode.toString(), false )
             bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+            bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
         }
     }

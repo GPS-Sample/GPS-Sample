@@ -51,6 +51,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
 
     private var editMode = true
+    private var fragmentResultListener = ""
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -76,11 +77,15 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
+        arguments?.getBoolean( Keys.kEditMode.toString())?.let { editMode ->
             this.editMode = editMode
         }
 
-        arguments?.getBoolean(Keys.kCollectionMode.toString())?.let { collectionMode ->
+        arguments?.getString( Keys.kFragmentResultListener.toString())?.let { fragmentResultListener ->
+            this.fragmentResultListener = fragmentResultListener
+        }
+
+        arguments?.getBoolean( Keys.kCollectionMode.toString())?.let { collectionMode ->
             if (collectionMode)
             {
                 binding.launchSurveyButton.visibility = View.VISIBLE
@@ -261,12 +266,24 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.cancelButton.setOnClickListener {
-            setFragmentResult(PerformCollectionFragment.AdditionalInfoRequest, Bundle())
+            if (fragmentResultListener.isNotEmpty())
+            {
+                val bundle = Bundle()
+                bundle.putString( Keys.kRequest.toString(), Keys.kAdditionalInfoRequest.toString())
+                setFragmentResult( fragmentResultListener, bundle )
+            }
+
             findNavController().popBackStack()
         }
 
         binding.launchSurveyButton.setOnClickListener {
-            setFragmentResult(PerformCollectionFragment.LaunchSurveyRequest, Bundle())
+            if (fragmentResultListener.isNotEmpty())
+            {
+                val bundle = Bundle()
+                bundle.putString( Keys.kRequest.toString(), Keys.kLaunchSurveyRequest.toString())
+                setFragmentResult( fragmentResultListener, bundle )
+            }
+
             findNavController().popBackStack()
         }
 

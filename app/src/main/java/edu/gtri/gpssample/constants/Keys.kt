@@ -8,6 +8,7 @@ enum class Keys {
     kIpAddress,
     kPayload,
     kTeam_id,
+    kRequest,
     kEditMode,
     kUserName,
     kStudyName,
@@ -18,5 +19,8 @@ enum class Keys {
     kSamplingMethod,
     kCollectionMode,
     kGpsAccuracyIsGood,
-    kGpsLocationIsGood
+    kGpsLocationIsGood,
+    kLaunchSurveyRequest,
+    kAdditionalInfoRequest,
+    kFragmentResultListener
 }

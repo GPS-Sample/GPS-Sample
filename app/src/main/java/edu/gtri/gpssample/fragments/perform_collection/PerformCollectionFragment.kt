@@ -67,12 +67,8 @@ class PerformCollectionFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate {
-    companion object {
-        const val LaunchSurveyRequest = "LaunchSurveyRequest"
-        const val AdditionalInfoRequest = "AdditionalInfoRequest"
-    }
-
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
+{
     private lateinit var user: User
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
@@ -97,24 +93,31 @@ class PerformCollectionFragment : Fragment(),
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 2
-
-    fun setFragmentResultListeners()
-    {
-        setFragmentResultListener(AdditionalInfoRequest) { key, bundle ->
-            AdditionalInfoDialog(activity, "", "", this)
-        }
-
-        setFragmentResultListener(LaunchSurveyRequest) { key, bundle ->
-            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                if (gpsAccuracyIsGood() && gpsLocationIsGood(location)) {
-                    SurveyLaunchNotificationDialog(activity!!, this)
-                }
-            }
-        }
-    }
+    private val kFragmentResultListener = "PerformCollectionFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
+            bundle.getString( Keys.kRequest.toString() )?.let { request ->
+                when (request)
+                {
+                    Keys.kAdditionalInfoRequest.toString() ->
+                    {
+                        AdditionalInfoDialog(activity, "", "", this)
+                    }
+
+                    Keys.kLaunchSurveyRequest.toString() ->
+                    {
+                        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                            if (gpsAccuracyIsGood() && gpsLocationIsGood(location)) {
+                                SurveyLaunchNotificationDialog(activity!!, this)
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         val vm: ConfigurationViewModel by activityViewModels()
         val networkVm: NetworkViewModel by activityViewModels()
@@ -257,11 +260,10 @@ class PerformCollectionFragment : Fragment(),
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
 
-                                    setFragmentResultListeners()
-
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.toString(), false )
                                     bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+                                    bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                                 }
                             }
@@ -531,11 +533,10 @@ class PerformCollectionFragment : Fragment(),
                 (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                 (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
 
-                setFragmentResultListeners()
-
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.toString(), false )
                 bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+                bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
             }
         }
