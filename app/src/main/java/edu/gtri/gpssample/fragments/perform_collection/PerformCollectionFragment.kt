@@ -100,20 +100,22 @@ class PerformCollectionFragment : Fragment(),
 
         setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
             bundle.getString( Keys.kRequest.toString() )?.let { request ->
-                when (request)
-                {
-                    Keys.kAdditionalInfoRequest.toString() ->
+                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                    if (gpsAccuracyIsGood() && gpsLocationIsGood(location))
                     {
-                        AdditionalInfoDialog(activity, "", "", this)
-                    }
-
-                    Keys.kLaunchSurveyRequest.toString() ->
-                    {
-                        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                            if (gpsAccuracyIsGood() && gpsLocationIsGood(location)) {
-                                SurveyLaunchNotificationDialog(activity!!, this)
-                            }
+                        when (request)
+                        {
+                            Keys.kAdditionalInfoRequest.toString() -> AdditionalInfoDialog(activity, "", "", this)
+                            Keys.kLaunchSurveyRequest.toString() -> SurveyLaunchNotificationDialog(activity!!, this)
                         }
+                    }
+                    else if (!gpsAccuracyIsGood())
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -54,20 +55,22 @@ class PerformMultiCollectionFragment : Fragment(),
 
         setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
             bundle.getString( Keys.kRequest.toString() )?.let { request ->
-                when (request)
-                {
-                    Keys.kAdditionalInfoRequest.toString() ->
+                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                    if (gpsAccuracyIsGood && gpsLocationIsGood)
                     {
-                        AdditionalInfoDialog(activity, "", "", this)
-                    }
-
-                    Keys.kLaunchSurveyRequest.toString() ->
-                    {
-                        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                            if (gpsAccuracyIsGood && gpsLocationIsGood) {
-                                SurveyLaunchNotificationDialog(activity!!, this)
-                            }
+                        when (request)
+                        {
+                            Keys.kAdditionalInfoRequest.toString() -> AdditionalInfoDialog(activity, "", "", this)
+                            Keys.kLaunchSurveyRequest.toString() -> SurveyLaunchNotificationDialog(activity!!, this)
                         }
+                    }
+                    else if (!gpsAccuracyIsGood)
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
