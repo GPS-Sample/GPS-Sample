@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.manage_collection_teams
 
 import android.os.Bundle
 import android.view.*
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -45,12 +47,26 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         _binding = FragmentManageCollectionTeamsBinding.inflate(inflater, container, false)
 
+        setHasOptionsMenu(true)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed()
+            {
+                (activity!!.application as? MainApplication)?.user?.let { user ->
+                    if (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString())
+                    {
+                        findNavController().popBackStack(R.id.ConfigurationFragment, false)
+                    }
+                }
+            }
+        })
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
@@ -125,6 +141,25 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
         study.collectionTeams.remove(collectionTeam)
         manageCollectionTeamsAdapter.updateTeams(study.collectionTeams)
         DAO.collectionTeamDAO.deleteTeam( collectionTeam )
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            16908332-> // TODO: use R.id.?
+            {
+                (activity!!.application as? MainApplication)?.user?.let { user ->
+                    if (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString())
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
+                        return false
+                    }
+                }
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()

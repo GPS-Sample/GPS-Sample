@@ -266,6 +266,12 @@
         <action
             android:id="@+id/action_navigate_to_PerformCollectionFragment"
             app:destination="@id/PerformCollectionFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_ConfigurationFragment"
+            app:destination="@id/ConfigurationFragment"
+            app:popUpToInclusive="false"
+            app:popUpTo="@id/ConfigurationFragment"/>
     </fragment>
 
     <!--CreateEnumerationTeamFragment-->
@@ -385,12 +391,6 @@
         <action
             android:id="@+id/action_navigate_to_AddLandmarkFragment"
             app:destination="@id/AddLandmarkFragment"/>
-
-        <action
-            android:id="@+id/action_navigate_to_ConfigurationFragment"
-            app:destination="@id/ConfigurationFragment"
-            app:popUpToInclusive="false"
-            app:popUpTo="@id/ConfigurationFragment"/>
     </fragment>
 
     <fragment

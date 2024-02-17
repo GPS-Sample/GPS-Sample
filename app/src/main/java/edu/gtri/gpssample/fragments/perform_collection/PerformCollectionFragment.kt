@@ -134,21 +134,12 @@ class PerformCollectionFragment : Fragment(),
     {
         _binding = FragmentPerformCollectionBinding.inflate(inflater, container, false)
 
-        setHasOptionsMenu(true)
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed()
-            {
-                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
-            }
-        })
 
         sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
             collectionTeam = it
@@ -915,20 +906,6 @@ class PerformCollectionFragment : Fragment(),
     {
         MapboxManager.cancelStylePackDownload()
         MapboxManager.cancelTilePackDownload()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        when (item.itemId)
-        {
-            16908332-> // TODO: use R.id.?
-            {
-                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
-                return false
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()
