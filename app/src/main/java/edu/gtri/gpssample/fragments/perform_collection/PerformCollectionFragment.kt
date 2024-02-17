@@ -67,12 +67,8 @@ class PerformCollectionFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate {
-    companion object {
-        const val LaunchSurveyRequest = "LaunchSurveyRequest"
-        const val AdditionalInfoRequest = "AdditionalInfoRequest"
-    }
-
+    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
+{
     private lateinit var user: User
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
@@ -97,24 +93,33 @@ class PerformCollectionFragment : Fragment(),
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 2
-
-    fun setFragmentResultListeners()
-    {
-        setFragmentResultListener(AdditionalInfoRequest) { key, bundle ->
-            AdditionalInfoDialog(activity, "", "", this)
-        }
-
-        setFragmentResultListener(LaunchSurveyRequest) { key, bundle ->
-            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                if (gpsAccuracyIsGood() && gpsLocationIsGood(location)) {
-                    SurveyLaunchNotificationDialog(activity!!, this)
-                }
-            }
-        }
-    }
+    private val kFragmentResultListener = "PerformCollectionFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
+            bundle.getString( Keys.kRequest.toString() )?.let { request ->
+                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                    if (gpsAccuracyIsGood() && gpsLocationIsGood(location))
+                    {
+                        when (request)
+                        {
+                            Keys.kAdditionalInfoRequest.toString() -> AdditionalInfoDialog(activity, "", "", this)
+                            Keys.kLaunchSurveyRequest.toString() -> SurveyLaunchNotificationDialog(activity!!, this)
+                        }
+                    }
+                    else if (!gpsAccuracyIsGood())
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
 
         val vm: ConfigurationViewModel by activityViewModels()
         val networkVm: NetworkViewModel by activityViewModels()
@@ -131,21 +136,12 @@ class PerformCollectionFragment : Fragment(),
     {
         _binding = FragmentPerformCollectionBinding.inflate(inflater, container, false)
 
-        setHasOptionsMenu(true)
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed()
-            {
-                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
-            }
-        })
 
         sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
             collectionTeam = it
@@ -257,11 +253,10 @@ class PerformCollectionFragment : Fragment(),
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
 
-                                    setFragmentResultListeners()
-
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.toString(), false )
                                     bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+                                    bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                                 }
                             }
@@ -481,23 +476,40 @@ class PerformCollectionFragment : Fragment(),
 
                         if (sampledItem.samplingState == SamplingState.Sampled)
                         {
-                            resourceId = if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                            when( sampledItem.collectionState )
+                            {
+                                CollectionState.Undefined -> resourceId = R.drawable.home_blue
+                                CollectionState.Incomplete -> resourceId = R.drawable.home_orange
+                                CollectionState.Complete -> resourceId = R.drawable.home_purple
+                            }
                         }
                     }
                     else
                     {
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            if (sampledItem.samplingState == SamplingState.Sampled && sampledItem.collectionState == CollectionState.Undefined)
                             {
-                                if (sampledItem.collectionState == CollectionState.Incomplete)
+                                resourceId = R.drawable.multi_home_blue
+                                break
+                            }
+                        }
+
+                        if (resourceId == 0)
+                        {
+                            for (sampledItem in location.enumerationItems)
+                            {
+                                if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
-                                    resourceId = R.drawable.multi_home_orange
-                                    break
-                                }
-                                else if (sampledItem.collectionState == CollectionState.Complete)
-                                {
-                                    resourceId = R.drawable.multi_home_purple
+                                    if (sampledItem.collectionState == CollectionState.Incomplete)
+                                    {
+                                        resourceId = R.drawable.multi_home_orange
+                                        break
+                                    }
+                                    else if (sampledItem.collectionState == CollectionState.Complete)
+                                    {
+                                        resourceId = R.drawable.multi_home_purple
+                                    }
                                 }
                             }
                         }
@@ -531,11 +543,10 @@ class PerformCollectionFragment : Fragment(),
                 (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                 (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
 
-                setFragmentResultListeners()
-
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.toString(), false )
                 bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+                bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
             }
         }
@@ -914,20 +925,6 @@ class PerformCollectionFragment : Fragment(),
     {
         MapboxManager.cancelStylePackDownload()
         MapboxManager.cancelTilePackDownload()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        when (item.itemId)
-        {
-            16908332-> // TODO: use R.id.?
-            {
-                findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
-                return false
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()

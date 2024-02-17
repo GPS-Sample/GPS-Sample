@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -46,19 +47,31 @@ class PerformMultiCollectionFragment : Fragment(),
     private var _binding: FragmentPerformMultiCollectionBinding? = null
     private val binding get() = _binding!!
 
+    private val kFragmentResultListener = "PerformMultiCollectionFragment"
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
-        setFragmentResultListener(PerformCollectionFragment.AdditionalInfoRequest) { key, bundle ->
-            AdditionalInfoDialog( activity, "", "", this)
-        }
-
-        setFragmentResultListener(PerformCollectionFragment.LaunchSurveyRequest) { key, bundle ->
-            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                if (gpsAccuracyIsGood && gpsLocationIsGood)
-                {
-                    SurveyLaunchNotificationDialog( activity!!, this )
+        setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
+            bundle.getString( Keys.kRequest.toString() )?.let { request ->
+                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                    if (gpsAccuracyIsGood && gpsLocationIsGood)
+                    {
+                        when (request)
+                        {
+                            Keys.kAdditionalInfoRequest.toString() -> AdditionalInfoDialog(activity, "", "", this)
+                            Keys.kLaunchSurveyRequest.toString() -> SurveyLaunchNotificationDialog(activity!!, this)
+                        }
+                    }
+                    else if (!gpsAccuracyIsGood)
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -130,6 +143,7 @@ class PerformMultiCollectionFragment : Fragment(),
             val bundle = Bundle()
             bundle.putBoolean( Keys.kEditMode.toString(), false )
             bundle.putBoolean( Keys.kCollectionMode.toString(), true )
+            bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
         }
     }
