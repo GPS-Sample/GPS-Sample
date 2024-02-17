@@ -257,8 +257,6 @@
     <string name="sampled">"Sampled"</string>
     <string name="completed_enumeration">"Completed Enumeration"</string>
     <string name="incomplete_enumeration">"Incomplete Enumeration"</string>
-    <string name="incomplete_collection">"Incomplete Collection"</string>
-    <string name="completed_collection">"Completed Collection"</string>
     <string name="dismiss">"Dismiss"</string>
     <string name="delete">"Delete"</string>
     <string name="launching_odk_collect_application">"Launching ODK Collect Application..."</string>
@@ -290,7 +288,6 @@
     <string name="less_than_equal">"Less Than Or Equal"</string>
     <string name="gps_accuracy_error">"GPS accuracy is less than the required accuracy"</string>
     <string name="gps_location_error">"You are currently too far away from this location"</string>
-    <string name="accuracy">"Accuracy :"</string>
     <string name="good">"GOOD"</string>
     <string name="poor">"POOR"</string>
     <string name="unknown">"UNKNOWN"</string>
@@ -316,6 +313,10 @@
     <string name="is_multi_family">Is this a multi household location?</string>
     <string name="sample">Sample</string>
     <string name="mark_status">Mark Status</string>
+    <string name="not_visited">Not Visited</string>
+    <string name="incomplete_collection">"Incomplete Survey"</string>
+    <string name="completed_collection">"Completed Survey"</string>
+    <string name="accuracy">"Accuracy : "</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

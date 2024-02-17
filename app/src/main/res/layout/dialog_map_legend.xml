@@ -26,7 +26,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="@string/undefined"
+            android:text="@string/not_visited"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />

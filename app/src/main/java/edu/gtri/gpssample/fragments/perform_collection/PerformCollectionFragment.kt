@@ -476,23 +476,40 @@ class PerformCollectionFragment : Fragment(),
 
                         if (sampledItem.samplingState == SamplingState.Sampled)
                         {
-                            resourceId = if (sampledItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                            when( sampledItem.collectionState )
+                            {
+                                CollectionState.Undefined -> resourceId = R.drawable.home_blue
+                                CollectionState.Incomplete -> resourceId = R.drawable.home_orange
+                                CollectionState.Complete -> resourceId = R.drawable.home_purple
+                            }
                         }
                     }
                     else
                     {
                         for (sampledItem in location.enumerationItems)
                         {
-                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            if (sampledItem.samplingState == SamplingState.Sampled && sampledItem.collectionState == CollectionState.Undefined)
                             {
-                                if (sampledItem.collectionState == CollectionState.Incomplete)
+                                resourceId = R.drawable.multi_home_blue
+                                break
+                            }
+                        }
+
+                        if (resourceId == 0)
+                        {
+                            for (sampledItem in location.enumerationItems)
+                            {
+                                if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
-                                    resourceId = R.drawable.multi_home_orange
-                                    break
-                                }
-                                else if (sampledItem.collectionState == CollectionState.Complete)
-                                {
-                                    resourceId = R.drawable.multi_home_purple
+                                    if (sampledItem.collectionState == CollectionState.Incomplete)
+                                    {
+                                        resourceId = R.drawable.multi_home_orange
+                                        break
+                                    }
+                                    else if (sampledItem.collectionState == CollectionState.Complete)
+                                    {
+                                        resourceId = R.drawable.multi_home_purple
+                                    }
                                 }
                             }
                         }

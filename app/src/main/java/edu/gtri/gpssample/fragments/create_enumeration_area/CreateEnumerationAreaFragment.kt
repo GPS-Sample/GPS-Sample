@@ -439,7 +439,12 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                         if (enumerationItem.samplingState == SamplingState.Sampled)
                         {
-                            resourceId = if (enumerationItem.collectionState == CollectionState.Incomplete) R.drawable.home_orange else R.drawable.home_purple
+                            when( enumerationItem.collectionState )
+                            {
+                                CollectionState.Undefined -> resourceId = R.drawable.home_blue
+                                CollectionState.Incomplete -> resourceId = R.drawable.home_orange
+                                CollectionState.Complete -> resourceId = R.drawable.home_purple
+                            }
                         }
                         else if (enumerationItem.enumerationState == EnumerationState.Undefined)
                         {
@@ -459,61 +464,70 @@ class CreateEnumerationAreaFragment : Fragment(),
                 {
                     for (enumerationItem in location.enumerationItems)
                     {
-                        if (enumerationItem.samplingState == SamplingState.Sampled)
+                        if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
                         {
-                            if (enumerationItem.collectionState == CollectionState.Incomplete)
-                            {
-                                resourceId = R.drawable.multi_home_orange
-                                break
-                            }
-                            else if (enumerationItem.collectionState == CollectionState.Complete)
-                            {
-                                resourceId = R.drawable.multi_home_purple
-                            }
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                        {
-                            resourceId = R.drawable.multi_home_black
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            resourceId = R.drawable.multi_home_red
+                            resourceId = R.drawable.multi_home_blue
                             break
                         }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                    }
+
+                    if (resourceId == R.drawable.home_black)
+                    {
+                        for (enumerationItem in location.enumerationItems)
                         {
-                            resourceId = R.drawable.multi_home_green
+                            if (enumerationItem.samplingState == SamplingState.Sampled)
+                            {
+                                if (enumerationItem.collectionState == CollectionState.Incomplete)
+                                {
+                                    resourceId = R.drawable.multi_home_orange
+                                    break
+                                }
+                                else if (enumerationItem.collectionState == CollectionState.Complete)
+                                {
+                                    resourceId = R.drawable.multi_home_purple
+                                }
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                            {
+                                resourceId = R.drawable.multi_home_black
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                            {
+                                resourceId = R.drawable.multi_home_red
+                                break
+                            }
+                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                            {
+                                resourceId = R.drawable.multi_home_green
+                            }
                         }
                     }
                 }
 
-                if (resourceId > 0)
+                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+
+                pointAnnotation?.let {
+                    pointHashMap[pointAnnotation.id] = location
+                    allPointAnnotations.add( pointAnnotation )
+                }
+
+                if (editMode)
                 {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    val pointAnnotation = mapboxManager.addMarker( point, resourceId )
-
-                    pointAnnotation?.let {
-                        pointHashMap[pointAnnotation.id] = location
-                        allPointAnnotations.add( pointAnnotation )
-                    }
-
-                    if (editMode)
-                    {
-                        pointAnnotationManager?.apply {
-                            addClickListener(
-                                OnPointAnnotationClickListener { pointAnnotation ->
-                                    pointHashMap[pointAnnotation.id]?.let { location ->
-                                        if (!location.isLandmark)
-                                        {
-                                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                                "${resources.getString(R.string.delete_household_message)}?",
-                                                resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@CreateEnumerationAreaFragment)
-                                        }
+                    pointAnnotationManager?.apply {
+                        addClickListener(
+                            OnPointAnnotationClickListener { pointAnnotation ->
+                                pointHashMap[pointAnnotation.id]?.let { location ->
+                                    if (!location.isLandmark)
+                                    {
+                                        ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+                                            "${resources.getString(R.string.delete_household_message)}?",
+                                            resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@CreateEnumerationAreaFragment)
                                     }
-                                    true
                                 }
-                            )
-                        }
+                                true
+                            }
+                        )
                     }
                 }
             }

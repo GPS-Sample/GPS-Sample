@@ -43,7 +43,7 @@ data class EnumerationItem(
         false,
         SamplingState.None,
         "",
-        CollectionState.Incomplete,
+        CollectionState.Undefined,
         0,
         "",
         "",
