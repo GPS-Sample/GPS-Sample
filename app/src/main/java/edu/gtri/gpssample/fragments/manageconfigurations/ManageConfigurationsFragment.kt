@@ -450,11 +450,18 @@ class ManageConfigurationsFragment : Fragment(),
                         val config = Config.unpack( text )
                         config?.let { config ->
 
-                            DAO.configDAO.createOrUpdateConfig( config )
+                            DAO.instance().writableDatabase.beginTransaction()
 
-                            sharedViewModel.setCurrentConfig( config )
-                            configurations = DAO.configDAO.getConfigs()
-                            manageConfigurationsAdapter.updateConfigurations( configurations )
+                            val savedConfig = DAO.configDAO.createOrUpdateConfig( config )
+
+                            DAO.instance().writableDatabase.setTransactionSuccessful()
+                            DAO.instance().writableDatabase.endTransaction()
+
+                            savedConfig?.let { savedConfig ->
+                                configurations = DAO.configDAO.getConfigs()
+                                sharedViewModel.setCurrentConfig( savedConfig )
+                                manageConfigurationsAdapter.updateConfigurations( configurations )
+                            }
 
                             didReceiveConfiguration(true )
                         } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()

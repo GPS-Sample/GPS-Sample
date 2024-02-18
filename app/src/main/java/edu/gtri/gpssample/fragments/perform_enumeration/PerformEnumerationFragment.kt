@@ -94,6 +94,8 @@ class PerformEnumerationFragment : Fragment(),
     private val kAddHouseholdTag = 2
     private val kSelectHouseholdTag = 3
 
+    private var enumerationCount = 0
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -330,8 +332,8 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
+        enumerationCount = 0
         var sampledCount = 0
-        var enumerationCount = 0
         var surveyedCount = 0
 
         for (location in enumArea.locations)
@@ -532,7 +534,9 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (gpsLocationIsGood( location ))
                 {
-                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
+                    val enumerationItem = EnumerationItem()
+                    enumerationItem.subAddress = "${enumerationCount + 1}"
+                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 
                     ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
                 }
