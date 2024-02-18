@@ -189,12 +189,31 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
         binding.nextButton.setOnClickListener {
 
-            for (enumArea in config.enumAreas)
+            if (binding.nextButton.text == resources.getString( R.string.save ))
             {
-                DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
-            }
+                binding.overlayView.visibility = View.VISIBLE
 
-            findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
+                Thread {
+                    DAO.instance().writableDatabase.beginTransaction()
+
+                    for (enumArea in config.enumAreas)
+                    {
+                        DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                    }
+
+                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                    DAO.instance().writableDatabase.endTransaction()
+
+                    activity!!.runOnUiThread {
+                        binding.overlayView.visibility = View.GONE
+                        findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
+                    }
+                }.start()
+            }
+            else
+            {
+                findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
+            }
         }
     }
 
