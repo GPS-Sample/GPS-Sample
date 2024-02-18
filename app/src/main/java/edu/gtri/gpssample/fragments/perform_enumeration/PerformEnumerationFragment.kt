@@ -151,6 +151,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performEnumerationAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " team)"
 

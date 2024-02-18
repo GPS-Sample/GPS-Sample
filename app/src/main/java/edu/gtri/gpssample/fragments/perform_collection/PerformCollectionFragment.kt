@@ -190,6 +190,7 @@ class PerformCollectionFragment : Fragment(),
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
             binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + collectionTeam.name + " team)"
@@ -478,7 +479,7 @@ class PerformCollectionFragment : Fragment(),
                         {
                             when( sampledItem.collectionState )
                             {
-                                CollectionState.Undefined -> resourceId = R.drawable.home_blue
+                                CollectionState.Undefined -> resourceId = R.drawable.home_light_blue
                                 CollectionState.Incomplete -> resourceId = R.drawable.home_orange
                                 CollectionState.Complete -> resourceId = R.drawable.home_purple
                             }
@@ -490,7 +491,7 @@ class PerformCollectionFragment : Fragment(),
                         {
                             if (sampledItem.samplingState == SamplingState.Sampled && sampledItem.collectionState == CollectionState.Undefined)
                             {
-                                resourceId = R.drawable.multi_home_blue
+                                resourceId = R.drawable.multi_home_light_blue
                                 break
                             }
                         }
