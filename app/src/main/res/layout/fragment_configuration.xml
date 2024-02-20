@@ -355,26 +355,24 @@
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_weight="1"
                                 android:layout_marginStart="10dp"
                                 android:gravity="center_vertical"
                                 android:text="@string/num_enumeration_areas"
                                 android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
 
                             <TextView
                                 android:id="@+id/number_of_enumeration_areas_text_view"
                                 android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:textColor="@color/primary"
                                 android:text="0"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -384,26 +382,24 @@
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_weight="1"
                                 android:layout_marginStart="10dp"
                                 android:gravity="center_vertical"
                                 android:text="@string/num_hhs_enumerated"
                                 android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
 
                             <TextView
                                 android:id="@+id/number_enumerated_text_view"
                                 android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:textColor="@color/primary"
                                 android:text="0"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -413,26 +409,24 @@
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_weight="1"
                                 android:layout_marginStart="10dp"
                                 android:gravity="center_vertical"
                                 android:text="@string/num_hhs_eligible"
                                 android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
 
                             <TextView
                                 android:id="@+id/number_eligible_text_view"
                                 android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:textColor="@color/primary"
                                 android:text="0"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -442,26 +436,24 @@
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_weight="1"
                                 android:layout_marginStart="10dp"
                                 android:gravity="center_vertical"
                                 android:text="@string/num_hhs_sampled"
                                 android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
 
                             <TextView
                                 android:id="@+id/number_sampled_text_view"
                                 android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:textColor="@color/primary"
                                 android:text="0"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -471,26 +463,24 @@
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_weight="1"
                                 android:layout_marginStart="10dp"
                                 android:gravity="center_vertical"
                                 android:text="@string/num_hhs_surveyed"
                                 android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
 
                             <TextView
                                 android:id="@+id/number_surveyed_text_view"
                                 android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:textColor="@color/primary"
                                 android:text="0"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -501,26 +491,24 @@
 
                             <TextView
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_weight="1"
                                 android:layout_marginStart="10dp"
                                 android:gravity="center_vertical"
                                 android:text="@string/num_hhs_remaining_to_survey"
                                 android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
 
                             <TextView
                                 android:id="@+id/number_remaining_text_view"
                                 android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_height="50dp"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="10dp"
                                 android:gravity="center"
                                 android:textColor="@color/primary"
                                 android:text="0"
-                                android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="17sp"/>
                         </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
