@@ -192,7 +192,7 @@ class ConfigurationFragment : Fragment(),
                 {
                     for (enumItem in location.enumerationItems)
                     {
-                        if (enumItem.enumerationState == EnumerationState.Enumerated)
+                        if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
                         {
                             enumerationCount += 1
                         }
