@@ -317,6 +317,19 @@
     <string name="incomplete_collection">"Incomplete Survey"</string>
     <string name="completed_collection">"Completed Survey"</string>
     <string name="accuracy">"Accuracy : "</string>
+    <string name="subaddress_is_required">Subaddress is Required</string>
+    <string name="auto_increment_subaddress">Auto Increment Subaddress</string>
+    <string name="allow_manual_identification_of_locations">Allow manual identification of locations</string>
+    <string name="proximity_warning_enabled">Proximity Warning Enabled</string>
+    <string name="encryption_password">Encryption Password</string>
+    <string name="enter_encryption_password">Enter Encryption Password</string>
+    <string name="summary">Summary</string>
+    <string name="num_enumeration_areas"># Enumeration Areas:</string>
+    <string name="num_hhs_enumerated"># HH\'s Enumerated:</string>
+    <string name="num_hhs_eligible"># HH\'s Eligible:</string>
+    <string name="num_hhs_sampled"># HH\'s Sampled:</string>
+    <string name="num_hhs_surveyed"># HH\'s Surveyed:</string>
+    <string name="num_hhs_remaining_to_survey"># HH\'s Remaining to Survey:</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

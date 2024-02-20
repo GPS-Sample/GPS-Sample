@@ -535,7 +535,12 @@ class PerformEnumerationFragment : Fragment(),
                 if (gpsLocationIsGood( location ))
                 {
                     val enumerationItem = EnumerationItem()
-                    enumerationItem.subAddress = "${enumerationCount + 1}"
+
+                    if (config.autoIncrementSubaddress)
+                    {
+                        enumerationItem.subAddress = "${enumerationCount + 1}"
+                    }
+
                     sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 
                     ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)

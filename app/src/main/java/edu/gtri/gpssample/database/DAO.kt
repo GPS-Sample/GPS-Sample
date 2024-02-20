@@ -39,8 +39,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_MIN_GPS_PRECISION + " INTEGER" + "," +
+                    COLUMN_CONFIG_ENCRYPTION_PASSWORD + " TEXT" + "," +
                     COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY + " INTEGER" + "," +
                     COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED + " INTEGER" + "," +
+                    COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS + " INTEGER" + "," +
                     COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_ID + " INTEGER" + "," +
                     COLUMN_STUDY_ID + " INTEGER" + "," +
@@ -485,8 +487,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_DATE_FORMAT_INDEX = "config_date_format_index"
         const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
         const val COLUMN_CONFIG_MIN_GPS_PRECISION = "config_min_gps_precision"
+        const val COLUMN_CONFIG_ENCRYPTION_PASSWORD = "config_encryption_password"
         const val COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY = "config_allow_manual_location_entry"
         const val COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED = "config_subaddress_is_required"
+        const val COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS = "config_auto_increment_subaddress"
         const val COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED = "config_proximity_warning_is_enabled"
 
 
@@ -780,6 +784,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 278
+        private const val DATABASE_VERSION = 279
     }
 }
