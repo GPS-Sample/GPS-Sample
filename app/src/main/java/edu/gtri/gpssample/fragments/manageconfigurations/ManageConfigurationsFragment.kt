@@ -53,6 +53,7 @@ class ManageConfigurationsFragment : Fragment(),
     private val binding get() = _binding!!
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var configurations = ArrayList<Config>()
+    private var encryptionPassword = ""
 
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
@@ -345,7 +346,7 @@ class ManageConfigurationsFragment : Fragment(),
 
         if (tag == kImportTag)
         {
-            sharedNetworkViewModel.networkClientModel.encryptionPassword = sharedPreferences.getString( Keys.kEncryptionPassword.toString(), "" )!!
+            sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
             sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
             getResult.launch(intent)
@@ -355,7 +356,7 @@ class ManageConfigurationsFragment : Fragment(),
             if (configurations.size == 1)
             {
                 view?.let { view ->
-                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = sharedPreferences.getString( Keys.kEncryptionPassword.toString(), "" )!!
+                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = encryptionPassword
                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin )
 
                     sharedNetworkViewModel.setCurrentConfig(configurations[0])
@@ -443,10 +444,7 @@ class ManageConfigurationsFragment : Fragment(),
                     inputStream?.let {  inputStream ->
                         val text = inputStream.bufferedReader().readText()
 
-                        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                        val encryptionPassword = sharedPreferences.getString( Keys.kEncryptionPassword.toString(), "" )
-
-                        val config = Config.unpack( text, encryptionPassword!! )
+                        val config = Config.unpack( text, encryptionPassword )
 
                         config?.let { config ->
 
@@ -702,10 +700,7 @@ class ManageConfigurationsFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kEncryptionPassword.toString(), name )
-        editor.commit()
+        encryptionPassword = name
 
         if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()) && (configurations.size > 0))
         {
