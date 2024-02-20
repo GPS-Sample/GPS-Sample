@@ -32,8 +32,10 @@ data class Config(
     var timeFormat: TimeFormat,
     var distanceFormat: DistanceFormat,
     var minGpsPrecision: Int,
+    var encryptionPassword: String,
     var allowManualLocationEntry: Boolean,
     var subaddressIsrequired: Boolean,
+    var autoIncrementSubaddress: Boolean,
     var proximityWarningIsEnabled: Boolean,
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
@@ -41,12 +43,12 @@ data class Config(
     var selectedEnumAreaId: Int,
     var mapTileRegions: ArrayList<MapTileRegion>)
 {
-    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, proximityWarningIsEnabled: Boolean)
-            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry, subaddressIsrequired, proximityWarningIsEnabled,
+    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean)
+            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled,
                                     ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1, ArrayList<MapTileRegion>())
     constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, proximityWarningIsEnabled: Boolean, selectedStudyId: Int, selectedEnumAreaId: Int)
-            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, allowManualLocationEntry, subaddressIsrequired, proximityWarningIsEnabled,
+                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, selectedStudyId: Int, selectedEnumAreaId: Int)
+            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled,
         ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId, ArrayList<MapTileRegion>())
 
     var minimumGPSPrecision : String
@@ -74,16 +76,16 @@ data class Config(
     {
        // return Json.encodeToString( this )
         val jsonString = Json.encodeToString( this )
-        return  EncryptionUtil.Encrypt(jsonString)
+        return  EncryptionUtil.Encrypt(jsonString, encryptionPassword)
     }
 
     companion object
     {
-        fun unpack( message: String ) : Config?
+        fun unpack( message: String, password: String ) : Config?
         {
             try
             {
-                val decrypted = EncryptionUtil.Decrypt(message)
+                val decrypted = EncryptionUtil.Decrypt(message, password)
                 decrypted?.let {decrypted ->
                     return Json.decodeFromString<Config>( decrypted )
                 }

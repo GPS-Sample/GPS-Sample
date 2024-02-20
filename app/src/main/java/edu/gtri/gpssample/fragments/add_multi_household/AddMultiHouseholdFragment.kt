@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddMultiHouseholdBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class AddMultiHouseholdFragment : Fragment()
 {
+    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var location: Location
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -64,6 +64,10 @@ class AddMultiHouseholdFragment : Fragment()
             enumArea = it
         }
 
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
+        }
+
         addMultiHouseholdAdapter = AddMultiHouseholdAdapter( location, location.enumerationItems, enumArea.name )
         addMultiHouseholdAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
@@ -72,13 +76,34 @@ class AddMultiHouseholdFragment : Fragment()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.addButton.setOnClickListener {
-            sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
+
+            val enumerationItem = EnumerationItem()
+
+            if (config.autoIncrementSubaddress)
+            {
+                var enumerationCount = 0
+
+                for (location in enumArea.locations)
+                {
+                    for (enumItem in location.enumerationItems)
+                    {
+                        if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            enumerationCount += 1
+                        }
+                    }
+                }
+
+                enumerationItem.subAddress = "${enumerationCount + 1}"
+            }
+
+            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
         }
 
         binding.backButton.setOnClickListener {
             findNavController().popBackStack()
-//            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
         }
     }
 

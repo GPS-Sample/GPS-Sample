@@ -96,7 +96,7 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            app:srcCompat="@drawable/home_blue"/>
+            app:srcCompat="@drawable/home_light_blue"/>
 
         <TextView
             android:id="@+id/sampled_text_view"

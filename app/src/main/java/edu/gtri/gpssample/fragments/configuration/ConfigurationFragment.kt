@@ -192,7 +192,7 @@ class ConfigurationFragment : Fragment(),
                 {
                     for (enumItem in location.enumerationItems)
                     {
-                        if (enumItem.enumerationState == EnumerationState.Enumerated)
+                        if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
                         {
                             enumerationCount += 1
                         }
@@ -295,7 +295,7 @@ class ConfigurationFragment : Fragment(),
                             }
                         }
 
-                        sharedViewModel?.currentConfiguration?.value?.let{
+                        sharedViewModel.currentConfiguration?.value?.let{
                             sharedNetworkViewModel.setCurrentConfig(it)
                         }
 
@@ -411,25 +411,22 @@ class ConfigurationFragment : Fragment(),
                     inputStream?.let {  inputStream ->
                         val text = inputStream.bufferedReader().readText()
 
-                        Log.d( "xxx", text )
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            EnumArea.unpack( text, config.encryptionPassword )?.let { enumArea ->
+                                for (location in enumArea.locations)
+                                {
+                                    DAO.locationDAO.createOrUpdateLocation(location, enumArea)
+                                }
 
-                        val enumArea = EnumArea.unpack( text )
-
-                        enumArea?.let { enumArea ->
-                            for (location in enumArea.locations)
-                            {
-                                DAO.locationDAO.createOrUpdateLocation(location, enumArea)
-                            }
-
-                            // replace the enumArea from currentConfig with this one
-                            sharedViewModel?.replaceEnumArea(enumArea)
+                                // replace the enumArea from currentConfig with this one
+                                sharedViewModel?.replaceEnumArea(enumArea)
+                            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.decryption_failed), Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
                 catch( ex: java.lang.Exception )
                 {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed),
-                        Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                 }
             }
         }

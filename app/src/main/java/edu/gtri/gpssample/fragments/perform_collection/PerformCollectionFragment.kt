@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.perform_collection
 
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -143,6 +144,11 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+            sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
+        }
+
         sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
             collectionTeam = it
         }
@@ -190,6 +196,7 @@ class PerformCollectionFragment : Fragment(),
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
             binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + collectionTeam.name + " team)"
@@ -350,7 +357,7 @@ class PerformCollectionFragment : Fragment(),
             {
                 for (enumItem in location.enumerationItems)
                 {
-                    if (enumItem.enumerationState == EnumerationState.Enumerated)
+                    if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
                     {
                         enumerationCount += 1
                     }
@@ -478,7 +485,7 @@ class PerformCollectionFragment : Fragment(),
                         {
                             when( sampledItem.collectionState )
                             {
-                                CollectionState.Undefined -> resourceId = R.drawable.home_blue
+                                CollectionState.Undefined -> resourceId = R.drawable.home_light_blue
                                 CollectionState.Incomplete -> resourceId = R.drawable.home_orange
                                 CollectionState.Complete -> resourceId = R.drawable.home_purple
                             }
@@ -490,7 +497,7 @@ class PerformCollectionFragment : Fragment(),
                         {
                             if (sampledItem.samplingState == SamplingState.Sampled && sampledItem.collectionState == CollectionState.Undefined)
                             {
-                                resourceId = R.drawable.multi_home_blue
+                                resourceId = R.drawable.multi_home_light_blue
                                 break
                             }
                         }
@@ -577,7 +584,6 @@ class PerformCollectionFragment : Fragment(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-
                     fileName = "C-${role}-${userName}-${dateTime!!}.json"
                     payload = config.pack()
                     message = resources.getString(R.string.config_saved_doc)
@@ -587,11 +593,13 @@ class PerformCollectionFragment : Fragment(),
             Role.Enumerator.toString(),
             Role.DataCollector.toString() ->
             {
-                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                    val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-                    fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}.json"
-                    payload = enumArea.pack()
-                    message = resources.getString(R.string.collection_saved_doc)
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                        val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+                        fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}.json"
+                        payload = enumArea.pack(config.encryptionPassword)
+                        message = resources.getString(R.string.collection_saved_doc)
+                    }
                 }
             }
         }
@@ -614,33 +622,33 @@ class PerformCollectionFragment : Fragment(),
         view?.let{ view ->
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 sharedNetworkViewModel.setCurrentConfig(config)
-            }
 
-            when(user.role)
-            {
-                Role.Supervisor.toString() ->
+                when(user.role)
                 {
-                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-                    startHotspot(view)
-                }
-
-                Role.Admin.toString() ->
-                {
-                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
-                    startHotspot(view)
-                }
-
-                Role.Enumerator.toString(),
-                Role.DataCollector.toString() ->
-                {
-                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                        sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
-                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                        getResult.launch(intent)
+                    Role.Supervisor.toString() ->
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                        startHotspot(view)
                     }
+
+                    Role.Admin.toString() ->
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                        startHotspot(view)
+                    }
+
+                    Role.Enumerator.toString(),
+                    Role.DataCollector.toString() ->
+                    {
+                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                            sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                            sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                            getResult.launch(intent)
+                        }
+                    }
+                    else -> {}
                 }
-                else -> {}
             }
         }
     }

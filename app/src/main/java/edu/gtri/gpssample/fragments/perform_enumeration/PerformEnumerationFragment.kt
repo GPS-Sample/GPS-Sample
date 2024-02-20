@@ -94,6 +94,8 @@ class PerformEnumerationFragment : Fragment(),
     private val kAddHouseholdTag = 2
     private val kSelectHouseholdTag = 3
 
+    private var enumerationCount = 0
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -125,6 +127,8 @@ class PerformEnumerationFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
+            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+            sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
         }
 
         if (!this::config.isInitialized)
@@ -151,6 +155,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performEnumerationAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
+        binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " team)"
 
@@ -329,15 +334,15 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
+        enumerationCount = 0
         var sampledCount = 0
-        var enumerationCount = 0
         var surveyedCount = 0
 
         for (location in enumArea.locations)
         {
             for (enumItem in location.enumerationItems)
             {
-                if (enumItem.enumerationState == EnumerationState.Enumerated)
+                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
                 {
                     enumerationCount += 1
                 }
@@ -531,7 +536,14 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (gpsLocationIsGood( location ))
                 {
-                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( EnumerationItem())
+                    val enumerationItem = EnumerationItem()
+
+                    if (config.autoIncrementSubaddress)
+                    {
+                        enumerationItem.subAddress = "${enumerationCount + 1}"
+                    }
+
+                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 
                     ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
                 }
@@ -717,7 +729,6 @@ class PerformEnumerationFragment : Fragment(),
                 Role.Supervisor.toString() ->
                 {
                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-
                     startHotspot(view)
                 }
 
@@ -806,7 +817,7 @@ class PerformEnumerationFragment : Fragment(),
 
                         Role.Enumerator.toString() ->
                         {
-                            val packedEnumArea = enumArea.pack()
+                            val packedEnumArea = enumArea.pack(config.encryptionPassword)
                             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
                             val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}.json"
                             val file = File(root, fileName)

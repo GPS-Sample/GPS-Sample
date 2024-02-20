@@ -441,7 +441,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         {
                             when( enumerationItem.collectionState )
                             {
-                                CollectionState.Undefined -> resourceId = R.drawable.home_blue
+                                CollectionState.Undefined -> resourceId = R.drawable.home_light_blue
                                 CollectionState.Incomplete -> resourceId = R.drawable.home_orange
                                 CollectionState.Complete -> resourceId = R.drawable.home_purple
                             }
@@ -466,7 +466,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                     {
                         if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
                         {
-                            resourceId = R.drawable.multi_home_blue
+                            resourceId = R.drawable.multi_home_light_blue
                             break
                         }
                     }

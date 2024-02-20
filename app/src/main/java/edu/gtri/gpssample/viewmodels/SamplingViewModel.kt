@@ -106,7 +106,7 @@ class SamplingViewModel : ViewModel()
 
                                 if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
-                                    resourceId = R.drawable.home_blue
+                                    resourceId = R.drawable.home_light_blue
                                 }
 
                                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
@@ -124,7 +124,7 @@ class SamplingViewModel : ViewModel()
                             {
                                 if (sampledItem.samplingState == SamplingState.Sampled)
                                 {
-                                    resourceId = R.drawable.multi_home_blue
+                                    resourceId = R.drawable.multi_home_light_blue
                                 }
                             }
 

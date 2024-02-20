@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -41,6 +42,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ManageConfigurationsFragment : Fragment(),
+    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     NetworkClientModel.ConfigurationDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
@@ -51,6 +53,7 @@ class ManageConfigurationsFragment : Fragment(),
     private val binding get() = _binding!!
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var configurations = ArrayList<Config>()
+    private var encryptionPassword = ""
 
     private lateinit var user: User
     private lateinit var manageConfigurationsAdapter: ManageConfigurationsAdapter
@@ -137,18 +140,7 @@ class ManageConfigurationsFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
-
-            if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()) && (configurations.size > 0))
-            {
-                ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
-                    resources.getString(R.string.delete_configuration),
-                    resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
-            }
-            else
-            {
-                ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
-                    resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
-            }
+            InputDialog( activity!!, resources.getString(R.string.enter_encryption_password), "", null, this, false )
         }
     }
 
@@ -350,8 +342,11 @@ class ManageConfigurationsFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+
         if (tag == kImportTag)
         {
+            sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
             sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
             getResult.launch(intent)
@@ -361,6 +356,7 @@ class ManageConfigurationsFragment : Fragment(),
             if (configurations.size == 1)
             {
                 view?.let { view ->
+                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = encryptionPassword
                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin )
 
                     sharedNetworkViewModel.setCurrentConfig(configurations[0])
@@ -447,14 +443,23 @@ class ManageConfigurationsFragment : Fragment(),
 
                     inputStream?.let {  inputStream ->
                         val text = inputStream.bufferedReader().readText()
-                        val config = Config.unpack( text )
+
+                        val config = Config.unpack( text, encryptionPassword )
+
                         config?.let { config ->
 
-                            DAO.configDAO.createOrUpdateConfig( config )
+                            DAO.instance().writableDatabase.beginTransaction()
 
-                            sharedViewModel.setCurrentConfig( config )
-                            configurations = DAO.configDAO.getConfigs()
-                            manageConfigurationsAdapter.updateConfigurations( configurations )
+                            val savedConfig = DAO.configDAO.createOrUpdateConfig( config )
+
+                            DAO.instance().writableDatabase.setTransactionSuccessful()
+                            DAO.instance().writableDatabase.endTransaction()
+
+                            savedConfig?.let { savedConfig ->
+                                configurations = DAO.configDAO.getConfigs()
+                                sharedViewModel.setCurrentConfig( savedConfig )
+                                manageConfigurationsAdapter.updateConfigurations( configurations )
+                            }
 
                             didReceiveConfiguration(true )
                         } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
@@ -691,6 +696,27 @@ class ManageConfigurationsFragment : Fragment(),
                 }
             }
         }
+    }
+
+    override fun didEnterText( name: String, tag: Any? )
+    {
+        encryptionPassword = name
+
+        if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()) && (configurations.size > 0))
+        {
+            ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
+                resources.getString(R.string.delete_configuration),
+                resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
+        }
+        else
+        {
+            ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
+                resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+        }
+    }
+
+    override fun didCancelText( tag: Any? )
+    {
     }
 
     override fun onDestroyView()

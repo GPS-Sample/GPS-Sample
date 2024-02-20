@@ -35,10 +35,10 @@ data class Study(
             : this(id, creationDate, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(),
         ArrayList<CollectionTeam>(), selectedCollectionTeamId)
 
-    fun pack() : String
+    fun pack(password: String) : String
     {
         val jsonString = Json.encodeToString( this )
-        return  EncryptionUtil.Encrypt(jsonString)
+        return  EncryptionUtil.Encrypt(jsonString,password)
     }
 
     fun equals(compare : Study) : Boolean
@@ -57,11 +57,11 @@ data class Study(
 
     companion object
     {
-        fun unpack( message: String ) : Study?
+        fun unpack( message: String, password: String ) : Study?
         {
             try
             {
-                val decrypted = EncryptionUtil.Decrypt(message)
+                val decrypted = EncryptionUtil.Decrypt(message,password)
                 decrypted?.let {decrypted ->
                     return Json.decodeFromString<Study>( decrypted )
                 }

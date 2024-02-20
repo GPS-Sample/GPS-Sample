@@ -155,6 +155,25 @@
                     android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"
                     android:hint="@string/enter_min_gps_precision" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/encryption_password"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <EditText
+                    android:id="@+id/encryption_password_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:text="@={viewModel.currentConfiguration.encryptionPassword}"
+                    android:hint="@string/enter_encryption_password" />
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -164,9 +183,10 @@
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
                         android:layout_marginStart="20dp"
                         android:gravity="center_vertical"
-                        android:text="Allow manual identification of locations"
+                        android:text="@string/allow_manual_identification_of_locations"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
 
@@ -190,7 +210,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:gravity="center_vertical"
-                        android:text="SubAddress is Required"
+                        android:text="@string/subaddress_is_required"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
 
@@ -214,7 +234,31 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:gravity="center_vertical"
-                        android:text="Proximity Warning Enabled"
+                        android:text="@string/auto_increment_subaddress"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/auto_subaddress_switch"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:checked="@={viewModel.currentConfiguration.autoIncrementSubaddress}"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="20dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/proximity_warning_enabled"
                         android:textSize="17sp"
                         android:textColor="@color/primary_textcolor" />
 
