@@ -26,19 +26,19 @@ data class EnumArea (
     constructor( name: String, vertices: ArrayList<LatLon>)
             : this(null, UUID.randomUUID().toString(), Date().time, name, -1, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>())
 
-    fun copy() : EnumArea?
-    {
-        val _copy = unpack(pack())
+//    fun copy() : EnumArea?
+//    {
+//        val _copy = unpack(pack())
+//
+//        _copy?.let { _copy ->
+//            return _copy
+//        } ?: return null
+//    }
 
-        _copy?.let { _copy ->
-            return _copy
-        } ?: return null
-    }
-
-    fun pack() : String
+    fun pack(password: String) : String
     {
         val jsonString = Json.encodeToString( this )
-        return EncryptionUtil.Encrypt(jsonString)
+        return EncryptionUtil.Encrypt(jsonString,password)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -53,11 +53,11 @@ data class EnumArea (
     }
     companion object
     {
-        fun unpack( string: String ) : EnumArea?
+        fun unpack( string: String, password: String ) : EnumArea?
         {
             try
             {
-                val decrypted = EncryptionUtil.Decrypt(string)
+                val decrypted = EncryptionUtil.Decrypt(string,password)
                 decrypted?.let { decrypted ->
                     return Json.decodeFromString<EnumArea>(decrypted)
                 }

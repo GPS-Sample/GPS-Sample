@@ -20,6 +20,7 @@ enum class Keys {
     kCollectionMode,
     kGpsAccuracyIsGood,
     kGpsLocationIsGood,
+    kEncryptionPassword,
     kLaunchSurveyRequest,
     kAdditionalInfoRequest,
     kFragmentResultListener

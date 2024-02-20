@@ -4,6 +4,7 @@ package edu.gtri.gpssample.viewmodels.models
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.net.*
 import android.net.wifi.*
 import android.os.Build
@@ -43,7 +44,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     }
 
     var clientStarted = false
-
+    var encryptionPassword = ""
     var currentEnumArea: EnumArea? = null
 
     var configurationDelegate: ConfigurationDelegate? = null
@@ -151,7 +152,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 _commandSent.postValue(NetworkStatus.CommandSent)
                 if (response.command == NetworkCommand.NetworkConfigResponse) {
                     response.payload?.let { payload ->
-                        val config = Config.unpack(payload)
+                        val config = Config.unpack(payload, encryptionPassword)
 
                         // TODO: put the config in the list of current configs.....
                         config?.let { config ->
@@ -173,7 +174,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     fun sendEnumerationData() {
         currentEnumArea?.let { enumArea ->
             networkInfo?.let { networkInfo ->
-                val payload = enumArea.pack()
+                val payload = enumArea.pack(encryptionPassword)
 
                 val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload)
                 val response = client.sendMessage(networkInfo.serverIP, message, this)
@@ -189,7 +190,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     fun sendCollectionData() {
         currentEnumArea?.let { enumArea ->
             networkInfo?.let { networkInfo ->
-                val payload = enumArea.pack()
+                val payload = enumArea.pack(encryptionPassword)
 
                 val message = TCPMessage(NetworkCommand.NetworkSampleAreaExport, payload)
                 val response = client.sendMessage(networkInfo.serverIP, message, this)

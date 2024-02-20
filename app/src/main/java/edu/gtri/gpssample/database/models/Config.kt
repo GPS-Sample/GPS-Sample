@@ -76,16 +76,16 @@ data class Config(
     {
        // return Json.encodeToString( this )
         val jsonString = Json.encodeToString( this )
-        return  EncryptionUtil.Encrypt(jsonString)
+        return  EncryptionUtil.Encrypt(jsonString, encryptionPassword)
     }
 
     companion object
     {
-        fun unpack( message: String ) : Config?
+        fun unpack( message: String, password: String ) : Config?
         {
             try
             {
-                val decrypted = EncryptionUtil.Decrypt(message)
+                val decrypted = EncryptionUtil.Decrypt(message, password)
                 decrypted?.let {decrypted ->
                     return Json.decodeFromString<Config>( decrypted )
                 }

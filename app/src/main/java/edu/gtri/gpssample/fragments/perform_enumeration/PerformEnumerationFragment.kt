@@ -127,6 +127,8 @@ class PerformEnumerationFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
+            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+            sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
         }
 
         if (!this::config.isInitialized)
@@ -727,7 +729,6 @@ class PerformEnumerationFragment : Fragment(),
                 Role.Supervisor.toString() ->
                 {
                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-
                     startHotspot(view)
                 }
 
@@ -816,7 +817,7 @@ class PerformEnumerationFragment : Fragment(),
 
                         Role.Enumerator.toString() ->
                         {
-                            val packedEnumArea = enumArea.pack()
+                            val packedEnumArea = enumArea.pack(config.encryptionPassword)
                             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
                             val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}.json"
                             val file = File(root, fileName)

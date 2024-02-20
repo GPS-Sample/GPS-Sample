@@ -46,6 +46,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
         fun didFinishImport()
     }
 
+    var encryptionPassword = ""
     var delegate : NetworkHotspotDelegate? = null
 
     override val type = NetworkMode.NetworkHotspot
@@ -217,7 +218,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             NetworkCommand.NetworkEnumAreaExport ->
             {
                 message.payload?.let { payload ->
-                    val enumArea = EnumArea.unpack( payload )
+                    val enumArea = EnumArea.unpack( payload, encryptionPassword )
 
                     enumArea?.let { enumArea ->
 
@@ -300,7 +301,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             NetworkCommand.NetworkSampleAreaExport ->
             {
                 message.payload?.let { payload ->
-                    val enumArea = EnumArea.unpack( payload )
+                    val enumArea = EnumArea.unpack( payload, "" )
 
                     enumArea?.let{ enumArea ->
 
