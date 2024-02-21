@@ -447,31 +447,47 @@ class ManageConfigurationsFragment : Fragment(),
                     val inputStream = activity!!.getContentResolver().openInputStream(uri)
 
                     inputStream?.let {  inputStream ->
-                        val text = inputStream.bufferedReader().readText()
+                        binding.overlayView.visibility = View.VISIBLE
 
-                        val config = Config.unpack( text, encryptionPassword )
+                        Thread {
+                            val text = inputStream.bufferedReader().readText()
 
-                        config?.let { config ->
+                            val config = Config.unpack( text, encryptionPassword )
 
-                            DAO.instance().writableDatabase.beginTransaction()
+                            if (config != null)
+                            {
+                                DAO.instance().writableDatabase.beginTransaction()
 
-                            val savedConfig = DAO.configDAO.createOrUpdateConfig( config )
+                                val savedConfig = DAO.configDAO.createOrUpdateConfig( config )
 
-                            DAO.instance().writableDatabase.setTransactionSuccessful()
-                            DAO.instance().writableDatabase.endTransaction()
+                                DAO.instance().writableDatabase.setTransactionSuccessful()
+                                DAO.instance().writableDatabase.endTransaction()
 
-                            savedConfig?.let { savedConfig ->
-                                configurations = DAO.configDAO.getConfigs()
-                                sharedViewModel.setCurrentConfig( savedConfig )
-                                manageConfigurationsAdapter.updateConfigurations( configurations )
+                                activity!!.runOnUiThread {
+                                    binding.overlayView.visibility = View.GONE
+
+                                    savedConfig?.let { savedConfig ->
+                                        configurations = DAO.configDAO.getConfigs()
+                                        sharedViewModel.setCurrentConfig( savedConfig )
+                                        manageConfigurationsAdapter.updateConfigurations( configurations )
+
+                                        didReceiveConfiguration(true)
+                                    }
+                                }
                             }
-
-                            didReceiveConfiguration(true )
-                        } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                            else
+                            {
+                                activity!!.runOnUiThread {
+                                    binding.overlayView.visibility = View.GONE
+                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }.start()
                     }
                 }
                 catch( ex: Exception )
                 {
+                    binding.overlayView.visibility = View.GONE
                     Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                 }
             }

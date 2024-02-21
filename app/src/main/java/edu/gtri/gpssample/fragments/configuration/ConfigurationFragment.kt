@@ -403,30 +403,52 @@ class ConfigurationFragment : Fragment(),
             val uri = data?.data
 
             uri?.let { uri ->
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    try
+                    {
+                        val inputStream = activity!!.getContentResolver().openInputStream(uri)
 
-                try
-                {
-                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                        inputStream?.let {  inputStream ->
+                            binding.overlayView.visibility = View.VISIBLE
 
-                    inputStream?.let {  inputStream ->
-                        val text = inputStream.bufferedReader().readText()
+                            Thread {
+                                val text = inputStream.bufferedReader().readText()
 
-                        sharedViewModel.currentConfiguration?.value?.let { config ->
-                            EnumArea.unpack( text, config.encryptionPassword )?.let { enumArea ->
-                                for (location in enumArea.locations)
+                                val enumArea = EnumArea.unpack( text, config.encryptionPassword )
+
+                                if (enumArea != null)
                                 {
-                                    DAO.locationDAO.createOrUpdateLocation(location, enumArea)
-                                }
+                                    DAO.instance().writableDatabase.beginTransaction()
 
-                                // replace the enumArea from currentConfig with this one
-                                sharedViewModel?.replaceEnumArea(enumArea)
-                            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.decryption_failed), Toast.LENGTH_SHORT).show()
+                                    for (location in enumArea.locations)
+                                    {
+                                        DAO.locationDAO.createOrUpdateLocation(location, enumArea)
+                                    }
+
+                                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                                    DAO.instance().writableDatabase.endTransaction()
+
+                                    // replace the enumArea from currentConfig with this one
+                                    sharedViewModel.replaceEnumArea(enumArea)
+
+                                    activity!!.runOnUiThread {
+                                        binding.overlayView.visibility = View.GONE
+                                    }
+                                }
+                                else
+                                {
+                                    activity!!.runOnUiThread {
+                                        binding.overlayView.visibility = View.GONE
+                                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.decryption_failed), Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }.start()
                         }
                     }
-                }
-                catch( ex: java.lang.Exception )
-                {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                    catch( ex: java.lang.Exception )
+                    {
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

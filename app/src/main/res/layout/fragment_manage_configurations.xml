@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
+<FrameLayout
     android:id="@+id/fragment_root_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,66 +8,87 @@
     android:layout_height="match_parent"
     tools:context=".fragments.manageconfigurations.ManageConfigurationsFragment">
 
-    <FrameLayout
-        android:layout_marginBottom="2dp"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="match_parent">
 
-        <TextView
+        <FrameLayout
+            android:layout_marginBottom="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="@string/configurations"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/add_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/plus_blue" />
+        </FrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"/>
+
+        <Button
+            android:id="@+id/create_button"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:gravity="center"
-            android:text="@string/configurations"
-            android:textColor="@color/primary_textcolor"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_centerInParent="true"
+            android:text="@string/create_enumeration_area" />
 
-        <ImageView
-            android:id="@+id/add_button"
-            android:layout_width="50dp"
+        <Button
+            android:id="@+id/export_button"
+            android:visibility="gone"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_gravity="end"
+            android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:src="@drawable/plus_blue" />
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_centerInParent="true"
+            android:text="@string/export_configuration" />
+
+        <Button
+            android:id="@+id/import_button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_centerInParent="true"
+            android:text="@string/import_configuration" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <FrameLayout
+        android:id="@+id/overlay_view"
+        android:visibility="gone"
+        android:background="@color/light_gray"
+        android:alpha=".5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/device_progress_bar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center" />
     </FrameLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"/>
-
-    <Button
-        android:id="@+id/create_button"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:layout_centerInParent="true"
-        android:text="@string/create_enumeration_area" />
-
-    <Button
-        android:id="@+id/export_button"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:layout_centerInParent="true"
-        android:text="@string/export_configuration" />
-
-    <Button
-        android:id="@+id/import_button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:layout_centerInParent="true"
-        android:text="@string/import_configuration" />
-
-</androidx.appcompat.widget.LinearLayoutCompat>
+</FrameLayout>
