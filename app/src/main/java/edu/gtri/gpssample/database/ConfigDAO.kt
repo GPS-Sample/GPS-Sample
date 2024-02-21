@@ -23,8 +23,6 @@ class ConfigDAO(private var dao: DAO)
                 val values = ContentValues()
                 putConfig( config, values )
                 dao.writableDatabase.update(DAO.TABLE_CONFIG, values, whereClause, args )
-                createOrUpdateEnumAreas(config)
-                createOrUpdateStudies(config)
             }
         }
         else
