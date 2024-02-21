@@ -135,12 +135,19 @@ class ManageConfigurationsFragment : Fragment(),
         }
 
         binding.exportButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message),
-                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
         binding.importButton.setOnClickListener {
-            InputDialog( activity!!, resources.getString(R.string.enter_encryption_password), "", null, this, false )
+            if ((user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString()) && configurations.size == 1)
+            {
+                encryptionPassword = configurations[0].encryptionPassword
+                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+            }
+            else
+            {
+                InputDialog(activity!!, resources.getString(R.string.enter_encryption_password), "", null, this, false)
+            }
         }
     }
 
@@ -375,9 +382,7 @@ class ManageConfigurationsFragment : Fragment(),
             configurations.clear()
             manageConfigurationsAdapter.updateConfigurations(configurations)
 
-            ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
-                resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code),
-                resources.getString(R.string.file_system), kImportTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
         }
         else if (tag == kImportTag)
         {
@@ -704,14 +709,11 @@ class ManageConfigurationsFragment : Fragment(),
 
         if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()) && (configurations.size > 0))
         {
-            ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
-                resources.getString(R.string.delete_configuration),
-                resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
         }
         else
         {
-            ConfirmationDialog( activity, resources.getString(R.string.import_configuration),
-                resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+            ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
         }
     }
 
