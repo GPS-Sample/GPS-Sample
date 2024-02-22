@@ -15,8 +15,9 @@ import kotlin.collections.ArrayList
 @SerialName("EnumerationItem")
 data class EnumerationItem(
     var id : Int? = null,
-    var modificationDate: Long,
+    var creationDate: Long,
     var uuid : String,
+    var syncCode : Int,
     var subAddress : String,
     var enumeratorName : String,
     var enumerationState : EnumerationState,
@@ -33,7 +34,10 @@ data class EnumerationItem(
     var fieldDataList : ArrayList<FieldData>,
     var locationId : Int )
 {
-    constructor() : this(null,  Date().time, UUID.randomUUID().toString(),
+    constructor() : this(null,
+        Date().time,
+        UUID.randomUUID().toString(),
+        0,
         "",
         "",
         EnumerationState.Undefined,

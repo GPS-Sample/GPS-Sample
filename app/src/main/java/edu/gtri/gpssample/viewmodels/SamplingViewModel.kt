@@ -420,7 +420,7 @@ class SamplingViewModel : ViewModel()
             {
                 sampleItem.samplingState = SamplingState.NotSampled
                 sampleItem.enumerationEligibleForSampling = false
-                sampleItem.modificationDate = DAO.updateCreationDate( sampleItem.modificationDate )
+                sampleItem.syncCode = sampleItem.syncCode + 1
 
                 // find and remove items that are not valid
                 if (sampleItem.enumerationState == EnumerationState.Enumerated)
@@ -564,7 +564,7 @@ class SamplingViewModel : ViewModel()
                         }
 
                         sampledIndices.add(rnds)
-                        validSamples[rnds].modificationDate = DAO.updateCreationDate( validSamples[rnds].modificationDate )
+                        validSamples[rnds].syncCode = validSamples[rnds].syncCode + 1
                         validSamples[rnds].samplingState = SamplingState.Sampled
                     }
 

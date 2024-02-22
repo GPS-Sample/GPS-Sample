@@ -268,6 +268,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_UUID + " TEXT" + "," +
+                    COLUMN_SYNC_CODE + " INTEGER" + "," +
                     COLUMN_LOCATION_ID + " INTEGER" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME + " TEXT" + "," +
@@ -448,6 +449,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
 
         const val COLUMN_UUID = "uuid"
+        const val COLUMN_SYNC_CODE = "sync_code"
         const val COLUMN_CREATION_DATE = "creation_date"
 
         // foreign key columns
@@ -743,20 +745,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             }
         }
 
-        fun updateCreationDate( oldDate: Long ) : Long
-        {
-            val newDate = Date().time
-
-            if (newDate > oldDate)
-            {
-                return newDate
-            }
-            else
-            {
-                return oldDate + 1
-            }
-        }
-
         fun createSharedInstance( context: Context ): DAO
         {
             if (_instance == null)
@@ -784,6 +772,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 279
+        private const val DATABASE_VERSION = 280
     }
 }

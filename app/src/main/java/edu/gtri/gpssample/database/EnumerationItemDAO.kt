@@ -47,7 +47,7 @@ class EnumerationItemDAO(private var dao: DAO)
             enumerationItem.id = null // force the new item be created
             createOrUpdateEnumerationItem( enumerationItem, location )
         }
-        else if (enumerationItem.modificationDate > existingEnumerationItem.modificationDate)
+        else if (enumerationItem.syncCode > existingEnumerationItem.syncCode)
         {
             delete( existingEnumerationItem )
             createOrUpdateEnumerationItem( enumerationItem, location )
@@ -73,7 +73,7 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
 
-        if (existingEnumerationItem != null && enumerationItem.modificationDate > existingEnumerationItem.modificationDate)
+        if (existingEnumerationItem != null && enumerationItem.syncCode > existingEnumerationItem.syncCode)
         {
             delete( existingEnumerationItem )
             createOrUpdateEnumerationItem( enumerationItem, location )
@@ -86,8 +86,9 @@ class EnumerationItemDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, id )
         }
 
-        values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.modificationDate )
+        values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
+        values.put( DAO.COLUMN_SYNC_CODE, enumerationItem.syncCode)
         values.put( DAO.COLUMN_LOCATION_ID, location.id)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME, enumerationItem.enumeratorName )
@@ -109,6 +110,7 @@ class EnumerationItemDAO(private var dao: DAO)
         val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val syncCode = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SYNC_CODE))
         val locationId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_ID))
         val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
         val enumeratorName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME))
@@ -130,6 +132,7 @@ class EnumerationItemDAO(private var dao: DAO)
             id,
             creationDate,
             uuid,
+            syncCode,
             subAddress,
             enumeratorName,
             enumerationState,

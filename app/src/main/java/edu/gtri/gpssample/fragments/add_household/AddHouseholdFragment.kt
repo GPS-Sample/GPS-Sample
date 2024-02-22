@@ -398,8 +398,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         enumerationItem.enumerationNotes = notes
-        enumerationItem.modificationDate = DAO.updateCreationDate( enumerationItem.modificationDate )
-        enumerationItem.enumerationDate = enumerationItem.modificationDate
+        enumerationItem.enumerationDate = Date().time
+        enumerationItem.syncCode = enumerationItem.syncCode + 1
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
         (activity!!.application as MainApplication).user?.let { user ->
