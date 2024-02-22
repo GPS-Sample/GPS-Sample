@@ -88,7 +88,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             else
             {
                 DAO.userDAO.getUser(userName)?.let {
-                    InputDialog( activity!!, it.recoveryQuestion, "", null, this@SignInFragment )
+                    InputDialog( activity!!, it.recoveryQuestion, "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@SignInFragment )
                 } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }

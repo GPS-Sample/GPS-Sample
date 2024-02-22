@@ -215,7 +215,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 if (droppedPointAnnotations.size > 2)
                 {
-                    InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
+                    InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
                     binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
                     binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
                 }
@@ -946,7 +946,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
         {
             data?.data?.let { uri ->
-                InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", uri, this, false )
+                InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
             }
         }
     }

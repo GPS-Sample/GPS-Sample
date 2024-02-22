@@ -199,13 +199,13 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         val checkboxAddAnotherButton = checkboxLayout.findViewById<Button>(R.id.add_another_button)
 
         checkboxAddAnotherButton.setOnClickListener {
-            InputDialog( activity!!, resources.getString(R.string.option_item_name), "", kCheckboxTag, this@CreateFieldFragment )
+            InputDialog( activity!!, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kCheckboxTag, this@CreateFieldFragment )
         }
 
         val dropdownAddAnotherButton = dropdownLayout.findViewById<Button>(R.id.add_another_button)
 
         dropdownAddAnotherButton.setOnClickListener {
-            InputDialog( activity!!, resources.getString(R.string.option_item_name), "", kDropdownTag, this@CreateFieldFragment )
+            InputDialog( activity!!, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kDropdownTag, this@CreateFieldFragment )
         }
 
         binding.saveButton.setOnClickListener {

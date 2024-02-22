@@ -69,7 +69,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             {
                 if (position == 7)
                 {
-                    InputDialog( activity!!, resources.getString(R.string.enter_other_question), "", null, this@SignUpFragment )
+                    InputDialog( activity!!, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@SignUpFragment )
                 }
             }
 
@@ -116,7 +116,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
 
                 if (question.length == 0)
                 {
-                    InputDialog( activity!!, resources.getString(R.string.enter_other_question), "", null, this@SignUpFragment )
+                    InputDialog( activity!!, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@SignUpFragment )
                     return@setOnClickListener
                 }
             }

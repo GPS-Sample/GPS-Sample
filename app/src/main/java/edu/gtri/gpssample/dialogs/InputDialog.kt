@@ -18,7 +18,7 @@ class InputDialog
     {
     }
 
-    constructor( context: Context, title: String, text: String?, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true )
+    constructor( context: Context, title: String, text: String?, leftButton: String, rightButton: String, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -42,12 +42,15 @@ class InputDialog
         alertDialog.show()
 
         val cancelButton = view!!.findViewById<Button>(R.id.cancel_button)
+        cancelButton.text = leftButton
+
         cancelButton.setOnClickListener {
             alertDialog.dismiss()
             delegate.didCancelText( tag )
         }
 
         val saveButton = view.findViewById<Button>(R.id.save_button)
+        saveButton.text = rightButton
 
         saveButton.setOnClickListener {
 

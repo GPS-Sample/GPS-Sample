@@ -146,7 +146,7 @@ class ManageConfigurationsFragment : Fragment(),
             }
             else
             {
-                InputDialog(activity!!, resources.getString(R.string.enter_encryption_password), "", null, this, false)
+                InputDialog(activity!!, resources.getString(R.string.enter_encryption_password), "", resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
             }
         }
     }
