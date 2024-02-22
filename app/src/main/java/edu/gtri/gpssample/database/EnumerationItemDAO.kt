@@ -24,6 +24,9 @@ class EnumerationItemDAO(private var dao: DAO)
             val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
             enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
+            enumerationItem.id?.let { id ->
+                Log.d( "xxx", "created EnumerationItem with ID $id" )
+            }
         }
 
         enumerationItem.id?.let { id ->
@@ -229,7 +232,7 @@ class EnumerationItemDAO(private var dao: DAO)
     fun delete( enumerationItem: EnumerationItem )
     {
         enumerationItem.id?.let { id ->
-            Log.d( "xxx", "deleting EnumerationItem with ID $id" )
+            Log.d( "xxx", "deleted EnumerationItem with ID $id" )
 
             val fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
 

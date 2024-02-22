@@ -29,6 +29,9 @@ class FieldDataDAO(private var dao: DAO)
             val values = ContentValues()
             putFieldData( fieldData, values, enumerationItem )
             fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
+            fieldData.id?.let { id ->
+                Log.d( "xxx", "created FieldData with ID $id" )
+            }
         }
 
         fieldData.id?.let { id ->
@@ -92,8 +95,10 @@ class FieldDataDAO(private var dao: DAO)
 
     fun updateFieldData( fieldData: FieldData )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
         fieldData.id?.let { id ->
+            Log.d( "xxx", "updated FieldData with ID $id" )
+
+            val whereClause = "${DAO.COLUMN_ID} = ?"
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
 
@@ -180,7 +185,7 @@ class FieldDataDAO(private var dao: DAO)
     fun delete( fieldData: FieldData )
     {
         fieldData.id?.let { id ->
-            Log.d( "xxx", "deleting fieldData with id $id" )
+            Log.d( "xxx", "deleted FieldData with ID $id" )
 
             for (fieldDataOption in fieldData.fieldDataOptions)
             {

@@ -24,7 +24,6 @@ class LocationDAO(private var dao: DAO)
     {
         if (exists( location ))
         {
-            Log.d( "xxx", "update location id = ${location.id!!}")
             updateLocation( location, enumArea )
         }
         else
@@ -33,8 +32,8 @@ class LocationDAO(private var dao: DAO)
             val values = ContentValues()
             putLocation( location, enumArea, values )
             location.id = dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values).toInt()
-            location.id?.let {
-                Log.d( "xxx", "new Location id = ${it}")
+            location.id?.let { id ->
+                Log.d( "xxx", "created Location with ID $id" )
             }
         }
 
@@ -112,19 +111,22 @@ class LocationDAO(private var dao: DAO)
 
     fun updateLocation( location: Location, enumArea: EnumArea )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(location.id!!.toString())
-        val values = ContentValues()
+        location.id?.let { id ->
+            Log.d( "xxx", "updated Location with ID $id" )
 
-        putLocation( location, enumArea, values )
+            val whereClause = "${DAO.COLUMN_ID} = ?"
+            val args: Array<String> = arrayOf(location.id!!.toString())
+            val values = ContentValues()
 
-        dao.writableDatabase.update(DAO.TABLE_LOCATION, values, whereClause, args )
+            putLocation( location, enumArea, values )
+
+            dao.writableDatabase.update(DAO.TABLE_LOCATION, values, whereClause, args )
+        }
     }
 
     fun putLocation( location: Location, enumArea : EnumArea, values: ContentValues)
     {
         location.id?.let { id ->
-            Log.d( "xxx", "existing Location id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
 
@@ -292,7 +294,7 @@ class LocationDAO(private var dao: DAO)
     fun delete( location: Location )
     {
         location.id?.let { id ->
-            Log.d( "xxx", "deleting location with ID $id" )
+            Log.d( "xxx", "deleted Location with ID $id" )
 
 //            for (enumerationItem in location.enumerationItems)
 //            {

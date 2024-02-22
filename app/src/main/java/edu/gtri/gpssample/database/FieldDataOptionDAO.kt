@@ -24,6 +24,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             putFieldDataOption( fieldDataOption, values )
             fieldDataOption.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA_OPTION, null, values).toInt()
             fieldDataOption.id?.let { id ->
+                Log.d( "xxx", "created FieldDataOption with ID $id")
                 val fieldData = obj as? FieldData
                 fieldData?.let { fieldData ->
                     createFieldDataConnection( fieldDataOption, fieldData )
@@ -65,7 +66,6 @@ class FieldDataOptionDAO(private var dao: DAO)
     fun putFieldDataOption(fieldDataOption: FieldDataOption, values: ContentValues)
     {
         fieldDataOption.id?.let { id ->
-            Log.d( "xxx", "existing fieldDataOption id = ${id}")
             values.put( DAO.COLUMN_ID, fieldDataOption.id )
         }
 
@@ -77,7 +77,7 @@ class FieldDataOptionDAO(private var dao: DAO)
     fun updateFieldDataOption( fieldDataOption: FieldDataOption)
     {
         fieldDataOption.id?.let{ id ->
-            Log.d( "xxx", "update fieldDataOption id ${id}")
+            Log.d( "xxx", "updated FieldDataOption with ID $id")
 
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args: Array<String> = arrayOf(id.toString())
@@ -192,6 +192,8 @@ class FieldDataOptionDAO(private var dao: DAO)
     fun delete( fieldDataOption: FieldDataOption)
     {
         fieldDataOption.id?.let { id ->
+            Log.d( "xxx", "deleted FieldDataOption with ID $id")
+
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args = arrayOf(id.toString())
 

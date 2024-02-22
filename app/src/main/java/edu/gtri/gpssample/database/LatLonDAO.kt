@@ -20,6 +20,9 @@ class LatLonDAO(private var dao: DAO)
             val values = ContentValues()
             putLatLon( latLon, values )
             latLon.id = dao.writableDatabase.insert(DAO.TABLE_LAT_LON, null, values).toInt()
+            latLon.id?.let { id ->
+                Log.d( "xxx", "created LatLon with ID $id" )
+            }
         }
 
         latLon.id?.let { latLonId ->
@@ -109,7 +112,7 @@ class LatLonDAO(private var dao: DAO)
     fun updateLatLon( latLon: LatLon )
     {
         latLon.id?.let{ id ->
-            Log.d( "xxx", "update latLon id ${id}")
+            Log.d( "xxx", "updated LatLon with ID $id" )
 
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args: Array<String> = arrayOf(id.toString())
@@ -249,10 +252,11 @@ class LatLonDAO(private var dao: DAO)
 
     fun delete( latLon: LatLon )
     {
-        latLon.id?.let {lat_lon_id ->
+        latLon.id?.let {id ->
+            Log.d( "xxx", "deleted LatLon with ID $id" )
 
             val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args = arrayOf(lat_lon_id.toString())
+            val args = arrayOf(id.toString())
 
             dao.writableDatabase.delete(DAO.TABLE_LAT_LON, whereClause, args)
         }
