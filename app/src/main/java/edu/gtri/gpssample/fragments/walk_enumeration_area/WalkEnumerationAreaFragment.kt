@@ -258,7 +258,7 @@ class WalkEnumerationAreaFragment : Fragment(),
             {
                 isRecording = false
 
-                InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", null, this, false )
+                InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
 
                 refreshMap()
             }
@@ -538,7 +538,7 @@ class WalkEnumerationAreaFragment : Fragment(),
         if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
         {
             data?.data?.let { uri ->
-                InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", uri, this, false )
+                InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
             }
         }
     }
