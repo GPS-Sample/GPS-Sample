@@ -139,10 +139,18 @@ class ManageConfigurationsFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
-            if ((user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString()) && configurations.size == 1)
+            if (configurations.size == 1)
             {
                 encryptionPassword = configurations[0].encryptionPassword
-                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+
+                if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()))
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
+                }
+                else
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+                }
             }
             else
             {
@@ -349,8 +357,6 @@ class ManageConfigurationsFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectLeftButton(tag: Any?)
     {
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-
         if (tag == kImportTag)
         {
             sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
