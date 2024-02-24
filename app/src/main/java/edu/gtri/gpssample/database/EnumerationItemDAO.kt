@@ -52,7 +52,7 @@ class EnumerationItemDAO(private var dao: DAO)
         }
         else if (enumerationItem.syncCode > existingEnumerationItem.syncCode)
         {
-            delete( existingEnumerationItem )
+            delete( existingEnumerationItem, false )
             createOrUpdateEnumerationItem( enumerationItem, location )
         }
     }
@@ -78,7 +78,7 @@ class EnumerationItemDAO(private var dao: DAO)
 
         if (existingEnumerationItem != null && enumerationItem.syncCode > existingEnumerationItem.syncCode)
         {
-            delete( existingEnumerationItem )
+            delete( existingEnumerationItem, false )
             createOrUpdateEnumerationItem( enumerationItem, location )
         }
     }
@@ -229,16 +229,19 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItem
     }
 
-    fun delete( enumerationItem: EnumerationItem )
+    fun delete( enumerationItem: EnumerationItem, shouldDeleteFieldData: Boolean = true )
     {
         enumerationItem.id?.let { id ->
             Log.d( "xxx", "deleted EnumerationItem with ID $id" )
 
             val fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
 
-            for (fieldData in fieldDataList)
+            if (shouldDeleteFieldData)
             {
-                DAO.fieldDataDAO.delete( fieldData)
+                for (fieldData in fieldDataList)
+                {
+                    DAO.fieldDataDAO.delete( fieldData)
+                }
             }
 
             val whereClause = "${DAO.COLUMN_ID} = ?"

@@ -24,7 +24,10 @@ class LocationDAO(private var dao: DAO)
     {
         if (exists( location ))
         {
-            updateLocation( location, enumArea )
+            if (modified( location ))
+            {
+                updateLocation( location, enumArea )
+            }
         }
         else
         {
@@ -74,9 +77,10 @@ class LocationDAO(private var dao: DAO)
 
         if (existingLocation != null) 
         {
-            // make sure that the location id is based on the existing, id not the import id
-            location.id = existingLocation.id
-            updateLocation( location, enumArea )
+            if (modified(location))
+            {
+                updateLocation( location, enumArea )
+            }
 
             for (enumerationItem in location.enumerationItems)
             {
@@ -96,12 +100,17 @@ class LocationDAO(private var dao: DAO)
 
     fun exists( location: Location ): Boolean
     {
-        val locations = getLocations()
+        getLocation( location.uuid )?.let {
+            return true
+        } ?: return false
+    }
 
-        for (existingLocation in locations)
-        {
-            if (location.uuid == existingLocation.uuid)
+    fun modified( location : Location ) : Boolean
+    {
+        getLocation( location.uuid )?.let {
+            if (!location.equals(it))
             {
+                location.id = it.id
                 return true
             }
         }

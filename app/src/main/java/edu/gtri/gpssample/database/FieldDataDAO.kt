@@ -9,10 +9,7 @@ import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
-import edu.gtri.gpssample.database.models.EnumerationItem
-import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.FieldData
-import edu.gtri.gpssample.database.models.FieldDataOption
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
 
 class FieldDataDAO(private var dao: DAO)
@@ -21,7 +18,10 @@ class FieldDataDAO(private var dao: DAO)
     {
         if (exists( fieldData ))
         {
-            updateFieldData( fieldData )
+            if (modified( fieldData ))
+            {
+                updateFieldData( fieldData )
+            }
         }
         else
         {
@@ -73,6 +73,19 @@ class FieldDataDAO(private var dao: DAO)
         getFieldData( fieldData.uuid )?.let {
             return true
         } ?: return false
+    }
+
+    fun modified( fieldData : FieldData ) : Boolean
+    {
+        getFieldData( fieldData.uuid )?.let {
+            if (!fieldData.equals(it))
+            {
+                fieldData.id = it.id
+                return true
+            }
+        }
+
+        return false
     }
 
     @SuppressLint("Range")

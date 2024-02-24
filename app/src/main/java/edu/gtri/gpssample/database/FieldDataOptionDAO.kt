@@ -15,7 +15,10 @@ class FieldDataOptionDAO(private var dao: DAO)
     {
         if (exists( fieldDataOption ))
         {
-            updateFieldDataOption( fieldDataOption )
+            if (modified( fieldDataOption ))
+            {
+                updateFieldDataOption( fieldDataOption )
+            }
         }
         else
         {
@@ -94,6 +97,19 @@ class FieldDataOptionDAO(private var dao: DAO)
         getFieldDataOption( fieldDataOption.uuid )?.let {
             return true
         } ?: return false
+    }
+
+    fun modified( fieldDataOption : FieldDataOption ) : Boolean
+    {
+        getFieldDataOption( fieldDataOption.uuid )?.let {
+            if (!fieldDataOption.equals(it))
+            {
+                fieldDataOption.id = it.id
+                return true
+            }
+        }
+
+        return false
     }
 
     @SuppressLint("Range")

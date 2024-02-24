@@ -12,7 +12,10 @@ class LatLonDAO(private var dao: DAO)
     {
         if (exists( latLon ))
         {
-            updateLatLon( latLon )
+            if (modified( latLon ))
+            {
+                updateLatLon( latLon )
+            }
         }
         else
         {
@@ -58,12 +61,6 @@ class LatLonDAO(private var dao: DAO)
         return latLon
     }
 
-    private fun putLatLonTeam(llID : Int, teamId : Int, values : ContentValues)
-    {
-        values.put( DAO.COLUMN_LAT_LON_ID, llID )
-        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, teamId )
-    }
-
     private fun putLatLonConfig(llID : Int, configId: Int, values : ContentValues)
     {
         values.put( DAO.COLUMN_LAT_LON_ID, llID )
@@ -90,12 +87,21 @@ class LatLonDAO(private var dao: DAO)
     fun exists( latLon: LatLon ): Boolean
     {
         getLatLon( latLon.uuid )?.let {
+            return true
+        } ?: return false
+    }
+
+    fun modified( latLon: LatLon ): Boolean
+    {
+        getLatLon( latLon.uuid )?.let {
             if (latLon.id != it.id)
             {
                 latLon.id = it.id
+                return true
             }
-            return true
-        } ?: return false
+        }
+
+        return false
     }
 
     @SuppressLint("Range")

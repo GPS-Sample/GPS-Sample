@@ -26,6 +26,26 @@ data class Location(
     constructor(type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, isLandmark: Boolean, description: String ) :
             this( null, Date().time, UUID.randomUUID().toString(), type, gpsAccuracy, latitude, longitude, isLandmark, description,"", null, ArrayList<EnumerationItem>())
 
+    fun equals( location: Location ) : Boolean
+    {
+        if (this.id == location.id &&
+            this.creationDate == location.creationDate &&
+            this.uuid == location.uuid &&
+            this.type == location.type &&
+            this.gpsAccuracy == location.gpsAccuracy &&
+            this.latitude == location.latitude &&
+            this.longitude == location.longitude &&
+            this.isLandmark == location.isLandmark &&
+            this.description == location.description &&
+            this.imageData == location.imageData &&
+            this.isMultiFamily == location.isMultiFamily)
+        {
+            return true
+        }
+
+        return false
+    }
+
     fun pack() : String
     {
         return Json.encodeToString( this )

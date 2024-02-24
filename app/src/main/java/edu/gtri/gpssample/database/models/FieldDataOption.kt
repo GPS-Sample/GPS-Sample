@@ -15,6 +15,19 @@ data class FieldDataOption(
 {
     constructor(name: String, value: Boolean) : this( null, UUID.randomUUID().toString(), name, value )
 
+    fun equals( fieldDataOption: FieldDataOption ) : Boolean
+    {
+        if (this.id == fieldDataOption.id &&
+            this.uuid == fieldDataOption.uuid &&
+            this.name == fieldDataOption.name &&
+            this.value == fieldDataOption.value )
+        {
+            return true
+        }
+
+        return false
+    }
+
     fun pack() : String
     {
         return Json.encodeToString( this )

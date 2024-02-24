@@ -81,7 +81,7 @@ class TCPServer
                 }
                 catch( ex: Exception )
                 {
-                    Log.d( "xxx", ex.stackTraceToString())
+//                    Log.d( "xxx", ex.stackTraceToString())
                     _serverListening = false
                 }
 
