@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -37,6 +38,7 @@ import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListen
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -77,6 +79,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var createMapTileCache = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
+    private var inputDialog: InputDialog? = null
     private val polygonHashMap = HashMap<Long,Any>()
     private val pointHashMap = HashMap<Long,Location>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
@@ -215,7 +218,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 if (droppedPointAnnotations.size > 2)
                 {
-                    InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
                     binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
                     binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
                 }
@@ -388,9 +391,9 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                         if (obj is EnumArea)
                         {
-                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                "${resources.getString(R.string.delete_enum_area_message)} ${obj.name}?",
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
+                            ConfirmationDialog( activity, resources.getString(R.string.select_task),
+                                "${resources.getString(R.string.rename_or_delete)} ${obj.name}?",
+                                resources.getString(R.string.rename), resources.getString(R.string.delete), obj, this@CreateEnumerationAreaFragment)
                         }
                         else if (obj is MapTileRegion)
                         {
@@ -794,9 +797,26 @@ class CreateEnumerationAreaFragment : Fragment(),
         droppedPointAnnotations.clear()
     }
 
+    override fun didPressQrButton()
+    {
+        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+        getResult.launch(intent)
+    }
+
+    private val getResult =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == ResultCode.BarcodeScanned.value) {
+                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+                inputDialog?.editText?.let { editText ->
+                    editText.setText( payload.toString())
+                }
+            }
+        }
+
     override fun didEnterText( name: String, tag: Any? )
     {
-        if (tag != null)
+        if (tag is Uri)
         {
             Thread {
                 val uri = tag as Uri
@@ -816,6 +836,10 @@ class CreateEnumerationAreaFragment : Fragment(),
                     }
                 }
             }.start()
+        }
+        else if (tag is EnumArea)
+        {
+            tag.name = name
         }
         else
         {
@@ -853,6 +877,10 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun didSelectLeftButton(tag: Any?)
     {
+        if (tag is EnumArea)
+        {
+            inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), tag.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
+        }
     }
 
     override fun didSelectRightButton(tag: Any?)
@@ -946,7 +974,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
         {
             data?.data?.let { uri ->
-                InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
+                inputDialog = InputDialog( activity!!, false, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
             }
         }
     }

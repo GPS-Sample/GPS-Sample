@@ -330,7 +330,9 @@
     <string name="num_hhs_sampled"># HH\'s Sampled:</string>
     <string name="num_hhs_surveyed"># HH\'s Surveyed:</string>
     <string name="num_hhs_remaining_to_survey"># HH\'s Remaining to Survey:</string>
-    <string name="decryption_failed">"Decryption failed.  Please try again."</string>
+    <string name="decryption_failed">Decryption failed.  Please try again.</string>
+    <string name="rename_or_delete">Would you like to Rename or Delete Enumeration Area </string>
+    <string name="rename">Rename</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
