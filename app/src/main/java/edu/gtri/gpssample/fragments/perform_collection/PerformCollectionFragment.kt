@@ -42,6 +42,7 @@ import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -578,13 +579,14 @@ class PerformCollectionFragment : Fragment(),
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
         val dateTime = LocalDateTime.now().format(formatter)
+        val version = BuildConfig.VERSION_NAME.replace(" #", "-" )
 
         when(user.role) {
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    fileName = "C-${role}-${userName}-${dateTime!!}.json"
+                    fileName = "C-${role}-${userName}-${version}-${dateTime!!}.json"
                     payload = config.pack()
                     message = resources.getString(R.string.config_saved_doc)
                 }
@@ -596,7 +598,7 @@ class PerformCollectionFragment : Fragment(),
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
                         val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-                        fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}.json"
+                        fileName = "D-${role}-${userName}-${version}-${clusterName}-${dateTime!!}.json"
                         payload = enumArea.pack(config.encryptionPassword)
                         message = resources.getString(R.string.collection_saved_doc)
                     }

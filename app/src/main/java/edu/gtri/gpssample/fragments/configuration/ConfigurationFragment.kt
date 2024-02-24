@@ -22,6 +22,7 @@ import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.CollectionState
@@ -363,7 +364,9 @@ class ConfigurationFragment : Fragment(),
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
             val dateTime = LocalDateTime.now().format(formatter)
 
-            val fileName = "C-${role}-${userName}-${dateTime!!}.json"
+            val version = BuildConfig.VERSION_NAME.replace(" #", "-" )
+
+            val fileName = "C-${role}-${userName}-${version}-${dateTime!!}.json"
 
             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
             root.mkdirs()

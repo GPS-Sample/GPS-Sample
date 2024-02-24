@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -424,8 +425,8 @@ class ManageConfigurationsFragment : Fragment(),
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
         val dateTime = LocalDateTime.now().format(formatter)
-
-        val fileName = "C-${role}-${userName}-${dateTime!!}.json"
+        val version = BuildConfig.VERSION_NAME.replace(" #", "-" )
+        val fileName = "C-${role}-${userName}-${version}-${dateTime!!}.json"
 
         val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
         root.mkdirs()

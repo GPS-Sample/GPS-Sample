@@ -36,6 +36,7 @@ import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -800,12 +801,14 @@ class PerformEnumerationFragment : Fragment(),
                     val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
                     root.mkdirs()
 
+                    val version = BuildConfig.VERSION_NAME.replace(" #", "-" )
+
                     when(user.role)
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
                             val packedConfig = config.pack()
-                            val fileName = "C-${role}-${userName}-${dateTime!!}.json"
+                            val fileName = "C-${role}-${userName}-${version}-${dateTime!!}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedConfig)
@@ -819,7 +822,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             val packedEnumArea = enumArea.pack(config.encryptionPassword)
                             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-                            val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}.json"
+                            val fileName = "E-${role}-${userName}-${clusterName}-${version}-${dateTime!!}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedEnumArea)
