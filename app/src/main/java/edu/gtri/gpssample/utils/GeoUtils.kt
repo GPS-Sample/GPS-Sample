@@ -7,10 +7,8 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.LatLon
 import kotlin.math.*
 
-const val kMinimumDistance = 10.0
 data class HaversineCheck(val distance : Double, var withinBounds : Boolean, val start : LatLng, val end : LatLng)
 {
-    val minimumDistance = kMinimumDistance
 }
 
 object GeoUtils {
@@ -41,13 +39,13 @@ object GeoUtils {
         return LatLngBounds(LatLng(0.0,0.0), LatLng(0.0,0.0))
     }
 
-    fun isCloseTo( latLng1: LatLng, latLng2: LatLng): HaversineCheck
+    fun isCloseTo( latLng1: LatLng, latLng2: LatLng, minimumDistance: Int): HaversineCheck
     {
         val distance = distanceBetween( latLng1, latLng2 )
 
         val haversineCheck = HaversineCheck(distance, false, latLng1, latLng2)
 
-        if(distance < kMinimumDistance)
+        if(distance < minimumDistance)
         {
             haversineCheck.withinBounds = true
         }

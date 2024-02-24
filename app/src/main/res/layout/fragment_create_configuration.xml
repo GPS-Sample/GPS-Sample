@@ -53,7 +53,6 @@
                     android:inputType="textCapWords"
                     android:imeOptions="actionDone"
                     android:text="@={viewModel.currentConfiguration.name}"
-
                     android:hint="@string/enter_config_name" />
 
                 <TextView
@@ -270,6 +269,17 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp" />
                 </LinearLayout>
+
+                <EditText
+                    android:id="@+id/proximity_warning_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:text="@={viewModel.currentConfiguration.proximityWarningStringValue}"
+                    android:hint="Enter the proximity warning value" />
 
                 <Space
                     android:layout_width="match_parent"

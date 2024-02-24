@@ -305,6 +305,16 @@
                                 android:layout_marginStart="20dp"
                                 android:layout_marginEnd="20dp" />
                         </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/proximity_warning_text_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginRight="20dp"
+                            android:textSize="17sp"
+                            android:text="@{viewModel.currentConfiguration.proximityWarningStringValue}" />
+
                     </LinearLayout>
 
                     <Space

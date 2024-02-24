@@ -592,7 +592,7 @@ class PerformEnumerationFragment : Fragment(),
             if (config.proximityWarningIsEnabled)
             {
                 enumArea.locations.map{
-                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue )
                     if (haversineCheck.withinBounds)
                     {
                         val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
@@ -684,7 +684,7 @@ class PerformEnumerationFragment : Fragment(),
                 if (config.proximityWarningIsEnabled)
                 {
                     enumArea.locations.map{
-                        val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()))
+                        val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
                         if (haversineCheck.withinBounds)
                         {
                             val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"

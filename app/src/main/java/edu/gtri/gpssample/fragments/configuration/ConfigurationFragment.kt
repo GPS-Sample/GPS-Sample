@@ -154,6 +154,11 @@ class ConfigurationFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
+            if (!config.proximityWarningIsEnabled)
+            {
+                binding.proximityWarningTextView.visibility = View.GONE
+            }
+
             binding.configNameTextView.text = config.name
 
             studiesAdapter = StudiesAdapter(config.studies)

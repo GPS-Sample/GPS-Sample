@@ -65,6 +65,7 @@ class CreateConfigurationFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -79,10 +80,14 @@ class CreateConfigurationFragment : Fragment(),
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.cancelButton.setOnClickListener {
-//            sharedViewModel.currentConfiguration?.value?.let { config ->
-//                sharedViewModel.deleteConfig( config )
-//            }
             findNavController().popBackStack()
+        }
+
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            if (!config.proximityWarningIsEnabled)
+            {
+                binding.proximityWarningEditText.visibility = View.GONE
+            }
         }
 
         binding.saveButton.setOnClickListener {
@@ -109,6 +114,17 @@ class CreateConfigurationFragment : Fragment(),
                     sharedViewModel.updateConfiguration()
                     findNavController().popBackStack()
                 }
+            }
+        }
+
+        binding.proximityWarningEnabledSwitch.setOnClickListener {
+            if (binding.proximityWarningEnabledSwitch.isChecked)
+            {
+                binding.proximityWarningEditText.visibility = View.VISIBLE
+            }
+            else
+            {
+                binding.proximityWarningEditText.visibility = View.GONE
             }
         }
 
