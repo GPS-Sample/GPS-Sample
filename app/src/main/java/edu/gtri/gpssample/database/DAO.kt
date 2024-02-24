@@ -292,7 +292,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ID + COLUMN_ID_TYPE + "," +
                     COLUMN_UUID + " TEXT" + "," +
                     COLUMN_FIELD_ID + " INTEGER" + "," +
-                    COLUMN_ENUMERATION_ITEM_ID + " INTEGER" + "," +
+                    COLUMN_ENUMERATION_ITEM_UUID + " TEXT" + "," +
                     COLUMN_FIELD_NAME + " TEXT" + "," +
                     COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_TEXT_VALUE + " TEXT" + "," +
@@ -300,8 +300,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_DATA_DATE_VALUE + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_DROPDOWN_INDEX + " INTEGER" + "," +
                     COLUMN_FIELD_DATA_BLOCK_NUMBER + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" + "," +
-                    "FOREIGN KEY($COLUMN_ENUMERATION_ITEM_ID) REFERENCES $TABLE_ENUMERATION_ITEM($COLUMN_ID)" +
+                    "FOREIGN KEY($COLUMN_FIELD_ID) REFERENCES $TABLE_FIELD($COLUMN_ID)" +
                     ")")
             db.execSQL(createTableFieldData)
 
@@ -467,7 +466,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_COLLECTION_TEAM_ID = "collection_team_id"
         const val COLUMN_OPERATOR_ID = "operator_id"
         const val COLUMN_LOCATION_ID = "location_id"
-        const val COLUMN_ENUMERATION_ITEM_ID = "enumeration_item_id"
+        const val COLUMN_ENUMERATION_ITEM_UUID = "enumeration_item_uuid"
         const val COLUMN_LAT_LON_ID = "lat_lon_id"
 
         // Connector Tables
@@ -772,6 +771,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 280
+        private const val DATABASE_VERSION = 281
     }
 }

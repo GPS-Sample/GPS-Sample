@@ -152,12 +152,9 @@ class TCPServer
         }
         catch( ex: Exception )
         {
-            Log.d( "xxx", ex.stackTraceToString())
-//            Log.d( "xxx", ex.localizedMessage!! )
+//            Log.d( "xxx", ex.stackTraceToString())
         }
 
         Log.d( "xxx", "stopped waiting for TCP messages")
     }
-
-
 }

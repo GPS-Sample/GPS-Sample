@@ -50,8 +50,8 @@ class FieldDataDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ID, it )
         }
 
-        enumerationItem?.id?.let {
-            values.put( DAO.COLUMN_ENUMERATION_ITEM_ID, it )
+        enumerationItem?.uuid?.let {
+            values.put( DAO.COLUMN_ENUMERATION_ITEM_UUID, it )
         }
 
         fieldData.field?.let { field ->
@@ -161,19 +161,17 @@ class FieldDataDAO(private var dao: DAO)
     {
         val fieldDataList = ArrayList<FieldData>()
 
-        enumerationItem.id?.let { id ->
-            val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUMERATION_ITEM_ID} = $id"
-            val cursor = dao.writableDatabase.rawQuery(query, null)
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUMERATION_ITEM_UUID} = '${enumerationItem.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            while (cursor.moveToNext())
-            {
-                val fieldData = createFieldData( cursor )
-                fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
-                fieldDataList.add( fieldData )
-            }
-
-            cursor.close()
+        while (cursor.moveToNext())
+        {
+            val fieldData = createFieldData( cursor )
+            fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
+            fieldDataList.add( fieldData )
         }
+
+        cursor.close()
 
         return fieldDataList
     }
