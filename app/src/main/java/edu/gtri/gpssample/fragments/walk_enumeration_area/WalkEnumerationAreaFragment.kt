@@ -14,6 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -37,6 +38,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -50,6 +52,7 @@ import io.github.dellisd.spatialk.geojson.MultiPolygon
 import io.github.dellisd.spatialk.geojson.Point
 import io.github.dellisd.spatialk.geojson.dsl.point
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
@@ -70,6 +73,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
     private lateinit var defaultColorList : ColorStateList
 
+    private var inputDialog: InputDialog? = null
     private var startPointAnnotation : PointAnnotation? = null
 
     private var isRecording = false
@@ -258,7 +262,7 @@ class WalkEnumerationAreaFragment : Fragment(),
             {
                 isRecording = false
 
-                InputDialog( activity!!, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
 
                 refreshMap()
             }
@@ -417,6 +421,23 @@ class WalkEnumerationAreaFragment : Fragment(),
         droppedPointAnnotations.clear()
     }
 
+    override fun didPressQrButton()
+    {
+        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+        getResult.launch(intent)
+    }
+
+    private val getResult =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == ResultCode.BarcodeScanned.value) {
+                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+                inputDialog?.editText?.let { editText ->
+                    editText.setText( payload.toString())
+                }
+            }
+        }
+
     override fun didEnterText( name: String, tag: Any? )
     {
         // close the polygon
@@ -538,7 +559,7 @@ class WalkEnumerationAreaFragment : Fragment(),
         if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
         {
             data?.data?.let { uri ->
-                InputDialog( activity!!, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
             }
         }
     }
