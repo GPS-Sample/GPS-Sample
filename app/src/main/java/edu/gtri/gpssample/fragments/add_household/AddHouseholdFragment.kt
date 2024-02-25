@@ -304,11 +304,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
     override fun didSelectRightButton(tag: Any?)
     {
-        location.enumerationItems.remove(enumerationItem)
-        enumArea.locations.remove(location)
-
-        DAO.locationDAO.delete( location )
+        location.enumerationItems.remove( enumerationItem )
         DAO.enumerationItemDAO.delete( enumerationItem )
+
+        if (location.enumerationItems.size == 0)
+        {
+            enumArea.locations.remove( location )
+            DAO.locationDAO.delete( location )
+        }
 
         DAO.configDAO.getConfig( config.id!! )?.let {
             sharedViewModel.setCurrentConfig( it )
