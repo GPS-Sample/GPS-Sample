@@ -314,9 +314,9 @@
     <string name="sample">Sample</string>
     <string name="mark_status">Mark Status</string>
     <string name="not_visited">Not Visited</string>
-    <string name="incomplete_collection">"Incomplete Survey"</string>
-    <string name="completed_collection">"Completed Survey"</string>
-    <string name="accuracy">"Accuracy : "</string>
+    <string name="incomplete_collection">Incomplete Survey</string>
+    <string name="completed_collection">Completed Survey</string>
+    <string name="accuracy">Accuracy : </string>
     <string name="subaddress_is_required">Subaddress is Required</string>
     <string name="auto_increment_subaddress">Auto Increment Subaddress</string>
     <string name="allow_manual_identification_of_locations">Allow manual identification of locations</string>
@@ -331,7 +331,7 @@
     <string name="num_hhs_surveyed"># HH\'s Surveyed:</string>
     <string name="num_hhs_remaining_to_survey"># HH\'s Remaining to Survey:</string>
     <string name="decryption_failed">Decryption failed.  Please try again.</string>
-    <string name="rename_or_delete">Would you like to Rename or Delete Enumeration Area </string>
+    <string name="rename_or_delete">Would you like to Rename or Delete Enumeration Area</string>
     <string name="rename">Rename</string>
 
     <string-array name="forgot_pin_questions">
