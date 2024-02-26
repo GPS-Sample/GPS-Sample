@@ -301,8 +301,9 @@ class ConfigurationFragment : Fragment(),
                             }
                         }
 
-                        sharedViewModel.currentConfiguration?.value?.let{
-                            sharedNetworkViewModel.setCurrentConfig(it)
+                        sharedViewModel.currentConfiguration?.value?.let{ config ->
+                            sharedNetworkViewModel.setCurrentConfig(config)
+                            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                         }
 
                         sharedNetworkViewModel.createHotspot(view)

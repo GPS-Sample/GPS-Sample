@@ -301,7 +301,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             NetworkCommand.NetworkSampleAreaExport ->
             {
                 message.payload?.let { payload ->
-                    val enumArea = EnumArea.unpack( payload, "" )
+                    val enumArea = EnumArea.unpack( payload, encryptionPassword )
 
                     enumArea?.let{ enumArea ->
 
