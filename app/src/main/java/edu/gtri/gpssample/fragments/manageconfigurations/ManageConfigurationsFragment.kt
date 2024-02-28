@@ -522,7 +522,11 @@ class ManageConfigurationsFragment : Fragment(),
 
     override fun didReceiveConfiguration(complete: Boolean)
     {
-        if (complete)
+        if (!complete)
+        {
+            Toast.makeText(activity!!.applicationContext,  "Decryption Failed.", Toast.LENGTH_SHORT).show()
+        }
+        else
         {
             sharedViewModel.currentConfiguration?.value?.let { config ->
 

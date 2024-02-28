@@ -44,6 +44,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
     {
         fun didStartImport()
         fun didFinishImport()
+        fun importFailed( message: String )
     }
 
     var encryptionPassword = ""
@@ -220,13 +221,19 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload, encryptionPassword )
 
-                    enumArea?.let { enumArea ->
-
-                        DAO.instance().writableDatabase.beginTransaction()
-
+                    if (enumArea == null)
+                    {
+                        delegate?.let {
+                            it.importFailed( "Decryption Failed.")
+                        }
+                    }
+                    else
+                    {
                         delegate?.let {
                             it.didStartImport()
                         }
+
+                        DAO.instance().writableDatabase.beginTransaction()
 
                         // first, import landmarks
                         for (location in enumArea.locations)
@@ -284,16 +291,16 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         DAO.instance().writableDatabase.setTransactionSuccessful()
                         DAO.instance().writableDatabase.endTransaction()
 
-                        delegate?.let {
-                            it.didFinishImport()
-                        }
-
                         sharedViewModel?.currentConfiguration?.value?.let { config ->
                             config.id?.let {
                                 DAO.configDAO.getConfig( it )?.let { config ->
                                     sharedViewModel?.setCurrentConfig(config)
                                 }
                             }
+                        }
+
+                        delegate?.let {
+                            it.didFinishImport()
                         }
                     }
                 }
@@ -303,13 +310,19 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload, encryptionPassword )
 
-                    enumArea?.let{ enumArea ->
-
-                        DAO.instance().writableDatabase.beginTransaction()
-
+                    if (enumArea == null)
+                    {
+                        delegate?.let {
+                            it.importFailed( "Decryption Failed.")
+                        }
+                    }
+                    else
+                    {
                         delegate?.let {
                             it.didStartImport()
                         }
+
+                        DAO.instance().writableDatabase.beginTransaction()
 
                         for (location in enumArea.locations)
                         {
@@ -319,16 +332,16 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         DAO.instance().writableDatabase.setTransactionSuccessful()
                         DAO.instance().writableDatabase.endTransaction()
 
-                        delegate?.let {
-                            it.didFinishImport()
-                        }
-
                         sharedViewModel?.currentConfiguration?.value?.let { config ->
                             config.id?.let {
                                 DAO.configDAO.getConfig( it )?.let { config ->
                                     sharedViewModel?.setCurrentConfig(config)
                                 }
                             }
+                        }
+
+                        delegate?.let {
+                            it.didFinishImport()
                         }
                     }
                 }
