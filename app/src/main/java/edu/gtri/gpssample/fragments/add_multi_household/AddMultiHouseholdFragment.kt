@@ -118,7 +118,7 @@ class AddMultiHouseholdFragment : Fragment()
         sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.toString(), editMode )
-        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+        findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
     }
 
     override fun onDestroyView()
