@@ -224,7 +224,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     if (enumArea == null)
                     {
                         delegate?.let {
-                            it.importFailed( "Decryption Failed.")
+                            it.importFailed( "Import Failed.")
                         }
                     }
                     else
@@ -313,7 +313,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     if (enumArea == null)
                     {
                         delegate?.let {
-                            it.importFailed( "Decryption Failed.")
+                            it.importFailed( "Import Failed.")
                         }
                     }
                     else

@@ -524,10 +524,12 @@ class ManageConfigurationsFragment : Fragment(),
     {
         if (!complete)
         {
-            Toast.makeText(activity!!.applicationContext,  "Decryption Failed.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity!!.applicationContext,  "Import Failed.", Toast.LENGTH_SHORT).show()
         }
         else
         {
+            Toast.makeText(activity!!.applicationContext,  "Success!", Toast.LENGTH_SHORT).show()
+
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
                 if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
