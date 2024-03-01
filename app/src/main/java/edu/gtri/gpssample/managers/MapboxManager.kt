@@ -149,7 +149,7 @@ class MapboxManager(
             val tilesetDescriptor = offlineManager.createTilesetDescriptor(
                 TilesetDescriptorOptions.Builder()
                     .styleURI(Style.OUTDOORS)
-                    .minZoom(0)
+                    .minZoom(9)
                     .maxZoom(16)
                     .build()
             )

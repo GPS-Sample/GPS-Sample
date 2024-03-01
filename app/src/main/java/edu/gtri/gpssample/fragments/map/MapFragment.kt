@@ -2,7 +2,9 @@ package edu.gtri.gpssample.fragments.map
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -13,6 +15,7 @@ import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
@@ -23,12 +26,22 @@ import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.dialogs.CreateEnumAreaHelpDialog
+import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.MapHelpDialog
 
-class MapFragment : Fragment(), MapboxManager.MapTileCacheDelegate, BusyIndicatorDialog.BusyIndicatorDialogDelegate
+class MapFragment : Fragment(),
+    View.OnTouchListener,
+    InputDialog.InputDialogDelegate,
+    MapboxManager.MapTileCacheDelegate,
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
     private var centerOnLocation = true
+    private var defineMapRegion = false
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
 
     private lateinit var defaultColorList : ColorStateList
@@ -66,25 +79,56 @@ class MapFragment : Fragment(), MapboxManager.MapTileCacheDelegate, BusyIndicato
             }
         )
 
-        binding.centerOnLocationButton.backgroundTintList?.let {
-            defaultColorList = it
-        }
-
         val locationComponentPlugin = binding.mapView.location
         locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.addOnMoveListener(onMoveListener)
         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-                if (config.mapTileRegions.size > 0)
-                {
-                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                    MapboxManager.loadStylePack( activity!!, this )
-                }
+//        sharedViewModel.currentConfiguration?.value?.let { config ->
+//                if (config.mapTileRegions.size > 0)
+//                {
+//                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+//                    MapboxManager.loadStylePack( activity!!, this )
+//                }
+//        }
+
+        binding.defineMapTileRegionButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
+        binding.overlayView.setOnTouchListener(this)
+
+        binding.defineMapTileRegionButton.setOnClickListener {
+            if (defineMapRegion)
+            {
+                defineMapRegion = false
+                binding.overlayView.visibility = View.GONE
+                binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+            }
+            else
+            {
+                defineMapRegion = true
+                binding.overlayView.visibility = View.VISIBLE
+                binding.defineMapTileRegionButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+        }
+
+        binding.cacheMapTilesButton.setOnClickListener {
+            defineMapRegion = false
+            binding.overlayView.visibility = View.GONE
+            binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+        }
+
+        binding.helpButton.setOnClickListener {
+            MapHelpDialog( activity!! )
         }
 
         binding.centerOnLocationButton.setOnClickListener {
+            defineMapRegion = false
+            binding.overlayView.visibility = View.GONE
+            binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+
             centerOnLocation = !centerOnLocation
             if (centerOnLocation)
             {
@@ -101,6 +145,45 @@ class MapFragment : Fragment(), MapboxManager.MapTileCacheDelegate, BusyIndicato
                 binding.mapView.gestures.removeOnMoveListener(onMoveListener)
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
+        }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MapFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
+    {
+        if (defineMapRegion)
+        {
+            defineMapRegion = false
+            binding.overlayView.visibility = View.GONE
+            binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+
+            InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@MapFragment )
+        }
+
+        return true
+    }
+
+    override fun didCancelText( tag: Any? )
+    {
+        defineMapRegion = false
+    }
+
+    override fun didEnterText( name: String, tag: Any? )
+    {
+        defineMapRegion = false
+
+        name.toIntOrNull()?.let {
+
+//            val circleManager = CircleAnnotationManager
+
+            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+            MapboxManager.loadStylePack( activity!!, this )
         }
     }
 

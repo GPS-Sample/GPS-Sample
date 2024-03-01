@@ -334,6 +334,8 @@
     <string name="rename_or_delete">Would you like to Rename or Delete Enumeration Area</string>
     <string name="rename">Rename</string>
 
+    <string name="map_tile_boundary">"Enter the length/width (Kilometers) of the desired map tile region"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
