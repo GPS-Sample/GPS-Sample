@@ -67,6 +67,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 {
     private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
+    private lateinit var defaultColorList : ColorStateList
     private lateinit var polylineAnnotation: PolylineAnnotation
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var pointAnnotationManager: PointAnnotationManager
@@ -83,7 +84,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     private val polygonHashMap = HashMap<Long,Any>()
     private val pointHashMap = HashMap<Long,Location>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
-    private lateinit var defaultColorList : ColorStateList
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private val unsavedMapTileRegions = ArrayList<MapTileRegion>()
     private var allPointAnnotations = ArrayList<PointAnnotation>()
