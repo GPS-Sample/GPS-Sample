@@ -2,7 +2,6 @@ package edu.gtri.gpssample.fragments.map
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -12,25 +11,33 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.mapbox.android.gestures.MoveGestureDetector
+import com.mapbox.geojson.Point
+import com.mapbox.geojson.Polygon
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
+import com.mapbox.maps.plugin.annotation.AnnotationConfig
+import com.mapbox.maps.plugin.annotation.AnnotationPlugin
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
-import edu.gtri.gpssample.databinding.FragmentMapBinding
-import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
-import edu.gtri.gpssample.managers.MapboxManager
-import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
-import edu.gtri.gpssample.dialogs.CreateEnumAreaHelpDialog
+import edu.gtri.gpssample.database.models.LatLon
+import edu.gtri.gpssample.database.models.MapTileRegion
+import edu.gtri.gpssample.databinding.FragmentMapBinding
+import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.MapHelpDialog
+import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.ArrayList
+
 
 class MapFragment : Fragment(),
     View.OnTouchListener,
@@ -40,12 +47,22 @@ class MapFragment : Fragment(),
 {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
+
+    private var point: Point? = null
     private var centerOnLocation = true
     private var defineMapRegion = false
+    private var mapTileRegion: MapTileRegion? = null
+    private var polygonAnnotation: PolygonAnnotation? = null
+    private var polylineAnnotation: PolylineAnnotation? = null
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
 
+    private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList : ColorStateList
     private lateinit var sharedViewModel: ConfigurationViewModel
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var circleAnnotationManager: CircleAnnotationManager
+    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -79,19 +96,18 @@ class MapFragment : Fragment(),
             }
         )
 
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+
+        circleAnnotationManager = binding.mapView.annotations.createCircleAnnotationManager()
+
         val locationComponentPlugin = binding.mapView.location
         locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
         locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
         binding.mapView.gestures.addOnMoveListener(onMoveListener)
         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-
-//        sharedViewModel.currentConfiguration?.value?.let { config ->
-//                if (config.mapTileRegions.size > 0)
-//                {
-//                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-//                    MapboxManager.loadStylePack( activity!!, this )
-//                }
-//        }
 
         binding.defineMapTileRegionButton.backgroundTintList?.let {
             defaultColorList = it
@@ -115,9 +131,13 @@ class MapFragment : Fragment(),
         }
 
         binding.cacheMapTilesButton.setOnClickListener {
-            defineMapRegion = false
-            binding.overlayView.visibility = View.GONE
-            binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+            mapTileRegion?.let {
+                defineMapRegion = false
+                binding.overlayView.visibility = View.GONE
+                binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                MapboxManager.loadStylePack( activity!!, this )
+            }
         }
 
         binding.helpButton.setOnClickListener {
@@ -154,11 +174,18 @@ class MapFragment : Fragment(),
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MapFragment.value.toString() + ": " + this.javaClass.simpleName
     }
-
+    
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
         if (defineMapRegion)
         {
+            p1?.let { p1 ->
+                if (p1.action == MotionEvent.ACTION_DOWN)
+                {
+                    point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                }
+            }
+
             defineMapRegion = false
             binding.overlayView.visibility = View.GONE
             binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
@@ -180,11 +207,58 @@ class MapFragment : Fragment(),
 
         name.toIntOrNull()?.let {
 
-//            val circleManager = CircleAnnotationManager
+            val radius = it * 1000
 
-            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-            MapboxManager.loadStylePack( activity!!, this )
+            point?.let { point ->
+                val r_earth = 6378000.0
+
+                var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                val northEast = LatLon( latitude, longitude )
+
+                latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                val southWest = LatLon( latitude, longitude )
+
+                mapTileRegion = MapTileRegion( northEast, southWest )
+
+                polylineAnnotation?.let {
+                    polylineAnnotationManager.delete(it)
+                }
+
+                polygonAnnotation?.let {
+                    polygonAnnotationManager.delete(it)
+                }
+
+                mapTileRegion?.let {
+                    addPolygon( it )
+                }
+            }
         }
+    }
+
+    fun addPolygon( mapTileRegion: MapTileRegion )
+    {
+        val points = ArrayList<Point>()
+        val pointList = ArrayList<ArrayList<Point>>()
+
+        val vertices = ArrayList<LatLon>()
+
+        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
+
+        vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.0 )
+
+        // create the polygon border
+        polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#000000" )
     }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
@@ -261,8 +335,10 @@ class MapFragment : Fragment(),
             }
             else
             {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+                mapTileRegion?.let { mapTileRegion ->
+                    val mapTileRegions = ArrayList<MapTileRegion>()
+                    mapTileRegions.add(mapTileRegion)
+                    MapboxManager.loadTilePacks( activity!!, mapTileRegions, this )
                 }
             }
         }
