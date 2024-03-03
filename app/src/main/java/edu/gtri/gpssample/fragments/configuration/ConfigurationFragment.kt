@@ -370,9 +370,14 @@ class ConfigurationFragment : Fragment(),
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
             val dateTime = LocalDateTime.now().format(formatter)
 
-            val version = BuildConfig.VERSION_NAME.replace(" #", "-" )
+            var version = ""
+            val versionName = BuildConfig.VERSION_NAME.split( "#" )
+            if (versionName.size == 2)
+            {
+                version = versionName[1]
+            }
 
-            val fileName = "C-${role}-${userName}-${version}-${dateTime!!}.json"
+            val fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
 
             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
             root.mkdirs()

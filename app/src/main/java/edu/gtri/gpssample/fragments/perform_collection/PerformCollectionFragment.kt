@@ -579,14 +579,19 @@ class PerformCollectionFragment : Fragment(),
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
         val dateTime = LocalDateTime.now().format(formatter)
-        val version = BuildConfig.VERSION_NAME.replace(" #", "-" )
+        var version = ""
+        val versionName = BuildConfig.VERSION_NAME.split( "#" )
+        if (versionName.size == 2)
+        {
+            version = versionName[1]
+        }
 
         when(user.role) {
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    fileName = "C-${role}-${userName}-${version}-${dateTime!!}.json"
+                    fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
                     payload = config.pack()
                     message = resources.getString(R.string.config_saved_doc)
                 }
@@ -598,7 +603,7 @@ class PerformCollectionFragment : Fragment(),
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
                         val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-                        fileName = "D-${role}-${userName}-${version}-${clusterName}-${dateTime!!}.json"
+                        fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                         payload = enumArea.pack(config.encryptionPassword)
                         message = resources.getString(R.string.collection_saved_doc)
                     }
