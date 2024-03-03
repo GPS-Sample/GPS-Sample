@@ -10,7 +10,7 @@ import kotlin.collections.ArrayList
 object NetworkUtils {
     const val kHeartbeatInterval : Long = 1000
     const val kNumRetries = 200
-    fun readToEnd(fullSize : Int, actualRead : Int, socket : Socket, payloadArray : ByteArray )
+    fun readToEnd(fullSize : Int, actualRead : Int, socket : Socket, payloadArray : ByteArray ) : Boolean
     {
         var retryCounter : Int = 0
         if(actualRead < fullSize)
@@ -30,9 +30,10 @@ object NetworkUtils {
                     offset += read
                     leftAfterReading -= read
                     retryCounter += 1
-                }else
+                }
+                else
                 {
-                    break
+                    return false
                 }
             }
 
@@ -43,9 +44,10 @@ object NetworkUtils {
                 {
                     payloadArray[i] = leftover[i - (fullSize - left)]
                 }
-
             }
         }
+
+        return true
     }
 
     fun getWifiApIpAddresses(): ArrayList<InetAddress> {

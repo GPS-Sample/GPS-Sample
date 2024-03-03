@@ -54,8 +54,12 @@ class TCPClient
                 val read = socket.inputStream.read(headerArray,0,TCPHeader.size - 3)
                 if(read < TCPHeader.size)
                 {
-                    NetworkUtils.readToEnd(TCPHeader.size, read, socket, headerArray)
+                    if (!NetworkUtils.readToEnd(TCPHeader.size, read, socket, headerArray))
+                    {
+                        return null
+                    }
                 }
+
                 val header = TCPHeader.fromByteArray(headerArray)
                 header?.let { header ->
                     // if we get here, the key is valid
@@ -68,8 +72,10 @@ class TCPClient
 
                         if(read < header.payloadSize)
                         {
-                            NetworkUtils.readToEnd(header.payloadSize, read, socket, payloadArray)
-
+                            if (!NetworkUtils.readToEnd(header.payloadSize, read, socket, payloadArray))
+                            {
+                                return null
+                            }
                         }
                     }
 
@@ -77,6 +83,7 @@ class TCPClient
 
                     return TCPMessage(header, payload)
                 }
+
                 return null
             }
         }
@@ -85,6 +92,7 @@ class TCPClient
             Log.d( "xxx", ex.stackTraceToString())
             delegate.connectionString("Connection failed to ${inetAddress}")
         }
+
         return null
     }
 

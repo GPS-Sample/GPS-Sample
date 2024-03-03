@@ -123,29 +123,38 @@ class TCPServer
                 if(success == -1)
                 {
                     break
-                }else if(success < TCPHeader.size)
-                {
-                    NetworkUtils.readToEnd(TCPHeader.size, success, socket, headerArray)
                 }
-                val header = TCPHeader.fromByteArray(headerArray)
-                header?.let {header ->
+                else if(success < TCPHeader.size)
+                {
+                    if (!NetworkUtils.readToEnd(TCPHeader.size, success, socket, headerArray))
+                    {
+                        break
+                    }
+                }
 
+                val header = TCPHeader.fromByteArray(headerArray)
+
+                if (header != null)
+                {
                     // if we get here, the key is valid
                     val payloadArray = ByteArray(header.payloadSize)
                     val read = socket.inputStream.read(payloadArray, 0, header.payloadSize)
 
-                    // TCP read may not read the requested bytes.
-                    // handle if not
+                    // TCP read may not read the requested bytes. handle if not
                     if(read < header.payloadSize)
                     {
-                        NetworkUtils.readToEnd(header.payloadSize, read, socket, payloadArray)
-
+                        if (!NetworkUtils.readToEnd(header.payloadSize, read, socket, payloadArray))
+                        {
+                            break
+                        }
                     }
+
                     val payload = String(payloadArray)
                     val tcpMessage = TCPMessage(header, payload)
                     delegate.didReceiveTCPMessage( tcpMessage, socket )
                 }
             }
+
             socket.close()
             delegate.didDisconnect(socket)
 
