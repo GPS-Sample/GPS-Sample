@@ -26,21 +26,6 @@ data class EnumArea (
     constructor( name: String, vertices: ArrayList<LatLon>)
             : this(null, UUID.randomUUID().toString(), Date().time, name, -1, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>())
 
-//    fun copy() : EnumArea?
-//    {
-//        val _copy = unpack(pack())
-//
-//        _copy?.let { _copy ->
-//            return _copy
-//        } ?: return null
-//    }
-
-    fun pack(password: String) : String
-    {
-        val jsonString = Json.encodeToString( this )
-        return EncryptionUtil.Encrypt(jsonString,password)
-    }
-
     override fun equals(other: Any?): Boolean {
         if(other is EnumArea)
         {
@@ -51,20 +36,42 @@ data class EnumArea (
         }
         return false
     }
+
+    fun pack(password: String) : String
+    {
+        val jsonString = Json.encodeToString( this )
+
+        if (password.isEmpty())
+        {
+            return jsonString
+        }
+        else
+        {
+            return EncryptionUtil.Encrypt(jsonString,password)
+        }
+    }
+
     companion object
     {
-        fun unpack( string: String, password: String ) : EnumArea?
+        fun unpack( message: String, password: String ) : EnumArea?
         {
             try
             {
-                val decrypted = EncryptionUtil.Decrypt(string,password)
-                decrypted?.let { decrypted ->
-                    return Json.decodeFromString<EnumArea>(decrypted)
+                if (password.isEmpty())
+                {
+                    return Json.decodeFromString<EnumArea>(message)
+                }
+                else
+                {
+                    val clearText = EncryptionUtil.Decrypt(message,password)
+                    clearText?.let { clearText ->
+                        return Json.decodeFromString<EnumArea>(clearText)
+                    }
                 }
             }
             catch (ex: Exception)
             {
-                Log.d( "xxXXx", ex.stackTrace.toString())
+                Log.d( "xxx", ex.stackTrace.toString())
             }
 
             return null;

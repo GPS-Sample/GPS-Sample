@@ -97,9 +97,16 @@ data class Config(
 
     fun pack() : String
     {
-       // return Json.encodeToString( this )
         val jsonString = Json.encodeToString( this )
-        return  EncryptionUtil.Encrypt(jsonString, encryptionPassword)
+
+        if (encryptionPassword.isEmpty())
+        {
+            return  jsonString
+        }
+        else
+        {
+            return  EncryptionUtil.Encrypt(jsonString, encryptionPassword)
+        }
     }
 
     companion object
@@ -108,14 +115,21 @@ data class Config(
         {
             try
             {
-                val decrypted = EncryptionUtil.Decrypt(message, password)
-                decrypted?.let {decrypted ->
-                    return Json.decodeFromString<Config>( decrypted )
+                if (password.isEmpty())
+                {
+                    return Json.decodeFromString<Config>( message )
+                }
+                else
+                {
+                    val clearText = EncryptionUtil.Decrypt(message, password)
+                    clearText?.let { clearText ->
+                        return Json.decodeFromString<Config>( clearText )
+                    }
                 }
             }
             catch( ex: Exception )
             {
-                Log.d( "xxXXx", ex.stackTrace.toString())
+                Log.d( "xxx", ex.stackTrace.toString())
             }
 
             return null
