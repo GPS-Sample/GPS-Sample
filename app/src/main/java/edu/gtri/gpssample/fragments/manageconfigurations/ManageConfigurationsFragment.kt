@@ -11,8 +11,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.*
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +25,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -69,6 +69,7 @@ class ManageConfigurationsFragment : Fragment(),
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
         val vm : ConfigurationViewModel by activityViewModels()
         val networkVm : NetworkViewModel by activityViewModels()
         val samplingVm : SamplingViewModel by activityViewModels()
@@ -77,16 +78,23 @@ class ManageConfigurationsFragment : Fragment(),
         samplingViewModel = samplingVm
 
         sharedNetworkViewModel = networkVm
-        sharedNetworkViewModel.currentFragment = this
-        sharedNetworkViewModel.networkClientModel.configurationDelegate = this
-        sharedNetworkViewModel.manageConfigurationNetworkDelegate = this
 
         setHasOptionsMenu(true)
+
+        clearFragmentResultListener( this.javaClass.simpleName )
+
+        setFragmentResultListener( this.javaClass.simpleName ) { key, bundle ->
+            didReceiveConfiguration( bundle.getBoolean(Keys.kError.toString()))
+            clearFragmentResult( this.javaClass.simpleName )
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         _binding = FragmentManageConfigurationsBinding.inflate(inflater, container, false)
+
+        sharedNetworkViewModel.currentFragment = this
+        sharedNetworkViewModel.networkClientModel.configurationDelegate = this
 
         return binding.root
     }
@@ -461,7 +469,14 @@ class ManageConfigurationsFragment : Fragment(),
 
                             val config = Config.unpack( text, encryptionPassword )
 
-                            if (config != null)
+                            if (config == null)
+                            {
+                                activity!!.runOnUiThread {
+                                    binding.overlayView.visibility = View.GONE
+                                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                                }
+                            }
+                            else
                             {
                                 DAO.instance().writableDatabase.beginTransaction()
 
@@ -478,15 +493,8 @@ class ManageConfigurationsFragment : Fragment(),
                                         sharedViewModel.setCurrentConfig( savedConfig )
                                         manageConfigurationsAdapter.updateConfigurations( configurations )
 
-                                        didReceiveConfiguration(true)
+                                        didReceiveConfiguration(false )
                                     }
-                                }
-                            }
-                            else
-                            {
-                                activity!!.runOnUiThread {
-                                    binding.overlayView.visibility = View.GONE
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }.start()
@@ -495,7 +503,7 @@ class ManageConfigurationsFragment : Fragment(),
                 catch( ex: Exception )
                 {
                     binding.overlayView.visibility = View.GONE
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                 }
             }
         }
@@ -520,15 +528,15 @@ class ManageConfigurationsFragment : Fragment(),
         }
     }
 
-    override fun didReceiveConfiguration(complete: Boolean)
+    override fun didReceiveConfiguration(error: Boolean)
     {
-        if (!complete)
+        if (error)
         {
-            Toast.makeText(activity!!.applicationContext,  "Import Failed.", Toast.LENGTH_SHORT).show()
+            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
         }
         else
         {
-            Toast.makeText(activity!!.applicationContext,  "Success!", Toast.LENGTH_SHORT).show()
+            InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
 
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
@@ -539,16 +547,6 @@ class ManageConfigurationsFragment : Fragment(),
                 }
 
                 navigateBasedOnRole()
-
-//                if (config.mapTileRegions.size > 0)
-//                {
-//                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-//                    MapboxManager.loadStylePack( activity!!, this )
-//                }
-//                else
-//                {
-//                    navigateBasedOnRole()
-//                }
             }
         }
     }

@@ -39,7 +39,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     }
 
     interface NetworkConnectDelegate {
-        fun didConnect(complete: Boolean)
+        fun didReceiveConfiguration(error: Boolean)
         fun didSendData(complete: Boolean)
     }
 
@@ -152,18 +152,15 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 _commandSent.postValue(NetworkStatus.CommandSent)
                 if (response.command == NetworkCommand.NetworkConfigResponse) {
                     response.payload?.let { payload ->
-                        val config = Config.unpack(payload, encryptionPassword)
-
-                        // TODO: put the config in the list of current configs.....
-                        config?.let { config ->
+                        Config.unpack(payload, encryptionPassword)?.let { config ->
                             configurationDelegate?.configurationReceived(config)
                             _dataReceived.postValue(NetworkStatus.DataReceived)
 
                             sleep(kDialogTimeout)
-                            connectDelegate?.didConnect(true)
+                            connectDelegate?.didReceiveConfiguration(false)
                         } ?: run {
                             _dataReceived.postValue(NetworkStatus.DataReceivedError)
-                            connectDelegate?.didConnect(false)
+                            connectDelegate?.didReceiveConfiguration(true)
                         }
                     }
                 }
@@ -459,6 +456,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         _commandSent.postValue(NetworkStatus.CommandError)
         _dataReceived.postValue(NetworkStatus.DataReceivedError)
         sleep(kDialogTimeout)
-        connectDelegate?.didConnect(false)
+        connectDelegate?.didReceiveConfiguration(true)
     }
 }

@@ -38,6 +38,7 @@ import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -286,7 +287,6 @@ class ConfigurationFragment : Fragment(),
                         val user = (activity!!.application as MainApplication).user
                         user?.let { user ->
 
-                            //TODO: fix this! compare should be the enum
                             when(user.role)
                             {
                                 Role.Supervisor.toString() ->
@@ -425,7 +425,14 @@ class ConfigurationFragment : Fragment(),
 
                                 val enumArea = EnumArea.unpack( text, config.encryptionPassword )
 
-                                if (enumArea != null)
+                                if (enumArea == null)
+                                {
+                                    activity!!.runOnUiThread {
+                                        binding.overlayView.visibility = View.GONE
+                                        InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                                    }
+                                }
+                                else
                                 {
                                     DAO.instance().writableDatabase.beginTransaction()
 
@@ -442,13 +449,7 @@ class ConfigurationFragment : Fragment(),
 
                                     activity!!.runOnUiThread {
                                         binding.overlayView.visibility = View.GONE
-                                    }
-                                }
-                                else
-                                {
-                                    activity!!.runOnUiThread {
-                                        binding.overlayView.visibility = View.GONE
-                                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.decryption_failed), Toast.LENGTH_SHORT).show()
+                                        InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
                                     }
                                 }
                             }.start()
@@ -456,7 +457,8 @@ class ConfigurationFragment : Fragment(),
                     }
                     catch( ex: java.lang.Exception )
                     {
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                        binding.overlayView.visibility = View.GONE
+                        InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                     }
                 }
             }

@@ -139,7 +139,6 @@
     <string name="delete_enum_area_message">"Are you sure you want to permanently delete Enumeration Area"</string>
     <string name="no_study_ea">"You do not have a study associated with this EA."</string>
     <string name="filename_export_message">"Enter a file name for the export"</string>
-    <string name="import_failed">"Oops! The import failed.  Please try again."</string>
     <string name="select_task">"Select a task"</string>
     <string name="yes">"Yes"</string>
     <string name="no">"No"</string>
@@ -335,6 +334,10 @@
     <string name="rename">Rename</string>
 
     <string name="map_tile_boundary">"Enter the length/width (Kilometers) of the desired map tile region"</string>
+    <string name="success">SUCCESS!</string>
+    <string name="error">ERROR!</string>
+    <string name="import_failed">The import failed.</string>
+    <string name="import_succeeded">The import was successful.</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

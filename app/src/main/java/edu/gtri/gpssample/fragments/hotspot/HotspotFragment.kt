@@ -105,14 +105,14 @@ class HotspotFragment : Fragment(), NetworkHotspotModel.NetworkHotspotDelegate
     {
         activity!!.runOnUiThread {
             binding.doneButton.isEnabled = true
-            Toast.makeText(activity!!.applicationContext, "Success!", Toast.LENGTH_SHORT).show()
+            InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
         }
     }
 
     override fun importFailed( message: String )
     {
         activity!!.runOnUiThread {
-            Toast.makeText(activity!!.applicationContext, message, Toast.LENGTH_SHORT).show()
+            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
         }
     }
 }

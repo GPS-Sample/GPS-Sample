@@ -3,6 +3,7 @@ package edu.gtri.gpssample.viewmodels
 import android.app.Activity
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -23,8 +24,11 @@ import kotlinx.coroutines.*
 import java.util.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.fragments.manageconfigurations.ManageConfigurationsFragment
 
 class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegate,
     NetworkClientModel.NetworkConnectDelegate{
@@ -33,8 +37,6 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
     {
         fun didReceiveConfiguration(complete: Boolean)
     }
-
-    var manageConfigurationNetworkDelegate : ManageConfigurationNetworkDelegate? = null
 
     private var _activity : Activity? = null
 
@@ -164,13 +166,21 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
        // }
     }
 
-    override fun didConnect(complete: Boolean) {
+    override fun didReceiveConfiguration(error: Boolean)
+    {
         runBlocking(Dispatchers.Main) {
             networkClientModel.resetState()
             navController?.popBackStack()
 
-            manageConfigurationNetworkDelegate?.didReceiveConfiguration(complete)
-            // tear down conenctions
+            currentFragment?.let {
+                if (it is ManageConfigurationsFragment)
+                {
+                    val bundle = Bundle()
+                    bundle.putBoolean( Keys.kError.toString(), error )
+                    it.setFragmentResult( it.javaClass.simpleName, bundle )
+                }
+            }
+
             shutdown()
         }
     }

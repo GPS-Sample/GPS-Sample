@@ -18,8 +18,7 @@ class InfoDialog
     {
     }
 
-    constructor( context: Context?, title: String?, message: String?,
-                 button: String, tag: Any?, delegate: InfoDialogDelegate )
+    constructor( context: Context?, title: String?, message: String?, button: String, tag: Any?, delegate: InfoDialogDelegate? )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -40,7 +39,9 @@ class InfoDialog
         okButton.text = button
 
         okButton.setOnClickListener {
-            delegate.didSelectOkButton(tag)
+            delegate?.let {
+                it.didSelectOkButton(tag)
+            }
             alertDialog.dismiss()
         }
 
