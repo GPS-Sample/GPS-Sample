@@ -6,6 +6,7 @@ import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
+import java.io.DataInputStream
 import java.io.InputStreamReader
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -20,8 +21,8 @@ class TCPServer
 
         fun didDisconnect(socket : Socket)
         fun clientConnected(socket: Socket)
-
     }
+
     private var clientSockets : ArrayList<Socket> = ArrayList()
     val serverListening : Boolean
         get() = _serverListening
@@ -45,26 +46,31 @@ class TCPServer
 
     fun  createSocket() : Boolean
     {
-        try {
+        try
+        {
             serverSocket = ServerSocket(port)
             serverSocket?.let {
                 socketStarted = true
             } ?: run{
                 socketStarted = false
             }
-        }catch (ex : Exception)
+        }
+        catch (ex : Exception)
         {
             socketStarted = false
         }
+
         return socketStarted
     }
+
     suspend fun beginListening( inetAddress: InetAddress, delegate: TCPServerDelegate )
     {
         if(socketStarted && serverSocket != null)
         {
             withContext(Dispatchers.IO)
             {
-                try {
+                try
+                {
                     Log.d( "xxx", "waiting for TCP connections on $inetAddress:$port...")
                     _serverListening = true
                     enabled = true
@@ -87,9 +93,7 @@ class TCPServer
 
                 Log.d( "xxx", "stopped waiting for TCP connections")
             }
-
         }
-
     }
 
     fun shutdown()
@@ -102,6 +106,7 @@ class TCPServer
             {
                 socket.close()
             }
+
             _sockets.clear()
             serverSocket!!.close()
             serverSocket = null
@@ -113,40 +118,22 @@ class TCPServer
     {
         try
         {
-           // clientSockets.add(socket)
             delegate.clientConnected(socket)
-            val headerArray : ByteArray = ByteArray(TCPHeader.size)
+
+            val headerArray = ByteArray(TCPHeader.size)
+            val dataInputStream = DataInputStream( socket.inputStream )
 
             while(socket.isConnected)
             {
-                val success = socket.inputStream.read(headerArray,0, TCPHeader.size )
-                if(success == -1)
-                {
-                    break
-                }
-                else if(success < TCPHeader.size)
-                {
-                    if (!NetworkUtils.readToEnd(TCPHeader.size, success, socket, headerArray))
-                    {
-                        break
-                    }
-                }
+                dataInputStream.readFully( headerArray, 0, TCPHeader.size )
 
                 val header = TCPHeader.fromByteArray(headerArray)
-
-                if (header != null)
-                {
-                    // if we get here, the key is valid
+                header?.let { header ->
                     val payloadArray = ByteArray(header.payloadSize)
-                    val read = socket.inputStream.read(payloadArray, 0, header.payloadSize)
 
-                    // TCP read may not read the requested bytes. handle if not
-                    if(read < header.payloadSize)
+                    if(header.payloadSize > 0)
                     {
-                        if (!NetworkUtils.readToEnd(header.payloadSize, read, socket, payloadArray))
-                        {
-                            break
-                        }
+                        dataInputStream.readFully( payloadArray, 0, header.payloadSize )
                     }
 
                     val payload = String(payloadArray)

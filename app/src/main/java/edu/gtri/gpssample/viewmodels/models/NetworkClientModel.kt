@@ -28,20 +28,24 @@ import java.net.InetAddress
 
 private const val kDialogTimeout: Long = 400
 
-class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
+class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
+{
+    interface ConfigurationDelegate
+    {
+        fun configurationReceived(config: Config)
+    }
+
+    interface NetworkConnectDelegate
+    {
+        fun didReceiveConfiguration(error: Boolean)
+        fun didSendData(complete: Boolean)
+    }
+
     override val type = NetworkMode.NetworkClient
     private val client: TCPClient = TCPClient()
     private var heartbeatBroadcasting: Boolean = false
     private var connectWaiting : Boolean = true
     private val kNetworkTimeout = 20
-    interface ConfigurationDelegate {
-        fun configurationReceived(config: Config)
-    }
-
-    interface NetworkConnectDelegate {
-        fun didReceiveConfiguration(error: Boolean)
-        fun didSendData(complete: Boolean)
-    }
 
     var clientStarted = false
     var encryptionPassword = ""
@@ -76,7 +80,6 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     val clientMode: LiveData<ClientMode>
         get() = _clientMode
 
-
     private var networkInfo: NetworkInfo? = null
 
     private var _clientConnectMessage: MutableLiveData<String> = MutableLiveData("")
@@ -84,10 +87,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     var clientConnectMessage: LiveData<String> = _clientConnectMessage
     var clientDataMessage: LiveData<String> = _clientDataMessage
 
-
     var _configurationReceived: MutableLiveData<NetworkStatus> = MutableLiveData(NetworkStatus.None)
     var configurationReceived: LiveData<NetworkStatus> = _configurationReceived
-
 
     override var Activity: Activity?
         get() = _activity
@@ -95,16 +96,18 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
             _activity = value
         }
 
-    override fun initializeNetwork() {
-
+    override fun initializeNetwork()
+    {
     }
 
-    fun setClientMode(mode: ClientMode) {
+    fun setClientMode(mode: ClientMode)
+    {
         _clientMode.value = mode
         _clientMode.postValue(mode)
     }
 
-    fun sendRegistration() {
+    fun sendRegistration()
+    {
         _activity?.let { activity ->
             val app = (activity.application as MainApplication?)
             app?.user?.let { user ->
@@ -112,15 +115,16 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                 val payload = user.name
                 val message = TCPMessage(NetworkCommand.NetworkDeviceRegistrationRequest, payload)
                 networkInfo?.let { networkInfo ->
-                    val response =
-                        client.sendMessage(networkInfo.serverIP, message, this@NetworkClientModel)
+                    val response = client.sendMessage(networkInfo.serverIP, message, this@NetworkClientModel)
                     // validate response
                     response?.let { response ->
-                        if (response.command == NetworkCommand.NetworkDeviceRegistrationResponse) {
+                        if (response.command == NetworkCommand.NetworkDeviceRegistrationResponse)
+                        {
                             sleep(kDialogTimeout)
                             _clientRegistered.postValue(NetworkStatus.ClientRegistered)
 
-                            when (clientMode.value) {
+                            when (clientMode.value)
+                            {
                                 ClientMode.Configuration -> {
                                     sendConfigurationCommand()
                                 }
@@ -132,18 +136,15 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                                 }
                                 else -> {}
                             }
-                            // TODO:  change this to be more generic
-
                         }
                     }
                 }
             }
-
         }
-
     }
 
-    private fun sendConfigurationCommand() {
+    private fun sendConfigurationCommand()
+    {
         val message = TCPMessage(NetworkCommand.NetworkConfigRequest, "")
         networkInfo?.let { networkInfo ->
             val response = client.sendMessage(networkInfo.serverIP, message, this)
@@ -168,7 +169,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         }
     }
 
-    fun sendEnumerationData() {
+    fun sendEnumerationData()
+    {
         currentEnumArea?.let { enumArea ->
             networkInfo?.let { networkInfo ->
                 val payload = enumArea.pack(encryptionPassword)
@@ -184,7 +186,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         }
     }
 
-    fun sendCollectionData() {
+    fun sendCollectionData()
+    {
         currentEnumArea?.let { enumArea ->
             networkInfo?.let { networkInfo ->
                 val payload = enumArea.pack(encryptionPassword)
@@ -201,8 +204,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun startNetworking(networkInfo: NetworkInfo?): Boolean {
-        // connect to wifi
+    override fun startNetworking(networkInfo: NetworkInfo?): Boolean
+    {
         clientStarted = true
         _networkConnected.postValue(NetworkStatus.None)
         _configurationReceived.postValue(NetworkStatus.None)
@@ -222,7 +225,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
         return false
     }
 
-    fun intToInetAddress(address: Int): InetAddress? {
+    fun intToInetAddress(address: Int): InetAddress?
+    {
         val addressBytes = byteArrayOf(
             (0xff and address).toByte(),
             (0xff and (address shr 8)).toByte(),
@@ -240,15 +244,18 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun connectToWifi(networkInfo: NetworkInfo) {
+    fun connectToWifi(networkInfo: NetworkInfo)
+    {
         connectWaiting = true
         clientStarted = true
         this.networkInfo = networkInfo
         // if  (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
         if (client.socket == null) {
             //if(false)
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            {
+                try
+                {
                     val connectivityManager =
                         Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -257,14 +264,14 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     wifiConfig.SSID = "\"" + networkInfo.ssid + "\""
                     wifiConfig.preSharedKey = "\"" + networkInfo.password + "\""
 
-                    var wifiManager =
-                        Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                    val wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
                     wifiManager!!.setWifiEnabled(true)
 
-                    if (wifiManager!!.isWifiEnabled) {
-
+                    if (wifiManager!!.isWifiEnabled)
+                    {
                         var netId = wifiManager!!.addNetwork(wifiConfig)
-                        if (netId == -1) {
+                        if (netId == -1)
+                        {
                             //Try it again with no quotes in case of hex password
                             wifiConfig.wepKeys[0] = networkInfo.password;
                             netId = wifiManager.addNetwork(wifiConfig);
@@ -273,16 +280,16 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                         runBlocking(Dispatchers.Main) {
 
                             val disconnect = wifiManager.disconnect()
-                            if (disconnect) {
+                            if (disconnect)
+                            {
                                 wifiManager.enableNetwork(netId, true)
 
                                 val reconnect = wifiManager.reconnect()
-                                if (reconnect) {
-
+                                if (reconnect)
+                                {
                                     Handler().postDelayed({
 
-                                        val connectivityManager =
-                                            Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                                        val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                                         connectivityManager.registerDefaultNetworkCallback(networkCallback)
 
                                         CoroutineScope(Dispatchers.IO +  SupervisorJob()).launch {
@@ -294,12 +301,15 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                             }
                         }
                     }
-                } catch (e: Exception) {
+                }
+                catch (e: Exception)
+                {
                     Log.d("error", e.stackTraceToString())
                 }
-            } else {
-                var wifiManager =
-                    Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+            }
+            else
+            {
+                val wifiManager = Activity!!.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
                 val wifiInfo: WifiInfo = wifiManager!!.getConnectionInfo()
 
                 val builder = WifiNetworkSpecifier.Builder()
@@ -316,38 +326,40 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
 
                 val networkRequest = networkRequestBuilder.build()
 
-                val connectivityManager =
-                    Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 connectivityManager.requestNetwork(networkRequest, networkCallback)
                 CoroutineScope(Dispatchers.IO +  SupervisorJob()).launch {
                     networkErrorCheck()
                 }
-
             }
-        } else {
+        }
+        else
+        {
             _networkConnected.postValue(NetworkStatus.NetworkConnected)
             sendRegistration()
         }
-
     }
 
-    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) {
-
+    private val networkCallback = object : ConnectivityManager.NetworkCallback()
+    {
+        override fun onAvailable(network: Network)
+        {
             super.onAvailable(network)
-            val connectivityManager =
-                Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+            val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             connectivityManager.bindProcessToNetwork(network)
             sleep(1000)
+
             val job = GlobalScope.launch(Dispatchers.Default) {
 
                 networkInfo?.let { networkInfo ->
-                    if (client.connect(networkInfo.serverIP, this@NetworkClientModel)) {
-
+                    if (client.connect(networkInfo.serverIP, this@NetworkClientModel))
+                    {
                         _networkConnected.postValue(NetworkStatus.NetworkConnected)
                         sendRegistration()
                         connectWaiting = false
-                    }else
+                    }
+                    else
                     {
                         runError()
                     }
@@ -355,100 +367,102 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate {
                     runError()
                 }
             }
-
         }
 
-        override fun onLost(network: Network) {
+        override fun onLost(network: Network)
+        {
             super.onLost(network)
             runError()
-
         }
 
-        override fun onUnavailable() {
+        override fun onUnavailable()
+        {
             super.onUnavailable()
             runError()
-
         }
 
-        override fun onCapabilitiesChanged(
-            network: Network,
-            networkCapabilities: NetworkCapabilities
-        ) {
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities)
+        {
             super.onCapabilitiesChanged(network, networkCapabilities)
-
         }
 
         @RequiresApi(Build.VERSION_CODES.R)
-        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties)
+        {
             super.onLinkPropertiesChanged(network, linkProperties)
-
         }
     }
 
-
-    override fun sentData(data: String) {
+    override fun sentData(data: String)
+    {
         _clientDataMessage.postValue(data)
     }
 
-    override fun connectionString(connection: String) {
+    override fun connectionString(connection: String)
+    {
         _clientConnectMessage.postValue(connection)
     }
 
-    fun resetState() {
+    fun resetState()
+    {
         _networkConnected.postValue(NetworkStatus.None)
         _clientRegistered.postValue(NetworkStatus.None)
         _commandSent.postValue(NetworkStatus.None)
         _dataReceived.postValue(NetworkStatus.None)
     }
 
-    fun shutdown() {
-        try {
-            if (clientStarted) {
+    fun shutdown()
+    {
+        try
+        {
+            if (clientStarted)
+            {
                 resetState()
                 client.shutdown()
                 heartbeatBroadcasting = false
 
-                val connectivityManager =
-                    Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val connectivityManager = Activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 connectivityManager.bindProcessToNetwork(null)
-                try {
-                    connectivityManager.unregisterNetworkCallback(networkCallback)
-                } catch (e: Exception) {
 
+                try
+                {
+                    connectivityManager.unregisterNetworkCallback(networkCallback)
                 }
+                catch (e: Exception)
+                {
+                }
+
                 clientStarted = false
             }
         } catch (ex: Exception) {
             Log.d("shutdown Exception ", ex.stackTraceToString())
         }
-
     }
 
     private fun networkErrorCheck()
     {
-        var count = 0
-        var timeout = false
-        while(connectWaiting)
-        {
-            sleep(1000)
-            count += 1
-
-            if(count > kNetworkTimeout)
-            {
-                timeout = true
-                break
-            }
-        }
-
-        if(timeout)
-        {
-            GlobalScope.launch(Dispatchers.Default) {
-                runError()
-            }
-        }
-
-
+//        var count = 0
+//        var timeout = false
+//        while(connectWaiting)
+//        {
+//            sleep(1000)
+//            count += 1
+//
+//            if(count > kNetworkTimeout)
+//            {
+//                timeout = true
+//                break
+//            }
+//        }
+//
+//        if(timeout)
+//        {
+//            GlobalScope.launch(Dispatchers.Default) {
+//                runError()
+//            }
+//        }
     }
+
     fun runError()
     {
         _networkConnected.postValue(NetworkStatus.NetworkError)
