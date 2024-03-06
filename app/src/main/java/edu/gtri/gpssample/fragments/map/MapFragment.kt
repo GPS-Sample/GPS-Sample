@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.map
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -55,6 +56,7 @@ class MapFragment : Fragment(),
     private var polygonAnnotation: PolygonAnnotation? = null
     private var polylineAnnotation: PolylineAnnotation? = null
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
+    private var droppedPointAnnotation: PointAnnotation? = null
 
     private lateinit var mapboxManager: MapboxManager
     private lateinit var defaultColorList : ColorStateList
@@ -144,6 +146,25 @@ class MapFragment : Fragment(),
             MapHelpDialog( activity!! )
         }
 
+        binding.clearMapButton.setOnClickListener {
+
+            defineMapRegion = false
+            binding.overlayView.visibility = View.GONE
+            binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
+
+            droppedPointAnnotation?.let {
+                pointAnnotationManager.delete( it )
+            }
+
+            polylineAnnotation?.let {
+                polylineAnnotationManager.delete(it)
+            }
+
+            polygonAnnotation?.let {
+                polygonAnnotationManager.delete(it)
+            }
+        }
+
         binding.centerOnLocationButton.setOnClickListener {
             defineMapRegion = false
             binding.overlayView.visibility = View.GONE
@@ -182,7 +203,14 @@ class MapFragment : Fragment(),
             p1?.let { p1 ->
                 if (p1.action == MotionEvent.ACTION_DOWN)
                 {
+                    droppedPointAnnotation?.let {
+                        pointAnnotationManager.delete( it )
+                    }
+
                     point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                    point?.let {
+                        droppedPointAnnotation =  mapboxManager.addMarker( it, R.drawable.location_blue )
+                    }
                 }
             }
 
@@ -190,7 +218,8 @@ class MapFragment : Fragment(),
             binding.overlayView.visibility = View.GONE
             binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
 
-            InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@MapFragment )
+            val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@MapFragment )
+            inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
 
         return true
@@ -205,7 +234,7 @@ class MapFragment : Fragment(),
     {
         defineMapRegion = false
 
-        name.toIntOrNull()?.let {
+        name.toDoubleOrNull()?.let {
 
             val radius = it * 1000
 
@@ -222,14 +251,6 @@ class MapFragment : Fragment(),
 
                 mapTileRegion = MapTileRegion( northEast, southWest )
 
-                polylineAnnotation?.let {
-                    polylineAnnotationManager.delete(it)
-                }
-
-                polygonAnnotation?.let {
-                    polygonAnnotationManager.delete(it)
-                }
-
                 mapTileRegion?.let {
                     addPolygon( it )
                 }
@@ -239,6 +260,14 @@ class MapFragment : Fragment(),
 
     fun addPolygon( mapTileRegion: MapTileRegion )
     {
+        polylineAnnotation?.let {
+            polylineAnnotationManager.delete(it)
+        }
+
+        polygonAnnotation?.let {
+            polygonAnnotationManager.delete(it)
+        }
+
         val points = ArrayList<Point>()
         val pointList = ArrayList<ArrayList<Point>>()
 

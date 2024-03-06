@@ -338,6 +338,7 @@
     <string name="error">ERROR!</string>
     <string name="import_failed">The import failed.</string>
     <string name="import_succeeded">The import was successful.</string>
+    <string name="clear_map_tile_region">Clear map tile cache region</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
