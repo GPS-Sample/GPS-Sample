@@ -42,7 +42,7 @@ class TCPClient
         return false
     }
 
-    fun sendMessage(inetAddress: String, message : TCPMessage, delegate: TCPClientDelegate) : TCPMessage?
+    fun sendMessage(inetAddress: String, message : TCPMessage, delegate: TCPClientDelegate, waitForResponse: Boolean = true) : TCPMessage?
     {
         try
         {
@@ -51,26 +51,28 @@ class TCPClient
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()
 
-                val headerArray = ByteArray(TCPHeader.size )
+                if (waitForResponse)
+                {
+                    val headerArray = ByteArray(TCPHeader.size )
 
-                val dataInputStream = DataInputStream( socket.inputStream )
-                dataInputStream.readFully( headerArray, 0, TCPHeader.size )
+                    val dataInputStream = DataInputStream( socket.inputStream )
+                    dataInputStream.readFully( headerArray, 0, TCPHeader.size )
 
-                val header = TCPHeader.fromByteArray(headerArray)
-                header?.let { header ->
-                    val payloadArray = ByteArray(header.payloadSize)
-
-                    if(header.payloadSize > 0)
+                    val header = TCPHeader.fromByteArray(headerArray)
+                    if (header != null)
                     {
-                        dataInputStream.readFully( payloadArray, 0, header.payloadSize )
+                        val payloadArray = ByteArray(header.payloadSize)
+
+                        if(header.payloadSize > 0)
+                        {
+                            dataInputStream.readFully( payloadArray, 0, header.payloadSize )
+                        }
+
+                        val payload = String(payloadArray)
+
+                        return TCPMessage(header, payload)
                     }
-
-                    val payload = String(payloadArray)
-
-                    return TCPMessage(header, payload)
                 }
-
-                return null
             }
         }
         catch (ex: Exception)

@@ -176,7 +176,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                 val payload = enumArea.pack(encryptionPassword)
 
                 val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload)
-                val response = client.sendMessage(networkInfo.serverIP, message, this)
+                client.sendMessage(networkInfo.serverIP, message, this, false)
 
                 _commandSent.postValue(NetworkStatus.CommandSent)
                 // quick sleep to make the UI look better
@@ -193,7 +193,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                 val payload = enumArea.pack(encryptionPassword)
 
                 val message = TCPMessage(NetworkCommand.NetworkSampleAreaExport, payload)
-                val response = client.sendMessage(networkInfo.serverIP, message, this)
+                client.sendMessage(networkInfo.serverIP, message, this, false)
 
                 _commandSent.postValue(NetworkStatus.CommandSent)
                 // quick sleep to make the UI look better
