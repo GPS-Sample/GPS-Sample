@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
@@ -82,18 +83,33 @@
                     mapbox:mapbox_cameraZoom="9.0">
                 </com.mapbox.maps.MapView>
 
-                <TextView
-                    android:id="@+id/legend_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:layout_gravity="top|start"
-                    android:text="@string/legend"
+
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_marginTop="30dp"
                     android:layout_marginStart="10dp"
-                    android:textColor="@color/blue"
-                    android:textSize="15sp"
-                    android:textStyle="normal" />
+                    android:layout_gravity="top|start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp">
+
+                    <TextView
+                        android:id="@+id/legend_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/legend"
+                        android:textColor="@color/primary_textcolor"
+                        android:textSize="15sp"
+                        android:textStyle="normal" />
+
+                    <ImageView
+                        android:id="@+id/legend_image_view"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:srcCompat="@drawable/help2"/>
+                </LinearLayout>
             </FrameLayout>
 
             <Button

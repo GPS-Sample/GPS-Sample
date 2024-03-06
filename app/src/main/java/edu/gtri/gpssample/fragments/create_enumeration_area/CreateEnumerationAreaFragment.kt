@@ -312,6 +312,10 @@ class CreateEnumerationAreaFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
+        binding.legendImageView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         binding.helpButton.setOnClickListener {
             CreateEnumAreaHelpDialog( activity!! )
         }

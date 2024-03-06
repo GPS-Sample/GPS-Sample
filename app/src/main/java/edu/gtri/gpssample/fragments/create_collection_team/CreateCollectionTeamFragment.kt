@@ -223,7 +223,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
                         if (sampledItem.samplingState == SamplingState.Sampled) {
                             val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            mapboxManager.addMarker( point, R.drawable.home_black )
+                            mapboxManager.addMarker( point, R.drawable.home_light_blue )
                         }
                     }
                     else
@@ -233,7 +233,7 @@ class CreateCollectionTeamFragment : Fragment(),
                             if (sampledItem.samplingState == SamplingState.Sampled)
                             {
                                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                mapboxManager.addMarker( point, R.drawable.multi_home_black )
+                                mapboxManager.addMarker( point, R.drawable.multi_home_light_blue )
                                 break
                             }
                         }

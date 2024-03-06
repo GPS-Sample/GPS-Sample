@@ -289,6 +289,10 @@ class PerformCollectionFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
+        binding.legendImageView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
         if (centerOnCurrentLocation == null)
         {

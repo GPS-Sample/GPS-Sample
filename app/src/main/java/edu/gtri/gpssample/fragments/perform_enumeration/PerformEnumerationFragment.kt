@@ -205,6 +205,10 @@ class PerformEnumerationFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
+        binding.legendImageView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         binding.mapTileCacheButton.setOnClickListener {
             if (config.mapTileRegions.isNotEmpty())
             {

@@ -112,6 +112,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             MapLegendDialog( activity!! )
         }
 
+        binding.legendImageView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
