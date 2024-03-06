@@ -15,10 +15,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.TimeFormat
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.EnumerationItem
-import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.fragments.createfield.CreateFieldCheckboxAdapter
@@ -155,6 +152,16 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                                 enumerationItem.fieldDataList.add(blockFieldData)
 
                                 blockFieldDataList.add(blockFieldData)
+
+                                if (blockField.type == FieldType.Checkbox || blockField.type == FieldType.Dropdown)
+                                {
+                                    // create a fiedDataOption for each fieldOption
+                                    for (fieldOption in blockField.fieldOptions)
+                                    {
+                                        val fieldDataOption = FieldDataOption(fieldOption.name, false)
+                                        blockFieldData.fieldDataOptions.add(fieldDataOption)
+                                    }
+                                }
                             }
                         }
 
