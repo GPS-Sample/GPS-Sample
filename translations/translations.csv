@@ -106,7 +106,6 @@ define_enumeration_fields,Define Enumeration Fields,Definir campos de enumeraci�
 define_enumeration_area,Define Enumeration Area,Definir área de enumeración,Définir la zone de dénombrement,Definir área de enumeração,Определить область перечисления
 define_sampling_method,Define Sampling Method,Definir método de muestreo,Définir la méthode d'échantillonnage,Definir método de amostragem,Определить метод выборки
 studies,Studies,Estudios,Études,Estudos,Исследования
-enumeration_area,Enumeration Areas,Áreas de enumeración,Zones de dénombrement,Áreas de enumeração,Области перечисления
 barcode_result,Barcode detected,Código de barras detectado,Code-barres détecté,Código de barras detectado,Обнаружен штрих-код
 error_scanner_cancelled,Code scanner is cancelled.,El escáner del código fue anulado,Le scanner de code est annulé.,Scanner de código é cancelado.,Сканер кодов отменен.
 error_camera_permission_not_granted,Camera permission is not granted.,Permiso de cámara no otorgado,L'autorisation pour la caméra n'est pas accordée.,A permissão da câmara não é concedida.,Разрешение камеры не выдано.
@@ -166,7 +165,6 @@ configuration_documents_message,The configuration has been saved to the Document
 delete_enum_area_message,Are you sure you want to permanently delete Enumeration Area,¿Está seguro de que desea borrar permanentemente el Área de Enumeración?,Etes-vous sûr de vouloir supprimer définitivement la zone de dénombrement ?,Tem a certeza de que deseja eliminar permanentemente a Área de Enumeração,"Вы уверены, что хотите навсегда удалить область пересчета"
 no_study_ea,You do not have a study associated with this EA.,No tiene ningún estudio asociado a esta Área de Enumeración.,Vous n'avez pas d'étude associée à cette zone de dénombrement.,Não tem um estudo associado a esta Área de Enumeração.,"У вас нет исследования, связанного с этим экспертом."
 filename_export_message,Enter a file name for the export,Introduzca un nombre de archivo para la exportación,Entrez un nom de fichier pour l'exportation,Insira um nome de ficheiro para a exportação,Введите имя файла для экспорта
-import_failed,Oops! The import failed.  Please try again.,¡Ups! La importación ha fallado.  Vuelva a intentarlo.,Oups ! L'importation a échoué.  Veuillez réessayer.,"Oops! A importação falhou.  Por favor, tente novamente.","Упс! Импорт не удался.  Пожалуйста, попробуйте еще раз."
 select_task,Select a task,Seleccione una tarea,Sélectionnez une tâche,Selecione uma tarefa,Выберите задачу
 yes,Yes,Sí,Oui,Sim,Да
 no,No,No,Non,Não,Нет
@@ -284,10 +282,6 @@ subaddress,Subaddress,Subdirección,Sous-adresse,Sub-endereço,Субадрес
 sampled,Sampled,Muestreo,Échantillonné,Amostragem,Выборочный
 completed_enumeration,Completed Enumeration,Enumeración completada,Dénombrement terminé,Enumeração concluída,Завершенное перечисление
 incomplete_enumeration,Incomplete Enumeration,Enumeración incompleta,Dénombrement incomplet,Enumeração Incompleta,Неполный сбор
-incomplete_collection,Incomplete Collection,Colección incompleta,Collecte incomplète,Recolha incompleta,Неполная коллекция
-completed_collection,Completed Collection,Recogida completa,Collecte complète,Recolha Completa,Завершенный сбор
-is_multi_family,Is this a multi family location?,¿Se trata de una ubicación multifamiliar?,S'agit-il d'un site multifamilial ?,Este é um local multifamiliar?,Является ли это место проживания многосемейным?
-multi_families,Multi Families,Multifamiliar,Familles multiples,Multifamiliar,Многосемейные
 dismiss,Dismiss,Descartar,Supprimer,Excluir,Удалить
 delete,Delete,Borrar,Supprimer,Eliminar,Удалить
 launching_odk_collect_application,Launching ODK Collect Application...,Lanzamiento de la aplicación ODK Collect...,Lancement de l'application ODK Collect...,Iniciar a aplicação ODK Collect...,Запуск приложения ODK Collect...
@@ -319,7 +313,6 @@ center_on_location,Center on location,Centrar en ubicación,Centrez sur l'emplac
 less_than_equal,Less Than Or Equal,Menor o igual que,Inférieur ou égal,Menor que ou igual,Меньше или равно
 gps_accuracy_error,GPS accuracy is less than the required accuracy,La precisión del GPS es inferior a la requerida,La précision du GPS est inférieure à la précision requise,A precisão do GPS é inferior à precisão exigida,Точность GPS меньше требуемой точности
 gps_location_error,You are currently too far away from this location,Se encuentra demasiado lejos de esta ubicación,Vous êtes actuellement trop loin de cet emplacement,Está atualmente demasiado longe desta localização,Вы находитесь слишком далеко от этого места
-accuracy,Accuracy : ,Precisión : ,Précision : ,Precisão : ,Точность : 
 good,GOOD,BUENA,BON,BOA,ХОРОШО
 poor,POOR,POBRE,MAUVAIS,RUIM,ПЛОХО
 unknown,UNKNOWN,DESCONOCIDO,INCONNU,DESCONHECIDA,НЕИЗВЕСТНО
@@ -328,3 +321,46 @@ select_date_type,Please select the Date type,Seleccione el tipo de fecha,Veuille
 contains,Contains,Contiene,Contient,Contém,Содержит
 collection_saved_doc,Collection has been saved to the Documents directory,La colección se ha guardado en el directorio Documentos,La collection a été enregistrée dans le répertoire Documents,A coleção foi guardada no diretório Documentos,Коллекция была сохранена в каталоге Документы
 invalid_operator,The selected operator is not valid for the selected rule,El operador seleccionado no es válido para la regla seleccionada,L'opérateur sélectionné n'est pas valide pour la règle sélectionnée,O operador selecionado não é válido para a regra selecionada,Выбранный оператор не действителен для выбранного правила
+about_gpssample,About GPSSample,Acerca de GPSSample,À propos de GPSSample,Sobre o GPSSample,О компании GPSSample
+privacy_statement,Privacy Statement,Declaración de privacidad,Déclaration de confidentialité,Declaração de privacidade,Положение о конфиденциальности
+terms_and_conditions,Terms and Conditions,Condiciones de uso,Conditions d'utilisation,Termos e Condições,Условия и положения
+show_map,Show Map,Mostrar mapa,Afficher la carte,Mostrar mapa,Показать карту
+number_of_residents,Number of Residents,Número de residentes,Nombre de résidents,Número de residentes,Количество жителей
+end_user_license_agreement,End User License Agreement,Acuerdo de licencia de usuario final,Accord de licence pour l'utilisateur final,Contrato de Licença de Utilizador Final,Лицензионное соглашение с конечным пользователем
+code_of_conduct,Code of Conduct,Código de conducta,Code de conduite,Código de Conduta,Кодекс поведения
+clear_map,Are you sure you want to clear the map?,¿Estás seguro de que quieres borrar el mapa?,Êtes-vous sûr de vouloir effacer la carte ?,Tens a certeza de que queres limpar o mapa?,"Вы уверены, что хотите очистить карту?"
+delete_point,Are you sure you want to remove the last point?,¿Estás seguro de que quieres eliminar el último punto?,Êtes-vous sûr de vouloir supprimer le dernier point ?,Tem a certeza de que pretende remover o último ponto?,"Вы уверены, что хотите удалить последнюю точку?"
+enumeration_area,Enumeration Area,Área de Enumeración,Zone de dénombrement,Área de enumeração,Зона переписи
+please_select_a_role,Please select a role,Seleccione un rol,Veuillez sélectionner un rôle,"Por favor, seleccione uma função","Пожалуйста, выберите роль"
+please_enter_your_user_name,Please enter your user name,Introduzca su nombre de usuario,Veuillez saisir votre nom d'utilisateur,Introduza o seu nome de utilizador,"Пожалуйста, введите имя пользователя"
+user_name_not_found,User name not found,Nombre de usuario no encontrado,Nom d'utilisateur non trouvé,Nome de utilizador não encontrado,Имя пользователя не найдено
+multi_families,Multi Households,Multihogares,Multi-ménages,Agregados familiares múltiplos,Многоквартирные дома
+is_multi_family,Is this a multi household location?,¿Se trata de una ubicación multihogar?,S'agit-il d'un lieu où vivent plusieurs ménages ?,Este é um local com vários agregados familiares?,Является ли это место расположения несколькими домохозяйствами?
+sample,Sample,Muestra,Exemple,Amostra,Образец
+mark_status,Mark Status,Marca Estado,Statut de la marque,Estado da marca,Статус отметки
+not_visited,Not Visited,No visitado,Non visitée,Não visitado,Не посещен
+incomplete_collection,Incomplete Survey,Encuesta incompleta,Enquête incomplète,Inquérito Incompleto,Незавершенный опрос
+completed_collection,Completed Survey,Encuesta completada,Enquête terminée,Inquérito concluído,Завершенный опрос
+accuracy,Accuracy : ,Precisión : ,Précision : ,Exatidão : ,Точность 
+subaddress_is_required,Subaddress is Required,Se requiere subdirección,La sous-adresse est requise,O subendereço é necessário,Требуется субадрес
+auto_increment_subaddress,Auto Increment Subaddress,Incremento automático de la subdirección,Incrémentation automatique de la sous-adresse,Incremento automático do subendereço,Автоматическое увеличение субадреса
+allow_manual_identification_of_locations,Allow manual identification of locations,Permitir la identificación manual de ubicaciones,Permettre l'identification manuelle des lieux,Permitir a identificação manual de localizações,Разрешить ручную идентификацию местоположений
+proximity_warning_enabled,Proximity Warning Enabled,Aviso de proximidad activado,Avertissement de proximité activé,Aviso de proximidade ativado,Включено предупреждение о приближении
+encryption_password,Encryption Password,Contraseña de encriptación,Mot de passe de cryptage,Palavra-passe de encriptação,Пароль шифрования
+enter_encryption_password,Enter Encryption Password,Introduzca la contraseña de encriptación,Entrer le mot de passe de cryptage,Introduzir palavra-passe de encriptação,Введите пароль шифрования
+summary,Summary,Resumen,Résumé,Resumo,Резюме
+num_enumeration_areas,# Enumeration Areas:,# Áreas de Enumeración:,# Zones de dénombrement :,# Áreas de Enumeração:,# Области перечисления:
+num_hhs_enumerated,# HH\'s Enumerated:,# Hogares censados,# Ménages recensés :,# Agregados Familiares Enumerados:,# Перечисленные домохозяйства:
+num_hhs_eligible,# HH\'s Eligible:,# Hogares elegibles:,# Ménages éligibles :,# Agregados Elegíveis:,"# Домохозяйства, отвечающие критериям:"
+num_hhs_sampled,# HH\'s Sampled:,# Hogares muestreados,# Ménages échantillonnés :,# Agregados Familiares Amostrados:,"# Домохозяйства, попавшие в выборку:"
+num_hhs_surveyed,# HH\'s Surveyed:,# Hogares encuestados:,# Nombre de ménages enquêtés:,# Agregados inquiridos:,# Обследованные домохозяйства:
+num_hhs_remaining_to_survey,# HH\'s Remaining to Survey:,# Hogares pendientes de encuestar:,# Ménages restant à enquêter :,# Agregados que faltam inquirir:,"# Домохозяйства, оставшиеся для опроса:"
+decryption_failed,Decryption failed.  Please try again.,La desencriptación ha fallado.  Inténtelo de nuevo.,Le décodage a échoué.  Veuillez réessayer.,"A descodificação falhou.  Por favor, tente novamente.","Расшифровка не удалась.  Пожалуйста, попробуйте еще раз."
+rename_or_delete,Would you like to Rename or Delete the Enumeration Area ?,¿Desea cambiar el nombre o eliminar el área de enumeración?,Souhaitez-vous renommer ou supprimer la zone de dénombrement ?,Gostaria de mudar o nome ou eliminar a área de enumeração?,Вы хотите переименовать или удалить область переписи?
+rename,Rename,Renombrar,Renommer,Mudar o nome,Переименовать
+map_tile_boundary,Enter the length/width (Kilometers) of the desired map tile region,Introduzca la longitud/anchura (Kilómetros) de la región de mosaico de mapa deseada,Saisir la longueur/largeur (en kilomètres) de la région souhaitée.,Introduza o comprimento/largura (quilómetros) da região de mosaico pretendida,Введите длину/ширину (в километрах) желаемого региона картографической плитки
+success,SUCCESS!,¡ÉXITO!,SUCCES !,SUCESSO!,УСПЕХ!
+error,ERROR!,¡ERROR!,ERREUR !,ERRO!,ОШИБКА!
+import_failed,The import failed.,La importación ha fallado.,L'importation a échoué.,A importação falhou.,Импорт не удался.
+import_succeeded,The import was successful.,La importación se ha realizado correctamente.,L'importation a réussi.,A importação foi bem sucedida.,Импорт прошел успешно.
+clear_map_tile_region,Clear map tile cache region,Borrar región de caché de mosaico de mapa,Effacer la région du cache des tuiles de la carte,Limpar a região da cache de mosaicos do mapa,Очистить кэш региона плитки карты
