@@ -25,7 +25,19 @@
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp">
-            <!-- TODO: Update blank fragment layout -->
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="20dp"
+                android:gravity="center"
+                android:textColor="@color/primary_textcolor"
+                android:textSize="20sp"
+                android:text="@{viewModel.networkHotspotModel.title}"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"/>
+
             <TextView
                 android:id="@+id/qr_code_title"
                 android:layout_width="match_parent"
@@ -36,7 +48,8 @@
                 android:textSize="20sp"
                 android:text="@{viewModel.networkHotspotModel.message}"
                 android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@id/title"/>
+
             <LinearLayout
                 android:id="@+id/image_layout"
                 android:layout_width="match_parent"
@@ -58,6 +71,7 @@
                         />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/list"
                 android:layout_width="match_parent"

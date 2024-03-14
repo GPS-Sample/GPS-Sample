@@ -711,7 +711,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM__LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
 
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_ITEM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_CONFIG'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUM_AREA'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_STUDY'")

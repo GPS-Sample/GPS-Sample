@@ -21,15 +21,12 @@ class TCPClient
     {
         try
         {
-            // if you call connect and we're connected, we kill the socket and start over!
-            socket?.let{socket ->
-                socket.close()
-            }
-            socket = null
+            socket?.close()
+
             socket = Socket( inetAddress, kTCPPort )
-            if(socket != null)
-            {
-                socket!!.soTimeout = kSocketTimeout
+
+            socket?.let {
+                it.soTimeout = kSocketTimeout
                 return true
             }
         }
@@ -51,26 +48,28 @@ class TCPClient
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()
 
+                Log.d( "xxx", "Client: wrote ${message.toByteArray()!!.size}")
+
                 if (waitForResponse)
                 {
                     val headerArray = ByteArray(TCPHeader.size )
 
-                    val dataInputStream = DataInputStream( socket.inputStream )
-                    dataInputStream.readFully( headerArray, 0, TCPHeader.size )
-
-                    val header = TCPHeader.fromByteArray(headerArray)
-                    if (header != null)
+                    if (NetworkUtils.readFully( headerArray, TCPHeader.size, socket, "Client" ) == TCPHeader.size)
                     {
-                        val payloadArray = ByteArray(header.payloadSize)
-
-                        if(header.payloadSize > 0)
+                        val header = TCPHeader.fromByteArray(headerArray)
+                        if (header != null)
                         {
-                            dataInputStream.readFully( payloadArray, 0, header.payloadSize )
+                            val payloadArray = ByteArray(header.payloadSize)
+
+                            if(header.payloadSize > 0)
+                            {
+                                NetworkUtils.readFully( payloadArray, header.payloadSize, socket, "Client" )
+                            }
+
+                            val payload = String(payloadArray)
+
+                            return TCPMessage(header, payload)
                         }
-
-                        val payload = String(payloadArray)
-
-                        return TCPMessage(header, payload)
                     }
                 }
             }

@@ -10,6 +10,30 @@ import kotlin.collections.ArrayList
 object NetworkUtils {
     const val kHeartbeatInterval : Long = 1000
     const val kNumRetries = 200
+
+    fun readFully( byteArray: ByteArray, totalNeeded: Int, socket: Socket, tag: String ) : Int
+    {
+        var totalRead = 0
+
+        while( totalRead < totalNeeded)
+        {
+            Log.d( "xxx", "${tag}: waiting on read..." )
+            val numRead = socket.inputStream.read( byteArray, totalRead, totalNeeded - totalRead )
+            Log.d( "xxx", "${tag}: read ${numRead}")
+            if (numRead < 0)
+            {
+                break
+            }
+
+            totalRead += numRead
+            Log.d( "xxx", "${tag}: needed/read = ${totalNeeded} / ${totalRead}")
+        }
+
+        Log.d( "xxx", "${tag}: done reading.")
+
+        return totalRead
+    }
+
     fun readToEnd(fullSize : Int, actualRead : Int, socket : Socket, payloadArray : ByteArray ) : Boolean
     {
         var retryCounter : Int = 0

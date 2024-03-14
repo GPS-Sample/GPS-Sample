@@ -636,15 +636,12 @@ class PerformCollectionFragment : Fragment(),
 
                 when(user.role)
                 {
+                    Role.Admin.toString(),
                     Role.Supervisor.toString() ->
                     {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-                        startHotspot(view)
-                    }
-
-                    Role.Admin.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
+                        sharedNetworkViewModel.networkHotspotModel.setTitle("Export Configuration")
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                        sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                         startHotspot(view)
                     }
 

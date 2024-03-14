@@ -40,11 +40,22 @@ const val hotspotMessageTemplate = "SSID:"
 const val kNetworkTimeout = 5 //seconds
 class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSampleWifiManager.HotspotDelegate
 {
+    enum class MessageType()
+    {
+        ImportFailed,
+        ImportRequestFailed,
+        ExportRequestFailed,
+    }
+
+    companion object
+    {
+    }
+
     interface NetworkHotspotDelegate
     {
         fun didStartImport()
         fun didFinishImport()
-        fun importFailed( message: String )
+        fun importFailed( messageType: MessageType )
     }
 
     var encryptionPassword = ""
@@ -85,6 +96,15 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
     private var _message : MutableLiveData<String> = MutableLiveData("")
     var message : LiveData<String> = _message
 
+    private var _title : MutableLiveData<String> = MutableLiveData("")
+    var title : LiveData<String> = _title
+
+    fun setTitle( t: String)
+    {
+        _title = MutableLiveData(t)
+        title = _title
+    }
+
     private var _hotspotMode : MutableLiveData<HotspotMode> = MutableLiveData(HotspotMode.None)
     var hotspotMode : LiveData<HotspotMode> = _hotspotMode
 
@@ -120,7 +140,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
     init
     {
-
         _connections.value = clientConenctions
         _connections.postValue(clientConenctions)
     }
@@ -167,7 +186,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
         // if we are here the key was authenticated
         when (message.header.command)
         {
-
             NetworkCommand.NetworkDeviceRegistrationRequest ->
             {
                 message.payload?.let { payload ->
@@ -204,27 +222,41 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     // create a new entry in the list
                     // send an ack
                 }
-
             }
+
             NetworkCommand.NetworkConfigRequest ->
             {
-                config?.let {config->
-                    val packedConfig = config.pack()
+                if (hotspotMode.value == HotspotMode.Import)
+                {
+                    delegate?.importFailed( MessageType.ImportRequestFailed )
+                }
+                else
+                {
+                    config?.let {config->
+                        val packedConfig = config.pack()
 
-                    val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
-                    socket.outputStream.write(response.toByteArray())
-                    socket.outputStream.flush()
+                        val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
+                        socket.outputStream.write(response.toByteArray())
+                        socket.outputStream.flush()
+                    }
                 }
             }
+
             NetworkCommand.NetworkEnumAreaExport ->
             {
+                if (hotspotMode.value == HotspotMode.Export)
+                {
+                    delegate?.importFailed( MessageType.ExportRequestFailed )
+                    return
+                }
+
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload, encryptionPassword )
 
                     if (enumArea == null)
                     {
                         delegate?.let {
-                            it.importFailed( "Import Failed.")
+                            it.importFailed( MessageType.ImportFailed )
                         }
                     }
                     else
@@ -305,15 +337,21 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     }
                 }
             }
+
             NetworkCommand.NetworkSampleAreaExport ->
             {
+                if (hotspotMode.value == HotspotMode.Export)
+                {
+                    delegate?.importFailed( MessageType.ExportRequestFailed )
+                }
+
                 message.payload?.let { payload ->
                     val enumArea = EnumArea.unpack( payload, encryptionPassword )
 
                     if (enumArea == null)
                     {
                         delegate?.let {
-                            it.importFailed( "Import Failed.")
+                            it.importFailed( MessageType.ImportFailed )
                         }
                     }
                     else
@@ -375,7 +413,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
             viewModelScope?.let{ viewModelScope ->
 
-
                 viewModelScope.launch(Dispatchers.IO) {
                     startNetworkServices()
                 }
@@ -383,7 +420,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 // debug message
                 val message = "${hotspotMessageTemplate} ${hotspot.hotspotSSID.value}"
                 _message.postValue(message)
-
 
                 // if the server isn't started already
                 if(!tcpServer.serverListening)
@@ -396,27 +432,23 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         }
                     }
                 }
-
             }
-
-        }else
+        }
+        else
         {
             // TODO:  Handle the error
             _networkCreated.value = NetworkStatus.NetworkError
             _networkCreated.postValue(NetworkStatus.NetworkError)
         }
-
     }
 
     private fun startNetworkServices()
     {
-
         var timeout = 0
 
         // maybe better way thread safety.  observable?
         while(!tcpServer.serverListening && timeout != kNetworkTimeout)
         {
-            Log.d("xxx", "time out ${timeout}")
             Thread.sleep(1000)
             timeout += 1
         }
@@ -431,9 +463,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
         _serverCreated.postValue(NetworkStatus.ServerCreated)
 
         // if the qrCode isn't generated
-        if(generatedQRCode == null) {
-
-
+        if(generatedQRCode == null)
+        {
             val jsonObject = JSONObject()
             jsonObject.put(Keys.kSSID.toString(), hotspot.hotspotSSID.value)
             jsonObject.put(Keys.kPass.toString(), hotspot.hotspotSSIDPassword.value)
@@ -461,7 +492,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
             _networkCreated.value == NetworkStatus.NetworkCreated)
         {
             _creationDelegate?.didComplete(true)
-        }else
+        }
+        else
         {
             _creationDelegate?.didComplete(false)
         }
@@ -475,7 +507,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 tcpServer.shutdown()
                 hotspot.stopHotSpot()
 
-
                 _serverCreated.value = NetworkStatus.None
                 _networkCreated.value = NetworkStatus.None
                 _qrCreated.value = NetworkStatus.None
@@ -486,35 +517,33 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 clientConenctions.clear()
                 _connections.postValue(clientConenctions)
             }
-        }catch (exception : Exception)
+        }
+        catch (exception : Exception)
         {
             Log.d("Shutdown Exception", exception.stackTraceToString())
         }
-
-
-    }
-
-    companion object
-    {
-
     }
 }
+
 @BindingAdapter("android:layout_height")
-fun setLayoutHeight(view: View, height: Float) {
+fun setLayoutHeight(view: View, height: Float)
+{
     val layoutParams = view.layoutParams
     layoutParams.height = height.toInt()
     view.layoutParams = layoutParams
 }
 
 @BindingAdapter("android:layout_width")
-fun setLayoutWidth(view: View, width: Float) {
+fun setLayoutWidth(view: View, width: Float)
+{
     val layoutParams = view.layoutParams
     layoutParams.width = width.toInt()
     view.layoutParams = layoutParams
 }
 
 @BindingAdapter("bind:imageBitmap")
-fun loadImage(iv: ImageView, bitmap: Bitmap?) {
+fun loadImage(iv: ImageView, bitmap: Bitmap?)
+{
     iv.setImageBitmap(bitmap)
 }
 

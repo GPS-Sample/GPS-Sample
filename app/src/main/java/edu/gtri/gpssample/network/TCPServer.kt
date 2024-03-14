@@ -49,6 +49,7 @@ class TCPServer
         try
         {
             serverSocket = ServerSocket(port)
+
             serverSocket?.let {
                 socketStarted = true
             } ?: run{
@@ -91,7 +92,7 @@ class TCPServer
                     _serverListening = false
                 }
 
-                Log.d( "xxx", "stopped waiting for TCP connections")
+                Log.d( "xxx", "Server: stopped waiting for TCP connections")
             }
         }
     }
@@ -121,19 +122,24 @@ class TCPServer
             delegate.clientConnected(socket)
 
             val headerArray = ByteArray(TCPHeader.size)
-            val dataInputStream = DataInputStream( socket.inputStream )
 
             while(socket.isConnected)
             {
-                dataInputStream.readFully( headerArray, 0, TCPHeader.size )
+                val numRead = NetworkUtils.readFully( headerArray, TCPHeader.size, socket, "Server" )
+
+                if (numRead != TCPHeader.size)
+                {
+                    break
+                }
 
                 val header = TCPHeader.fromByteArray(headerArray)
+
                 header?.let { header ->
                     val payloadArray = ByteArray(header.payloadSize)
 
                     if(header.payloadSize > 0)
                     {
-                        dataInputStream.readFully( payloadArray, 0, header.payloadSize )
+                        NetworkUtils.readFully( payloadArray, header.payloadSize, socket, "Server" )
                     }
 
                     val payload = String(payloadArray)
@@ -144,13 +150,12 @@ class TCPServer
 
             socket.close()
             delegate.didDisconnect(socket)
-
         }
         catch( ex: Exception )
         {
-//            Log.d( "xxx", ex.stackTraceToString())
+            Log.d( "xxx", ex.stackTraceToString())
         }
 
-        Log.d( "xxx", "stopped waiting for TCP messages")
+        Log.d( "xxx", "Server: stopped waiting for TCP messages")
     }
 }

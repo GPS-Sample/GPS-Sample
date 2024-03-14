@@ -725,15 +725,12 @@ class PerformEnumerationFragment : Fragment(),
 
             when(user.role)
             {
-                Role.Admin.toString() ->
-                {
-                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
-                    startHotspot(view)
-                }
-
+                Role.Admin.toString(),
                 Role.Supervisor.toString() ->
                 {
-                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
+                    sharedNetworkViewModel.networkHotspotModel.setTitle("Export Configuration")
+                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                     startHotspot(view)
                 }
 

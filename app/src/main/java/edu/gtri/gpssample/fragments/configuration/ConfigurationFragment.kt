@@ -282,31 +282,23 @@ class ConfigurationFragment : Fragment(),
             when(tag)
             {
                 kImportTag, kExportTag -> {
-                    // Launch connection screen
+                    if (tag == kImportTag)
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setTitle("Import Field Data")
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Import )
+                    }
+                    else
+                    {
+                        sharedNetworkViewModel.networkHotspotModel.setTitle("Export Configuration")
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
+                    }
+
                     view?.let{view ->
-                        val user = (activity!!.application as MainApplication).user
-                        user?.let { user ->
-
-                            when(user.role)
-                            {
-                                Role.Supervisor.toString() ->
-                                {
-                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Supervisor)
-                                }
-
-                                Role.Admin.toString() ->
-                                {
-                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Admin)
-                                }
-                            }
-                        }
-
                         sharedViewModel.currentConfiguration?.value?.let{ config ->
                             sharedNetworkViewModel.setCurrentConfig(config)
                             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                            sharedNetworkViewModel.createHotspot(view)
                         }
-
-                        sharedNetworkViewModel.createHotspot(view)
                     }
                 }
 
@@ -326,7 +318,7 @@ class ConfigurationFragment : Fragment(),
                 when(tag)
                 {
                     kDeleteTag -> {
-                        sharedViewModel.deleteConfig(config)
+//                        sharedViewModel.deleteConfig(config)
                         DAO.deleteAll()
                         findNavController().popBackStack()
                     }

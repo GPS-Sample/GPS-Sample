@@ -375,6 +375,8 @@ class SamplingViewModel : ViewModel()
             {
                 SamplingMethod.SimpleRandom ->
                 {
+                    _currentSampledItemsForSampling.clear()
+
                     currentConfig?.value?.let { config ->
                         for (enumArea in config.enumAreas) {
                             for (location in enumArea.locations) {

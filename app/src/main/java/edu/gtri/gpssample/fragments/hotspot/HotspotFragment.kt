@@ -109,10 +109,18 @@ class HotspotFragment : Fragment(), NetworkHotspotModel.NetworkHotspotDelegate
         }
     }
 
-    override fun importFailed( message: String )
+    override fun importFailed( messageType: NetworkHotspotModel.MessageType )
     {
         activity!!.runOnUiThread {
-            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+            when (messageType)
+            {
+                NetworkHotspotModel.MessageType.ImportFailed ->
+                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                NetworkHotspotModel.MessageType.ImportRequestFailed ->
+                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_request_failed), resources.getString(R.string.ok), null, null)
+                NetworkHotspotModel.MessageType.ExportRequestFailed ->
+                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.export_request_failed), resources.getString(R.string.ok), null, null)
+            }
         }
     }
 }
