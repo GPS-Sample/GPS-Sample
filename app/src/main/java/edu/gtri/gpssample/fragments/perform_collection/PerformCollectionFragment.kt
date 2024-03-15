@@ -639,7 +639,7 @@ class PerformCollectionFragment : Fragment(),
                     Role.Admin.toString(),
                     Role.Supervisor.toString() ->
                     {
-                        sharedNetworkViewModel.networkHotspotModel.setTitle("Export Configuration")
+                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
                         sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                         startHotspot(view)

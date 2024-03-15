@@ -284,12 +284,12 @@ class ConfigurationFragment : Fragment(),
                 kImportTag, kExportTag -> {
                     if (tag == kImportTag)
                     {
-                        sharedNetworkViewModel.networkHotspotModel.setTitle("Import Field Data")
+                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.import_field_data))
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Import )
                     }
                     else
                     {
-                        sharedNetworkViewModel.networkHotspotModel.setTitle("Export Configuration")
+                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
                     }
 

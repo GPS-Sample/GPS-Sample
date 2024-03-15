@@ -378,7 +378,7 @@ class ManageConfigurationsFragment : Fragment(),
             if (configurations.size == 1)
             {
                 view?.let { view ->
-                    sharedNetworkViewModel.networkHotspotModel.setTitle("Export Configuration")
+                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
                     sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
                     sharedNetworkViewModel.networkHotspotModel.encryptionPassword = encryptionPassword
 
