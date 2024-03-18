@@ -5,7 +5,7 @@ import edu.gtri.gpssample.network.models.TCPHeader
 import edu.gtri.gpssample.network.models.TCPMessage
 import java.io.DataInputStream
 import java.net.Socket
-const val kSocketTimeout = 5000
+const val kSocketTimeout = 10000
 const val kTCPPort = 51234
 class TCPClient
 {

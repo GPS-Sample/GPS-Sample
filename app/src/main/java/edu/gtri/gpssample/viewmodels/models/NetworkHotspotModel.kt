@@ -235,9 +235,11 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     config?.let {config->
                         val packedConfig = config.pack()
 
-                        val response = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
-                        socket.outputStream.write(response.toByteArray())
+                        val message = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
+                        val byteArray = message.toByteArray()
+                        socket.outputStream.write(byteArray)
                         socket.outputStream.flush()
+                        Log.d( "xxx", "Server: wrote ${byteArray!!.size}")
                     }
                 }
             }
