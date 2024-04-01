@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.graphics.Bitmap
+import androidx.appcompat.app.AppCompatDelegate
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
@@ -23,6 +24,8 @@ class MainApplication : Application()
     override fun onCreate()
     {
         super.onCreate()
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         val serviceChannel = NotificationChannel(
 
