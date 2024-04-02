@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.Connector
 
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.databinding.DialogSelectRuleBinding
@@ -61,6 +62,12 @@ class SelectRuleDialogFragment: DialogFragment() {
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
         val inflater = LayoutInflater.from(context)
+
+        sharedViewModel.createFilterRuleModel.connectors.clear()
+
+        resources.getTextArray( R.array.connectors ).map {
+            sharedViewModel.createFilterRuleModel.connectors.add( it.toString())
+        }
 
         _binding = DialogSelectRuleBinding.inflate(inflater )
 

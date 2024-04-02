@@ -161,7 +161,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
                     binding.pinEditText.setText("")
 
-                    activity!!.setTitle( "GPSSample - ${user.role}" )
+                    setTitle( user )
 
                     val bundle = Bundle()
                     bundle.putString(Keys.kRole.toString(), user.role.toString())
@@ -175,6 +175,17 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.SignInFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    fun setTitle( user: User )
+    {
+        when (user.role)
+        {
+            Role.Admin.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.admin)}" )
+            Role.Supervisor.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.supervisor)}" )
+            Role.Enumerator.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.enumerator)}" )
+            Role.DataCollector.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.data_collector)}" )
+        }
     }
 
     override fun didCancelText( tag: Any? )
@@ -223,7 +234,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         val userName = binding.nameEditText.text.toString()
 
         DAO.userDAO.getUser(userName, pin)?.let { user ->
-            activity!!.setTitle( "GPSSample - ${user.role}" )
+            setTitle( user )
 
             val bundle = Bundle()
             bundle.putString(Keys.kRole.toString(), user.role.toString())

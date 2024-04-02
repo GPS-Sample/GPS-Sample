@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.activityViewModels
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.databinding.DialogNetworkConnectionBinding
 
 class NetworkConnectionDialogFragment : DialogFragment() {
@@ -66,7 +67,7 @@ class NetworkConnectionDialogFragment : DialogFragment() {
         _binding = DialogNetworkConnectionBinding.inflate(inflater )
 
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Network Connection").setView(binding.root)
+        builder.setTitle(resources.getString( R.string.network_connection)).setView(binding.root)
 
         alertDialog = builder.create()
         alertDialog.setCancelable(false)

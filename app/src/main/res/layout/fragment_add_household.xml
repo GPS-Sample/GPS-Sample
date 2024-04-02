@@ -340,7 +340,7 @@
                 android:layout_marginEnd="20dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Launch Survey" />
+                android:text="@string/launch_survey" />
 
             <Button
                 android:id="@+id/save_button"

@@ -78,12 +78,8 @@ class CreateFilterRuleModel {
 
     val ruleConditionPosition : MutableLiveData<Int>
         get() = _ruleConditionPosition
-//
-    val connectors : Array<String>
-        get() {
-            return ConnectorConverter.array
-        }
 
+    var connectors = ArrayList<String>()
 
     private lateinit var ruleList : Array<Rule>
        // get() = getRules()
