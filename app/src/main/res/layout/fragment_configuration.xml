@@ -314,7 +314,6 @@
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
                             android:text="@{viewModel.currentConfiguration.proximityWarningStringValue}" />
-
                     </LinearLayout>
 
                     <Space

@@ -63,7 +63,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Enumerated"
+                    android:text="@string/enumerated"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
@@ -72,7 +72,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Sampled"
+                    android:text="@string/sampled"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
@@ -81,7 +81,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Surveyed"
+                    android:text="@string/surveyed"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
             </LinearLayout>
