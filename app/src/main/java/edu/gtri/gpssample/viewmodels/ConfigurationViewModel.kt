@@ -48,8 +48,7 @@ class ConfigurationViewModel : ViewModel()
     val currentConfiguration : LiveData<Config>?
         get() = _currentConfiguration
 
-    val distanceFormats : Array<String>
-        get() = DistanceFormatConverter.array
+    val distanceFormats = arrayOf( "", "" )
 
     val timeFormats : Array<String>
         get() = TimeFormatConverter.array
@@ -78,11 +77,12 @@ class ConfigurationViewModel : ViewModel()
 
     val distanceFormatPosition : MutableLiveData<Int>
         get() = _distanceFormatPosition
+
     val dateFormatPosition : MutableLiveData<Int>
         get() = _dateFormatPosition
+
     val timeFormatPosition : MutableLiveData<Int>
         get() = _timeFormatPosition
-
 
     val currentConfigurationTimeFormat : String
         get(){
@@ -91,13 +91,22 @@ class ConfigurationViewModel : ViewModel()
             }
             return unavailable
         }
+
     val currentConfigurationDistanceFormat : String
         get(){
             currentConfiguration?.value?.let {config ->
-                return config.distanceFormat.format
+                if (config.distanceFormat == DistanceFormat.Meters)
+                {
+                    return distanceFormats[0]
+                }
+                else
+                {
+                    return distanceFormats[1]
+                }
             }
             return unavailable
         }
+
     val currentConfigurationDateFormat : String
         get(){
             currentConfiguration?.value?.let {config ->
@@ -127,17 +136,21 @@ class ConfigurationViewModel : ViewModel()
             return Role.Undefined
 
         }
+
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        if(position < distanceFormats.size)
-        {
-            val dist : String = distanceFormats[position]
-            _currentConfiguration?.value?.let {
-                it.distanceFormat = DistanceFormatConverter.fromString(dist)
+        _currentConfiguration?.value?.let {
+            if (position == 0)
+            {
+                it.distanceFormat = DistanceFormat.Meters
+            }
+            else
+            {
+                it.distanceFormat = DistanceFormat.Feet
             }
         }
-
     }
+
     fun onTimeFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < timeFormats.size)
@@ -149,6 +162,7 @@ class ConfigurationViewModel : ViewModel()
         }
 
     }
+
     fun onDateFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         if(position < dateFormats.size)
@@ -161,7 +175,6 @@ class ConfigurationViewModel : ViewModel()
 
     }
 
-    // Configuration
     fun createNewConfiguration()
     {
         val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 0, "", false, false, false, true, 10 )
@@ -295,7 +308,6 @@ class ConfigurationViewModel : ViewModel()
         }
 
     }
-
 
     fun createNewFilterRule()
     {
