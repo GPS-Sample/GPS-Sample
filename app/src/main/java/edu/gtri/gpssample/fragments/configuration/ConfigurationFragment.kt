@@ -99,10 +99,6 @@ class ConfigurationFragment : Fragment(),
             configurationFragment = this@ConfigurationFragment
         }
 
-        val distanceFormats = resources.getTextArray( R.array.distance_formats )
-        sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
-        sharedViewModel.distanceFormats[1] = distanceFormats[1].toString()
-
         binding.hideAdditionalInfoImageView.setOnClickListener {
             binding.settingsLayout.visibility = View.GONE
             binding.hideAdditionalInfoImageView.visibility = View.GONE

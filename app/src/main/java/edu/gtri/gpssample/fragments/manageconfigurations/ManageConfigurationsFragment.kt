@@ -103,6 +103,10 @@ class ManageConfigurationsFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        val distanceFormats = resources.getTextArray( R.array.distance_formats )
+        sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
+        sharedViewModel.distanceFormats[1] = distanceFormats[1].toString()
+
         configurations = DAO.configDAO.getConfigs()
 
         manageConfigurationsAdapter = ManageConfigurationsAdapter(configurations)
