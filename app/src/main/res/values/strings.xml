@@ -345,6 +345,10 @@
     <string name="add_landmark">Add Landmark</string>
     <string name="enumerated">Enumerated</string>
     <string name="surveyed">Surveyed</string>
+    <string name="meters">Meters</string>
+    <string name="feet">Feet</string>
+    <string name="kilometers">Kilometers</string>
+    <string name="miles">Miles</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

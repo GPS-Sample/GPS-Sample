@@ -2,12 +2,14 @@ package edu.gtri.gpssample.fragments.perform_collection
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.mapbox.maps.extension.style.expressions.dsl.generated.distance
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.database.DAO
@@ -28,7 +30,7 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val 
     {
         this.mContext = parent.context
 
-        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_collection, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -48,11 +50,18 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val 
 
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-        holder.dateTextView.setText( enumerationItem.uuid )
+        holder.secondTextView.setText( enumerationItem.uuid )
 
         if (enumerationItem.subAddress.isNotEmpty())
         {
-            holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
+            holder.firstTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
+        }
+
+        holder.thirdTextView.setText("")
+
+        if (enumerationItem.distance > 0)
+        {
+            holder.thirdTextView.setText("Distance: ${String.format( "%.2f", enumerationItem.distance )} ${enumerationItem.distanceUnits}")
         }
 
         if (enumerationItem.collectionState == CollectionState.Complete)
@@ -71,8 +80,9 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
-        val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
+        val firstTextView: TextView = itemView.findViewById(R.id.first_text_view);
+        val secondTextView: TextView = itemView.findViewById(R.id.second_text_view);
+        val thirdTextView: TextView = itemView.findViewById(R.id.third_text_view);
         val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view)
     }
 }

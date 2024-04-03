@@ -778,6 +778,8 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
+    private var lastLocationUpdateTime: Long = 0
+
     private val locationConsumer = object : LocationConsumer
     {
         override fun onBearingUpdated(vararg bearing: Double, options: (ValueAnimator.() -> Unit)?) {
@@ -789,6 +791,51 @@ class PerformCollectionFragment : Fragment(),
                 val point = location.last()
                 binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
                 currentGPSLocation = point
+
+                if (Date().time - lastLocationUpdateTime > 3000)
+                {
+                    lastLocationUpdateTime = Date().time
+
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+
+                        for (enumerationItem in performCollectionAdapter.enumerationItems)
+                        {
+                            val currentLatLng = LatLng( point.latitude(), point.longitude())
+                            DAO.locationDAO.getLocation( enumerationItem.locationId )?.let {
+                                val itemLatLng = LatLng( it.latitude, it.longitude )
+                                val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+                                if (distance < 400) // display in meters or feet
+                                {
+                                    if (config.distanceFormat == DistanceFormat.Meters)
+                                    {
+                                        enumerationItem.distance = distance
+                                        enumerationItem.distanceUnits = resources.getString( R.string.meters )
+                                    }
+                                    else
+                                    {
+                                        enumerationItem.distance = distance * 3.28084
+                                        enumerationItem.distanceUnits = resources.getString( R.string.feet )
+                                    }
+                                }
+                                else // display in kilometers or miles
+                                {
+                                    if (config.distanceFormat == DistanceFormat.Meters)
+                                    {
+                                        enumerationItem.distance = distance / 1000.0
+                                        enumerationItem.distanceUnits = resources.getString( R.string.kilometers )
+                                    }
+                                    else
+                                    {
+                                        enumerationItem.distance = distance / 1609.34
+                                        enumerationItem.distanceUnits = resources.getString( R.string.miles )
+                                    }
+                                }
+                            }
+                        }
+
+                        performCollectionAdapter.updateEnumerationItems( performCollectionAdapter.enumerationItems )
+                    }
+                }
             }
         }
 

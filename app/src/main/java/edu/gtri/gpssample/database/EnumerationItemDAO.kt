@@ -136,6 +136,8 @@ class EnumerationItemDAO(private var dao: DAO)
             creationDate,
             uuid,
             syncCode,
+            0.0,
+            "",
             subAddress,
             enumeratorName,
             enumerationState,

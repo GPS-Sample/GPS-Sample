@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import com.google.android.gms.maps.model.LatLng
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
@@ -18,6 +19,8 @@ data class EnumerationItem(
     var creationDate: Long,
     var uuid : String,
     var syncCode : Int,
+    var distance : Double,
+    var distanceUnits: String,
     var subAddress : String,
     var enumeratorName : String,
     var enumerationState : EnumerationState,
@@ -38,6 +41,8 @@ data class EnumerationItem(
         Date().time,
         UUID.randomUUID().toString(),
         0,
+        0.0,
+        "",
         "",
         "",
         EnumerationState.Undefined,
