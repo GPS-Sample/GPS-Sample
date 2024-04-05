@@ -87,17 +87,12 @@ class EnumerationTeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
     }
 
-    fun exists(enumerationTeam: EnumerationTeam ): Boolean
+    fun exists( enumerationTeam: EnumerationTeam ): Boolean
     {
-        for (existingEnumerationTeam in getEnumerationTeams())
-        {
-            if (existingEnumerationTeam.uuid == enumerationTeam.uuid)
-            {
-                return true
-            }
-        }
-
-        return false
+        getTeam( enumerationTeam.uuid )?.let {
+            enumerationTeam.id = it.id
+            return true
+        } ?: return false
     }
 
     @SuppressLint("Range")
@@ -139,7 +134,23 @@ class EnumerationTeamDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
+            enumerationTeam = createTeam( cursor )
+        }
 
+        cursor.close()
+
+        return enumerationTeam
+    }
+
+    fun getTeam( uuid: String ): EnumerationTeam?
+    {
+        var enumerationTeam: EnumerationTeam? = null
+        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
             enumerationTeam = createTeam( cursor )
         }
 

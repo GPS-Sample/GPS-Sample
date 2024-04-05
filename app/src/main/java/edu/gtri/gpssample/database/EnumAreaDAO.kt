@@ -15,6 +15,9 @@ class EnumAreaDAO(private var dao: DAO)
         if (exists( enumArea ))
         {
             updateEnumArea( enumArea, config )
+            enumArea.id?.let {
+                Log.d( "xxx", "updated EnumerationArea with ID ${it}" )
+            }
         }
         else
         {
@@ -22,6 +25,9 @@ class EnumAreaDAO(private var dao: DAO)
             val values = ContentValues()
             putEnumArea( enumArea, config, values )
             enumArea.id = dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA, null, values).toInt()
+            enumArea.id?.let {
+                Log.d( "xxx", "created EnumerationArea with ID ${it}" )
+            }
         }
 
         enumArea.id?.let { id ->
@@ -72,7 +78,6 @@ class EnumAreaDAO(private var dao: DAO)
     fun putEnumArea( enumArea: EnumArea, config : Config, values: ContentValues )
     {
         enumArea.id?.let { id ->
-            Log.d( "xxx", "existing enumArea id = ${id}")
             values.put( DAO.COLUMN_ID, id )
         }
 
@@ -98,6 +103,7 @@ class EnumAreaDAO(private var dao: DAO)
     fun exists( enumArea: EnumArea ): Boolean
     {
         getEnumArea( enumArea.uuid )?.let {
+            enumArea.id = it.id
             return true
         } ?: return false
     }
@@ -105,8 +111,6 @@ class EnumAreaDAO(private var dao: DAO)
     fun updateEnumArea( enumArea: EnumArea, config : Config )
     {
         enumArea.id?.let{ id ->
-            Log.d( "xxx", "update enumArea id ${id}")
-
             val whereClause = "${DAO.COLUMN_ID} = ?"
             val args: Array<String> = arrayOf(id.toString())
             val values = ContentValues()
