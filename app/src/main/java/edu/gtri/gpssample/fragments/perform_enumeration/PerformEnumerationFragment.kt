@@ -917,12 +917,12 @@ class PerformEnumerationFragment : Fragment(),
 
         if (accuracy <= config.minGpsPrecision)
         {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.good)
+            binding.accuracyLabelTextView.text = " " + resources.getString(R.string.good)
             binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
         }
         else
         {
-            binding.accuracyLabelTextView.text = resources.getString(R.string.poor)
+            binding.accuracyLabelTextView.text = " " + resources.getString(R.string.poor)
             binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
         }
 
