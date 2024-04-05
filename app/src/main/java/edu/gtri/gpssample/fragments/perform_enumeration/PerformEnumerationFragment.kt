@@ -308,6 +308,11 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
+        if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaId < 0)
+        {
+            binding.exportButton.visibility = View.GONE
+        }
+
         binding.exportButton.setOnClickListener {
             if (dropMode)
             {
