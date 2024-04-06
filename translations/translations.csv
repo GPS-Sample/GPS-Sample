@@ -313,6 +313,7 @@ center_on_location,Center on location,Centrar en ubicación,Centrez sur l'emplac
 less_than_equal,Less Than Or Equal,Menor o igual que,Inférieur ou égal,Menor que ou igual,Меньше или равно
 gps_accuracy_error,GPS accuracy is less than the required accuracy,La precisión del GPS es inferior a la requerida,La précision du GPS est inférieure à la précision requise,A precisão do GPS é inferior à precisão exigida,Точность GPS меньше требуемой точности
 gps_location_error,You are currently too far away from this location,Se encuentra demasiado lejos de esta ubicación,Vous êtes actuellement trop loin de cet emplacement,Está atualmente demasiado longe desta localização,Вы находитесь слишком далеко от этого места
+accuracy,Accuracy : ,Precisión : ,Précision : ,Precisão : ,Точность : 
 good,GOOD,BUENA,BON,BOA,ХОРОШО
 poor,POOR,POBRE,MAUVAIS,RUIM,ПЛОХО
 unknown,UNKNOWN,DESCONOCIDO,INCONNU,DESCONHECIDA,НЕИЗВЕСТНО
@@ -341,7 +342,6 @@ mark_status,Mark Status,Marca Estado,Statut de la marque,Estado da marca,Ста�
 not_visited,Not Visited,No visitado,Non visitée,Não visitado,Не посещен
 incomplete_collection,Incomplete Survey,Encuesta incompleta,Enquête incomplète,Inquérito Incompleto,Незавершенный опрос
 completed_collection,Completed Survey,Encuesta completada,Enquête terminée,Inquérito concluído,Завершенный опрос
-accuracy,Accuracy : ,Precisión : ,Précision : ,Exatidão : ,Точность 
 subaddress_is_required,Subaddress is Required,Se requiere subdirección,La sous-adresse est requise,O subendereço é necessário,Требуется субадрес
 auto_increment_subaddress,Auto Increment Subaddress,Incremento automático de la subdirección,Incrémentation automatique de la sous-adresse,Incremento automático do subendereço,Автоматическое увеличение субадреса
 allow_manual_identification_of_locations,Allow manual identification of locations,Permitir la identificación manual de ubicaciones,Permettre l'identification manuelle des lieux,Permitir a identificação manual de localizações,Разрешить ручную идентификацию местоположений
@@ -351,10 +351,10 @@ enter_encryption_password,Enter Encryption Password,Introduzca la contraseña de
 summary,Summary,Resumen,Résumé,Resumo,Резюме
 num_enumeration_areas,# Enumeration Areas:,# Áreas de Enumeración:,# Zones de dénombrement :,# Áreas de Enumeração:,# Области перечисления:
 num_hhs_enumerated,# HH\'s Enumerated:,# Hogares censados,# Ménages recensés :,# Agregados Familiares Enumerados:,# Перечисленные домохозяйства:
-num_hhs_eligible,# HH\'s Eligible:,# Hogares elegibles:,# Ménages éligibles :,# Agregados Elegíveis:,"# Домохозяйства, отвечающие критериям:"
+num_hhs_eligible,# HH\'s Eligible:,# Hogares elegibles:,# Ménages éligibles :,# Agregados Familiares Elegíveis:,"# Домохозяйства, отвечающие критериям:"
 num_hhs_sampled,# HH\'s Sampled:,# Hogares muestreados,# Ménages échantillonnés :,# Agregados Familiares Amostrados:,"# Домохозяйства, попавшие в выборку:"
-num_hhs_surveyed,# HH\'s Surveyed:,# Hogares encuestados:,# Nombre de ménages enquêtés:,# Agregados inquiridos:,# Обследованные домохозяйства:
-num_hhs_remaining_to_survey,# HH\'s Remaining to Survey:,# Hogares pendientes de encuestar:,# Ménages restant à enquêter :,# Agregados que faltam inquirir:,"# Домохозяйства, оставшиеся для опроса:"
+num_hhs_surveyed,# HH\'s Surveyed:,# Hogares encuestados:,# Nombre de ménages enquêtés:,# Agregados Familiares Inquiridos:,# Обследованные домохозяйства:
+num_hhs_remaining_to_survey,# HH\'s Remaining to Survey:,# Hogares pendientes de encuestar:,# Ménages restant à enquêter :,# Agregados Familiares que Faltam Inquirir:,"# Домохозяйства, оставшиеся для опроса:"
 decryption_failed,Decryption failed.  Please try again.,La desencriptación ha fallado.  Inténtelo de nuevo.,Le décodage a échoué.  Veuillez réessayer.,"A descodificação falhou.  Por favor, tente novamente.","Расшифровка не удалась.  Пожалуйста, попробуйте еще раз."
 rename_or_delete,Would you like to Rename or Delete the Enumeration Area ?,¿Desea cambiar el nombre o eliminar el área de enumeración?,Souhaitez-vous renommer ou supprimer la zone de dénombrement ?,Gostaria de mudar o nome ou eliminar a área de enumeração?,Вы хотите переименовать или удалить область переписи?
 rename,Rename,Renombrar,Renommer,Mudar o nome,Переименовать
@@ -364,3 +364,13 @@ error,ERROR!,¡ERROR!,ERREUR !,ERRO!,ОШИБКА!
 import_failed,The import failed.,La importación ha fallado.,L'importation a échoué.,A importação falhou.,Импорт не удался.
 import_succeeded,The import was successful.,La importación se ha realizado correctamente.,L'importation a réussi.,A importação foi bem sucedida.,Импорт прошел успешно.
 clear_map_tile_region,Clear map tile cache region,Borrar región de caché de mosaico de mapa,Effacer la région du cache des tuiles de la carte,Limpar a região da cache de mosaicos do mapa,Очистить кэш региона плитки карты
+import_request_failed,Received an Export Request while waiting for an Import Request,Recibida una solicitud de exportación a la espera de una solicitud de importación,Réception d'une demande d'exportation en attente d'une demande d'importation,Recebeu um pedido de exportação enquanto aguardava um pedido de importação,Получен запрос на экспорт в ожидании запроса на импорт
+export_request_failed,Received an Import Request while waiting for an Export Request,Recibida una Solicitud de Importación mientras se espera una Solicitud de Exportación,Réception d'une demande d'importation en attente d'une demande d'exportation,Recebeu um pedido de importação enquanto aguardava um pedido de exportação,Получен запрос на импорт в ожидании запроса на экспорт
+network_connection,Network Connection,Conexión a la red,Connexion au réseau,Ligação de rede,Сетевое подключение
+add_landmark,Add Landmark,Añadir punto de referencia,Ajoutez un point de repère,Adicionar ponto de referência,Добавить ориентир
+enumerated,Enumerated,Censados,Recensés,Enumerados,Перечисленные
+surveyed,Surveyed,Encuestados,Enquêtés,Inquiridos,Обследованные
+meters,Meters,Metros,Mètres,Metros,Метры
+feet,Feet,Pies,Pieds,Pés,Футы
+kilometers,Kilometers,Kilómetros,Kilomètres,Quilômetros ,километры
+miles,Miles,Millas,Miles,Milhas,Мили

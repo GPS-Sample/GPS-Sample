@@ -287,6 +287,7 @@
     <string name="less_than_equal">"Menor que ou igual"</string>
     <string name="gps_accuracy_error">"A precisão do GPS é inferior à precisão exigida"</string>
     <string name="gps_location_error">"Está atualmente demasiado longe desta localização"</string>
+    <string name="accuracy">"Precisão :"</string>
     <string name="good">"BOA"</string>
     <string name="poor">"RUIM"</string>
     <string name="unknown">"DESCONHECIDA"</string>
@@ -315,7 +316,6 @@
     <string name="not_visited">"Não visitado"</string>
     <string name="incomplete_collection">"Inquérito Incompleto"</string>
     <string name="completed_collection">"Inquérito concluído"</string>
-    <string name="accuracy">"Exatidão :"</string>
     <string name="subaddress_is_required">"O subendereço é necessário"</string>
     <string name="auto_increment_subaddress">"Incremento automático do subendereço"</string>
     <string name="allow_manual_identification_of_locations">"Permitir a identificação manual de localizações"</string>
@@ -325,10 +325,10 @@
     <string name="summary">"Resumo"</string>
     <string name="num_enumeration_areas">"# Áreas de Enumeração:"</string>
     <string name="num_hhs_enumerated">"# Agregados Familiares Enumerados:"</string>
-    <string name="num_hhs_eligible">"# Agregados Elegíveis:"</string>
+    <string name="num_hhs_eligible">"# Agregados Familiares Elegíveis:"</string>
     <string name="num_hhs_sampled">"# Agregados Familiares Amostrados:"</string>
-    <string name="num_hhs_surveyed">"# Agregados inquiridos:"</string>
-    <string name="num_hhs_remaining_to_survey">"# Agregados que faltam inquirir:"</string>
+    <string name="num_hhs_surveyed">"# Agregados Familiares Inquiridos:"</string>
+    <string name="num_hhs_remaining_to_survey">"# Agregados Familiares que Faltam Inquirir:"</string>
     <string name="decryption_failed">""A descodificação falhou.  Por favor"</string>
     <string name="rename_or_delete">"Gostaria de mudar o nome ou eliminar a área de enumeração?"</string>
     <string name="rename">"Mudar o nome"</string>
@@ -338,6 +338,16 @@
     <string name="import_failed">"A importação falhou."</string>
     <string name="import_succeeded">"A importação foi bem sucedida."</string>
     <string name="clear_map_tile_region">"Limpar a região da cache de mosaicos do mapa"</string>
+    <string name="import_request_failed">"Recebeu um pedido de exportação enquanto aguardava um pedido de importação"</string>
+    <string name="export_request_failed">"Recebeu um pedido de importação enquanto aguardava um pedido de exportação"</string>
+    <string name="network_connection">"Ligação de rede"</string>
+    <string name="add_landmark">"Adicionar ponto de referência"</string>
+    <string name="enumerated">"Enumerados"</string>
+    <string name="surveyed">"Inquiridos"</string>
+    <string name="meters">"Metros"</string>
+    <string name="feet">"Pés"</string>
+    <string name="kilometers">"Quilômetros"</string>
+    <string name="miles">"Milhas"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

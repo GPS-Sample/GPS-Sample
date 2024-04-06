@@ -287,6 +287,7 @@
     <string name="less_than_equal">"Inférieur ou égal"</string>
     <string name="gps_accuracy_error">"La précision du GPS est inférieure à la précision requise"</string>
     <string name="gps_location_error">"Vous êtes actuellement trop loin de cet emplacement"</string>
+    <string name="accuracy">"Précision :"</string>
     <string name="good">"BON"</string>
     <string name="poor">"MAUVAIS"</string>
     <string name="unknown">"INCONNU"</string>
@@ -315,7 +316,6 @@
     <string name="not_visited">"Non visitée"</string>
     <string name="incomplete_collection">"Enquête incomplète"</string>
     <string name="completed_collection">"Enquête terminée"</string>
-    <string name="accuracy">"Précision :"</string>
     <string name="subaddress_is_required">"La sous-adresse est requise"</string>
     <string name="auto_increment_subaddress">"Incrémentation automatique de la sous-adresse"</string>
     <string name="allow_manual_identification_of_locations">"Permettre l'identification manuelle des lieux"</string>
@@ -338,6 +338,16 @@
     <string name="import_failed">"L'importation a échoué."</string>
     <string name="import_succeeded">"L'importation a réussi."</string>
     <string name="clear_map_tile_region">"Effacer la région du cache des tuiles de la carte"</string>
+    <string name="import_request_failed">"Réception d'une demande d'exportation en attente d'une demande d'importation"</string>
+    <string name="export_request_failed">"Réception d'une demande d'importation en attente d'une demande d'exportation"</string>
+    <string name="network_connection">"Connexion au réseau"</string>
+    <string name="add_landmark">"Ajoutez un point de repère"</string>
+    <string name="enumerated">"Recensés"</string>
+    <string name="surveyed">"Enquêtés"</string>
+    <string name="meters">"Mètres"</string>
+    <string name="feet">"Pieds"</string>
+    <string name="kilometers">"Kilomètres"</string>
+    <string name="miles">"Miles"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

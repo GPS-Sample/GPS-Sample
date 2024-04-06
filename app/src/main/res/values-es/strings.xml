@@ -287,6 +287,7 @@
     <string name="less_than_equal">"Menor o igual que"</string>
     <string name="gps_accuracy_error">"La precisión del GPS es inferior a la requerida"</string>
     <string name="gps_location_error">"Se encuentra demasiado lejos de esta ubicación"</string>
+    <string name="accuracy">"Precisión :"</string>
     <string name="good">"BUENA"</string>
     <string name="poor">"POBRE"</string>
     <string name="unknown">"DESCONOCIDO"</string>
@@ -315,7 +316,6 @@
     <string name="not_visited">"No visitado"</string>
     <string name="incomplete_collection">"Encuesta incompleta"</string>
     <string name="completed_collection">"Encuesta completada"</string>
-    <string name="accuracy">"Precisión :"</string>
     <string name="subaddress_is_required">"Se requiere subdirección"</string>
     <string name="auto_increment_subaddress">"Incremento automático de la subdirección"</string>
     <string name="allow_manual_identification_of_locations">"Permitir la identificación manual de ubicaciones"</string>
@@ -338,6 +338,16 @@
     <string name="import_failed">"La importación ha fallado."</string>
     <string name="import_succeeded">"La importación se ha realizado correctamente."</string>
     <string name="clear_map_tile_region">"Borrar región de caché de mosaico de mapa"</string>
+    <string name="import_request_failed">"Recibida una solicitud de exportación a la espera de una solicitud de importación"</string>
+    <string name="export_request_failed">"Recibida una Solicitud de Importación mientras se espera una Solicitud de Exportación"</string>
+    <string name="network_connection">"Conexión a la red"</string>
+    <string name="add_landmark">"Añadir punto de referencia"</string>
+    <string name="enumerated">"Censados"</string>
+    <string name="surveyed">"Encuestados"</string>
+    <string name="meters">"Metros"</string>
+    <string name="feet">"Pies"</string>
+    <string name="kilometers">"Kilómetros"</string>
+    <string name="miles">"Millas"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
