@@ -182,10 +182,16 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             // Clear the sample state from the unsaved enumeration items.
             // SampleState may be set to Sampled if you generate
             // a sample, then hit the back button, instead of the next button
-            for (enumArea in config.enumAreas) {
-                for (location in enumArea.locations) {
-                    for (enumerationItem in location.enumerationItems) {
-                        enumerationItem.samplingState = SamplingState.NotSampled
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { currentEnumArea ->
+                    for (enumArea in config.enumAreas) {
+                        if (study.samplingMethod == SamplingMethod.SimpleRandom || (study.samplingMethod == SamplingMethod.Cluster && enumArea.uuid == currentEnumArea.uuid)) {
+                            for (location in enumArea.locations) {
+                                for (enumerationItem in location.enumerationItems) {
+                                    enumerationItem.samplingState = SamplingState.NotSampled
+                                }
+                            }
+                        }
                     }
                 }
             }
