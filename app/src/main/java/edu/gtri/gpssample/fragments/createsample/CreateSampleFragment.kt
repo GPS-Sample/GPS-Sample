@@ -2,9 +2,7 @@ package edu.gtri.gpssample.fragments.createsample
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
@@ -57,6 +55,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
     private var _binding: FragmentCreateSampleBinding? = null
     private val binding get() = _binding!!
+    private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
+    private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -72,6 +72,8 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         samplingViewModel.currentConfig = sharedViewModel.currentConfiguration
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
         samplingViewModel.currentEnumArea = sharedViewModel.enumAreaViewModel.currentEnumArea
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -238,6 +240,20 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
     {
         binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
 
+        for (polygonAnnotation in allPolygonAnnotations)
+        {
+            polygonAnnotationManager.delete( polygonAnnotation )
+        }
+
+        allPolygonAnnotations.clear()
+
+        for (polylineAnnotation in allPolylineAnnotations)
+        {
+            polylineAnnotationManager.delete( polylineAnnotation )
+        }
+
+        allPolylineAnnotations.clear()
+
         for (enumArea in config.enumAreas)
         {
             val points = java.util.ArrayList<Point>()
@@ -251,8 +267,13 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
             if (pointList.isNotEmpty())
             {
-                mapboxManager.addPolygon(pointList,"#000000", 0.25)
-                mapboxManager.addPolyline( pointList[0], "#ff0000" )
+                mapboxManager.addPolygon(pointList,"#000000", 0.25)?.let{
+                    allPolygonAnnotations.add( it )
+                }
+
+                mapboxManager.addPolyline( pointList[0], "#ff0000" )?.let {
+                    allPolylineAnnotations.add( it )
+                }
 
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                     val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
@@ -278,6 +299,49 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
     fun sampleGenerated()
     {
         binding.sampleButton.visibility = View.GONE
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_redefine_ea_boundary, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.redefine_ea_boundary -> redefineEnumerationAreaBoundary()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun redefineEnumerationAreaBoundary()
+    {
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+            val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val northWest = LatLon( latLngBounds.northeast.latitude, latLngBounds.southwest.longitude )
+            val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            val southEast = LatLon( latLngBounds.southwest.latitude, latLngBounds.northeast.longitude )
+
+            for (vertice in enumArea.vertices)
+            {
+                DAO.latLonDAO.delete(vertice)
+            }
+
+            enumArea.vertices.clear()
+
+            enumArea.vertices.add( northWest )
+            enumArea.vertices.add( northEast )
+            enumArea.vertices.add( southEast )
+            enumArea.vertices.add( southWest )
+            enumArea.vertices.add( northWest )
+
+            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
+
+            refreshMap()
+        }
     }
 
     override fun onDestroyView()
