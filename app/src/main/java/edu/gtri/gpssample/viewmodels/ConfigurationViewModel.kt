@@ -185,14 +185,20 @@ class ConfigurationViewModel : ViewModel()
     fun saveNewConfiguration()
     {
         _currentConfiguration?.value?.let{ configuration ->
+            DAO.instance().writableDatabase.beginTransaction()
             DAO.configDAO.createOrUpdateConfig(configuration)
+            DAO.instance().writableDatabase.setTransactionSuccessful()
+            DAO.instance().writableDatabase.endTransaction()
         }
     }
 
     fun updateConfiguration()
     {
         _currentConfiguration?.value?.let{ configuration ->
+            DAO.instance().writableDatabase.beginTransaction()
             DAO.configDAO.createOrUpdateConfig(configuration)
+            DAO.instance().writableDatabase.setTransactionSuccessful()
+            DAO.instance().writableDatabase.endTransaction()
         }
     }
 

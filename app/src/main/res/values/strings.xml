@@ -348,6 +348,10 @@
     <string name="feet">"Feet"</string>
     <string name="kilometers">"Kilometers"</string>
     <string name="miles">"Miles"</string>
+
+    <string name="importing_locations">"Importing Locations..."</string>
+    <string name="saving_configuration">"Saving Configuration..."</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

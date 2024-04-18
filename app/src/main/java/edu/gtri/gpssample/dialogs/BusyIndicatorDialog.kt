@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Handler
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import edu.gtri.gpssample.R
@@ -16,9 +17,9 @@ class BusyIndicatorDialog
     }
 
     lateinit var alertDialog: AlertDialog
-    lateinit var textView: TextView
+    lateinit var progressTextView: TextView
 
-    constructor( context: Context?, text: String, delegate: BusyIndicatorDialogDelegate )
+    constructor( context: Context?, text: String, delegate: BusyIndicatorDialogDelegate, cancelable: Boolean = true )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -32,10 +33,17 @@ class BusyIndicatorDialog
         alertDialog.setCancelable(false)
         alertDialog.show()
 
-        textView = view.findViewById<TextView>(R.id.text_view)
+        val textView = view.findViewById<TextView>(R.id.title_text_view)
         textView.text = text
 
+        progressTextView = view.findViewById<TextView>(R.id.progress_text_view)
+
         val cancelButton = view.findViewById<Button>(R.id.cancel_button)
+
+        if (!cancelable)
+        {
+            cancelButton.visibility = View.GONE
+        }
 
         cancelButton.setOnClickListener {
             alertDialog.dismiss()
@@ -45,6 +53,6 @@ class BusyIndicatorDialog
 
     fun updateProgress( text: String )
     {
-        textView.text = text
+        progressTextView.text = text
     }
 }

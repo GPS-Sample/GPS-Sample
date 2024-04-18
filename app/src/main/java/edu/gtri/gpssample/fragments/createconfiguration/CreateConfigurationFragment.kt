@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.fragments.createconfiguration
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -29,6 +30,7 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
+import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
@@ -36,7 +38,8 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.ArrayList
 
 class CreateConfigurationFragment : Fragment(),
-    ConfirmationDialog.ConfirmationDialogDelegate
+    ConfirmationDialog.ConfirmationDialogDelegate,
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -111,8 +114,16 @@ class CreateConfigurationFragment : Fragment(),
                 }
                 else
                 {
-                    sharedViewModel.updateConfiguration()
-                    findNavController().popBackStack()
+                    val busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.saving_configuration), this, false )
+
+                    Thread {
+                        sharedViewModel.updateConfiguration()
+
+                        activity!!.runOnUiThread {
+                            busyIndicatorDialog.alertDialog.cancel()
+                            findNavController().popBackStack()
+                        }
+                    }.start()
                 }
             }
         }
@@ -221,6 +232,10 @@ class CreateConfigurationFragment : Fragment(),
     {
         sharedViewModel.removeStudy(selectedStudy)
         manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
+    }
+
+    override fun didPressCancelButton()
+    {
     }
 
     override fun onDestroyView()

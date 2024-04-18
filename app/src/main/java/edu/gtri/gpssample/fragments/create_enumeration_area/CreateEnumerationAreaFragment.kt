@@ -3,7 +3,8 @@ package edu.gtri.gpssample.fragments.create_enumeration_area
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.content.res.Resources
+import android.graphics.BitmapFactory
+import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -18,14 +19,22 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.ScreenCoordinate
-import com.mapbox.maps.Style
+import com.mapbox.geojson.Feature
+import com.mapbox.maps.*
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
+import com.mapbox.maps.extension.style.image.image
+import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+import com.mapbox.maps.extension.style.layers.generated.symbolLayer
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.extension.style.sources.addSource
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
+import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
+import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
@@ -51,10 +60,13 @@ import io.github.dellisd.spatialk.geojson.FeatureCollection
 import io.github.dellisd.spatialk.geojson.MultiPolygon
 import io.github.dellisd.spatialk.geojson.Point
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
+
 
 class CreateEnumerationAreaFragment : Fragment(),
     OnMapClickListener,
@@ -74,8 +86,10 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
+    private var sourceId = ""
     private var editMode = false
     private var addHousehold = false
+    private var features = JSONArray()
     private var createEnumArea = false
     private var createMapTileCache = false
     private val binding get() = _binding!!
@@ -154,6 +168,13 @@ class CreateEnumerationAreaFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 14.0 )
         }
 
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+
+        binding.mapView.gestures.addOnMapClickListener(this )
+
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
@@ -163,13 +184,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                 }
             }
         )
-
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
-        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
-
-        binding.mapView.gestures.addOnMapClickListener(this )
 
         binding.centerOnLocationButton.setOnClickListener {
             showCurrentLocation = !showCurrentLocation
@@ -331,6 +345,208 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
+    fun loadStyle( completion: (style: Style) -> Unit )
+    {
+        binding.mapView.getMapboxMap().loadStyle(
+            styleExtension = style(Style.MAPBOX_STREETS) {
+
+                +image("home_black") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_black))
+                }
+
+                +image("home_blue") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_blue))
+                }
+
+                +image("home_green") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_green))
+                }
+
+                +image("home_light_blue") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_light_blue))
+                }
+
+                +image("home_orange") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_orange))
+                }
+
+                +image("home_purple") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_purple))
+                }
+
+                +image("home_red") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_red))
+                }
+
+                +image("multi_home_black") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_black))
+                }
+
+                +image("multi_home_blue") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_blue))
+                }
+
+                +image("multi_home_green") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_green))
+                }
+
+                +image("multi_home_light_blue") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_light_blue))
+                }
+
+                +image("multi_home_orange") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_orange))
+                }
+
+                +image("multi_home_purple") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_purple))
+                }
+
+                +image("multi_home_red") {
+                    bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.multi_home_red))
+                }
+
+                +symbolLayer("LAYER_ID", "SOURCE_ID") {
+                    sourceLayer("SOURCE_LAYER_ID")
+                    iconImage(
+                        switchCase {
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("home_black")
+                            }
+                            literal("home_black")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("home_blue")
+                            }
+                            literal("home_blue")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("home_green")
+                            }
+                            literal("home_green")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("home_light_blue")
+                            }
+                            literal("home_light_blue")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("home_orange")
+                            }
+                            literal("home_orange")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("home_purple")
+                            }
+                            literal("home_purple")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("home_red")
+                            }
+                            literal("home_red")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("multi_home_black")
+                            }
+                            literal("multi_home_black")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("multi_home_blue")
+                            }
+                            literal("multi_home_blue")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("multi_home_green")
+                            }
+                            literal("multi_home_green")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("multi_home_light_blue")
+                            }
+                            literal("multi_home_light_blue")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("multi_home_orange")
+                            }
+                            literal("multi_home_orange")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("multi_home_purple")
+                            }
+                            literal("multi_home_purple")
+                            eq {
+                                get {
+                                    literal("POI")
+                                }
+                                literal("multi_home_red")
+                            }
+                            literal("multi_home_red")
+
+                            // Default case is to return an empty string so no icon will be loaded
+                            literal("home_green")
+                        }
+                    )
+
+                    iconAllowOverlap(true)
+                    iconAnchor(IconAnchor.CENTER)
+                }
+            }
+        )
+        {
+            completion( it )
+        }
+    }
+
+    fun createFeature( lat: Double, lon: Double, icon: String ) : JSONObject
+    {
+        val geometry = JSONObject()
+        geometry.put( "type", "Point" )
+
+        val coordinates = JSONArray()
+        coordinates.put( lon )
+        coordinates.put( lat )
+
+        geometry.put( "coordinates", coordinates )
+
+        val properties = JSONObject()
+        properties.put( "name", icon )
+        properties.put("POI", icon )
+
+        val feature = JSONObject()
+        feature.put( "type", "Feature" )
+        feature.put( "geometry", geometry )
+        feature.put( "properties", properties )
+
+        return feature
+    }
+
     override fun onResume()
     {
         super.onResume()
@@ -352,6 +568,20 @@ class CreateEnumerationAreaFragment : Fragment(),
                 createLocation( LatLng( point.latitude(), point.longitude()))
                 refreshMap()
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+                return true
+            }
+            else
+            {
+                binding.mapView.getMapboxMap().queryRenderedFeatures(
+                    RenderedQueryGeometry(binding.mapView.getMapboxMap().pixelForCoordinate(point)!!),
+                    RenderedQueryOptions(listOf("LAYER_ID"), null)
+                ) {
+                    if (!it.isValue || it.value!!.isEmpty()) return@queryRenderedFeatures
+                    Log.d( "xxx", "selected HH" )
+                    Log.d( "xxx", it.value.toString())
+                    val selectedFeature = it.value!![0].feature
+                    // ... do things with selected feature
+                }
                 return true
             }
         }
@@ -421,143 +651,165 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         val allEnumAreas = getAllEnumAreas()
 
-        for (enumArea in allEnumAreas)
-        {
-            addPolygon(enumArea)
+        val geoJson = JSONObject()
+        geoJson.put( "type", "FeatureCollection" )
 
-            for (location in enumArea.locations)
+        loadStyle() { style ->
+            features = JSONArray()
+
+            for (enumArea in allEnumAreas)
             {
-                var resourceId = R.drawable.home_black
-                var isMultiFamily = false
+                addPolygon(enumArea)
 
-                location.isMultiFamily?.let {
-                    isMultiFamily = it
-                }
+                for (location in enumArea.locations)
+                {
+                    var resourceName = "home_black"
+                    var isMultiFamily = false
 
-                if (location.isLandmark)
-                {
-                    resourceId = R.drawable.location_blue
-                }
-                else if (!isMultiFamily)
-                {
-                    if (location.enumerationItems.isNotEmpty())
-                    {
-                        val enumerationItem = location.enumerationItems[0]
-
-                        if (enumerationItem.samplingState == SamplingState.Sampled)
-                        {
-                            when( enumerationItem.collectionState )
-                            {
-                                CollectionState.Undefined -> resourceId = R.drawable.home_light_blue
-                                CollectionState.Incomplete -> resourceId = R.drawable.home_orange
-                                CollectionState.Complete -> resourceId = R.drawable.home_purple
-                            }
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                        {
-                            resourceId = R.drawable.home_black
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            resourceId = R.drawable.home_red
-                        }
-                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                        {
-                            resourceId = R.drawable.home_green
-                        }
-                    }
-                }
-                else
-                {
-                    for (enumerationItem in location.enumerationItems)
-                    {
-                        if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
-                        {
-                            resourceId = R.drawable.multi_home_light_blue
-                            break
-                        }
+                    location.isMultiFamily?.let {
+                        isMultiFamily = it
                     }
 
-                    if (resourceId == R.drawable.home_black)
+                    if (location.isLandmark)
                     {
-                        for (enumerationItem in location.enumerationItems)
+                        resourceName = "location_blue"
+                    }
+                    else if (!isMultiFamily)
+                    {
+                        if (location.enumerationItems.isNotEmpty())
                         {
+                            val enumerationItem = location.enumerationItems[0]
+
                             if (enumerationItem.samplingState == SamplingState.Sampled)
                             {
-                                if (enumerationItem.collectionState == CollectionState.Incomplete)
+                                when( enumerationItem.collectionState )
                                 {
-                                    resourceId = R.drawable.multi_home_orange
-                                    break
-                                }
-                                else if (enumerationItem.collectionState == CollectionState.Complete)
-                                {
-                                    resourceId = R.drawable.multi_home_purple
+                                    CollectionState.Undefined -> resourceName = "home_light_blue"
+                                    CollectionState.Incomplete -> resourceName = "home_orange"
+                                    CollectionState.Complete -> resourceName = "home_purple"
                                 }
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Undefined)
                             {
-                                resourceId = R.drawable.multi_home_black
+                                resourceName = "home_black"
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceId = R.drawable.multi_home_red
-                                break
+                                resourceName = "home_red"
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                             {
-                                resourceId = R.drawable.multi_home_green
+                                resourceName = "home_green"
                             }
                         }
                     }
-                }
+                    else
+                    {
+                        for (enumerationItem in location.enumerationItems)
+                        {
+                            if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
+                            {
+                                resourceName = "home_light_blue"
+                                break
+                            }
+                        }
 
-                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                val pointAnnotation = mapboxManager.addMarker( point, resourceId )
-
-                pointAnnotation?.let {
-                    pointHashMap[pointAnnotation.id] = location
-                    allPointAnnotations.add( pointAnnotation )
-                }
-
-                if (editMode)
-                {
-                    pointAnnotationManager?.apply {
-                        addClickListener(
-                            OnPointAnnotationClickListener { pointAnnotation ->
-                                pointHashMap[pointAnnotation.id]?.let { location ->
-                                    if (!location.isLandmark)
+                        if (resourceName == "home_black")
+                        {
+                            for (enumerationItem in location.enumerationItems)
+                            {
+                                if (enumerationItem.samplingState == SamplingState.Sampled)
+                                {
+                                    if (enumerationItem.collectionState == CollectionState.Incomplete)
                                     {
-                                        ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                            "${resources.getString(R.string.delete_household_message)}?",
-                                            resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@CreateEnumerationAreaFragment)
+                                        resourceName = "multi_home_orange"
+                                        break
+                                    }
+                                    else if (enumerationItem.collectionState == CollectionState.Complete)
+                                    {
+                                        resourceName = "multi_home_purple"
                                     }
                                 }
-                                true
+                                else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                {
+                                    resourceName = "multi_home_black"
+                                }
+                                else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                                {
+                                    resourceName = "multi_home_red"
+                                    break
+                                }
+                                else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                                {
+                                    resourceName = "multi_home_green"
+                                }
                             }
-                        )
+                        }
                     }
+
+                    val feature = createFeature( location.latitude, location.longitude, resourceName )
+                    features.put(feature)
+
+//                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+//                val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+//
+//                pointAnnotation?.let {
+//                    pointHashMap[pointAnnotation.id] = location
+//                    allPointAnnotations.add( pointAnnotation )
+//                }
+//
+//                if (editMode)
+//                {
+//                    pointAnnotationManager?.apply {
+//                        addClickListener(
+//                            OnPointAnnotationClickListener { pointAnnotation ->
+//                                pointHashMap[pointAnnotation.id]?.let { location ->
+//                                    if (!location.isLandmark)
+//                                    {
+//                                        ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+//                                            "${resources.getString(R.string.delete_household_message)}?",
+//                                            resources.getString(R.string.no), resources.getString(R.string.yes), pointAnnotation, this@CreateEnumerationAreaFragment)
+//                                    }
+//                                }
+//                                true
+//                            }
+//                        )
+//                    }
+//                }
                 }
             }
-        }
 
-        if (allEnumAreas.isNotEmpty())
-        {
-            val enumArea = allEnumAreas[0]
-            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+            if (features.length() > 0)
+            {
+                geoJson.put( "features", features )
 
-            currentZoomLevel?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                val cameraPosition = CameraOptions.Builder()
-                    .zoom(currentZoomLevel)
-                    .center(point)
+                val geoJsonSource = GeoJsonSource.Builder("SOURCE_ID")
+                    .data(geoJson.toString())
                     .build()
 
-                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                style.addSource(geoJsonSource)
+                style.addLayer(SymbolLayer("SOURCE_LAYER_ID", "SOURCE_ID"))
             }
-        }
 
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+            if (allEnumAreas.isNotEmpty())
+            {
+                val enumArea = allEnumAreas[0]
+                val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+
+                currentZoomLevel?.let { currentZoomLevel ->
+                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                    val cameraPosition = CameraOptions.Builder()
+                        .zoom(currentZoomLevel)
+                        .center(point)
+                        .build()
+
+                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                }
+            }
+
+            binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+        }
     }
 
     fun getAllEnumAreas() : ArrayList<EnumArea>
@@ -941,7 +1193,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         busyIndicatorDialog?.let {
             activity!!.runOnUiThread {
-                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
+                it.updateProgress("${numLoaded}/${numNeeded}")
             }
         }
     }
@@ -1012,7 +1264,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                         val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
                         val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
-                        config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
+                        unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
                     }
                     is Point -> {
                         val point = geometry as Point
@@ -1025,47 +1277,61 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         // figure out which enumArea contains each point
 
-        var count = 0
-
-        for (point in points)
+        if (points.isNotEmpty())
         {
-            Log.d( "xxx", "${count}/${points.size}")
-            count += 1
-
-            val allEnumAreas = ArrayList<EnumArea>()
-
-            if (config.enumAreas.isNotEmpty())
-            {
-                allEnumAreas.addAll( config.enumAreas)
+            activity!!.runOnUiThread {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this )
             }
 
-            if (unsavedEnumAreas.isNotEmpty())
-            {
-                allEnumAreas.addAll( unsavedEnumAreas )
-            }
+            var count = 0
 
-            for (enumArea in allEnumAreas)
+            for (point in points)
             {
-                val enumAreaPoints = ArrayList<Coordinate>()
-
-                enumArea.vertices.map {
-                    enumAreaPoints.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                busyIndicatorDialog?.let {
+                    activity!!.runOnUiThread {
+                        it.updateProgress("${count}/${points.size}")
+                    }
                 }
 
-                val geometryFactory = GeometryFactory()
-                val geometry: Geometry = geometryFactory.createPolygon(enumAreaPoints.toTypedArray())
+                Log.d( "xxx", "${count}/${points.size}")
+                count += 1
 
-                val coordinate = Coordinate( point.coordinates.longitude, point.coordinates.latitude )
-                val geometry1 = geometryFactory.createPoint( coordinate )
-                if (geometry.contains( geometry1 ))
+                val allEnumAreas = ArrayList<EnumArea>()
+
+                if (config.enumAreas.isNotEmpty())
                 {
-                    val location = Location( LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, false, "" )
-                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                    allEnumAreas.addAll( config.enumAreas)
+                }
 
-                    enumArea.locations.add( location )
-                    break // found! assuming that it can only exist in a single EA, for now!
+                if (unsavedEnumAreas.isNotEmpty())
+                {
+                    allEnumAreas.addAll( unsavedEnumAreas )
+                }
+
+                for (enumArea in allEnumAreas)
+                {
+                    val enumAreaPoints = ArrayList<Coordinate>()
+
+                    enumArea.vertices.map {
+                        enumAreaPoints.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                    }
+
+                    val geometryFactory = GeometryFactory()
+                    val geometry: Geometry = geometryFactory.createPolygon(enumAreaPoints.toTypedArray())
+
+                    val coordinate = Coordinate( point.coordinates.longitude, point.coordinates.latitude )
+                    val geometry1 = geometryFactory.createPoint( coordinate )
+                    if (geometry.contains( geometry1 ))
+                    {
+                        val location = Location( LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, false, "" )
+
+                        enumArea.locations.add( location )
+                        break // found! assuming that it can only exist in a single EA, for now!
+                    }
                 }
             }
+
+            busyIndicatorDialog?.alertDialog?.cancel()
         }
 
         lifecycleScope.launch {
