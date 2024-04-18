@@ -22,12 +22,14 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Feature
+import com.mapbox.geojson.GeoJson
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
 import com.mapbox.maps.extension.style.image.image
 import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.addLayerAt
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.layers.generated.symbolLayer
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
@@ -86,7 +88,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
-    private var sourceId = ""
     private var editMode = false
     private var addHousehold = false
     private var features = JSONArray()
@@ -345,10 +346,9 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
-    fun loadStyle( completion: (style: Style) -> Unit )
+    fun loadStyle( geoJson: String, completion: (style: Style) -> Unit )
     {
-        binding.mapView.getMapboxMap().loadStyle(
-            styleExtension = style(Style.MAPBOX_STREETS) {
+        binding.mapView.getMapboxMap().loadStyle(style(Style.MAPBOX_STREETS) {
 
                 +image("home_black") {
                     bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_black))
@@ -517,6 +517,11 @@ class CreateEnumerationAreaFragment : Fragment(),
                     iconAllowOverlap(true)
                     iconAnchor(IconAnchor.CENTER)
                 }
+
+                +geoJsonSource( "SOURCE_ID" ) {
+                    this.data(geoJson.toString())
+                    this.build()
+                }
             }
         )
         {
@@ -654,101 +659,100 @@ class CreateEnumerationAreaFragment : Fragment(),
         val geoJson = JSONObject()
         geoJson.put( "type", "FeatureCollection" )
 
-        loadStyle() { style ->
-            features = JSONArray()
+        features = JSONArray()
 
-            for (enumArea in allEnumAreas)
+        for (enumArea in allEnumAreas)
+        {
+            addPolygon(enumArea)
+
+            for (location in enumArea.locations)
             {
-                addPolygon(enumArea)
+                var resourceName = "home_black"
+                var isMultiFamily = false
 
-                for (location in enumArea.locations)
+                location.isMultiFamily?.let {
+                    isMultiFamily = it
+                }
+
+                if (location.isLandmark)
                 {
-                    var resourceName = "home_black"
-                    var isMultiFamily = false
-
-                    location.isMultiFamily?.let {
-                        isMultiFamily = it
-                    }
-
-                    if (location.isLandmark)
+                    resourceName = "location_blue"
+                }
+                else if (!isMultiFamily)
+                {
+                    if (location.enumerationItems.isNotEmpty())
                     {
-                        resourceName = "location_blue"
-                    }
-                    else if (!isMultiFamily)
-                    {
-                        if (location.enumerationItems.isNotEmpty())
+                        val enumerationItem = location.enumerationItems[0]
+
+                        if (enumerationItem.samplingState == SamplingState.Sampled)
                         {
-                            val enumerationItem = location.enumerationItems[0]
+                            when( enumerationItem.collectionState )
+                            {
+                                CollectionState.Undefined -> resourceName = "home_light_blue"
+                                CollectionState.Incomplete -> resourceName = "home_orange"
+                                CollectionState.Complete -> resourceName = "home_purple"
+                            }
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                        {
+                            resourceName = "home_black"
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                        {
+                            resourceName = "home_red"
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            resourceName = "home_green"
+                        }
+                    }
+                }
+                else
+                {
+                    for (enumerationItem in location.enumerationItems)
+                    {
+                        if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
+                        {
+                            resourceName = "home_light_blue"
+                            break
+                        }
+                    }
 
+                    if (resourceName == "home_black")
+                    {
+                        for (enumerationItem in location.enumerationItems)
+                        {
                             if (enumerationItem.samplingState == SamplingState.Sampled)
                             {
-                                when( enumerationItem.collectionState )
+                                if (enumerationItem.collectionState == CollectionState.Incomplete)
                                 {
-                                    CollectionState.Undefined -> resourceName = "home_light_blue"
-                                    CollectionState.Incomplete -> resourceName = "home_orange"
-                                    CollectionState.Complete -> resourceName = "home_purple"
+                                    resourceName = "multi_home_orange"
+                                    break
+                                }
+                                else if (enumerationItem.collectionState == CollectionState.Complete)
+                                {
+                                    resourceName = "multi_home_purple"
                                 }
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Undefined)
                             {
-                                resourceName = "home_black"
+                                resourceName = "multi_home_black"
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceName = "home_red"
+                                resourceName = "multi_home_red"
+                                break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                             {
-                                resourceName = "home_green"
+                                resourceName = "multi_home_green"
                             }
                         }
                     }
-                    else
-                    {
-                        for (enumerationItem in location.enumerationItems)
-                        {
-                            if (enumerationItem.samplingState == SamplingState.Sampled && enumerationItem.collectionState == CollectionState.Undefined)
-                            {
-                                resourceName = "home_light_blue"
-                                break
-                            }
-                        }
+                }
 
-                        if (resourceName == "home_black")
-                        {
-                            for (enumerationItem in location.enumerationItems)
-                            {
-                                if (enumerationItem.samplingState == SamplingState.Sampled)
-                                {
-                                    if (enumerationItem.collectionState == CollectionState.Incomplete)
-                                    {
-                                        resourceName = "multi_home_orange"
-                                        break
-                                    }
-                                    else if (enumerationItem.collectionState == CollectionState.Complete)
-                                    {
-                                        resourceName = "multi_home_purple"
-                                    }
-                                }
-                                else if (enumerationItem.enumerationState == EnumerationState.Undefined)
-                                {
-                                    resourceName = "multi_home_black"
-                                }
-                                else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                                {
-                                    resourceName = "multi_home_red"
-                                    break
-                                }
-                                else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                                {
-                                    resourceName = "multi_home_green"
-                                }
-                            }
-                        }
-                    }
-
-                    val feature = createFeature( location.latitude, location.longitude, resourceName )
-                    features.put(feature)
+                val feature = createFeature( location.latitude, location.longitude, resourceName )
+                features.put(feature)
 
 //                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
 //                val pointAnnotation = mapboxManager.addMarker( point, resourceId )
@@ -776,20 +780,14 @@ class CreateEnumerationAreaFragment : Fragment(),
 //                        )
 //                    }
 //                }
-                }
             }
+        }
 
-            if (features.length() > 0)
-            {
-                geoJson.put( "features", features )
+        geoJson.put( "features", features )
 
-                val geoJsonSource = GeoJsonSource.Builder("SOURCE_ID")
-                    .data(geoJson.toString())
-                    .build()
+        loadStyle( geoJson.toString() ) { style ->
 
-                style.addSource(geoJsonSource)
-                style.addLayer(SymbolLayer("SOURCE_LAYER_ID", "SOURCE_ID"))
-            }
+            style.addLayer(SymbolLayer("SOURCE_LAYER_ID", "SOURCE_ID"))
 
             if (allEnumAreas.isNotEmpty())
             {
@@ -1280,7 +1278,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (points.isNotEmpty())
         {
             activity!!.runOnUiThread {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this )
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
             }
 
             var count = 0
@@ -1293,7 +1291,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                     }
                 }
 
-                Log.d( "xxx", "${count}/${points.size}")
                 count += 1
 
                 val allEnumAreas = ArrayList<EnumArea>()
