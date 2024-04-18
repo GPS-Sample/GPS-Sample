@@ -539,6 +539,7 @@ class ConfigurationFragment : Fragment(),
                 activity!!.runOnUiThread {
                     busyIndicatorDialog.alertDialog.cancel()
                     updateOverview()
+                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
                 }
             }.start()
         }
@@ -599,6 +600,7 @@ class ConfigurationFragment : Fragment(),
                 activity!!.runOnUiThread {
                     busyIndicatorDialog.alertDialog.cancel()
                     updateOverview()
+                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
                 }
             }.start()
         }
