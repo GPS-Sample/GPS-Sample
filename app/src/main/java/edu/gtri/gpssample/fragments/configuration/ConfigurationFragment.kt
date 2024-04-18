@@ -79,7 +79,7 @@ class ConfigurationFragment : Fragment(),
         sharedNetworkViewModel.currentFragment = this
         sharedViewModel.currentFragment = this
 
-        setHasOptionsMenu(true)
+//        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
