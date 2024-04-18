@@ -21,7 +21,7 @@ class EnumerationTeamDAO(private var dao: DAO)
             putTeam( enumerationTeam, values )
             enumerationTeam.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM, null, values).toInt()
             enumerationTeam.id?.let { id ->
-                Log.d( "xxx", "new Team id = ${id}")
+                Log.d( "xxx", "new Enumeration Team id = ${id}")
             } ?: return null
         }
 

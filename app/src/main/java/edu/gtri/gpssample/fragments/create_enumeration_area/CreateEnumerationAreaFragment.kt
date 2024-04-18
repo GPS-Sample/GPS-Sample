@@ -1328,7 +1328,11 @@ class CreateEnumerationAreaFragment : Fragment(),
                 }
             }
 
-            busyIndicatorDialog?.alertDialog?.cancel()
+            busyIndicatorDialog?.let {
+                activity!!.runOnUiThread {
+                    it.alertDialog.cancel()
+                }
+            }
         }
 
         lifecycleScope.launch {

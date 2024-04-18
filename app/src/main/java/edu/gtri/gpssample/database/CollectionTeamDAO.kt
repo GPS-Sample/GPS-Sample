@@ -24,7 +24,7 @@ class CollectionTeamDAO(private var dao: DAO)
             putTeam( collectionTeam, values )
             collectionTeam.id = dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM, null, values).toInt()
             collectionTeam.id?.let { id ->
-                Log.d( "xxx", "new Team id = ${id}")
+                Log.d( "xxx", "new Collection Team id = ${id}")
             } ?: return null
         }
 

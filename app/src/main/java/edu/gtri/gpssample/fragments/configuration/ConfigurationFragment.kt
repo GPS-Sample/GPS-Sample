@@ -2,6 +2,7 @@ package edu.gtri.gpssample.fragments.configuration
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -33,10 +34,9 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.LatLon
-import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
+import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.managers.MapboxManager
@@ -50,7 +50,8 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class ConfigurationFragment : Fragment(),
-    ConfirmationDialog.ConfirmationDialogDelegate
+    ConfirmationDialog.ConfirmationDialogDelegate,
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -77,6 +78,8 @@ class ConfigurationFragment : Fragment(),
 
         sharedNetworkViewModel.currentFragment = this
         sharedViewModel.currentFragment = this
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -184,6 +187,11 @@ class ConfigurationFragment : Fragment(),
         binding.enumAreasRecycler.adapter = enumerationAreasAdapter
         binding.enumAreasRecycler.layoutManager = LinearLayoutManager(activity )
 
+        updateOverview()
+    }
+
+    fun updateOverview()
+    {
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
             var sampledCount = 0
@@ -460,6 +468,144 @@ class ConfigurationFragment : Fragment(),
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_test, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.enumerate -> enumerateEverything()
+            R.id.survey -> surveyEverything()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun enumerateEverything()
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+
+            var count = 1
+            var total = 0
+            val busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Enumerating HH's...", this, false)
+
+            for (enumArea in config.enumAreas)
+            {
+                for (location in enumArea.locations)
+                {
+                    total += 1
+                }
+            }
+
+            Thread {
+                DAO.instance().writableDatabase.beginTransaction()
+
+                for (enumArea in config.enumAreas)
+                {
+                    val polygon = ArrayList<LatLon>()
+
+                    enumArea.vertices.map {
+                        polygon.add( LatLon( it.latitude, it.longitude ))
+                    }
+
+                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.id!!, "E-Team-${enumArea.id!!}", polygon, enumArea.locations ))
+                    enumArea.enumerationTeams.add(enumerationTeam!!)
+
+                    for (location in enumArea.locations)
+                    {
+                        val enumerationItem = EnumerationItem()
+                        enumerationItem.subAddress = count.toString()
+                        enumerationItem.enumerationDate = Date().time
+                        enumerationItem.enumerationEligibleForSampling = true
+                        enumerationItem.syncCode = enumerationItem.syncCode + 1
+                        enumerationItem.enumerationState = EnumerationState.Enumerated
+                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                        location.enumerationItems.add(enumerationItem)
+                        activity!!.runOnUiThread {
+                            busyIndicatorDialog.updateProgress("${count}/${total}")
+                        }
+                        count += 1
+                    }
+                }
+
+                DAO.instance().writableDatabase.setTransactionSuccessful()
+                DAO.instance().writableDatabase.endTransaction()
+
+                activity!!.runOnUiThread {
+                    busyIndicatorDialog.alertDialog.cancel()
+                    updateOverview()
+                }
+            }.start()
+        }
+    }
+
+    fun surveyEverything()
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+
+            var count = 1
+            var total = 0
+            val busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Enumerating HH's...", this, false)
+
+            for (enumArea in config.enumAreas)
+            {
+                for (location in enumArea.locations)
+                {
+                    total += 1
+                }
+            }
+
+            Thread {
+                DAO.instance().writableDatabase.beginTransaction()
+
+                for (enumArea in config.enumAreas)
+                {
+                    val polygon = ArrayList<LatLon>()
+
+                    enumArea.vertices.map {
+                        polygon.add( LatLon( it.latitude, it.longitude ))
+                    }
+
+                    sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                        val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.id!!, study.id!!, "S-Team-${enumArea.id!!}", polygon, enumArea.locations ))
+                        study.collectionTeams.add(collectionTeam!!)
+                    }
+
+                    for (location in enumArea.locations)
+                    {
+                        for (enumerationItem in location.enumerationItems)
+                        {
+                            enumerationItem.collectionDate = Date().time
+                            enumerationItem.syncCode = enumerationItem.syncCode + 1
+                            enumerationItem.collectionState = CollectionState.Complete
+                            enumerationItem.samplingState = SamplingState.Sampled
+                            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                            activity!!.runOnUiThread {
+                                busyIndicatorDialog.updateProgress("${count}/${total}")
+                            }
+                            count += 1
+                        }
+                    }
+                }
+
+                DAO.instance().writableDatabase.setTransactionSuccessful()
+                DAO.instance().writableDatabase.endTransaction()
+
+                activity!!.runOnUiThread {
+                    busyIndicatorDialog.alertDialog.cancel()
+                    updateOverview()
+                }
+            }.start()
+        }
+    }
+
+    override fun didPressCancelButton()
+    {
     }
 
     override fun onDestroyView()
