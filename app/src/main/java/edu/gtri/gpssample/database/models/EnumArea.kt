@@ -1,12 +1,17 @@
 package edu.gtri.gpssample.database.models
 
+import android.util.Base64
 import android.util.Log
 import edu.gtri.gpssample.utils.EncryptionUtil
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.util.*
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 import kotlin.collections.ArrayList
 
 @Serializable
@@ -26,7 +31,8 @@ data class EnumArea (
     constructor( name: String, vertices: ArrayList<LatLon>)
             : this(null, UUID.randomUUID().toString(), Date().time, name, -1, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>())
 
-    override fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean
+    {
         if(other is EnumArea)
         {
             if (this.uuid == other.uuid)
@@ -39,42 +45,79 @@ data class EnumArea (
 
     fun pack(password: String) : String
     {
-        val jsonString = Json.encodeToString( this )
+        try
+        {
+            // step 1: create the json string
 
-        if (password.isEmpty())
-        {
-            return jsonString
+            val jsonString = Json.encodeToString( this )
+
+            // step 2: compress the json string
+
+            val byteArrayOutputStream = ByteArrayOutputStream(jsonString.length)
+            val gzipOutputStream = GZIPOutputStream( byteArrayOutputStream )
+            gzipOutputStream.write(jsonString.toByteArray())
+            gzipOutputStream.close()
+            val byteArray = byteArrayOutputStream.toByteArray()
+            byteArrayOutputStream.close()
+
+            val compressedString = Base64.encodeToString( byteArray, Base64.DEFAULT )
+
+            // step 3: encrypt the json string, if necessary
+
+            if (password.isEmpty())
+            {
+                return compressedString
+            }
+            else
+            {
+                return EncryptionUtil.Encrypt(compressedString,password)
+            }
         }
-        else
+        catch (ex: Exception)
         {
-            return EncryptionUtil.Encrypt(jsonString,password)
+            Log.d( "xxx", ex.stackTraceToString())
         }
+
+        return ""
     }
 
     companion object
     {
-        fun unpack( message: String, password: String ) : EnumArea?
+        fun unpack( jsonString: String, password: String ) : EnumArea?
         {
             try
             {
-                if (password.isEmpty())
+                var clearText = jsonString
+
+                // step 1: decrypt the json string, if necessary
+
+                if (password.isNotEmpty())
                 {
-                    return Json.decodeFromString<EnumArea>(message)
-                }
-                else
-                {
-                    val clearText = EncryptionUtil.Decrypt(message,password)
-                    clearText?.let { clearText ->
-                        return Json.decodeFromString<EnumArea>(clearText)
+                    EncryptionUtil.Decrypt(jsonString, password)?.let {
+                        clearText = it
                     }
                 }
+
+                // step 2: decompress the json string
+
+                val byteArray = Base64.decode( clearText, Base64.DEFAULT )
+                val byteArrayInputStream = ByteArrayInputStream( byteArray )
+                val gzipInputStream = GZIPInputStream( byteArrayInputStream, byteArray.size )
+                val bytes = gzipInputStream.readBytes()
+                val uncompressedString = bytes.decodeToString()
+                gzipInputStream.close()
+                byteArrayInputStream.close()
+
+                // step 3: decode the JSON string into a Config object
+
+                return Json.decodeFromString<EnumArea>( uncompressedString )
             }
             catch (ex: Exception)
             {
-                Log.d( "xxx", ex.stackTrace.toString())
+                Log.d( "xxx", ex.stackTraceToString())
             }
 
-            return null;
+            return null
         }
     }
 }
