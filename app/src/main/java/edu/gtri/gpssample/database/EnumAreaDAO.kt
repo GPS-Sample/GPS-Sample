@@ -40,16 +40,20 @@ class EnumAreaDAO(private var dao: DAO)
                 DAO.locationDAO.createOrUpdateLocation(location, enumArea)
             }
 
+            val locations = DAO.locationDAO.getLocations()
+
             for (enumerationTeam in enumArea.enumerationTeams)
             {
                 // update the team location id's, if necc.
                 for (teamLocation in enumerationTeam.locations)
                 {
-                    for (location in DAO.locationDAO.getLocations())
+                    val filteredLocations = locations.filter {
+                        it.uuid == teamLocation.uuid
+                    }
+
+                    if (filteredLocations.isNotEmpty() && teamLocation.id != filteredLocations[0].id)
                     {
-                        if (teamLocation.uuid == location.uuid && teamLocation.id != location.id) {
-                            teamLocation.id = location.id
-                        }
+                        teamLocation.id = filteredLocations[0].id
                     }
                 }
 

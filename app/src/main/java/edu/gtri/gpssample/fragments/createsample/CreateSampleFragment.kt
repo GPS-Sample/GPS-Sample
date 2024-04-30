@@ -210,7 +210,18 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
                     for (enumArea in config.enumAreas)
                     {
-                        DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                        if (study.samplingMethod == SamplingMethod.Cluster)
+                        {
+                            if (enumArea.id == config.selectedEnumAreaId)
+                            {
+                                DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                                break
+                            }
+                        }
+                        else
+                        {
+                            DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                        }
                     }
 
                     DAO.instance().writableDatabase.setTransactionSuccessful()

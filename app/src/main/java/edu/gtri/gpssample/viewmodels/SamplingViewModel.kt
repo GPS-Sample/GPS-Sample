@@ -85,6 +85,11 @@ class SamplingViewModel : ViewModel()
         currentConfig?.value?.let { config ->
             for (enumArea in config.enumAreas)
             {
+                if (enumArea.id != config.selectedEnumAreaId)
+                {
+                    continue
+                }
+
                 for (location in enumArea.locations)
                 {
                     if (!location.isLandmark && location.enumerationItems.isNotEmpty())
