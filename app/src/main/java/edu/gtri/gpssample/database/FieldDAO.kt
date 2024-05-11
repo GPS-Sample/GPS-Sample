@@ -70,29 +70,6 @@ class FieldDAO(private var dao: DAO)
         dao.writableDatabase.update(DAO.TABLE_FIELD, values, whereClause, args )
     }
 
-    @SuppressLint("Range")
-    fun findFieldId(field : Field) : Int?
-    {
-//        // look for the rule by it's pieces then return the id
-//        field.id?.let{ fieldId ->
-//            return fieldId
-//
-//        }?: run{
-//            val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_FIELD} WHERE " +
-//                    "${DAO.COLUMN_UUID} = '${field.uuid}' " +
-//                    "AND ${DAO.COLUMN_FIELD_NAME} = '${field.name}'"
-//
-//            val cursor = dao.writableDatabase.rawQuery(query, null)
-//
-//            while (cursor.moveToNext())
-//            {
-//                return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-//            }
-//        }
-
-        return null
-    }
-
     fun exists( field: Field ): Boolean
     {
         getField( field.uuid )?.let {

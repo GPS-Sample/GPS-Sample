@@ -36,41 +36,6 @@ class EnumAreaDAO(private var dao: DAO)
             DAO.locationDAO.createOrUpdateLocation(location, enumArea)
         }
 
-//        val locations = DAO.locationDAO.getLocations()
-//
-//        for (enumerationTeam in enumArea.enumerationTeams)
-//        {
-//            // update the team location id's, if necc.
-//            for (teamLocation in enumerationTeam.locations)
-//            {
-//                val filteredLocations = locations.filter {
-//                    it.uuid == teamLocation.uuid
-//                }
-//
-//                if (filteredLocations.isNotEmpty() && teamLocation.id != filteredLocations[0].id)
-//                {
-//                    teamLocation.id = filteredLocations[0].id
-//                }
-//            }
-//
-//            enumerationTeam.enumerAreaId = id
-//
-//            // the teamId may change, make sure that we update the enumArea.selectedEnumerationTeam, if necessary
-//
-//            val oldTeamId = enumerationTeam.id
-//
-//            DAO.enumerationTeamDAO.createOrUpdateTeam(enumerationTeam)?.let { newTeam ->
-//                newTeam.id?.let { newTeamId ->
-//                    oldTeamId?.let { oldTeamId ->
-//                        if (enumArea.selectedEnumerationTeamId == oldTeamId) {
-//                            enumArea.selectedEnumerationTeamId = newTeamId
-//                            updateEnumArea(enumArea, config)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
         return enumArea
     }
 
@@ -112,28 +77,6 @@ class EnumAreaDAO(private var dao: DAO)
 
         dao.writableDatabase.update(DAO.TABLE_ENUM_AREA, values, whereClause, args )
     }
-
-//    fun getEnumArea( id: Int ): EnumArea?
-//    {
-//        var enumArea: EnumArea? = null
-//        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_ID} = $id"
-//        val cursor = dao.writableDatabase.rawQuery(query, null)
-//
-//        if (cursor.count > 0)
-//        {
-//            cursor.moveToNext()
-//            enumArea = buildEnumArea( cursor )
-//            enumArea.id?.let { id ->
-//                enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
-//                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
-//                enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
-//            }
-//        }
-//
-//        cursor.close()
-//
-//        return enumArea
-//    }
 
     fun getEnumArea( uuid: String ): EnumArea?
     {

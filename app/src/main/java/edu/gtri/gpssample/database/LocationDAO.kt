@@ -65,28 +65,6 @@ class LocationDAO(private var dao: DAO)
         cursor.close()
     }
 
-//    fun importLocation( location: Location, enumArea : EnumArea )
-//    {
-//        val existingLocation = getLocation( location.uuid )
-//
-//        if (existingLocation != null)
-//        {
-//            if (modified(location))
-//            {
-//                updateLocation( location, enumArea )
-//            }
-//
-//            for (enumerationItem in location.enumerationItems)
-//            {
-//                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-//            }
-//        }
-//        else
-//        {
-//            createOrUpdateLocation( location, enumArea )
-//        }
-//    }
-
     fun exists( location: Location ): Boolean
     {
         getLocation( location.uuid )?.let {

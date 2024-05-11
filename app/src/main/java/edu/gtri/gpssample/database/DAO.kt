@@ -85,16 +85,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createConnectorTableConfigStudy)
 
-//            val createConnectorTableStudyEnumArea = ("CREATE TABLE " +
-//                    CONNECTOR_TABLE_STUDY__ENUM_AREA + "(" +
-//                    COLUMN_CID + COLUMN_CID_TYPE + "," +
-//                    COLUMN_STUDY_UUID + " TEXT NOT NULL" + "," +
-//                    COLUMN_ENUM_AREA_UUID + " TEXT NOT NULL" + "," +
-//                    "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" + "," +
-//                    "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
-//                    ")")
-//            db.execSQL(createConnectorTableStudyEnumArea)
-
             val createTableField = ("CREATE TABLE " +
                     TABLE_FIELD + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
@@ -317,21 +307,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableLatLon = ("CREATE TABLE " +
                     TABLE_LAT_LON + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_INDEX + " INTEGER" + "," +
                     COLUMN_LAT + " REAL" + "," +
                     COLUMN_LON + " REAL" +
                     ")")
             db.execSQL(createTableLatLon)
-
-//            val createConnectorTableConfigLatLon = ("CREATE TABLE " +
-//                    CONNECTOR_TABLE_CONFIG__LAT_LON + "(" +
-//                    COLUMN_CID + COLUMN_CID_TYPE + "," +
-//                    COLUMN_CONFIG_UUID + " TEXT " + "," +
-//                    COLUMN_LAT_LON_UUID + " TEXT " + "," +
-//                    "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
-//                    "FOREIGN KEY($COLUMN_LAT_LON_UUID) REFERENCES $TABLE_LAT_LON($COLUMN_UUID)" + "," +
-//                    "UNIQUE ($COLUMN_CONFIG_UUID, $COLUMN_LAT_LON_UUID)" +
-//                    ")")
-//            db.execSQL(createConnectorTableConfigLatLon)
 
             val createConnectorTableEnumAreaLatLon = ("CREATE TABLE " +
                     CONNECTOR_TABLE_ENUM_AREA__LAT_LON + "(" +
@@ -391,7 +371,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_CONFIG__STUDY")
-//        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_STUDY__ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
@@ -404,7 +383,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
-//        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_CONFIG__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUM_AREA__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
@@ -424,9 +402,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
 
-//        const val COLUMN_ID = "id"
-//        const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
-
         const val COLUMN_CID = "cid"
         const val COLUMN_CID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
 
@@ -437,7 +412,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CREATION_DATE = "creation_date"
 
         // foreign key columns
-        const val COLUMN_USER_ID = "user_id"
         const val COLUMN_CONFIG_UUID = "config_uuid"
         const val COLUMN_STUDY_UUID = "study_uuid"
         const val COLUMN_FIELD_UUID = "field_uuid"
@@ -465,9 +439,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON = "enumeration_team__lat_lon"
         const val CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON = "collection_team__lat_lon"
         const val CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION = "rule__field_data_option"
-
-//        const val CONNECTOR_TABLE_CONFIG__LAT_LON = "config__lat_lon"
-//        const val CONNECTOR_TABLE_STUDY__ENUM_AREA = "study__enum_area"
 
         // User Table
         const val TABLE_USER = "user"
@@ -594,6 +565,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_SOUTH_WEST_LON = "south_west_lon"
 
         const val TABLE_LAT_LON = "lat_lon"
+        const val COLUMN_INDEX = "idx"
         const val COLUMN_LAT = "lat"
         const val COLUMN_LON = "lon"
 
@@ -653,7 +625,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_CONFIG")
                 db.execSQL("DELETE FROM $TABLE_ENUM_AREA")
                 db.execSQL("DELETE FROM $TABLE_STUDY")
-//                db.execSQL("DELETE FROM $CONNECTOR_TABLE_STUDY__ENUM_AREA")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_CONFIG__STUDY")
                 db.execSQL("DELETE FROM $TABLE_FIELD")
                 db.execSQL("DELETE FROM $TABLE_FIELD_OPTION")
@@ -673,7 +644,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION")
                 db.execSQL("DELETE FROM $TABLE_LAT_LON")
-//                db.execSQL("DELETE FROM $CONNECTOR_TABLE_CONFIG__LAT_LON")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_ENUM_AREA__LAT_LON")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
@@ -682,7 +652,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_CONFIG'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUM_AREA'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_STUDY'")
-//                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_STUDY__ENUM_AREA'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_CONFIG__STUDY'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD_OPTION'")
@@ -702,7 +671,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LAT_LON'")
-//                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_CONFIG__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_ENUM_AREA__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON'")
@@ -739,6 +707,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 292
+        private const val DATABASE_VERSION = 293
     }
 }

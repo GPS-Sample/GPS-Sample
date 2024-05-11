@@ -53,7 +53,7 @@ class MapTileRegionDAO(private var dao: DAO)
         val sw_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_SOUTH_WEST_LAT))
         val sw_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_SOUTH_WEST_LON))
 
-        return MapTileRegion( uuid, LatLon( ne_lat, ne_lon ), LatLon( sw_lat, sw_lon ))
+        return MapTileRegion( uuid, LatLon( 0, ne_lat, ne_lon ), LatLon( 0, sw_lat, sw_lon ))
     }
 
     fun updateMapTileRegion( mapTileRegion: MapTileRegion, config: Config )

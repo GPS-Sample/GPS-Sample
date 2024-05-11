@@ -25,18 +25,6 @@ class LatLonDAO(private var dao: DAO)
             Log.d( "xxx", "created LatLon with ID ${latLon.uuid}" )
         }
 
-//        config?.let { config ->
-//            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_CONFIG__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}'"
-//            val cursor = dao.writableDatabase.rawQuery(query, null)
-//            if (cursor.count == 0)
-//            {
-//                val values = ContentValues()
-//                putLatLonConfig( latLon.uuid, config.uuid, values)
-//                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_CONFIG__LAT_LON, null, values)
-//            }
-//            cursor.close()
-//        }
-
         enumArea?.let { enumArea ->
             val values = ContentValues()
             val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
@@ -67,6 +55,7 @@ class LatLonDAO(private var dao: DAO)
     private fun putLatLon(latLon: LatLon, values: ContentValues)
     {
         values.put( DAO.COLUMN_UUID, latLon.uuid )
+        values.put( DAO.COLUMN_INDEX, latLon.index )
         values.put( DAO.COLUMN_LAT, latLon.latitude )
         values.put( DAO.COLUMN_LON, latLon.longitude )
     }
@@ -82,10 +71,11 @@ class LatLonDAO(private var dao: DAO)
     private fun buildLatLon(cursor: Cursor): LatLon
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_INDEX))
         val lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LAT))
         val lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LON))
 
-        return LatLon( uuid, lat, lon )
+        return LatLon( uuid, index, lat, lon )
     }
 
     fun updateLatLon( latLon: LatLon )
@@ -121,7 +111,8 @@ class LatLonDAO(private var dao: DAO)
         val latLons = ArrayList<LatLon>()
 
         val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_ENUM_AREA_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
-                "${DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_ENUM_AREA_UUID} = '${enumAreaUuid}'"
+                "${DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_ENUM_AREA_UUID} = '${enumAreaUuid}' " +
+                "ORDER BY ${DAO.COLUMN_INDEX} ASC"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
@@ -142,7 +133,8 @@ class LatLonDAO(private var dao: DAO)
         val latLons = ArrayList<LatLon>()
 
         val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
-                "${DAO.CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${teamUuid}'"
+                "${DAO.CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${teamUuid}'" +
+                "ORDER BY ${DAO.COLUMN_INDEX} ASC"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
@@ -163,7 +155,8 @@ class LatLonDAO(private var dao: DAO)
         val latLons = ArrayList<LatLon>()
 
         val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
-                "${DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${teamUuid}'"
+                "${DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${teamUuid}'" +
+                "ORDER BY ${DAO.COLUMN_INDEX} ASC"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 

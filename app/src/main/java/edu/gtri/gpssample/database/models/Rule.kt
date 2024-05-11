@@ -20,7 +20,7 @@ data class Rule(
     var fieldDataOptions : ArrayList<FieldDataOption>
     )
 {
-    constructor() : this(UUID.randomUUID().toString(), null, "", "", Operator.Equal, null, ArrayList<FieldDataOption>())
+    constructor() : this("", null, "", "", Operator.Equal, null, ArrayList<FieldDataOption>())
 
     constructor( field: Field, name: String, value: String, operator: Operator)
             : this(UUID.randomUUID().toString(), field, name, value, operator, null, ArrayList<FieldDataOption>())

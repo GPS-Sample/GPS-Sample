@@ -9,6 +9,8 @@ import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
+import java.util.*
+import kotlin.collections.ArrayList
 
 class EnumerationItemDAO(private var dao: DAO)
 {
@@ -20,6 +22,10 @@ class EnumerationItemDAO(private var dao: DAO)
         }
         else
         {
+            if (enumerationItem.uuid.isEmpty())
+            {
+                enumerationItem.uuid = UUID.randomUUID().toString()
+            }
             val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
             if (dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values) < 0)
@@ -38,21 +44,6 @@ class EnumerationItemDAO(private var dao: DAO)
 
         return enumerationItem
     }
-
-//    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, enumArea: EnumArea )
-//    {
-//        val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
-//
-//        if (existingEnumerationItem == null)
-//        {
-//            createOrUpdateEnumerationItem( enumerationItem, location )
-//        }
-//        else if (enumerationItem.syncCode > existingEnumerationItem.syncCode)
-//        {
-//            delete( existingEnumerationItem, false )
-//            createOrUpdateEnumerationItem( enumerationItem, location )
-//        }
-//    }
 
     fun exists( enumerationItem: EnumerationItem ): Boolean
     {

@@ -505,8 +505,10 @@ class ConfigurationFragment : Fragment(),
                 {
                     val polygon = ArrayList<LatLon>()
 
+                    var index = 0
+
                     enumArea.vertices.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
+                        polygon.add( LatLon( index++, it.latitude, it.longitude ))
                     }
 
                     val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.uuid, "E-Team-${enumArea.uuid}", polygon, enumArea.locations ))
@@ -564,8 +566,10 @@ class ConfigurationFragment : Fragment(),
                 {
                     val polygon = ArrayList<LatLon>()
 
+                    var index = 0
+
                     enumArea.vertices.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
+                        polygon.add( LatLon( index++, it.latitude, it.longitude ))
                     }
 
                     sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->

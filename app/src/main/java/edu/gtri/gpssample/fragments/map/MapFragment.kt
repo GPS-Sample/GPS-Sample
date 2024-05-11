@@ -243,11 +243,11 @@ class MapFragment : Fragment(),
 
                 var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
                 var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                val northEast = LatLon( latitude, longitude )
+                val northEast = LatLon( 0, latitude, longitude )
 
                 latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
                 longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                val southWest = LatLon( latitude, longitude )
+                val southWest = LatLon( 0, latitude, longitude )
 
                 mapTileRegion = MapTileRegion( northEast, southWest )
 
@@ -273,10 +273,10 @@ class MapFragment : Fragment(),
 
         val vertices = ArrayList<LatLon>()
 
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
 
         vertices.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )

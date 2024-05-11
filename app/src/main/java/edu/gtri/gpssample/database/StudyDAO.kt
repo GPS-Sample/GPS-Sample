@@ -33,44 +33,6 @@ class StudyDAO(private var dao: DAO)
             Log.d( "xxx", "created study with ID = ${study.uuid}")
         }
 
-//        for (collectionTeam in study.collectionTeams)
-//        {
-//            // update the team location id's, if necc.
-//            for (teamLocation in collectionTeam.locations)
-//            {
-//                for (location in DAO.locationDAO.getLocations())
-//                {
-//                    if (teamLocation.uuid == location.uuid && teamLocation.id != location.id)
-//                    {
-//                        for (enumerationItem in teamLocation.enumerationItems)
-//                        {
-//                            if (enumerationItem.locationId != location.id)
-//                            {
-//                                enumerationItem.locationId = location.id!!
-//                            }
-//                        }
-//                        teamLocation.id = location.id
-//                    }
-//                }
-//            }
-//
-//            // the teamId may change, make sure that we update the study.selectedCollectionTeam, if necessary
-//
-//            val oldTeamId = collectionTeam.id
-//
-//            DAO.collectionTeamDAO.createOrUpdateTeam( collectionTeam )?.let { newTeam ->
-//                newTeam.id?.let { newTeamId ->
-//                    oldTeamId?.let { oldTeamId ->
-//                        if (study.selectedCollectionTeamId == oldTeamId)
-//                        {
-//                            study.selectedCollectionTeamId = newTeamId
-//                            updateStudy( study )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
         // add fields
         for (field in study.fields)
         {

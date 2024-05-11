@@ -8,6 +8,8 @@ import edu.gtri.gpssample.constants.OperatorConverter
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
+import java.util.*
+import kotlin.collections.ArrayList
 
 class RuleDAO(private var dao: DAO)
 {
@@ -19,6 +21,10 @@ class RuleDAO(private var dao: DAO)
         }
         else
         {
+            if (rule.uuid.isEmpty())
+            {
+                rule.uuid = UUID.randomUUID().toString()
+            }
             val values = ContentValues()
             putRule( rule, values )
             if (dao.writableDatabase.insert(DAO.TABLE_RULE, null, values) < 0)
@@ -34,30 +40,6 @@ class RuleDAO(private var dao: DAO)
 
         return rule
     }
-
-    @SuppressLint("Range")
-//    fun findRuleId(rule : Rule) : Int?
-//    {
-//        rule.field?.let { field ->
-////            // look for the field cause it may exist and the copy doesn't have the id
-////            val field_id = DAO.fieldDAO.findFieldId(field)
-////            field.id = field_id
-//
-//            rule.operator?.let { operator ->
-//                val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_RULE} WHERE " +
-//                        "${DAO.COLUMN_FIELD_UUID} = '${field.uuid}' AND ${DAO.COLUMN_RULE_NAME} = '${rule.name}' " +
-//                        "AND ${DAO.COLUMN_OPERATOR_ID} = '${OperatorConverter.toIndex(operator)}' AND " +
-//                        "${DAO.COLUMN_RULE_VALUE} = '${rule.value}'"
-//
-//                val cursor = dao.writableDatabase.rawQuery(query, null)
-//
-//                while (cursor.moveToNext()) {
-//                    return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-//                }
-//            }
-//        }
-//        return null
-//    }
 
     fun exists( rule: Rule ): Boolean
     {

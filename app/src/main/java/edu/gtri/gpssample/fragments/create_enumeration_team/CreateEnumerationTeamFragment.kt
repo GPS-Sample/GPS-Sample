@@ -137,16 +137,18 @@ class CreateEnumerationTeamFragment : Fragment(),
 
             val polygon = ArrayList<LatLon>()
 
+            var index = 0
+
             intersectionPolygon?.points?.map { points ->
                 points.map { point ->
-                    polygon.add( LatLon( point.latitude(), point.longitude()))
+                    polygon.add( LatLon( index++, point.latitude(), point.longitude()))
                 }
             }
 
             if (polygon.isEmpty())
             {
                 enumArea.vertices.map {
-                    polygon.add( LatLon( it.latitude, it.longitude ))
+                    polygon.add( LatLon( index++, it.latitude, it.longitude ))
                 }
             }
 

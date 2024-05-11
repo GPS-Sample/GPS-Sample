@@ -36,7 +36,8 @@ data class EnumerationItem(
     var fieldDataList : ArrayList<FieldData>,
     var locationUuid : String )
 {
-    constructor() : this(UUID.randomUUID().toString(),
+    constructor() : this(
+        "",
         Date().time,
         0,
         0.0,
