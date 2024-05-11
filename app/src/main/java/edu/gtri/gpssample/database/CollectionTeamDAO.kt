@@ -42,28 +42,28 @@ class CollectionTeamDAO(private var dao: DAO)
     {
         for (latLon in collectionTeam.polygon)
         {
-            val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
+            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
             val cursor = dao.writableDatabase.rawQuery(query, null)
             if (cursor.count == 0)
             {
                 val values = ContentValues()
                 values.put( DAO.COLUMN_LAT_LON_UUID, latLon.uuid )
                 values.put( DAO.COLUMN_COLLECTION_TEAM_UUID, collectionTeam.uuid )
-                dao.writableDatabase.insert(DAO.TABLE_COLLECTION_TEAM__LAT_LON, null, values)
+                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON, null, values)
             }
             cursor.close()
         }
 
         for (location in collectionTeam.locations)
         {
-            val query = "SELECT * FROM ${DAO.TABLE_LOCATION__COLLECTION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
+            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
             val cursor = dao.writableDatabase.rawQuery(query, null)
             if (cursor.count == 0)
             {
                 val values = ContentValues()
                 values.put( DAO.COLUMN_LOCATION_UUID, location.uuid )
                 values.put( DAO.COLUMN_COLLECTION_TEAM_UUID, collectionTeam.uuid )
-                dao.writableDatabase.insert(DAO.TABLE_LOCATION__COLLECTION_TEAM, null, values)
+                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM, null, values)
             }
             cursor.close()
         }

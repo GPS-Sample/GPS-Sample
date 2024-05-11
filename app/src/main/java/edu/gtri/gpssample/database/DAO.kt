@@ -75,25 +75,25 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableStudy)
 
-            val createTableConfigStudy = ("CREATE TABLE " +
-                    TABLE_CONFIG_STUDY + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+            val createConnectorTableConfigStudy = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_CONFIG__STUDY + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_CONFIG_UUID + " TEXT NOT NULL" + "," +
                     COLUMN_STUDY_UUID + " TEXT NOT NULL" + "," +
                     "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" +
                     ")")
-            db.execSQL(createTableConfigStudy)
+            db.execSQL(createConnectorTableConfigStudy)
 
-            val createTableStudyEnumArea = ("CREATE TABLE " +
-                    TABLE_STUDY_ENUM_AREA + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_STUDY_UUID + " TEXT NOT NULL" + "," +
-                    COLUMN_ENUM_AREA_UUID + " TEXT NOT NULL" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" + "," +
-                    "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
-                    ")")
-            db.execSQL(createTableStudyEnumArea)
+//            val createConnectorTableStudyEnumArea = ("CREATE TABLE " +
+//                    CONNECTOR_TABLE_STUDY__ENUM_AREA + "(" +
+//                    COLUMN_CID + COLUMN_CID_TYPE + "," +
+//                    COLUMN_STUDY_UUID + " TEXT NOT NULL" + "," +
+//                    COLUMN_ENUM_AREA_UUID + " TEXT NOT NULL" + "," +
+//                    "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" + "," +
+//                    "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
+//                    ")")
+//            db.execSQL(createConnectorTableStudyEnumArea)
 
             val createTableField = ("CREATE TABLE " +
                     TABLE_FIELD + "(" +
@@ -126,15 +126,15 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableFieldOption)
 
-            val createTableField__FieldOption = ("CREATE TABLE " +
-                    TABLE_FIELD__FIELD_OPTION + "(" +
-                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+            val createConnectorTableField__FieldOption = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_FIELD__FIELD_OPTION + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_FIELD_UUID + " TEXT" + "," +
                     COLUMN_FIELD_OPTION_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_UUID) REFERENCES $TABLE_FIELD($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_OPTION_UUID) REFERENCES $TABLE_FIELD_OPTION($COLUMN_UUID)" +
                     ")")
-            db.execSQL(createTableField__FieldOption)
+            db.execSQL(createConnectorTableField__FieldOption)
 
             val createTableRule = ("CREATE TABLE " +
                     TABLE_RULE + "(" +
@@ -212,38 +212,38 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableLocation)
 
-            val createTableLocationEnumArea = ("CREATE TABLE " +
-                    TABLE_LOCATION__ENUM_AREA + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+            val createConnectorTableLocationEnumArea = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_LOCATION__ENUM_AREA + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_LOCATION_UUID + " TEXT" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_UUID) REFERENCES $TABLE_LOCATION($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" + "," +
                     "UNIQUE ($COLUMN_LOCATION_UUID, $COLUMN_ENUM_AREA_UUID)" +
                     ")")
-            db.execSQL(createTableLocationEnumArea)
+            db.execSQL(createConnectorTableLocationEnumArea)
 
-            val createTableLocationEnumerationTeam = ("CREATE TABLE " +
-                    TABLE_LOCATION__ENUMERATION_TEAM + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+            val createConnectorTableLocationEnumerationTeam = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_LOCATION_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_TEAM_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_UUID) REFERENCES $TABLE_LOCATION($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_UUID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_UUID)" + "," +
                     "UNIQUE ($COLUMN_LOCATION_UUID, $COLUMN_ENUMERATION_TEAM_UUID)" +
                     ")")
-            db.execSQL(createTableLocationEnumerationTeam)
+            db.execSQL(createConnectorTableLocationEnumerationTeam)
 
-            val createTableLocationCollectionTeam = ("CREATE TABLE " +
-                    TABLE_LOCATION__COLLECTION_TEAM + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+            val createConnectorTableLocationCollectionTeam = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_LOCATION_UUID + " TEXT" + "," +
                     COLUMN_COLLECTION_TEAM_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_UUID) REFERENCES $TABLE_LOCATION($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_COLLECTION_TEAM_UUID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_UUID)" + "," +
                     "UNIQUE ($COLUMN_LOCATION_UUID, $COLUMN_COLLECTION_TEAM_UUID)" +
                     ")")
-            db.execSQL(createTableLocationCollectionTeam)
+            db.execSQL(createConnectorTableLocationCollectionTeam)
 
             val createTableEnumerationItem = ("CREATE TABLE " +
                     TABLE_ENUMERATION_ITEM + "(" +
@@ -295,25 +295,25 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableFieldDataOption)
 
-            val createTableFieldData__FieldDataOption = ("CREATE TABLE " +
-                    TABLE_FIELD_DATA__FIELD_DATA_OPTION + "(" +
-                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+            val createConnectorTableFieldData__FieldDataOption = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_FIELD_DATA_UUID + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_DATA_UUID) REFERENCES $TABLE_FIELD_DATA($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_DATA_OPTION_UUID) REFERENCES $TABLE_FIELD_DATA_OPTION($COLUMN_UUID)" +
                     ")")
-            db.execSQL(createTableFieldData__FieldDataOption)
+            db.execSQL(createConnectorTableFieldData__FieldDataOption)
 
-            val createTableRule__FieldDataOption = ("CREATE TABLE " +
-                    TABLE_RULE__FIELD_DATA_OPTION + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+            val createConnectorTableRule__FieldDataOption = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_RULE_UUID + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_UUID + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_DATA_OPTION_UUID) REFERENCES $TABLE_FIELD_DATA_OPTION($COLUMN_UUID)" +
                     ")")
-            db.execSQL(createTableRule__FieldDataOption)
+            db.execSQL(createConnectorTableRule__FieldDataOption)
 
             val createTableLatLon = ("CREATE TABLE " +
                     TABLE_LAT_LON + "(" +
@@ -323,49 +323,49 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     ")")
             db.execSQL(createTableLatLon)
 
-            val createTableConfigLatLon = ("CREATE TABLE " +
-                    TABLE_CONFIG__LAT_LON + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_CONFIG_UUID + " TEXT " + "," +
-                    COLUMN_LAT_LON_UUID + " TEXT " + "," +
-                    "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
-                    "FOREIGN KEY($COLUMN_LAT_LON_UUID) REFERENCES $TABLE_LAT_LON($COLUMN_UUID)" + "," +
-                    "UNIQUE ($COLUMN_CONFIG_UUID, $COLUMN_LAT_LON_UUID)" +
-                    ")")
-            db.execSQL(createTableConfigLatLon)
+//            val createConnectorTableConfigLatLon = ("CREATE TABLE " +
+//                    CONNECTOR_TABLE_CONFIG__LAT_LON + "(" +
+//                    COLUMN_CID + COLUMN_CID_TYPE + "," +
+//                    COLUMN_CONFIG_UUID + " TEXT " + "," +
+//                    COLUMN_LAT_LON_UUID + " TEXT " + "," +
+//                    "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
+//                    "FOREIGN KEY($COLUMN_LAT_LON_UUID) REFERENCES $TABLE_LAT_LON($COLUMN_UUID)" + "," +
+//                    "UNIQUE ($COLUMN_CONFIG_UUID, $COLUMN_LAT_LON_UUID)" +
+//                    ")")
+//            db.execSQL(createConnectorTableConfigLatLon)
 
-            val createTableEnumAreaLatLon = ("CREATE TABLE " +
-                    TABLE_ENUM_AREA__LAT_LON + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+            val createConnectorTableEnumAreaLatLon = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_ENUM_AREA__LAT_LON + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT " + "," +
                     COLUMN_LAT_LON_UUID + " TEXT " + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_LAT_LON_UUID) REFERENCES $TABLE_LAT_LON($COLUMN_UUID)" + "," +
                     "UNIQUE ($COLUMN_ENUM_AREA_UUID, $COLUMN_LAT_LON_UUID)" +
                     ")")
-            db.execSQL(createTableEnumAreaLatLon)
+            db.execSQL(createConnectorTableEnumAreaLatLon)
 
-            val createTableEnumerationTeamLatLon = ("CREATE TABLE " +
-                    TABLE_ENUMERATION_TEAM__LAT_LON + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+            val createConnectorTableEnumerationTeamLatLon = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
                     COLUMN_ENUMERATION_TEAM_UUID + " TEXT " + "," +
                     COLUMN_LAT_LON_UUID + " TEXT " + "," +
                     "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_UUID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_LAT_LON_UUID) REFERENCES $TABLE_LAT_LON($COLUMN_UUID)" + "," +
                     "UNIQUE ($COLUMN_ENUMERATION_TEAM_UUID, $COLUMN_LAT_LON_UUID)" +
                     ")")
-            db.execSQL(createTableEnumerationTeamLatLon)
+            db.execSQL(createConnectorTableEnumerationTeamLatLon)
 
-            val createTableCollectionTeamLatLon = ("CREATE TABLE " +
-                    TABLE_COLLECTION_TEAM__LAT_LON + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
-                    COLUMN_COLLECTION_TEAM_UUID + " STRING " + "," +
+            val createConnectorTableCollectionTeamLatLon = ("CREATE TABLE " +
+                    CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON + "(" +
+                    COLUMN_CID + COLUMN_CID_TYPE + "," +
+                    COLUMN_COLLECTION_TEAM_UUID + " TEXT " + "," +
                     COLUMN_LAT_LON_UUID + " TEXT " + "," +
                     "FOREIGN KEY($COLUMN_COLLECTION_TEAM_UUID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_LAT_LON_UUID) REFERENCES $TABLE_LAT_LON($COLUMN_UUID)" + "," +
                     "UNIQUE ($COLUMN_COLLECTION_TEAM_UUID, $COLUMN_LAT_LON_UUID)" +
                     ")")
-            db.execSQL(createTableCollectionTeamLatLon)
+            db.execSQL(createConnectorTableCollectionTeamLatLon)
 
             val createTableMapTileRegion = ("CREATE TABLE " +
                     TABLE_MAP_TILE_REGION + "(" +
@@ -391,8 +391,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG_STUDY")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY_ENUM_AREA")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_CONFIG__STUDY")
+//        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_STUDY__ENUM_AREA")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
@@ -405,18 +405,18 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG__LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA__LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM__LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM__LAT_LON")
+//        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_CONFIG__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUM_AREA__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD__FIELD_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE__FIELD_DATA_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUM_AREA")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__ENUMERATION_TEAM")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION__COLLECTION_TEAM")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD__FIELD_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUM_AREA")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM")
+        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM")
 
         onCreate(db)
     }
@@ -427,6 +427,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         const val COLUMN_ID = "id"
         const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
+
+        const val COLUMN_CID = "cid"
+        const val COLUMN_CID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
 
         const val COLUMN_UUID = "uuid"
         const val COLUMN_UUID_TYPE = " TEXT PRIMARY KEY NOT NULL"
@@ -453,7 +456,19 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LAT_LON_UUID = "lat_lon_uuid"
 
         // Connector Tables
-        const val TABLE_CONFIG_STUDY = "config_study_conn"
+        const val CONNECTOR_TABLE_CONFIG__STUDY = "config__study"
+        const val CONNECTOR_TABLE_FIELD__FIELD_OPTION = "field__field_option"
+        const val CONNECTOR_TABLE_LOCATION__ENUM_AREA = "location__enum_area"
+        const val CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM = "location__enumeration_team"
+        const val CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM = "location__collection_team"
+        const val CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION = "field_data__field_data_option"
+        const val CONNECTOR_TABLE_ENUM_AREA__LAT_LON = "enum_area__lat_lon"
+        const val CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON = "enumeration_team__lat_lon"
+        const val CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON = "collection_team__lat_lon"
+        const val CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION = "rule__field_data_option"
+
+//        const val CONNECTOR_TABLE_CONFIG__LAT_LON = "config__lat_lon"
+//        const val CONNECTOR_TABLE_STUDY__ENUM_AREA = "study__enum_area"
 
         // User Table
         const val TABLE_USER = "user"
@@ -477,10 +492,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS = "config_auto_increment_subaddress"
         const val COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED = "config_proximity_warning_is_enabled"
         const val COLUMN_CONFIG_PROXIMITY_WARNING_VALUE = "config_proximity_warning_value"
-
-        // Study EnumArea connector table
-        const val TABLE_STUDY_ENUM_AREA = "study_enum_area"
-        // columns are defined in foreign key area
 
         // Study Table
         const val TABLE_STUDY = "study"
@@ -508,9 +519,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
         const val TABLE_FIELD_OPTION = "field_option"
         const val COLUMN_FIELD_OPTION_NAME = "field_option_name"
-
-        // connector table, field to field_option
-        const val TABLE_FIELD__FIELD_OPTION = "field__field_option"
 
         // Rule Table
         const val TABLE_RULE = "rule"
@@ -553,15 +561,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LOCATION_IMAGE_DATA = "location_image_data"
         const val COLUMN_LOCATION_IS_MULTI_FAMILY = "location_is_multi_family"
 
-        // connector table, location to EnumArea
-        const val TABLE_LOCATION__ENUM_AREA = "location__enum_area"
-
-        // connector table, location to EnumerationTeam
-        const val TABLE_LOCATION__ENUMERATION_TEAM = "location__enumeration_team"
-
-        // connector table, location to CollectionTeam
-        const val TABLE_LOCATION__COLLECTION_TEAM = "location__collection_team"
-
         // EnumerationItem Table
         const val TABLE_ENUMERATION_ITEM = "enumeration_item"
         const val COLUMN_ENUMERATION_ITEM_SUB_ADDRESS = "enumeration_item_sub_address"
@@ -595,21 +594,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_SOUTH_WEST_LAT = "south_west_lat"
         const val COLUMN_SOUTH_WEST_LON = "south_west_lon"
 
-        // connector table, fieldData to fieldDataOption
-        const val TABLE_FIELD_DATA__FIELD_DATA_OPTION = "field_data__field_data_option"
-
-        // connector table, rule to fieldDataOption
-        const val TABLE_RULE__FIELD_DATA_OPTION = "rule__field_data_option"
-
         const val TABLE_LAT_LON = "lat_lon"
         const val COLUMN_LAT = "lat"
         const val COLUMN_LON = "lon"
-
-        // connector tables for lat lon
-        const val TABLE_CONFIG__LAT_LON = "config_lat_lon"
-        const val TABLE_ENUM_AREA__LAT_LON = "enum_area_lat_lon"
-        const val TABLE_ENUMERATION_TEAM__LAT_LON = "enumeration_team_lat_lon"
-        const val TABLE_COLLECTION_TEAM__LAT_LON = "collection_team_lat_lon"
 
         // DAO's
         lateinit var userDAO: UserDAO
@@ -667,59 +654,59 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_CONFIG")
                 db.execSQL("DELETE FROM $TABLE_ENUM_AREA")
                 db.execSQL("DELETE FROM $TABLE_STUDY")
-                db.execSQL("DELETE FROM $TABLE_STUDY_ENUM_AREA")
-                db.execSQL("DELETE FROM $TABLE_CONFIG_STUDY")
+//                db.execSQL("DELETE FROM $CONNECTOR_TABLE_STUDY__ENUM_AREA")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_CONFIG__STUDY")
                 db.execSQL("DELETE FROM $TABLE_FIELD")
                 db.execSQL("DELETE FROM $TABLE_FIELD_OPTION")
-                db.execSQL("DELETE FROM $TABLE_FIELD__FIELD_OPTION")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_FIELD__FIELD_OPTION")
                 db.execSQL("DELETE FROM $TABLE_RULE")
                 db.execSQL("DELETE FROM $TABLE_FILTER")
                 db.execSQL("DELETE FROM $TABLE_FILTEROPERATOR")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_LOCATION")
-                db.execSQL("DELETE FROM $TABLE_LOCATION__ENUM_AREA")
-                db.execSQL("DELETE FROM $TABLE_LOCATION__ENUMERATION_TEAM")
-                db.execSQL("DELETE FROM $TABLE_LOCATION__COLLECTION_TEAM")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_LOCATION__ENUM_AREA")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_ITEM")
                 db.execSQL("DELETE FROM $TABLE_FIELD_DATA")
                 db.execSQL("DELETE FROM $TABLE_FIELD_DATA_OPTION")
-                db.execSQL("DELETE FROM $TABLE_FIELD_DATA__FIELD_DATA_OPTION")
-                db.execSQL("DELETE FROM $TABLE_RULE__FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION")
                 db.execSQL("DELETE FROM $TABLE_LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_CONFIG__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_ENUM_AREA__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM__LAT_LON")
-                db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM__LAT_LON")
+//                db.execSQL("DELETE FROM $CONNECTOR_TABLE_CONFIG__LAT_LON")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_ENUM_AREA__LAT_LON")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON")
+                db.execSQL("DELETE FROM $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
 
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_CONFIG'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUM_AREA'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_STUDY'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_STUDY_ENUM_AREA'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_CONFIG_STUDY'")
+//                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_STUDY__ENUM_AREA'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_CONFIG__STUDY'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD_OPTION'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD__FIELD_OPTION'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_FIELD__FIELD_OPTION'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_RULE'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FILTER'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FILTEROPERATOR'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_COLLECTION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION__ENUM_AREA'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION__ENUMERATION_TEAM'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LOCATION__COLLECTION_TEAM'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_LOCATION__ENUM_AREA'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_ITEM'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD_DATA'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD_DATA_OPTION'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_FIELD_DATA__FIELD_DATA_OPTION'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_RULE__FIELD_DATA_OPTION'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_LAT_LON'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_CONFIG__LAT_LON'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUM_AREA__LAT_LON'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUMERATION_TEAM__LAT_LON'")
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_COLLECTION_TEAM__LAT_LON'")
+//                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_CONFIG__LAT_LON'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_ENUM_AREA__LAT_LON'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_MAP_TILE_REGION'")
 
                 db.close()

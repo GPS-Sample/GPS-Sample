@@ -47,7 +47,7 @@ class FieldDataOptionDAO(private var dao: DAO)
         val values = ContentValues()
         values.put( DAO.COLUMN_FIELD_DATA_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
-        dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA__FIELD_DATA_OPTION, null, values).toInt()
+        dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION, null, values).toInt()
     }
 
     fun createRuleConnection(fieldDataOption: FieldDataOption, rule: Rule)
@@ -55,7 +55,7 @@ class FieldDataOptionDAO(private var dao: DAO)
         val values = ContentValues()
         values.put( DAO.COLUMN_RULE_UUID, rule.uuid )
         values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
-        dao.writableDatabase.insert(DAO.TABLE_RULE__FIELD_DATA_OPTION, null, values).toInt()
+        dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION, null, values).toInt()
     }
 
     fun putFieldDataOption(fieldDataOption: FieldDataOption, values: ContentValues)
@@ -145,7 +145,7 @@ class FieldDataOptionDAO(private var dao: DAO)
     {
         val fieldDataOptions = ArrayList<FieldDataOption>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA__FIELD_DATA_OPTION} where ${DAO.COLUMN_FIELD_DATA_UUID} = '${fieldData.uuid}'"
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION} where ${DAO.COLUMN_FIELD_DATA_UUID} = '${fieldData.uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -167,7 +167,7 @@ class FieldDataOptionDAO(private var dao: DAO)
     {
         val fieldDataOptions = ArrayList<FieldDataOption>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_RULE__FIELD_DATA_OPTION} where ${DAO.COLUMN_RULE_UUID}='${rule.uuid}'"
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION} where ${DAO.COLUMN_RULE_UUID}='${rule.uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

@@ -25,26 +25,26 @@ class LatLonDAO(private var dao: DAO)
             Log.d( "xxx", "created LatLon with ID ${latLon.uuid}" )
         }
 
-        config?.let { config ->
-            val query = "SELECT * FROM ${DAO.TABLE_CONFIG__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}'"
-            val cursor = dao.writableDatabase.rawQuery(query, null)
-            if (cursor.count == 0)
-            {
-                val values = ContentValues()
-                putLatLonConfig( latLon.uuid, config.uuid, values)
-                dao.writableDatabase.insert(DAO.TABLE_CONFIG__LAT_LON, null, values)
-            }
-            cursor.close()
-        }
+//        config?.let { config ->
+//            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_CONFIG__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}'"
+//            val cursor = dao.writableDatabase.rawQuery(query, null)
+//            if (cursor.count == 0)
+//            {
+//                val values = ContentValues()
+//                putLatLonConfig( latLon.uuid, config.uuid, values)
+//                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_CONFIG__LAT_LON, null, values)
+//            }
+//            cursor.close()
+//        }
 
         enumArea?.let { enumArea ->
             val values = ContentValues()
-            val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
+            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
             val cursor = dao.writableDatabase.rawQuery(query, null)
             if (cursor.count == 0)
             {
                 putLatLonEnumArea( latLon.uuid, enumArea.uuid, values)
-                dao.writableDatabase.insert(DAO.TABLE_ENUM_AREA__LAT_LON, null, values)
+                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON, null, values)
             }
             cursor.close()
         }
@@ -119,8 +119,10 @@ class LatLonDAO(private var dao: DAO)
     fun getLatLonsWithEnumAreaUuid( enumAreaUuid: String ): ArrayList<LatLon>
     {
         val latLons = ArrayList<LatLon>()
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_ENUM_AREA__LAT_LON} ELL WHERE" +
-                " ELL.${DAO.COLUMN_ENUM_AREA_UUID} = '$enumAreaUuid' AND LL.uuid = ELL.${DAO.COLUMN_LAT_LON_UUID}"
+
+        val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_ENUM_AREA_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
+                "${DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_ENUM_AREA_UUID} = '${enumAreaUuid}'"
+
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -138,8 +140,10 @@ class LatLonDAO(private var dao: DAO)
     fun getLatLonsWithEnumerationTeamId( teamUuid: String ): ArrayList<LatLon>
     {
         val latLons = ArrayList<LatLon>()
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_ENUMERATION_TEAM__LAT_LON} ELL WHERE" +
-                " ELL.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '$teamUuid' AND LL.uuid = ELL.${DAO.COLUMN_LAT_LON_UUID}"
+
+        val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
+                "${DAO.CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${teamUuid}'"
+
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -157,8 +161,10 @@ class LatLonDAO(private var dao: DAO)
     fun getLatLonsWithCollectionTeamId( teamUuid: String ): ArrayList<LatLon>
     {
         val latLons = ArrayList<LatLon>()
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LAT_LON} AS LL, ${DAO.TABLE_COLLECTION_TEAM__LAT_LON} ELL WHERE" +
-                " ELL.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '$teamUuid' AND LL.uuid = ELL.${DAO.COLUMN_LAT_LON_UUID}"
+
+        val query = "SELECT latlon.*, conn.${DAO.COLUMN_LAT_LON_UUID}, conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} FROM ${DAO.TABLE_LAT_LON} AS latlon, " +
+                "${DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON} AS conn WHERE latlon.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LAT_LON_UUID} AND conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${teamUuid}'"
+
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

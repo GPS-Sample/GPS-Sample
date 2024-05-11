@@ -160,7 +160,7 @@ class StudyDAO(private var dao: DAO)
         val studies = ArrayList<Study>()
 
         val query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_UUID}, conn.${DAO.COLUMN_STUDY_UUID} FROM ${DAO.TABLE_STUDY} as study, " +
-                "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_STUDY_UUID} and "  + "conn.${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}'"
+                "${DAO.CONNECTOR_TABLE_CONFIG__STUDY} as conn WHERE study.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_STUDY_UUID} and "  + "conn.${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}'"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 

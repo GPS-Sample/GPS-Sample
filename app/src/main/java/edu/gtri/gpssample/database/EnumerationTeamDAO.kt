@@ -39,28 +39,28 @@ class EnumerationTeamDAO(private var dao: DAO)
     {
         for (latLon in enumerationTeam.polygon)
         {
-            val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
+            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
             val cursor = dao.writableDatabase.rawQuery(query, null)
             if (cursor.count == 0)
             {
                 val values = ContentValues()
                 values.put( DAO.COLUMN_LAT_LON_UUID, latLon.uuid )
                 values.put( DAO.COLUMN_ENUMERATION_TEAM_UUID, enumerationTeam.uuid )
-                dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM__LAT_LON, null, values)
+                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON, null, values)
             }
             cursor.close()
         }
 
         for (location in enumerationTeam.locations)
         {
-            val query = "SELECT * FROM ${DAO.TABLE_LOCATION__ENUMERATION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
+            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
             val cursor = dao.writableDatabase.rawQuery(query, null)
             if (cursor.count == 0)
             {
                 val values = ContentValues()
                 values.put( DAO.COLUMN_LOCATION_UUID, location.uuid )
                 values.put( DAO.COLUMN_ENUMERATION_TEAM_UUID, enumerationTeam.uuid )
-                dao.writableDatabase.insert(DAO.TABLE_LOCATION__ENUMERATION_TEAM, null, values)
+                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM, null, values)
             }
             cursor.close()
         }

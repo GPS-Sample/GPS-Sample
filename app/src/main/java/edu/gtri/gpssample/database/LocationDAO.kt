@@ -53,14 +53,14 @@ class LocationDAO(private var dao: DAO)
 
     private fun updateConnectorTable( location : Location, enumArea : EnumArea )
     {
-        val query = "SELECT * FROM ${DAO.TABLE_LOCATION__ENUM_AREA} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
         if (cursor.count == 0)
         {
             val values = ContentValues()
             values.put( DAO.COLUMN_LOCATION_UUID, location.uuid )
             values.put( DAO.COLUMN_ENUM_AREA_UUID, enumArea.uuid )
-            dao.writableDatabase.insert(DAO.TABLE_LOCATION__ENUM_AREA, null, values)
+            dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA, null, values)
         }
         cursor.close()
     }
@@ -202,8 +202,9 @@ class LocationDAO(private var dao: DAO)
     {
         val locations = ArrayList<Location>()
 
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__ENUMERATION_TEAM} ELL WHERE" +
-                " ELL.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}' AND LL.ID = ELL.${DAO.COLUMN_LOCATION_UUID}"
+        val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} FROM ${DAO.TABLE_LOCATION} AS location, " +
+                "${DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM} AS conn WHERE location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
+
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -222,8 +223,9 @@ class LocationDAO(private var dao: DAO)
     {
         val locations = ArrayList<Location>()
 
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__COLLECTION_TEAM} ELL WHERE" +
-                " ELL.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}' AND LL.ID = ELL.${DAO.COLUMN_LOCATION_UUID}"
+        val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} FROM ${DAO.TABLE_LOCATION} AS location, " +
+                "${DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM} AS conn WHERE location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
+
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -242,8 +244,9 @@ class LocationDAO(private var dao: DAO)
     {
         val locations = ArrayList<Location>()
 
-        val query = "SELECT LL.* FROM ${DAO.TABLE_LOCATION} AS LL, ${DAO.TABLE_LOCATION__ENUM_AREA} ELL WHERE" +
-                " ELL.${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}' AND LL.ID = ELL.${DAO.COLUMN_LOCATION_UUID}"
+        val query = "SELECT location.*, conn.${DAO.COLUMN_LOCATION_UUID}, conn.${DAO.COLUMN_ENUM_AREA_UUID} FROM ${DAO.TABLE_LOCATION} AS location, " +
+                "${DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA} AS conn WHERE location.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_LOCATION_UUID} AND conn.${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
+
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

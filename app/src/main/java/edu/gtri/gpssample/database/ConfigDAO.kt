@@ -168,7 +168,7 @@ class ConfigDAO(private var dao: DAO)
         val whereClause = "${DAO.COLUMN_CONFIG_UUID} = ?"
         val args = arrayOf(config.uuid)
 
-        dao.writableDatabase.delete(DAO.TABLE_CONFIG_STUDY, whereClause, args)
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_CONFIG__STUDY, whereClause, args)
 
         // add studies
         for(study in config.studies)
@@ -177,7 +177,7 @@ class ConfigDAO(private var dao: DAO)
             DAO.studyDAO.createOrUpdateStudy(study)?.let { study
                 val configStudyValues = ContentValues()
                 putConfigStudy(config, study, configStudyValues)
-                dao.writableDatabase.insert(DAO.TABLE_CONFIG_STUDY, null, configStudyValues).toInt()
+                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_CONFIG__STUDY, null, configStudyValues).toInt()
             }
         }
     }

@@ -35,7 +35,7 @@ class FieldOptionDAO(private var dao: DAO)
         val values = ContentValues()
         values.put( DAO.COLUMN_FIELD_UUID, field.uuid )
         values.put( DAO.COLUMN_FIELD_OPTION_UUID, fieldOption.uuid )
-        dao.writableDatabase.insert(DAO.TABLE_FIELD__FIELD_OPTION, null, values).toInt()
+        dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD__FIELD_OPTION, null, values).toInt()
     }
 
     fun putFieldOption( fieldOption: FieldOption, values: ContentValues )
@@ -93,7 +93,7 @@ class FieldOptionDAO(private var dao: DAO)
     {
         val fieldOptions = ArrayList<FieldOption>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD__FIELD_OPTION} where ${DAO.COLUMN_FIELD_UUID} = '${field.uuid}'"
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_FIELD__FIELD_OPTION} where ${DAO.COLUMN_FIELD_UUID} = '${field.uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
