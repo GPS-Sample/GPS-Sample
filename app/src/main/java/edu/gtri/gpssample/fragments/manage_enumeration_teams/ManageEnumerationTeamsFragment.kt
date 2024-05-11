@@ -103,9 +103,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
     {
         sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumerationTeam )
 
-        enumerationTeam.id?.let {
-            enumArea.selectedEnumerationTeamId = it
-        }
+        enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
 
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
     }

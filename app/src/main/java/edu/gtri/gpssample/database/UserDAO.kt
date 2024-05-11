@@ -11,18 +11,19 @@ import edu.gtri.gpssample.extensions.toBoolean
 class UserDAO(private var dao: DAO)
 {
     //--------------------------------------------------------------------------
-    fun createUser( user: User) : Int
+    fun createUser( user: User)
     {
         val values = ContentValues()
 
         putUser( user, values )
 
-        return dao.writableDatabase.insert(DAO.TABLE_USER, null, values).toInt()
+        dao.writableDatabase.insert(DAO.TABLE_USER, null, values)
     }
 
     //--------------------------------------------------------------------------
     fun putUser( user: User, values: ContentValues )
     {
+        values.put( DAO.COLUMN_UUID, user.uuid )
         values.put( DAO.COLUMN_USER_ROLE, user.role )
         values.put( DAO.COLUMN_USER_NAME, user.name )
         values.put( DAO.COLUMN_USER_PIN, user.pin )
@@ -34,7 +35,7 @@ class UserDAO(private var dao: DAO)
     fun getUser( id: Int ): User?
     {
         var user: User? = null
-        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_UUID} = '$id'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -91,7 +92,7 @@ class UserDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun createUser(cursor: Cursor) : User
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
         val pin = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_PIN))
         val role = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_ROLE))
@@ -99,14 +100,14 @@ class UserDAO(private var dao: DAO)
         val recoveryAnswer = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_RECOVERY_ANSWER))
         val isOnline = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_USER_IS_ONLINE)).toBoolean()
 
-        return User(id, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
+        return User(uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
     }
 
     //--------------------------------------------------------------------------
     fun updateUser( user: User )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args: Array<String> = arrayOf(user.id!!.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(user.uuid)
         val values = ContentValues()
 
         putUser( user, values )

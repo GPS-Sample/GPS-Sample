@@ -28,7 +28,7 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class Config(
-    var id : Int? = null,
+    var uuid : String,
     var creationDate: Long,
     var name: String,
     var dateFormat: DateFormat,
@@ -43,17 +43,17 @@ data class Config(
     var proximityWarningValue: Int,
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
-    var selectedStudyId: Int,
-    var selectedEnumAreaId: Int,
+    var selectedStudyUuid: String,
+    var selectedEnumAreaUuid: String,
     var mapTileRegions: ArrayList<MapTileRegion>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
-            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-                                    ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1, ArrayList<MapTileRegion>())
-    constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyId: Int, selectedEnumAreaId: Int)
-            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId, ArrayList<MapTileRegion>())
+            : this(UUID.randomUUID().toString(), Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+                                    ArrayList<Study>(), ArrayList<EnumArea>(), "", "", ArrayList<MapTileRegion>())
+    constructor(uuid: String, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String)
+            : this(uuid, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, ArrayList<MapTileRegion>())
 
     var minimumGPSPrecision : String
         get() {

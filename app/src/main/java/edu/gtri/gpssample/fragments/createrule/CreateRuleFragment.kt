@@ -161,7 +161,7 @@ class CreateRuleFragment : Fragment(),
             }
         }
 
-        if (rule.id == null)
+        if (rule.uuid.isEmpty())
         {
             val field = study.fields[0]
             if (field.type == FieldType.Checkbox)

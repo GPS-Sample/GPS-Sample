@@ -308,7 +308,7 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
-        if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaId < 0)
+        if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
         {
             binding.exportButton.visibility = View.GONE
         }
@@ -320,7 +320,7 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaId < 0)
+            if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
             {
                 InfoDialog( this@PerformEnumerationFragment.context, "Please Note", "Since this Enumeration Area was created by an Enumerator, you will need to press the Back button and use the EXPORT CONFIGURATION button of the previous page in order to export the configuration.", resources.getString(R.string.ok), null, this)
             }

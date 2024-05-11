@@ -141,7 +141,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
                 DAO.deleteAll( true )
 
                 val user = User( name, pin1, role, question, answer, false )
-                user.id = DAO.userDAO.createUser( user )
+                DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
                 bundle.putString( Keys.kRole.toString(), role )

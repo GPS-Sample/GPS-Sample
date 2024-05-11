@@ -186,19 +186,19 @@ class PerformMultiCollectionFragment : Fragment(),
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.getConfig( config.id!! )?.let {
+                    DAO.configDAO.getConfig( config.uuid )?.let {
                         sharedViewModel.setCurrentConfig( it )
                     }
                 }
 
                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
+                    DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
                         sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
                     }
                 }
 
                 sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    DAO.studyDAO.getStudy( study.id!! )?.let {
+                    DAO.studyDAO.getStudy( study.uuid )?.let {
                         sharedViewModel.createStudyModel.setStudy( it )
                     }
                 }

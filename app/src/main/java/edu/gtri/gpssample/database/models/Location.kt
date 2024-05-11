@@ -10,9 +10,8 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class Location(
-    var id : Int? = null,
-    var creationDate: Long,
     var uuid : String,
+    var creationDate: Long,
     var type : LocationType,
     var gpsAccuracy : Int,
     var latitude : Double,
@@ -24,11 +23,11 @@ data class Location(
     var enumerationItems: ArrayList<EnumerationItem>)
 {
     constructor(type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, isLandmark: Boolean, description: String ) :
-            this( null, Date().time, UUID.randomUUID().toString(), type, gpsAccuracy, latitude, longitude, isLandmark, description,"", null, ArrayList<EnumerationItem>())
+            this( UUID.randomUUID().toString(), Date().time, type, gpsAccuracy, latitude, longitude, isLandmark, description,"", null, ArrayList<EnumerationItem>())
 
     fun equals( location: Location ) : Boolean
     {
-        if (this.id == location.id &&
+        if (this.uuid == location.uuid &&
             this.creationDate == location.creationDate &&
             this.uuid == location.uuid &&
             this.type == location.type &&

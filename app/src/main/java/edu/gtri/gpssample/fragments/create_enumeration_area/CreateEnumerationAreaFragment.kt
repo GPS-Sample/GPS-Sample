@@ -1110,12 +1110,12 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             if (name.isEmpty())
             {
-                val enumArea = EnumArea( "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
+                val enumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
                 unsavedEnumAreas.add( enumArea )
             }
             else
             {
-                val enumArea = EnumArea( name, vertices )
+                val enumArea = EnumArea( config.uuid, name, vertices )
                 unsavedEnumAreas.add( enumArea )
             }
 
@@ -1249,7 +1249,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             feature.geometry?.let { geometry ->
                 when( geometry ) {
                     is MultiPolygon -> {
-                        val enumArea = EnumArea(name, ArrayList<LatLon>())
+                        val enumArea = EnumArea(config.uuid, name, ArrayList<LatLon>())
                         val multiPolygon = geometry as MultiPolygon
 
                         multiPolygon.coordinates[0][0].forEach { position ->

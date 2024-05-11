@@ -11,7 +11,6 @@ import java.util.*
 
 @Serializable
 data class Rule(
-    var id : Int? = null,
     var uuid : String,
     var field: Field?,
     var name: String,
@@ -22,13 +21,13 @@ data class Rule(
     )
 {
     constructor( field: Field, name: String, value: String, operator: Operator)
-            : this(null, UUID.randomUUID().toString(), field, name, value, operator, null, ArrayList<FieldDataOption>())
+            : this(UUID.randomUUID().toString(), field, name, value, operator, null, ArrayList<FieldDataOption>())
 
     constructor( field: Field, name: String, value: String)
-            : this(null, UUID.randomUUID().toString(), field, name, value, null, null, ArrayList<FieldDataOption>())
+            : this(UUID.randomUUID().toString(), field, name, value, null, null, ArrayList<FieldDataOption>())
 
     constructor(id : Int?, field: Field?, name: String, value: String, operator: Operator, filterOperator: FilterOperator?)
-            : this(id, UUID.randomUUID().toString(), field, name, value, operator, filterOperator, ArrayList<FieldDataOption>())
+            : this(UUID.randomUUID().toString(), field, name, value, operator, filterOperator, ArrayList<FieldDataOption>())
 
     fun pack() : String
     {

@@ -92,7 +92,7 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
         values.put( DAO.COLUMN_SYNC_CODE, enumerationItem.syncCode)
-        values.put( DAO.COLUMN_LOCATION_ID, location.id)
+        values.put( DAO.COLUMN_LOCATION_UUID, location.uuid)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME, enumerationItem.enumeratorName )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE, enumerationItem.enumerationState.format )
@@ -114,7 +114,7 @@ class EnumerationItemDAO(private var dao: DAO)
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val syncCode = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SYNC_CODE))
-        val locationId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_ID))
+        val locationUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_UUID))
         val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
         val enumeratorName = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATOR_NAME))
         val enumerationState = EnumerationState.valueOf(cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ENUMERATION_STATE)))
@@ -152,7 +152,7 @@ class EnumerationItemDAO(private var dao: DAO)
             collectionIncompleteReason,
             collectionNotes,
             fieldDataList,
-            locationId
+            locationUuid
         )
     }
 
@@ -178,19 +178,17 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         val enumerationItems = ArrayList<EnumerationItem>()
 
-        location.id?.let { id ->
-            val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_LOCATION_ID} = $id"
-            val cursor = dao.writableDatabase.rawQuery(query, null)
+        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            while (cursor.moveToNext())
-            {
-                val enumerationItem = createEnumerationItem( cursor )
-                enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
-                enumerationItems.add( enumerationItem )
-            }
-
-            cursor.close()
+        while (cursor.moveToNext())
+        {
+            val enumerationItem = createEnumerationItem( cursor )
+            enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
+            enumerationItems.add( enumerationItem )
         }
+
+        cursor.close()
 
         return enumerationItems
     }

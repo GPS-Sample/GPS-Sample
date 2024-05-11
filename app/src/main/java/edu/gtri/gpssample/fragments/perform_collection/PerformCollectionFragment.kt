@@ -180,11 +180,9 @@ class PerformCollectionFragment : Fragment(),
                 {
                     // FIX THIS!!!
                     // why is the locationId NOT set?
-                    if (enumurationItem.locationId < 0)
+                    if (enumurationItem.locationUuid.isEmpty())
                     {
-                        location.id?.let {
-                            enumurationItem.locationId = it
-                        }
+                        enumurationItem.locationUuid = location.uuid
                     }
                     enumerationItems.add( enumurationItem )
                 }
@@ -548,7 +546,7 @@ class PerformCollectionFragment : Fragment(),
     private fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
     {
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-            DAO.locationDAO.getLocation( enumerationItem.locationId )?.let { location ->
+            DAO.locationDAO.getLocation( enumerationItem.locationUuid )?.let { location ->
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
                 sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
                 (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
@@ -737,19 +735,19 @@ class PerformCollectionFragment : Fragment(),
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.getConfig( config.id!! )?.let {
+                    DAO.configDAO.getConfig( config.uuid )?.let {
                         sharedViewModel.setCurrentConfig( it )
                     }
                 }
 
                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
+                    DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
                         sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
                     }
                 }
 
                 sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    DAO.studyDAO.getStudy( study.id!! )?.let {
+                    DAO.studyDAO.getStudy( study.uuid )?.let {
                         sharedViewModel.createStudyModel.setStudy( it )
                     }
                 }
@@ -801,7 +799,7 @@ class PerformCollectionFragment : Fragment(),
                         for (enumerationItem in performCollectionAdapter.enumerationItems)
                         {
                             val currentLatLng = LatLng( point.latitude(), point.longitude())
-                            DAO.locationDAO.getLocation( enumerationItem.locationId )?.let {
+                            DAO.locationDAO.getLocation( enumerationItem.locationUuid )?.let {
                                 val itemLatLng = LatLng( it.latitude, it.longitude )
                                 val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
                                 if (distance < 400) // display in meters or feet

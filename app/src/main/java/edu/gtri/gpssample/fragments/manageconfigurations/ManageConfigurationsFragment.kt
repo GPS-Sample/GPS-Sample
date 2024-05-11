@@ -124,7 +124,7 @@ class ManageConfigurationsFragment : Fragment(),
                 binding.addButton.visibility = View.GONE
             }
 
-            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
             {
                 binding.createButton.visibility = View.VISIBLE
                 binding.exportButton.visibility = View.VISIBLE
@@ -233,9 +233,7 @@ class ManageConfigurationsFragment : Fragment(),
 
             // find the selected Enum Area
             val enumAreas = config.enumAreas.filter {
-                it.id?.let { id ->
-                    id == config.selectedEnumAreaId
-                } ?: false
+                it.uuid == config.selectedEnumAreaUuid
             }
 
             var enumArea: EnumArea? = null
@@ -244,16 +242,14 @@ class ManageConfigurationsFragment : Fragment(),
             {
                 enumArea = enumAreas[0]
             }
-            else if (config.selectedEnumAreaId < 0 && config.enumAreas.isNotEmpty())
+            else if (config.selectedEnumAreaUuid.isEmpty() && config.enumAreas.isNotEmpty())
             {
                 enumArea = config.enumAreas[0]
             }
 
             // find the selected study
             val studies = config.studies.filter {
-                it.id?.let { id ->
-                    id == config.selectedStudyId
-                } ?: false
+                it.uuid == config.selectedStudyUuid
             }
 
             var study: Study? = null
@@ -262,7 +258,7 @@ class ManageConfigurationsFragment : Fragment(),
             {
                 study = studies[0]
             }
-            else if (config.selectedStudyId < 0 && config.studies.isNotEmpty())
+            else if (config.selectedStudyUuid.isEmpty() && config.studies.isNotEmpty())
             {
                 study = config.studies[0]
             }
@@ -271,9 +267,7 @@ class ManageConfigurationsFragment : Fragment(),
             {
                 // find the selected enumeration Team
                 val enumTeams = enumArea.enumerationTeams.filter {
-                    it.id?.let { id ->
-                        id == enumArea.selectedEnumerationTeamId
-                    } ?: false
+                    it.uuid == enumArea.selectedEnumerationTeamUuid
                 }
 
                 var enumTeam: EnumerationTeam? = null
@@ -282,7 +276,7 @@ class ManageConfigurationsFragment : Fragment(),
                 {
                     enumTeam = enumTeams[0]
                 }
-                else if (enumArea.selectedEnumerationTeamId < 0 && enumArea.enumerationTeams.isNotEmpty())
+                else if (enumArea.selectedEnumerationTeamUuid.isEmpty() && enumArea.enumerationTeams.isNotEmpty())
                 {
                     enumTeam = enumArea.enumerationTeams[0]
                 }
@@ -306,16 +300,12 @@ class ManageConfigurationsFragment : Fragment(),
 
             // find the selected Enum Area
             val enumAreas = config.enumAreas.filter {
-                it.id?.let { id ->
-                    id == config.selectedEnumAreaId
-                } ?: false
+                it.uuid == config.selectedEnumAreaUuid
             }
 
             // find the selected study
             val studies = config.studies.filter {
-                it.id?.let { id ->
-                    id == config.selectedStudyId
-                } ?: false
+                it.uuid == config.selectedStudyUuid
             }
 
             if (enumAreas.isNotEmpty() && studies.isNotEmpty())
@@ -325,9 +315,7 @@ class ManageConfigurationsFragment : Fragment(),
 
                 // find the selected collection Team
                 val collectionTeams = study.collectionTeams.filter { collectionTeam ->
-                    collectionTeam.id?.let { id ->
-                        id == study.selectedCollectionTeamId
-                    } ?: false
+                    collectionTeam.uuid == study.selectedCollectionTeamUuid
                 }
 
                 if (collectionTeams.isNotEmpty())
@@ -551,7 +539,7 @@ class ManageConfigurationsFragment : Fragment(),
 
             sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaId < 0)
+                if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
                 {
                     binding.createButton.visibility = View.VISIBLE
                     binding.exportButton.visibility = View.VISIBLE
@@ -628,16 +616,12 @@ class ManageConfigurationsFragment : Fragment(),
 
                     // find the selected Enum Area
                     val enumAreas = config.enumAreas.filter {
-                        it.id?.let { id ->
-                            id == config.selectedEnumAreaId
-                        } ?: false
+                        it.uuid == config.selectedEnumAreaUuid
                     }
 
                     // find the selected study
                     val studies = config.studies.filter {
-                        it.id?.let { id ->
-                            id == config.selectedStudyId
-                        } ?: false
+                        it.uuid == config.selectedStudyUuid
                     }
 
                     if (enumAreas.isNotEmpty() && studies.isNotEmpty())
@@ -647,16 +631,12 @@ class ManageConfigurationsFragment : Fragment(),
 
                         // find the selected enumeration Team
                         val enumTeams = enumArea.enumerationTeams.filter { enumTeam ->
-                            enumTeam.id?.let { id ->
-                                id == enumArea.selectedEnumerationTeamId
-                            } ?: false
+                            enumTeam.uuid == enumArea.selectedEnumerationTeamUuid
                         }
 
                         // find the selected collection Team
                         val collectionTeams = study.collectionTeams.filter { collectionTeam ->
-                            collectionTeam.id?.let { id ->
-                                id == study.selectedCollectionTeamId
-                            } ?: false
+                            collectionTeam.uuid == study.selectedCollectionTeamUuid
                         }
 
                         if (collectionTeams.isNotEmpty())
@@ -665,9 +645,7 @@ class ManageConfigurationsFragment : Fragment(),
 
                             // find the selected Enum Area
                             val enumAreas = config.enumAreas.filter {
-                                it.id?.let { id ->
-                                    id == collectionTeam.enumAreaId
-                                } ?: false
+                                it.uuid == collectionTeam.enumAreaUuid
                             }
 
                             val enumArea = enumAreas[0]
@@ -699,9 +677,7 @@ class ManageConfigurationsFragment : Fragment(),
 
                     // find the selected study
                     val studies = config.studies.filter {
-                        it.id?.let { id ->
-                            id == config.selectedStudyId
-                        } ?: false
+                        it.uuid == config.selectedStudyUuid
                     }
 
                     if (studies.isNotEmpty())
@@ -710,9 +686,7 @@ class ManageConfigurationsFragment : Fragment(),
 
                         // find the selected collection Team
                         val collectionTeams = study.collectionTeams.filter { collectionTeam ->
-                            collectionTeam.id?.let { id ->
-                                id == study.selectedCollectionTeamId
-                            } ?: false
+                            collectionTeam.uuid == study.selectedCollectionTeamUuid
                         }
 
                         if (collectionTeams.isNotEmpty())
@@ -721,9 +695,7 @@ class ManageConfigurationsFragment : Fragment(),
 
                             // find the selected Enum Area
                             val enumAreas = config.enumAreas.filter {
-                                it.id?.let { id ->
-                                    id == collectionTeam.enumAreaId
-                                } ?: false
+                                it.uuid == collectionTeam.enumAreaUuid
                             }
 
                             val enumArea = enumAreas[0]

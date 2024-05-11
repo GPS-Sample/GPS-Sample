@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.NetworkConnection
 import edu.gtri.gpssample.viewmodels.NetworkConnectionViewModel
 import java.util.*
 import kotlin.collections.ArrayList

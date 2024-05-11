@@ -279,7 +279,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         }
 
                         // next, import HH's
-                        val team = enumArea.enumerationTeams.find { it.id == enumArea.selectedEnumerationTeamId }
+                        val team = enumArea.enumerationTeams.find { it.uuid == enumArea.selectedEnumerationTeamUuid }
                         team?.let { team ->
 
                             val newLocations = ArrayList<Location>()
@@ -291,14 +291,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                                 // find out if the location exists in the local version of the selected team
 
-                                val enumerationTeam = DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamId )
+                                val enumerationTeam = DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )
 
                                 if (enumerationTeam == null)
                                 {
                                     DAO.enumerationTeamDAO.createOrUpdateTeam( team )
                                 }
 
-                                DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamId )?.let { currentTeam ->
+                                DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )?.let { currentTeam ->
                                     var found = false
 
                                     for (teamLocation in currentTeam.locations)
@@ -326,10 +326,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         DAO.instance().writableDatabase.endTransaction()
 
                         sharedViewModel?.currentConfiguration?.value?.let { config ->
-                            config.id?.let {
-                                DAO.configDAO.getConfig( it )?.let { config ->
-                                    sharedViewModel?.setCurrentConfig(config)
-                                }
+                            DAO.configDAO.getConfig( config.uuid )?.let { config ->
+                                sharedViewModel?.setCurrentConfig(config)
                             }
                         }
 
@@ -373,10 +371,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         DAO.instance().writableDatabase.endTransaction()
 
                         sharedViewModel?.currentConfiguration?.value?.let { config ->
-                            config.id?.let {
-                                DAO.configDAO.getConfig( it )?.let { config ->
-                                    sharedViewModel?.setCurrentConfig(config)
-                                }
+                            DAO.configDAO.getConfig( config.uuid )?.let { config ->
+                                sharedViewModel?.setCurrentConfig(config)
                             }
                         }
 

@@ -15,7 +15,6 @@ import edu.gtri.gpssample.database.models.Study
 
 class FieldDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateField( field: Field, study : Study ) : Field?
     {
         if (exists( field ))
@@ -26,29 +25,24 @@ class FieldDAO(private var dao: DAO)
         {
             val values = ContentValues()
             putField( field, study, values )
-            field.id = dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values).toInt()
-            field.id?.let { id ->
-                Log.d( "xxx", "new field id = ${id}")
-                for (fieldOption in field.fieldOptions)
-                {
-                    DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
-                }
-            } ?: return null
+            if (dao.writableDatabase.insert(DAO.TABLE_FIELD, null, values) < 0)
+            {
+                return null
+            }
+            Log.d( "xxx", "created field with Id = ${field.uuid}")
+            for (fieldOption in field.fieldOptions)
+            {
+                DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
+            }
         }
 
         return field
     }
 
-    //--------------------------------------------------------------------------
     fun putField( field: Field, study : Study, values: ContentValues )
     {
-        field.id?.let { id ->
-            Log.d( "xxx", "existing field id = ${id}")
-            values.put( DAO.COLUMN_ID, field.id )
-        }
-
         values.put( DAO.COLUMN_UUID, field.uuid )
-        values.put( DAO.COLUMN_STUDY_ID, study.id )
+        values.put( DAO.COLUMN_STUDY_UUID, study.uuid )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
         values.put( DAO.COLUMN_FIELD_BLOCK_CONTAINER, field.fieldBlockContainer )
@@ -65,60 +59,50 @@ class FieldDAO(private var dao: DAO)
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, type )
     }
 
-    //--------------------------------------------------------------------------
     fun updateField( field: Field, study : Study )
     {
-        field.id?.let{ id ->
-            Log.d( "xxx", "update field id ${id}")
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(field.uuid)
+        val values = ContentValues()
 
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
+        putField( field, study, values )
 
-            putField( field, study, values )
-
-            dao.writableDatabase.update(DAO.TABLE_FIELD, values, whereClause, args )
-        }
+        dao.writableDatabase.update(DAO.TABLE_FIELD, values, whereClause, args )
     }
 
     @SuppressLint("Range")
     fun findFieldId(field : Field) : Int?
     {
-        // look for the rule by it's pieces then return the id
-        field.id?.let{ fieldId ->
-            return fieldId
-
-        }?: run{
-            val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_FIELD} WHERE " +
-                    "${DAO.COLUMN_UUID} = '${field.uuid}' " +
-                    "AND ${DAO.COLUMN_FIELD_NAME} = '${field.name}'"
-
-            val cursor = dao.writableDatabase.rawQuery(query, null)
-
-            while (cursor.moveToNext())
-            {
-                return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-            }
-
-        }
+//        // look for the rule by it's pieces then return the id
+//        field.id?.let{ fieldId ->
+//            return fieldId
+//
+//        }?: run{
+//            val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_FIELD} WHERE " +
+//                    "${DAO.COLUMN_UUID} = '${field.uuid}' " +
+//                    "AND ${DAO.COLUMN_FIELD_NAME} = '${field.name}'"
+//
+//            val cursor = dao.writableDatabase.rawQuery(query, null)
+//
+//            while (cursor.moveToNext())
+//            {
+//                return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+//            }
+//        }
 
         return null
     }
-    //--------------------------------------------------------------------------
+
     fun exists( field: Field ): Boolean
     {
-        field.id?.let { id ->
-            getField( id )?.let {
-                return true
-            } ?: return false
+        getField( field.uuid )?.let {
+            return true
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun  buildField(cursor: Cursor ): Field
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val typeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
@@ -133,14 +117,13 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(id, uuid, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
+        return Field(uuid, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
     }
 
-    //--------------------------------------------------------------------------
-    fun getField( id : Int ): Field?
+    fun getField( uuid : String ): Field?
     {
         var field: Field? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where id=${id}"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where id=${uuid}"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -155,11 +138,10 @@ class FieldDAO(private var dao: DAO)
         return field
     }
 
-    //--------------------------------------------------------------------------
     fun getFields(study : Study): ArrayList<Field>
     {
         val fields = ArrayList<Field>()
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where study_id=${study.id}"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
@@ -176,7 +158,6 @@ class FieldDAO(private var dao: DAO)
         return fields
     }
 
-    //--------------------------------------------------------------------------
     fun getFields(): List<Field>
     {
         val fields = ArrayList<Field>()
@@ -193,11 +174,10 @@ class FieldDAO(private var dao: DAO)
         return fields
     }
 
-    //--------------------------------------------------------------------------
     fun deleteField( field: Field )
     {
         val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(field.id.toString())
+        val args = arrayOf(field.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD, whereClause, args)
     }

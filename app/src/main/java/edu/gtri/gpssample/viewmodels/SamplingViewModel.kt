@@ -85,7 +85,7 @@ class SamplingViewModel : ViewModel()
         currentConfig?.value?.let { config ->
             for (enumArea in config.enumAreas)
             {
-                if (enumArea.id != config.selectedEnumAreaId)
+                if (enumArea.uuid != config.selectedEnumAreaUuid)
                 {
                     continue
                 }
@@ -488,7 +488,7 @@ class SamplingViewModel : ViewModel()
                                                         // check the operator
                                                         if(validNextRule)
                                                         {
-                                                            when(fo.conenctor)
+                                                            when(fo.connector)
                                                             {
                                                                 Connector.AND->{
                                                                     validFilterOperator = (validRule && validNextRule)

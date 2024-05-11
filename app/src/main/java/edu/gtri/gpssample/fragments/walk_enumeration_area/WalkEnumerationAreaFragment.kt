@@ -468,7 +468,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                 name2 = "${resources.getString(R.string.enumeration_area)} 1"
             }
 
-            val enumArea = EnumArea( name2, vertices )
+            val enumArea = EnumArea( config.uuid, name2, vertices )
             config.enumAreas.add( enumArea )
 
             val latLngBounds = GeoUtils.findGeobounds(vertices)
@@ -479,7 +479,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                 config.enumAreas[0].let { enumArea ->
-                    DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.id!!, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
+                    DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.uuid, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
                         enumArea.enumerationTeams.add( enumerationTeam )
                     }
                 }

@@ -6,12 +6,11 @@ import java.util.*
 
 @Serializable
 data class LatLon (
-    var id: Int?,
     var uuid : String,
     var latitude: Double,
     var longitude: Double)
 {
-    constructor( latitude: Double, longitude: Double ) : this( null, UUID.randomUUID().toString(), latitude, longitude)
+    constructor( latitude: Double, longitude: Double ) : this(UUID.randomUUID().toString(), latitude, longitude)
 
     fun toLatLng() : LatLng
     {

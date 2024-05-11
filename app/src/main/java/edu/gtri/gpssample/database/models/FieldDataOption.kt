@@ -8,17 +8,15 @@ import java.util.*
 
 @Serializable
 data class FieldDataOption(
-    var id : Int? = null,
     var uuid : String,
     var name : String,
     var value: Boolean )
 {
-    constructor(name: String, value: Boolean) : this( null, UUID.randomUUID().toString(), name, value )
+    constructor(name: String, value: Boolean) : this(UUID.randomUUID().toString(), name, value )
 
     fun equals( fieldDataOption: FieldDataOption ) : Boolean
     {
-        if (this.id == fieldDataOption.id &&
-            this.uuid == fieldDataOption.uuid &&
+        if (this.uuid == fieldDataOption.uuid &&
             this.name == fieldDataOption.name &&
             this.value == fieldDataOption.value )
         {

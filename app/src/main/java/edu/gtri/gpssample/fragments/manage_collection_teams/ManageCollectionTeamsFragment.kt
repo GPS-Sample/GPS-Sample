@@ -77,7 +77,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             for (collectionTeam in study.collectionTeams)
             {
-                if (collectionTeam.enumAreaId == enumArea.id!!)
+                if (collectionTeam.enumAreaUuid == enumArea.uuid)
                 {
                     collectionTeams.add( collectionTeam )
                 }
@@ -118,9 +118,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
 
-        collectionTeam.id?.let {
-            study.selectedCollectionTeamId = it
-        }
+        study.selectedCollectionTeamUuid = collectionTeam.uuid
 
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }

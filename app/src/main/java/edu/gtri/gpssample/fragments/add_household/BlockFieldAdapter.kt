@@ -55,7 +55,7 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
 
         fieldData.field?.let { field ->
 
-            if (field.id == null)
+            if (field.uuid.isEmpty())
             {
                 return
             }

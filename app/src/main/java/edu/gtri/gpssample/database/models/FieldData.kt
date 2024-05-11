@@ -13,7 +13,6 @@ import java.util.*
 
 @Serializable
 data class FieldData (
-    var id : Int? = null,
     var uuid : String,
     var field : Field?,
     var name : String,
@@ -25,21 +24,20 @@ data class FieldData (
     var blockNumber : Int?,
     var fieldDataOptions : ArrayList<FieldDataOption>)
 {
-    constructor( field: Field ) : this( null, UUID.randomUUID().toString(), field, "", FieldType.None,
+    constructor( field: Field ) : this( UUID.randomUUID().toString(), field, "", FieldType.None,
         "", null, null, null, null, ArrayList<FieldDataOption>())
 
-    constructor( field: Field, blockNumber: Int ) : this( null, UUID.randomUUID().toString(), field, "", FieldType.None,
+    constructor( field: Field, blockNumber: Int ) : this( UUID.randomUUID().toString(), field, "", FieldType.None,
         "", null, null, null, blockNumber, ArrayList<FieldDataOption>())
 
     constructor( field: Field,  name : String, type : FieldType, textValue: String,
                  numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :
-            this( null, UUID.randomUUID().toString(), field, name, type,  textValue,
+            this( UUID.randomUUID().toString(), field, name, type,  textValue,
                 numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
 
     fun equals( fieldData: FieldData ) : Boolean
     {
-        if (this.id == fieldData.id &&
-            this.uuid == fieldData.uuid &&
+        if (this.uuid == fieldData.uuid &&
             this.name == fieldData.name &&
             this.type == fieldData.type &&
             this.textValue == fieldData.textValue &&

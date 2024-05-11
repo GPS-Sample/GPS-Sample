@@ -348,24 +348,19 @@ class ConfigurationViewModel : ViewModel()
             // this does not work, not sure why
             // config.enumAreas.add(enumArea)
 
-            enumArea.id?.let { enumAreaId ->
-                var found = false
+            var found = false
 
-                for (i in 0..config.enumAreas.size-1)
+            for (i in 0..config.enumAreas.size-1)
+            {
+                if (config.enumAreas[i].uuid == enumArea.uuid)
                 {
-                    val ea = config.enumAreas[i]
-                    ea.id?.let { eaId ->
-                        if (ea.id == enumAreaId)
-                        {
-                            config.enumAreas.removeAt(i)
-                            config.enumAreas.add(enumArea)
-                            found = true
-                        }
-                    }
-                    if (found)
-                    {
-                        break
-                    }
+                    config.enumAreas.removeAt(i)
+                    config.enumAreas.add(enumArea)
+                    found = true
+                }
+                if (found)
+                {
+                    break
                 }
             }
         }

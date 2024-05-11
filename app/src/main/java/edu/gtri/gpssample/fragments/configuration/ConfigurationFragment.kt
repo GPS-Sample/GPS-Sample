@@ -394,17 +394,13 @@ class ConfigurationFragment : Fragment(),
 
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
-        enumArea.id?.let { enumAreaId ->
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                config.selectedEnumAreaId = enumAreaId
-                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    study.id?.let { studyId ->
-                        config.selectedStudyId = studyId
-                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-                        ConfirmationDialog( activity, "", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
-                    }
-                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
-            }
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            config.selectedEnumAreaUuid = enumArea.uuid
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                config.selectedStudyUuid = study.uuid
+                sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+                ConfirmationDialog( activity, "", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
+            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -513,7 +509,7 @@ class ConfigurationFragment : Fragment(),
                         polygon.add( LatLon( it.latitude, it.longitude ))
                     }
 
-                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.id!!, "E-Team-${enumArea.id!!}", polygon, enumArea.locations ))
+                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.uuid, "E-Team-${enumArea.uuid}", polygon, enumArea.locations ))
                     enumArea.enumerationTeams.add(enumerationTeam!!)
 
                     for (location in enumArea.locations)
@@ -573,7 +569,7 @@ class ConfigurationFragment : Fragment(),
                     }
 
                     sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                        val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.id!!, study.id!!, "S-Team-${enumArea.id!!}", polygon, enumArea.locations ))
+                        val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.uuid, study.uuid, "S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
                         study.collectionTeams.add(collectionTeam!!)
                     }
 

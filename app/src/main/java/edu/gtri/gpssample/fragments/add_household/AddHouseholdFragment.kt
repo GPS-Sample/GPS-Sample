@@ -313,19 +313,19 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             DAO.locationDAO.delete( location )
         }
 
-        DAO.configDAO.getConfig( config.id!! )?.let {
+        DAO.configDAO.getConfig( config.uuid )?.let {
             sharedViewModel.setCurrentConfig( it )
         }
 
-        DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
+        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
         }
 
-        DAO.studyDAO.getStudy( study.id!! )?.let {
+        DAO.studyDAO.getStudy( study.uuid )?.let {
             sharedViewModel.createStudyModel.setStudy( it )
         }
 
-        DAO.enumerationTeamDAO.getTeam( enumTeam.id!! )?.let {
+        DAO.enumerationTeamDAO.getTeam( enumTeam.uuid )?.let {
             sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
         }
 
@@ -421,19 +421,19 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
-        DAO.configDAO.getConfig( config.id!! )?.let {
+        DAO.configDAO.getConfig( config.uuid )?.let {
             sharedViewModel.setCurrentConfig( it )
         }
 
-        DAO.enumAreaDAO.getEnumArea( enumArea.id!! )?.let {
+        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
         }
 
-        DAO.studyDAO.getStudy( study.id!! )?.let {
+        DAO.studyDAO.getStudy( study.uuid )?.let {
             sharedViewModel.createStudyModel.setStudy( it )
         }
 
-        DAO.enumerationTeamDAO.getTeam( enumTeam.id!! )?.let {
+        DAO.enumerationTeamDAO.getTeam( enumTeam.uuid )?.let {
             sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
         }
 

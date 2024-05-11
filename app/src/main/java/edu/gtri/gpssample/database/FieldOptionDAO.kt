@@ -19,11 +19,12 @@ class FieldOptionDAO(private var dao: DAO)
         {
             val values = ContentValues()
             putFieldOption( fieldOption, values )
-            fieldOption.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_OPTION, null, values).toInt()
-            fieldOption.id?.let { id ->
-                Log.d( "xxx", "new fieldOption id = ${id}")
-                createConnection( fieldOption, field )
-            } ?: return null
+            if (dao.writableDatabase.insert(DAO.TABLE_FIELD_OPTION, null, values) < 0)
+            {
+                return null
+            }
+            Log.d( "xxx", "created fieldOption with id = ${fieldOption.uuid}")
+            createConnection( fieldOption, field )
         }
 
         return fieldOption
@@ -31,63 +32,49 @@ class FieldOptionDAO(private var dao: DAO)
 
     fun createConnection( fieldOption: FieldOption, field: Field )
     {
-        fieldOption.id?.let { fieldOptionId ->
-            field.id?.let { fieldId ->
-                val values = ContentValues()
-                values.put( DAO.COLUMN_FIELD_ID, fieldId )
-                values.put( DAO.COLUMN_FIELD_OPTION_ID, fieldOptionId )
-                dao.writableDatabase.insert(DAO.TABLE_FIELD__FIELD_OPTION, null, values).toInt()
-            }
-        }
+        val values = ContentValues()
+        values.put( DAO.COLUMN_FIELD_UUID, field.uuid )
+        values.put( DAO.COLUMN_FIELD_OPTION_UUID, fieldOption.uuid )
+        dao.writableDatabase.insert(DAO.TABLE_FIELD__FIELD_OPTION, null, values).toInt()
     }
 
     fun putFieldOption( fieldOption: FieldOption, values: ContentValues )
     {
-        fieldOption.id?.let { id ->
-            Log.d( "xxx", "existing fieldOption id = ${id}")
-            values.put( DAO.COLUMN_ID, fieldOption.id )
-        }
-
+        values.put( DAO.COLUMN_UUID, fieldOption.uuid )
         values.put( DAO.COLUMN_FIELD_OPTION_NAME, fieldOption.name )
     }
 
     fun updateFieldOption( fieldOption: FieldOption )
     {
-        fieldOption.id?.let{ id ->
-            Log.d( "xxx", "update fieldOption id ${id}")
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(fieldOption.uuid)
+        val values = ContentValues()
 
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
+        putFieldOption( fieldOption, values )
 
-            putFieldOption( fieldOption, values )
-
-            dao.writableDatabase.update(DAO.TABLE_FIELD_OPTION, values, whereClause, args )
-        }
+        dao.writableDatabase.update(DAO.TABLE_FIELD_OPTION, values, whereClause, args )
     }
 
     fun exists( fieldOption: FieldOption): Boolean
     {
-        fieldOption.id?.let { id ->
-            getFieldOption( id )?.let {
-                return true
-            } ?: return false
+        getFieldOption( fieldOption.uuid )?.let {
+            return true
         } ?: return false
     }
 
     @SuppressLint("Range")
     private fun  buildFieldOption(cursor: Cursor ): FieldOption
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_NAME))
 
-        return FieldOption(id, name)
+        return FieldOption(uuid, name)
     }
 
-    fun getFieldOption( id : Int ): FieldOption?
+    fun getFieldOption( uuid : String ): FieldOption?
     {
         var fieldOption: FieldOption? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_OPTION} where id=${id}"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_OPTION} where ${DAO.COLUMN_UUID}=${uuid}"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -106,29 +93,27 @@ class FieldOptionDAO(private var dao: DAO)
     {
         val fieldOptions = ArrayList<FieldOption>()
 
-        field.id?.let { fieldId ->
-            val query = "SELECT * FROM ${DAO.TABLE_FIELD__FIELD_OPTION} where ${DAO.COLUMN_FIELD_ID}=${fieldId}"
-            val cursor = dao.writableDatabase.rawQuery(query, null)
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD__FIELD_OPTION} where ${DAO.COLUMN_FIELD_UUID} = '${field.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            while (cursor.moveToNext())
-            {
-                val fieldOptionId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_ID))
-                val fieldOption = getFieldOption( fieldOptionId )
-                fieldOption?.let {
-                    fieldOptions.add( it )
-                }
+        while (cursor.moveToNext())
+        {
+            val fieldOptionId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_UUID))
+            val fieldOption = getFieldOption( fieldOptionId )
+            fieldOption?.let {
+                fieldOptions.add( it )
             }
-
-            cursor.close()
         }
+
+        cursor.close()
 
         return fieldOptions
     }
 
     fun deleteFieldOption( fieldOption: FieldOption )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(fieldOption.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(fieldOption.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD_OPTION, whereClause, args)
     }

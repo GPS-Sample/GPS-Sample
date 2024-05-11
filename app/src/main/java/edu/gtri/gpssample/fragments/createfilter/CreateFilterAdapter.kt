@@ -87,7 +87,7 @@ class CreateFilterAdapter(var filterRules: List<Rule>?) : RecyclerView.Adapter<C
             {
                 // TODO: use resource holder
                 rule.filterOperator?.let{operator->
-                    holder.titleTextView.text = rule.name + " " + operator.conenctor.format    //rule!!.connector.format + " " + rule.name
+                    holder.titleTextView.text = rule.name + " " + operator.connector.format    //rule!!.connector.format + " " + rule.name
                 }?: run{
                     holder.titleTextView.text = rule.name
                 }

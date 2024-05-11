@@ -16,20 +16,18 @@ class EnumerationTeamDAO(private var dao: DAO)
         }
         else
         {
-            enumerationTeam.id = null
             val values = ContentValues()
             putTeam( enumerationTeam, values )
-            enumerationTeam.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM, null, values).toInt()
-            enumerationTeam.id?.let { id ->
-                Log.d( "xxx", "new Enumeration Team id = ${id}")
-            } ?: return null
+            if (dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM, null, values) < 0)
+            {
+                return null
+            }
+            Log.d( "xxx", "Created Enumeration Team ID = ${enumerationTeam.uuid}")
         }
 
-        enumerationTeam.id?.let {
-            for (latLon in enumerationTeam.polygon)
-            {
-                DAO.latLonDAO.createOrUpdateLatLon(latLon,null, null)
-            }
+        for (latLon in enumerationTeam.polygon)
+        {
+            DAO.latLonDAO.createOrUpdateLatLon(latLon,null, null)
         }
 
         updateConnectorTable( enumerationTeam )
@@ -39,58 +37,46 @@ class EnumerationTeamDAO(private var dao: DAO)
 
     fun updateConnectorTable( enumerationTeam: EnumerationTeam )
     {
-        enumerationTeam.id?.let { enumerationTeamId ->
-            for (latLon in enumerationTeam.polygon)
+        for (latLon in enumerationTeam.polygon)
+        {
+            val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_UUID} = '${latLon.uuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
+            val cursor = dao.writableDatabase.rawQuery(query, null)
+            if (cursor.count == 0)
             {
-                latLon.id?.let { latLonId ->
-                    val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM__LAT_LON} WHERE ${DAO.COLUMN_LAT_LON_ID} = $latLonId AND ${DAO.COLUMN_ENUMERATION_TEAM_ID} = $enumerationTeamId"
-                    val cursor = dao.writableDatabase.rawQuery(query, null)
-                    if (cursor.count == 0)
-                    {
-                        val values = ContentValues()
-                        values.put( DAO.COLUMN_LAT_LON_ID, latLonId )
-                        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, enumerationTeamId )
-                        dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM__LAT_LON, null, values)
-                    }
-                    cursor.close()
-                }
+                val values = ContentValues()
+                values.put( DAO.COLUMN_LAT_LON_UUID, latLon.uuid )
+                values.put( DAO.COLUMN_ENUMERATION_TEAM_UUID, enumerationTeam.uuid )
+                dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_TEAM__LAT_LON, null, values)
             }
+            cursor.close()
+        }
 
-            for (location in enumerationTeam.locations)
+        for (location in enumerationTeam.locations)
+        {
+            val query = "SELECT * FROM ${DAO.TABLE_LOCATION__ENUMERATION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
+            val cursor = dao.writableDatabase.rawQuery(query, null)
+            if (cursor.count == 0)
             {
-                location.id?.let { locationId ->
-                    val query = "SELECT * FROM ${DAO.TABLE_LOCATION__ENUMERATION_TEAM} WHERE ${DAO.COLUMN_LOCATION_ID} = $locationId AND ${DAO.COLUMN_ENUMERATION_TEAM_ID} = $enumerationTeamId"
-                    val cursor = dao.writableDatabase.rawQuery(query, null)
-                    if (cursor.count == 0)
-                    {
-                        val values = ContentValues()
-                        values.put( DAO.COLUMN_LOCATION_ID, locationId )
-                        values.put( DAO.COLUMN_ENUMERATION_TEAM_ID, enumerationTeamId )
-                        dao.writableDatabase.insert(DAO.TABLE_LOCATION__ENUMERATION_TEAM, null, values)
-                    }
-                    cursor.close()
-                }
+                val values = ContentValues()
+                values.put( DAO.COLUMN_LOCATION_UUID, location.uuid )
+                values.put( DAO.COLUMN_ENUMERATION_TEAM_UUID, enumerationTeam.uuid )
+                dao.writableDatabase.insert(DAO.TABLE_LOCATION__ENUMERATION_TEAM, null, values)
             }
+            cursor.close()
         }
     }
 
     fun putTeam(enumerationTeam: EnumerationTeam, values: ContentValues )
     {
-        enumerationTeam.id?.let { id ->
-            Log.d( "xxx", "existing team id = ${id}")
-            values.put( DAO.COLUMN_ID, id )
-        }
-
         values.put( DAO.COLUMN_UUID, enumerationTeam.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumerationTeam.creationDate )
-        values.put( DAO.COLUMN_ENUM_AREA_ID, enumerationTeam.enumerAreaId )
+        values.put( DAO.COLUMN_ENUM_AREA_UUID, enumerationTeam.enumerAreaUuid )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
     }
 
     fun exists( enumerationTeam: EnumerationTeam ): Boolean
     {
         getTeam( enumerationTeam.uuid )?.let {
-            enumerationTeam.id = it.id
             return true
         } ?: return false
     }
@@ -98,15 +84,14 @@ class EnumerationTeamDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun createTeam(cursor: Cursor): EnumerationTeam
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
-        val enumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
+        val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
 
-        val enumerationTeam = EnumerationTeam(id, uuid, creationDate, enumAreaId, name, ArrayList<LatLon>(), ArrayList<Location>())
+        val enumerationTeam = EnumerationTeam(uuid, creationDate, enumAreaUuid, name, ArrayList<LatLon>(), ArrayList<Location>())
 
-        enumerationTeam.polygon = DAO.latLonDAO.getLatLonsWithEnumerationTeamId( id )
+        enumerationTeam.polygon = DAO.latLonDAO.getLatLonsWithEnumerationTeamId( enumerationTeam.uuid )
         enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
 
         return enumerationTeam
@@ -114,15 +99,13 @@ class EnumerationTeamDAO(private var dao: DAO)
 
     fun updateTeam( enumerationTeam: EnumerationTeam )
     {
-        enumerationTeam.id?.let { id ->
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
+        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val args: Array<String> = arrayOf(enumerationTeam.uuid)
+        val values = ContentValues()
 
-            putTeam( enumerationTeam, values )
+        putTeam( enumerationTeam, values )
 
-            dao.writableDatabase.update(DAO.TABLE_ENUMERATION_TEAM, values, whereClause, args )
-        }
+        dao.writableDatabase.update(DAO.TABLE_ENUMERATION_TEAM, values, whereClause, args )
     }
 
     fun getTeam( id: Int ): EnumerationTeam?
@@ -163,17 +146,15 @@ class EnumerationTeamDAO(private var dao: DAO)
     {
         val enumerationTeams = ArrayList<EnumerationTeam>()
 
-        enumArea.id?.let { id ->
-            val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_ID} = $id"
-            val cursor = dao.writableDatabase.rawQuery(query, null)
+        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            while (cursor.moveToNext())
-            {
-                enumerationTeams.add( createTeam( cursor ))
-            }
-
-            cursor.close()
+        while (cursor.moveToNext())
+        {
+            enumerationTeams.add( createTeam( cursor ))
         }
+
+        cursor.close()
 
         return enumerationTeams
     }
@@ -197,7 +178,7 @@ class EnumerationTeamDAO(private var dao: DAO)
     fun deleteTeam(enumerationTeam: EnumerationTeam )
     {
         val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(enumerationTeam.id.toString())
+        val args = arrayOf(enumerationTeam.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_ENUMERATION_TEAM, whereClause, args)
     }

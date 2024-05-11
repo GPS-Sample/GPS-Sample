@@ -16,20 +16,20 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class EnumArea (
-    var id : Int? = null,
     var uuid : String,
     var creationDate: Long,
+    var configUuid: String,
     var name: String,
-    var selectedEnumerationTeamId: Int,
+    var selectedEnumerationTeamUuid: String,
     var vertices: ArrayList<LatLon>,
     var locations: ArrayList<Location>,
     var enumerationTeams: ArrayList<EnumerationTeam>)
 {
-    constructor( id: Int, uuid: String, creationDate: Long, name: String, selectedEnumerationTeamId: Int)
-            : this(id, uuid, creationDate, name, selectedEnumerationTeamId, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>())
+    constructor( uuid: String, creationDate: Long, configUuid: String, name: String, selectedEnumerationTeamUuid: String)
+            : this(uuid, creationDate, configUuid, name, selectedEnumerationTeamUuid, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>())
 
-    constructor( name: String, vertices: ArrayList<LatLon>)
-            : this(null, UUID.randomUUID().toString(), Date().time, name, -1, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>())
+    constructor( configUuid: String, name: String, vertices: ArrayList<LatLon>)
+            : this(UUID.randomUUID().toString(), Date().time, configUuid, name, "", vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>())
 
     override fun equals(other: Any?): Boolean
     {

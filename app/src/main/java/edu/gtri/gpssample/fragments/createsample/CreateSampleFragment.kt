@@ -212,15 +212,15 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                     {
                         if (study.samplingMethod == SamplingMethod.Cluster)
                         {
-                            if (enumArea.id == config.selectedEnumAreaId)
+                            if (enumArea.uuid == config.selectedEnumAreaUuid)
                             {
-                                DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                                DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea)
                                 break
                             }
                         }
                         else
                         {
-                            DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                            DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea)
                         }
                     }
 
@@ -349,7 +349,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             enumArea.vertices.add( southWest )
             enumArea.vertices.add( northWest )
 
-            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
+            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
 
             refreshMap()
         }
