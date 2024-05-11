@@ -82,7 +82,7 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createFieldData(cursor: Cursor): FieldData
+    private fun buildFieldData(cursor: Cursor): FieldData
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val field_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
@@ -101,7 +101,7 @@ class FieldDataDAO(private var dao: DAO)
 
     fun updateFieldData( fieldData: FieldData )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(fieldData.uuid)
         val values = ContentValues()
 
@@ -119,7 +119,7 @@ class FieldDataDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            fieldData = createFieldData( cursor )
+            fieldData = buildFieldData( cursor )
             fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
         }
 
@@ -137,7 +137,7 @@ class FieldDataDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val fieldData = createFieldData( cursor )
+            val fieldData = buildFieldData( cursor )
             fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
             fieldDataList.add( fieldData )
         }
@@ -156,7 +156,7 @@ class FieldDataDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            fieldDataList.add( createFieldData( cursor ))
+            fieldDataList.add( buildFieldData( cursor ))
         }
 
         cursor.close()

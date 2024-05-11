@@ -93,7 +93,7 @@ class CreateRuleModel {
 
     fun createNewRule(study: Study) : Boolean
     {
-        val newRule = Rule(null,  null, "", "" , Operator.Equal, null)
+        val newRule = Rule()
         if (study.fields.isNotEmpty())
         {
             newRule.field = study.fields[0]

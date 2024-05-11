@@ -139,7 +139,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-        if (editMode && enumerationItem.id != null)
+        if (editMode && enumerationItem.uuid.isNotEmpty())
         {
             binding.addMultiButton.visibility = View.VISIBLE
 
@@ -224,7 +224,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
 
-        if (enumerationItem.id != null)
+        if (enumerationItem.uuid.isNotEmpty())
         {
             binding.hideAdditionalInfoImageView.visibility = View.GONE
             binding.showAdditionalInfoImageView.visibility = View.VISIBLE
@@ -409,7 +409,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             enumerationItem.enumeratorName = user.name
         }
 
-        if (enumerationItem.id == null)
+        if (enumerationItem.uuid.isEmpty())
         {
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
             location.enumerationItems.add(enumerationItem)

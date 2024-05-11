@@ -65,7 +65,7 @@ class FieldOptionDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun  buildFieldOption(cursor: Cursor ): FieldOption
     {
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_OPTION_NAME))
 
         return FieldOption(uuid, name)

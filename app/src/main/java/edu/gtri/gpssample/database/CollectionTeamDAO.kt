@@ -92,7 +92,7 @@ class CollectionTeamDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createTeam(cursor: Cursor): CollectionTeam
+    private fun buildTeam(cursor: Cursor): CollectionTeam
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
@@ -129,7 +129,7 @@ class CollectionTeamDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            collectionTeam = createTeam( cursor )
+            collectionTeam = buildTeam( cursor )
         }
 
         cursor.close()
@@ -146,7 +146,7 @@ class CollectionTeamDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            collectionTeam.add( createTeam( cursor ))
+            collectionTeam.add( buildTeam( cursor ))
         }
 
         cursor.close()
@@ -162,7 +162,7 @@ class CollectionTeamDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            collectionTeam.add( createTeam( cursor ))
+            collectionTeam.add( buildTeam( cursor ))
         }
 
         cursor.close()

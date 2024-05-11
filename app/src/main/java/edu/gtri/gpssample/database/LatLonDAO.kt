@@ -79,7 +79,7 @@ class LatLonDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createLatLon(cursor: Cursor): LatLon
+    private fun buildLatLon(cursor: Cursor): LatLon
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LAT))
@@ -108,7 +108,7 @@ class LatLonDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            latLon = createLatLon( cursor )
+            latLon = buildLatLon( cursor )
         }
 
         cursor.close()
@@ -127,7 +127,7 @@ class LatLonDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val latlon = createLatLon(cursor)
+            val latlon = buildLatLon(cursor)
 
             latLons.add( latlon )
         }
@@ -148,7 +148,7 @@ class LatLonDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val latlon = createLatLon(cursor)
+            val latlon = buildLatLon(cursor)
 
             latLons.add( latlon )
         }
@@ -169,7 +169,7 @@ class LatLonDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val latlon = createLatLon(cursor)
+            val latlon = buildLatLon(cursor)
 
             latLons.add( latlon )
         }
@@ -187,7 +187,7 @@ class LatLonDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            latLons.add( createLatLon( cursor ))
+            latLons.add( buildLatLon( cursor ))
         }
 
         cursor.close()
@@ -197,7 +197,7 @@ class LatLonDAO(private var dao: DAO)
 
     fun delete( latLon: LatLon )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(latLon.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_LAT_LON, whereClause, args)

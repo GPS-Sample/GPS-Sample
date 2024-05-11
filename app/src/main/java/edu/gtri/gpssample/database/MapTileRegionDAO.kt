@@ -45,9 +45,9 @@ class MapTileRegionDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createMapTileRegion(cursor: Cursor): MapTileRegion
+    private fun buildMapTileRegion(cursor: Cursor): MapTileRegion
     {
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val ne_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_NORTH_EAST_LAT))
         val ne_lon = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_NORTH_EAST_LON))
         val sw_lat = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_SOUTH_WEST_LAT))
@@ -58,7 +58,7 @@ class MapTileRegionDAO(private var dao: DAO)
 
     fun updateMapTileRegion( mapTileRegion: MapTileRegion, config: Config )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(mapTileRegion.uuid)
         val values = ContentValues()
 
@@ -76,7 +76,7 @@ class MapTileRegionDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            mapTileRegion = createMapTileRegion( cursor )
+            mapTileRegion = buildMapTileRegion( cursor )
         }
 
         cursor.close()
@@ -93,7 +93,7 @@ class MapTileRegionDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val mapTileRegion = createMapTileRegion(cursor)
+            val mapTileRegion = buildMapTileRegion(cursor)
 
             mapTileRegions.add( mapTileRegion )
         }
@@ -111,7 +111,7 @@ class MapTileRegionDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            mapTileRegions.add( createMapTileRegion( cursor ))
+            mapTileRegions.add( buildMapTileRegion( cursor ))
         }
 
         cursor.close()
@@ -121,7 +121,7 @@ class MapTileRegionDAO(private var dao: DAO)
 
     fun delete( mapTileRegion: MapTileRegion )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(mapTileRegion.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_MAP_TILE_REGION, whereClause, args)

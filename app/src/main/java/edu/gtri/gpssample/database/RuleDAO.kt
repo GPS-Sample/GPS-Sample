@@ -36,28 +36,29 @@ class RuleDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    fun findRuleId(rule : Rule) : Int?
-    {
-        rule.field?.let { field ->
-//            // look for the field cause it may exist and the copy doesn't have the id
-//            val field_id = DAO.fieldDAO.findFieldId(field)
-//            field.id = field_id
+//    fun findRuleId(rule : Rule) : Int?
+//    {
+//        rule.field?.let { field ->
+////            // look for the field cause it may exist and the copy doesn't have the id
+////            val field_id = DAO.fieldDAO.findFieldId(field)
+////            field.id = field_id
+//
+//            rule.operator?.let { operator ->
+//                val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_RULE} WHERE " +
+//                        "${DAO.COLUMN_FIELD_UUID} = '${field.uuid}' AND ${DAO.COLUMN_RULE_NAME} = '${rule.name}' " +
+//                        "AND ${DAO.COLUMN_OPERATOR_ID} = '${OperatorConverter.toIndex(operator)}' AND " +
+//                        "${DAO.COLUMN_RULE_VALUE} = '${rule.value}'"
+//
+//                val cursor = dao.writableDatabase.rawQuery(query, null)
+//
+//                while (cursor.moveToNext()) {
+//                    return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+//                }
+//            }
+//        }
+//        return null
+//    }
 
-            rule.operator?.let { operator ->
-                val query = "SELECT ${DAO.COLUMN_ID} FROM ${DAO.TABLE_RULE} WHERE " +
-                        "${DAO.COLUMN_FIELD_UUID} = '${field.uuid}' AND ${DAO.COLUMN_RULE_NAME} = '${rule.name}' " +
-                        "AND ${DAO.COLUMN_OPERATOR_ID} = '${OperatorConverter.toIndex(operator)}' AND " +
-                        "${DAO.COLUMN_RULE_VALUE} = '${rule.value}'"
-
-                val cursor = dao.writableDatabase.rawQuery(query, null)
-
-                while (cursor.moveToNext()) {
-                    return cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-                }
-            }
-        }
-        return null
-    }
     fun exists( rule: Rule ): Boolean
     {
         getRule( rule.uuid )?.let {
@@ -86,7 +87,7 @@ class RuleDAO(private var dao: DAO)
 
     fun updateRule( rule: Rule )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(rule.uuid)
         val values = ContentValues()
 
@@ -98,7 +99,7 @@ class RuleDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun buildRule(cursor: Cursor): Rule?
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val fieldId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
 
@@ -110,7 +111,7 @@ class RuleDAO(private var dao: DAO)
         val operator = OperatorConverter.fromIndex(operatorId)
 
         field?.let{rule->
-            return Rule( id, field, name, value, operator, null )
+            return Rule( uuid, field, name, value, operator, null )
         }
 
         return null
@@ -178,7 +179,7 @@ class RuleDAO(private var dao: DAO)
 
     fun deleteRule( rule: Rule )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(rule.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_RULE, whereClause, args)

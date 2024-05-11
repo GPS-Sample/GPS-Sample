@@ -67,7 +67,7 @@ class FieldDataOptionDAO(private var dao: DAO)
 
     fun updateFieldDataOption( fieldDataOption: FieldDataOption)
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(fieldDataOption.uuid)
         val values = ContentValues()
 
@@ -98,7 +98,6 @@ class FieldDataOptionDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun  buildFieldDataOption(cursor: Cursor): FieldDataOption
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_NAME))
         val value = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_OPTION_VALUE)).toBoolean()
@@ -186,7 +185,7 @@ class FieldDataOptionDAO(private var dao: DAO)
 
     fun delete( fieldDataOption: FieldDataOption)
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(fieldDataOption.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA_OPTION, whereClause, args)

@@ -274,7 +274,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                         {
                             if (location.isLandmark)
                             {
-                                DAO.locationDAO.importLocation( location, enumArea )
+                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                             }
                         }
 
@@ -287,7 +287,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                             // only import locations from the selected team
                             for (location in team.locations)
                             {
-                                DAO.locationDAO.importLocation( location, enumArea )
+                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
                                 // find out if the location exists in the local version of the selected team
 
@@ -364,7 +364,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                         for (location in enumArea.locations)
                         {
-                            DAO.locationDAO.importLocation( location, enumArea )
+                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         }
 
                         DAO.instance().writableDatabase.setTransactionSuccessful()

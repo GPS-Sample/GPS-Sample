@@ -16,60 +16,49 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         if (exists( enumerationItem ))
         {
-            updateEnumerationItem( enumerationItem, location)
+            updateEnumerationItem( enumerationItem, location )
         }
         else
         {
-            enumerationItem.id = null
             val values = ContentValues()
             putEnumerationItem( enumerationItem, location, values )
-            enumerationItem.id = dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values).toInt()
-            enumerationItem.id?.let { id ->
-                Log.d( "xxx", "created EnumerationItem with ID $id" )
+            if (dao.writableDatabase.insert(DAO.TABLE_ENUMERATION_ITEM, null, values) < 0)
+            {
+                return null
             }
+            Log.d( "xxx", "created EnumerationItem with ID $enumerationItem.uuid" )
         }
 
-        enumerationItem.id?.let { id ->
-            enumerationItem.fieldDataList?.let { fieldDataList ->
-                for (fieldData in fieldDataList)
-                {
-                    DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
-                }
+        enumerationItem.fieldDataList?.let { fieldDataList ->
+            for (fieldData in fieldDataList)
+            {
+                DAO.fieldDataDAO.createOrUpdateFieldData( fieldData, enumerationItem )
             }
-        } ?: return null
+        }
 
         return enumerationItem
     }
 
-    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, enumArea: EnumArea )
-    {
-        val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
-
-        if (existingEnumerationItem == null)
-        {
-            enumerationItem.id = null // force the new item be created
-            createOrUpdateEnumerationItem( enumerationItem, location )
-        }
-        else if (enumerationItem.syncCode > existingEnumerationItem.syncCode)
-        {
-            delete( existingEnumerationItem, false )
-            createOrUpdateEnumerationItem( enumerationItem, location )
-        }
-    }
+//    fun importEnumerationItem( enumerationItem: EnumerationItem, location : Location, enumArea: EnumArea )
+//    {
+//        val existingEnumerationItem = getEnumerationItem( enumerationItem.uuid )
+//
+//        if (existingEnumerationItem == null)
+//        {
+//            createOrUpdateEnumerationItem( enumerationItem, location )
+//        }
+//        else if (enumerationItem.syncCode > existingEnumerationItem.syncCode)
+//        {
+//            delete( existingEnumerationItem, false )
+//            createOrUpdateEnumerationItem( enumerationItem, location )
+//        }
+//    }
 
     fun exists( enumerationItem: EnumerationItem ): Boolean
     {
-        val enumerationItems = getEnumerationItems()
-
-        for (existingEnumerationItem in enumerationItems)
-        {
-            if (enumerationItem.uuid == existingEnumerationItem.uuid)
-            {
-                return true
-            }
-        }
-
-        return false
+        getEnumerationItem( enumerationItem.uuid )?.let {
+            return true
+        } ?: return false
     }
 
     fun updateEnumerationItem( enumerationItem: EnumerationItem, location : Location )
@@ -78,19 +67,18 @@ class EnumerationItemDAO(private var dao: DAO)
 
         if (existingEnumerationItem != null && enumerationItem.syncCode > existingEnumerationItem.syncCode)
         {
-            delete( existingEnumerationItem, false )
-            createOrUpdateEnumerationItem( enumerationItem, location )
+            val whereClause = "${DAO.COLUMN_UUID} = ?"
+            val args: Array<String> = arrayOf(enumerationItem.uuid)
+            val values = ContentValues()
+            putEnumerationItem( enumerationItem, location, values )
+            dao.writableDatabase.update(DAO.TABLE_ENUMERATION_ITEM, values, whereClause, args )
         }
     }
 
     fun putEnumerationItem( enumerationItem: EnumerationItem, location : Location, values: ContentValues )
     {
-        enumerationItem.id?.let { id ->
-            values.put( DAO.COLUMN_ID, id )
-        }
-
-        values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
         values.put( DAO.COLUMN_UUID, enumerationItem.uuid )
+        values.put( DAO.COLUMN_CREATION_DATE, enumerationItem.creationDate )
         values.put( DAO.COLUMN_SYNC_CODE, enumerationItem.syncCode)
         values.put( DAO.COLUMN_LOCATION_UUID, location.uuid)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS, enumerationItem.subAddress )
@@ -109,10 +97,9 @@ class EnumerationItemDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createEnumerationItem(cursor: Cursor): EnumerationItem {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+    private fun buildEnumerationItem(cursor: Cursor): EnumerationItem {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val syncCode = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SYNC_CODE))
         val locationUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_UUID))
         val subAddress = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_SUB_ADDRESS))
@@ -132,9 +119,8 @@ class EnumerationItemDAO(private var dao: DAO)
         val fieldDataList = ArrayList<FieldData>()
 
         return EnumerationItem(
-            id,
-            creationDate,
             uuid,
+            creationDate,
             syncCode,
             0.0,
             "",
@@ -166,7 +152,7 @@ class EnumerationItemDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            enumerationItem = createEnumerationItem( cursor )
+            enumerationItem = buildEnumerationItem( cursor )
         }
 
         cursor.close()
@@ -183,7 +169,7 @@ class EnumerationItemDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val enumerationItem = createEnumerationItem( cursor )
+            val enumerationItem = buildEnumerationItem( cursor )
             enumerationItem.fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
             enumerationItems.add( enumerationItem )
         }
@@ -202,7 +188,7 @@ class EnumerationItemDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val enumerationItem = createEnumerationItem( cursor )
+            val enumerationItem = buildEnumerationItem( cursor )
             enumerationItems.add( enumerationItem )
         }
 
@@ -211,43 +197,21 @@ class EnumerationItemDAO(private var dao: DAO)
         return enumerationItems
     }
 
-    fun getEnumerationItem( id: Int ) : EnumerationItem?
-    {
-        var enumerationItem: EnumerationItem? = null
-
-        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            enumerationItem = createEnumerationItem( cursor )
-        }
-
-        cursor.close()
-
-        return enumerationItem
-    }
-
     fun delete( enumerationItem: EnumerationItem, shouldDeleteFieldData: Boolean = true )
     {
-        enumerationItem.id?.let { id ->
-            Log.d( "xxx", "deleted EnumerationItem with ID $id" )
+        val fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
 
-            val fieldDataList = DAO.fieldDataDAO.getFieldDataList( enumerationItem )
-
-            if (shouldDeleteFieldData)
+        if (shouldDeleteFieldData)
+        {
+            for (fieldData in fieldDataList)
             {
-                for (fieldData in fieldDataList)
-                {
-                    DAO.fieldDataDAO.delete( fieldData)
-                }
+                DAO.fieldDataDAO.delete( fieldData)
             }
-
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args = arrayOf(id.toString())
-
-            dao.writableDatabase.delete(DAO.TABLE_ENUMERATION_ITEM, whereClause, args)
         }
+
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(enumerationItem.uuid)
+
+        dao.writableDatabase.delete(DAO.TABLE_ENUMERATION_ITEM, whereClause, args)
     }
 }

@@ -61,7 +61,7 @@ class FieldDAO(private var dao: DAO)
 
     fun updateField( field: Field, study : Study )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(field.uuid)
         val values = ContentValues()
 
@@ -176,7 +176,7 @@ class FieldDAO(private var dao: DAO)
 
     fun deleteField( field: Field )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(field.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FIELD, whereClause, args)

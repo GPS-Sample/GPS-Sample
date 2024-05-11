@@ -65,31 +65,27 @@ class LocationDAO(private var dao: DAO)
         cursor.close()
     }
 
-    fun importLocation( location: Location, enumArea : EnumArea )
-    {
-        val existingLocation = getLocation( location.uuid )
-
-        if (existingLocation != null) 
-        {
-            if (modified(location))
-            {
-                updateLocation( location, enumArea )
-            }
-
-            for (enumerationItem in location.enumerationItems)
-            {
-                DAO.enumerationItemDAO.importEnumerationItem( enumerationItem, location, enumArea )
-            }
-        }
-        else
-        {
-            for (enumerationItem in location.enumerationItems)
-            {
-                enumerationItem.id = null
-            }
-            createOrUpdateLocation( location, enumArea )
-        }
-    }
+//    fun importLocation( location: Location, enumArea : EnumArea )
+//    {
+//        val existingLocation = getLocation( location.uuid )
+//
+//        if (existingLocation != null)
+//        {
+//            if (modified(location))
+//            {
+//                updateLocation( location, enumArea )
+//            }
+//
+//            for (enumerationItem in location.enumerationItems)
+//            {
+//                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+//            }
+//        }
+//        else
+//        {
+//            createOrUpdateLocation( location, enumArea )
+//        }
+//    }
 
     fun exists( location: Location ): Boolean
     {
@@ -112,7 +108,7 @@ class LocationDAO(private var dao: DAO)
 
     fun updateLocation( location: Location, enumArea: EnumArea )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(location.uuid)
         val values = ContentValues()
 
@@ -139,7 +135,7 @@ class LocationDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createLocation(cursor: Cursor): Location
+    private fun buildLocation(cursor: Cursor): Location
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
@@ -171,26 +167,7 @@ class LocationDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            location = createLocation( cursor )
-        }
-
-        cursor.close()
-
-        return location
-    }
-
-    fun getLocation( id: Int ) : Location?
-    {
-        var location: Location? = null
-
-        val query = "SELECT * FROM ${DAO.TABLE_LOCATION} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            location = createLocation( cursor )
-            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+            location = buildLocation( cursor )
         }
 
         cursor.close()
@@ -209,7 +186,7 @@ class LocationDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val location = createLocation( cursor )
+            val location = buildLocation( cursor )
             location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
@@ -230,7 +207,7 @@ class LocationDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val location = createLocation( cursor )
+            val location = buildLocation( cursor )
             location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
@@ -251,7 +228,7 @@ class LocationDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val location = createLocation( cursor )
+            val location = buildLocation( cursor )
             location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
@@ -270,7 +247,7 @@ class LocationDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val location = createLocation( cursor )
+            val location = buildLocation( cursor )
            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
@@ -282,7 +259,7 @@ class LocationDAO(private var dao: DAO)
 
     fun delete( location: Location )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(location.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_LOCATION, whereClause, args)

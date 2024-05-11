@@ -10,7 +10,6 @@ import edu.gtri.gpssample.extensions.toBoolean
 
 class UserDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createUser( user: User)
     {
         val values = ContentValues()
@@ -20,7 +19,6 @@ class UserDAO(private var dao: DAO)
         dao.writableDatabase.insert(DAO.TABLE_USER, null, values)
     }
 
-    //--------------------------------------------------------------------------
     fun putUser( user: User, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, user.uuid )
@@ -31,7 +29,6 @@ class UserDAO(private var dao: DAO)
         values.put( DAO.COLUMN_USER_RECOVERY_ANSWER, user.recoveryAnswer )
     }
 
-    //--------------------------------------------------------------------------
     fun getUser( id: Int ): User?
     {
         var user: User? = null
@@ -42,7 +39,7 @@ class UserDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            user = createUser( cursor )
+            user = buildUser( cursor )
         }
 
         cursor.close()
@@ -50,7 +47,6 @@ class UserDAO(private var dao: DAO)
         return user
     }
 
-    //--------------------------------------------------------------------------
     fun getUser( name: String, pin: String ): User?
     {
         var user: User? = null
@@ -61,7 +57,7 @@ class UserDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            user = createUser( cursor )
+            user = buildUser( cursor )
         }
 
         cursor.close()
@@ -69,7 +65,6 @@ class UserDAO(private var dao: DAO)
         return user
     }
 
-    //--------------------------------------------------------------------------
     fun getUser( name: String ): User?
     {
         var user: User? = null
@@ -80,7 +75,7 @@ class UserDAO(private var dao: DAO)
         {
             cursor.moveToNext()
 
-            user = createUser( cursor )
+            user = buildUser( cursor )
         }
 
         cursor.close()
@@ -88,9 +83,8 @@ class UserDAO(private var dao: DAO)
         return user
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
-    private fun createUser(cursor: Cursor) : User
+    private fun buildUser(cursor: Cursor) : User
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_USER_NAME))
@@ -103,7 +97,6 @@ class UserDAO(private var dao: DAO)
         return User(uuid, name, pin, role, recoveryQuestion, recoveryAnswer, isOnline )
     }
 
-    //--------------------------------------------------------------------------
     fun updateUser( user: User )
     {
         val whereClause = "${DAO.COLUMN_UUID} = ?"
@@ -115,7 +108,6 @@ class UserDAO(private var dao: DAO)
         dao.writableDatabase.update(DAO.TABLE_USER, values, whereClause, args )
     }
 
-    //--------------------------------------------------------------------------
     fun getUsers(): List<User>
     {
         val users = ArrayList<User>()
@@ -124,7 +116,7 @@ class UserDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            users.add( createUser( cursor ))
+            users.add( buildUser( cursor ))
         }
 
         cursor.close()

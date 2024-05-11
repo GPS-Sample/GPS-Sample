@@ -15,9 +15,8 @@ import kotlin.collections.ArrayList
 @Serializable
 @SerialName("EnumerationItem")
 data class EnumerationItem(
-    var id : Int? = null,
-    var creationDate: Long,
     var uuid : String,
+    var creationDate: Long,
     var syncCode : Int,
     var distance : Double,
     var distanceUnits: String,
@@ -37,9 +36,8 @@ data class EnumerationItem(
     var fieldDataList : ArrayList<FieldData>,
     var locationUuid : String )
 {
-    constructor() : this(null,
+    constructor() : this(UUID.randomUUID().toString(),
         Date().time,
-        UUID.randomUUID().toString(),
         0,
         0.0,
         "",

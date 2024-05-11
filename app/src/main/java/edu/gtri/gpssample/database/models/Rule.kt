@@ -20,14 +20,16 @@ data class Rule(
     var fieldDataOptions : ArrayList<FieldDataOption>
     )
 {
+    constructor() : this(UUID.randomUUID().toString(), null, "", "", Operator.Equal, null, ArrayList<FieldDataOption>())
+
     constructor( field: Field, name: String, value: String, operator: Operator)
             : this(UUID.randomUUID().toString(), field, name, value, operator, null, ArrayList<FieldDataOption>())
 
     constructor( field: Field, name: String, value: String)
             : this(UUID.randomUUID().toString(), field, name, value, null, null, ArrayList<FieldDataOption>())
 
-    constructor(id : Int?, field: Field?, name: String, value: String, operator: Operator, filterOperator: FilterOperator?)
-            : this(UUID.randomUUID().toString(), field, name, value, operator, filterOperator, ArrayList<FieldDataOption>())
+    constructor(uuid : String, field: Field?, name: String, value: String, operator: Operator, filterOperator: FilterOperator?)
+            : this(uuid, field, name, value, operator, filterOperator, ArrayList<FieldDataOption>())
 
     fun pack() : String
     {

@@ -82,7 +82,7 @@ class EnumerationTeamDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createTeam(cursor: Cursor): EnumerationTeam
+    private fun buildTeam(cursor: Cursor): EnumerationTeam
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
@@ -99,30 +99,13 @@ class EnumerationTeamDAO(private var dao: DAO)
 
     fun updateTeam( enumerationTeam: EnumerationTeam )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(enumerationTeam.uuid)
         val values = ContentValues()
 
         putTeam( enumerationTeam, values )
 
         dao.writableDatabase.update(DAO.TABLE_ENUMERATION_TEAM, values, whereClause, args )
-    }
-
-    fun getTeam( id: Int ): EnumerationTeam?
-    {
-        var enumerationTeam: EnumerationTeam? = null
-        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            enumerationTeam = createTeam( cursor )
-        }
-
-        cursor.close()
-
-        return enumerationTeam
     }
 
     fun getTeam( uuid: String ): EnumerationTeam?
@@ -134,7 +117,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            enumerationTeam = createTeam( cursor )
+            enumerationTeam = buildTeam( cursor )
         }
 
         cursor.close()
@@ -151,7 +134,7 @@ class EnumerationTeamDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            enumerationTeams.add( createTeam( cursor ))
+            enumerationTeams.add( buildTeam( cursor ))
         }
 
         cursor.close()
@@ -167,7 +150,7 @@ class EnumerationTeamDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            enumerationTeams.add( createTeam( cursor ))
+            enumerationTeams.add( buildTeam( cursor ))
         }
 
         cursor.close()
@@ -177,7 +160,7 @@ class EnumerationTeamDAO(private var dao: DAO)
 
     fun deleteTeam(enumerationTeam: EnumerationTeam )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(enumerationTeam.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_ENUMERATION_TEAM, whereClause, args)

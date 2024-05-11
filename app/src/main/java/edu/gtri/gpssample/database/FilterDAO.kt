@@ -127,7 +127,7 @@ class FilterDAO(private var dao: DAO)
 
     fun updateFilter( filter: Filter, study : Study )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(filter.uuid)
         val values = ContentValues()
 
@@ -139,7 +139,7 @@ class FilterDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun  buildFilter(cursor: Cursor, study : Study ): Filter?
     {
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FILTER_NAME))
         val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_SIZE))
 
@@ -273,7 +273,7 @@ class FilterDAO(private var dao: DAO)
     {
         deleteAllFilterOperators(filter)
         // delete the filterOperators
-        val whereClause = "${DAO.COLUMN_ID} = ?"
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(filter.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_FILTER, whereClause, args)

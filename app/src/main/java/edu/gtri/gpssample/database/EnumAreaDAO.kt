@@ -84,7 +84,7 @@ class EnumAreaDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createEnumArea(cursor: Cursor): EnumArea
+    private fun buildEnumArea(cursor: Cursor): EnumArea
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
@@ -122,7 +122,7 @@ class EnumAreaDAO(private var dao: DAO)
 //        if (cursor.count > 0)
 //        {
 //            cursor.moveToNext()
-//            enumArea = createEnumArea( cursor )
+//            enumArea = buildEnumArea( cursor )
 //            enumArea.id?.let { id ->
 //                enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaId( id )
 //                enumArea.locations = DAO.locationDAO.getLocations( enumArea )
@@ -144,7 +144,7 @@ class EnumAreaDAO(private var dao: DAO)
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            enumArea = createEnumArea( cursor )
+            enumArea = buildEnumArea( cursor )
             enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
@@ -165,7 +165,7 @@ class EnumAreaDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val enumArea = createEnumArea( cursor )
+            val enumArea = buildEnumArea( cursor )
             enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
@@ -186,7 +186,7 @@ class EnumAreaDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val enumArea = createEnumArea( cursor )
+            val enumArea = buildEnumArea( cursor )
             enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )

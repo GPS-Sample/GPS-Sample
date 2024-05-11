@@ -247,9 +247,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
             val createTableEnumerationItem = ("CREATE TABLE " +
                     TABLE_ENUMERATION_ITEM + "(" +
-                    COLUMN_ID + COLUMN_ID_TYPE + "," +
+                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_UUID + " TEXT" + "," +
                     COLUMN_SYNC_CODE + " INTEGER" + "," +
                     COLUMN_LOCATION_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_SUB_ADDRESS + " TEXT" + "," +
@@ -425,8 +424,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
     {
         private const val DATABASE_NAME = "GPSSampleDB.db"
 
-        const val COLUMN_ID = "id"
-        const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
+//        const val COLUMN_ID = "id"
+//        const val COLUMN_ID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
 
         const val COLUMN_CID = "cid"
         const val COLUMN_CID_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL"
@@ -740,6 +739,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 290
+        private const val DATABASE_VERSION = 292
     }
 }

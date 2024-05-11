@@ -12,7 +12,6 @@ import kotlin.math.min
 
 class ConfigDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateConfig( config: Config ) : Config?
     {
         if (exists( config ))
@@ -74,14 +73,12 @@ class ConfigDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX, distanceFormatIndex)
     }
 
-    //--------------------------------------------------------------------------
     fun putConfigStudy(config: Config, study: Study, values: ContentValues )
     {
         values.put(DAO.COLUMN_CONFIG_UUID, config.uuid)
         values.put(DAO.COLUMN_STUDY_UUID, study.uuid)
     }
 
-    //--------------------------------------------------------------------------
     fun exists( config: Config ): Boolean
     {
         getConfig( config.uuid )?.let {
@@ -89,7 +86,6 @@ class ConfigDAO(private var dao: DAO)
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
     fun getConfig( uuid: String ): Config?
     {
         var config: Config? = null
@@ -112,7 +108,6 @@ class ConfigDAO(private var dao: DAO)
         return config
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun buildConfig(cursor: Cursor ) : Config
     {
@@ -140,7 +135,6 @@ class ConfigDAO(private var dao: DAO)
         return Config( uuid, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid )
     }
 
-    //--------------------------------------------------------------------------
     fun getConfigs(): ArrayList<Config>
     {
         val configs = ArrayList<Config>()
