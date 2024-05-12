@@ -13,7 +13,7 @@ import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
 
-data class RawFilterOperator(var uuid : String, var order : Int, var rule1 :Int , var rule2 : Int?, var connector : Int)
+data class RawFilterOperator(var uuid : String, var order : Int, var rule1 : String , var rule2 : String?, var connector : Int)
 
 class FilterDAO(private var dao: DAO)
 {
@@ -61,7 +61,7 @@ class FilterDAO(private var dao: DAO)
         values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(Connector.NONE))
         values.put(DAO.COLUMN_FILTEROPERATOR_ORDER, 1)
         values.put(DAO.COLUMN_FILTER_UUID, filter.uuid)
-        values.put( DAO.COLUMN_FIRST_RULE_ID, rule.uuid )
+        values.put( DAO.COLUMN_FIRST_RULE_UUID, rule.uuid )
         dao.writableDatabase.insert(DAO.TABLE_FILTEROPERATOR, null, values)
     }
 
@@ -92,8 +92,8 @@ class FilterDAO(private var dao: DAO)
                 values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.connector))
                 values.put(DAO.COLUMN_FILTEROPERATOR_ORDER, order)
                 values.put(DAO.COLUMN_FILTER_UUID, filter.uuid)
-                values.put( DAO.COLUMN_FIRST_RULE_ID, rule.uuid )
-                values.put( DAO.COLUMN_SECOND_RULE_ID, secondRule.uuid )
+                values.put( DAO.COLUMN_FIRST_RULE_UUID, rule.uuid )
+                values.put( DAO.COLUMN_SECOND_RULE_UUID, secondRule.uuid )
             }
         }
     }
@@ -161,8 +161,8 @@ class FilterDAO(private var dao: DAO)
         while (cursor.moveToNext()) {
             val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
             val order = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FILTEROPERATOR_ORDER))
-            val firstRuleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIRST_RULE_ID))
-            val secondRuleId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_SECOND_RULE_ID))
+            val firstRuleId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIRST_RULE_UUID))
+            val secondRuleId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_SECOND_RULE_UUID))
             val connectorId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONNECTOR))
             val rawFilterOperator = RawFilterOperator(uuid, order, firstRuleId, secondRuleId, connectorId)
             rawFilterOperators.add(rawFilterOperator)
@@ -182,45 +182,44 @@ class FilterDAO(private var dao: DAO)
         // now loop through to create the rule stack
         var firstRule: Rule? = null
 
-//        for (rfo in rawFilterOperators)
-//        {
-//            //build a list of rules
-//            // don't reload the rule from the database
-//            if (!rulesMap.keys.contains(rfo.rule1)) {
-//                val rule1 = DAO.ruleDAO.getRule(rfo.rule1)
-//                rule1?.let { rule1 ->
-//                    rulesMap.put(rule1.uuid, rule1)
-//                }
-//            }
-//            rfo.rule2?.let { rule2Id ->
-//                // don't reload the rule from the database
-//                if (!rulesMap.keys.contains(rule2Id)) {
-//                    val rule2 = DAO.ruleDAO.getRule(rule2Id)
-//                    rule2?.let { rule2 ->
-//                        rulesMap.put(rule2.uuid, rule2)
-//                    }
-//                }
-//            }
-//        }
+        for (rfo in rawFilterOperators)
+        {
+            //build a list of rules, don't reload the rule from the database
+            if (!rulesMap.keys.contains(rfo.rule1)) {
+                val rule1 = DAO.ruleDAO.getRule(rfo.rule1)
+                rule1?.let { rule1 ->
+                    rulesMap.put(rule1.uuid, rule1)
+                }
+            }
+            rfo.rule2?.let { rule2Id ->
+                // don't reload the rule from the database
+                if (!rulesMap.keys.contains(rule2Id)) {
+                    val rule2 = DAO.ruleDAO.getRule(rule2Id)
+                    rule2?.let { rule2 ->
+                        rulesMap.put(rule2.uuid, rule2)
+                    }
+                }
+            }
+        }
 
         // loop through again
-//        for(rfo in rawFilterOperators)
-//        {
-//            // build up the ruleset
-//            val rule1 = rulesMap[rfo.rule1]
-//            val connector = ConnectorConverter.fromIndex(rfo.connector)
-//            if(connector != Connector.NONE)
-//            {
-//                rfo.rule2?.let{rule2Id->
-//                    val rule2 = rulesMap[rule2Id]
-//                    rule1?.filterOperator = FilterOperator(rfo.id, rfo.order, connector, rule2 )
-//                }
-//            }
-//            if(firstRule == null )
-//            {
-//                firstRule = rule1
-//            }
-//        }
+        for(rfo in rawFilterOperators)
+        {
+            // build up the ruleset
+            val rule1 = rulesMap[rfo.rule1]
+            val connector = ConnectorConverter.fromIndex(rfo.connector)
+            if(connector != Connector.NONE)
+            {
+                rfo.rule2?.let{ rule2Id->
+                    val rule2 = rulesMap[rule2Id]
+                    rule1?.filterOperator = FilterOperator(rfo.uuid, rfo.order, connector, rule2 )
+                }
+            }
+            if(firstRule == null )
+            {
+                firstRule = rule1
+            }
+        }
 
         // put the rule in the filter
         filter.rule = firstRule

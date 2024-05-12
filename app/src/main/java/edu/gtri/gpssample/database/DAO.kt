@@ -157,11 +157,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FILTEROPERATOR_ORDER + " INTEGER NOT NULL " + "," +
                     COLUMN_CONNECTOR +  " INTEGER " + "," +
                     COLUMN_FILTER_UUID + " TEXT " + "," +
-                    COLUMN_FIRST_RULE_ID+   " INTEGER NOT NULL " + "," +
-                    COLUMN_SECOND_RULE_ID +  " INTEGER " + "," +
+                    COLUMN_FIRST_RULE_UUID +   " TEXT " + "," +
+                    COLUMN_SECOND_RULE_UUID +  " TEXT " + "," +
                     "FOREIGN KEY($COLUMN_FILTER_UUID) REFERENCES $TABLE_FILTER($COLUMN_UUID)" + "," +
-                    "FOREIGN KEY($COLUMN_FIRST_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
-                    "FOREIGN KEY($COLUMN_SECOND_RULE_ID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
+                    "FOREIGN KEY($COLUMN_FIRST_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
+                    "FOREIGN KEY($COLUMN_SECOND_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
                     ")")
             db.execSQL(createTableFilterOperator)
 
@@ -505,8 +505,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_FILTEROPERATOR = "filteroperator"
         const val COLUMN_FILTEROPERATOR_ORDER = "operator_order"
         const val COLUMN_CONNECTOR = "connector"
-        const val COLUMN_FIRST_RULE_ID = "first_rule_id"
-        const val COLUMN_SECOND_RULE_ID = "second_rule_id"
+        const val COLUMN_FIRST_RULE_UUID = "first_rule_uuid"
+        const val COLUMN_SECOND_RULE_UUID = "second_rule_uuid"
 
         // EnumArea Table
         const val TABLE_ENUM_AREA = "enum_area"
@@ -707,6 +707,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 293
+        private const val DATABASE_VERSION = 294
     }
 }
