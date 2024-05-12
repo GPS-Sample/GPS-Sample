@@ -21,16 +21,13 @@ class RuleDAO(private var dao: DAO)
         }
         else
         {
-            if (rule.uuid.isEmpty())
-            {
-                rule.uuid = UUID.randomUUID().toString()
-            }
             val values = ContentValues()
             putRule( rule, values )
             if (dao.writableDatabase.insert(DAO.TABLE_RULE, null, values) < 0)
             {
                 return null
             }
+            Log.d( "xxx", "create rule with ID ${rule.uuid}")
         }
 
         for (fieldDataOption in rule.fieldDataOptions)
@@ -138,7 +135,7 @@ class RuleDAO(private var dao: DAO)
         return rules
     }
 
-    fun getRulesForField( field : Field) : ArrayList<Rule>
+    fun getRules( field : Field) : ArrayList<Rule>
     {
         val rules = ArrayList<Rule>()
 

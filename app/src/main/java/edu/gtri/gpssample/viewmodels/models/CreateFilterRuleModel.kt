@@ -132,7 +132,6 @@ class CreateFilterRuleModel {
                     _secondRuleFieldPosition = MutableLiveData(1)
                 }
             }
-            Log.d("xxxxxx", "ummmmmm")
         }
         // build list of rules
         for (rule in ruleList)
@@ -146,8 +145,6 @@ class CreateFilterRuleModel {
 
     fun addFilterRule(filter : Filter)
     {
-        Log.d("xxxxx", "test")
-
         // stitch it all together
         _currentRule?.value?.let{currentRule ->
             // we save the first rule
@@ -162,7 +159,6 @@ class CreateFilterRuleModel {
                 // the first rule in the UI is the last rule in the list normally,
 
             _secondRule?.value?.let{secondRule ->
-                Log.d("xxxxx", "we can stitch together")
                 // build operator
                 val operator = FilterOperator("", 0, currentConnector, secondRule)
                 // add add operator to first rule

@@ -125,7 +125,7 @@ class FieldDAO(private var dao: DAO)
         {
             val field = buildField( cursor )
             field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
-            val rules = DAO.ruleDAO.getRulesForField(field)
+            val rules = DAO.ruleDAO.getRules(field)
             study.rules.addAll(rules)
             fields.add( field)
         }

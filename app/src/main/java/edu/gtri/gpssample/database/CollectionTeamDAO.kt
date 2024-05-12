@@ -11,7 +11,7 @@ import edu.gtri.gpssample.database.models.Study
 
 class CollectionTeamDAO(private var dao: DAO)
 {
-    fun createOrUpdateTeam(collectionTeam: CollectionTeam) : CollectionTeam?
+    fun createOrUpdateCollectionTeam(collectionTeam: CollectionTeam) : CollectionTeam?
     {
         if (exists( collectionTeam ))
         {

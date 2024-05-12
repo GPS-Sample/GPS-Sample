@@ -36,6 +36,10 @@ class EnumAreaDAO(private var dao: DAO)
             DAO.locationDAO.createOrUpdateLocation(location, enumArea)
         }
 
+        for (enumerationTeam in enumArea.enumerationTeams) {
+            DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( enumerationTeam )
+        }
+
         return enumArea
     }
 

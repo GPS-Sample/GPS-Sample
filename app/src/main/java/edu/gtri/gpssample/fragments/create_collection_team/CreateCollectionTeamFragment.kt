@@ -161,7 +161,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.uuid, study.uuid, binding.teamNameEditText.text.toString(), polygon, locations ))
+            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, study.uuid, binding.teamNameEditText.text.toString(), polygon, locations ))
 
             collectionTeam?.let { team ->
                 study.collectionTeams.add(team)

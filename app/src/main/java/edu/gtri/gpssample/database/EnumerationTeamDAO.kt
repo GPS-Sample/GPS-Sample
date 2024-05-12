@@ -8,7 +8,7 @@ import edu.gtri.gpssample.database.models.*
 
 class EnumerationTeamDAO(private var dao: DAO)
 {
-    fun createOrUpdateTeam(enumerationTeam: EnumerationTeam) : EnumerationTeam?
+    fun createOrUpdateEnumerationTeam(enumerationTeam: EnumerationTeam) : EnumerationTeam?
     {
         if (exists( enumerationTeam ))
         {

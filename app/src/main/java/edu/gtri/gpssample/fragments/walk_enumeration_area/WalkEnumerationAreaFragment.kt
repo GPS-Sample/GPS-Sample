@@ -481,7 +481,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                 config.enumAreas[0].let { enumArea ->
-                    DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.uuid, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
+                    DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
                         enumArea.enumerationTeams.add( enumerationTeam )
                     }
                 }

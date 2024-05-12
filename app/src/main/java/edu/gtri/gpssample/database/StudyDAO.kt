@@ -10,6 +10,7 @@ import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingMethodConverter
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Study
 
@@ -49,6 +50,12 @@ class StudyDAO(private var dao: DAO)
         for(filter in study.filters)
         {
             DAO.filterDAO.createOrUpdateFilter(filter, study);
+        }
+
+        // add teams
+        for(team in study.collectionTeams)
+        {
+            DAO.collectionTeamDAO.createOrUpdateCollectionTeam( team );
         }
 
         return study
@@ -107,7 +114,8 @@ class StudyDAO(private var dao: DAO)
             cursor.moveToNext()
 
             study = buildStudy( cursor )
-            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+            study.fields = DAO.fieldDAO.getFields(study)
+            // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
             study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
         }
@@ -131,6 +139,7 @@ class StudyDAO(private var dao: DAO)
             val study = buildStudy( cursor )
             studies.add( study )
             study.fields = DAO.fieldDAO.getFields(study)
+            // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
             study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
         }
@@ -152,6 +161,7 @@ class StudyDAO(private var dao: DAO)
         {
             val study = buildStudy( cursor )
             study.fields = DAO.fieldDAO.getFields(study)
+            // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
             study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             studies.add( study )

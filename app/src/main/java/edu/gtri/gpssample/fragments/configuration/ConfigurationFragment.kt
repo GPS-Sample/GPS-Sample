@@ -437,16 +437,24 @@ class ConfigurationFragment : Fragment(),
                                 {
                                     DAO.instance().writableDatabase.beginTransaction()
 
-                                    for (location in enumArea.locations)
-                                    {
-                                        DAO.locationDAO.createOrUpdateLocation(location, enumArea)
-                                    }
+//                                    for (location in enumArea.locations)
+//                                    {
+//                                        DAO.locationDAO.createOrUpdateLocation(location, enumArea)
+//                                    }
+
+                                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
 
                                     DAO.instance().writableDatabase.setTransactionSuccessful()
                                     DAO.instance().writableDatabase.endTransaction()
 
+                                    sharedViewModel?.currentConfiguration?.value?.let { config ->
+                                        DAO.configDAO.getConfig( config.uuid )?.let { config ->
+                                            sharedViewModel?.setCurrentConfig(config)
+                                        }
+                                    }
+
                                     // replace the enumArea from currentConfig with this one
-                                    sharedViewModel.replaceEnumArea(enumArea)
+//                                    sharedViewModel.replaceEnumArea(enumArea)
 
                                     activity!!.runOnUiThread {
                                         binding.overlayView.visibility = View.GONE
@@ -511,7 +519,7 @@ class ConfigurationFragment : Fragment(),
                         polygon.add( LatLon( index++, it.latitude, it.longitude ))
                     }
 
-                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.uuid, "E-Team-${enumArea.uuid}", polygon, enumArea.locations ))
+                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "E-Team-${enumArea.uuid}", polygon, enumArea.locations ))
                     enumArea.enumerationTeams.add(enumerationTeam!!)
 
                     for (location in enumArea.locations)
@@ -573,7 +581,7 @@ class ConfigurationFragment : Fragment(),
                     }
 
                     sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                        val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.uuid, study.uuid, "S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
+                        val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, study.uuid, "S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
                         study.collectionTeams.add(collectionTeam!!)
                     }
 

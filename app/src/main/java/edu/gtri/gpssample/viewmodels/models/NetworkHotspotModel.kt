@@ -269,58 +269,60 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                         DAO.instance().writableDatabase.beginTransaction()
 
-                        // first, import landmarks
-                        for (location in enumArea.locations)
-                        {
-                            if (location.isLandmark)
-                            {
-                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-                            }
-                        }
+                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
 
-                        // next, import HH's
-                        val team = enumArea.enumerationTeams.find { it.uuid == enumArea.selectedEnumerationTeamUuid }
-                        team?.let { team ->
-
-                            val newLocations = ArrayList<Location>()
-
-                            // only import locations from the selected team
-                            for (location in team.locations)
-                            {
-                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-
-                                // find out if the location exists in the local version of the selected team
-
-                                val enumerationTeam = DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )
-
-                                if (enumerationTeam == null)
-                                {
-                                    DAO.enumerationTeamDAO.createOrUpdateTeam( team )
-                                }
-
-                                DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )?.let { currentTeam ->
-                                    var found = false
-
-                                    for (teamLocation in currentTeam.locations)
-                                    {
-                                        if (teamLocation.uuid == location.uuid)
-                                        {
-                                            found = true
-                                        }
-                                    }
-
-                                    if (!found)
-                                    {
-                                        newLocations.add( location )
-                                    }
-                                }
-                            }
-
-                            for (location in newLocations)
-                            {
-                                DAO.enumerationTeamDAO.createOrUpdateTeam( team )
-                            }
-                        }
+//                        // first, import landmarks
+//                        for (location in enumArea.locations)
+//                        {
+//                            if (location.isLandmark)
+//                            {
+//                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+//                            }
+//                        }
+//
+//                        // next, import HH's
+//                        val team = enumArea.enumerationTeams.find { it.uuid == enumArea.selectedEnumerationTeamUuid }
+//                        team?.let { team ->
+//
+//                            val newLocations = ArrayList<Location>()
+//
+//                            // only import locations from the selected team
+//                            for (location in team.locations)
+//                            {
+//                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+//
+//                                // find out if the location exists in the local version of the selected team
+//
+//                                val enumerationTeam = DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )
+//
+//                                if (enumerationTeam == null)
+//                                {
+//                                    DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( team )
+//                                }
+//
+//                                DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )?.let { currentTeam ->
+//                                    var found = false
+//
+//                                    for (teamLocation in currentTeam.locations)
+//                                    {
+//                                        if (teamLocation.uuid == location.uuid)
+//                                        {
+//                                            found = true
+//                                        }
+//                                    }
+//
+//                                    if (!found)
+//                                    {
+//                                        newLocations.add( location )
+//                                    }
+//                                }
+//                            }
+//
+//                            for (location in newLocations)
+//                            {
+//                                DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( team )
+//                            }
+//                        }
 
                         DAO.instance().writableDatabase.setTransactionSuccessful()
                         DAO.instance().writableDatabase.endTransaction()
@@ -362,10 +364,12 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                         DAO.instance().writableDatabase.beginTransaction()
 
-                        for (location in enumArea.locations)
-                        {
-                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-                        }
+                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+
+//                        for (location in enumArea.locations)
+//                        {
+//                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+//                        }
 
                         DAO.instance().writableDatabase.setTransactionSuccessful()
                         DAO.instance().writableDatabase.endTransaction()
