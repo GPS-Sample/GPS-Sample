@@ -101,7 +101,7 @@ class RuleDAO(private var dao: DAO)
 
     fun getRule( uuid: String ) : Rule?
     {
-        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = ${uuid}"
+        val query = "SELECT * FROM ${DAO.TABLE_RULE} WHERE ${DAO.COLUMN_UUID} = '${uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

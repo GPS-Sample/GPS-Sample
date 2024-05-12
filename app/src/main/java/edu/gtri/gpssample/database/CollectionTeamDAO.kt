@@ -119,24 +119,6 @@ class CollectionTeamDAO(private var dao: DAO)
         dao.writableDatabase.update(DAO.TABLE_COLLECTION_TEAM, values, whereClause, args )
     }
 
-    fun getTeam( id: Int ): CollectionTeam?
-    {
-        var collectionTeam: CollectionTeam? = null
-        val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_UUID} = $id"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            collectionTeam = buildTeam( cursor )
-        }
-
-        cursor.close()
-
-        return collectionTeam
-    }
-
     fun getCollectionTeams( study: Study ): ArrayList<CollectionTeam>
     {
         val collectionTeam = ArrayList<CollectionTeam>()

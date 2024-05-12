@@ -74,7 +74,7 @@ class FieldOptionDAO(private var dao: DAO)
     fun getFieldOption( uuid : String ): FieldOption?
     {
         var fieldOption: FieldOption? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_OPTION} where ${DAO.COLUMN_UUID}=${uuid}"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_OPTION} where ${DAO.COLUMN_UUID} = '${uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)

@@ -229,7 +229,7 @@ class FilterDAO(private var dao: DAO)
     fun getFilter(uuid : String, study : Study) : Filter?
     {
         var filter: Filter? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = ${uuid}"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTER} WHERE ${DAO.COLUMN_UUID} = '${uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

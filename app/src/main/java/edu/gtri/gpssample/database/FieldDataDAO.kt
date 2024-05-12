@@ -113,7 +113,7 @@ class FieldDataDAO(private var dao: DAO)
     fun getFieldData( uuid: String ): FieldData?
     {
         var fieldData: FieldData? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_UUID}='$uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)

@@ -29,24 +29,6 @@ class UserDAO(private var dao: DAO)
         values.put( DAO.COLUMN_USER_RECOVERY_ANSWER, user.recoveryAnswer )
     }
 
-    fun getUser( id: Int ): User?
-    {
-        var user: User? = null
-        val query = "SELECT * FROM ${DAO.TABLE_USER} WHERE ${DAO.COLUMN_UUID} = '$id'"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-
-            user = buildUser( cursor )
-        }
-
-        cursor.close()
-
-        return user
-    }
-
     fun getUser( name: String, pin: String ): User?
     {
         var user: User? = null
