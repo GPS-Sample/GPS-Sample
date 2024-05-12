@@ -817,7 +817,21 @@ class PerformEnumerationFragment : Fragment(),
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
-                            val packedConfig = config.pack()
+                            var packedConfig = config.pack()
+
+                            Config.unpack( packedConfig, config.encryptionPassword )?.let { configCopy ->
+                                configCopy.enumAreas.clear()
+                                for (enumArea in config.enumAreas)
+                                {
+                                    if (enumArea.uuid == config.selectedEnumAreaUuid)
+                                    {
+                                        configCopy.enumAreas.add( enumArea )
+                                        packedConfig = configCopy.pack()
+                                        break
+                                    }
+                                }
+                            }
+
                             val fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)

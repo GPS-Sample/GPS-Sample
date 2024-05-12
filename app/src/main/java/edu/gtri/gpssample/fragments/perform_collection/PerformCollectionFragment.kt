@@ -595,6 +595,20 @@ class PerformCollectionFragment : Fragment(),
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
                     payload = config.pack()
+
+                    Config.unpack( payload, config.encryptionPassword )?.let { configCopy ->
+                        configCopy.enumAreas.clear()
+                        for (enumArea in config.enumAreas)
+                        {
+                            if (enumArea.uuid == config.selectedEnumAreaUuid)
+                            {
+                                configCopy.enumAreas.add( enumArea )
+                                payload = configCopy.pack()
+                                break
+                            }
+                        }
+                    }
+
                     message = resources.getString(R.string.config_saved_doc)
                 }
             }

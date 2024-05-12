@@ -232,11 +232,27 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
                 else
                 {
-                    config?.let {config->
-                        val packedConfig = config.pack()
+                    config?.let { config->
+                        var packedConfig = config.pack()
 
-                        val message = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
-                        val byteArray = message.toByteArray()
+                        if (config.selectedEnumAreaUuid.isNotEmpty())
+                        {
+                            Config.unpack( packedConfig, encryptionPassword )?.let { configCopy ->
+                                configCopy.enumAreas.clear()
+                                for (enumArea in config.enumAreas)
+                                {
+                                    if (enumArea.uuid == config.selectedEnumAreaUuid)
+                                    {
+                                        configCopy.enumAreas.add( enumArea )
+                                        packedConfig = configCopy.pack()
+                                        break
+                                    }
+                                }
+                            }
+                        }
+
+                        val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
+                        val byteArray = tcpMessage.toByteArray()
                         socket.outputStream.write(byteArray)
                         socket.outputStream.flush()
                         Log.d( "xxx", "Server: wrote ${byteArray!!.size}")

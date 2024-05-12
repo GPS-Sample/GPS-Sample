@@ -297,12 +297,14 @@ class ConfigurationFragment : Fragment(),
                     }
                     else
                     {
+
                         sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
                     }
 
-                    view?.let{view ->
+                    view?.let { view ->
                         sharedViewModel.currentConfiguration?.value?.let{ config ->
+                            config.selectedEnumAreaUuid = ""
                             sharedNetworkViewModel.setCurrentConfig(config)
                             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                             sharedNetworkViewModel.createHotspot(view)
@@ -354,6 +356,8 @@ class ConfigurationFragment : Fragment(),
     fun exportToDevice( )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
+            config.selectedEnumAreaUuid = ""
+
             val packedConfig = config.pack()
 
             val user = (activity!!.application as MainApplication).user
