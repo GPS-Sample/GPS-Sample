@@ -260,7 +260,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
             }
 
-            NetworkCommand.NetworkEnumAreaExport ->
+            NetworkCommand.NetworkEnumAreaExport,
+            NetworkCommand.NetworkSampleAreaExport ->
             {
                 if (hotspotMode.value == HotspotMode.Export)
                 {
@@ -269,136 +270,28 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
 
                 message.payload?.let { payload ->
-                    val enumArea = EnumArea.unpack( payload, encryptionPassword )
+                    val config = Config.unpack( payload, encryptionPassword )
 
-                    if (enumArea == null)
+                    if (config == null)
                     {
-                        delegate?.let {
-                            it.importFailed( MessageType.ImportFailed )
-                        }
+                        delegate?.importFailed( MessageType.ImportFailed )
                     }
                     else
                     {
-                        delegate?.let {
-                            it.didStartImport()
-                        }
+                        delegate?.didStartImport()
 
                         DAO.instance().writableDatabase.beginTransaction()
 
-                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-
-//                        // first, import landmarks
-//                        for (location in enumArea.locations)
-//                        {
-//                            if (location.isLandmark)
-//                            {
-//                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-//                            }
-//                        }
-//
-//                        // next, import HH's
-//                        val team = enumArea.enumerationTeams.find { it.uuid == enumArea.selectedEnumerationTeamUuid }
-//                        team?.let { team ->
-//
-//                            val newLocations = ArrayList<Location>()
-//
-//                            // only import locations from the selected team
-//                            for (location in team.locations)
-//                            {
-//                                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-//
-//                                // find out if the location exists in the local version of the selected team
-//
-//                                val enumerationTeam = DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )
-//
-//                                if (enumerationTeam == null)
-//                                {
-//                                    DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( team )
-//                                }
-//
-//                                DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamUuid )?.let { currentTeam ->
-//                                    var found = false
-//
-//                                    for (teamLocation in currentTeam.locations)
-//                                    {
-//                                        if (teamLocation.uuid == location.uuid)
-//                                        {
-//                                            found = true
-//                                        }
-//                                    }
-//
-//                                    if (!found)
-//                                    {
-//                                        newLocations.add( location )
-//                                    }
-//                                }
-//                            }
-//
-//                            for (location in newLocations)
-//                            {
-//                                DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( team )
-//                            }
-//                        }
+                        DAO.configDAO.createOrUpdateConfig( config )
 
                         DAO.instance().writableDatabase.setTransactionSuccessful()
                         DAO.instance().writableDatabase.endTransaction()
 
-                        sharedViewModel?.currentConfiguration?.value?.let { config ->
-                            DAO.configDAO.getConfig( config.uuid )?.let { config ->
-                                sharedViewModel?.setCurrentConfig(config)
-                            }
+                        DAO.configDAO.getConfig( config.uuid )?.let {
+                            sharedViewModel?.setCurrentConfig(it)
                         }
 
-                        delegate?.let {
-                            it.didFinishImport()
-                        }
-                    }
-                }
-            }
-
-            NetworkCommand.NetworkSampleAreaExport ->
-            {
-                if (hotspotMode.value == HotspotMode.Export)
-                {
-                    delegate?.importFailed( MessageType.ExportRequestFailed )
-                }
-
-                message.payload?.let { payload ->
-                    val enumArea = EnumArea.unpack( payload, encryptionPassword )
-
-                    if (enumArea == null)
-                    {
-                        delegate?.let {
-                            it.importFailed( MessageType.ImportFailed )
-                        }
-                    }
-                    else
-                    {
-                        delegate?.let {
-                            it.didStartImport()
-                        }
-
-                        DAO.instance().writableDatabase.beginTransaction()
-
-                        DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
-
-//                        for (location in enumArea.locations)
-//                        {
-//                            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-//                        }
-
-                        DAO.instance().writableDatabase.setTransactionSuccessful()
-                        DAO.instance().writableDatabase.endTransaction()
-
-                        sharedViewModel?.currentConfiguration?.value?.let { config ->
-                            DAO.configDAO.getConfig( config.uuid )?.let { config ->
-                                sharedViewModel?.setCurrentConfig(config)
-                            }
-                        }
-
-                        delegate?.let {
-                            it.didFinishImport()
-                        }
+                        delegate?.didFinishImport()
                     }
                 }
             }

@@ -593,15 +593,15 @@ class PerformCollectionFragment : Fragment(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
                     payload = config.pack()
-
                     Config.unpack( payload, config.encryptionPassword )?.let { configCopy ->
                         configCopy.enumAreas.clear()
                         for (enumArea in config.enumAreas)
                         {
                             if (enumArea.uuid == config.selectedEnumAreaUuid)
                             {
+                                val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+                                fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                                 configCopy.enumAreas.add( enumArea )
                                 payload = configCopy.pack()
                                 break
@@ -620,7 +620,7 @@ class PerformCollectionFragment : Fragment(),
                     sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
                         val clusterName = enumArea.name.replace(" ", "" ).uppercase()
                         fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                        payload = enumArea.pack(config.encryptionPassword)
+                        payload = config.pack()
                         message = resources.getString(R.string.collection_saved_doc)
                     }
                 }
@@ -662,7 +662,7 @@ class PerformCollectionFragment : Fragment(),
                     {
                         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
                             sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                            sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                            sharedNetworkViewModel.networkClientModel.currentConfig = config
                             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                             getResult.launch(intent)
                         }

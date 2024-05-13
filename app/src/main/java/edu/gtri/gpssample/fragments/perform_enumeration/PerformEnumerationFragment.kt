@@ -742,7 +742,7 @@ class PerformEnumerationFragment : Fragment(),
                 Role.Enumerator.toString() ->
                 {
                     sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                    sharedNetworkViewModel.networkClientModel.currentConfig = config
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                     getResult.launch(intent)
                 }
@@ -817,6 +817,7 @@ class PerformEnumerationFragment : Fragment(),
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
+                            var clusterName = ""
                             var packedConfig = config.pack()
 
                             Config.unpack( packedConfig, config.encryptionPassword )?.let { configCopy ->
@@ -825,6 +826,7 @@ class PerformEnumerationFragment : Fragment(),
                                 {
                                     if (enumArea.uuid == config.selectedEnumAreaUuid)
                                     {
+                                        clusterName = enumArea.name.replace(" ", "" ).uppercase()
                                         configCopy.enumAreas.add( enumArea )
                                         packedConfig = configCopy.pack()
                                         break
@@ -832,7 +834,7 @@ class PerformEnumerationFragment : Fragment(),
                                 }
                             }
 
-                            val fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
+                            val fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedConfig)
@@ -844,12 +846,12 @@ class PerformEnumerationFragment : Fragment(),
 
                         Role.Enumerator.toString() ->
                         {
-                            val packedEnumArea = enumArea.pack(config.encryptionPassword)
+                            val packedConfig = config.pack()
                             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
                             val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
-                            writer.append(packedEnumArea)
+                            writer.append(packedConfig)
                             writer.flush()
                             writer.close()
 

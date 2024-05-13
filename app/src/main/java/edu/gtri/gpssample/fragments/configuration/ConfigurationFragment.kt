@@ -417,20 +417,19 @@ class ConfigurationFragment : Fragment(),
             val uri = data?.data
 
             uri?.let { uri ->
-                sharedViewModel.currentConfiguration?.value?.let { config ->
+                sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
                     try
                     {
-                        val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                        activity!!.getContentResolver().openInputStream(uri)?.let { inputStream ->
 
-                        inputStream?.let {  inputStream ->
                             binding.overlayView.visibility = View.VISIBLE
 
                             Thread {
                                 val text = inputStream.bufferedReader().readText()
 
-                                val enumArea = EnumArea.unpack( text, config.encryptionPassword )
+                                val config = Config.unpack( text, currentConfig.encryptionPassword )
 
-                                if (enumArea == null)
+                                if (config == null)
                                 {
                                     activity!!.runOnUiThread {
                                         binding.overlayView.visibility = View.GONE
@@ -441,24 +440,14 @@ class ConfigurationFragment : Fragment(),
                                 {
                                     DAO.instance().writableDatabase.beginTransaction()
 
-//                                    for (location in enumArea.locations)
-//                                    {
-//                                        DAO.locationDAO.createOrUpdateLocation(location, enumArea)
-//                                    }
-
-                                    DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
+                                    DAO.configDAO.createOrUpdateConfig( config )
 
                                     DAO.instance().writableDatabase.setTransactionSuccessful()
                                     DAO.instance().writableDatabase.endTransaction()
 
-                                    sharedViewModel?.currentConfiguration?.value?.let { config ->
-                                        DAO.configDAO.getConfig( config.uuid )?.let { config ->
-                                            sharedViewModel?.setCurrentConfig(config)
-                                        }
+                                    DAO.configDAO.getConfig( config.uuid )?.let {
+                                        sharedViewModel.setCurrentConfig(it)
                                     }
-
-                                    // replace the enumArea from currentConfig with this one
-//                                    sharedViewModel.replaceEnumArea(enumArea)
 
                                     activity!!.runOnUiThread {
                                         binding.overlayView.visibility = View.GONE

@@ -49,7 +49,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
     var clientStarted = false
     var encryptionPassword = ""
-    var currentEnumArea: EnumArea? = null
+    var currentConfig: Config? = null
 
     var configurationDelegate: ConfigurationDelegate? = null
 
@@ -125,15 +125,17 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
                             when (clientMode.value)
                             {
-                                ClientMode.Configuration -> {
-                                    sendConfigurationCommand()
+                                ClientMode.Configuration ->
+                                {
+                                    sendConfigRequestCommand()
                                 }
-                                ClientMode.EnumerationTeam -> {
-                                    sendEnumerationData()
+
+                                ClientMode.EnumerationTeam,
+                                ClientMode.CollectionTeam ->
+                                {
+                                    sendConfig()
                                 }
-                                ClientMode.CollectionTeam -> {
-                                    sendCollectionData()
-                                }
+
                                 else -> {}
                             }
                         }
@@ -143,7 +145,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
         }
     }
 
-    private fun sendConfigurationCommand()
+    private fun sendConfigRequestCommand()
     {
         val message = TCPMessage(NetworkCommand.NetworkConfigRequest, "")
         networkInfo?.let { networkInfo ->
@@ -169,28 +171,13 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
         }
     }
 
-    fun sendEnumerationData()
+    fun sendConfig()
     {
-        currentEnumArea?.let { enumArea ->
+        currentConfig?.let { config ->
             networkInfo?.let { networkInfo ->
-                val payload = enumArea.pack(encryptionPassword)
+                val payload = config.pack()
 
                 val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload)
-                client.sendMessage(networkInfo.serverIP, message, this)
-
-                _commandSent.postValue(NetworkStatus.CommandSent)
-                connectDelegate?.didSendData(true)
-            }
-        }
-    }
-
-    fun sendCollectionData()
-    {
-        currentEnumArea?.let { enumArea ->
-            networkInfo?.let { networkInfo ->
-                val payload = enumArea.pack(encryptionPassword)
-
-                val message = TCPMessage(NetworkCommand.NetworkSampleAreaExport, payload)
                 client.sendMessage(networkInfo.serverIP, message, this)
 
                 _commandSent.postValue(NetworkStatus.CommandSent)
