@@ -38,7 +38,7 @@ class CollectionTeamDAO(private var dao: DAO)
         return collectionTeam
     }
 
-    fun updateConnectorTable( collectionTeam: CollectionTeam)
+    private fun updateConnectorTable( collectionTeam: CollectionTeam)
     {
         for (latLon in collectionTeam.polygon)
         {

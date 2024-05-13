@@ -42,20 +42,30 @@ class FieldDataOptionDAO(private var dao: DAO)
         return fieldDataOption
     }
 
-    fun createFieldDataConnection(fieldDataOption: FieldDataOption, fieldData: FieldData)
+    private fun createFieldDataConnection(fieldDataOption: FieldDataOption, fieldData: FieldData)
     {
-        val values = ContentValues()
-        values.put( DAO.COLUMN_FIELD_DATA_UUID, fieldData.uuid )
-        values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
-        dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION, null, values).toInt()
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION} WHERE ${DAO.COLUMN_FIELD_DATA_UUID} = '${fieldData.uuid}' AND ${DAO.COLUMN_FIELD_DATA_OPTION_UUID} = '${fieldDataOption.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+        if (cursor.count == 0)
+        {
+            val values = ContentValues()
+            values.put( DAO.COLUMN_FIELD_DATA_UUID, fieldData.uuid )
+            values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
+            dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION, null, values).toInt()
+        }
     }
 
-    fun createRuleConnection(fieldDataOption: FieldDataOption, rule: Rule)
+    private fun createRuleConnection(fieldDataOption: FieldDataOption, rule: Rule)
     {
-        val values = ContentValues()
-        values.put( DAO.COLUMN_RULE_UUID, rule.uuid )
-        values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
-        dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION, null, values).toInt()
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION} WHERE ${DAO.COLUMN_RULE_UUID} = '${rule.uuid}' AND ${DAO.COLUMN_FIELD_DATA_OPTION_UUID} = '${fieldDataOption.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+        if (cursor.count == 0)
+        {
+            val values = ContentValues()
+            values.put( DAO.COLUMN_RULE_UUID, rule.uuid )
+            values.put( DAO.COLUMN_FIELD_DATA_OPTION_UUID, fieldDataOption.uuid )
+            dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION, null, values).toInt()
+        }
     }
 
     fun putFieldDataOption(fieldDataOption: FieldDataOption, values: ContentValues)

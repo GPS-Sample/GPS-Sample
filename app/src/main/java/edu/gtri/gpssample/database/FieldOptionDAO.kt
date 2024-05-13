@@ -30,12 +30,17 @@ class FieldOptionDAO(private var dao: DAO)
         return fieldOption
     }
 
-    fun createConnection( fieldOption: FieldOption, field: Field )
+    private fun createConnection( fieldOption: FieldOption, field: Field )
     {
-        val values = ContentValues()
-        values.put( DAO.COLUMN_FIELD_UUID, field.uuid )
-        values.put( DAO.COLUMN_FIELD_OPTION_UUID, fieldOption.uuid )
-        dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD__FIELD_OPTION, null, values).toInt()
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_FIELD__FIELD_OPTION} WHERE ${DAO.COLUMN_FIELD_UUID} = '${field.uuid}' AND ${DAO.COLUMN_FIELD_OPTION_UUID} = '${fieldOption.uuid}'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+        if (cursor.count == 0)
+        {
+            val values = ContentValues()
+            values.put( DAO.COLUMN_FIELD_UUID, field.uuid )
+            values.put( DAO.COLUMN_FIELD_OPTION_UUID, fieldOption.uuid )
+            dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_FIELD__FIELD_OPTION, null, values).toInt()
+        }
     }
 
     fun putFieldOption( fieldOption: FieldOption, values: ContentValues )
