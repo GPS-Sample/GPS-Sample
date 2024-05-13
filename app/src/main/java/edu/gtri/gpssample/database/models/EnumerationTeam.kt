@@ -9,7 +9,7 @@ import java.util.*
 data class EnumerationTeam(
     var uuid : String,
     var creationDate: Long,
-    var enumerAreaUuid: String,
+    var enumAreaUuid: String,
     var name: String,
     var polygon: ArrayList<LatLon>,
     var locations: ArrayList<Location>)

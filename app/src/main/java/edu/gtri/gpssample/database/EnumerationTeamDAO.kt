@@ -70,7 +70,7 @@ class EnumerationTeamDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, enumerationTeam.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumerationTeam.creationDate )
-        values.put( DAO.COLUMN_ENUM_AREA_UUID, enumerationTeam.enumerAreaUuid )
+        values.put( DAO.COLUMN_ENUM_AREA_UUID, enumerationTeam.enumAreaUuid )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
     }
 
