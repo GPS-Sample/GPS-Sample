@@ -590,12 +590,13 @@ class PerformCollectionFragment : Fragment(),
             version = versionName[1]
         }
 
+        val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+
         when(user.role) {
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    val clusterName = enumArea.name.replace(" ", "" ).uppercase()
                     fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                     payload = config.packMinimal()
                     message = resources.getString(R.string.config_saved_doc)
@@ -607,7 +608,6 @@ class PerformCollectionFragment : Fragment(),
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                        val clusterName = enumArea.name.replace(" ", "" ).uppercase()
                         fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                         payload = config.pack()
                         message = resources.getString(R.string.collection_saved_doc)

@@ -813,11 +813,13 @@ class PerformEnumerationFragment : Fragment(),
                     {
                         version = versionName[1]
                     }
+
+                    val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+
                     when(user.role)
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
-                            val clusterName = ""
                             val packedConfig = config.packMinimal()
                             val fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
@@ -832,7 +834,6 @@ class PerformEnumerationFragment : Fragment(),
                         Role.Enumerator.toString() ->
                         {
                             val packedConfig = config.pack()
-                            val clusterName = enumArea.name.replace(" ", "" ).uppercase()
                             val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
