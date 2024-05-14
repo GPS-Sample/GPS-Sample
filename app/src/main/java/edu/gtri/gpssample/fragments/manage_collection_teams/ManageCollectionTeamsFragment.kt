@@ -107,6 +107,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
 
+        enumArea.selectedEnumerationTeamUuid = ""
         enumArea.selectedCollectionTeamUuid = collectionTeam.uuid
 
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
