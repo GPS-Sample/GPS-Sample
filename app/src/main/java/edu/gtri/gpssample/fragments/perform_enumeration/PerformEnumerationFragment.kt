@@ -817,23 +817,8 @@ class PerformEnumerationFragment : Fragment(),
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
-                            var clusterName = ""
-                            var packedConfig = config.pack()
-
-                            Config.unpack( packedConfig, config.encryptionPassword )?.let { configCopy ->
-                                configCopy.enumAreas.clear()
-                                for (enumArea in config.enumAreas)
-                                {
-                                    if (enumArea.uuid == config.selectedEnumAreaUuid)
-                                    {
-                                        clusterName = enumArea.name.replace(" ", "" ).uppercase()
-                                        configCopy.enumAreas.add( enumArea )
-                                        packedConfig = configCopy.pack()
-                                        break
-                                    }
-                                }
-                            }
-
+                            val clusterName = ""
+                            val packedConfig = config.packMinimal()
                             val fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)

@@ -233,24 +233,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 else
                 {
                     config?.let { config->
-                        var packedConfig = config.pack()
-
-                        if (config.selectedEnumAreaUuid.isNotEmpty())
-                        {
-                            Config.unpack( packedConfig, encryptionPassword )?.let { configCopy ->
-                                configCopy.enumAreas.clear()
-                                for (enumArea in config.enumAreas)
-                                {
-                                    if (enumArea.uuid == config.selectedEnumAreaUuid)
-                                    {
-                                        configCopy.enumAreas.add( enumArea )
-                                        packedConfig = configCopy.pack()
-                                        break
-                                    }
-                                }
-                            }
-                        }
-
+                        val packedConfig = config.packMinimal()
                         val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
                         val byteArray = tcpMessage.toByteArray()
                         socket.outputStream.write(byteArray)

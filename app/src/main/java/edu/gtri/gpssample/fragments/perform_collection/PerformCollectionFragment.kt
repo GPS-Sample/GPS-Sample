@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.util.Log.ASSERT
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -182,6 +183,7 @@ class PerformCollectionFragment : Fragment(),
                     // why is the locationId NOT set?
                     if (enumurationItem.locationUuid.isEmpty())
                     {
+                        assert(false)
                         enumurationItem.locationUuid = location.uuid
                     }
                     enumerationItems.add( enumurationItem )
@@ -593,22 +595,9 @@ class PerformCollectionFragment : Fragment(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    payload = config.pack()
-                    Config.unpack( payload, config.encryptionPassword )?.let { configCopy ->
-                        configCopy.enumAreas.clear()
-                        for (enumArea in config.enumAreas)
-                        {
-                            if (enumArea.uuid == config.selectedEnumAreaUuid)
-                            {
-                                val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-                                fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                                configCopy.enumAreas.add( enumArea )
-                                payload = configCopy.pack()
-                                break
-                            }
-                        }
-                    }
-
+                    val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+                    fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                    payload = config.packMinimal()
                     message = resources.getString(R.string.config_saved_doc)
                 }
             }

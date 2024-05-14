@@ -304,7 +304,15 @@ class ConfigurationFragment : Fragment(),
 
                     view?.let { view ->
                         sharedViewModel.currentConfiguration?.value?.let{ config ->
+
                             config.selectedEnumAreaUuid = ""
+
+                            for (enumArea in config.enumAreas)
+                            {
+                                enumArea.selectedEnumerationTeamUuid = ""
+                                enumArea.selectedCollectionTeamUuid = ""
+                            }
+
                             sharedNetworkViewModel.setCurrentConfig(config)
                             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                             sharedNetworkViewModel.createHotspot(view)
@@ -356,7 +364,14 @@ class ConfigurationFragment : Fragment(),
     fun exportToDevice( )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
+
             config.selectedEnumAreaUuid = ""
+
+            for (enumArea in config.enumAreas)
+            {
+                enumArea.selectedEnumerationTeamUuid = ""
+                enumArea.selectedCollectionTeamUuid = ""
+            }
 
             val packedConfig = config.pack()
 
@@ -573,9 +588,10 @@ class ConfigurationFragment : Fragment(),
                         polygon.add( LatLon( index++, it.latitude, it.longitude ))
                     }
 
+                    val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid,"S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
+                    enumArea.collectionTeams.add(collectionTeam!!)
+
                     sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                        val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, study.uuid, "S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
-                        study.collectionTeams.add(collectionTeam!!)
                     }
 
                     for (location in enumArea.locations)

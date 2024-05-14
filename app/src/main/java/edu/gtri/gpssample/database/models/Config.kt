@@ -136,6 +136,62 @@ data class Config(
         return ""
     }
 
+    fun packMinimal() : String
+    {
+        var packedConfig = this.pack()
+
+        if (this.selectedEnumAreaUuid.isNotEmpty())
+        {
+            unpack( packedConfig, encryptionPassword )?.let { configCopy ->
+
+                for (enumArea in configCopy.enumAreas)
+                {
+                    if (enumArea.uuid == configCopy.selectedEnumAreaUuid)
+                    {
+                        configCopy.enumAreas.clear()
+                        configCopy.enumAreas.add( enumArea )
+                        break
+                    }
+                }
+
+                val enumArea = configCopy.enumAreas[0]
+
+                if (enumArea.selectedCollectionTeamUuid.isNotEmpty())
+                {
+                    enumArea.enumerationTeams.clear()
+
+                    for (collectionTeam in enumArea.collectionTeams)
+                    {
+                        if (collectionTeam.uuid == enumArea.selectedCollectionTeamUuid)
+                        {
+                            enumArea.collectionTeams.clear()
+                            enumArea.collectionTeams.add( collectionTeam )
+                            break
+                        }
+                    }
+                }
+                else if (enumArea.selectedEnumerationTeamUuid.isNotEmpty())
+                {
+                    enumArea.collectionTeams.clear()
+
+                    for (enumerationTeam in enumArea.enumerationTeams)
+                    {
+                        if (enumerationTeam.uuid == enumArea.selectedEnumerationTeamUuid)
+                        {
+                            enumArea.enumerationTeams.clear()
+                            enumArea.enumerationTeams.add( enumerationTeam )
+                            break
+                        }
+                    }
+                }
+
+                packedConfig = configCopy.pack()
+            }
+        }
+
+        return packedConfig
+    }
+
     companion object
     {
         fun unpack( jsonString: String, password: String ) : Config?

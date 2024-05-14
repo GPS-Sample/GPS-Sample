@@ -52,12 +52,6 @@ class StudyDAO(private var dao: DAO)
             DAO.filterDAO.createOrUpdateFilter(filter, study);
         }
 
-        // add teams
-        for(team in study.collectionTeams)
-        {
-            DAO.collectionTeamDAO.createOrUpdateCollectionTeam( team );
-        }
-
         return study
     }
 
@@ -67,7 +61,6 @@ class StudyDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CREATION_DATE, study.creationDate )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
-        values.put( DAO.COLUMN_COLLECTION_TEAM_UUID, study.selectedCollectionTeamUuid )
 
         // convert enum to int.  Maybe not do this and have look up tables?
         var index = SampleTypeConverter.toIndex(study.sampleType)
@@ -78,7 +71,7 @@ class StudyDAO(private var dao: DAO)
 
     fun exists( study: Study ): Boolean
     {
-        getStudy( study.uuid )?.let { study
+        getStudy( study.uuid )?.let {
             return true
         } ?: return false
     }
@@ -86,19 +79,18 @@ class StudyDAO(private var dao: DAO)
     @SuppressLint("Range")
     private fun buildStudy(cursor: Cursor ): Study
     {
-        val uuid = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_UUID}"))
-        val selectedCollectionTeamUuid = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_COLLECTION_TEAM_UUID}"))
-        val creationDate = cursor.getLong(cursor.getColumnIndex("${DAO.COLUMN_CREATION_DATE}"))
-        val name = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_NAME}"))
-        val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX}"))
-        val sampleSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE}"))
-        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX}"))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
+        val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX))
+        val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE))
+        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX))
 
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
 
-        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType, selectedCollectionTeamUuid )
+        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType )
 
         return study
     }
@@ -117,7 +109,6 @@ class StudyDAO(private var dao: DAO)
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
-            study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
         }
 
         cursor.close()
@@ -141,7 +132,6 @@ class StudyDAO(private var dao: DAO)
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
-            study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
         }
 
         cursor.close()
@@ -163,7 +153,6 @@ class StudyDAO(private var dao: DAO)
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
-            study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             studies.add( study )
         }
 

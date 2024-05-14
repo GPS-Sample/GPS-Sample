@@ -57,8 +57,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
                     COLUMN_ENUMERATION_TEAM_UUID + " TEXT" + "," +
+                    COLUMN_COLLECTION_TEAM_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
-                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_UUID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_UUID)" +
+                    "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_UUID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_UUID)" + "," +
+                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_UUID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_UUID)" +
                     ")")
             db.execSQL(createTableEnumArea)
 
@@ -67,11 +69,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_NAME + " TEXT" + "," +
-                    COLUMN_COLLECTION_TEAM_UUID + " TEXT" + "," +
                     COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
                     COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
-                    COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" + "," +
-                    "FOREIGN KEY($COLUMN_COLLECTION_TEAM_UUID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_UUID)" +
+                    COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" +
                     ")")
             db.execSQL(createTableStudy)
 
@@ -179,10 +179,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_COLLECTION_TEAM + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_STUDY_UUID + " TEXT" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_COLLECTION_TEAM_NAME + " TEXT" + "," +
-                    "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
                     ")")
             db.execSQL(createTableCollectionTeam)
@@ -707,6 +705,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 294
+        private const val DATABASE_VERSION = 295
     }
 }

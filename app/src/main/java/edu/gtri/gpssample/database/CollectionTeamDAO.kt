@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
-import edu.gtri.gpssample.database.models.CollectionTeam
-import edu.gtri.gpssample.database.models.LatLon
-import edu.gtri.gpssample.database.models.Location
-import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.*
 
 class CollectionTeamDAO(private var dao: DAO)
 {
@@ -74,7 +71,6 @@ class CollectionTeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, collectionTeam.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, collectionTeam.creationDate )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, collectionTeam.enumAreaUuid )
-        values.put( DAO.COLUMN_STUDY_UUID, collectionTeam.studyUuid )
         values.put( DAO.COLUMN_COLLECTION_TEAM_NAME, collectionTeam.name )
     }
 
@@ -97,10 +93,9 @@ class CollectionTeamDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val enum_area_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
-        val study_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
 
-        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, study_uuid, name, ArrayList<LatLon>(), ArrayList<Location>())
+        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, ArrayList<LatLon>(), ArrayList<Location>())
 
         collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( collectionTeam.uuid )
         collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
@@ -119,11 +114,11 @@ class CollectionTeamDAO(private var dao: DAO)
         dao.writableDatabase.update(DAO.TABLE_COLLECTION_TEAM, values, whereClause, args )
     }
 
-    fun getCollectionTeams( study: Study ): ArrayList<CollectionTeam>
+    fun getCollectionTeams( enumArea: EnumArea ): ArrayList<CollectionTeam>
     {
         val collectionTeam = ArrayList<CollectionTeam>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}'"
+        val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_ENUM_AREA_UUID} = '${enumArea.uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

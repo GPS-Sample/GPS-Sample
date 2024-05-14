@@ -24,6 +24,7 @@ import kotlin.collections.ArrayList
 class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var study: Study
+    private lateinit var enumArea: EnumArea
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var manageCollectionTeamsAdapter: ManageCollectionTeamsAdapter
@@ -68,29 +69,17 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
             }
         })
 
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
+        }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
         }
 
-        val collectionTeams = ArrayList<CollectionTeam>()
-
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-            for (collectionTeam in study.collectionTeams)
-            {
-                if (collectionTeam.enumAreaUuid == enumArea.uuid)
-                {
-                    collectionTeams.add( collectionTeam )
-                }
-            }
-        }
-
         if (!this::manageCollectionTeamsAdapter.isInitialized)
         {
-            manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( collectionTeams )
-        }
-        else
-        {
-            manageCollectionTeamsAdapter.updateTeams( collectionTeams )
+            manageCollectionTeamsAdapter = ManageCollectionTeamsAdapter( enumArea.collectionTeams )
         }
 
         manageCollectionTeamsAdapter.didSelectTeam = this::didSelectTeam
@@ -118,7 +107,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     {
         sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
 
-        study.selectedCollectionTeamUuid = collectionTeam.uuid
+        enumArea.selectedCollectionTeamUuid = collectionTeam.uuid
 
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }
@@ -136,8 +125,8 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
     override fun didSelectRightButton(tag: Any?)
     {
         val collectionTeam = tag as CollectionTeam
-        study.collectionTeams.remove(collectionTeam)
-        manageCollectionTeamsAdapter.updateTeams(study.collectionTeams)
+        enumArea.collectionTeams.remove(collectionTeam)
+        manageCollectionTeamsAdapter.updateTeams(enumArea.collectionTeams)
         DAO.collectionTeamDAO.deleteTeam( collectionTeam )
     }
 

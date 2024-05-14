@@ -23,17 +23,13 @@ data class Study(
     var fields : ArrayList<Field>,
     var rules : ArrayList<Rule>,
     var filters : ArrayList<Filter>,
-    var collectionTeams: ArrayList<CollectionTeam>,
-    var selectedCollectionTeamUuid: String
 )
 {
     constructor(name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
-            : this(UUID.randomUUID().toString(), Date().time, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<CollectionTeam>(), "")
+            : this(UUID.randomUUID().toString(), Date().time, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
 
-    constructor(uuid: String, creationDate: Long, name: String, samplingMethod: SamplingMethod,
-                sampleSize: Int, sampleType: SampleType, selectedCollectionTeamUuid: String )
-            : this(uuid, creationDate, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(),
-        ArrayList<CollectionTeam>(), selectedCollectionTeamUuid)
+    constructor(uuid: String, creationDate: Long, name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType )
+            : this(uuid, creationDate, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
 
     fun pack(password: String) : String
     {
