@@ -28,7 +28,7 @@ class RuleDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Create Rule with ID ${rule.uuid}")
+            Log.d( "xxx", "Created Rule with ID ${rule.uuid}")
         }
 
         for (fieldDataOption in rule.fieldDataOptions)
