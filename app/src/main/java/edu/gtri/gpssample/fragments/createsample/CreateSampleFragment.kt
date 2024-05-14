@@ -212,15 +212,15 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                     {
                         if (study.samplingMethod == SamplingMethod.Cluster)
                         {
-                            if (enumArea.id == config.selectedEnumAreaId)
+                            if (enumArea.uuid == config.selectedEnumAreaUuid)
                             {
-                                DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                                DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea)
                                 break
                             }
                         }
                         else
                         {
-                            DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea, config)
+                            DAO.enumAreaDAO.createOrUpdateEnumArea(enumArea)
                         }
                     }
 
@@ -331,10 +331,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
     {
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-            val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-            val northWest = LatLon( latLngBounds.northeast.latitude, latLngBounds.southwest.longitude )
-            val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-            val southEast = LatLon( latLngBounds.southwest.latitude, latLngBounds.northeast.longitude )
+            val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val northWest = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.southwest.longitude )
+            val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            val southEast = LatLon( 0,latLngBounds.southwest.latitude, latLngBounds.northeast.longitude )
 
             for (vertice in enumArea.vertices)
             {
@@ -349,7 +349,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
             enumArea.vertices.add( southWest )
             enumArea.vertices.add( northWest )
 
-            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
+            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
 
             refreshMap()
         }

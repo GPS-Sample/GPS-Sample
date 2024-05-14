@@ -885,10 +885,10 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         val vertices = ArrayList<LatLon>()
 
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( 0,mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
 
         vertices.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
@@ -963,14 +963,16 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 val points1 = ArrayList<Coordinate>()
 
+                var index = 0
+
                 polylineAnnotation.points.map { point ->
-                    vertices.add( LatLon( point.latitude(), point.longitude()))
+                    vertices.add( LatLon( index++, point.latitude(), point.longitude()))
                     points1.add( Coordinate( point.longitude(), point.latitude()))
                 }
 
                 val latLngBounds = GeoUtils.findGeobounds(vertices)
-                val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+                val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
                 val mapTileRegion = MapTileRegion( northEast, southWest )
 
@@ -1101,27 +1103,29 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             val vertices = ArrayList<LatLon>()
 
+            var index = 0
+
             droppedPointAnnotations.map { pointAnnotation ->
                 pointAnnotation?.let{ pointAnnotation ->
-                    vertices.add( LatLon( pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
+                    vertices.add( LatLon( index++, pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
                     pointAnnotationManager.delete( pointAnnotation )
                 }
             }
 
             if (name.isEmpty())
             {
-                val enumArea = EnumArea( "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
+                val enumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
                 unsavedEnumAreas.add( enumArea )
             }
             else
             {
-                val enumArea = EnumArea( name, vertices )
+                val enumArea = EnumArea( config.uuid, name, vertices )
                 unsavedEnumAreas.add( enumArea )
             }
 
             val latLngBounds = GeoUtils.findGeobounds(vertices)
-            val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-            val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
             unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
 
@@ -1249,18 +1253,20 @@ class CreateEnumerationAreaFragment : Fragment(),
             feature.geometry?.let { geometry ->
                 when( geometry ) {
                     is MultiPolygon -> {
-                        val enumArea = EnumArea(name, ArrayList<LatLon>())
+                        val enumArea = EnumArea(config.uuid, name, ArrayList<LatLon>())
                         val multiPolygon = geometry as MultiPolygon
 
+                        var index = 0
+
                         multiPolygon.coordinates[0][0].forEach { position ->
-                            enumArea.vertices.add( LatLon( position.latitude, position.longitude ))
+                            enumArea.vertices.add( LatLon( index++, position.latitude, position.longitude ))
                         }
 
                         unsavedEnumAreas.add(enumArea)
 
                         val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                        val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                        val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+                        val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                        val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
                         unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
                     }

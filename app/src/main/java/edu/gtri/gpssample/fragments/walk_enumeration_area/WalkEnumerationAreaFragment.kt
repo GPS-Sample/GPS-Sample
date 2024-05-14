@@ -386,10 +386,10 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         val vertices = ArrayList<LatLon>()
 
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
-        vertices.add( LatLon( mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
-        vertices.add( LatLon( mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.southWest.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.northEast.latitude, mapTileRegion.southWest.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.northEast.latitude, mapTileRegion.northEast.longitude ))
+        vertices.add( LatLon( 0, mapTileRegion.southWest.latitude, mapTileRegion.northEast.longitude ))
 
         vertices.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
@@ -445,9 +445,11 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         val vertices = ArrayList<LatLon>()
 
+        var index = 0
+
         for (point in polyLinePoints)
         {
-            vertices.add( LatLon( point.latitude(), point.longitude()))
+            vertices.add( LatLon( index++, point.latitude(), point.longitude()))
         }
 
         polyLinePoints.clear()
@@ -468,18 +470,18 @@ class WalkEnumerationAreaFragment : Fragment(),
                 name2 = "${resources.getString(R.string.enumeration_area)} 1"
             }
 
-            val enumArea = EnumArea( name2, vertices )
+            val enumArea = EnumArea( config.uuid, name2, vertices )
             config.enumAreas.add( enumArea )
 
             val latLngBounds = GeoUtils.findGeobounds(vertices)
-            val northEast = LatLon( latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-            val southWest = LatLon( latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
             config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
 
             DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                 config.enumAreas[0].let { enumArea ->
-                    DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.id!!, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
+                    DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
                         enumArea.enumerationTeams.add( enumerationTeam )
                     }
                 }

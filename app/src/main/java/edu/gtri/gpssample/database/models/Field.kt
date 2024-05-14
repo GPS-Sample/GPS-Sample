@@ -14,7 +14,6 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class Field(
-    var id: Int? = null,
     var uuid: String,
     var name: String,
     var type: FieldType,
@@ -29,7 +28,7 @@ data class Field(
     var fieldOptions: ArrayList<FieldOption>)
 {
     constructor(name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, numberOfResidents: Boolean, date: Boolean, time: Boolean)
-            : this(null, UUID.randomUUID().toString(), name, type, false, null, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
+            : this(UUID.randomUUID().toString(), name, type, false, null, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
 
     fun copy() : Field
     {

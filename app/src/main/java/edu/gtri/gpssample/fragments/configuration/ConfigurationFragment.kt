@@ -297,12 +297,22 @@ class ConfigurationFragment : Fragment(),
                     }
                     else
                     {
+
                         sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
                         sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
                     }
 
-                    view?.let{view ->
+                    view?.let { view ->
                         sharedViewModel.currentConfiguration?.value?.let{ config ->
+
+                            config.selectedEnumAreaUuid = ""
+
+                            for (enumArea in config.enumAreas)
+                            {
+                                enumArea.selectedEnumerationTeamUuid = ""
+                                enumArea.selectedCollectionTeamUuid = ""
+                            }
+
                             sharedNetworkViewModel.setCurrentConfig(config)
                             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
                             sharedNetworkViewModel.createHotspot(view)
@@ -354,6 +364,15 @@ class ConfigurationFragment : Fragment(),
     fun exportToDevice( )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
+
+            config.selectedEnumAreaUuid = ""
+
+            for (enumArea in config.enumAreas)
+            {
+                enumArea.selectedEnumerationTeamUuid = ""
+                enumArea.selectedCollectionTeamUuid = ""
+            }
+
             val packedConfig = config.pack()
 
             val user = (activity!!.application as MainApplication).user
@@ -394,17 +413,13 @@ class ConfigurationFragment : Fragment(),
 
     private fun didSelectEnumArea(enumArea: EnumArea)
     {
-        enumArea.id?.let { enumAreaId ->
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                config.selectedEnumAreaId = enumAreaId
-                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    study.id?.let { studyId ->
-                        config.selectedStudyId = studyId
-                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-                        ConfirmationDialog( activity, "", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
-                    }
-                } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
-            }
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            config.selectedEnumAreaUuid = enumArea.uuid
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                config.selectedStudyUuid = study.uuid
+                sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
+                ConfirmationDialog( activity, "", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
+            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -417,20 +432,19 @@ class ConfigurationFragment : Fragment(),
             val uri = data?.data
 
             uri?.let { uri ->
-                sharedViewModel.currentConfiguration?.value?.let { config ->
+                sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
                     try
                     {
-                        val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                        activity!!.getContentResolver().openInputStream(uri)?.let { inputStream ->
 
-                        inputStream?.let {  inputStream ->
                             binding.overlayView.visibility = View.VISIBLE
 
                             Thread {
                                 val text = inputStream.bufferedReader().readText()
 
-                                val enumArea = EnumArea.unpack( text, config.encryptionPassword )
+                                val config = Config.unpack( text, currentConfig.encryptionPassword )
 
-                                if (enumArea == null)
+                                if (config == null)
                                 {
                                     activity!!.runOnUiThread {
                                         binding.overlayView.visibility = View.GONE
@@ -441,16 +455,14 @@ class ConfigurationFragment : Fragment(),
                                 {
                                     DAO.instance().writableDatabase.beginTransaction()
 
-                                    for (location in enumArea.locations)
-                                    {
-                                        DAO.locationDAO.createOrUpdateLocation(location, enumArea)
-                                    }
+                                    DAO.configDAO.createOrUpdateConfig( config )
 
                                     DAO.instance().writableDatabase.setTransactionSuccessful()
                                     DAO.instance().writableDatabase.endTransaction()
 
-                                    // replace the enumArea from currentConfig with this one
-                                    sharedViewModel.replaceEnumArea(enumArea)
+                                    DAO.configDAO.getConfig( config.uuid )?.let {
+                                        sharedViewModel.setCurrentConfig(it)
+                                    }
 
                                     activity!!.runOnUiThread {
                                         binding.overlayView.visibility = View.GONE
@@ -509,11 +521,13 @@ class ConfigurationFragment : Fragment(),
                 {
                     val polygon = ArrayList<LatLon>()
 
+                    var index = 0
+
                     enumArea.vertices.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
+                        polygon.add( LatLon( index++, it.latitude, it.longitude ))
                     }
 
-                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumArea.id!!, "E-Team-${enumArea.id!!}", polygon, enumArea.locations ))
+                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "E-Team-${enumArea.uuid}", polygon, enumArea.locations ))
                     enumArea.enumerationTeams.add(enumerationTeam!!)
 
                     for (location in enumArea.locations)
@@ -568,13 +582,16 @@ class ConfigurationFragment : Fragment(),
                 {
                     val polygon = ArrayList<LatLon>()
 
+                    var index = 0
+
                     enumArea.vertices.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
+                        polygon.add( LatLon( index++, it.latitude, it.longitude ))
                     }
 
+                    val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid,"S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
+                    enumArea.collectionTeams.add(collectionTeam!!)
+
                     sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                        val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.id!!, study.id!!, "S-Team-${enumArea.id!!}", polygon, enumArea.locations ))
-                        study.collectionTeams.add(collectionTeam!!)
                     }
 
                     for (location in enumArea.locations)

@@ -28,7 +28,7 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class Config(
-    var id : Int? = null,
+    var uuid : String,
     var creationDate: Long,
     var name: String,
     var dateFormat: DateFormat,
@@ -43,17 +43,17 @@ data class Config(
     var proximityWarningValue: Int,
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
-    var selectedStudyId: Int,
-    var selectedEnumAreaId: Int,
+    var selectedStudyUuid: String,
+    var selectedEnumAreaUuid: String,
     var mapTileRegions: ArrayList<MapTileRegion>)
 {
     constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
-            : this(null, Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-                                    ArrayList<Study>(), ArrayList<EnumArea>(), -1, -1, ArrayList<MapTileRegion>())
-    constructor(id: Int?, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyId: Int, selectedEnumAreaId: Int)
-            : this(id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyId, selectedEnumAreaId, ArrayList<MapTileRegion>())
+            : this(UUID.randomUUID().toString(), Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+                                    ArrayList<Study>(), ArrayList<EnumArea>(), "", "", ArrayList<MapTileRegion>())
+    constructor(uuid: String, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String)
+            : this(uuid, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, ArrayList<MapTileRegion>())
 
     var minimumGPSPrecision : String
         get() {
@@ -134,6 +134,62 @@ data class Config(
         }
 
         return ""
+    }
+
+    fun packMinimal() : String
+    {
+        var packedConfig = this.pack()
+
+        if (this.selectedEnumAreaUuid.isNotEmpty())
+        {
+            unpack( packedConfig, encryptionPassword )?.let { configCopy ->
+
+                for (enumArea in configCopy.enumAreas)
+                {
+                    if (enumArea.uuid == configCopy.selectedEnumAreaUuid)
+                    {
+                        configCopy.enumAreas.clear()
+                        configCopy.enumAreas.add( enumArea )
+                        break
+                    }
+                }
+
+                val enumArea = configCopy.enumAreas[0]
+
+                if (enumArea.selectedCollectionTeamUuid.isNotEmpty())
+                {
+                    enumArea.enumerationTeams.clear()
+
+                    for (collectionTeam in enumArea.collectionTeams)
+                    {
+                        if (collectionTeam.uuid == enumArea.selectedCollectionTeamUuid)
+                        {
+                            enumArea.collectionTeams.clear()
+                            enumArea.collectionTeams.add( collectionTeam )
+                            break
+                        }
+                    }
+                }
+                else if (enumArea.selectedEnumerationTeamUuid.isNotEmpty())
+                {
+                    enumArea.collectionTeams.clear()
+
+                    for (enumerationTeam in enumArea.enumerationTeams)
+                    {
+                        if (enumerationTeam.uuid == enumArea.selectedEnumerationTeamUuid)
+                        {
+                            enumArea.enumerationTeams.clear()
+                            enumArea.enumerationTeams.add( enumerationTeam )
+                            break
+                        }
+                    }
+                }
+
+                packedConfig = configCopy.pack()
+            }
+        }
+
+        return packedConfig
     }
 
     companion object

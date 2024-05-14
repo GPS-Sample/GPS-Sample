@@ -232,11 +232,10 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
                 else
                 {
-                    config?.let {config->
-                        val packedConfig = config.pack()
-
-                        val message = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
-                        val byteArray = message.toByteArray()
+                    config?.let { config->
+                        val packedConfig = config.packMinimal()
+                        val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
+                        val byteArray = tcpMessage.toByteArray()
                         socket.outputStream.write(byteArray)
                         socket.outputStream.flush()
                         Log.d( "xxx", "Server: wrote ${byteArray!!.size}")
@@ -244,7 +243,8 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
             }
 
-            NetworkCommand.NetworkEnumAreaExport ->
+            NetworkCommand.NetworkEnumAreaExport,
+            NetworkCommand.NetworkSampleAreaExport ->
             {
                 if (hotspotMode.value == HotspotMode.Export)
                 {
@@ -253,136 +253,28 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
 
                 message.payload?.let { payload ->
-                    val enumArea = EnumArea.unpack( payload, encryptionPassword )
+                    val config = Config.unpack( payload, encryptionPassword )
 
-                    if (enumArea == null)
+                    if (config == null)
                     {
-                        delegate?.let {
-                            it.importFailed( MessageType.ImportFailed )
-                        }
+                        delegate?.importFailed( MessageType.ImportFailed )
                     }
                     else
                     {
-                        delegate?.let {
-                            it.didStartImport()
-                        }
+                        delegate?.didStartImport()
 
                         DAO.instance().writableDatabase.beginTransaction()
 
-                        // first, import landmarks
-                        for (location in enumArea.locations)
-                        {
-                            if (location.isLandmark)
-                            {
-                                DAO.locationDAO.importLocation( location, enumArea )
-                            }
-                        }
-
-                        // next, import HH's
-                        val team = enumArea.enumerationTeams.find { it.id == enumArea.selectedEnumerationTeamId }
-                        team?.let { team ->
-
-                            val newLocations = ArrayList<Location>()
-
-                            // only import locations from the selected team
-                            for (location in team.locations)
-                            {
-                                DAO.locationDAO.importLocation( location, enumArea )
-
-                                // find out if the location exists in the local version of the selected team
-
-                                val enumerationTeam = DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamId )
-
-                                if (enumerationTeam == null)
-                                {
-                                    DAO.enumerationTeamDAO.createOrUpdateTeam( team )
-                                }
-
-                                DAO.enumerationTeamDAO.getTeam( enumArea.selectedEnumerationTeamId )?.let { currentTeam ->
-                                    var found = false
-
-                                    for (teamLocation in currentTeam.locations)
-                                    {
-                                        if (teamLocation.uuid == location.uuid)
-                                        {
-                                            found = true
-                                        }
-                                    }
-
-                                    if (!found)
-                                    {
-                                        newLocations.add( location )
-                                    }
-                                }
-                            }
-
-                            for (location in newLocations)
-                            {
-                                DAO.enumerationTeamDAO.createOrUpdateTeam( team )
-                            }
-                        }
+                        DAO.configDAO.createOrUpdateConfig( config )
 
                         DAO.instance().writableDatabase.setTransactionSuccessful()
                         DAO.instance().writableDatabase.endTransaction()
 
-                        sharedViewModel?.currentConfiguration?.value?.let { config ->
-                            config.id?.let {
-                                DAO.configDAO.getConfig( it )?.let { config ->
-                                    sharedViewModel?.setCurrentConfig(config)
-                                }
-                            }
+                        DAO.configDAO.getConfig( config.uuid )?.let {
+                            sharedViewModel?.setCurrentConfig(it)
                         }
 
-                        delegate?.let {
-                            it.didFinishImport()
-                        }
-                    }
-                }
-            }
-
-            NetworkCommand.NetworkSampleAreaExport ->
-            {
-                if (hotspotMode.value == HotspotMode.Export)
-                {
-                    delegate?.importFailed( MessageType.ExportRequestFailed )
-                }
-
-                message.payload?.let { payload ->
-                    val enumArea = EnumArea.unpack( payload, encryptionPassword )
-
-                    if (enumArea == null)
-                    {
-                        delegate?.let {
-                            it.importFailed( MessageType.ImportFailed )
-                        }
-                    }
-                    else
-                    {
-                        delegate?.let {
-                            it.didStartImport()
-                        }
-
-                        DAO.instance().writableDatabase.beginTransaction()
-
-                        for (location in enumArea.locations)
-                        {
-                            DAO.locationDAO.importLocation( location, enumArea )
-                        }
-
-                        DAO.instance().writableDatabase.setTransactionSuccessful()
-                        DAO.instance().writableDatabase.endTransaction()
-
-                        sharedViewModel?.currentConfiguration?.value?.let { config ->
-                            config.id?.let {
-                                DAO.configDAO.getConfig( it )?.let { config ->
-                                    sharedViewModel?.setCurrentConfig(config)
-                                }
-                            }
-                        }
-
-                        delegate?.let {
-                            it.didFinishImport()
-                        }
+                        delegate?.didFinishImport()
                     }
                 }
             }

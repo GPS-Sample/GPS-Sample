@@ -12,48 +12,50 @@ import kotlin.math.min
 
 class ConfigDAO(private var dao: DAO)
 {
-    //--------------------------------------------------------------------------
     fun createOrUpdateConfig( config: Config ) : Config?
     {
         if (exists( config ))
         {
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            config.id?.let { id ->
-                val args: Array<String> = arrayOf(id.toString())
-                val values = ContentValues()
-                putConfig( config, values )
-                dao.writableDatabase.update(DAO.TABLE_CONFIG, values, whereClause, args )
-            }
+            updateConfig( config )
+            Log.d( "xxx", "Updated Config with ID ${config.uuid}" )
         }
         else
         {
             val values = ContentValues()
             putConfig( config, values )
-            config.id = dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values).toInt()
+            if (dao.writableDatabase.insert(DAO.TABLE_CONFIG, null, values) < 0)
+            {
+                return null
+            }
+            Log.d( "xxx", "Created Config with ID = ${config.uuid}")
         }
 
-        config.id?.let { id ->
-            createOrUpdateEnumAreas(config)
-            createOrUpdateStudies(config)
-            for (mapTileRegion in config.mapTileRegions)
-            {
-                DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( mapTileRegion, config )
-            }
-        } ?: return null
+        createOrUpdateEnumAreas(config)
+        createOrUpdateStudies(config)
+
+        for (mapTileRegion in config.mapTileRegions)
+        {
+            DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( mapTileRegion, config )
+        }
 
         return config
     }
 
-    //--------------------------------------------------------------------------
+    fun updateConfig( config: Config )
+    {
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(config.uuid)
+        val values = ContentValues()
+        putConfig( config, values )
+        dao.writableDatabase.update(DAO.TABLE_CONFIG, values, whereClause, args )
+    }
+
     fun putConfig( config: Config, values: ContentValues )
     {
-        config.id?.let { id ->
-            values.put( DAO.COLUMN_ID, id )
-        }
-
-        values.put( DAO.COLUMN_ENUM_AREA_ID, config.selectedEnumAreaId )
-        values.put( DAO.COLUMN_STUDY_ID, config.selectedStudyId )
+        values.put( DAO.COLUMN_UUID, config.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, config.creationDate )
+        values.put( DAO.COLUMN_ENUM_AREA_UUID, config.selectedEnumAreaUuid )
+        values.put( DAO.COLUMN_STUDY_UUID, config.selectedStudyUuid )
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
         values.put( DAO.COLUMN_CONFIG_MIN_GPS_PRECISION, config.minGpsPrecision )
         values.put( DAO.COLUMN_CONFIG_ENCRYPTION_PASSWORD, config.encryptionPassword )
@@ -73,29 +75,24 @@ class ConfigDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX, distanceFormatIndex)
     }
 
-    //--------------------------------------------------------------------------
     fun putConfigStudy(config: Config, study: Study, values: ContentValues )
     {
-        values.put(DAO.COLUMN_CONFIG_ID, config.id)
-        values.put(DAO.COLUMN_STUDY_ID, study.id)
+        values.put(DAO.COLUMN_CONFIG_UUID, config.uuid)
+        values.put(DAO.COLUMN_STUDY_UUID, study.uuid)
     }
 
-    //--------------------------------------------------------------------------
     fun exists( config: Config ): Boolean
     {
-        config.id?.let { id ->
-            getConfig( id )?.let { config
-                return true
-            } ?: return false
+        getConfig( config.uuid )?.let {
+            return true
         } ?: return false
     }
 
-    //--------------------------------------------------------------------------
-    fun getConfig( id: Int ): Config?
+    fun getConfig( uuid: String ): Config?
     {
         var config: Config? = null
 
-        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_ID} = $id"
+        val query = "SELECT * FROM ${DAO.TABLE_CONFIG} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
@@ -103,12 +100,9 @@ class ConfigDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             config = buildConfig( cursor )
-
-            config.id?.let{ id ->
-                config.studies = DAO.studyDAO.getStudies( config )
-                config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-                config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
-            }
+            config.studies = DAO.studyDAO.getStudies( config )
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+            config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
         }
 
         cursor.close()
@@ -116,13 +110,12 @@ class ConfigDAO(private var dao: DAO)
         return config
     }
 
-    //--------------------------------------------------------------------------
     @SuppressLint("Range")
     private fun buildConfig(cursor: Cursor ) : Config
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
-        val selectedEnumAreaId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_ID))
-        val selectedStudyId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_ID))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val selectedEnumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
+        val selectedStudyUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
         val distanceFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX))
@@ -141,10 +134,9 @@ class ConfigDAO(private var dao: DAO)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( id, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyId, selectedEnumAreaId )
+        return Config( uuid, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid )
     }
 
-    //--------------------------------------------------------------------------
     fun getConfigs(): ArrayList<Config>
     {
         val configs = ArrayList<Config>()
@@ -154,12 +146,9 @@ class ConfigDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val config = buildConfig( cursor )
-
-            config.id?.let{id ->
-                config.studies = DAO.studyDAO.getStudies( config )
-                config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-                config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
-            }
+            config.studies = DAO.studyDAO.getStudies( config )
+            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+            config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
 
             configs.add( config)
         }
@@ -171,37 +160,29 @@ class ConfigDAO(private var dao: DAO)
 
     private fun createOrUpdateStudies(config : Config)
     {
-        // check the id.  if we get here and the id is null, there's a problem.
-        // TODO: add some error checking
-        config.id?.let{id ->
+        // remove all studies from connector table
+        val whereClause = "${DAO.COLUMN_CONFIG_UUID} = ?"
+        val args = arrayOf(config.uuid)
 
-            // remove all studies from connector table
-            val whereClause = "${DAO.COLUMN_CONFIG_ID} = ?"
-            val args = arrayOf(id.toString())
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_CONFIG__STUDY, whereClause, args)
 
-            dao.writableDatabase.delete(DAO.TABLE_CONFIG_STUDY, whereClause, args)
-
-            // add studies
-            for(study in config.studies)
-            {
-                // study will either be created or updated
-                DAO.studyDAO.createOrUpdateStudy(study)?.let { study
-                    val configStudyValues = ContentValues()
-                    putConfigStudy(config, study, configStudyValues)
-                    dao.writableDatabase.insert(DAO.TABLE_CONFIG_STUDY, null, configStudyValues).toInt()
-                }
+        // add studies
+        for(study in config.studies)
+        {
+            // study will either be created or updated
+            DAO.studyDAO.createOrUpdateStudy(study)?.let { study
+                val configStudyValues = ContentValues()
+                putConfigStudy(config, study, configStudyValues)
+                dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_CONFIG__STUDY, null, configStudyValues).toInt()
             }
         }
     }
 
     private fun createOrUpdateEnumAreas(config: Config)
     {
-        config.id?.let { id ->
-
-            for (enumArea in config.enumAreas)
-            {
-                DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea, config )
-            }
+        for (enumArea in config.enumAreas)
+        {
+            DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
         }
     }
 
@@ -225,8 +206,8 @@ class ConfigDAO(private var dao: DAO)
             DAO.mapTileRegionDAO.delete( mapTileRegion )
         }
 
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        val args = arrayOf(config.id.toString())
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(config.uuid)
 
         dao.writableDatabase.delete(DAO.TABLE_CONFIG, whereClause, args)
     }

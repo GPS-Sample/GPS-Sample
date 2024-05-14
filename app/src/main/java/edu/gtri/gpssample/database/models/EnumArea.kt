@@ -16,20 +16,22 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class EnumArea (
-    var id : Int? = null,
     var uuid : String,
     var creationDate: Long,
+    var configUuid: String,
     var name: String,
-    var selectedEnumerationTeamId: Int,
     var vertices: ArrayList<LatLon>,
     var locations: ArrayList<Location>,
-    var enumerationTeams: ArrayList<EnumerationTeam>)
+    var enumerationTeams: ArrayList<EnumerationTeam>,
+    var selectedEnumerationTeamUuid: String,
+    var collectionTeams: ArrayList<CollectionTeam>,
+    var selectedCollectionTeamUuid: String )
 {
-    constructor( id: Int, uuid: String, creationDate: Long, name: String, selectedEnumerationTeamId: Int)
-            : this(id, uuid, creationDate, name, selectedEnumerationTeamId, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>())
+    constructor( uuid: String, creationDate: Long, configUuid: String, name: String, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String )
+            : this(uuid, creationDate, configUuid, name, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid)
 
-    constructor( name: String, vertices: ArrayList<LatLon>)
-            : this(null, UUID.randomUUID().toString(), Date().time, name, -1, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>())
+    constructor( configUuid: String, name: String, vertices: ArrayList<LatLon>)
+            : this(UUID.randomUUID().toString(), Date().time, configUuid, name, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "")
 
     override fun equals(other: Any?): Boolean
     {

@@ -135,29 +135,28 @@ class CreateEnumerationTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            enumArea.id?.let { enumAreaId ->
+            val polygon = ArrayList<LatLon>()
 
-                val polygon = ArrayList<LatLon>()
+            var index = 0
 
-                intersectionPolygon?.points?.map { points ->
-                    points.map { point ->
-                        polygon.add( LatLon( point.latitude(), point.longitude()))
-                    }
+            intersectionPolygon?.points?.map { points ->
+                points.map { point ->
+                    polygon.add( LatLon( index++, point.latitude(), point.longitude()))
                 }
+            }
 
-                if (polygon.isEmpty())
-                {
-                    enumArea.vertices.map {
-                        polygon.add( LatLon( it.latitude, it.longitude ))
-                    }
+            if (polygon.isEmpty())
+            {
+                enumArea.vertices.map {
+                    polygon.add( LatLon( index++, it.latitude, it.longitude ))
                 }
+            }
 
-                val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateTeam( EnumerationTeam( enumAreaId, binding.teamNameEditText.text.toString(), polygon, locations ))
+            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locations ))
 
-                enumerationTeam?.let { team ->
-                    enumArea.enumerationTeams.add(team)
-                    findNavController().popBackStack()
-                }
+            enumerationTeam?.let { team ->
+                enumArea.enumerationTeams.add(team)
+                findNavController().popBackStack()
             }
         }
 

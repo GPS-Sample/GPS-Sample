@@ -10,6 +10,7 @@ import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingMethodConverter
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.extensions.toBoolean
 import edu.gtri.gpssample.database.models.Study
 
@@ -17,89 +18,38 @@ class StudyDAO(private var dao: DAO)
 {
     fun createOrUpdateStudy( study: Study ) : Study?
     {
-        // if study exists and is untouched, use it.
-        // if study exists and is modified, created a new one.
-
-        study.id?.let{id ->
-            val testStudy = DAO.studyDAO.getStudy(id)
-
-            if(study.equals( testStudy))
-            {
-                Log.d( "xxx", "study with id ${id} already exists!")
-                return study
-            }
-        }
-
         if (exists( study ))
         {
             updateStudy( study )
+            Log.d( "xxx", "Updated Study with ID = ${study.uuid}")
         }
         else
         {
             val values = ContentValues()
             putStudy(study, values)
-            study.id = dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values).toInt()
-            study.id?.let { id ->
-                Log.d( "xxx", "new study id = ${id}")
-            } ?: return null
+            if (dao.writableDatabase.insert(DAO.TABLE_STUDY, null, values) < 0)
+            {
+                return null
+            }
+            Log.d( "xxx", "Created Study with ID = ${study.uuid}")
         }
 
-        study.id?.let { id ->
-            for (collectionTeam in study.collectionTeams)
-            {
-                // update the team location id's, if necc.
-                for (teamLocation in collectionTeam.locations)
-                {
-                    for (location in DAO.locationDAO.getLocations())
-                    {
-                        if (teamLocation.uuid == location.uuid && teamLocation.id != location.id)
-                        {
-                            for (enumerationItem in teamLocation.enumerationItems)
-                            {
-                                if (enumerationItem.locationId != location.id)
-                                {
-                                    enumerationItem.locationId = location.id!!
-                                }
-                            }
-                            teamLocation.id = location.id
-                        }
-                    }
-                }
+        // add fields
+        for (field in study.fields)
+        {
+            DAO.fieldDAO.createOrUpdateField( field, study )
+        }
 
-                // the teamId may change, make sure that we update the study.selectedCollectionTeam, if necessary
+        // add rules
+        for (rule in study.rules)
+        {
+            DAO.ruleDAO.createOrUpdateRule( rule )
+        }
 
-                val oldTeamId = collectionTeam.id
-
-                DAO.collectionTeamDAO.createOrUpdateTeam( collectionTeam )?.let { newTeam ->
-                    newTeam.id?.let { newTeamId ->
-                        oldTeamId?.let { oldTeamId ->
-                            if (study.selectedCollectionTeamId == oldTeamId)
-                            {
-                                study.selectedCollectionTeamId = newTeamId
-                                updateStudy( study )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // add fields
-            for (field in study.fields)
-            {
-                DAO.fieldDAO.createOrUpdateField( field, study )
-            }
-
-            // add rules
-            for (rule in study.rules)
-            {
-                DAO.ruleDAO.createOrUpdateRule( rule )
-            }
-
-            // add filters
-            for(filter in study.filters)
-            {
-                DAO.filterDAO.createOrUpdateFilter(filter, study);
-            }
+        // add filters
+        for(filter in study.filters)
+        {
+            DAO.filterDAO.createOrUpdateFilter(filter, study);
         }
 
         return study
@@ -107,15 +57,10 @@ class StudyDAO(private var dao: DAO)
 
     private fun putStudy( study: Study, values: ContentValues )
     {
-        study.id?.let { id ->
-            Log.d( "xxx", "existing study id = ${id}")
-            values.put( DAO.COLUMN_ID, id )
-        }
-
+        values.put( DAO.COLUMN_UUID, study.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, study.creationDate )
         values.put( DAO.COLUMN_STUDY_NAME, study.name )
         values.put( DAO.COLUMN_STUDY_SAMPLE_SIZE, study.sampleSize )
-        values.put( DAO.COLUMN_COLLECTION_TEAM_ID, study.selectedCollectionTeamId )
 
         // convert enum to int.  Maybe not do this and have look up tables?
         var index = SampleTypeConverter.toIndex(study.sampleType)
@@ -126,37 +71,34 @@ class StudyDAO(private var dao: DAO)
 
     fun exists( study: Study ): Boolean
     {
-        study.id?.let { id ->
-            getStudy( id )?.let { study
-                return true
-            } ?: return false
+        getStudy( study.uuid )?.let {
+            return true
         } ?: return false
     }
 
     @SuppressLint("Range")
     private fun buildStudy(cursor: Cursor ): Study
     {
-        val id = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_ID}"))
-        val selectedCollectionTeamId = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_COLLECTION_TEAM_ID}"))
-        val creationDate = cursor.getLong(cursor.getColumnIndex("${DAO.COLUMN_CREATION_DATE}"))
-        val name = cursor.getString(cursor.getColumnIndex("${DAO.COLUMN_STUDY_NAME}"))
-        val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX}"))
-        val sampleSize = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE}"))
-        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex("${DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX}"))
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_NAME))
+        val samplingMethodIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLING_METHOD_INDEX))
+        val sampleSize = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE))
+        val sampleSizeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_STUDY_SAMPLE_SIZE_INDEX))
 
         // convert enum to int.  Maybe not do this and have look up tables?
         val sampleType = SampleTypeConverter.fromIndex(sampleSizeIndex)
         val samplingMethod = SamplingMethodConverter.fromIndex(samplingMethodIndex)
 
-        val study = Study( id, creationDate, name, samplingMethod, sampleSize, sampleType, selectedCollectionTeamId )
+        val study = Study( uuid, creationDate, name, samplingMethod, sampleSize, sampleType )
 
         return study
     }
 
-    fun getStudy( id: Int ): Study?
+    fun getStudy( uuid: String ): Study?
     {
         var study: Study? = null
-        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_ID} = $id"
+        val query = "SELECT study.* FROM ${DAO.TABLE_STUDY} as study WHERE ${DAO.COLUMN_UUID} = '${uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
@@ -164,9 +106,9 @@ class StudyDAO(private var dao: DAO)
             cursor.moveToNext()
 
             study = buildStudy( cursor )
-            study.fields = DAO.fieldDAO.getFields(study) as ArrayList<Field>
+            study.fields = DAO.fieldDAO.getFields(study)
+            // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
-            study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
         }
 
         cursor.close()
@@ -178,24 +120,21 @@ class StudyDAO(private var dao: DAO)
     {
         val studies = ArrayList<Study>()
 
-        config.id?.let { id ->
-            val query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_ID}, conn.${DAO.COLUMN_STUDY_ID} FROM ${DAO.TABLE_STUDY} as study, " +
-                    "${DAO.TABLE_CONFIG_STUDY} as conn WHERE study.${DAO.COLUMN_ID} = conn.${DAO.COLUMN_STUDY_ID} and "  +
-                    "conn.${DAO.COLUMN_CONFIG_ID} = ${id}"
+        val query = "SELECT study.*, conn.${DAO.COLUMN_CONFIG_UUID}, conn.${DAO.COLUMN_STUDY_UUID} FROM ${DAO.TABLE_STUDY} as study, " +
+                "${DAO.CONNECTOR_TABLE_CONFIG__STUDY} as conn WHERE study.${DAO.COLUMN_UUID} = conn.${DAO.COLUMN_STUDY_UUID} and "  + "conn.${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}'"
 
-            val cursor = dao.writableDatabase.rawQuery(query, null)
+        val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            while (cursor.moveToNext())
-            {
-                val study = buildStudy( cursor )
-                studies.add( study )
-                study.fields = DAO.fieldDAO.getFields(study)
-                study.filters.addAll(DAO.filterDAO.getFilters(study))
-                study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
-            }
-
-            cursor.close()
+        while (cursor.moveToNext())
+        {
+            val study = buildStudy( cursor )
+            studies.add( study )
+            study.fields = DAO.fieldDAO.getFields(study)
+            // study.rules is loaded by getFields()
+            study.filters.addAll(DAO.filterDAO.getFilters(study))
         }
+
+        cursor.close()
 
         return studies
     }
@@ -212,8 +151,8 @@ class StudyDAO(private var dao: DAO)
         {
             val study = buildStudy( cursor )
             study.fields = DAO.fieldDAO.getFields(study)
+            // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
-            study.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( study )
             studies.add( study )
         }
 
@@ -224,48 +163,41 @@ class StudyDAO(private var dao: DAO)
 
     fun updateStudy( study: Study )
     {
-        val whereClause = "${DAO.COLUMN_ID} = ?"
-        study.id?.let { id ->
-            Log.d( "xxx", "update study id ${id}")
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(study.uuid)
+        val values = ContentValues()
 
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
+        putStudy( study, values )
 
-            putStudy( study, values )
-
-            dao.writableDatabase.update(DAO.TABLE_STUDY, values, whereClause, args )
-        }
+        dao.writableDatabase.update(DAO.TABLE_STUDY, values, whereClause, args )
     }
 
     fun deleteStudy( study: Study )
     {
-        study.id?.let{ id ->
+        val filters = DAO.filterDAO.getFilters( study )
 
-            val filters = DAO.filterDAO.getFilters( study )
-
-            for (filter in filters)
-            {
-                DAO.filterDAO.deleteFilter( filter )
-            }
-
-           // val rules = DAO.ruleDAO.getRules( study )
-
-            for (rule in study.rules)
-            {
-                DAO.ruleDAO.deleteRule( rule )
-            }
-
-            val fields = DAO.fieldDAO.getFields( study )
-
-            for (field in fields)
-            {
-                DAO.fieldDAO.deleteField( field )
-            }
-
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args = arrayOf(study.id.toString())
-
-            dao.writableDatabase.delete(DAO.TABLE_STUDY, whereClause, args)
+        for (filter in filters)
+        {
+            DAO.filterDAO.deleteFilter( filter )
         }
+
+        // val rules = DAO.ruleDAO.getRules( study )
+
+        for (rule in study.rules)
+        {
+            DAO.ruleDAO.deleteRule( rule )
+        }
+
+        val fields = DAO.fieldDAO.getFields( study )
+
+        for (field in fields)
+        {
+            DAO.fieldDAO.deleteField( field )
+        }
+
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(study.uuid)
+
+        dao.writableDatabase.delete(DAO.TABLE_STUDY, whereClause, args)
     }
 }

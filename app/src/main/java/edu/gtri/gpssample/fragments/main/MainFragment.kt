@@ -79,7 +79,7 @@ class MainFragment : Fragment()
             p += x.get(6)
 
             val user = User( "@test-admin", p.toInt(), Role.Admin.toString(), "", "", false )
-            user.id = DAO.userDAO.createUser( user )
+            DAO.userDAO.createUser( user )
         }
 
         val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)

@@ -56,7 +56,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
         fieldData.field?.let { field ->
 
-            if (field.id == null)
+            if (field.uuid.isEmpty())
             {
                 return
             }

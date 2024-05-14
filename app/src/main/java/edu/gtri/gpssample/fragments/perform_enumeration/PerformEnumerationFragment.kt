@@ -308,7 +308,7 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
-        if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaId < 0)
+        if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
         {
             binding.exportButton.visibility = View.GONE
         }
@@ -320,7 +320,7 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaId < 0)
+            if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
             {
                 InfoDialog( this@PerformEnumerationFragment.context, "Please Note", "Since this Enumeration Area was created by an Enumerator, you will need to press the Back button and use the EXPORT CONFIGURATION button of the previous page in order to export the configuration.", resources.getString(R.string.ok), null, this)
             }
@@ -742,7 +742,7 @@ class PerformEnumerationFragment : Fragment(),
                 Role.Enumerator.toString() ->
                 {
                     sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                    sharedNetworkViewModel.networkClientModel.currentEnumArea = enumArea
+                    sharedNetworkViewModel.networkClientModel.currentConfig = config
                     val intent = Intent(context, CameraXLivePreviewActivity::class.java)
                     getResult.launch(intent)
                 }
@@ -813,12 +813,15 @@ class PerformEnumerationFragment : Fragment(),
                     {
                         version = versionName[1]
                     }
+
+                    val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+
                     when(user.role)
                     {
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
-                            val packedConfig = config.pack()
-                            val fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
+                            val packedConfig = config.packMinimal()
+                            val fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedConfig)
@@ -830,12 +833,11 @@ class PerformEnumerationFragment : Fragment(),
 
                         Role.Enumerator.toString() ->
                         {
-                            val packedEnumArea = enumArea.pack(config.encryptionPassword)
-                            val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+                            val packedConfig = config.pack()
                             val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
-                            writer.append(packedEnumArea)
+                            writer.append(packedConfig)
                             writer.flush()
                             writer.close()
 

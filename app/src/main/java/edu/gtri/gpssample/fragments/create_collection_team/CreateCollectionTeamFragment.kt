@@ -145,28 +145,27 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            study.id?.let { studyId ->
+            val polygon = ArrayList<LatLon>()
 
-                val polygon = ArrayList<LatLon>()
+            var index = 0
 
-                intersectionPolygon?.points?.map { points ->
-                    points.map { point ->
-                        polygon.add( LatLon( point.latitude(), point.longitude()))
-                    }
+            intersectionPolygon?.points?.map { points ->
+                points.map { point ->
+                    polygon.add( LatLon( index++, point.latitude(), point.longitude()))
                 }
+            }
 
-                if (polygon.isEmpty())
-                {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_team_boundary), Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
+            if (polygon.isEmpty())
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_team_boundary), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-                val collectionTeam = DAO.collectionTeamDAO.createOrUpdateTeam( CollectionTeam( enumArea.id!!, studyId, binding.teamNameEditText.text.toString(), polygon, locations ))
+            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locations ))
 
-                collectionTeam?.let { team ->
-                    study.collectionTeams.add(team)
-                    findNavController().popBackStack()
-                }
+            collectionTeam?.let { team ->
+                enumArea.collectionTeams.add(team)
+                findNavController().popBackStack()
             }
         }
 

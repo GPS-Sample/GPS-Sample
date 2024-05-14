@@ -14,7 +14,7 @@ import kotlin.collections.ArrayList
 
 @Serializable
 data class Study(
-    var id : Int? = null,
+    var uuid : String,
     var creationDate: Long,
     var name: String,
     var samplingMethod: SamplingMethod,
@@ -23,17 +23,13 @@ data class Study(
     var fields : ArrayList<Field>,
     var rules : ArrayList<Rule>,
     var filters : ArrayList<Filter>,
-    var collectionTeams: ArrayList<CollectionTeam>,
-    var selectedCollectionTeamId: Int
 )
 {
     constructor(name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType)
-            : this(null, Date().time, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(), ArrayList<CollectionTeam>(), -1)
+            : this(UUID.randomUUID().toString(), Date().time, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
 
-    constructor(id: Int, creationDate: Long, name: String, samplingMethod: SamplingMethod,
-                sampleSize: Int, sampleType: SampleType, selectedCollectionTeamId: Int )
-            : this(id, creationDate, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>(),
-        ArrayList<CollectionTeam>(), selectedCollectionTeamId)
+    constructor(uuid: String, creationDate: Long, name: String, samplingMethod: SamplingMethod, sampleSize: Int, sampleType: SampleType )
+            : this(uuid, creationDate, name, samplingMethod, sampleSize, sampleType, ArrayList<Field>(), ArrayList<Rule>(), ArrayList<Filter>())
 
     fun pack(password: String) : String
     {

@@ -57,22 +57,6 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
             enumArea = it
         }
 
-//        if (study.selectedEnumerationTeamId > 0) // if teamId is valid, then filter out all teams except this one
-//        {
-//            val teams = study.enumerationTeams.filter { enumerationTeam ->
-//                enumerationTeam.id?.let { id ->
-//                    id == study.selectedEnumerationTeamId
-//                } ?: false
-//            }
-//
-//            if (teams.isNotEmpty())
-//            {
-//                val enumerationTeams = ArrayList<EnumerationTeam>()
-//                enumerationTeams.add( teams[0] )
-//                manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( enumerationTeams )
-//            }
-//        }
-
         if (!this::manageEnumerationTeamsAdapter.isInitialized)
         {
             manageEnumerationTeamsAdapter = ManageEnumerationTeamsAdapter( enumArea.enumerationTeams )
@@ -103,9 +87,8 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
     {
         sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumerationTeam )
 
-        enumerationTeam.id?.let {
-            enumArea.selectedEnumerationTeamId = it
-        }
+        enumArea.selectedCollectionTeamUuid = ""
+        enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
 
         findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
     }

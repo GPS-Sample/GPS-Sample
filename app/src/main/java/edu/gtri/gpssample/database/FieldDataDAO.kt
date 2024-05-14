@@ -21,41 +21,36 @@ class FieldDataDAO(private var dao: DAO)
             if (modified( fieldData ))
             {
                 updateFieldData( fieldData )
+                Log.d( "xxx", "Updated FieldData with ID $fieldData.uuid" )
             }
         }
         else
         {
-            fieldData.id = null
             val values = ContentValues()
             putFieldData( fieldData, values, enumerationItem )
-            fieldData.id = dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values).toInt()
-            fieldData.id?.let { id ->
-                Log.d( "xxx", "created FieldData with ID $id" )
+            if (dao.writableDatabase.insert(DAO.TABLE_FIELD_DATA, null, values) < 0)
+            {
+                return null
             }
+            Log.d( "xxx", "Created FieldData with ID $fieldData.uuid" )
         }
 
-        fieldData.id?.let { id ->
-            for (fieldDataOption in fieldData.fieldDataOptions)
-            {
-                DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
-            }
-        } ?: return null
+        for (fieldDataOption in fieldData.fieldDataOptions)
+        {
+            DAO.fieldDataOptionDAO.createOrUpdateFieldDataOption( fieldDataOption, fieldData )
+        }
 
         return fieldData
     }
 
     fun putFieldData(fieldData: FieldData, values: ContentValues, enumerationItem: EnumerationItem?)
     {
-        fieldData.id?.let {
-            values.put( DAO.COLUMN_ID, it )
-        }
-
-        enumerationItem?.uuid?.let {
-            values.put( DAO.COLUMN_ENUMERATION_ITEM_UUID, it )
+        enumerationItem?.let {
+            values.put( DAO.COLUMN_ENUMERATION_ITEM_UUID, it.uuid )
         }
 
         fieldData.field?.let { field ->
-            values.put( DAO.COLUMN_FIELD_ID, field.id )
+            values.put( DAO.COLUMN_FIELD_UUID, field.uuid )
         }
 
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
@@ -80,7 +75,6 @@ class FieldDataDAO(private var dao: DAO)
         getFieldData( fieldData.uuid )?.let {
             if (!fieldData.equals(it))
             {
-                fieldData.id = it.id
                 return true
             }
         }
@@ -89,12 +83,10 @@ class FieldDataDAO(private var dao: DAO)
     }
 
     @SuppressLint("Range")
-    private fun createFieldData(cursor: Cursor): FieldData
+    private fun buildFieldData(cursor: Cursor): FieldData
     {
-        val id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_ID))
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val field_id = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_ID))
-        val field = DAO.fieldDAO.getField(field_id)
+        val field_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val type = FieldTypeConverter.fromIndex(cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX)))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
@@ -103,52 +95,32 @@ class FieldDataDAO(private var dao: DAO)
         val dropdownIndex = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX))
         val blockNumber = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER))
 
-        return FieldData( id, uuid, field, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
+        val field = DAO.fieldDAO.getField(field_uuid)
+
+        return FieldData( uuid, field, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
     }
 
     fun updateFieldData( fieldData: FieldData )
     {
-        fieldData.id?.let { id ->
-            Log.d( "xxx", "updated FieldData with ID $id" )
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args: Array<String> = arrayOf(fieldData.uuid)
+        val values = ContentValues()
 
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args: Array<String> = arrayOf(id.toString())
-            val values = ContentValues()
+        putFieldData( fieldData, values, null )
 
-            putFieldData( fieldData, values, null )
-
-            dao.writableDatabase.update(DAO.TABLE_FIELD_DATA, values, whereClause, args )
-        }
-    }
-
-    fun getFieldData( id: Int ): FieldData?
-    {
-        var fieldData: FieldData? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ID} = $id"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        if (cursor.count > 0)
-        {
-            cursor.moveToNext()
-            fieldData = createFieldData( cursor )
-            fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
-        }
-
-        cursor.close()
-
-        return fieldData
+        dao.writableDatabase.update(DAO.TABLE_FIELD_DATA, values, whereClause, args )
     }
 
     fun getFieldData( uuid: String ): FieldData?
     {
         var fieldData: FieldData? = null
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_UUID}='$uuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         if (cursor.count > 0)
         {
             cursor.moveToNext()
-            fieldData = createFieldData( cursor )
+            fieldData = buildFieldData( cursor )
             fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
         }
 
@@ -166,7 +138,7 @@ class FieldDataDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            val fieldData = createFieldData( cursor )
+            val fieldData = buildFieldData( cursor )
             fieldData.fieldDataOptions = DAO.fieldDataOptionDAO.getFieldDataOptions( fieldData )
             fieldDataList.add( fieldData )
         }
@@ -185,7 +157,7 @@ class FieldDataDAO(private var dao: DAO)
 
         while (cursor.moveToNext())
         {
-            fieldDataList.add( createFieldData( cursor ))
+            fieldDataList.add( buildFieldData( cursor ))
         }
 
         cursor.close()
@@ -195,18 +167,14 @@ class FieldDataDAO(private var dao: DAO)
 
     fun delete( fieldData: FieldData )
     {
-        fieldData.id?.let { id ->
-            Log.d( "xxx", "deleted FieldData with ID $id" )
-
-            for (fieldDataOption in fieldData.fieldDataOptions)
-            {
-                DAO.fieldDataOptionDAO.delete(fieldDataOption)
-            }
-
-            val whereClause = "${DAO.COLUMN_ID} = ?"
-            val args = arrayOf(id.toString())
-
-            dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
+        for (fieldDataOption in fieldData.fieldDataOptions)
+        {
+            DAO.fieldDataOptionDAO.delete(fieldDataOption)
         }
+
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(fieldData.uuid)
+
+        dao.writableDatabase.delete(DAO.TABLE_FIELD_DATA, whereClause, args)
     }
 }
