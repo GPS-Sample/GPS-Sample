@@ -18,6 +18,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             if (modified( fieldDataOption ))
             {
                 updateFieldDataOption( fieldDataOption )
+                Log.d( "xxx", "Updated FieldDataOption with ID $fieldDataOption.uuid")
             }
         }
         else
@@ -28,15 +29,19 @@ class FieldDataOptionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created FieldDataOption with ID $fieldDataOption.uuid")
-            val fieldData = obj as? FieldData
-            fieldData?.let { fieldData ->
-                createFieldDataConnection( fieldDataOption, fieldData )
-            }
-            val rule = obj as? Rule
-            rule?.let {
-                createRuleConnection( fieldDataOption, rule )
-            }
+            Log.d( "xxx", "Created FieldDataOption with ID $fieldDataOption.uuid")
+        }
+
+        val fieldData = obj as? FieldData
+
+        fieldData?.let {
+            createFieldDataConnection( fieldDataOption, it )
+        }
+
+        val rule = obj as? Rule
+
+        rule?.let {
+            createRuleConnection( fieldDataOption, it )
         }
 
         return fieldDataOption

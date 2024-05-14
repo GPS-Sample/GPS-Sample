@@ -18,6 +18,7 @@ class RuleDAO(private var dao: DAO)
         if (exists( rule ))
         {
             updateRule( rule )
+            Log.d( "xxx", "Updated Rule with ID ${rule.uuid}")
         }
         else
         {
@@ -27,7 +28,7 @@ class RuleDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "create rule with ID ${rule.uuid}")
+            Log.d( "xxx", "Create Rule with ID ${rule.uuid}")
         }
 
         for (fieldDataOption in rule.fieldDataOptions)

@@ -21,7 +21,7 @@ class StudyDAO(private var dao: DAO)
         if (exists( study ))
         {
             updateStudy( study )
-            Log.d( "xxx", "updated study with ID = ${study.uuid}")
+            Log.d( "xxx", "Updated Study with ID = ${study.uuid}")
         }
         else
         {
@@ -31,7 +31,7 @@ class StudyDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created study with ID = ${study.uuid}")
+            Log.d( "xxx", "Created Study with ID = ${study.uuid}")
         }
 
         // add fields

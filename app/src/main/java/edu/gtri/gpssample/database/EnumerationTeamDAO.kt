@@ -13,6 +13,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         if (exists( enumerationTeam ))
         {
             updateTeam( enumerationTeam )
+            Log.d( "xxx", "Updated EnumerationTeam with ID = ${enumerationTeam.uuid}")
         }
         else
         {
@@ -22,7 +23,7 @@ class EnumerationTeamDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Enumeration Team ID = ${enumerationTeam.uuid}")
+            Log.d( "xxx", "Created EnumerationTeam with ID = ${enumerationTeam.uuid}")
         }
 
         for (latLon in enumerationTeam.polygon)

@@ -20,6 +20,7 @@ class FieldDAO(private var dao: DAO)
         if (exists( field ))
         {
             updateField( field, study )
+            Log.d( "xxx", "Updated Field with ID = ${field.uuid}")
         }
         else
         {
@@ -29,11 +30,12 @@ class FieldDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created field with Id = ${field.uuid}")
-            for (fieldOption in field.fieldOptions)
-            {
-                DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
-            }
+            Log.d( "xxx", "Created Field with ID = ${field.uuid}")
+        }
+
+        for (fieldOption in field.fieldOptions)
+        {
+            DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
         }
 
         return field

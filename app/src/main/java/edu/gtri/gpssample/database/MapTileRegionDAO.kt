@@ -13,6 +13,7 @@ class MapTileRegionDAO(private var dao: DAO)
         if (exists( mapTileRegion ))
         {
             updateMapTileRegion( mapTileRegion, config )
+            Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
         }
         else
         {
@@ -22,6 +23,7 @@ class MapTileRegionDAO(private var dao: DAO)
             {
                 return null
             }
+            Log.d( "xxx", "Created MapTileRegion with ID ${mapTileRegion.uuid}" )
         }
 
         return mapTileRegion

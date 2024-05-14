@@ -13,6 +13,7 @@ class LatLonDAO(private var dao: DAO)
         if (exists( latLon ))
         {
             updateLatLon( latLon )
+            Log.d( "xxx", "Updated LatLon with ID ${latLon.uuid}" )
         }
         else
         {
@@ -22,7 +23,7 @@ class LatLonDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created LatLon with ID ${latLon.uuid}" )
+            Log.d( "xxx", "Created LatLon with ID ${latLon.uuid}" )
         }
 
         enumArea?.let { enumArea ->

@@ -17,6 +17,7 @@ class ConfigDAO(private var dao: DAO)
         if (exists( config ))
         {
             updateConfig( config )
+            Log.d( "xxx", "Updated Config with ID ${config.uuid}" )
         }
         else
         {
@@ -26,6 +27,7 @@ class ConfigDAO(private var dao: DAO)
             {
                 return null
             }
+            Log.d( "xxx", "Created Config with ID = ${config.uuid}")
         }
 
         createOrUpdateEnumAreas(config)

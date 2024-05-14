@@ -13,6 +13,7 @@ class CollectionTeamDAO(private var dao: DAO)
         if (exists( collectionTeam ))
         {
             updateTeam( collectionTeam )
+            Log.d( "xxx", "Updated CollectionTeam with ID ${collectionTeam.uuid}" )
         }
         else
         {
@@ -22,7 +23,7 @@ class CollectionTeamDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Collection Team with ID = ${collectionTeam.uuid}")
+            Log.d( "xxx", "Created CollectionTeam with ID = ${collectionTeam.uuid}")
         }
 
         for (latLon in collectionTeam.polygon)

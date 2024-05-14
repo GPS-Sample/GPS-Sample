@@ -27,6 +27,7 @@ class LocationDAO(private var dao: DAO)
             if (modified( location ))
             {
                 updateLocation( location, enumArea )
+                Log.d( "xxx", "Updated Location with ID ${location.uuid}" )
             }
         }
         else
@@ -37,7 +38,7 @@ class LocationDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created Location with ID ${location.uuid}" )
+            Log.d( "xxx", "Created Location with ID ${location.uuid}" )
         }
 
         updateConnectorTable( location, enumArea )

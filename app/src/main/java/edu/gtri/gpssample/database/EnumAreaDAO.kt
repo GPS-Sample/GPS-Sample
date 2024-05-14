@@ -15,7 +15,7 @@ class EnumAreaDAO(private var dao: DAO)
         if (exists( enumArea ))
         {
             updateEnumArea( enumArea )
-            Log.d( "xxx", "updated EnumerationArea with ID ${enumArea.uuid}" )
+            Log.d( "xxx", "Updated EnumerationArea with ID ${enumArea.uuid}" )
         }
         else
         {
@@ -25,7 +25,7 @@ class EnumAreaDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created EnumerationArea with ID ${enumArea.uuid}" )
+            Log.d( "xxx", "Created EnumerationArea with ID ${enumArea.uuid}" )
         }
 
         for (latLon in enumArea.vertices) {

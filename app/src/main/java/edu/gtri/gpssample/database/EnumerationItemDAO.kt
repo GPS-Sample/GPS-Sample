@@ -19,6 +19,7 @@ class EnumerationItemDAO(private var dao: DAO)
         if (exists( enumerationItem ))
         {
             updateEnumerationItem( enumerationItem, location )
+            Log.d( "xxx", "Updated EnumerationItem with ID $enumerationItem.uuid" )
         }
         else
         {
@@ -32,7 +33,7 @@ class EnumerationItemDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created EnumerationItem with ID $enumerationItem.uuid" )
+            Log.d( "xxx", "Created EnumerationItem with ID $enumerationItem.uuid" )
         }
 
         enumerationItem.fieldDataList?.let { fieldDataList ->

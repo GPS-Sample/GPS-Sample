@@ -21,6 +21,7 @@ class FieldDataDAO(private var dao: DAO)
             if (modified( fieldData ))
             {
                 updateFieldData( fieldData )
+                Log.d( "xxx", "Updated FieldData with ID $fieldData.uuid" )
             }
         }
         else
@@ -31,7 +32,7 @@ class FieldDataDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "created FieldData with ID $fieldData.uuid" )
+            Log.d( "xxx", "Created FieldData with ID $fieldData.uuid" )
         }
 
         for (fieldDataOption in fieldData.fieldDataOptions)
