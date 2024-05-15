@@ -27,15 +27,21 @@ object TestUtils
 
         for (location in enumArea.locations)
         {
-            val enumerationItem = EnumerationItem()
-            enumerationItem.subAddress = count.toString()
-            enumerationItem.enumerationDate = Date().time
-            enumerationItem.enumerationEligibleForSampling = true
-            enumerationItem.syncCode = enumerationItem.syncCode + 1
-            enumerationItem.enumerationState = EnumerationState.Enumerated
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-            location.enumerationItems.add(enumerationItem)
-            count += 1
+            if (location.enumerationItems.isEmpty())
+            {
+                location.enumerationItems.add( EnumerationItem())
+            }
+
+            for (enumerationItem in location.enumerationItems)
+            {
+                enumerationItem.subAddress = count.toString()
+                enumerationItem.enumerationDate = Date().time
+                enumerationItem.enumerationEligibleForSampling = true
+                enumerationItem.syncCode = enumerationItem.syncCode + 1
+                enumerationItem.enumerationState = EnumerationState.Enumerated
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+                count += 1
+            }
         }
 
         DAO.instance().writableDatabase.setTransactionSuccessful()

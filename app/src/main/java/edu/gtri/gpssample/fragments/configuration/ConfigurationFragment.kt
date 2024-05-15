@@ -593,9 +593,6 @@ class ConfigurationFragment : Fragment(),
                     val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid,"S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
                     enumArea.collectionTeams.add(collectionTeam!!)
 
-                    sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    }
-
                     for (location in enumArea.locations)
                     {
                         for (enumerationItem in location.enumerationItems)

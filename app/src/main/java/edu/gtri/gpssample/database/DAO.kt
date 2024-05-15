@@ -25,7 +25,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_USER_RECOVERY_QUESTION + " TEXT" + "," +
                     COLUMN_USER_RECOVERY_ANSWER + " TEXT" + "," +
                     COLUMN_USER_IS_ONLINE + " BOOLEAN" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableUser)
 
             val createTableConfig = ("CREATE TABLE " +
@@ -47,7 +47,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_STUDY_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableConfig)
 
             val createTableEnumArea = ("CREATE TABLE " +
@@ -61,7 +61,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_ENUMERATION_TEAM_UUID) REFERENCES $TABLE_ENUMERATION_TEAM($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_COLLECTION_TEAM_UUID) REFERENCES $TABLE_COLLECTION_TEAM($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableEnumArea)
 
             val createTableStudy = ("CREATE TABLE " +
@@ -72,7 +72,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_STUDY_SAMPLING_METHOD_INDEX + " INTEGER" + "," +
                     COLUMN_STUDY_SAMPLE_SIZE + " INTEGER" + "," +
                     COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableStudy)
 
             val createConnectorTableConfigStudy = ("CREATE TABLE " +
@@ -106,14 +106,14 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_OPTION_3 + " TEXT" + "," +
                     COLUMN_FIELD_OPTION_4 + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableField)
 
             val createTableFieldOption = ("CREATE TABLE " +
                     TABLE_FIELD_OPTION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_FIELD_OPTION_NAME + " TEXT" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableFieldOption)
 
             val createConnectorTableField__FieldOption = ("CREATE TABLE " +
@@ -136,7 +136,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FILTEROPERATOR_UUID + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_FILTEROPERATOR_UUID) REFERENCES $TABLE_FILTEROPERATOR($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_UUID) REFERENCES $TABLE_FIELD($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableRule)
 
             val createTableFilter = ("CREATE TABLE " +
@@ -147,8 +147,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FILTER_SAMPLE_SIZE + " INTEGER" + "," +
                     COLUMN_FILTER_SAMPLE_TYPE_INDEX + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" +
-
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableFilter)
 
             val createTableFilterOperator = ("CREATE TABLE " +
@@ -162,7 +161,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     "FOREIGN KEY($COLUMN_FILTER_UUID) REFERENCES $TABLE_FILTER($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_FIRST_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
                     "FOREIGN KEY($COLUMN_SECOND_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableFilterOperator)
 
             val createTableEnumerationTeam = ("CREATE TABLE " +
@@ -172,7 +171,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_TEAM_NAME + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableEnumerationTeam)
 
             val createTableCollectionTeam = ("CREATE TABLE " +
@@ -182,7 +181,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_COLLECTION_TEAM_NAME + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableCollectionTeam)
 
             val createTableLocation = ("CREATE TABLE " +
@@ -197,7 +196,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_LOCATION_DESCRIPTION + " TEXT" + "," +
                     COLUMN_LOCATION_IMAGE_DATA + " TEXT" + "," +
                     COLUMN_LOCATION_IS_MULTI_FAMILY + " INTEGER" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableLocation)
 
             val createConnectorTableLocationEnumArea = ("CREATE TABLE " +
@@ -253,7 +252,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON + " TEXT" + "," +
                     COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_LOCATION_UUID) REFERENCES $TABLE_LOCATION($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableEnumerationItem)
 
             val createTableFieldData = ("CREATE TABLE " +
@@ -271,7 +270,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIELD_DATA_BLOCK_NUMBER + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_FIELD_UUID) REFERENCES $TABLE_FIELD($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableFieldData)
 
             val createTableFieldDataOption = ("CREATE TABLE " +
@@ -279,7 +278,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_FIELD_DATA_OPTION_NAME + " TEXT" + "," +
                     COLUMN_FIELD_DATA_OPTION_VALUE + " INTEGER" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableFieldDataOption)
 
             val createConnectorTableFieldData__FieldDataOption = ("CREATE TABLE " +
@@ -308,7 +307,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_INDEX + " INTEGER" + "," +
                     COLUMN_LAT + " REAL" + "," +
                     COLUMN_LON + " REAL" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableLatLon)
 
             val createConnectorTableEnumAreaLatLon = ("CREATE TABLE " +
@@ -353,7 +352,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_SOUTH_WEST_LAT + " REAL" + "," +
                     COLUMN_SOUTH_WEST_LON + " REAL" + "," +
                     "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" +
-                    ")")
+                    ") WITHOUT ROWID")
             db.execSQL(createTableMapTileRegion)
         }
         catch(ex: Exception)
@@ -705,6 +704,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 295
+        private const val DATABASE_VERSION = 296
     }
 }

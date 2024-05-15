@@ -154,12 +154,12 @@ class PerformCollectionFragment : Fragment(),
             sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
         }
 
-        sharedViewModel.teamViewModel.currentCollectionTeam?.value?.let {
-            collectionTeam = it
-        }
-
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
+        }
+
+        DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
+            collectionTeam = it
         }
 
         val _user = (activity!!.application as? MainApplication)?.user
@@ -176,17 +176,22 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val enumerationItems = ArrayList<EnumerationItem>()
+        var errorShown = false
 
         collectionTeam.locations.map { location ->
             for (enumurationItem in location.enumerationItems)
             {
                 if (enumurationItem.samplingState == SamplingState.Sampled)
                 {
-                    // FIX THIS!!!
-                    // why is the locationId NOT set?
+                    // FIX THIS!!! why is the locationId sometimes NOT set?
                     if (enumurationItem.locationUuid.isEmpty())
                     {
-                        assert(false)
+                        if (!errorShown)
+                        {
+                            errorShown = true
+                            NotificationDialog( activity!!, "Oops!", "Found an EnumerationItem that is missing a Location")
+                        }
+
                         enumurationItem.locationUuid = location.uuid
                     }
                     enumerationItems.add( enumurationItem )
