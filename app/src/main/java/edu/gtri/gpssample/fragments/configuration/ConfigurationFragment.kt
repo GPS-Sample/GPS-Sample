@@ -67,11 +67,10 @@ class ConfigurationFragment : Fragment(),
     private val kImportTag = 3
     private val kTaskTag =   4
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val vm : ConfigurationViewModel by activityViewModels()
-        val networkVm : NetworkViewModel by activityViewModels()
+        val vm: ConfigurationViewModel by activityViewModels()
+        val networkVm: NetworkViewModel by activityViewModels()
 
         sharedViewModel = vm
         sharedNetworkViewModel = networkVm
@@ -79,7 +78,10 @@ class ConfigurationFragment : Fragment(),
         sharedNetworkViewModel.currentFragment = this
         sharedViewModel.currentFragment = this
 
-//        setHasOptionsMenu(true)
+        if (BuildConfig.DEBUG)
+        {
+            setHasOptionsMenu(true)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?

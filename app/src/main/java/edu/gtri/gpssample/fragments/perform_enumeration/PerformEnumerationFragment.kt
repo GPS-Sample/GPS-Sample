@@ -8,9 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -47,6 +45,7 @@ import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
+import edu.gtri.gpssample.utils.TestUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
@@ -106,6 +105,11 @@ class PerformEnumerationFragment : Fragment(),
         sharedViewModel = vm
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
+
+        if (BuildConfig.DEBUG)
+        {
+            setHasOptionsMenu(true)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -1023,6 +1027,28 @@ class PerformEnumerationFragment : Fragment(),
     {
         MapboxManager.cancelStylePackDownload()
         MapboxManager.cancelTilePackDownload()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_enumerate_all, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.enumerate ->
+            {
+                TestUtils.enumerateAll( enumArea )
+
+                enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
+
+                refreshMap()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()

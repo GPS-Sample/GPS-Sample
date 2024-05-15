@@ -178,8 +178,9 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                 val payload = config.pack()
 
                 val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload)
-                client.sendMessage(networkInfo.serverIP, message, this)
+                client.sendMessage(networkInfo.serverIP, message, this, false)
 
+                sleep( 1000 )
                 _commandSent.postValue(NetworkStatus.CommandSent)
                 connectDelegate?.didSendData(true)
             }

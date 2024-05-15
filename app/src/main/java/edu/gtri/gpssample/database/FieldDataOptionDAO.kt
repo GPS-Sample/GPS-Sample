@@ -18,7 +18,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             if (modified( fieldDataOption ))
             {
                 updateFieldDataOption( fieldDataOption )
-                Log.d( "xxx", "Updated FieldDataOption with ID $fieldDataOption.uuid")
+                Log.d( "xxx", "Updated FieldDataOption with ID ${fieldDataOption.uuid}")
             }
         }
         else
@@ -29,7 +29,7 @@ class FieldDataOptionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldDataOption with ID $fieldDataOption.uuid")
+            Log.d( "xxx", "Created FieldDataOption with ID ${fieldDataOption.uuid}")
         }
 
         val fieldData = obj as? FieldData

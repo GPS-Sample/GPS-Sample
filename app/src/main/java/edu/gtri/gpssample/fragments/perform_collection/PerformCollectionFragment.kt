@@ -10,10 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.util.Log.ASSERT
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -54,6 +51,7 @@ import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
+import edu.gtri.gpssample.utils.TestUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -133,6 +131,11 @@ class PerformCollectionFragment : Fragment(),
         val samplingVm: SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+        if (BuildConfig.DEBUG)
+        {
+            setHasOptionsMenu(true)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -989,6 +992,28 @@ class PerformCollectionFragment : Fragment(),
     {
         MapboxManager.cancelStylePackDownload()
         MapboxManager.cancelTilePackDownload()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_survey_all, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.survey ->
+            {
+                TestUtils.surveyAll( enumArea )
+
+                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
+
+                refreshMap()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()
