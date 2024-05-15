@@ -55,6 +55,33 @@ data class Config(
             : this(uuid, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
         ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, ArrayList<MapTileRegion>())
 
+    override fun equals(other: Any?): Boolean
+    {
+        if (other is Config)
+        {
+            if (this.uuid == other.uuid &&
+                this.creationDate == other.creationDate &&
+                this.name == other.name &&
+                this.dateFormat == other.dateFormat &&
+                this.timeFormat == other.timeFormat &&
+                this.distanceFormat == other.distanceFormat &&
+                this.minGpsPrecision == other.minGpsPrecision &&
+                this.encryptionPassword == other.encryptionPassword &&
+                this.allowManualLocationEntry == other.allowManualLocationEntry &&
+                this.subaddressIsrequired == other.subaddressIsrequired &&
+                this.autoIncrementSubaddress == other.autoIncrementSubaddress &&
+                this.proximityWarningIsEnabled == other.proximityWarningIsEnabled &&
+                this.proximityWarningValue == other.proximityWarningValue &&
+                this.selectedStudyUuid == other.selectedStudyUuid &&
+                this.selectedEnumAreaUuid == other.selectedEnumAreaUuid)
+            {
+                return true
+            }
+        }
+
+        return false
+    }
+
     var minimumGPSPrecision : String
         get() {
             if (distanceFormat == DistanceFormat.Meters)

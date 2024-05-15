@@ -10,10 +10,15 @@ class LatLonDAO(private var dao: DAO)
 {
     fun createOrUpdateLatLon( latLon: LatLon, enumArea : EnumArea?, config: Config? ) : LatLon?
     {
-        if (exists( latLon ))
+        val existingLatLon = getLatLon( latLon.uuid )
+
+        if (existingLatLon != null)
         {
-            updateLatLon( latLon )
-            Log.d( "xxx", "Updated LatLon with ID ${latLon.uuid}" )
+            if (!latLon.equals( existingLatLon ))
+            {
+                updateLatLon( latLon )
+                Log.d( "xxx", "Updated LatLon with ID ${latLon.uuid}" )
+            }
         }
         else
         {

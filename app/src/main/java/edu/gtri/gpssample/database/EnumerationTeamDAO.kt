@@ -10,10 +10,15 @@ class EnumerationTeamDAO(private var dao: DAO)
 {
     fun createOrUpdateEnumerationTeam(enumerationTeam: EnumerationTeam) : EnumerationTeam?
     {
-        if (exists( enumerationTeam ))
+        val existingEnumerationTeam = getEnumerationTeam( enumerationTeam.uuid )
+
+        if (existingEnumerationTeam != null)
         {
-            updateTeam( enumerationTeam )
-            Log.d( "xxx", "Updated EnumerationTeam with ID = ${enumerationTeam.uuid}")
+            if (!enumerationTeam.equals( existingEnumerationTeam ))
+            {
+                updateTeam( enumerationTeam )
+                Log.d( "xxx", "Updated EnumerationTeam with ID ${enumerationTeam.uuid}")
+            }
         }
         else
         {
@@ -23,7 +28,7 @@ class EnumerationTeamDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created EnumerationTeam with ID = ${enumerationTeam.uuid}")
+            Log.d( "xxx", "Created EnumerationTeam with ID ${enumerationTeam.uuid}")
         }
 
         for (latLon in enumerationTeam.polygon)
@@ -77,7 +82,7 @@ class EnumerationTeamDAO(private var dao: DAO)
 
     fun exists( enumerationTeam: EnumerationTeam ): Boolean
     {
-        getTeam( enumerationTeam.uuid )?.let {
+        getEnumerationTeam( enumerationTeam.uuid )?.let {
             return true
         } ?: return false
     }
@@ -109,7 +114,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         dao.writableDatabase.update(DAO.TABLE_ENUMERATION_TEAM, values, whereClause, args )
     }
 
-    fun getTeam( uuid: String ): EnumerationTeam?
+    fun getEnumerationTeam( uuid: String ): EnumerationTeam?
     {
         var enumerationTeam: EnumerationTeam? = null
         val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_TEAM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"

@@ -18,10 +18,15 @@ class StudyDAO(private var dao: DAO)
 {
     fun createOrUpdateStudy( study: Study ) : Study?
     {
-        if (exists( study ))
+        val existingStudy = getStudy( study.uuid )
+
+        if (existingStudy != null)
         {
-            updateStudy( study )
-            Log.d( "xxx", "Updated Study with ID = ${study.uuid}")
+            if (!study.equals( existingStudy ))
+            {
+                updateStudy( study )
+                Log.d( "xxx", "Updated Study with ID ${study.uuid}")
+            }
         }
         else
         {
@@ -31,7 +36,7 @@ class StudyDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created Study with ID = ${study.uuid}")
+            Log.d( "xxx", "Created Study with ID ${study.uuid}")
         }
 
         // add fields

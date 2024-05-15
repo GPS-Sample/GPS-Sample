@@ -15,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
@@ -153,9 +154,19 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
             response?.let {
 
                 _commandSent.postValue(NetworkStatus.CommandSent)
-                if (response.command == NetworkCommand.NetworkConfigResponse) {
+                if (response.command == NetworkCommand.NetworkConfigResponse)
+                {
                     response.payload?.let { payload ->
+
                         Config.unpack(payload, encryptionPassword)?.let { config ->
+
+                            DAO.instance().writableDatabase.beginTransaction()
+
+                            DAO.configDAO.createOrUpdateConfig(config)
+
+                            DAO.instance().writableDatabase.setTransactionSuccessful()
+                            DAO.instance().writableDatabase.endTransaction()
+
                             configurationDelegate?.configurationReceived(config)
                             _dataReceived.postValue(NetworkStatus.DataReceived)
 

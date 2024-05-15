@@ -35,13 +35,19 @@ data class EnumArea (
 
     override fun equals(other: Any?): Boolean
     {
-        if(other is EnumArea)
+        if (other is EnumArea)
         {
-            if (this.uuid == other.uuid)
+            if (this.uuid == other.uuid &&
+                this.creationDate == other.creationDate &&
+                this.configUuid == other.configUuid &&
+                this.name == other.name &&
+                this.selectedEnumerationTeamUuid == other.selectedEnumerationTeamUuid &&
+                this.selectedCollectionTeamUuid == other.selectedCollectionTeamUuid)
             {
                 return true
             }
         }
+
         return false
     }
 

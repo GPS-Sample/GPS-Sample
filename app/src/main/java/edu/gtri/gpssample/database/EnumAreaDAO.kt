@@ -12,10 +12,15 @@ class EnumAreaDAO(private var dao: DAO)
 {
     fun createOrUpdateEnumArea( enumArea: EnumArea ) : EnumArea?
     {
-        if (exists( enumArea ))
+        val existingEnumArea = getEnumArea( enumArea.uuid )
+
+        if (existingEnumArea != null)
         {
-            updateEnumArea( enumArea )
-            Log.d( "xxx", "Updated EnumerationArea with ID ${enumArea.uuid}" )
+            if (!enumArea.equals( existingEnumArea ))
+            {
+                updateEnumArea( enumArea )
+                Log.d( "xxx", "Updated EnumerationArea with ID ${enumArea.uuid}" )
+            }
         }
         else
         {

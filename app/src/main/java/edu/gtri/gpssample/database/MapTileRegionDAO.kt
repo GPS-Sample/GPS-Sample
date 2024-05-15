@@ -10,10 +10,15 @@ class MapTileRegionDAO(private var dao: DAO)
 {
     fun createOrUpdateMapTileRegion( mapTileRegion: MapTileRegion, config: Config ) : MapTileRegion?
     {
-        if (exists( mapTileRegion ))
+        val existingMapTileRegion = getMapTileRegion( mapTileRegion.uuid )
+
+        if (existingMapTileRegion != null)
         {
-            updateMapTileRegion( mapTileRegion, config )
-            Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
+            if (!mapTileRegion.equals( existingMapTileRegion ))
+            {
+                updateMapTileRegion( mapTileRegion, config )
+                Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
+            }
         }
         else
         {

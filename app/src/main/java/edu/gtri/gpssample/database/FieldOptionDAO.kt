@@ -14,7 +14,7 @@ class FieldOptionDAO(private var dao: DAO)
         if (exists( fieldOption ))
         {
             updateFieldOption( fieldOption )
-            Log.d( "xxx", "Updated FieldOption with ID = ${fieldOption.uuid}")
+            Log.d( "xxx", "Updated FieldOption with ID ${fieldOption.uuid}")
         }
         else
         {
@@ -24,7 +24,7 @@ class FieldOptionDAO(private var dao: DAO)
             {
                 return null
             }
-            Log.d( "xxx", "Created FieldOption with ID = ${fieldOption.uuid}")
+            Log.d( "xxx", "Created FieldOption with ID ${fieldOption.uuid}")
         }
 
         createConnection( fieldOption, field )

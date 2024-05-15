@@ -325,7 +325,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             sharedViewModel.createStudyModel.setStudy( it )
         }
 
-        DAO.enumerationTeamDAO.getTeam( enumTeam.uuid )?.let {
+        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
             sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
         }
 
@@ -433,7 +433,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             sharedViewModel.createStudyModel.setStudy( it )
         }
 
-        DAO.enumerationTeamDAO.getTeam( enumTeam.uuid )?.let {
+        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
             sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
         }
 

@@ -16,9 +16,11 @@ class FieldDataDAO(private var dao: DAO)
 {
     fun createOrUpdateFieldData( fieldData: FieldData, enumerationItem: EnumerationItem ) : FieldData?
     {
-        if (exists( fieldData ))
+        val existingFieldData = getFieldData( fieldData.uuid )
+
+        if (existingFieldData != null)
         {
-            if (modified( fieldData ))
+            if (!fieldData.equals( existingFieldData ))
             {
                 updateFieldData( fieldData )
                 Log.d( "xxx", "Updated FieldData with ID ${fieldData.uuid}" )
@@ -68,18 +70,6 @@ class FieldDataDAO(private var dao: DAO)
         getFieldData( fieldData.uuid )?.let {
             return true
         } ?: return false
-    }
-
-    fun modified( fieldData : FieldData ) : Boolean
-    {
-        getFieldData( fieldData.uuid )?.let {
-            if (!fieldData.equals(it))
-            {
-                return true
-            }
-        }
-
-        return false
     }
 
     @SuppressLint("Range")

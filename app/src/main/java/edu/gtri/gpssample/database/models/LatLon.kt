@@ -17,4 +17,17 @@ data class LatLon (
     {
         return LatLng( latitude, longitude )
     }
+
+    fun equals( latLon: LatLon ) : Boolean
+    {
+        if (this.uuid == latLon.uuid &&
+            this.index == latLon.index &&
+            this.latitude == latLon.latitude &&
+            this.longitude == latLon.longitude)
+        {
+            return true
+        }
+
+        return false
+    }
 }

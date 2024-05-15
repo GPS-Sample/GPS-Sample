@@ -17,6 +17,22 @@ data class EnumerationTeam(
     constructor( enumAreaUuid: String,  name: String, polygon: ArrayList<LatLon>, locations: ArrayList<Location> )
             : this(UUID.randomUUID().toString(), Date().time, enumAreaUuid, name, polygon, locations )
 
+    override fun equals(other: Any?): Boolean
+    {
+        if (other is EnumerationTeam)
+        {
+            if (this.uuid == other.uuid &&
+                this.creationDate == other.creationDate &&
+                this.enumAreaUuid == other.enumAreaUuid &&
+                this.name == other.name)
+            {
+                return true
+            }
+        }
+
+        return false
+    }
+
     fun pack() : String
     {
         return Json.encodeToString( this )

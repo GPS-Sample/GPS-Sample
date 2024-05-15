@@ -13,9 +13,11 @@ class FieldDataOptionDAO(private var dao: DAO)
 {
     fun createOrUpdateFieldDataOption(fieldDataOption: FieldDataOption, obj: Any) : FieldDataOption?
     {
-        if (exists( fieldDataOption ))
+        val existingFieldDataOption = getFieldDataOption( fieldDataOption.uuid )
+
+        if (existingFieldDataOption != null)
         {
-            if (modified( fieldDataOption ))
+            if (!fieldDataOption.equals( existingFieldDataOption ))
             {
                 updateFieldDataOption( fieldDataOption )
                 Log.d( "xxx", "Updated FieldDataOption with ID ${fieldDataOption.uuid}")

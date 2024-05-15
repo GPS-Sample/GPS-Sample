@@ -10,10 +10,15 @@ class CollectionTeamDAO(private var dao: DAO)
 {
     fun createOrUpdateCollectionTeam(collectionTeam: CollectionTeam) : CollectionTeam?
     {
-        if (exists( collectionTeam ))
+        val existingCollectionTeam = getCollectionTeam( collectionTeam.uuid )
+
+        if (existingCollectionTeam != null)
         {
-            updateTeam( collectionTeam )
-            Log.d( "xxx", "Updated CollectionTeam with ID ${collectionTeam.uuid}" )
+            if (!collectionTeam.equals( existingCollectionTeam ))
+            {
+                updateTeam( collectionTeam )
+                Log.d( "xxx", "Updated CollectionTeam with ID ${collectionTeam.uuid}" )
+            }
         }
         else
         {
@@ -113,6 +118,23 @@ class CollectionTeamDAO(private var dao: DAO)
         putTeam( collectionTeam, values )
 
         dao.writableDatabase.update(DAO.TABLE_COLLECTION_TEAM, values, whereClause, args )
+    }
+
+    fun getCollectionTeam( uuid: String ): CollectionTeam?
+    {
+        var collectionTeam: CollectionTeam? = null
+        val query = "SELECT * FROM ${DAO.TABLE_COLLECTION_TEAM} WHERE ${DAO.COLUMN_UUID} = '$uuid'"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        if (cursor.count > 0)
+        {
+            cursor.moveToNext()
+            collectionTeam = buildTeam( cursor )
+        }
+
+        cursor.close()
+
+        return collectionTeam
     }
 
     fun getCollectionTeams( enumArea: EnumArea ): ArrayList<CollectionTeam>

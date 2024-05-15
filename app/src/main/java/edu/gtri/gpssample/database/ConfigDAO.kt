@@ -14,10 +14,15 @@ class ConfigDAO(private var dao: DAO)
 {
     fun createOrUpdateConfig( config: Config ) : Config?
     {
-        if (exists( config ))
+        val existingConfig = getConfig( config.uuid )
+
+        if (existingConfig != null)
         {
-            updateConfig( config )
-            Log.d( "xxx", "Updated Config with ID ${config.uuid}" )
+            if (!config.equals( existingConfig ))
+            {
+                updateConfig( config )
+                Log.d( "xxx", "Updated Config with ID ${config.uuid}" )
+            }
         }
         else
         {

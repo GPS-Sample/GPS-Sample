@@ -107,7 +107,15 @@ class ManageConfigurationsFragment : Fragment(),
         sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
         sharedViewModel.distanceFormats[1] = distanceFormats[1].toString()
 
-        configurations = DAO.configDAO.getConfigs()
+        val busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Reading Configurations...", this, false)
+
+        Thread {
+            configurations = DAO.configDAO.getConfigs()
+            activity!!.runOnUiThread {
+                busyIndicatorDialog.alertDialog.cancel()
+                manageConfigurationsAdapter.updateConfigurations(configurations)
+            }
+        }.start()
 
         manageConfigurationsAdapter = ManageConfigurationsAdapter(configurations)
         manageConfigurationsAdapter.didSelectConfig = this::didSelectConfig
@@ -511,19 +519,9 @@ class ManageConfigurationsFragment : Fragment(),
     override fun configurationReceived(config: Config)
     {
         runBlocking(Dispatchers.Main) {
-
-            DAO.instance().writableDatabase.beginTransaction()
-
-            val savedConfig = DAO.configDAO.createOrUpdateConfig(config)
-
-            DAO.instance().writableDatabase.setTransactionSuccessful()
-            DAO.instance().writableDatabase.endTransaction()
-
-            savedConfig?.let { savedConfig ->
-                configurations = DAO.configDAO.getConfigs()
-                sharedViewModel.setCurrentConfig( savedConfig )
-                manageConfigurationsAdapter.updateConfigurations( configurations )
-            }
+            configurations = DAO.configDAO.getConfigs()
+            sharedViewModel.setCurrentConfig( config )
+            manageConfigurationsAdapter.updateConfigurations( configurations )
         }
     }
 
