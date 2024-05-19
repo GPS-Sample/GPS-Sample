@@ -381,14 +381,14 @@ class ConfigurationFragment : Fragment(),
 
             var userName = user!!.name.replace(" ", "" ).uppercase()
 
-            if (userName.length > 4)
+            if (userName.length > 3)
             {
-                userName = userName.substring(0,4)
+                userName = userName.substring(0,3)
             }
 
-            val role = user.role.toString().substring(0,2).uppercase()
+            val role = user.role.toString().substring(0,1).uppercase()
 
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
+            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
             val dateTime = LocalDateTime.now().format(formatter)
 
             var version = ""
@@ -398,7 +398,7 @@ class ConfigurationFragment : Fragment(),
                 version = versionName[1]
             }
 
-            val fileName = "C-${role}-${userName}-${dateTime!!}-${version}.json"
+            val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}.json"
 
             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
             root.mkdirs()

@@ -582,14 +582,14 @@ class PerformCollectionFragment : Fragment(),
 
         var userName = user!!.name.replace(" ", "" ).uppercase()
 
-        if (userName.length > 4)
+        if (userName.length > 3)
         {
-            userName = userName.substring(0,4)
+            userName = userName.substring(0,3)
         }
 
-        val role = user.role.toString().substring(0,2).uppercase()
+        val role = user.role.toString().substring(0,1).uppercase()
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
+        val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
         val dateTime = LocalDateTime.now().format(formatter)
         var version = ""
         val versionName = BuildConfig.VERSION_NAME.split( "#" )
@@ -605,7 +605,7 @@ class PerformCollectionFragment : Fragment(),
             Role.Supervisor.toString() ->
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
-                    fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                    fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}.json"
                     payload = config.packMinimal()
                     message = resources.getString(R.string.config_saved_doc)
                 }
@@ -616,7 +616,7 @@ class PerformCollectionFragment : Fragment(),
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                        fileName = "D-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                        fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                         payload = config.pack()
                         message = resources.getString(R.string.collection_saved_doc)
                     }
@@ -744,6 +744,23 @@ class PerformCollectionFragment : Fragment(),
                 }
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
+
+                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
+
+                val enumerationItems = ArrayList<EnumerationItem>()
+
+                for (loc in collectionTeam.locations)
+                {
+                    for (enumurationItem in loc.enumerationItems)
+                    {
+                        if (enumurationItem.samplingState == SamplingState.Sampled)
+                        {
+                            enumerationItems.add( enumurationItem )
+                        }
+                    }
+                }
+
+                performCollectionAdapter.updateEnumerationItems( enumerationItems )
 
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     DAO.configDAO.getConfig( config.uuid )?.let {

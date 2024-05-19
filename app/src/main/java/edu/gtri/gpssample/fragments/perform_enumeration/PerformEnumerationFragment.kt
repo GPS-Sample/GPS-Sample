@@ -798,14 +798,14 @@ class PerformEnumerationFragment : Fragment(),
 
                     var userName = user!!.name.replace(" ", "" ).uppercase()
 
-                    if (userName.length > 4)
+                    if (userName.length > 3)
                     {
-                        userName = userName.substring(0,4)
+                        userName = userName.substring(0,3)
                     }
 
-                    val role = user.role.toString().substring(0,2).uppercase()
+                    val role = user.role.toString().substring(0,1).uppercase()
 
-                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")
+                    val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
                     val dateTime = LocalDateTime.now().format(formatter)
 
                     val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
@@ -825,7 +825,7 @@ class PerformEnumerationFragment : Fragment(),
                         Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
                             val packedConfig = config.packMinimal()
-                            val fileName = "C-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                            val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedConfig)
@@ -838,7 +838,7 @@ class PerformEnumerationFragment : Fragment(),
                         Role.Enumerator.toString() ->
                         {
                             val packedConfig = config.pack()
-                            val fileName = "E-${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                            val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                             val file = File(root, fileName)
                             val writer = FileWriter(file)
                             writer.append(packedConfig)
