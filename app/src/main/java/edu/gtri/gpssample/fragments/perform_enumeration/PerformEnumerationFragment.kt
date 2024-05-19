@@ -312,11 +312,6 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
-        if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
-        {
-            binding.exportButton.visibility = View.GONE
-        }
-
         binding.exportButton.setOnClickListener {
             if (dropMode)
             {
@@ -324,26 +319,19 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            if (user.role == Role.Enumerator.toString() && config.selectedEnumAreaUuid.isEmpty())
+            when(user.role)
             {
-                InfoDialog( this@PerformEnumerationFragment.context, "Please Note", "Since this Enumeration Area was created by an Enumerator, you will need to press the Back button and use the EXPORT CONFIGURATION button of the previous page in order to export the configuration.", resources.getString(R.string.ok), null, this)
-            }
-            else
-            {
-                when(user.role)
+                Role.Supervisor.toString(), Role.Admin.toString() ->
                 {
-                    Role.Supervisor.toString(), Role.Admin.toString() ->
-                    {
-                        ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
-                            resources.getString(R.string.select_export_message),
-                            resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                    }
-                    Role.Enumerator.toString() ->
-                    {
-                        ConfirmationDialog( activity, resources.getString(R.string.export_enum_data),
-                            resources.getString(R.string.select_export_message),
-                            resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                    }
+                    ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
+                        resources.getString(R.string.select_export_message),
+                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                }
+                Role.Enumerator.toString() ->
+                {
+                    ConfirmationDialog( activity, resources.getString(R.string.export_enum_data),
+                        resources.getString(R.string.select_export_message),
+                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
                 }
             }
         }

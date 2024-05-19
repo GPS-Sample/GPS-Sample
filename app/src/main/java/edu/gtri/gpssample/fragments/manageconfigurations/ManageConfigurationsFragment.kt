@@ -64,7 +64,6 @@ class ManageConfigurationsFragment : Fragment(),
 
     private val kImportTag = 1
     private val kDeleteTag = 2
-    private val kExportTag = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -135,7 +134,6 @@ class ManageConfigurationsFragment : Fragment(),
             if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
             {
                 binding.createButton.visibility = View.VISIBLE
-                binding.exportButton.visibility = View.VISIBLE
             }
         }
 
@@ -153,10 +151,6 @@ class ManageConfigurationsFragment : Fragment(),
                 bundle.putBoolean( Keys.kEditMode.toString(), true )
                 findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
             }
-        }
-
-        binding.exportButton.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
         binding.importButton.setOnClickListener {
@@ -373,21 +367,6 @@ class ManageConfigurationsFragment : Fragment(),
             val intent = Intent(context, CameraXLivePreviewActivity::class.java)
             getResult.launch(intent)
         }
-        else if (tag == kExportTag)
-        {
-            if (configurations.size == 1)
-            {
-                view?.let { view ->
-                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
-                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = encryptionPassword
-
-                    sharedNetworkViewModel.setCurrentConfig(configurations[0])
-
-                    sharedNetworkViewModel.createHotspot(view)
-                }
-            }
-        }
     }
 
     override fun didSelectRightButton(tag: Any?)
@@ -407,53 +386,6 @@ class ManageConfigurationsFragment : Fragment(),
                 .setAction(Intent.ACTION_GET_CONTENT)
 
             startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), 1023)
-        }
-        else if (tag == kExportTag)
-        {
-            exportToDevice()
-        }
-    }
-
-    fun exportToDevice( )
-    {
-        // this is a config with an EnumArea created by walking the boundary
-
-        if (configurations.size == 1 && configurations[0].enumAreas.size == 1)
-        {
-            val packedConfig = configurations[0].pack()  // no need to packMinimal here, since there should only be 1 EA and 1 team
-
-            val user = (activity!!.application as MainApplication).user
-
-            val clusterName = configurations[0].enumAreas[0].name
-            var userName = user!!.name.replace(" ", "" ).uppercase()
-
-            if (userName.length > 3)
-            {
-                userName = userName.substring(0,3)
-            }
-
-            val role = user.role.toString().substring(0,1).uppercase()
-
-            var version = ""
-            val versionName = BuildConfig.VERSION_NAME.split( "#" )
-            if (versionName.size == 2)
-            {
-                version = versionName[1]
-            }
-
-            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-            val dateTime = LocalDateTime.now().format(formatter)
-            val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
-            root.mkdirs()
-            val file = File(root, fileName)
-            val writer = FileWriter(file)
-            writer.append(packedConfig)
-            writer.flush()
-            writer.close()
-
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -543,7 +475,6 @@ class ManageConfigurationsFragment : Fragment(),
                 if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
                 {
                     binding.createButton.visibility = View.VISIBLE
-                    binding.exportButton.visibility = View.VISIBLE
                 }
 
                 navigateBasedOnRole()
