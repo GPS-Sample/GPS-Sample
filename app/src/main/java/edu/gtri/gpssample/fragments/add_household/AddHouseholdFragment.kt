@@ -217,9 +217,16 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        val components = enumerationItem.uuid.split("-" )
+        if (enumerationItem.uuid.isEmpty())
+        {
+            binding.uuidLayout.visibility = View.GONE
+        }
+        else
+        {
+            val components = enumerationItem.uuid.split("-" )
+            binding.UUIDEditText.setText( components[0] )
+        }
 
-        binding.UUIDEditText.setText( components[0] )
         binding.subaddressEditText.setText( enumerationItem.subAddress )
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
