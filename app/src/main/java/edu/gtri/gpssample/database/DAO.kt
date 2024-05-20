@@ -159,7 +159,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_FIRST_RULE_UUID +   " TEXT " + "," +
                     COLUMN_SECOND_RULE_UUID +  " TEXT " + "," +
                     "FOREIGN KEY($COLUMN_FILTER_UUID) REFERENCES $TABLE_FILTER($COLUMN_UUID)" + "," +
-                    "FOREIGN KEY($COLUMN_FIRST_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
+                    "FOREIGN KEY($COLUMN_FIRST_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_SECOND_RULE_UUID) REFERENCES $TABLE_RULE($COLUMN_UUID)" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableFilterOperator)
@@ -704,6 +704,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 296
+        private const val DATABASE_VERSION = 299
     }
 }

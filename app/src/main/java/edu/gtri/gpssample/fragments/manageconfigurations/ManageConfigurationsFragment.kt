@@ -106,12 +106,12 @@ class ManageConfigurationsFragment : Fragment(),
         sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
         sharedViewModel.distanceFormats[1] = distanceFormats[1].toString()
 
-        val busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Reading Configurations...", this, false)
+        busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Reading Configurations...", this, false)
 
         Thread {
             configurations = DAO.configDAO.getConfigs()
             activity!!.runOnUiThread {
-                busyIndicatorDialog.alertDialog.cancel()
+                busyIndicatorDialog!!.alertDialog.cancel()
                 manageConfigurationsAdapter.updateConfigurations(configurations)
             }
         }.start()

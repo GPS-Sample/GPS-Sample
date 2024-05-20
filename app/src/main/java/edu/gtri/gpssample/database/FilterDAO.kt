@@ -12,6 +12,7 @@ import edu.gtri.gpssample.database.models.FilterOperator
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.extensions.toBoolean
+import java.util.UUID
 
 data class RawFilterOperator(var uuid : String, var order : Int, var rule1 : String , var rule2 : String?, var connector : Int)
 
@@ -60,6 +61,7 @@ class FilterDAO(private var dao: DAO)
     {
         ruleCheck(rule)
         val values = ContentValues()
+        values.put(DAO.COLUMN_UUID, UUID.randomUUID().toString())
         values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(Connector.NONE))
         values.put(DAO.COLUMN_FILTEROPERATOR_ORDER, 1)
         values.put(DAO.COLUMN_FILTER_UUID, filter.uuid)
@@ -87,14 +89,14 @@ class FilterDAO(private var dao: DAO)
     {
         val index = SampleTypeConverter.toIndex(filter.samplingType)
 
-        rule.filterOperator?.let{filterOperator ->
-            values.put( DAO.COLUMN_UUID, filterOperator.uuid )
+        rule.filterOperator?.let{ filterOperator ->
+            values.put( DAO.COLUMN_UUID, UUID.randomUUID().toString())
+            values.put( DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.connector))
+            values.put( DAO.COLUMN_FILTEROPERATOR_ORDER, order)
+            values.put( DAO.COLUMN_FILTER_UUID, filter.uuid)
+            values.put( DAO.COLUMN_FIRST_RULE_UUID, rule.uuid )
 
-            filterOperator.rule?.let{secondRule ->
-                values.put(DAO.COLUMN_CONNECTOR, ConnectorConverter.toIndex(filterOperator.connector))
-                values.put(DAO.COLUMN_FILTEROPERATOR_ORDER, order)
-                values.put(DAO.COLUMN_FILTER_UUID, filter.uuid)
-                values.put( DAO.COLUMN_FIRST_RULE_UUID, rule.uuid )
+            filterOperator.rule?.let{ secondRule ->
                 values.put( DAO.COLUMN_SECOND_RULE_UUID, secondRule.uuid )
             }
         }
@@ -146,6 +148,7 @@ class FilterDAO(private var dao: DAO)
 
         val type = SampleTypeConverter.fromIndex(cursor.getColumnIndex(DAO.COLUMN_FILTER_SAMPLE_TYPE_INDEX))
         val filter = Filter( uuid, name, type, sampleSize )
+
         findFieldOperators(filter)
 
         return filter
