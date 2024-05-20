@@ -15,6 +15,8 @@ import com.mapbox.maps.*
 import com.mapbox.maps.plugin.annotation.generated.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.MapTileRegion
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.GeometryFactory
 import java.util.concurrent.atomic.AtomicInteger
 
 class MapboxManager(
@@ -110,6 +112,45 @@ class MapboxManager(
 
         private var stylePackCancelable: Cancelable? = null
         private var tileRegionsCancelable = ArrayList<Cancelable>()
+
+        fun isSelfIntersectingPolygon1( polylinePoints: java.util.ArrayList<Point> ) : Boolean
+        {
+            val coordinates = java.util.ArrayList<Coordinate>()
+
+            polylinePoints.map { point ->
+                coordinates.add( Coordinate( point.longitude(), point.latitude()))
+            }
+
+            return isSelfIntersectingPolygon( coordinates )
+        }
+
+        fun isSelfIntersectingPolygon2( pointAnnotations: java.util.ArrayList<PointAnnotation?>) : Boolean
+        {
+            val coordinates = java.util.ArrayList<Coordinate>()
+
+            pointAnnotations.map { pointAnnotation ->
+                pointAnnotation?.let{ pointAnnotation ->
+                    coordinates.add( Coordinate( pointAnnotation.point.longitude(), pointAnnotation.point.latitude()))
+                }
+            }
+
+            coordinates.add( coordinates[0] )
+
+            return isSelfIntersectingPolygon( coordinates )
+        }
+
+        fun isSelfIntersectingPolygon( coordinates: java.util.ArrayList<Coordinate> ) : Boolean
+        {
+            try
+            {
+                return !GeometryFactory().createPolygon(coordinates.toTypedArray()).isSimple
+            }
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTraceToString())
+                return true
+            }
+        }
 
         fun loadStylePack( context: Context, delegate: MapTileCacheDelegate )
         {

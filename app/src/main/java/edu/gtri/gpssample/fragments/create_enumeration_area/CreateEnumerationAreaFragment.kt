@@ -233,9 +233,26 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 if (droppedPointAnnotations.size > 2)
                 {
-                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
-                    binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
-                    binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+                    if (MapboxManager.isSelfIntersectingPolygon2( droppedPointAnnotations ))
+                    {
+                        droppedPointAnnotations.map { pointAnnotation ->
+                            pointAnnotation?.let{ pointAnnotation ->
+                                pointAnnotationManager.delete( pointAnnotation )
+                            }
+                        }
+
+                        droppedPointAnnotations.clear()
+                        binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                        binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+                        binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                        binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+                    }
                 }
                 else
                 {

@@ -262,9 +262,20 @@ class WalkEnumerationAreaFragment : Fragment(),
             {
                 isRecording = false
 
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+                // close the polygon
+                polyLinePoints.add( polyLinePoints[0] )
 
-                refreshMap()
+                if (MapboxManager.isSelfIntersectingPolygon1( polyLinePoints ))
+                {
+                    polyLinePoints.removeLast()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
+                }
+                else
+                {
+                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+
+                    refreshMap()
+                }
             }
         }
     }
@@ -440,9 +451,6 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
-        // close the polygon
-        polyLinePoints.add( polyLinePoints[0] )
-
         val vertices = ArrayList<LatLon>()
 
         var index = 0

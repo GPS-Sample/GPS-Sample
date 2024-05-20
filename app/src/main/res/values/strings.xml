@@ -351,6 +351,7 @@
 
     <string name="importing_locations">"Importing Locations..."</string>
     <string name="saving_configuration">"Saving Configuration..."</string>
+    <string name="polygon_is_self_intersecting">"The polygon is self-intersecting. Please try again."</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
