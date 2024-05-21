@@ -118,7 +118,7 @@ class EnumAreaDAO(private var dao: DAO)
     {
         val enumAreas = ArrayList<EnumArea>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE}"
+        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA} WHERE ${DAO.COLUMN_CONFIG_UUID} = '${config.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
 
         val cursor = dao.writableDatabase.rawQuery(query, null)
 

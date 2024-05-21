@@ -147,11 +147,11 @@ class CreateCollectionTeamFragment : Fragment(),
 
             val polygon = ArrayList<LatLon>()
 
-            var index = 0
+            var creationDate = Date().time
 
             intersectionPolygon?.points?.map { points ->
                 points.map { point ->
-                    polygon.add( LatLon( index++, point.latitude(), point.longitude()))
+                    polygon.add( LatLon( creationDate++, point.latitude(), point.longitude()))
                 }
             }
 

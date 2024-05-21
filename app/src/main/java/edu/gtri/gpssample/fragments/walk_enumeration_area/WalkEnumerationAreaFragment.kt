@@ -453,11 +453,11 @@ class WalkEnumerationAreaFragment : Fragment(),
     {
         val vertices = ArrayList<LatLon>()
 
-        var index = 0
+        var creationDate = Date().time
 
         for (point in polyLinePoints)
         {
-            vertices.add( LatLon( index++, point.latitude(), point.longitude()))
+            vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
         }
 
         polyLinePoints.clear()

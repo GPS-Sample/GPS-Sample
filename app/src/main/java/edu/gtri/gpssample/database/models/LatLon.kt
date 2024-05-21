@@ -7,11 +7,11 @@ import java.util.*
 @Serializable
 data class LatLon (
     var uuid : String,
-    var index : Int,
+    var creationDate : Long,
     var latitude: Double,
     var longitude: Double)
 {
-    constructor( index: Int, latitude: Double, longitude: Double ) : this(UUID.randomUUID().toString(), index, latitude, longitude)
+    constructor( creationDate: Long, latitude: Double, longitude: Double ) : this(UUID.randomUUID().toString(), creationDate, latitude, longitude)
 
     fun toLatLng() : LatLng
     {
@@ -21,7 +21,7 @@ data class LatLon (
     fun equals( latLon: LatLon ) : Boolean
     {
         if (this.uuid == latLon.uuid &&
-            this.index == latLon.index &&
+            this.creationDate == latLon.creationDate &&
             this.latitude == latLon.latitude &&
             this.longitude == latLon.longitude)
         {

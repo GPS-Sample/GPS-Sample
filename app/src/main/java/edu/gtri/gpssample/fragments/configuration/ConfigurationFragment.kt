@@ -523,10 +523,10 @@ class ConfigurationFragment : Fragment(),
                 {
                     val polygon = ArrayList<LatLon>()
 
-                    var index = 0
+                    var creationDate = Date().time
 
                     enumArea.vertices.map {
-                        polygon.add( LatLon( index++, it.latitude, it.longitude ))
+                        polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
                     }
 
                     val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "E-Team-${enumArea.uuid}", polygon, enumArea.locations ))
@@ -584,10 +584,10 @@ class ConfigurationFragment : Fragment(),
                 {
                     val polygon = ArrayList<LatLon>()
 
-                    var index = 0
+                    var creationDate = Date().time
 
                     enumArea.vertices.map {
-                        polygon.add( LatLon( index++, it.latitude, it.longitude ))
+                        polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
                     }
 
                     val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid,"S-Team-${enumArea.uuid}", polygon, enumArea.locations ))

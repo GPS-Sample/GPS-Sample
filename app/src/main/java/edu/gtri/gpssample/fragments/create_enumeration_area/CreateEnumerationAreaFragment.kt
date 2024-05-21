@@ -980,10 +980,10 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 val points1 = ArrayList<Coordinate>()
 
-                var index = 0
+                var creationDate = Date().time
 
                 polylineAnnotation.points.map { point ->
-                    vertices.add( LatLon( index++, point.latitude(), point.longitude()))
+                    vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
                     points1.add( Coordinate( point.longitude(), point.latitude()))
                 }
 
@@ -1120,11 +1120,11 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             val vertices = ArrayList<LatLon>()
 
-            var index = 0
+            var creationDate = Date().time
 
             droppedPointAnnotations.map { pointAnnotation ->
                 pointAnnotation?.let{ pointAnnotation ->
-                    vertices.add( LatLon( index++, pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
+                    vertices.add( LatLon( creationDate++, pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
                     pointAnnotationManager.delete( pointAnnotation )
                 }
             }
@@ -1273,10 +1273,10 @@ class CreateEnumerationAreaFragment : Fragment(),
                         val enumArea = EnumArea(config.uuid, name, ArrayList<LatLon>())
                         val multiPolygon = geometry as MultiPolygon
 
-                        var index = 0
+                        var creationDate = Date().time
 
                         multiPolygon.coordinates[0][0].forEach { position ->
-                            enumArea.vertices.add( LatLon( index++, position.latitude, position.longitude ))
+                            enumArea.vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
                         }
 
                         unsavedEnumAreas.add(enumArea)

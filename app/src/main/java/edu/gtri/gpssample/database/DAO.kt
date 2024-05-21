@@ -304,7 +304,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableLatLon = ("CREATE TABLE " +
                     TABLE_LAT_LON + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
-                    COLUMN_INDEX + " INTEGER" + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_LAT + " REAL" + "," +
                     COLUMN_LON + " REAL" +
                     ") WITHOUT ROWID")
@@ -562,7 +562,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_SOUTH_WEST_LON = "south_west_lon"
 
         const val TABLE_LAT_LON = "lat_lon"
-        const val COLUMN_INDEX = "idx"
         const val COLUMN_LAT = "lat"
         const val COLUMN_LON = "lon"
 
@@ -704,6 +703,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 299
+        private const val DATABASE_VERSION = 300
     }
 }

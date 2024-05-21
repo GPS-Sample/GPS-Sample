@@ -17,10 +17,10 @@ object TestUtils
 
         val polygon = ArrayList<LatLon>()
 
-        var index = 0
+        var creationDate = Date().time
 
         enumArea.vertices.map {
-            polygon.add( LatLon( index++, it.latitude, it.longitude ))
+            polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
         }
 
         DAO.instance().writableDatabase.beginTransaction()
@@ -52,10 +52,10 @@ object TestUtils
     {
         val polygon = ArrayList<LatLon>()
 
-        var index = 0
+        var creationDate = Date().time
 
         enumArea.vertices.map {
-            polygon.add( LatLon( index++, it.latitude, it.longitude ))
+            polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
         }
 
         DAO.instance().writableDatabase.beginTransaction()
