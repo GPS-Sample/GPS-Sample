@@ -44,15 +44,12 @@ import kotlin.collections.ArrayList
 
 class ManageConfigurationsFragment : Fragment(),
     InputDialog.InputDialogDelegate,
-    MapboxManager.MapTileCacheDelegate,
     NetworkClientModel.ConfigurationDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     NetworkViewModel.ManageConfigurationNetworkDelegate
 {
     private var _binding: FragmentManageConfigurationsBinding? = null
     private val binding get() = _binding!!
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var configurations = ArrayList<Config>()
     private var encryptionPassword = ""
 
@@ -106,12 +103,12 @@ class ManageConfigurationsFragment : Fragment(),
         sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
         sharedViewModel.distanceFormats[1] = distanceFormats[1].toString()
 
-        busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Reading Configurations...", this, false)
+        binding.overlayView.visibility = View.VISIBLE
 
         Thread {
             configurations = DAO.configDAO.getConfigs()
             activity!!.runOnUiThread {
-                busyIndicatorDialog!!.alertDialog.cancel()
+                binding.overlayView.visibility = View.GONE
                 manageConfigurationsAdapter.updateConfigurations(configurations)
             }
         }.start()
@@ -480,62 +477,6 @@ class ManageConfigurationsFragment : Fragment(),
                 navigateBasedOnRole()
             }
         }
-    }
-
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                    navigateBasedOnRole()
-                }
-            }
-            else
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
-                }
-            }
-        }
-    }
-
-    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
-    {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
-            }
-        }
-    }
-
-    override fun tilePacksLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
-            }
-
-            navigateBasedOnRole()
-        }
-    }
-
-    override fun didPressCancelButton()
-    {
-        MapboxManager.cancelStylePackDownload()
-        MapboxManager.cancelTilePackDownload()
     }
 
     fun navigateBasedOnRole()
