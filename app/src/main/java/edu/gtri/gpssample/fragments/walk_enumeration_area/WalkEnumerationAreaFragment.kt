@@ -208,6 +208,16 @@ class WalkEnumerationAreaFragment : Fragment(),
                     {
                         startPointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
                     }
+                    else if (polyLinePoints.size > 2)
+                    {
+                        val testPoints = ArrayList<com.mapbox.geojson.Point>()
+                        testPoints.addAll( polyLinePoints )
+                        testPoints.add( polyLinePoints[0])
+                        if (MapboxManager.isSelfIntersectingPolygon1( testPoints ))
+                        {
+                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
             }
         }
@@ -265,17 +275,9 @@ class WalkEnumerationAreaFragment : Fragment(),
                 // close the polygon
                 polyLinePoints.add( polyLinePoints[0] )
 
-                if (MapboxManager.isSelfIntersectingPolygon1( polyLinePoints ))
-                {
-                    polyLinePoints.removeLast()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
-                }
-                else
-                {
-                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
 
-                    refreshMap()
-                }
+                refreshMap()
             }
         }
     }
