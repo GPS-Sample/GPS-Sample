@@ -14,6 +14,7 @@ import java.util.*
 @Serializable
 data class FieldData (
     var uuid : String,
+    var creationDate : Long,
     var field : Field?,
     var name : String,
     var type : FieldType,
@@ -24,15 +25,15 @@ data class FieldData (
     var blockNumber : Int?,
     var fieldDataOptions : ArrayList<FieldDataOption>)
 {
-    constructor( field: Field ) : this( UUID.randomUUID().toString(), field, "", FieldType.None,
+    constructor( creationDate: Long, field: Field ) : this( UUID.randomUUID().toString(), creationDate, field, "", FieldType.None,
         "", null, null, null, null, ArrayList<FieldDataOption>())
 
-    constructor( field: Field, blockNumber: Int ) : this( UUID.randomUUID().toString(), field, "", FieldType.None,
+    constructor( field: Field, blockNumber: Int ) : this( UUID.randomUUID().toString(), Date().time, field, "", FieldType.None,
         "", null, null, null, blockNumber, ArrayList<FieldDataOption>())
 
     constructor( field: Field,  name : String, type : FieldType, textValue: String,
                  numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :
-            this( UUID.randomUUID().toString(), field, name, type,  textValue,
+            this( UUID.randomUUID().toString(), Date().time, field, name, type,  textValue,
                 numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
 
     fun equals( fieldData: FieldData ) : Boolean

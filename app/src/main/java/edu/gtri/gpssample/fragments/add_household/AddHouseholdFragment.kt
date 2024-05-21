@@ -164,11 +164,13 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         // create field data for every field that is not a block field
         if (enumerationItem.fieldDataList.isEmpty())
         {
+            var creationDate = Date().time
+
             for (field in study.fields)
             {
                 if (field.fieldBlockContainer || field.fieldBlockUUID == null)
                 {
-                    val fieldData = FieldData(field)
+                    val fieldData = FieldData(creationDate++, field)
                     enumerationItem.fieldDataList.add(fieldData)
 
                     if (field.type == FieldType.Checkbox || field.type == FieldType.Dropdown)
