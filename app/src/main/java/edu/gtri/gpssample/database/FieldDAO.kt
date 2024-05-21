@@ -122,7 +122,7 @@ class FieldDAO(private var dao: DAO)
     fun getFields(study : Study): ArrayList<Field>
     {
         val fields = ArrayList<Field>()
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE}"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

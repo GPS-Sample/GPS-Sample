@@ -37,7 +37,7 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapte
     {
         this.context = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_enum_area, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_enum_area, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)

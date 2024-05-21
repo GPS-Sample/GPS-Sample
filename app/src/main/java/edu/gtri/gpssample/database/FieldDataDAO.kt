@@ -125,7 +125,7 @@ class FieldDataDAO(private var dao: DAO)
     {
         val fieldDataList = ArrayList<FieldData>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUMERATION_ITEM_UUID} = '${enumerationItem.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE}"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD_DATA} WHERE ${DAO.COLUMN_ENUMERATION_ITEM_UUID} = '${enumerationItem.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())

@@ -467,7 +467,9 @@ class ConfigurationFragment : Fragment(),
                                     }
 
                                     activity!!.runOnUiThread {
+                                        updateOverview()
                                         binding.overlayView.visibility = View.GONE
+                                        enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
                                         InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
                                     }
                                 }

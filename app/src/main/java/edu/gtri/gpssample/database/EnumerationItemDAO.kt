@@ -156,7 +156,7 @@ class EnumerationItemDAO(private var dao: DAO)
     {
         val enumerationItems = ArrayList<EnumerationItem>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}'"
+        val query = "SELECT * FROM ${DAO.TABLE_ENUMERATION_ITEM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
