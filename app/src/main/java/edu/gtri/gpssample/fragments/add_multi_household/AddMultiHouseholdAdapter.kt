@@ -14,7 +14,7 @@ import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import java.util.*
 
-class AddMultiHouseholdAdapter(var location: Location, var enumerationItems: List<EnumerationItem>, val enumAreaName: String) : RecyclerView.Adapter<AddMultiHouseholdAdapter.ViewHolder>()
+class AddMultiHouseholdAdapter( var enumerationItems: List<EnumerationItem>, val enumAreaName: String ) : RecyclerView.Adapter<AddMultiHouseholdAdapter.ViewHolder>()
 {
     override fun getItemCount() = enumerationItems.size
 

@@ -10,11 +10,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.CollectionState
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 
-class PerformMultiCollectionAdapter(var enumerationItems: List<EnumerationItem>) : RecyclerView.Adapter<PerformMultiCollectionAdapter.ViewHolder>()
+class PerformMultiCollectionAdapter( var enumerationItems: List<EnumerationItem>, val enumAreaName: String ) : RecyclerView.Adapter<PerformMultiCollectionAdapter.ViewHolder>()
 {
     override fun getItemCount() = enumerationItems.size
 
@@ -25,7 +26,7 @@ class PerformMultiCollectionAdapter(var enumerationItems: List<EnumerationItem>)
     {
         this.context = parent.context
 
-        var viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
 
         viewHolder.itemView.isSelected = false
 
@@ -44,12 +45,14 @@ class PerformMultiCollectionAdapter(var enumerationItems: List<EnumerationItem>)
 
         val enumerationItem = enumerationItems.get(holder.adapterPosition)
 
-//        val location = DAO.locationDAO.getLocation( enumerationItem.locationId )
+        holder.dateTextView.setText( enumerationItem.uuid )
 
-        holder.nameTextView.setText( enumerationItem.uuid )
-        holder.dateTextView.setText( enumerationItem.subAddress )
+        if (enumerationItem.subAddress.isNotEmpty())
+        {
+            holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
+        }
 
-        if (enumerationItem.collectionState == CollectionState.Complete)
+        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
         {
             holder.checkImageView.visibility = View.VISIBLE
         }

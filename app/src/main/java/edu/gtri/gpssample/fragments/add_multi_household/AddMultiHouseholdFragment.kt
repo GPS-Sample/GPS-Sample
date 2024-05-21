@@ -68,7 +68,7 @@ class AddMultiHouseholdFragment : Fragment()
             config = it
         }
 
-        addMultiHouseholdAdapter = AddMultiHouseholdAdapter( location, location.enumerationItems, enumArea.name )
+        addMultiHouseholdAdapter = AddMultiHouseholdAdapter( location.enumerationItems, enumArea.name )
         addMultiHouseholdAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()

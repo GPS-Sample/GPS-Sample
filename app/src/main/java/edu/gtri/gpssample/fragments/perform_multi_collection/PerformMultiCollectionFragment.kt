@@ -113,7 +113,10 @@ class PerformMultiCollectionFragment : Fragment(),
             }
         }
 
-        performMultiCollectionAdapter = PerformMultiCollectionAdapter( enumerationItems )
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            performMultiCollectionAdapter = PerformMultiCollectionAdapter( enumerationItems, enumArea.name )
+        }
+
         performMultiCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
