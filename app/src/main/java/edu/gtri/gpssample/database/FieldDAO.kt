@@ -44,6 +44,7 @@ class FieldDAO(private var dao: DAO)
     fun putField( field: Field, study : Study, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, field.uuid )
+        values.put( DAO.COLUMN_CREATION_DATE, field.creationDate )
         values.put( DAO.COLUMN_STUDY_UUID, study.uuid )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
@@ -83,6 +84,7 @@ class FieldDAO(private var dao: DAO)
     private fun  buildField(cursor: Cursor ): Field
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val typeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
         val fieldBlockContainer = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_BLOCK_CONTAINER)).toBoolean()
@@ -96,7 +98,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(uuid, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
+        return Field(uuid, creationDate, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
     }
 
     fun getField( uuid : String ): Field?
@@ -120,7 +122,7 @@ class FieldDAO(private var dao: DAO)
     fun getFields(study : Study): ArrayList<Field>
     {
         val fields = ArrayList<Field>()
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}'"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE}"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
