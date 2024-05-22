@@ -352,6 +352,7 @@
     <string name="importing_locations">"Importing Locations..."</string>
     <string name="saving_configuration">"Saving Configuration..."</string>
     <string name="polygon_is_self_intersecting">"A polygon based on these points will be self-intersecting"</string>
+    <string name="no_eligible_households">"There are no eligible households to sample."</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

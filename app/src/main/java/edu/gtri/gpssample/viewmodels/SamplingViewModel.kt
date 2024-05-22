@@ -2,6 +2,7 @@ package edu.gtri.gpssample.viewmodels
 
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -465,8 +466,6 @@ class SamplingViewModel : ViewModel()
                                 if (validRule)
                                 {
                                     validFilterOperator = true
-//                                    sampleItem.enumerationEligibleForSampling = true
-//                                    validSamples.add(sampleItem)
                                 }
                             }
                             else
@@ -557,7 +556,14 @@ class SamplingViewModel : ViewModel()
                     else -> {}
                 }
 
-                if (sampleSize > 0)
+                if (sampleSize == 0)
+                {
+                    val fragment = currentFragment as? CreateSampleFragment
+                    fragment?.let { fragment ->
+                        Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                else
                 {
                     val sampledIndices = ArrayList<Int>()
 
@@ -576,9 +582,7 @@ class SamplingViewModel : ViewModel()
                     }
 
                     val fragment = currentFragment as? CreateSampleFragment
-                    fragment?.let {
-                        it.sampleGenerated()
-                    }
+                    fragment?.sampleGenerated()
                 }
             }
         }
