@@ -52,7 +52,7 @@ class PerformMultiCollectionAdapter( var enumerationItems: List<EnumerationItem>
             holder.nameTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
         }
 
-        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+        if (enumerationItem.collectionState == CollectionState.Complete)
         {
             holder.checkImageView.visibility = View.VISIBLE
         }
