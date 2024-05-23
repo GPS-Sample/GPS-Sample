@@ -286,15 +286,18 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                     allPolylineAnnotations.add( it )
                 }
 
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(currentZoomLevel)
-                        .center(point)
-                        .build()
+                if (enumArea.uuid == config.selectedEnumAreaUuid)
+                {
+                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                        val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                        val cameraPosition = CameraOptions.Builder()
+                            .zoom(currentZoomLevel)
+                            .center(point)
+                            .build()
 
-                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                        binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                    }
                 }
             }
         }
