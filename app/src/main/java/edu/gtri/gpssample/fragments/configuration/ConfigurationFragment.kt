@@ -463,14 +463,13 @@ class ConfigurationFragment : Fragment(),
                                     DAO.instance().writableDatabase.endTransaction()
 
                                     DAO.configDAO.getConfig( config.uuid )?.let {
-                                        sharedViewModel.setCurrentConfig(it)
-                                    }
-
-                                    activity!!.runOnUiThread {
-                                        updateOverview()
-                                        binding.overlayView.visibility = View.GONE
-                                        enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
-                                        InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+                                        activity!!.runOnUiThread {
+                                            sharedViewModel.setCurrentConfig(it)
+                                            updateOverview()
+                                            binding.overlayView.visibility = View.GONE
+                                            enumerationAreasAdapter.updateEnumAreas(it.enumAreas)
+                                            InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+                                        }
                                     }
                                 }
                             }.start()

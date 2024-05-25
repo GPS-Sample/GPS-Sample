@@ -419,21 +419,19 @@ class ManageConfigurationsFragment : Fragment(),
                             {
                                 DAO.instance().writableDatabase.beginTransaction()
 
-                                val savedConfig = DAO.configDAO.createOrUpdateConfig( config )
+                                DAO.configDAO.createOrUpdateConfig( config )
 
                                 DAO.instance().writableDatabase.setTransactionSuccessful()
                                 DAO.instance().writableDatabase.endTransaction()
 
                                 activity!!.runOnUiThread {
                                     binding.overlayView.visibility = View.GONE
-
-                                    savedConfig?.let { savedConfig ->
-                                        configurations = DAO.configDAO.getConfigs()
-                                        sharedViewModel.setCurrentConfig( savedConfig )
-                                        manageConfigurationsAdapter.updateConfigurations( configurations )
-
-                                        didReceiveConfiguration(false )
+                                    configurations = DAO.configDAO.getConfigs()
+                                    manageConfigurationsAdapter.updateConfigurations( configurations )
+                                    configurations.find{ item -> item.uuid == config.uuid }?.let {
+                                        sharedViewModel.setCurrentConfig( it )
                                     }
+                                    didReceiveConfiguration(false )
                                 }
                             }
                         }.start()
