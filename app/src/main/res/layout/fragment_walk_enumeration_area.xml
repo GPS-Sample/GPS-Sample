@@ -22,16 +22,28 @@
         <FrameLayout
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp">
 
-            <com.mapbox.maps.MapView
-                android:id="@+id/map_view"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                mapbox:mapbox_cameraTargetLat="33.77577524978659"
-                mapbox:mapbox_cameraTargetLng="-84.39630379821243"
-                mapbox:mapbox_cameraZoom="9.0">
-            </com.mapbox.maps.MapView>
+                android:layout_height="match_parent">
+
+                <com.mapbox.maps.MapView
+                    android:id="@+id/map_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    mapbox:mapbox_cameraTargetLat="33.77577524978659"
+                    mapbox:mapbox_cameraTargetLng="-84.39630379821243"
+                    mapbox:mapbox_cameraZoom="9.0">
+                </com.mapbox.maps.MapView>
+
+                <View
+                    android:visibility="gone"
+                    android:id="@+id/overlay_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </View>
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/legend_text_view"

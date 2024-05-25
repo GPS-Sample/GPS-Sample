@@ -36,6 +36,7 @@ import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
+import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -59,6 +60,7 @@ import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
 class WalkEnumerationAreaFragment : Fragment(),
+    View.OnTouchListener,
     OnCameraChangeListener,
     InputDialog.InputDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
@@ -87,7 +89,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
-    private val test = "test-OFF"
+    private var debug = false
     private val kClearMapTag = 1
     private val kDeletePointTag = 2
 
@@ -96,6 +98,11 @@ class WalkEnumerationAreaFragment : Fragment(),
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        if (BuildConfig.DEBUG)
+        {
+            debug = true
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -169,37 +176,25 @@ class WalkEnumerationAreaFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
+        binding.overlayView.setOnTouchListener(this)
+
         binding.addPointButton.setOnClickListener {
-            currentGPSLocation?.let { point ->
-
-                if (test == "test-1")
+            if (debug)
+            {
+                if (binding.overlayView.visibility == View.VISIBLE)
                 {
-                    createTest1Point(point)?.let {
-                        polyLinePoints.add( it )
-                        polylineAnnotation.points = polyLinePoints
-                        polylineAnnotationManager.update(polylineAnnotation)
-
-                        if (polyLinePoints.size == 1)
-                        {
-                            startPointAnnotation = mapboxManager.addMarker( it, R.drawable.location_blue )
-                        }
-                    }
-                }
-                else if (test == "test-2")
-                {
-                    createTest2Point(point)?.let {
-                        polyLinePoints.add( it )
-                        polylineAnnotation.points = polyLinePoints
-                        polylineAnnotationManager.update(polylineAnnotation)
-
-                        if (polyLinePoints.size == 1)
-                        {
-                            startPointAnnotation = mapboxManager.addMarker( it, R.drawable.location_blue )
-                        }
-                    }
+                    binding.overlayView.visibility = View.GONE
+                    binding.addPointButton.setBackgroundTintList(defaultColorList);
                 }
                 else
                 {
+                    binding.overlayView.visibility = View.VISIBLE
+                    binding.addPointButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                }
+            }
+            else
+            {
+                currentGPSLocation?.let { point ->
                     polyLinePoints.add( point )
                     polylineAnnotation.points = polyLinePoints
                     polylineAnnotationManager.update(polylineAnnotation)
@@ -223,6 +218,9 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
 
         binding.deletePointButton.setOnClickListener {
+            binding.overlayView.visibility = View.GONE
+            binding.addPointButton.setBackgroundTintList(defaultColorList);
+
             if (polyLinePoints.size > 0)
             {
                 ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_point), resources.getString(R.string.no), resources.getString(R.string.yes), kDeletePointTag, this@WalkEnumerationAreaFragment)
@@ -230,6 +228,8 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
 
         binding.deleteEverythingButton.setOnClickListener {
+            binding.overlayView.visibility = View.GONE
+            binding.addPointButton.setBackgroundTintList(defaultColorList);
             ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), kClearMapTag, this@WalkEnumerationAreaFragment)
         }
 
@@ -280,54 +280,6 @@ class WalkEnumerationAreaFragment : Fragment(),
                 refreshMap()
             }
         }
-    }
-
-    fun createTest1Point( point: com.mapbox.geojson.Point ) : com.mapbox.geojson.Point?
-    {
-        var p: com.mapbox.geojson.Point? = null
-
-        if (polyLinePoints.size == 0)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()+0.1 )
-        }
-        else if (polyLinePoints.size == 1)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()+0.1 )
-        }
-        else if (polyLinePoints.size == 2)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()-0.1 )
-        }
-        else if (polyLinePoints.size == 3)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()-0.1 )
-        }
-
-        return p
-    }
-
-    fun createTest2Point( point: com.mapbox.geojson.Point ) : com.mapbox.geojson.Point?
-    {
-        var p: com.mapbox.geojson.Point? = null
-
-        if (polyLinePoints.size == 0)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()+0.3 )
-        }
-        else if (polyLinePoints.size == 1)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()+0.3 )
-        }
-        else if (polyLinePoints.size == 2)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()+0.1, point.latitude()+0.1 )
-        }
-        else if (polyLinePoints.size == 3)
-        {
-            p = com.mapbox.geojson.Point.fromLngLat( point.longitude()-0.1, point.latitude()+0.1 )
-        }
-
-        return p
     }
 
     override fun onResume()
@@ -686,6 +638,46 @@ class WalkEnumerationAreaFragment : Fragment(),
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
         sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+    }
+
+    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
+    {
+        p1?.let { p1 ->
+            if (p1.action == MotionEvent.ACTION_DOWN)
+            {
+                binding.overlayView.visibility = View.GONE
+                binding.addPointButton.setBackgroundTintList(defaultColorList)
+
+                binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))?.let { point ->
+                    val radius = 1000
+                    val r_earth = 6378000.0
+
+                    var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                    var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                    val northEast = LatLon( 0, latitude, longitude )
+
+                    latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                    longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                    val southWest = LatLon( 0, latitude, longitude )
+
+                    polyLinePoints.clear()
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
+
+                    polylineAnnotation.points = polyLinePoints
+                    polylineAnnotationManager.update(polylineAnnotation)
+
+                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+
+                    refreshMap()
+                }
+            }
+        }
+
+        return true
     }
 
     override fun onDestroyView()
