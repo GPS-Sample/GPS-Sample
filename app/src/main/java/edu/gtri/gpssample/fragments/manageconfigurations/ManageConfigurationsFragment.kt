@@ -134,6 +134,11 @@ class ManageConfigurationsFragment : Fragment(),
             }
         }
 
+        if (BuildConfig.DEBUG)
+        {
+            binding.createButton.visibility = View.VISIBLE
+        }
+
         binding.addButton.setOnClickListener {
             sharedViewModel.createNewConfiguration()
             findNavController().navigate(R.id.action_navigate_to_CreateConfigurationFragment)

@@ -8,6 +8,7 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -82,6 +83,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     private val binding get() = _binding!!
     private var showCurrentLocation = true
     private var currentGPSAccuracy: Int? = null
+    private var point: com.mapbox.geojson.Point? = null
     private var currentGPSLocation: com.mapbox.geojson.Point? = null
     private var _binding: FragmentWalkEnumerationAreaBinding? = null
     private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
@@ -89,20 +91,16 @@ class WalkEnumerationAreaFragment : Fragment(),
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
-    private var debug = false
     private val kClearMapTag = 1
     private val kDeletePointTag = 2
+    private val kEnumAreaName = 3
+    private val kEnumAreaRadius = 4
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
-
-        if (BuildConfig.DEBUG)
-        {
-            debug = true
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -179,7 +177,7 @@ class WalkEnumerationAreaFragment : Fragment(),
         binding.overlayView.setOnTouchListener(this)
 
         binding.addPointButton.setOnClickListener {
-            if (debug)
+            if (BuildConfig.DEBUG)
             {
                 if (binding.overlayView.visibility == View.VISIBLE)
                 {
@@ -275,7 +273,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                 // close the polygon
                 polyLinePoints.add( polyLinePoints[0] )
 
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, this, false )
 
                 refreshMap()
             }
@@ -405,53 +403,85 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
-        val vertices = ArrayList<LatLon>()
-
-        var creationDate = Date().time
-
-        for (point in polyLinePoints)
+        if (tag == kEnumAreaName)
         {
-            vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
-        }
+            val vertices = ArrayList<LatLon>()
 
-        polyLinePoints.clear()
-        polylineAnnotation.points = polyLinePoints
-        polylineAnnotationManager.update(polylineAnnotation)
+            var creationDate = Date().time
 
-        startPointAnnotation?.let {
-            pointAnnotationManager.delete( it )
-            startPointAnnotation = null
-        }
-
-        if (vertices.size > 2)
-        {
-            var name2 = name
-
-            if (name2.isEmpty())
+            for (point in polyLinePoints)
             {
-                name2 = "${resources.getString(R.string.enumeration_area)} 1"
+                vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
             }
 
-            val enumArea = EnumArea( config.uuid, name2, vertices )
-            config.enumAreas.add( enumArea )
+            polyLinePoints.clear()
+            polylineAnnotation.points = polyLinePoints
+            polylineAnnotationManager.update(polylineAnnotation)
 
-            val latLngBounds = GeoUtils.findGeobounds(vertices)
-            val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-            val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            startPointAnnotation?.let {
+                pointAnnotationManager.delete( it )
+                startPointAnnotation = null
+            }
 
-            config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
+            if (vertices.size > 2)
+            {
+                var name2 = name
 
-            DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
-                config.enumAreas[0].let { enumArea ->
-                    DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
-                        enumArea.enumerationTeams.add( enumerationTeam )
+                if (name2.isEmpty())
+                {
+                    name2 = "${resources.getString(R.string.enumeration_area)} 1"
+                }
+
+                val enumArea = EnumArea( config.uuid, name2, vertices )
+                config.enumAreas.add( enumArea )
+
+                val latLngBounds = GeoUtils.findGeobounds(vertices)
+                val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+                config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
+
+                DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
+                    config.enumAreas[0].let { enumArea ->
+                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen Team", enumArea.vertices, ArrayList<Location>()))?.let { enumerationTeam ->
+                            enumArea.enumerationTeams.add( enumerationTeam )
+                        }
                     }
                 }
-            }
 
-            binding.saveButton.isEnabled = false
-            binding.addPointButton.isEnabled = false
-            binding.deletePointButton.isEnabled = false
+                binding.saveButton.isEnabled = false
+                binding.addPointButton.isEnabled = false
+                binding.deletePointButton.isEnabled = false
+            }
+        }
+        else
+        {
+            name.toDoubleOrNull()?.let {
+                val radius = it * 1000
+                val r_earth = 6378000.0
+
+                point?.let { point ->
+                    var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                    var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                    val northEast = LatLon( 0, latitude, longitude )
+
+                    latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                    longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                    val southWest = LatLon( 0, latitude, longitude )
+
+                    polyLinePoints.clear()
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude ))
+                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
+
+                    polylineAnnotation.points = polyLinePoints
+                    polylineAnnotationManager.update(polylineAnnotation)
+
+                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, this, false )
+                }
+            }
         }
 
         refreshMap()
@@ -516,17 +546,17 @@ class WalkEnumerationAreaFragment : Fragment(),
         MapboxManager.cancelTilePackDownload()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-    {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
-        {
-            data?.data?.let { uri ->
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+//    {
+//        super.onActivityResult(requestCode, resultCode, data)
+//
+//        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
+//        {
+//            data?.data?.let { uri ->
+//                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
+//            }
+//        }
+//    }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
         binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
@@ -648,32 +678,10 @@ class WalkEnumerationAreaFragment : Fragment(),
                 binding.overlayView.visibility = View.GONE
                 binding.addPointButton.setBackgroundTintList(defaultColorList)
 
-                binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))?.let { point ->
-                    val radius = 1000
-                    val r_earth = 6378000.0
+                point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
 
-                    var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
-                    var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                    val northEast = LatLon( 0, latitude, longitude )
-
-                    latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
-                    longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                    val southWest = LatLon( 0, latitude, longitude )
-
-                    polyLinePoints.clear()
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
-
-                    polylineAnnotation.points = polyLinePoints
-                    polylineAnnotationManager.update(polylineAnnotation)
-
-                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
-
-                    refreshMap()
-                }
+                val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@WalkEnumerationAreaFragment )
+                inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             }
         }
 
