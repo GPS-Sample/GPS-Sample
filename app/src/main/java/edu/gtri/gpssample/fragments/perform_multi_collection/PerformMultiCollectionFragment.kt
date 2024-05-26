@@ -132,7 +132,7 @@ class PerformMultiCollectionFragment : Fragment(),
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformMultiCollectionFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem)
