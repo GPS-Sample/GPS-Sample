@@ -134,7 +134,7 @@ class ManageConfigurationsFragment : Fragment(),
             }
         }
 
-        if (BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG && (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString()))
         {
             binding.createButton.visibility = View.VISIBLE
         }
