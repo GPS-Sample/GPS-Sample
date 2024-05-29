@@ -32,7 +32,7 @@ class AboutFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getBoolean(Keys.kIsOnBoarding.toString())?.let { isOnBoarding ->
+        arguments?.getBoolean(Keys.kIsOnBoarding.value)?.let { isOnBoarding ->
             this.isOnBoarding = isOnBoarding
         }
 
@@ -47,7 +47,7 @@ class AboutFragment : Fragment()
             if (isOnBoarding)
             {
                 val bundle = Bundle()
-                bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
+                bundle.putBoolean( Keys.kIsOnBoarding.value, true )
                 findNavController().navigate(R.id.action_navigate_to_TermsFragment,bundle)
             }
             else

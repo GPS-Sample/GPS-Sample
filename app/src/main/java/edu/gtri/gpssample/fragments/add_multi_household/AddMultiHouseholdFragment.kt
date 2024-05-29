@@ -47,7 +47,7 @@ class AddMultiHouseholdFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
+        arguments?.getBoolean(Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
         }
 
@@ -117,7 +117,7 @@ class AddMultiHouseholdFragment : Fragment()
     {
         sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
         val bundle = Bundle()
-        bundle.putBoolean( Keys.kEditMode.toString(), editMode )
+        bundle.putBoolean( Keys.kEditMode.value, editMode )
         findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
     }
 

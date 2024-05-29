@@ -1,11 +1,11 @@
 package edu.gtri.gpssample.constants
 
-enum class Role {
-    Undefined,
-    Admin,
-    Supervisor,
-    Enumerator,
-    DataCollector
+enum class Role(val value: String) {
+    Undefined("Undefined"),
+    Admin("Admin"),
+    Supervisor("Supervisor"),
+    Enumerator("Enumerator"),
+    DataCollector("DataCollector")
 }
 
 object RoleConverter
@@ -15,9 +15,9 @@ object RoleConverter
         var role : Role = Role.Undefined
         when(roleString)
         {
-            Role.Admin.toString() -> role = Role.Admin
-            Role.Supervisor.toString() -> role = Role.Supervisor
-            Role.Enumerator.toString() -> role = Role.Enumerator
+            Role.Admin.value -> role = Role.Admin
+            Role.Supervisor.value -> role = Role.Supervisor
+            Role.Enumerator.value -> role = Role.Enumerator
         }
         return role
     }

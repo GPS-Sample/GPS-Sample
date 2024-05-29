@@ -45,7 +45,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getString(Keys.kRole.toString())?.let { role ->
+        arguments?.getString(Keys.kRole.value)?.let { role ->
             this.role = role
         }
 
@@ -55,7 +55,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             return
         }
 
-        binding.titleTextView.text = role.toString() + " " + resources.getString(R.string.sign_up)
+        binding.titleTextView.text = role + " " + resources.getString(R.string.sign_up)
 
         ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
             .also { adapter ->
@@ -135,7 +135,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
-                editor.putString( Keys.kUserName.toString(), name )
+                editor.putString( Keys.kUserName.value, name )
                 editor.commit()
 
                 DAO.deleteAll( true )
@@ -144,7 +144,7 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
                 DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()
-                bundle.putString( Keys.kRole.toString(), role )
+                bundle.putString( Keys.kRole.value, role )
 
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }

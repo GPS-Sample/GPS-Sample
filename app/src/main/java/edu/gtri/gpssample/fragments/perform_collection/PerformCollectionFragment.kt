@@ -94,20 +94,20 @@ class PerformCollectionFragment : Fragment(),
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 2
-    private val kFragmentResultListener = "PerformCollectionFragment"
+    private val fragmentResultListener = "PerformCollectionFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
-            bundle.getString( Keys.kRequest.toString() )?.let { request ->
+        setFragmentResultListener( fragmentResultListener ) { key, bundle ->
+            bundle.getString( Keys.kRequest.value )?.let { request ->
                 sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                     if (gpsAccuracyIsGood() && gpsLocationIsGood(location))
                     {
                         when (request)
                         {
-                            Keys.kAdditionalInfoRequest.toString() -> AdditionalInfoDialog(activity, "", "", this)
-                            Keys.kLaunchSurveyRequest.toString() -> SurveyLaunchNotificationDialog(activity!!, this)
+                            Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
+                            Keys.kLaunchSurveyRequest.value -> SurveyLaunchNotificationDialog(activity!!, this)
                         }
                     }
                     else if (!gpsAccuracyIsGood())
@@ -257,8 +257,8 @@ class PerformCollectionFragment : Fragment(),
                             if (count > 1)
                             {
                                 val bundle = Bundle()
-                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.toString(), gpsAccuracyIsGood())
-                                bundle.putBoolean( Keys.kGpsLocationIsGood.toString(), gpsLocationIsGood( location ))
+                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
+                                bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
 
                                 findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
                             }
@@ -270,9 +270,9 @@ class PerformCollectionFragment : Fragment(),
                                     (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
 
                                     val bundle = Bundle()
-                                    bundle.putBoolean( Keys.kEditMode.toString(), false )
-                                    bundle.putBoolean( Keys.kCollectionMode.toString(), true )
-                                    bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
+                                    bundle.putBoolean( Keys.kEditMode.value, false )
+                                    bundle.putBoolean( Keys.kCollectionMode.value, true )
+                                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                                 }
                             }
@@ -564,9 +564,9 @@ class PerformCollectionFragment : Fragment(),
                 (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
 
                 val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.toString(), false )
-                bundle.putBoolean( Keys.kCollectionMode.toString(), true )
-                bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
+                bundle.putBoolean( Keys.kEditMode.value, false )
+                bundle.putBoolean( Keys.kCollectionMode.value, true )
+                bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
             }
         }
@@ -675,15 +675,15 @@ class PerformCollectionFragment : Fragment(),
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
 
                 val jsonObject = JSONObject(payload);
 
                 Log.d("xxx", jsonObject.toString(2))
 
-                val ssid = jsonObject.getString(Keys.kSSID.toString())
-                val pass = jsonObject.getString(Keys.kPass.toString())
-                val serverIp = jsonObject.getString(Keys.kIpAddress.toString())
+                val ssid = jsonObject.getString(Keys.kSSID.value)
+                val pass = jsonObject.getString(Keys.kPass.value)
+                val serverIp = jsonObject.getString(Keys.kIpAddress.value)
 
                 Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
 

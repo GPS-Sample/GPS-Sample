@@ -532,7 +532,7 @@ class PerformEnumerationFragment : Fragment(),
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
 
             val bundle = Bundle()
-            bundle.putBoolean( Keys.kEditMode.toString(), gpsLocationIsGood( location ))
+            bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
 
             if (location.enumerationItems.isEmpty())
             {
@@ -671,7 +671,7 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                 location.isMultiFamily = false
                 val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.toString(), gpsLocationIsGood( location ))
+                bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
             }
 
@@ -771,7 +771,7 @@ class PerformEnumerationFragment : Fragment(),
                     sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                         location.isMultiFamily = true
                         val bundle = Bundle()
-                        bundle.putBoolean( Keys.kEditMode.toString(), gpsLocationIsGood( location ))
+                        bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
                         findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
                     }
                 }
@@ -852,15 +852,15 @@ class PerformEnumerationFragment : Fragment(),
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
 
                 val jsonObject = JSONObject(payload);
 
                 Log.d("xxx", jsonObject.toString(2))
 
-                val ssid = jsonObject.getString(Keys.kSSID.toString())
-                val pass = jsonObject.getString(Keys.kPass.toString())
-                val serverIp = jsonObject.getString(Keys.kIpAddress.toString())
+                val ssid = jsonObject.getString(Keys.kSSID.value)
+                val pass = jsonObject.getString(Keys.kPass.value)
+                val serverIp = jsonObject.getString(Keys.kIpAddress.value)
 
                 Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
 

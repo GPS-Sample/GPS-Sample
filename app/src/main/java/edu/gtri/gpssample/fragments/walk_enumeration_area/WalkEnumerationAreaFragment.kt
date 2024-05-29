@@ -394,7 +394,7 @@ class WalkEnumerationAreaFragment : Fragment(),
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
                 inputDialog?.editText?.let { editText ->
                     editText.setText( payload.toString())
                 }

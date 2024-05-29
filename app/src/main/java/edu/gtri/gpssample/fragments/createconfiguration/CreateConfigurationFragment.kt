@@ -150,7 +150,7 @@ class CreateConfigurationFragment : Fragment(),
 
         binding.mapView.getMapboxMap().addOnMapClickListener {
             val bundle = Bundle()
-            bundle.putBoolean( Keys.kEditMode.toString(), true )
+            bundle.putBoolean( Keys.kEditMode.value, true )
             findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
             return@addOnMapClickListener true
         }

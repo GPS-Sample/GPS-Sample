@@ -61,7 +61,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
             override fun handleOnBackPressed()
             {
                 (activity!!.application as? MainApplication)?.user?.let { user ->
-                    if (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString())
+                    if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
                     {
                         findNavController().popBackStack(R.id.ConfigurationFragment, false)
                     }
@@ -138,7 +138,7 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
             16908332-> // TODO: use R.id.?
             {
                 (activity!!.application as? MainApplication)?.user?.let { user ->
-                    if (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString())
+                    if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
                     {
                         findNavController().navigate(R.id.action_navigate_to_ConfigurationFragment)
                         return false

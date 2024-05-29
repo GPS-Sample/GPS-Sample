@@ -80,7 +80,7 @@ class ManageConfigurationsFragment : Fragment(),
         clearFragmentResultListener( this.javaClass.simpleName )
 
         setFragmentResultListener( this.javaClass.simpleName ) { key, bundle ->
-            didReceiveConfiguration( bundle.getBoolean(Keys.kError.toString()))
+            didReceiveConfiguration( bundle.getBoolean(Keys.kError.value))
             clearFragmentResult( this.javaClass.simpleName )
         }
     }
@@ -150,7 +150,7 @@ class ManageConfigurationsFragment : Fragment(),
             {
                 sharedViewModel.setCurrentConfig( configurations[0])
                 val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.toString(), true )
+                bundle.putBoolean( Keys.kEditMode.value, true )
                 findNavController().navigate(R.id.action_navigate_to_WalkEnumerationAreaFragment, bundle)
             }
         }
@@ -343,15 +343,15 @@ class ManageConfigurationsFragment : Fragment(),
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
 
                 val jsonObject = JSONObject(payload);
 
                 Log.d("xxx", jsonObject.toString(2))
 
-                val ssid = jsonObject.getString(Keys.kSSID.toString())
-                val pass = jsonObject.getString(Keys.kPass.toString())
-                val serverIp = jsonObject.getString(Keys.kIpAddress.toString())
+                val ssid = jsonObject.getString(Keys.kSSID.value)
+                val pass = jsonObject.getString(Keys.kPass.value)
+                val serverIp = jsonObject.getString(Keys.kIpAddress.value)
 
                 Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
 

@@ -47,21 +47,21 @@ class PerformMultiCollectionFragment : Fragment(),
     private var _binding: FragmentPerformMultiCollectionBinding? = null
     private val binding get() = _binding!!
 
-    private val kFragmentResultListener = "PerformMultiCollectionFragment"
+    private val fragmentResultListener = "PerformMultiCollectionFragment"
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
 
-        setFragmentResultListener( kFragmentResultListener ) { key, bundle ->
-            bundle.getString( Keys.kRequest.toString() )?.let { request ->
+        setFragmentResultListener( fragmentResultListener ) { key, bundle ->
+            bundle.getString( Keys.kRequest.value )?.let { request ->
                 sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                     if (gpsAccuracyIsGood && gpsLocationIsGood)
                     {
                         when (request)
                         {
-                            Keys.kAdditionalInfoRequest.toString() -> AdditionalInfoDialog(activity, "", "", this)
-                            Keys.kLaunchSurveyRequest.toString() -> SurveyLaunchNotificationDialog(activity!!, this)
+                            Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
+                            Keys.kLaunchSurveyRequest.value -> SurveyLaunchNotificationDialog(activity!!, this)
                         }
                     }
                     else if (!gpsAccuracyIsGood)
@@ -91,11 +91,11 @@ class PerformMultiCollectionFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getBoolean(Keys.kGpsAccuracyIsGood.toString())?.let { gpsAccuracyIsGood ->
+        arguments?.getBoolean(Keys.kGpsAccuracyIsGood.value)?.let { gpsAccuracyIsGood ->
             this.gpsAccuracyIsGood = gpsAccuracyIsGood
         }
 
-        arguments?.getBoolean(Keys.kGpsLocationIsGood.toString())?.let { gpsLocationIsGood ->
+        arguments?.getBoolean(Keys.kGpsLocationIsGood.value)?.let { gpsLocationIsGood ->
             this.gpsLocationIsGood = gpsLocationIsGood
         }
 
@@ -144,9 +144,9 @@ class PerformMultiCollectionFragment : Fragment(),
             sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 
             val bundle = Bundle()
-            bundle.putBoolean( Keys.kEditMode.toString(), false )
-            bundle.putBoolean( Keys.kCollectionMode.toString(), true )
-            bundle.putString( Keys.kFragmentResultListener.toString(), kFragmentResultListener )
+            bundle.putBoolean( Keys.kEditMode.value, false )
+            bundle.putBoolean( Keys.kCollectionMode.value, true )
+            bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
             findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
         }
     }

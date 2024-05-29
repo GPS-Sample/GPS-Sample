@@ -77,15 +77,15 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getBoolean( Keys.kEditMode.toString())?.let { editMode ->
+        arguments?.getBoolean( Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
         }
 
-        arguments?.getString( Keys.kFragmentResultListener.toString())?.let { fragmentResultListener ->
+        arguments?.getString( Keys.kFragmentResultListener.value)?.let { fragmentResultListener ->
             this.fragmentResultListener = fragmentResultListener
         }
 
-        arguments?.getBoolean( Keys.kCollectionMode.toString())?.let { collectionMode ->
+        arguments?.getBoolean( Keys.kCollectionMode.value)?.let { collectionMode ->
             if (collectionMode)
             {
                 binding.launchSurveyButton.visibility = View.VISIBLE
@@ -278,7 +278,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             if (fragmentResultListener.isNotEmpty())
             {
                 val bundle = Bundle()
-                bundle.putString( Keys.kRequest.toString(), Keys.kAdditionalInfoRequest.toString())
+                bundle.putString( Keys.kRequest.value, Keys.kAdditionalInfoRequest.value)
                 setFragmentResult( fragmentResultListener, bundle )
             }
 
@@ -289,7 +289,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             if (fragmentResultListener.isNotEmpty())
             {
                 val bundle = Bundle()
-                bundle.putString( Keys.kRequest.toString(), Keys.kLaunchSurveyRequest.toString())
+                bundle.putString( Keys.kRequest.value, Keys.kLaunchSurveyRequest.value)
                 setFragmentResult( fragmentResultListener, bundle )
             }
 

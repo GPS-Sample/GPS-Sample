@@ -56,7 +56,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getString(Keys.kRole.toString())?.let { role ->
+        arguments?.getString(Keys.kRole.value)?.let { role ->
             this.expectedRole = role
         }
 
@@ -66,10 +66,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             return
         }
 
-        binding.titleTextView.text = expectedRole.toString() + " " + resources.getString(R.string.sign_in)
+        binding.titleTextView.text = expectedRole + " " + resources.getString(R.string.sign_in)
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)
+        val userName = sharedPreferences.getString( Keys.kUserName.value, null)
 
         userName?.let {
             binding.nameEditText.setText( userName )
@@ -146,7 +146,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                 {
                     Toast.makeText(
                         activity!!.applicationContext,
-                        "The expected role for User " + userName + " is: " + user.role.toString() + ".  Please try again.",
+                        "The expected role for User " + userName + " is: " + user.role + ".  Please try again.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -154,7 +154,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                 {
                     val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                     val editor = sharedPreferences.edit()
-                    editor.putString(Keys.kUserName.toString(), userName)
+                    editor.putString(Keys.kUserName.value, userName)
                     editor.commit()
 
                     (activity!!.application as? MainApplication)?.user = user
@@ -164,7 +164,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                     setTitle( user )
 
                     val bundle = Bundle()
-                    bundle.putString(Keys.kRole.toString(), user.role.toString())
+                    bundle.putString(Keys.kRole.value, user.role)
                     findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
                 }
             }
@@ -181,10 +181,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
     {
         when (user.role)
         {
-            Role.Admin.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.admin)}" )
-            Role.Supervisor.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.supervisor)}" )
-            Role.Enumerator.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.enumerator)}" )
-            Role.DataCollector.toString() -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.data_collector)}" )
+            Role.Admin.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.admin)}" )
+            Role.Supervisor.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.supervisor)}" )
+            Role.Enumerator.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.enumerator)}" )
+            Role.DataCollector.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.data_collector)}" )
         }
     }
 
@@ -237,7 +237,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             setTitle( user )
 
             val bundle = Bundle()
-            bundle.putString(Keys.kRole.toString(), user.role.toString())
+            bundle.putString(Keys.kRole.value, user.role)
             findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
         }
     }

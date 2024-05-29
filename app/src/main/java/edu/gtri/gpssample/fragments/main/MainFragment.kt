@@ -60,12 +60,12 @@ class MainFragment : Fragment()
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
 
-        val termsAccepted = sharedPreferences.getBoolean( Keys.kTermsAccepted.toString(), false )
+        val termsAccepted = sharedPreferences.getBoolean( Keys.kTermsAccepted.value, false )
 
         if (!termsAccepted)
         {
             val bundle = Bundle()
-            bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
+            bundle.putBoolean( Keys.kIsOnBoarding.value, true )
             findNavController().navigate(R.id.action_navigate_to_AboutFragment,bundle)
             return
         }
@@ -78,17 +78,17 @@ class MainFragment : Fragment()
             p += x.get(0)
             p += x.get(6)
 
-            val user = User( "@test-admin", p.toInt(), Role.Admin.toString(), "", "", false )
+            val user = User( "@test-admin", p.toInt(), Role.Admin.value, "", "", false )
             DAO.userDAO.createUser( user )
         }
 
-        val userName = sharedPreferences.getString( Keys.kUserName.toString(), null)
+        val userName = sharedPreferences.getString( Keys.kUserName.value, null)
 
         userName?.let {
             DAO.userDAO.getUser(userName)?.let { user ->
                 when (user.role)
                 {
-                    Role.Enumerator.toString() ->
+                    Role.Enumerator.value ->
                     {
                         binding.enumeratorButton.isChecked = true
                         binding.adminButton.visibility = View.GONE
@@ -96,7 +96,7 @@ class MainFragment : Fragment()
                         binding.dataCollectorButton.visibility = View.GONE
                         binding.signUpTextView.visibility = View.GONE
                     }
-                    Role.DataCollector.toString() ->
+                    Role.DataCollector.value ->
                     {
                         binding.dataCollectorButton.isChecked = true
                         binding.adminButton.visibility = View.GONE
@@ -113,19 +113,19 @@ class MainFragment : Fragment()
 
             if (binding.adminButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Keys.kRole.toString(), Role.Admin.toString())
+                bundle.putString( Keys.kRole.value, Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Keys.kRole.toString(), Role.Supervisor.toString())
+                bundle.putString( Keys.kRole.value, Role.Supervisor.value)
             }
             else if (binding.enumeratorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Keys.kRole.toString(), Role.Enumerator.toString())
+                bundle.putString( Keys.kRole.value, Role.Enumerator.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
                 bundle = Bundle()
-                bundle.putString( Keys.kRole.toString(), Role.DataCollector.toString())
+                bundle.putString( Keys.kRole.value, Role.DataCollector.value)
             }
 
             if (bundle == null)
@@ -143,19 +143,19 @@ class MainFragment : Fragment()
 
             if (binding.adminButton.isChecked) {
                 bundl = Bundle()
-                bundl.putString( Keys.kRole.toString(), Role.Admin.toString())
+                bundl.putString( Keys.kRole.value, Role.Admin.value)
             }
             else if (binding.supervisorButton.isChecked) {
                 bundl = Bundle()
-                bundl.putString( Keys.kRole.toString(), Role.Supervisor.toString())
+                bundl.putString( Keys.kRole.value, Role.Supervisor.value)
             }
             else if (binding.enumeratorButton.isChecked) {
                 bundl = Bundle()
-                bundl.putString( Keys.kRole.toString(), Role.Enumerator.toString())
+                bundl.putString( Keys.kRole.value, Role.Enumerator.value)
             }
             else if (binding.dataCollectorButton.isChecked) {
                 bundl = Bundle()
-                bundl.putString( Keys.kRole.toString(), Role.DataCollector.toString())
+                bundl.putString( Keys.kRole.value, Role.DataCollector.value)
             }
 
             if (bundl == null)

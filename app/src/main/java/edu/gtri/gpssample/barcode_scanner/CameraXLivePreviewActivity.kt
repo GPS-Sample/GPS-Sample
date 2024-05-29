@@ -225,7 +225,7 @@ class CameraXLivePreviewActivity :
         Observer { barcode: Barcode? ->
           if (barcode != null) {
             val data = Intent();
-            data.putExtra( Keys.kPayload.toString(), barcode.rawValue!! )
+            data.putExtra( Keys.kPayload.value, barcode.rawValue!! )
             setResult( ResultCode.BarcodeScanned.value, data )
             finish()
             this.overridePendingTransition(R.animator.slide_from_left, R.animator.slide_to_right)

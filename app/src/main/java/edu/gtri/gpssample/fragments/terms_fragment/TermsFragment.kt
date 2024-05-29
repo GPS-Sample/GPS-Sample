@@ -32,7 +32,7 @@ class TermsFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getBoolean(Keys.kIsOnBoarding.toString())?.let { isOnBoarding ->
+        arguments?.getBoolean(Keys.kIsOnBoarding.value)?.let { isOnBoarding ->
             this.isOnBoarding = isOnBoarding
         }
 
@@ -48,11 +48,11 @@ class TermsFragment : Fragment()
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
-                editor.putBoolean(Keys.kTermsAccepted.toString(), true)
+                editor.putBoolean(Keys.kTermsAccepted.value, true)
                 editor.commit()
 
                 val bundle = Bundle()
-                bundle.putBoolean( Keys.kIsOnBoarding.toString(), true )
+                bundle.putBoolean( Keys.kIsOnBoarding.value, true )
                 findNavController().navigate(R.id.action_navigate_to_PrivacyFragment,bundle)
             }
             else

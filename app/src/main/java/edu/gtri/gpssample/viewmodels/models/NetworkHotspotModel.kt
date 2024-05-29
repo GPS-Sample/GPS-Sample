@@ -360,9 +360,9 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
         if(generatedQRCode == null)
         {
             val jsonObject = JSONObject()
-            jsonObject.put(Keys.kSSID.toString(), hotspot.hotspotSSID.value)
-            jsonObject.put(Keys.kPass.toString(), hotspot.hotspotSSIDPassword.value)
-            jsonObject.put(Keys.kIpAddress.toString(), hotspot.hotspotIP.value)
+            jsonObject.put(Keys.kSSID.value, hotspot.hotspotSSID.value)
+            jsonObject.put(Keys.kPass.value, hotspot.hotspotSSIDPassword.value)
+            jsonObject.put(Keys.kIpAddress.value, hotspot.hotspotIP.value)
 
 
             val qrgEncoder =

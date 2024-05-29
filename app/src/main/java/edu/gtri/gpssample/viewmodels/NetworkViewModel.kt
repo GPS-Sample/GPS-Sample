@@ -176,7 +176,7 @@ class NetworkViewModel : ViewModel(), NetworkHotspotModel.NetworkCreationDelegat
                 if (it is ManageConfigurationsFragment)
                 {
                     val bundle = Bundle()
-                    bundle.putBoolean( Keys.kError.toString(), error )
+                    bundle.putBoolean( Keys.kError.value, error )
                     it.setFragmentResult( it.javaClass.simpleName, bundle )
                 }
             }

@@ -31,7 +31,7 @@ class CodeFragment : Fragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getBoolean(Keys.kIsOnBoarding.toString())?.let { isOnBoarding ->
+        arguments?.getBoolean(Keys.kIsOnBoarding.value)?.let { isOnBoarding ->
             this.isOnBoarding = isOnBoarding
         }
 

@@ -151,7 +151,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             return
         }
 
-        arguments?.getBoolean(Keys.kEditMode.toString())?.let { editMode ->
+        arguments?.getBoolean(Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
         }
 
@@ -1080,7 +1080,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.toString())
+                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
                 inputDialog?.editText?.let { editText ->
                     editText.setText( payload.toString())
                 }
