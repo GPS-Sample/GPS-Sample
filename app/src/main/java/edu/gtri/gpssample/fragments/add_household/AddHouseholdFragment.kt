@@ -357,12 +357,6 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
 
         for (fieldData in enumerationItem.fieldDataList) {
             fieldData.field?.let { field ->
-                if (field.type == FieldType.Dropdown)
-                {
-                    fieldData.dropdownIndex?.let {
-                        fieldData.textValue = field.fieldOptions[it].name
-                    }
-                }
                 if (field.required) {
                     when (field.type) {
                         FieldType.Text -> {
@@ -379,6 +373,13 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                         }
                         FieldType.Date -> {
                             if (fieldData.dateValue == null) {
+                                Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
+                                return
+                            }
+                        }
+                        FieldType.Dropdown -> {
+                            if (fieldData.dropdownIndex == null)
+                            {
                                 Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                 return
                             }
