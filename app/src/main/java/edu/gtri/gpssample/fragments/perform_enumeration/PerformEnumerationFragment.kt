@@ -298,7 +298,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 currentGPSAccuracy?.let { accuracy ->
                     currentGPSLocation?.let { point ->
-                        val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), true, "")
+                        val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "")
                         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         enumArea.locations.add(location)
                         sharedViewModel.locationViewModel.setCurrentLocation(location)
@@ -609,7 +609,7 @@ class PerformEnumerationFragment : Fragment(),
                 accuracy = it
             }
 
-            val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), false, "")
+            val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "")
 
             if (gpsLocationIsGood( location ))
             {
@@ -701,7 +701,7 @@ class PerformEnumerationFragment : Fragment(),
                     accuracy = it
                 }
 
-                val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), false, "")
+                val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "")
 
                 DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                 enumArea.locations.add(location)
@@ -752,7 +752,7 @@ class PerformEnumerationFragment : Fragment(),
                 accuracy = it
             }
 
-            val location = Location( LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), false, "")
+            val location = Location( LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), tag.altitude(), false, "")
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
 

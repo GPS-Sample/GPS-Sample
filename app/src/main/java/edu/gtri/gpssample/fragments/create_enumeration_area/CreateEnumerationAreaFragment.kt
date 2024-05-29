@@ -587,7 +587,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             else if (addHousehold)
             {
                 addHousehold = false
-                createLocation( LatLng( point.latitude(), point.longitude()))
+                createLocation( point.latitude(), point.longitude(), point.altitude())
                 refreshMap()
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
                 return true
@@ -842,21 +842,19 @@ class CreateEnumerationAreaFragment : Fragment(),
         allMapTileRegions.addAll( unsavedMapTileRegions )
         return allMapTileRegions
     }
-    fun createLocation( latLng: LatLng )
+    fun createLocation( latitude: Double, longitude: Double, altitude: Double )
     {
-        var enumArea = findEnumAreaOfLocation( config.enumAreas, latLng )
+        var enumArea = findEnumAreaOfLocation( config.enumAreas, LatLng( latitude, longitude ))
 
         if (enumArea == null)
         {
-            enumArea = findEnumAreaOfLocation( unsavedEnumAreas, latLng )
+            enumArea = findEnumAreaOfLocation( unsavedEnumAreas, LatLng( latitude, longitude ))
         }
 
         enumArea?.let{  enumArea ->
-            latLng?.let { latLng ->
-                val location = Location( LocationType.Enumeration, -1, latLng.latitude, latLng.longitude, false, "")
-                enumArea.locations.add(location)
-                refreshMap()
-            }
+            val location = Location( LocationType.Enumeration, -1, latitude, longitude, altitude, false, "")
+            enumArea.locations.add(location)
+            refreshMap()
         }
     }
 
@@ -1343,7 +1341,12 @@ class CreateEnumerationAreaFragment : Fragment(),
                     val geometry1 = geometryFactory.createPoint( coordinate )
                     if (geometry.contains( geometry1 ))
                     {
-                        val location = Location( LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, false, "" )
+                        var altitude: Double = 0.0
+                        point.coordinates.altitude?.let {
+                            altitude = it
+                        }
+
+                        val location = Location( LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, altitude, false, "" )
 
                         enumArea.locations.add( location )
                         break // found! assuming that it can only exist in a single EA, for now!
