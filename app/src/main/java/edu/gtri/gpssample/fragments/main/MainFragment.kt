@@ -70,16 +70,45 @@ class MainFragment : Fragment()
             return
         }
 
-        if (DAO.userDAO.getUser("@test-admin") == null)
-        {
-            val x = id.toString()
-            var p = "" + x.get(9)
-            p += x.get(5)
-            p += x.get(0)
-            p += x.get(6)
+//        if (DAO.userDAO.getUser("@test-admin") == null)
+//        {
+//            val x = id.toString()
+//            var p = "" + x.get(9)
+//            p += x.get(5)
+//            p += x.get(0)
+//            p += x.get(6)
+//
+//            val user = User( "@test-admin", p.toInt(), Role.Admin.value, "", "", false )
+//            DAO.userDAO.createUser( user )
+//        }
 
-            val user = User( "@test-admin", p.toInt(), Role.Admin.value, "", "", false )
-            DAO.userDAO.createUser( user )
+        var highestRole = Role.Undefined
+
+        val users = DAO.userDAO.getUsers()
+
+        users.find{ user ->  user.role == Role.Admin.value}?.let {
+            highestRole = Role.Admin
+        }
+
+        if (highestRole == Role.Undefined)
+        {
+            users.find{ user ->  user.role == Role.Supervisor.value}?.let {
+                highestRole = Role.Supervisor
+            }
+        }
+
+        if (highestRole == Role.Undefined)
+        {
+            users.find{ user ->  user.role == Role.Enumerator.value}?.let {
+                highestRole = Role.Enumerator
+            }
+        }
+
+        if (highestRole == Role.Undefined)
+        {
+            users.find{ user ->  user.role == Role.DataCollector.value}?.let {
+                highestRole = Role.DataCollector
+            }
         }
 
         val userName = sharedPreferences.getString( Keys.kUserName.value, null)
@@ -88,21 +117,50 @@ class MainFragment : Fragment()
             DAO.userDAO.getUser(userName)?.let { user ->
                 when (user.role)
                 {
+                    Role.Admin.value ->
+                    {
+                        binding.adminButton.isChecked = true
+                    }
+                    Role.Supervisor.value ->
+                    {
+                        binding.supervisorButton.isChecked = true
+                        if (highestRole == Role.Supervisor)
+                        {
+                            binding.adminButton.visibility = View.GONE
+                        }
+                    }
                     Role.Enumerator.value ->
                     {
                         binding.enumeratorButton.isChecked = true
-                        binding.adminButton.visibility = View.GONE
-                        binding.supervisorButton.visibility = View.GONE
-                        binding.dataCollectorButton.visibility = View.GONE
-                        binding.signUpTextView.visibility = View.GONE
+                        if (highestRole == Role.Enumerator)
+                        {
+                            binding.adminButton.visibility = View.GONE
+                            binding.supervisorButton.visibility = View.GONE
+                        }
+                        else if (highestRole == Role.Supervisor)
+                        {
+                            binding.adminButton.visibility = View.GONE
+                        }
                     }
                     Role.DataCollector.value ->
                     {
                         binding.dataCollectorButton.isChecked = true
-                        binding.adminButton.visibility = View.GONE
-                        binding.supervisorButton.visibility = View.GONE
-                        binding.enumeratorButton.visibility = View.GONE
-                        binding.signUpTextView.visibility = View.GONE
+                        if (highestRole == Role.DataCollector)
+                        {
+                            binding.adminButton.visibility = View.GONE
+                            binding.supervisorButton.visibility = View.GONE
+                            binding.enumeratorButton.visibility = View.GONE
+                            binding.signUpTextView.visibility = View.GONE
+                        }
+                        else if (highestRole == Role.Enumerator)
+                        {
+                            binding.adminButton.visibility = View.GONE
+                            binding.supervisorButton.visibility = View.GONE
+                        }
+                        else if (highestRole == Role.Supervisor)
+                        {
+                            binding.adminButton.visibility = View.GONE
+                        }
                     }
                 }
             }
