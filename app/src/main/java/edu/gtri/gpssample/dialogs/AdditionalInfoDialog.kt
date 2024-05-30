@@ -56,6 +56,7 @@ class AdditionalInfoDialog
             {
                 if (isChecked)
                 {
+                    notesTextView.setText( "" )
                     incompleteCheckBox.isChecked = false
                     reasonIncompleteLayout.visibility = View.GONE
                 }

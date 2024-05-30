@@ -186,12 +186,22 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             }
         }
 
-        if (enumerationItem.enumerationIncompleteReason.isNotEmpty() || enumerationItem.enumerationNotes.isNotEmpty())
+        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
         {
-            binding.additionalInfoLayout.visibility = View.VISIBLE
             binding.incompleteCheckBox.isChecked = enumerationItem.enumerationIncompleteReason.isNotEmpty()
             binding.notesEditText.setText( enumerationItem.enumerationNotes )
             when (enumerationItem.enumerationIncompleteReason)
+            {
+                "Nobody home" -> binding.nobodyHomeButton.isChecked = true
+                "Home does not exist" -> binding.doesNotExistButton.isChecked = true
+                "Other" -> binding.otherButton.isChecked = true
+            }
+        }
+        else if (enumerationItem.collectionState == CollectionState.Incomplete)
+        {
+            binding.incompleteCheckBox.isChecked = enumerationItem.collectionIncompleteReason.isNotEmpty()
+            binding.notesEditText.setText( enumerationItem.collectionNotes )
+            when (enumerationItem.collectionIncompleteReason)
             {
                 "Nobody home" -> binding.nobodyHomeButton.isChecked = true
                 "Home does not exist" -> binding.doesNotExistButton.isChecked = true
@@ -252,7 +262,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.showAdditionalInfoImageView.visibility = View.GONE
             binding.hideAdditionalInfoImageView.visibility = View.VISIBLE
             binding.defaultInfoLayout.visibility = View.VISIBLE
-            if (enumerationItem.enumerationIncompleteReason.isNotEmpty() || enumerationItem.enumerationNotes.isNotEmpty())
+
+            if (enumerationItem.enumerationState == EnumerationState.Incomplete || enumerationItem.collectionState == CollectionState.Incomplete)
             {
                 binding.additionalInfoLayout.visibility = View.VISIBLE
             }
@@ -297,7 +308,14 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.saveButton.setOnClickListener {
-            AdditionalInfoDialog( activity, enumerationItem.enumerationIncompleteReason, enumerationItem.enumerationNotes, this)
+            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+            {
+                AdditionalInfoDialog( activity, enumerationItem.enumerationIncompleteReason, enumerationItem.enumerationNotes, this)
+            }
+            else
+            {
+                AdditionalInfoDialog( activity, "", "", this)
+            }
         }
     }
 

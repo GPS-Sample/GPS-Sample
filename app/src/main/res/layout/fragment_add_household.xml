@@ -237,7 +237,7 @@
 
                     <CheckBox
                         android:id="@+id/incomplete_check_box"
-                        android:enabled="false"
+                        android:clickable="false"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
                         android:layout_width="match_parent"
@@ -245,7 +245,7 @@
                         android:text="@string/incomplete" />
 
                     <TextView
-                        android:text="@string/reason_incomplete"
+                        android:text="@string/reason_incomplete_label"
                         android:textColor="@color/primary"
                         android:textSize="17sp"
                         android:textStyle="bold"
@@ -258,7 +258,7 @@
                         android:layout_height="wrap_content">
                         <RadioButton
                             android:id="@+id/nobody_home_button"
-                            android:enabled="false"
+                            android:clickable="false"
                             android:layout_marginStart="20dp"
                             android:layout_marginEnd="20dp"
                             android:layout_width="match_parent"
@@ -267,7 +267,7 @@
 
                         <RadioButton
                             android:id="@+id/does_not_exist_button"
-                            android:enabled="false"
+                            android:clickable="false"
                             android:layout_marginStart="20dp"
                             android:layout_marginEnd="20dp"
                             android:layout_width="match_parent"
@@ -276,7 +276,7 @@
 
                         <RadioButton
                             android:id="@+id/other_button"
-                            android:enabled="false"
+                            android:clickable="false"
                             android:layout_marginStart="20dp"
                             android:layout_marginEnd="20dp"
                             android:layout_width="match_parent"
@@ -285,6 +285,7 @@
                     </RadioGroup>
 
                     <TextView
+                        android:id="@+id/notes_text_view"
                         android:text="@string/notes"
                         android:textColor="@color/primary"
                         android:textSize="17sp"
@@ -301,6 +302,7 @@
                         android:layout_marginEnd="20dp"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"/>
+
                 </LinearLayout>
              </LinearLayout>
         </androidx.cardview.widget.CardView>
