@@ -14,7 +14,7 @@ class MapTileRegionDAO(private var dao: DAO)
 
         if (existingMapTileRegion != null)
         {
-            if (!mapTileRegion.equals( existingMapTileRegion ))
+            if (mapTileRegion.doesNotEqual( existingMapTileRegion ))
             {
                 updateMapTileRegion( mapTileRegion, config )
                 Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )

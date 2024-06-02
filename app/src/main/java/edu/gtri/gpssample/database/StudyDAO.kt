@@ -8,11 +8,8 @@ import edu.gtri.gpssample.constants.SampleType
 import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.constants.SamplingMethod
 import edu.gtri.gpssample.constants.SamplingMethodConverter
-import edu.gtri.gpssample.database.models.Config
-import edu.gtri.gpssample.database.models.Field
-import edu.gtri.gpssample.database.models.Rule
+import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.extensions.toBoolean
-import edu.gtri.gpssample.database.models.Study
 
 class StudyDAO(private var dao: DAO)
 {
@@ -22,7 +19,7 @@ class StudyDAO(private var dao: DAO)
 
         if (existingStudy != null)
         {
-            if (!study.equals( existingStudy ))
+            if (study.doesNotEqual( existingStudy ))
             {
                 updateStudy( study )
                 Log.d( "xxx", "Updated Study with ID ${study.uuid}")

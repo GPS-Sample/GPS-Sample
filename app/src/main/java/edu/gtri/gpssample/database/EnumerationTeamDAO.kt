@@ -14,7 +14,7 @@ class EnumerationTeamDAO(private var dao: DAO)
 
         if (existingEnumerationTeam != null)
         {
-            if (!enumerationTeam.equals( existingEnumerationTeam ))
+            if (enumerationTeam.doesNotEqual( existingEnumerationTeam ))
             {
                 updateTeam( enumerationTeam )
                 Log.d( "xxx", "Updated EnumerationTeam with ID ${enumerationTeam.uuid}")

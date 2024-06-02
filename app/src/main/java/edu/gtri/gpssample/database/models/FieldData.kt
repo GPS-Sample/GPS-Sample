@@ -36,21 +36,26 @@ data class FieldData (
             this( UUID.randomUUID().toString(), Date().time, field, name, type,  textValue,
                 numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
 
-    fun equals( fieldData: FieldData ) : Boolean
+    fun equals( other: FieldData ) : Boolean
     {
-        if (this.uuid == fieldData.uuid &&
-            this.name == fieldData.name &&
-            this.type == fieldData.type &&
-            this.textValue == fieldData.textValue &&
-            this.numberValue == fieldData.numberValue &&
-            this.dateValue == fieldData.dateValue &&
-            this.dropdownIndex == fieldData.dropdownIndex &&
-            this.blockNumber == fieldData.blockNumber)
+        if (this.uuid == other.uuid &&
+            this.name == other.name &&
+            this.type == other.type &&
+            this.textValue == other.textValue &&
+            this.numberValue == other.numberValue &&
+            this.dateValue == other.dateValue &&
+            this.dropdownIndex == other.dropdownIndex &&
+            this.blockNumber == other.blockNumber)
         {
             return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( fieldData: FieldData ): Boolean
+    {
+        return !this.equals( fieldData )
     }
 
     fun copy() : FieldData

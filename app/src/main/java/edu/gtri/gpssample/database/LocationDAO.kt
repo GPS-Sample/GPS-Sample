@@ -26,7 +26,7 @@ class LocationDAO(private var dao: DAO)
 
         if (existingLocation != null)
         {
-            if (!location.equals( existingLocation ))
+            if (location.doesNotEqual( existingLocation ))
             {
                 updateLocation( location, enumArea )
                 Log.d( "xxx", "Updated Location with ID ${location.uuid}" )

@@ -14,7 +14,7 @@ class CollectionTeamDAO(private var dao: DAO)
 
         if (existingCollectionTeam != null)
         {
-            if (!collectionTeam.equals( existingCollectionTeam ))
+            if (collectionTeam.doesNotEqual( existingCollectionTeam ))
             {
                 updateTeam( collectionTeam )
                 Log.d( "xxx", "Updated CollectionTeam with ID ${collectionTeam.uuid}" )

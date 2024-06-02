@@ -37,22 +37,24 @@ data class Study(
         return  EncryptionUtil.Encrypt(jsonString,password)
     }
 
-    override fun equals(other: Any?): Boolean
+    fun equals( other: Study ): Boolean
     {
-        if (other is Study)
+        if (this.uuid == other.uuid &&
+            this.creationDate == other.creationDate &&
+            this.name == other.name &&
+            this.samplingMethod == other.samplingMethod &&
+            this.sampleSize == other.sampleSize &&
+            this.sampleType == other.sampleType)
         {
-            if (this.uuid == other.uuid &&
-                this.creationDate == other.creationDate &&
-                this.name == other.name &&
-                this.samplingMethod == other.samplingMethod &&
-                this.sampleSize == other.sampleSize &&
-                this.sampleType == other.sampleType)
-            {
-                return true
-            }
+            return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( study: Study ): Boolean
+    {
+        return !this.equals( study )
     }
 
     companion object

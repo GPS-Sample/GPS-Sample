@@ -20,7 +20,7 @@ class FieldDataDAO(private var dao: DAO)
 
         if (existingFieldData != null)
         {
-            if (!fieldData.equals( existingFieldData ))
+            if (fieldData.doesNotEqual( existingFieldData ))
             {
                 updateFieldData( fieldData )
                 Log.d( "xxx", "Updated FieldData with ID ${fieldData.uuid}" )

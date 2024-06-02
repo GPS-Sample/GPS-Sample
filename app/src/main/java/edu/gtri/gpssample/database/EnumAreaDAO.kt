@@ -16,7 +16,7 @@ class EnumAreaDAO(private var dao: DAO)
 
         if (existingEnumArea != null)
         {
-            if (!enumArea.equals( existingEnumArea ))
+            if (enumArea.doesNotEqual( existingEnumArea ))
             {
                 updateEnumArea( enumArea )
                 Log.d( "xxx", "Updated EnumerationArea with ID ${enumArea.uuid}" )

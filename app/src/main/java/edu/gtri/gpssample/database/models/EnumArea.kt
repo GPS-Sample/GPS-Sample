@@ -33,22 +33,24 @@ data class EnumArea (
     constructor( configUuid: String, name: String, vertices: ArrayList<LatLon>)
             : this(UUID.randomUUID().toString(), Date().time, configUuid, name, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "")
 
-    override fun equals(other: Any?): Boolean
+    fun equals( other: EnumArea ): Boolean
     {
-        if (other is EnumArea)
+        if (this.uuid == other.uuid &&
+            this.creationDate == other.creationDate &&
+            this.configUuid == other.configUuid &&
+            this.name == other.name &&
+            this.selectedEnumerationTeamUuid == other.selectedEnumerationTeamUuid &&
+            this.selectedCollectionTeamUuid == other.selectedCollectionTeamUuid)
         {
-            if (this.uuid == other.uuid &&
-                this.creationDate == other.creationDate &&
-                this.configUuid == other.configUuid &&
-                this.name == other.name &&
-                this.selectedEnumerationTeamUuid == other.selectedEnumerationTeamUuid &&
-                this.selectedCollectionTeamUuid == other.selectedCollectionTeamUuid)
-            {
-                return true
-            }
+            return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( enumArea: EnumArea ): Boolean
+    {
+        return !this.equals( enumArea )
     }
 
     fun pack(password: String) : String

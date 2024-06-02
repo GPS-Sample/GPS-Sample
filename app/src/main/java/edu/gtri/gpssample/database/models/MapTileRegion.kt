@@ -12,20 +12,22 @@ data class MapTileRegion (
 {
     constructor( northEast: LatLon, southWest: LatLon ) : this( UUID.randomUUID().toString(), northEast, southWest )
 
-    override fun equals(other: Any?): Boolean
+    fun equals( other: MapTileRegion ): Boolean
     {
-        if (other is MapTileRegion)
+        if (this.uuid == other.uuid &&
+            this.northEast.latitude == other.northEast.latitude &&
+            this.northEast.longitude == other.northEast.longitude &&
+            this.southWest.latitude == other.southWest.latitude &&
+            this.southWest.longitude == other.southWest.longitude )
         {
-            if (this.uuid == other.uuid &&
-                this.northEast.latitude == other.northEast.latitude &&
-                this.northEast.longitude == other.northEast.longitude &&
-                this.southWest.latitude == other.southWest.latitude &&
-                this.southWest.longitude == other.southWest.longitude )
-            {
-                return true
-            }
+            return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( mapTileRegion: MapTileRegion ): Boolean
+    {
+        return !this.equals( mapTileRegion )
     }
 }

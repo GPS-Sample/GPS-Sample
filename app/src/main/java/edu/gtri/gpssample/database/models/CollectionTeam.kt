@@ -18,20 +18,22 @@ data class CollectionTeam(
     constructor( enumAreaUuid: String,  name: String, polygon: ArrayList<LatLon>, locations: ArrayList<Location>)
             : this(UUID.randomUUID().toString(), Date().time, enumAreaUuid, name, polygon, locations )
 
-    override fun equals(other: Any?): Boolean
+    fun equals( other: CollectionTeam ): Boolean
     {
-        if (other is CollectionTeam)
+        if (this.uuid == other.uuid &&
+            this.creationDate == other.creationDate &&
+            this.enumAreaUuid == other.enumAreaUuid &&
+            this.name == other.name)
         {
-            if (this.uuid == other.uuid &&
-                this.creationDate == other.creationDate &&
-                this.enumAreaUuid == other.enumAreaUuid &&
-                this.name == other.name)
-            {
-                return true
-            }
+            return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( collectionTeam: CollectionTeam ): Boolean
+    {
+        return !this.equals( collectionTeam )
     }
 
     fun pack() : String

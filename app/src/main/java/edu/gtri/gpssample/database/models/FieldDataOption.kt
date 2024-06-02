@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.database.models
 
+import edu.gtri.gpssample.database.FieldDataOptionDAO
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -14,16 +15,21 @@ data class FieldDataOption(
 {
     constructor(name: String, value: Boolean) : this(UUID.randomUUID().toString(), name, value )
 
-    fun equals( fieldDataOption: FieldDataOption ) : Boolean
+    fun equals( other: FieldDataOption ) : Boolean
     {
-        if (this.uuid == fieldDataOption.uuid &&
-            this.name == fieldDataOption.name &&
-            this.value == fieldDataOption.value )
+        if (this.uuid == other.uuid &&
+            this.name == other.name &&
+            this.value == other.value )
         {
             return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( fieldDataOption: FieldDataOption ): Boolean
+    {
+        return !this.equals( fieldDataOption )
     }
 
     fun pack() : String

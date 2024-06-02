@@ -18,16 +18,21 @@ data class LatLon (
         return LatLng( latitude, longitude )
     }
 
-    fun equals( latLon: LatLon ) : Boolean
+    fun equals( other: LatLon ) : Boolean
     {
-        if (this.uuid == latLon.uuid &&
-            this.creationDate == latLon.creationDate &&
-            this.latitude == latLon.latitude &&
-            this.longitude == latLon.longitude)
+        if (this.uuid == other.uuid &&
+            this.creationDate == other.creationDate &&
+            this.latitude == other.latitude &&
+            this.longitude == other.longitude)
         {
             return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( latLon: LatLon ): Boolean
+    {
+        return !this.equals( latLon )
     }
 }

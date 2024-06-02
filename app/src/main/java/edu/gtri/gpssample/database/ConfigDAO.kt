@@ -18,7 +18,7 @@ class ConfigDAO(private var dao: DAO)
 
         if (existingConfig != null)
         {
-            if (!config.equals( existingConfig ))
+            if (config.doesNotEqual( existingConfig ))
             {
                 updateConfig( config )
                 Log.d( "xxx", "Updated Config with ID ${config.uuid}" )

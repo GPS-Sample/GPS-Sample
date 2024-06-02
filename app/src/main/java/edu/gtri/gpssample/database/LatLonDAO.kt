@@ -14,7 +14,7 @@ class LatLonDAO(private var dao: DAO)
 
         if (existingLatLon != null)
         {
-            if (!latLon.equals( existingLatLon ))
+            if (latLon.doesNotEqual( existingLatLon ))
             {
                 updateLatLon( latLon )
                 Log.d( "xxx", "Updated LatLon with ID ${latLon.uuid}" )

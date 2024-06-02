@@ -17,7 +17,7 @@ class FieldDataOptionDAO(private var dao: DAO)
 
         if (existingFieldDataOption != null)
         {
-            if (!fieldDataOption.equals( existingFieldDataOption ))
+            if (fieldDataOption.doesNotEqual( existingFieldDataOption ))
             {
                 updateFieldDataOption( fieldDataOption )
                 Log.d( "xxx", "Updated FieldDataOption with ID ${fieldDataOption.uuid}")

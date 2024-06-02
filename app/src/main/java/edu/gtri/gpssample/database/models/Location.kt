@@ -26,25 +26,30 @@ data class Location(
     constructor(type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String ) :
             this( UUID.randomUUID().toString(), Date().time, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", null, ArrayList<EnumerationItem>())
 
-    fun equals( location: Location ) : Boolean
+    fun equals( other: Location ) : Boolean
     {
-        if (this.uuid == location.uuid &&
-            this.creationDate == location.creationDate &&
-            this.uuid == location.uuid &&
-            this.type == location.type &&
-            this.gpsAccuracy == location.gpsAccuracy &&
-            this.latitude == location.latitude &&
-            this.longitude == location.longitude &&
-            this.altitude == location.altitude &&
-            this.isLandmark == location.isLandmark &&
-            this.description == location.description &&
-            this.imageData == location.imageData &&
-            this.isMultiFamily == location.isMultiFamily)
+        if (this.uuid == other.uuid &&
+            this.creationDate == other.creationDate &&
+            this.uuid == other.uuid &&
+            this.type == other.type &&
+            this.gpsAccuracy == other.gpsAccuracy &&
+            this.latitude == other.latitude &&
+            this.longitude == other.longitude &&
+            this.altitude == other.altitude &&
+            this.isLandmark == other.isLandmark &&
+            this.description == other.description &&
+            this.imageData == other.imageData &&
+            this.isMultiFamily == other.isMultiFamily)
         {
             return true
         }
 
         return false
+    }
+
+    fun doesNotEqual( location: Location ): Boolean
+    {
+        return !this.equals( location )
     }
 
     fun pack() : String
