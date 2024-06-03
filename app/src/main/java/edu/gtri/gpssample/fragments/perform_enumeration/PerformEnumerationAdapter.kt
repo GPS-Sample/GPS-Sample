@@ -51,33 +51,31 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
         if (location.enumerationItems.size > 0)
         {
-            location.isMultiFamily?.let { isMultiFamily ->
-                if (!isMultiFamily)
+            if (!location.isMultiFamily)
+            {
+                if (location.enumerationItems[0].enumerationState == EnumerationState.Enumerated)
                 {
-                    if (location.enumerationItems[0].enumerationState == EnumerationState.Enumerated)
-                    {
-                        holder.checkImageView.visibility = View.VISIBLE
-                    }
-                    else
-                    {
-                        holder.checkImageView.visibility = View.GONE
-                    }
+                    holder.checkImageView.visibility = View.VISIBLE
                 }
                 else
                 {
-                    var isComplete = true
-                    for (enumerationItem in location.enumerationItems)
-                    {
-                        isComplete = isComplete && (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                    }
-                    if (isComplete)
-                    {
-                        holder.checkImageView.visibility = View.VISIBLE
-                    }
-                    else
-                    {
-                        holder.checkImageView.visibility = View.GONE
-                    }
+                    holder.checkImageView.visibility = View.GONE
+                }
+            }
+            else
+            {
+                var isComplete = true
+                for (enumerationItem in location.enumerationItems)
+                {
+                    isComplete = isComplete && (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                }
+                if (isComplete)
+                {
+                    holder.checkImageView.visibility = View.VISIBLE
+                }
+                else
+                {
+                    holder.checkImageView.visibility = View.GONE
                 }
             }
 

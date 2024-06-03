@@ -20,11 +20,11 @@ data class Location(
     var isLandmark: Boolean,
     var description: String,
     var imageData: String,
-    var isMultiFamily : Boolean?,
+    var isMultiFamily : Boolean,
     var enumerationItems: ArrayList<EnumerationItem>)
 {
     constructor(type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String ) :
-            this( UUID.randomUUID().toString(), Date().time, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", null, ArrayList<EnumerationItem>())
+            this( UUID.randomUUID().toString(), Date().time, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, ArrayList<EnumerationItem>())
 
     fun equals( other: Location ) : Boolean
     {

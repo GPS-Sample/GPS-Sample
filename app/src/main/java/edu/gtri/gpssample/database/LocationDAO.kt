@@ -117,13 +117,7 @@ class LocationDAO(private var dao: DAO)
         val isLandmark = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_LANDMARK)).toBoolean()
         val description = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_DESCRIPTION))
         val imageData = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_DATA))
-        val isMultiFamilyValue = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY))
-
-        var isMultiFamily: Boolean? = null
-
-        isMultiFamilyValue?.let {
-            isMultiFamily = it.toBoolean()
-        }
+        val isMultiFamily = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY)).toBoolean()
 
         return Location( uuid, creationDate, LocationTypeConverter.fromIndex(locationTypeId), gpsAccuracy, latitude, longitude, altitude, isLandmark, description, imageData, isMultiFamily, ArrayList<EnumerationItem>())
     }

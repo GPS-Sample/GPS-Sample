@@ -96,13 +96,7 @@ class SamplingViewModel : ViewModel()
                     if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                     {
                         var resourceId: Int
-                        var isMultiFamily = false
-
-                        location.isMultiFamily?.let {
-                            isMultiFamily = it
-                        }
-
-                        if (!isMultiFamily)
+                        if (!location.isMultiFamily)
                         {
                             val sampledItem = location.enumerationItems[0]
 
@@ -384,18 +378,16 @@ class SamplingViewModel : ViewModel()
                     _currentSampledItemsForSampling.clear()
 
                     currentConfig?.value?.let { config ->
-                        for (enumArea in config.enumAreas) {
-                            for (location in enumArea.locations) {
-                                if (!location.isLandmark && location.enumerationItems.isNotEmpty()) {
-                                    var isMultiFamily = false
-
-                                    location.isMultiFamily?.let {
-                                        isMultiFamily = it
-                                    }
-
+                        for (enumArea in config.enumAreas)
+                        {
+                            for (location in enumArea.locations)
+                            {
+                                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                                {
                                     for (enumerationItem in location.enumerationItems)
                                     {
-                                        if (!_currentSampledItemsForSampling.contains(enumerationItem)) {
+                                        if (!_currentSampledItemsForSampling.contains(enumerationItem))
+                                        {
                                             _currentSampledItemsForSampling.add(enumerationItem)
                                         }
                                     }

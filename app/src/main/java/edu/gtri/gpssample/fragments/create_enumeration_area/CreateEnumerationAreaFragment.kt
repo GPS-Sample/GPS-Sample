@@ -685,17 +685,12 @@ class CreateEnumerationAreaFragment : Fragment(),
             for (location in enumArea.locations)
             {
                 var resourceName = "home_black"
-                var isMultiFamily = false
-
-                location.isMultiFamily?.let {
-                    isMultiFamily = it
-                }
 
                 if (location.isLandmark)
                 {
                     resourceName = "location_blue"
                 }
-                else if (!isMultiFamily)
+                else if (!location.isMultiFamily)
                 {
                     if (location.enumerationItems.isNotEmpty())
                     {

@@ -375,7 +375,7 @@ class CreateRuleFragment : Fragment(),
         }
         else
         {
-            binding.textValueEditText.inputType = InputType.TYPE_CLASS_TEXT
+            binding.textValueEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
         }
     }
 

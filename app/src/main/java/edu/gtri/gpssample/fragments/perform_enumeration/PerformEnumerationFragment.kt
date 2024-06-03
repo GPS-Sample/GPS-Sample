@@ -298,7 +298,9 @@ class PerformEnumerationFragment : Fragment(),
             {
                 currentGPSAccuracy?.let { accuracy ->
                     currentGPSLocation?.let { point ->
-                        val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "")
+                        val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
+                        val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, true, "")
+
                         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         enumArea.locations.add(location)
                         sharedViewModel.locationViewModel.setCurrentLocation(location)
@@ -478,16 +480,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (!location.isLandmark)
                 {
-                    var isMultiHousehold = false
-
-                    if (location.enumerationItems.size > 0)
-                    {
-                        location.isMultiFamily?.let {
-                            isMultiHousehold = it
-                        }
-                    }
-
-                    var resourceId = if (isMultiHousehold) R.drawable.multi_home_black else R.drawable.home_black
+                    var resourceId = if (location.isMultiFamily) R.drawable.multi_home_black else R.drawable.home_black
 
                     var numComplete = 0
 
@@ -498,7 +491,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                             {
-                                resourceId = if (isMultiHousehold) R.drawable.multi_home_red else R.drawable.home_red
+                                resourceId = if (location.isMultiFamily) R.drawable.multi_home_red else R.drawable.home_red
                                 break
                             }
                             else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
@@ -510,7 +503,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (numComplete > 0 && numComplete == location.enumerationItems.size)
                     {
-                        resourceId = if (isMultiHousehold) R.drawable.multi_home_green else R.drawable.home_green
+                        resourceId = if (location.isMultiFamily) R.drawable.multi_home_green else R.drawable.home_green
                     }
 
                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
@@ -556,24 +549,14 @@ class PerformEnumerationFragment : Fragment(),
             }
             else if (location.enumerationItems.size == 1)
             {
-                if (location.isMultiFamily == null)
+                if (location.isMultiFamily)
                 {
-                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
                 }
                 else
                 {
-                    location.isMultiFamily?.let { isMultiFamily ->
-                        if (isMultiFamily)
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
-                        }
-                        else
-                        {
-                            sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
-                        }
-                    }
+                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                 }
             }
             else
@@ -609,7 +592,8 @@ class PerformEnumerationFragment : Fragment(),
                 accuracy = it
             }
 
-            val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "")
+            val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
+            val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "")
 
             if (gpsLocationIsGood( location ))
             {
@@ -701,7 +685,8 @@ class PerformEnumerationFragment : Fragment(),
                     accuracy = it
                 }
 
-                val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "")
+                val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
+                val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "")
 
                 DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                 enumArea.locations.add(location)
@@ -752,7 +737,9 @@ class PerformEnumerationFragment : Fragment(),
                 accuracy = it
             }
 
-            val location = Location( LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), tag.altitude(), false, "")
+            val altitude = if (tag.altitude().isNaN()) 0.0 else tag.altitude()
+            val location = Location( LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), altitude, false, "")
+
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
 
