@@ -348,6 +348,10 @@
     <string name="feet">"Футы"</string>
     <string name="kilometers">"километры"</string>
     <string name="miles">"Мили"</string>
+    <string name="importing_locations">""</string>
+    <string name="saving_configuration">""</string>
+    <string name="polygon_is_self_intersecting">""</string>
+    <string name="no_eligible_households">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

@@ -348,6 +348,10 @@
     <string name="feet">"Pés"</string>
     <string name="kilometers">"Quilômetros"</string>
     <string name="miles">"Milhas"</string>
+    <string name="importing_locations">""</string>
+    <string name="saving_configuration">""</string>
+    <string name="polygon_is_self_intersecting">""</string>
+    <string name="no_eligible_households">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

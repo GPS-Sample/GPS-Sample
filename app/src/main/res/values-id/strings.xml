@@ -348,6 +348,10 @@
     <string name="feet">"Kaki"</string>
     <string name="kilometers">"Kilometer"</string>
     <string name="miles">"mil"</string>
+    <string name="importing_locations">""</string>
+    <string name="saving_configuration">""</string>
+    <string name="polygon_is_self_intersecting">""</string>
+    <string name="no_eligible_households">""</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>
