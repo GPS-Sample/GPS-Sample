@@ -287,7 +287,6 @@
     <string name="less_than_equal">"Menor que ou igual"</string>
     <string name="gps_accuracy_error">"A precisão do GPS é inferior à precisão exigida"</string>
     <string name="gps_location_error">"Está atualmente demasiado longe desta localização"</string>
-    <string name="accuracy">"Precisão :"</string>
     <string name="good">"BOA"</string>
     <string name="poor">"RUIM"</string>
     <string name="unknown">"DESCONHECIDA"</string>
@@ -316,6 +315,7 @@
     <string name="not_visited">"Não visitado"</string>
     <string name="incomplete_collection">"Inquérito Incompleto"</string>
     <string name="completed_collection">"Inquérito concluído"</string>
+    <string name="accuracy">"Exatidão :"</string>
     <string name="subaddress_is_required">"O subendereço é necessário"</string>
     <string name="auto_increment_subaddress">"Incremento automático do subendereço"</string>
     <string name="allow_manual_identification_of_locations">"Permitir a identificação manual de localizações"</string>

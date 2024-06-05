@@ -1,376 +1,380 @@
-﻿app_name,GPSSample::en,GPSSample::es,GPSSample::fr,GPSSample::pt,GPSSample::ru
-action_settings,Settings,Configuración,Paramètres,Configurações,Настройки
-action_sign_out,Sign Out,Cerrar sesión,Se déconnecter,Sair,Выйти из системы
-next,Next,Siguiente,Écran suivant,Seguinte,Следующий
-previous,Previous,Anterior,Écran précédent,Anterior,Предыдущий
-manager,Manager,Gerente,Responsable,Gerente,Менеджер
-client,Enumeration,Enumeración,Énumération,Enumeração,Перечисление
-connected_clients,Connected Clients,Clientes conectados,Clients connectés,Clientes ligados,Подключенные клиенты
-create_hotspot,Create Hotspot,Crear punto de acceso,Créer un hotspot,Criar ponto de acesso,Создать точку доступа
-create_server,Create Server,Crear servidor,Créer un serveur,Criar servidor,Создать сервер
-create_qr_code,Create QR Code,Crear código QR,Créer un code QR,Criar código QR,Создать QR-код
-connect_hotspot,Connect To Hotspot,Conectar al punto de acceso,Se connecter au hotspot,Conectar-se a um ponto de acesso,Подключение к точке доступа
-registering_device,Registering Device,Registrando dispositivo ,Enregistrement de l'appareil,Registar dispositivo,Регистрация устройства
-sending_command,Sending Command,Enviando comando,Envoi de la commande,Comando de envio,Отправка команды
-sending_enum_data,Sending Enumeration Data,Enviando datos de enumeración,Envoi de données d'énumération,Enviar dados de enumeração,Отправка данных перечисления
-receiving_data,Receiving Data,Recibiendo datos,Réception des données,Recebendo dados,Получение данных
-configuration_received,Configuration Received,Configuración recibida,Configuration reçue,Configuração recebida,Полученная конфигурация
-forgot_pin_questions,Father's middle name,Segundo nombre del padre,Deuxième prénom de votre père,Nome do meio do pai,Отчество отца
-forgot_pin_questions,Mother's maiden name,Apellido de soltera de la madre,Nom de jeune fille de votre mère,Nome de solteira da mãe,Девичья фамилия матери
-forgot_pin_questions,Favorite Pet's name,El nombre de tu mascota favorita,Nom de votre animal de compagnie préféré,Nome do animal de estimação favorito,Имя любимого домашнего животного
-forgot_pin_questions,Last 4 digits of cell phone #,Últimas 4 cifras del número de celular,4 derniers chiffre de votre numéro de téléphone portable,Últimos 4 dígitos do número de telemóvel,Последние 4 цифры номера мобильного телефона
-forgot_pin_questions,Favorite Food,Comida favorita,Votre aliment/nourriture favorit(e),Comida favorita,Любимая еда
-forgot_pin_questions,Birth Month,Mes de nacimiento,Mois de naissance,Mês de nascimento,Месяц рождения
-forgot_pin_questions,Other Question,Otra pregunta,Autre question,Outra pergunta,Другой вопрос
-distance_formats,Meters / Kilometers,Metros / Kilómetros,Mètres / Kilomètres,Metros / Quilômetros ,Метры / километры
-distance_formats,Feet / Miles,Pies / Millas,Pieds / Miles,Pés / Milhas,Футы / Мили
-time_formats,12 hour (AM/PM),12 horas (AM/PM),12 heures (AM/PM),12 horas (AM/PM),12 часов (AM/PM)
-time_formats,24 hour,24 horas,24 heures,24 horas,24 часа
-field_types,Text,Texto,Texte,Texto,Текст
-field_types,Number,Número,Nombre,Número,Число
-field_types,Date,Fecha,Date,Data,Дата
-field_types,Checkbox,Casilla de chequeo,Case à cocher,Caixa de seleção,Флажок
-field_types,Dropdown,Menú de opciones,Question déroulante,Lista suspensa,Выпадающее окно
-operators,Equal,Igual,Égal,Igual,Равно
-operators,NotEqual,No igual,Inégal,Não igual,Не равно
-operators,LessThan,Menor que,Plus petit que,Menor que,Меньше чем
-operators,GreaterThan,Mayor que,Plus grand que,Maior que,Больше чем
-operators,GreaterThanOrEqual,Mayor que o igual,Plus grand ou égal à,Maior ou igual a,Больше чем или равно
-connectors,AND,Y,ET,E,И
-connectors,OR,O,OU,OU,ИЛИ
-connectors,NOT,NO,PAS,NÃO,НЕ
-samling_methods,Simple Random Sampling,Muestreo aleatorio simple,Échantillonnage aléatoire simple,Amostragem aleatória simples,Простая случайная выборка
-samling_methods,Cluster Sampling,Muestreo por conglomerados,Échantillonnage en grappes,Amostragem por conglomerados,Кластерная выборка
-samling_methods,Subsets: May Overlap,Subconjuntos: pueden superponerse,Sous-ensembles : peuvent se chevaucher,Subconjuntos: Podem sobrepor-se,Подмножества: Могут пересекаться
-samling_methods,Strata: Mutually Exclusive,Estratos: Mutuamente excluyentes,Strates : mutuellement exclusives,Estratos: Mutuamente exclusivos,Страты: Взаимоисключающие
-admin,Admin,Administrador,Administrateur,Administrador,Администратор
-supervisor,Supervisor,Supervisor,Superviseur,Supervisor,Руководитель
-enumerator,Enumerator,Enumerador,Recenseur,Enumerador,Перечислитель
-surveyor,Surveyor,Encuestador,Arpenteur,Topógrafo,Исследователь
-configurations,Configurations,Configuraciones,Configurations,Configuração,Конфигурации
-no_configurations,You don't have any configurations,No tiene ninguna configuración,Vous n'avez aucune configuration,Não tem nenhuma configuração,У вас нет каких -либо конфигураций
-no_studies,You don't have any studies for this configuration,No tienes ningún estudio para esta configuración,Vous n'avez pas d'études pour cette configuration,Não existem estudos para esta configuração,У вас нет исследований для этой конфигурации
-data_collector,Data Collector,Recolector de datos,Collecteur de données,Coletor de dados,Опрашивающий
-scan_qr_code,Scan QR Code,Escanear código QR,Scannez le code QR,Ler código QR,Сканирование QR-кода
-continue_with_existing_study,Continue with existing Study,Continuar el estudio existente,Continuez avec l'étude existante,Continuar com o estudo existente,Продолжить существующее исследование
-admin_sign_in,Admin Sign In,Inicio de sesión de administrador,Connexion de l'administrateur,Login do Administrador,Вход администратора
-supervisor_sign_in,Supervisor Sign In,​​Inicio de sesión de supervisor,Connexion du superviseur,Login do Supervisor,Вход  Руководитель
-data_collector_sign_in,Data Collector Sign In,Inicio de sesión de recolector de datos,Connexion du collecteur de données,Login do coletor de dados,Вход опрашивающего 
-admin_sign_up,Admin Sign Up,Registro de administrador,Inscription de l'administrateur,Registo do administrador,Зарегистрироваться как Администратор
-supervisor_sign_up,Supervisor Sign Up,Registro de supervisor,Inscription du superviseur,Registo do supervisor,Зарегистрироваться как Руководитель
-data_collector_sign_up,Data Collector Sign Up,Registro de recolector de datos,Inscription du collecteur de données,Registo do coletor de dados,Регистрация сборщика данных
-enter_your_pin,Enter your PIN,Ingrese su PIN,Saisissez votre code PIN,Digite seu PIN,Введите PIN-код
-reenter_your_pin,Re-enter your PIN,Vuelva a ingresar su PIN,Saisissez à nouveau votre code PIN,Digite novamente seu PIN,Повторный ввод PIN-кода
-back,Back,Atrás,Écran précédent,Voltar,Назад
-cancel,Cancel,Anular,Annulez,Cancelar,Отменить
-finish,Finish,Finalizar,Finir,Terminar,Завершить
-save,Save,Grabar,Sauvegardez,Guardar,Сохранить
-done,Done,Hecho,Terminé,Concluído,Готово
-select_role,Select your Role,Selecciona su rol,Sélectionnez votre rôle,Seleccione a sua função,Выберите свою роль
-admin_select_role,Admin Select Role,Administrador - selecciona rol,Administrateur - Sélectionnez un rôle,Administrador - Selecionar função,Выберите роль Администратора
-supervisor_select_role,Supervisor Select Role,Supervisor - selecciona rol,Superviseur - Sélectionnez un rôle,Supervisor - Selecionar função,Выберите роль Супервайзера
-sign_in,Sign In,Iniciar sesión,S'identifier,Login,Войти
-sign_up,Sign Up,Registrarse,S'inscrire,Inscrever-se,Зарегистрироваться
-sign_out,Sign Out,Cerrar sesión,Se déconnecter,Sair,Выйти из системы
-not_registered,Not registered?  Sign Up!,¿No estás registrado? ¡Regístrate!,Pas enregistré? S'inscrire!,Não está registado?  Registe-se!,Не зарегистрированы?  Зарегистрируйтесь!
-name,Name,Nombre,Nom,Nome,Имя
-enter_your_name,Enter your name,Ingrese su nombre,Entrez votre nom,Insira seu nome,Введите Ваше имя
-pin,PIN,PIN,PIN,PIN,PIN
-forgot_pin_question,Forgot PIN question,Se olvidó la pregunta del PIN,Question liée au PIN oubliée?,Pergunta sobre o PIN esquecido,Забыли PIN-код
-forgot_pin_answer,Forgot PIN answer,Se olvidó la respuesta del PIN,Réponse liée au PIN oubliée?,Resposta ao PIN esquecido,Забыли ответ PIN
-enter_your_answer,Enter your answer,Ingrese su respuesta,Saisissez votre réponse,Insira sua resposta,Введите ответ
-create_config,Create Configuration,Crear configuración,Créer une configuration,Criar configuração,Создать конфигурацию
-delete_config,Delete Configuration,Eliminar configuración,Supprimer la configuration,Eliminar configuração,Удалить конфигурацию
-edit_config,Edit Configuration,Editar configuración,Modifier la configuration,Editar configuração,Редактировать конфигурацию
-create_study,Create Study,Crear estudio,Créer une étude,Criar estudo,Создать исследование
-edit_study,Edit Study,Modificar estudio,Modifier l'étude,Editar estudo,Редактировать исследование
-delete_study,Delete Study,Eliminar estudio,Supprimer l'étude,Eliminar estudo,Удалить исследование
-create_field,Create Field,Crear campo,Créer un champ,Criar campo,Создать поле
-config_name,Configuration Name,Nombre de la configuración,Nom de la configuration,Nome da configuração,Конфигурация имени
-study_name,Study Name,Nombre del estudio,Nom de l'étude,Nome do estudo,Имя исследования
-field_name,Field Name,Nombre del campo,Nom du champ,Nome do campo,Имя поля
-enumeration_fields,Enumeration Fields,Campos de enumeración,Champs d'énumération,Campos de enumeração,Поля перечисления
-enter_config_name,Enter Configuration Name,Ingrese el nombre de la configuración,Entrez le nom de la configuration,Insirar nome da configuração,Введите имя конфигурации
-enter_study_name,Enter Study Name,Ingrese el nombre del estudio,Entrez le nom de l'étude,Insirar nome do estudo,Введите имя исследования
-enter_field_name,Enter Field Name,Ingrese el nombre del campo,Entrez le nom du champ,Insirar o nome do campo,Введите имя поля
-preferred_units,Preferred Units,Unidades preferidas,Unités de préférence,Unidades preferidas,Предпочитаемые единицы
-date_format,Date Format,Formato de fecha,Format de la date,Formato de data,Формат даты
-time_format,Time Format,Formato de hora,Format horaire,Formato da hora,Формат времени
-manage_enumerators,Manage Enumerators,Administrar enumeradores,Gérer les enquêteurs,Gerir enumeradores,Управление счетчиками
-collect_enumerations,Collect Enumerations,Recoger enumeraciones,Collecter les énumérations,Coletar enumerações,Сбор перечислений
-generate_sample,Generate Sample,Generar muestra,Générer un échantillon,Gerar amostra,Создасть выборку
-collect_samples,Collect Samples,Recoger muestras,Recueillir les échantillons,Coletar amostras,Сбор образцов
-min_gps_precision,Desired GPS Precision,Precisión deseada de GPS,Précision GPS souhaitée,Precisão GPS pretendida,Желаемая точность GPS
-enter_min_gps_precision,Enter Desired GPS Precision,Ingrese la precisión deseada de GPS ,Entrez la précision GPS souhaitée,Insirar a precisão GPS pretendida,Введите желаемую точность GPS
-define_enumeration_fields,Define Enumeration Fields,Definir campos de enumeración,Définir les champs d'énumération,Definir campos de enumeração,Определить поля перечисления
-define_enumeration_area,Define Enumeration Area,Definir área de enumeración,Définir la zone de dénombrement,Definir área de enumeração,Определить область перечисления
-define_sampling_method,Define Sampling Method,Definir método de muestreo,Définir la méthode d'échantillonnage,Definir método de amostragem,Определить метод выборки
-studies,Studies,Estudios,Études,Estudos,Исследования
-barcode_result,Barcode detected,Código de barras detectado,Code-barres détecté,Código de barras detectado,Обнаружен штрих-код
-error_scanner_cancelled,Code scanner is cancelled.,El escáner del código fue anulado,Le scanner de code est annulé.,Scanner de código é cancelado.,Сканер кодов отменен.
-error_camera_permission_not_granted,Camera permission is not granted.,Permiso de cámara no otorgado,L'autorisation pour la caméra n'est pas accordée.,A permissão da câmara não é concedida.,Разрешение камеры не выдано.
-error_app_name_unavailable,App name is not set.,Nombre de la aplicación no fue establecido,Le nom de l'application n'est pas défini.,O nome da aplicação não está definido.,Не задано имя приложения.
-error_default_message,Failed to scan code:,Error en escanear el código:,Le code QR n'a pas été scanné:,Falha na leitura do código:,Не удалось отсканировать код:
-menu_item_settings,Settings,Configuración,Paramètres,Configurações,Настройки
-change_role,Change Role,Cambiar rol,Changement de rôle,Alterar função,Изменить роль
-enter_your_user_name,Enter your User Name,Ingrese su nombre de usuario,Entrez votre nom d'utilisateur,Insirar o seu Nome de Utilizador,Введите имя пользователя
-field_type,Field Type,Tipo de campo,Type de champ,Tipo de campo,Тип поля
-enter_checkbox_text,Enter checkbox item text,Ingrese el texto del elemento de la casilla de chequeo,Saisir le texte de l'élément de la case à cocher,Insirar o texto do item da caixa de seleção,Введите текст элемента флажка
-enter_dropdown_item_text,Enter dropdown item text,Ingrese el texto del elemento del menú de opciones,Saisir le texte de l'élément déroulant,Insirar o texto do item da lista suspensa,Введите текст элемента выпадающего списка
-add_another,ADD ANOTHER,SUMA OTRO,AJOUTER UN AUTRE,ADICIONAR OUTRO,ДОБАВИТЬ ДРУГОЕ
-delete_field,Delete Field,Eliminar campo,Supprimer le champ,Eliminar campo,Удалить поле
-manage_this_study,Manage this Study,Administrar este estudio,Gérer cette étude,Gerir este estudo,Управление исследованием
-manage_study,Manage Study,Administrar estudio,Gérer l'étude,Gerir estudo,Управление исследованием
-manage_configuration,Manage Configuration,Administrar configuración,Gérer la configuration,Gerir a configuração,Управление конфигурацией
-manage_configurations,Manage Configurations,Administrar configuraciones,Gérer les configurations,Gerir configurações,Управление конфигурациями
-generate_qr_code,Generate QR Code,Generar código QR,Générer un code QR,Gerar código QR,Генерировать QR-код
-create_filter,Create Filter,Crear filtro,Créer un filtre,Criar filtro,Создать фильтр
-create_rule,Create Rule,Crear regla,Créer une règle,Criar regra,Создать правило
-enter_rule_name,Enter Rule Name,Ingrese el nombre de la regla,Entrez le nom de la règle,Insirar nome da regra,Введите имя правила
-field,Field,Campo,Champ,Campo,Поле
-operator,Operator,Operador,Opérateur de fonction,Operador,Оператор
-enter_value,Enter Value,Ingrese valor,Entrez la valeur,Insirar valor,Введите значение
-value,Value,Valor,Valeur,Valor,Значение
-rule,Rule,Regla,Règle,Regra,Правило
-connector,Connector,Conector,Connecteur,Conector,Коннектор
-sampling_method,Sampling Method,Método de muestreo,Méthode d'échantillonnage,Método de amostragem,Метод выборки
-enter_filter_name,Enter Filter Name,Ingrese el nombre del filtro,Entrez le nom du filtre,Insirar nome do filtro,Введите имя фильтра
-sample_size,Sample Size,Tamaño de la muestra,Taille de l'échantillon,Tamanho da amostra,Размер выборки
-filter_name,Filter Name,Nombre del filtro,Nom du filtre,Nome do filtro,Имя фильтра
-rule_name,Rule Name,Nombre de la regla,Nom de la règle,Nome da regra,Имя правила
-total_sample_size,Total Sample Size Across All Clusters,Tamaño total de la muestra en todos los conglomerados,Taille totale de l'échantillon pour toutes les grappes,Tamanho total da amostra em todos os conglomerados,Общий размер выборки по всем кластерам
-manage_studies,Manage Studies,Administrar estudios,Gérer les études,Gerir estudos,Управление исследованиями
-manage_samples,Manage Samples,Administrar muestras,Gérer les échantillons,Gerir amostras,Управление выборками
-create_sample,Create Sample,Crear muestra,Créer un échantillon,Criar amostra,Создать выборку
-delete_sample,Delete Sample,Eliminar muestra,Supprimer l'échantillon,Eliminar amostra,Удалить образец
-manage_supervisors,Manage Supervisors,Administrar supervisores,Gérer les superviseurs,Gerir supervisores,Управление супервизорами
-home,Home,Pantalla de inicio,Écran d'accueil,Início,Главная
-manage_enumeration_areas,Manage Enumeration Areas,Administrar áreas de enumeración,Gérer les zones de dénombrement,Gerir áreas de enumeração,Управление участками переписи
-please_confirm,Please Confirm,"Por favor, confirme","SVP, confirmez","Por favor, confirmar","Пожалуйста, подтвердите"
-import_enumeration,Import Enumeration Data,Importar datos de enumeración,Importez les données d'énumération,Importar dados de enumeração,Импорт данных перечисления
-export_configuration,Export Configuration,Exportar configuración,Exportez la configuration,Exportar configuração,Экспорт конфигурации
-delete_study_message,Are you sure you want to permanently delete this study?,¿Está seguro de que desea eliminar permanentemente este estudio?,Êtes-vous sûr de vouloir supprimer définitivement cette étude ?,Tem a certeza de que deseja eliminar permanentemente este estudo?,"Вы уверены, что хотите безвозвратно удалить это исследование?"
-delete_field_message,Are you sure you want to permanently delete this field?,¿Está seguro de que desea eliminar permanentemente este campo?,Êtes-vous sûr de vouloir supprimer définitivement ce champ ?,Tem a certeza de que deseja eliminar permanentemente este campo?,"Вы уверены, что хотите безвозвратно удалить это поле?"
-delete_rule_message,Are you sure you want to permanently delete this rule?,¿Está seguro de que desea eliminar permanentemente esta regla?,Êtes-vous sûr de vouloir supprimer définitivement cette règle ?,Tem a certeza de que deseja eliminar permanentemente esta regra?,"Вы уверены, что хотите навсегда удалить это правило?"
-delete_team_message,Are you sure you want to permanently delete this team?,¿Está seguro de que desea eliminar permanentemente este equipo?,Êtes-vous sûr de vouloir supprimer définitivement cette équipe ?,Tem a certeza de que deseja eliminar permanentemente esta equipa?,"Вы уверены, что хотите навсегда удалить эту команду?"
-delete_configuration_message,Are you sure you want to permanently delete this configuration?,¿Está seguro de que desea eliminar permanentemente esta configuración?,Êtes-vous sûr de vouloir supprimer définitivement cette configuration ?,Tem a certeza de que deseja eliminar permanentemente esta configuração?,"Вы уверены, что хотите навсегда удалить эту конфигурацию?"
-delete_household_message,Are you sure you want to permanently delete this household?,¿Está seguro de que desea eliminar permanentemente este hogar?,Êtes-vous sûr de vouloir supprimer définitivement ce ménage ?,Tem a certeza de que deseja eliminar permanentemente este agregado familiar?,"Вы уверены, что хотите навсегда удалить это домохозяйство?"
-create_field_rule_message,You must create at least one field before you can create a rule,Debe crear al menos un campo antes de poder crear una regla,Vous devez créer au moins un champ avant de pouvoir créer une règle.,Você deve criar pelo menos um campo antes de criar uma regra,Перед созданием правила необходимо создать хотя бы одно поле
-create_rule_filter_message,You must create at least one rule before you can create a filter,Debe crear al menos una regla antes de poder crear un filtro,Vous devez créer au moins une règle avant de pouvoir créer un filtre,Você deve criar pelo menos um campo antes de criar uma regra,Перед созданием фильтра необходимо создать хотя бы одно правило
-select_import_method_message,Select an import method,Seleccione un método de importación,Sélectionnez une méthode d'importation,Selecione um método de importação,Выберите метод импорта
-select_export_message,Select an export method,Seleccione un método de exportación,Sélectionnez une méthode d'exportation,Selecione um método de exportação,Выберите метод экспорта
-clear_selections_message,Are you sure you want clear all selections?,¿Está seguro de que desea borrar todas las selecciones?,Etes-vous sûr de vouloir effacer toutes les sélections ?,Tem a certeza de que deseja apagar todas as selecções?,"Вы уверены, что хотите снять все выделения?"
-team_name_message,You must enter a team name,Debe introducir un nombre de equipo,Vous devez saisir un nom d'équipe,Você deve inserir um nome de equipe,Необходимо ввести имя команды
-configuration_documents_message,The configuration has been saved to the Documents directory.,La configuración se ha guardado en el directorio Documentos.,La configuration a été sauvegardée dans le répertoire Documents.,A configuração foi guardada no diretório Documentos.,Конфигурация была сохранена в директории Documents.
-delete_enum_area_message,Are you sure you want to permanently delete Enumeration Area,¿Está seguro de que desea borrar permanentemente el Área de Enumeración?,Etes-vous sûr de vouloir supprimer définitivement la zone de dénombrement ?,Tem a certeza de que deseja eliminar permanentemente a Área de Enumeração,"Вы уверены, что хотите навсегда удалить область пересчета"
-no_study_ea,You do not have a study associated with this EA.,No tiene ningún estudio asociado a esta Área de Enumeración.,Vous n'avez pas d'étude associée à cette zone de dénombrement.,Não tem um estudo associado a esta Área de Enumeração.,"У вас нет исследования, связанного с этим экспертом."
-filename_export_message,Enter a file name for the export,Introduzca un nombre de archivo para la exportación,Entrez un nom de fichier pour l'exportation,Insira um nome de ficheiro para a exportação,Введите имя файла для экспорта
-select_task,Select a task,Seleccione una tarea,Sélectionnez une tâche,Selecione uma tarefa,Выберите задачу
-yes,Yes,Sí,Oui,Sim,Да
-no,No,No,Non,Não,Нет
-qr_code,QR Code,Código QR,Code QR,Código QR,QR-код
-file_system,File System,Sistema de archivos,Système de fichiers,Sistema de ficheiros,Файловая система
-survey,Survey,Encuesta,Enquête,Questionário,Опрос
-undefined,Undefined,Sin definir,Non défini,Indefinido,Неопределенный
-enter_name,Please enter a name,"Por favor, introduzca un nombre",Veuillez saisir un nom,"Por favor, insira um nome","Пожалуйста, введите имя"
-desired_gps_position,Please enter the minimum desired GPS precision,"Por favor, introduzca la precisión GPS mínima deseada",Veuillez saisir la précision GPS minimale souhaitée,"Por favor, insira a precisão GPS mínima pretendida",Введите минимальную желаемую точность GPS
-import_configuration,Import Configuration,Configuración de importación,Configuration de l'importation,Importar configuração,Конфигурация импорта
-select_import_method,Select an import method,Seleccione un método de importación,Sélectionnez une méthode d'importation,Selecione um método de importação,Выберите метод импорта
-select_configuration,Select a configuration,Seleccione una configuración,Sélectionner une configuration,Selecione uma configuração,Выберите конфигурацию
-home_not_exist,Home does not exist,La hogar no existe ,Le domicile n'existe pas,O agregado familiar não existe,Дом не существует
-reason_incomplete,Oops! Please select a reason for incomplete,"¡Oops! Por favor, seleccione una razón para incompleto",Oups ! Veuillez sélectionner une raison pour l'incomplétude,"Oops! Por favor, seleccione um razão para incompleto","Упс! Пожалуйста, выберите причину неполного заполнения"
-enter_enum_area_name,Enter the Enumeration Area name,Introduzca el nombre del área de enumeración,Saisir le nom de la zone d'énumération,Insira o nome da área de enumeração,Введите название области перечисления
-select_enumeration,Select an Enumeration Area,Seleccione un Área de Enumeración,Sélectionner une zone d'énumération,Selecione uma área de enumeração,Выберите область пересчета
-select_time,Select Time,Seleccione la hora,Sélectionner l'heure,Selecione a hora,Выберите время
-select_date,Select Date,Seleccione la fecha,Sélectionnez la date,Selecione a data,Выберите дату
-your_pin_is,Your PIN is:,Su PIN es,Votre code PIN est :,O seu PIN é:,Ваш PIN-код:
-incorrect_answer_message,Oops! Incorrect answer.  Please try again.,"¡Uy! Respuesta incorrecta.  Por favor, inténtelo de nuevo.",Oups ! Réponse incorrecte.  Veuillez réessayer.,"Oops! Resposta incorrecta.  Por favor, tente novamente.","Oops! Неправильный ответ.  Пожалуйста, попробуйте еще раз."
-enter_other_question,Enter Other Question,Introduzca otra pregunta,Saisir une autre question,Insira outra pergunta,Введите другой вопрос
-reenter_pin,Please re-enter the PIN,Vuelva a introducir el PIN,Veuillez saisir à nouveau le code PIN,Volte a insirar o PIN,"Пожалуйста, введите PIN-код повторно"
-enter_pin,Please enter a PIN,"Por favor, introduzca un PIN",Veuillez saisir un code PIN,"Por favor, insira um PIN","Пожалуйста, введите PIN-код"
-other_question,Other Question,Otra pregunta,Autre question,Outra pergunta,Другой вопрос
-enter_answer,Please enter an answer.,"Por favor, introduzca una respuesta.",Veuillez saisir une réponse.,"Por favor, insira uma resposta.","Пожалуйста, введите ответ."
-pin_not_match,The PIN's do not match,Los PIN no coinciden,Les codes PIN ne correspondent pas,Os PIN's não coincidem,PIN-коды не совпадают
-enter_file_name,You must enter a file name,Debe introducir un nombre de archivo,Vous devez saisir un nom de fichier,Tem de insirar um nome de ficheiro,Необходимо ввести имя файла
-pin_incorrect,The current PIN is incorrect,El PIN actual es incorrecto,Le code PIN actuel est incorrect,O PIN atual está incorreto,Текущий PIN-код неверен
-config_not_found,Fatal! Configuration not found.,Fallo Configuración no encontrada.,Erreur fatale ! La configuration n'a pas été trouvée.,Fatal! Configuração não encontrada.,Fatal! Конфигурация не найдена.
-missing_parameter_rule,Fatal! Missing required parameter: rule,¡Fatal! Falta el parámetro requerido: regla,Fatal ! Paramètre requis manquant : règle,Fatal! Parâmetro obrigatório em falta: regra,Fatal! Отсутствует необходимый параметр: правило
-ok,Ok,Ok,Ok,Ok,Хорошо
-wifi_disabled,WiFi disabled,WiFi desactivado,WiFi désactivé,WiFi desativado,WiFi отключен
-wifi_disabled_message,WiFi is disabled. Please make sure Wifi is turned on,"El WiFi está desactivado. Por favor, asegúrese de que el Wifi está activado",Le WiFi est désactivé. Veuillez vous assurer que le Wifi est activé,O WiFi está desativado. Certifique-se de que o Wi-Fi está ativado,"WiFi отключен. Пожалуйста, убедитесь, что WiFi включен"
-additional_info,Additional Info,Información adicional,Informations complémentaires,Informações adicionais,Дополнительная информация
-incomplete,Incomplete,Incompleto,Incomplet,Incompleto,Неполный
-does_not_exist,Does not exist,No existe,N'existe pas,Não existe,Не существует
-other,Other,Otros,Autre,Outros,Другое
-notes,Notes,Notas,Notes (en anglais),Notas,Примечания
-oops,Oops!,¡Vaya!,Oups !,Oops!,Упс!
-field_is_required,field is required,campo obligatorio,le champ est obligatoire,o campo é obrigatório,поле обязательно для заполнения
-number,Number,Número,Numéro,Número,Число
-text,Text,Texto,Texte,Texto,Текст
-checkbox,Checkbox,Casilla de chequeo,Case à cocher,Caixa de seleção,Флажок
-connected,Connected,Conectado,Connecté,Ligado,Подключено
-forgot_pin,Forgot PIN,PIN olvidado,PIN oublié,Esqueci-me do PIN,Забыл PIN-код
-reset_pin,Reset PIN,Restablecer PIN,Réinitialiser le code PIN,Redefinir PIN,Сбросить PIN-код
-personally_identifiable,Personally Identifiable Information,Información personal identificable,Informations personnelles identifiables,Informações de identificação pessoal,Персональная информация
-integer_only,Integer Only,Sólo números enteros,Nombre entier seulement,Apenas números inteiros,Только целое число
-required,Required,Requerido,Obligatoire,Necessário,Требуется
-time,Time,Hora,L'heure,Hora,Время
-date,Date,Fecha,La date,Data,Дата
-dropdown,Dropdown,Menú de opciones,Question déroulante,Lista suspensa,Выпадающее окно
-fields,Fields,Campos,Les Champs,Campos,Поля
-rules,Rules,Reglas,Les Règles,Regras,Правила
-simple_random,Simple Random Sampling,Muestreo aleatorio simple,Échantillonnage aléatoire simple,Amostragem aleatória simples,Простая случайная выборка
-cluster_sampling,Cluster Sampling,Muestreo por conglomerados,Échantillonnage en grappes,Amostragem por conglomerados,Кластерная выборка
-subset_overlap,Subsets: May Overlap,Subconjuntos: Pueden solaparse,Sous-ensembles : Peuvent se chevaucher,Subconjuntos: Podem sobrepor-se,Подмножества: Могут пересекаться
-strata_exclusive,Strata: Mutually Exclusive,Estratos: Mutuamente excluyentes,Strates : Exclusivité mutuelle,Estratos: Mutuamente exclusivos,Страты: Взаимоисключающие
-numberhouseholds,# of Households,# de hogares,#  de ménages,# Número de agregados familiares,# домохозяйств
-percenthouseholds,% of all Households,% de todos los hogares,% de tous les ménages,% de todos os agregados familiares,% от всех домохозяйств
-percenttotal,% of total population,% de la población total,% de la population totale,% da população total,% от общей численности населения
-equal,Equal,Igual,Egaux,Igual,Равно
-not_equal,Not Equal,No iguales,Non égaux,Não igual,Не равны
-less_than,Less Than,Menor que,Inférieur à,Menor que,Меньше
-greater_than,Greater Than,Mayor que,Supérieur à,Maior que,Больше чем
-greater_than_equal,Greater Than Or Equal,Mayor que o igual,Supérieur ou égal,Maior que ou igual,"Больше, чем или равно"
-add_condition,Add Condition,Añadir condición,Ajoutez une condition,Adicionar condição,Добавить условие
-select_rule,Select Rule,Seleccionar regla,Sélectionnez une règle,Selecionar regra,Выберите правило
-teams,Teams,Equipos,Équipes,Equipas,Команды
-select_location,Select Location,Seleccionar ubicación,Sélectionnez le lieu,Selecionar localização,Выбрать местоположение
-current_location,Current,Actual,Actuel,Atual,Текущее
-tap_the_map,Tap on the map to add a new location,Pulse en el mapa para añadir una nueva ubicación,Tapez sur la carte pour ajouter un nouveau lieu,Toque no mapa para adicionar uma nova localização,"Нажмите на карту, чтобы добавить новое местоположение"
-complete,Complete,Completar,Complet,Completar,Завершить
-reason_incomplete_label,Reason Incomplete,Razón Incompleto,Motif Incomplet,Razão Incompleto,Причина незавершенности
-warning,Warning!,Advertencia,Attention!,Aviso!,Внимание!
-duplicate_warning,Adding this new location is extremely close to an existing location.  Are you sure that you want to add it?,Añadir esta nueva ubicación está extremadamente cerca de una ubicación existente.  ¿Está seguro de que desea añadirla?,L'ajout de ce nouveau lieu est extrêmement proche d'un lieu existant.  Êtes-vous sûr de vouloir l'ajouter ?,A adição desta nova localização é extremamente próxima de uma localização existente.  Tem a certeza de que pretende adicioná-la?,"Добавление нового местоположения происходит очень близко к существующему местоположению.  Вы уверены, что хотите добавить его?"
-missing_team,Configuration is missing a Team definition,A la configuración le falta una definición de Equipo,Il manque une définition d'équipe à la configuration,A configuração não tem uma definição de Equipa,В конфигурации отсутствует определение команды
-collection_teams,Collection Teams,Equipos de recogida,Équipes de collecte,Equipes de coleta,Коллективные команды
-begin_field_block,Begin Field Block,Iniciar bloque de campo,Début d'une série de variables,Iniciar bloqueio de campo,Начало блока по полю
-save_and_end_block,Save and End Block,Guardar y finalizar bloque,Sauvegarder et terminer la série de variables,Salvar e terminar o bloco,Сохранить и завершить блок
-add_another_field,Save and Add Another Field,Guardar y añadir otro campo,Enregistrer et ajouter un autre champ,Salvar e adicionar outro campo,Сохранить и добавить другое поле
-current_location_not_set,Current Location Not Set,Ubicación actual no establecida,L'emplacement actuel n'est pas défini,Localização atual não definida,Текущее местоположение не установлено
-option_item_name,Enter the Option Item Name,Introduzca el nombre de la opción,Saisir le nom de l'élément de l'option,Introduzir o nome do item de opção,Введите имя элемента опции
-export_collection_data,Export Collection Data,Exportar datos de recogida,Exporter les données de la collection,Exportar dados de coleta,Экспорт данных коллекции
-import_field_data,Import Field Data,Importar datos de campo,Importer des données de champ,Importar dados de campo,Импортировать данные поля
-select_a_date,Select a Date,Seleccione una fecha,Sélectionner une date,Selecionar uma data,Выберите дату
-select,Select,Seleccione,Sélectionner,Selecionar,Выберите
-team_name,Team Name,Nombre del equipo,Nom de l'équipe,Nome da equipe,Имя команды
-launch_survey,Launch Survey,Iniciar encuesta,Lancer l'enquête,Lançar questionário,Запустить опрос
-mark_as_incomplete,Mark as Incomplete,Marcar como incompleta,Marquer comme incomplet,Marcar como Incompleto,Пометить как незавершенный
-enter_current_pin,Enter Current Pin,Introducir PIN actual,Saisir le code PIN actuel,Insirar o PIN atual,Введите текущий PIN-код
-enter_new_pin,Re-Enter New PIN,Vuelva a introducir el nuevo PIN,Saisissez à nouveau votre code PIN,Introduzir novamente o novo PIN,Повторный ввод нового PIN-кода
-re_enter_new_pin,Re-Enter New PIN,Vuelva a introducir el nuevo PIN,Saisissez à nouveau votre code PIN,Introduzir novamente o novo PIN,Повторно ввести новый PIN-код
-select_a_time,Select a Time,Seleccione una hora,Sélectionner une heure,Selecionar uma hora,Выбрать время
-UUID,UUID,UUID,UUID,UUID,UUID
-latitude,Latitude,Latitud,Latitude,Latitude,Широта
-longitude,Longitude,Longitud,Longitude,Longitude,Долгота
-last_updated,Last Updated,Última actualización,Dernière mise à jour,Última atualização,Последнее обновление
-status,Status,Estado,Statut,Estado,Статус
-description,Description,Descripción,Description de l'image,Descrição,Описание
-add_image,Add Image,Añadir imagen,Ajouter une image,Adicionar imagem,Добавить изображение
-enumeration_areas,Enumeration Areas,Áreas de Enumeración,Zones de dénombrement,Áreas de enumeração,Области перечисления
-enter_team_name,Enter Team Name,Introducir nombre de equipo,Saisir le nom de l'équipe,Insira nome da equipe,Введите название команды
-assign_households,Assign Households,Asignar hogares,Assigner les ménages,Atribuir agregados familiares,Назначить домохозяйства
-sampling_type,Sampling Type,Tipo de Muestreo,Type d'échantillonnage,Tipo de amostragem,Тип выборки
-generating_qr_code,Generating QR Code…,Generar Código QR...,Générer un code QR...,Gerar código QR...,Генерация QR-кода...
-samples,Samples,Muestras,Échantillons,Amostras,Образцы
-you_don_t_have_any_samples_for_this_study,You do not have any samples for this study,No tiene muestras para este estudio,Vous n'avez pas d'échantillons pour cette étude,Não tem amostras para este estudo,У вас нет образцов для этого исследования
-enum_saved_doc,Enumeration has been saved to the Documents directory.,Enumeración se ha guardado en el directorio Documentos.,L'énumération a été sauvegardée dans le répertoire Documents.,A enumeração foi guardada no diretório Documentos.,В директорию Документы сохранен файл Перепись.
-config_saved_doc,Configuration has been saved to the Documents directory.,La configuración se ha guardado en el directorio Documentos.,Configuration a été sauvegardé dans le répertoire Documents.,A configuração foi guardada no diretório Documentos.,Конфигурация сохранена в каталоге Документы.
-nobody_home,Nobody home,Nadie en casa,Personne à la maison,Ninguém em casa,Никто не дома
-export_enum_data,Export Enumeration Data,Exportar datos de enumeración,Exporter des données de recensement,Exportar dados de enumeração,Экспорт данных переписи населения
-delete_landmark_message,Are you sure you want to permanently delete this landmark?,¿Está seguro de que desea eliminar definitivamente este hito?,Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?,Tem a certeza de que pretende eliminar permanentemente esta referência?,"Вы уверены, что хотите безвозвратно удалить этот ориентир?"
-subaddress,Subaddress,Subdirección,Sous-adresse,Sub-endereço,Субадрес
-sampled,Sampled,Muestreo,Échantillonné,Amostragem,Выборочный
-completed_enumeration,Completed Enumeration,Enumeración completada,Dénombrement terminé,Enumeração concluída,Завершенное перечисление
-incomplete_enumeration,Incomplete Enumeration,Enumeración incompleta,Dénombrement incomplet,Enumeração Incompleta,Неполный сбор
-dismiss,Dismiss,Descartar,Supprimer,Excluir,Удалить
-delete,Delete,Borrar,Supprimer,Eliminar,Удалить
-launching_odk_collect_application,Launching ODK Collect Application...,Lanzamiento de la aplicación ODK Collect...,Lancement de l'application ODK Collect...,Iniciar a aplicação ODK Collect...,Запуск приложения ODK Collect...
-filters,Filters (combines rules),Filtros (combina reglas),Filtres (combine des règles),Filtros (combina regras),Фильтры (объединяет правила)
-new_location,Identify Location,Identificar ubicación,Identifier le lieu,Identificar a localização,Идентифицировать местоположение
-delete_configuration,The current configuration will be replaced by the import.  Would you like to proceed?,La configuración actual será reemplazada por la importación.  ¿Desea continuar?,La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?,A configuração atual será substituída pela importação. Deseja prosseguir? ,Текущая конфигурация будет заменена импортом.  Желаете ли вы продолжить?
-total_population,Total Population Size,Tamaño total de la población,Taille totale de la population,Tamanho total da população,Общий размер популяции
-enter_the_total_population_size,Enter the total population size,Introduzca el tamaño total de la población,Saisissez la taille totale de la population,Introduza o tamanho total da população,Введите общий размер популяции.
-total_population_size_error,The total population size must be greater than 0,El tamaño total de la población debe ser superior a 0,La taille totale de la population doit être supérieure à 0,O tamanho total da população tem de ser superior a 0,Размер генеральной совокупности должен быть больше 0
-sample_size_error,The sample size must be greater than 0,El tamaño de la muestra debe ser superior a 0,La taille de l'échantillon doit être supérieure à 0,O tamanho da amostra deve ser maior que 0,Размер выборки должен быть больше 0
-simple_random_sampling_label,Total Sample Size Across All Clusters,Tamaño total de la muestra en todas las agrupaciones,Taille totale de l'échantillon pour toutes les grappes,Tamanho total da amostra em todos os clusters,Общий размер выборки по всем кластерам
-cluster_sampling_label,Sample Size Per Cluster,Tamaño de la muestra por conglomerado,Taille de l'échantillon par grappe,Tamanho da amostra por agrupamento,Размер выборки для каждого кластера
-show_enumeration_info,Show Enumeration Info,Mostrar información de enumeración,Afficher les informations sur le dénombrement,Mostrar informações de enumeração,Показать информацию о населенном пункте
-please_enter_a_name,Please enter a name for this field.,Introduzca un nombre para este campo.,Veuillez saisir un nom pour ce champ.,Introduza um nome para este campo.,"Пожалуйста, введите имя для этого поля."
-please_enter_a_subaddress,Please enter a unique sub-address.,Introduzca una subdirección única.,Veuillez saisir une sous-adresse unique.,Introduza um sub-endereço único.,Укажите уникальный субадрес.
-please_select_team_boundary,Please select the team boundary.,"Por favor, seleccione el límite del equipo.",Veuillez sélectionner le périmètre de l'équipe.,Seleccione o limite da equipa.,"Пожалуйста, выберите границу группы."
-enum_area_name_property,Enter the value of the Enumeration Area Name property,Introduzca el valor de la propiedad Nombre del área de enumeración,Saisir la valeur de la propriété Nom de la zone d'énumération,Introduzir o valor da propriedade Nome da área de enumeração,"Введите значение свойства ""Имя области перечисления""."
-downloading_map_tiles,Downloading Map Tiles...,Descargando Mosaicos de Mapa...,Téléchargement des tuiles de carte...,Descarregamento de Map Tiles...,Загрузка плиток карты...
-style_pack_download_failed,Map Style Pack Download Failed,Fallo en la descarga del paquete de estilos de mapa,Échec du téléchargement du Map Style Pack,Falha no download do pacote de estilos de mapa,Загрузка пакета стилей карты не удалась
-tile_pack_download_failed,Map Tile Pack Download Failed,Descarga fallida del paquete de mosaicos de mapa,Le téléchargement du Map Tile Pack a échoué,Falha na transferência do pacote de mosaicos de mapas,Загрузка пакета плиток карты не удалась
-download_map_tiles_now,Would you like to download map tiles now?,¿Desea descargar los mosaicos de mapa ahora?,Voulez-vous télécharger les tuiles de carte maintenant ?,Gostaria de descarregar agora as peças do mapa?,Вы хотите загрузить плитки карты сейчас?
-delete_map_tile_region,Are you sure you want to delete this Map Tile Region?,¿Está seguro de que desea eliminar esta Región de Baldosas de Mapa?,Êtes-vous sûr de vouloir supprimer cette région de tuiles de carte ?,Tem a certeza de que pretende apagar esta Região de Map Tile?,"Вы уверены, что хотите удалить этот регион картографических плиток?"
-import_enumeration_area,Import Enumeration Area,Importar área de enumeración,Importez une zone de dénombrement,Importar área de enumeração,Импортировать область перечисления
-create_enumeration_area,Create Enumeration Area,Crear área de enumeración,Créez une zone de dénombrement,Criar área de enumeração,Создать область переписи населения
-add_household,Add Household,Añadir hogar,Ajoutez un ménage,Adicionar agregado familiar,Добавить домохозяйство
-define_map_tile_cache_region,Define map tile cache region,Definir región de caché de map tiles,Définir la région de cache des tuiles de la carte,Definir região de cache de mosaicos,Определить регион кэширования картографических плиток
-download_map_tiles,Download map tiles,Descargar mosaicos de mapa,Téléchargez les tuiles de la carte,Descarregar mosaicos do mapa,Загрузить плитки карты
-center_on_location,Center on location,Centrar en ubicación,Centrez sur l'emplacement,Centrar na localização,Центрирование по местоположению
-less_than_equal,Less Than Or Equal,Menor o igual que,Inférieur ou égal,Menor que ou igual,Меньше или равно
-gps_accuracy_error,GPS accuracy is less than the required accuracy,La precisión del GPS es inferior a la requerida,La précision du GPS est inférieure à la précision requise,A precisão do GPS é inferior à precisão exigida,Точность GPS меньше требуемой точности
-gps_location_error,You are currently too far away from this location,Se encuentra demasiado lejos de esta ubicación,Vous êtes actuellement trop loin de cet emplacement,Está atualmente demasiado longe desta localização,Вы находитесь слишком далеко от этого места
-accuracy,Accuracy : ,Precisión : ,Précision : ,Precisão : ,Точность : 
-good,GOOD,BUENA,BON,BOA,ХОРОШО
-poor,POOR,POBRE,MAUVAIS,RUIM,ПЛОХО
-unknown,UNKNOWN,DESCONOCIDO,INCONNU,DESCONHECIDA,НЕИЗВЕСТНО
-legend,Legend,Leyenda,Légende,Legenda,Легенда
-select_date_type,Please select the Date type,Seleccione el tipo de fecha,Veuillez sélectionner le type de date,Seleccione o tipo de data,"Пожалуйста, выберите тип даты"
-contains,Contains,Contiene,Contient,Contém,Содержит
-collection_saved_doc,Collection has been saved to the Documents directory,La colección se ha guardado en el directorio Documentos,La collection a été enregistrée dans le répertoire Documents,A coleção foi guardada no diretório Documentos,Коллекция была сохранена в каталоге Документы
-invalid_operator,The selected operator is not valid for the selected rule,El operador seleccionado no es válido para la regla seleccionada,L'opérateur sélectionné n'est pas valide pour la règle sélectionnée,O operador selecionado não é válido para a regra selecionada,Выбранный оператор не действителен для выбранного правила
-about_gpssample,About GPSSample,Acerca de GPSSample,À propos de GPSSample,Sobre o GPSSample,О компании GPSSample
-privacy_statement,Privacy Statement,Declaración de privacidad,Déclaration de confidentialité,Declaração de privacidade,Положение о конфиденциальности
-terms_and_conditions,Terms and Conditions,Condiciones de uso,Conditions d'utilisation,Termos e Condições,Условия и положения
-show_map,Show Map,Mostrar mapa,Afficher la carte,Mostrar mapa,Показать карту
-number_of_residents,Number of Residents,Número de residentes,Nombre de résidents,Número de residentes,Количество жителей
-end_user_license_agreement,End User License Agreement,Acuerdo de licencia de usuario final,Accord de licence pour l'utilisateur final,Contrato de Licença de Utilizador Final,Лицензионное соглашение с конечным пользователем
-code_of_conduct,Code of Conduct,Código de conducta,Code de conduite,Código de Conduta,Кодекс поведения
-clear_map,Are you sure you want to clear the map?,¿Estás seguro de que quieres borrar el mapa?,Êtes-vous sûr de vouloir effacer la carte ?,Tens a certeza de que queres limpar o mapa?,"Вы уверены, что хотите очистить карту?"
-delete_point,Are you sure you want to remove the last point?,¿Estás seguro de que quieres eliminar el último punto?,Êtes-vous sûr de vouloir supprimer le dernier point ?,Tem a certeza de que pretende remover o último ponto?,"Вы уверены, что хотите удалить последнюю точку?"
-enumeration_area,Enumeration Area,Área de Enumeración,Zone de dénombrement,Área de enumeração,Зона переписи
-please_select_a_role,Please select a role,Seleccione un rol,Veuillez sélectionner un rôle,"Por favor, seleccione uma função","Пожалуйста, выберите роль"
-please_enter_your_user_name,Please enter your user name,Introduzca su nombre de usuario,Veuillez saisir votre nom d'utilisateur,Introduza o seu nome de utilizador,"Пожалуйста, введите имя пользователя"
-user_name_not_found,User name not found,Nombre de usuario no encontrado,Nom d'utilisateur non trouvé,Nome de utilizador não encontrado,Имя пользователя не найдено
-multi_families,Multi Households,Multihogares,Multi-ménages,Agregados familiares múltiplos,Многоквартирные дома
-is_multi_family,Is this a multi household location?,¿Se trata de una ubicación multihogar?,S'agit-il d'un lieu où vivent plusieurs ménages ?,Este é um local com vários agregados familiares?,Является ли это место расположения несколькими домохозяйствами?
-sample,Sample,Muestra,Exemple,Amostra,Образец
-mark_status,Mark Status,Marca Estado,Statut de la marque,Estado da marca,Статус отметки
-not_visited,Not Visited,No visitado,Non visitée,Não visitado,Не посещен
-incomplete_collection,Incomplete Survey,Encuesta incompleta,Enquête incomplète,Inquérito Incompleto,Незавершенный опрос
-completed_collection,Completed Survey,Encuesta completada,Enquête terminée,Inquérito concluído,Завершенный опрос
-subaddress_is_required,Subaddress is Required,Se requiere subdirección,La sous-adresse est requise,O subendereço é necessário,Требуется субадрес
-auto_increment_subaddress,Auto Increment Subaddress,Incremento automático de la subdirección,Incrémentation automatique de la sous-adresse,Incremento automático do subendereço,Автоматическое увеличение субадреса
-allow_manual_identification_of_locations,Allow manual identification of locations,Permitir la identificación manual de ubicaciones,Permettre l'identification manuelle des lieux,Permitir a identificação manual de localizações,Разрешить ручную идентификацию местоположений
-proximity_warning_enabled,Proximity Warning Enabled,Aviso de proximidad activado,Avertissement de proximité activé,Aviso de proximidade ativado,Включено предупреждение о приближении
-encryption_password,Encryption Password,Contraseña de encriptación,Mot de passe de cryptage,Palavra-passe de encriptação,Пароль шифрования
-enter_encryption_password,Enter Encryption Password,Introduzca la contraseña de encriptación,Entrer le mot de passe de cryptage,Introduzir palavra-passe de encriptação,Введите пароль шифрования
-summary,Summary,Resumen,Résumé,Resumo,Резюме
-num_enumeration_areas,# Enumeration Areas:,# Áreas de Enumeración:,# Zones de dénombrement :,# Áreas de Enumeração:,# Области перечисления:
-num_hhs_enumerated,# HH\'s Enumerated:,# Hogares censados,# Ménages recensés :,# Agregados Familiares Enumerados:,# Перечисленные домохозяйства:
-num_hhs_eligible,# HH\'s Eligible:,# Hogares elegibles:,# Ménages éligibles :,# Agregados Familiares Elegíveis:,"# Домохозяйства, отвечающие критериям:"
-num_hhs_sampled,# HH\'s Sampled:,# Hogares muestreados,# Ménages échantillonnés :,# Agregados Familiares Amostrados:,"# Домохозяйства, попавшие в выборку:"
-num_hhs_surveyed,# HH\'s Surveyed:,# Hogares encuestados:,# Nombre de ménages enquêtés:,# Agregados Familiares Inquiridos:,# Обследованные домохозяйства:
-num_hhs_remaining_to_survey,# HH\'s Remaining to Survey:,# Hogares pendientes de encuestar:,# Ménages restant à enquêter :,# Agregados Familiares que Faltam Inquirir:,"# Домохозяйства, оставшиеся для опроса:"
-decryption_failed,Decryption failed.  Please try again.,La desencriptación ha fallado.  Inténtelo de nuevo.,Le décodage a échoué.  Veuillez réessayer.,"A descodificação falhou.  Por favor, tente novamente.","Расшифровка не удалась.  Пожалуйста, попробуйте еще раз."
-rename_or_delete,Would you like to Rename or Delete the Enumeration Area ?,¿Desea cambiar el nombre o eliminar el área de enumeración?,Souhaitez-vous renommer ou supprimer la zone de dénombrement ?,Gostaria de mudar o nome ou eliminar a área de enumeração?,Вы хотите переименовать или удалить область переписи?
-rename,Rename,Renombrar,Renommer,Mudar o nome,Переименовать
-map_tile_boundary,Enter the length/width (Kilometers) of the desired map tile region,Introduzca la longitud/anchura (Kilómetros) de la región de mosaico de mapa deseada,Saisir la longueur/largeur (en kilomètres) de la région souhaitée.,Introduza o comprimento/largura (quilómetros) da região de mosaico pretendida,Введите длину/ширину (в километрах) желаемого региона картографической плитки
-success,SUCCESS!,¡ÉXITO!,SUCCES !,SUCESSO!,УСПЕХ!
-error,ERROR!,¡ERROR!,ERREUR !,ERRO!,ОШИБКА!
-import_failed,The import failed.,La importación ha fallado.,L'importation a échoué.,A importação falhou.,Импорт не удался.
-import_succeeded,The import was successful.,La importación se ha realizado correctamente.,L'importation a réussi.,A importação foi bem sucedida.,Импорт прошел успешно.
-clear_map_tile_region,Clear map tile cache region,Borrar región de caché de mosaico de mapa,Effacer la région du cache des tuiles de la carte,Limpar a região da cache de mosaicos do mapa,Очистить кэш региона плитки карты
-import_request_failed,Received an Export Request while waiting for an Import Request,Recibida una solicitud de exportación a la espera de una solicitud de importación,Réception d'une demande d'exportation en attente d'une demande d'importation,Recebeu um pedido de exportação enquanto aguardava um pedido de importação,Получен запрос на экспорт в ожидании запроса на импорт
-export_request_failed,Received an Import Request while waiting for an Export Request,Recibida una Solicitud de Importación mientras se espera una Solicitud de Exportación,Réception d'une demande d'importation en attente d'une demande d'exportation,Recebeu um pedido de importação enquanto aguardava um pedido de exportação,Получен запрос на импорт в ожидании запроса на экспорт
-network_connection,Network Connection,Conexión a la red,Connexion au réseau,Ligação de rede,Сетевое подключение
-add_landmark,Add Landmark,Añadir punto de referencia,Ajoutez un point de repère,Adicionar ponto de referência,Добавить ориентир
-enumerated,Enumerated,Censados,Recensés,Enumerados,Перечисленные
-surveyed,Surveyed,Encuestados,Enquêtés,Inquiridos,Обследованные
-meters,Meters,Metros,Mètres,Metros,Метры
-feet,Feet,Pies,Pieds,Pés,Футы
-kilometers,Kilometers,Kilómetros,Kilomètres,Quilômetros ,километры
-miles,Miles,Millas,Miles,Milhas,Мили
+﻿app_name,GPSSample::en,GPSSample::es,GPSSample::fr,GPSSample::pt,GPSSample::ru,GPSSample::id
+action_settings,Settings,Configuración,Paramètres,Configurações,Настройки,Pengaturan
+action_sign_out,Sign Out,Cerrar sesión,Se déconnecter,Sair,Выйти из системы,Keluar
+next,Next,Siguiente,Écran suivant,Seguinte,Следующий,Berikutnya
+previous,Previous,Anterior,Écran précédent,Anterior,Предыдущий,Sebelumnya
+manager,Manager,Gerente,Responsable,Gerente,Менеджер,Pengelola
+client,Enumeration,Enumeración,Énumération,Enumeração,Перечисление,Pencacahan
+connected_clients,Connected Clients,Clientes conectados,Clients connectés,Clientes ligados,Подключенные клиенты,Klien yang Terhubung
+create_hotspot,Create Hotspot,Crear punto de acceso,Créer un hotspot,Criar ponto de acesso,Создать точку доступа,Buat Hotspot
+create_server,Create Server,Crear servidor,Créer un serveur,Criar servidor,Создать сервер,Buat Server
+create_qr_code,Create QR Code,Crear código QR,Créer un code QR,Criar código QR,Создать QR-код,Buat Kode QR
+connect_hotspot,Connect To Hotspot,Conectar al punto de acceso,Se connecter au hotspot,Conectar-se a um ponto de acesso,Подключение к точке доступа,Hubungkan Ke Hotspot
+registering_device,Registering Device,Registrando dispositivo ,Enregistrement de l'appareil,Registar dispositivo,Регистрация устройства,Mendaftarkan Perangkat
+sending_command,Sending Command,Enviando comando,Envoi de la commande,Comando de envio,Отправка команды,Mengirim Perintah
+sending_enum_data,Sending Enumeration Data,Enviando datos de enumeración,Envoi de données d'énumération,Enviar dados de enumeração,Отправка данных перечисления,Mengirim Data Pencacahan
+receiving_data,Receiving Data,Recibiendo datos,Réception des données,Recebendo dados,Получение данных,Menerima data
+configuration_received,Configuration Received,Configuración recibida,Configuration reçue,Configuração recebida,Полученная конфигурация,Konfigurasi Diterima
+forgot_pin_questions,Father's middle name,Segundo nombre del padre,Deuxième prénom de votre père,Nome do meio do pai,Отчество отца,Nama ayah
+forgot_pin_questions,Mother's maiden name,Apellido de soltera de la madre,Nom de jeune fille de votre mère,Nome de solteira da mãe,Девичья фамилия матери,Nama Ibu
+forgot_pin_questions,Favorite Pet's name,El nombre de tu mascota favorita,Nom de votre animal de compagnie préféré,Nome do animal de estimação favorito,Имя любимого домашнего животного,Nama binatang kesayangan
+forgot_pin_questions,Last 4 digits of cell phone #,Últimas 4 cifras del número de celular,4 derniers chiffre de votre numéro de téléphone portable,Últimos 4 dígitos do número de telemóvel,Последние 4 цифры номера мобильного телефона,4 digit terakhir ponsel#
+forgot_pin_questions,Favorite Food,Comida favorita,Votre aliment/nourriture favorit(e),Comida favorita,Любимая еда,Makanan favorit
+forgot_pin_questions,Birth Month,Mes de nacimiento,Mois de naissance,Mês de nascimento,Месяц рождения,Bulan lahir
+forgot_pin_questions,Other Question,Otra pregunta,Autre question,Outra pergunta,Другой вопрос,Pertanyaan lain
+distance_formats,Meters / Kilometers,Metros / Kilómetros,Mètres / Kilomètres,Metros / Quilômetros ,Метры / километры,Meter / Kilometer
+distance_formats,Feet / Miles,Pies / Millas,Pieds / Miles,Pés / Milhas,Футы / Мили,Kaki / Mil
+time_formats,12 hour (AM/PM),12 horas (AM/PM),12 heures (AM/PM),12 horas (AM/PM),12 часов (AM/PM),12 jam (AM/PM)
+time_formats,24 hour,24 horas,24 heures,24 horas,24 часа,24 jam
+field_types,Text,Texto,Texte,Texto,Текст,Teks
+field_types,Number,Número,Nombre,Número,Число,Nomor
+field_types,Date,Fecha,Date,Data,Дата,Tanggal
+field_types,Checkbox,Casilla de chequeo,Case à cocher,Caixa de seleção,Флажок,kotak centang
+field_types,Dropdown,Menú de opciones,Question déroulante,Lista suspensa,Выпадающее окно,tarik-turun
+operators,Equal,Igual,Égal,Igual,Равно,Setara
+operators,NotEqual,No igual,Inégal,Não igual,Не равно,Tidak sama
+operators,LessThan,Menor que,Plus petit que,Menor que,Меньше чем,Kurang dari
+operators,GreaterThan,Mayor que,Plus grand que,Maior que,Больше чем,Lebih besar dari
+operators,GreaterThanOrEqual,Mayor que o igual,Plus grand ou égal à,Maior ou igual a,Больше чем или равно,Lebih BesarDariAtauSama
+connectors,AND,Y,ET,E,И,DAN
+connectors,OR,O,OU,OU,ИЛИ,ATAU
+connectors,NOT,NO,PAS,NÃO,НЕ,BUKAN
+samling_methods,Simple Random Sampling,Muestreo aleatorio simple,Échantillonnage aléatoire simple,Amostragem aleatória simples,Простая случайная выборка,Contoh acak sederhana
+samling_methods,Cluster Sampling,Muestreo por conglomerados,Échantillonnage en grappes,Amostragem por conglomerados,Кластерная выборка,Pengambilan Sampel Klaster
+samling_methods,Subsets: May Overlap,Subconjuntos: pueden superponerse,Sous-ensembles : peuvent se chevaucher,Subconjuntos: Podem sobrepor-se,Подмножества: Могут пересекаться,Subset: Mungkin Tumpang Tindih
+samling_methods,Strata: Mutually Exclusive,Estratos: Mutuamente excluyentes,Strates : mutuellement exclusives,Estratos: Mutuamente exclusivos,Страты: Взаимоисключающие,Strata: Saling Eksklusif
+admin,Admin,Administrador,Administrateur,Administrador,Администратор,Admin
+supervisor,Supervisor,Supervisor,Superviseur,Supervisor,Руководитель,Pengawas
+enumerator,Enumerator,Enumerador,Recenseur,Enumerador,Перечислитель,Pencacah
+surveyor,Surveyor,Encuestador,Arpenteur,Topógrafo,Исследователь,surveyor
+configurations,Configurations,Configuraciones,Configurations,Configuração,Конфигурации,Konfigurasi
+no_configurations,You don't have any configurations,No tiene ninguna configuración,Vous n'avez aucune configuration,Não tem nenhuma configuração,У вас нет каких -либо конфигураций,Anda tidak memiliki konfigurasi apa pun
+no_studies,You don't have any studies for this configuration,No tienes ningún estudio para esta configuración,Vous n'avez pas d'études pour cette configuration,Não existem estudos para esta configuração,У вас нет исследований для этой конфигурации,Anda tidak memiliki studi apa pun untuk konfigurasi ini
+data_collector,Data Collector,Recolector de datos,Collecteur de données,Coletor de dados,Опрашивающий,Pengumpul data
+scan_qr_code,Scan QR Code,Escanear código QR,Scannez le code QR,Ler código QR,Сканирование QR-кода,Pindai kode QR
+continue_with_existing_study,Continue with existing Study,Continuar el estudio existente,Continuez avec l'étude existante,Continuar com o estudo existente,Продолжить существующее исследование,Lanjutkan dengan Studi yang ada
+admin_sign_in,Admin Sign In,Inicio de sesión de administrador,Connexion de l'administrateur,Login do Administrador,Вход администратора,Admin Masuk
+supervisor_sign_in,Supervisor Sign In,​​Inicio de sesión de supervisor,Connexion du superviseur,Login do Supervisor,Вход  Руководитель,Supervisor Masuk
+data_collector_sign_in,Data Collector Sign In,Inicio de sesión de recolector de datos,Connexion du collecteur de données,Login do coletor de dados,Вход опрашивающего ,Masuk Pengumpul Data
+admin_sign_up,Admin Sign Up,Registro de administrador,Inscription de l'administrateur,Registo do administrador,Зарегистрироваться как Администратор,Admin Daftar
+supervisor_sign_up,Supervisor Sign Up,Registro de supervisor,Inscription du superviseur,Registo do supervisor,Зарегистрироваться как Руководитель,Pendaftaran Supervisor
+data_collector_sign_up,Data Collector Sign Up,Registro de recolector de datos,Inscription du collecteur de données,Registo do coletor de dados,Регистрация сборщика данных,Pendaftaran Pengumpul Data
+enter_your_pin,Enter your PIN,Ingrese su PIN,Saisissez votre code PIN,Digite seu PIN,Введите PIN-код,Masukkan PIN Anda
+reenter_your_pin,Re-enter your PIN,Vuelva a ingresar su PIN,Saisissez à nouveau votre code PIN,Digite novamente seu PIN,Повторный ввод PIN-кода,Masukkan kembali PIN Anda
+back,Back,Atrás,Écran précédent,Voltar,Назад,Kembali
+cancel,Cancel,Anular,Annulez,Cancelar,Отменить,Membatalkan
+finish,Finish,Finalizar,Finir,Terminar,Завершить,Menyelesaikan
+save,Save,Grabar,Sauvegardez,Guardar,Сохранить,Menyimpan
+done,Done,Hecho,Terminé,Concluído,Готово,Selesai
+select_role,Select your Role,Selecciona su rol,Sélectionnez votre rôle,Seleccione a sua função,Выберите свою роль,Pilih Peran Anda
+admin_select_role,Admin Select Role,Administrador - selecciona rol,Administrateur - Sélectionnez un rôle,Administrador - Selecionar função,Выберите роль Администратора,Admin Pilih Peran
+supervisor_select_role,Supervisor Select Role,Supervisor - selecciona rol,Superviseur - Sélectionnez un rôle,Supervisor - Selecionar função,Выберите роль Супервайзера,Peran Pemilihan Supervisor
+sign_in,Sign In,Iniciar sesión,S'identifier,Login,Войти,Masuk
+sign_up,Sign Up,Registrarse,S'inscrire,Inscrever-se,Зарегистрироваться,Mendaftar
+sign_out,Sign Out,Cerrar sesión,Se déconnecter,Sair,Выйти из системы,Keluar
+not_registered,Not registered?  Sign Up!,¿No estás registrado? ¡Regístrate!,Pas enregistré? S'inscrire!,Não está registado?  Registe-se!,Не зарегистрированы?  Зарегистрируйтесь!,Tidak terdaftar? Mendaftar!
+name,Name,Nombre,Nom,Nome,Имя,Nama
+enter_your_name,Enter your name,Ingrese su nombre,Entrez votre nom,Insira seu nome,Введите Ваше имя,Masukkan nama Anda
+pin,PIN,PIN,PIN,PIN,PIN,PIN
+forgot_pin_question,Forgot PIN question,Se olvidó la pregunta del PIN,Question liée au PIN oubliée?,Pergunta sobre o PIN esquecido,Забыли PIN-код,Pertanyaan lupa PIN
+forgot_pin_answer,Forgot PIN answer,Se olvidó la respuesta del PIN,Réponse liée au PIN oubliée?,Resposta ao PIN esquecido,Забыли ответ PIN,Lupa jawaban PIN
+enter_your_answer,Enter your answer,Ingrese su respuesta,Saisissez votre réponse,Insira sua resposta,Введите ответ,Masukkan jawaban Anda
+create_config,Create Configuration,Crear configuración,Créer une configuration,Criar configuração,Создать конфигурацию,Buat Konfigurasi
+delete_config,Delete Configuration,Eliminar configuración,Supprimer la configuration,Eliminar configuração,Удалить конфигурацию,Hapus Konfigurasi
+edit_config,Edit Configuration,Editar configuración,Modifier la configuration,Editar configuração,Редактировать конфигурацию,Sunting Konfigurasi
+create_study,Create Study,Crear estudio,Créer une étude,Criar estudo,Создать исследование,Buat Studi
+edit_study,Edit Study,Modificar estudio,Modifier l'étude,Editar estudo,Редактировать исследование,Sunting Studi
+delete_study,Delete Study,Eliminar estudio,Supprimer l'étude,Eliminar estudo,Удалить исследование,Hapus Studi
+create_field,Create Field,Crear campo,Créer un champ,Criar campo,Создать поле,Buat Bidang
+config_name,Configuration Name,Nombre de la configuración,Nom de la configuration,Nome da configuração,Конфигурация имени,Nama Konfigurasi
+study_name,Study Name,Nombre del estudio,Nom de l'étude,Nome do estudo,Имя исследования,Nama Studi
+field_name,Field Name,Nombre del campo,Nom du champ,Nome do campo,Имя поля,Nama Bidang
+enumeration_fields,Enumeration Fields,Campos de enumeración,Champs d'énumération,Campos de enumeração,Поля перечисления,Bidang Pencacahan
+enter_config_name,Enter Configuration Name,Ingrese el nombre de la configuración,Entrez le nom de la configuration,Insirar nome da configuração,Введите имя конфигурации,Masukkan Nama Konfigurasi
+enter_study_name,Enter Study Name,Ingrese el nombre del estudio,Entrez le nom de l'étude,Insirar nome do estudo,Введите имя исследования,Masukkan Nama Studi
+enter_field_name,Enter Field Name,Ingrese el nombre del campo,Entrez le nom du champ,Insirar o nome do campo,Введите имя поля,Masukkan Nama Bidang
+preferred_units,Preferred Units,Unidades preferidas,Unités de préférence,Unidades preferidas,Предпочитаемые единицы,Unit Pilihan
+date_format,Date Format,Formato de fecha,Format de la date,Formato de data,Формат даты,Format tanggal
+time_format,Time Format,Formato de hora,Format horaire,Formato da hora,Формат времени,Format waktu
+manage_enumerators,Manage Enumerators,Administrar enumeradores,Gérer les enquêteurs,Gerir enumeradores,Управление счетчиками,Kelola Enumerator
+collect_enumerations,Collect Enumerations,Recoger enumeraciones,Collecter les énumérations,Coletar enumerações,Сбор перечислений,Kumpulkan Enumerasi
+generate_sample,Generate Sample,Generar muestra,Générer un échantillon,Gerar amostra,Создасть выборку,Hasilkan Sampel
+collect_samples,Collect Samples,Recoger muestras,Recueillir les échantillons,Coletar amostras,Сбор образцов,Kumpulkan Sampel
+min_gps_precision,Desired GPS Precision,Precisión deseada de GPS,Précision GPS souhaitée,Precisão GPS pretendida,Желаемая точность GPS,Presisi GPS yang Diinginkan
+enter_min_gps_precision,Enter Desired GPS Precision,Ingrese la precisión deseada de GPS ,Entrez la précision GPS souhaitée,Insirar a precisão GPS pretendida,Введите желаемую точность GPS,Masukkan Presisi GPS yang Diinginkan
+define_enumeration_fields,Define Enumeration Fields,Definir campos de enumeración,Définir les champs d'énumération,Definir campos de enumeração,Определить поля перечисления,Tentukan Bidang Pencacahan
+define_enumeration_area,Define Enumeration Area,Definir área de enumeración,Définir la zone de dénombrement,Definir área de enumeração,Определить область перечисления,Tentukan Area Pencacahan
+define_sampling_method,Define Sampling Method,Definir método de muestreo,Définir la méthode d'échantillonnage,Definir método de amostragem,Определить метод выборки,Tentukan Metode Pengambilan Sampel
+studies,Studies,Estudios,Études,Estudos,Исследования,Studi
+barcode_result,Barcode detected,Código de barras detectado,Code-barres détecté,Código de barras detectado,Обнаружен штрих-код,Kode batang terdeteksi
+error_scanner_cancelled,Code scanner is cancelled.,El escáner del código fue anulado,Le scanner de code est annulé.,Scanner de código é cancelado.,Сканер кодов отменен.,Pemindai kode dibatalkan.
+error_camera_permission_not_granted,Camera permission is not granted.,Permiso de cámara no otorgado,L'autorisation pour la caméra n'est pas accordée.,A permissão da câmara não é concedida.,Разрешение камеры не выдано.,Izin kamera tidak diberikan.
+error_app_name_unavailable,App name is not set.,Nombre de la aplicación no fue establecido,Le nom de l'application n'est pas défini.,O nome da aplicação não está definido.,Не задано имя приложения.,Nama aplikasi belum disetel.
+error_default_message,Failed to scan code:,Error en escanear el código:,Le code QR n'a pas été scanné:,Falha na leitura do código:,Не удалось отсканировать код:,Gagal memindai kode:
+menu_item_settings,Settings,Configuración,Paramètres,Configurações,Настройки,Pengaturan
+change_role,Change Role,Cambiar rol,Changement de rôle,Alterar função,Изменить роль,Ubah Peran
+enter_your_user_name,Enter your User Name,Ingrese su nombre de usuario,Entrez votre nom d'utilisateur,Insirar o seu Nome de Utilizador,Введите имя пользователя,Masukkan Nama Pengguna Anda
+field_type,Field Type,Tipo de campo,Type de champ,Tipo de campo,Тип поля,Jenis Bidang
+enter_checkbox_text,Enter checkbox item text,Ingrese el texto del elemento de la casilla de chequeo,Saisir le texte de l'élément de la case à cocher,Insirar o texto do item da caixa de seleção,Введите текст элемента флажка,Masukkan teks item kotak centang
+enter_dropdown_item_text,Enter dropdown item text,Ingrese el texto del elemento del menú de opciones,Saisir le texte de l'élément déroulant,Insirar o texto do item da lista suspensa,Введите текст элемента выпадающего списка,Masukkan teks item tarik-turun
+add_another,ADD ANOTHER,SUMA OTRO,AJOUTER UN AUTRE,ADICIONAR OUTRO,ДОБАВИТЬ ДРУГОЕ,TAMBAHKAN LAINNYA
+delete_field,Delete Field,Eliminar campo,Supprimer le champ,Eliminar campo,Удалить поле,Hapus Bidang
+manage_this_study,Manage this Study,Administrar este estudio,Gérer cette étude,Gerir este estudo,Управление исследованием,Kelola Studi ini
+manage_study,Manage Study,Administrar estudio,Gérer l'étude,Gerir estudo,Управление исследованием,Kelola Studi
+manage_configuration,Manage Configuration,Administrar configuración,Gérer la configuration,Gerir a configuração,Управление конфигурацией,Kelola Konfigurasi
+manage_configurations,Manage Configurations,Administrar configuraciones,Gérer les configurations,Gerir configurações,Управление конфигурациями,Kelola Konfigurasi
+generate_qr_code,Generate QR Code,Generar código QR,Générer un code QR,Gerar código QR,Генерировать QR-код,Hasilkan Kode QR
+create_filter,Create Filter,Crear filtro,Créer un filtre,Criar filtro,Создать фильтр,Buat Filter
+create_rule,Create Rule,Crear regla,Créer une règle,Criar regra,Создать правило,Buat Aturan
+enter_rule_name,Enter Rule Name,Ingrese el nombre de la regla,Entrez le nom de la règle,Insirar nome da regra,Введите имя правила,Masukkan Nama Aturan
+field,Field,Campo,Champ,Campo,Поле,Bidang
+operator,Operator,Operador,Opérateur de fonction,Operador,Оператор,Operator
+enter_value,Enter Value,Ingrese valor,Entrez la valeur,Insirar valor,Введите значение,Masukkan Nilai
+value,Value,Valor,Valeur,Valor,Значение,Nilai
+rule,Rule,Regla,Règle,Regra,Правило,Aturan
+connector,Connector,Conector,Connecteur,Conector,Коннектор,Penyambung
+sampling_method,Sampling Method,Método de muestreo,Méthode d'échantillonnage,Método de amostragem,Метод выборки,Metode Pengambilan Sampel
+enter_filter_name,Enter Filter Name,Ingrese el nombre del filtro,Entrez le nom du filtre,Insirar nome do filtro,Введите имя фильтра,Masukkan Nama Filter
+sample_size,Sample Size,Tamaño de la muestra,Taille de l'échantillon,Tamanho da amostra,Размер выборки,Ukuran sampel
+filter_name,Filter Name,Nombre del filtro,Nom du filtre,Nome do filtro,Имя фильтра,Nama Penyaring
+rule_name,Rule Name,Nombre de la regla,Nom de la règle,Nome da regra,Имя правила,Nama aturan
+total_sample_size,Total Sample Size Across All Clusters,Tamaño total de la muestra en todos los conglomerados,Taille totale de l'échantillon pour toutes les grappes,Tamanho total da amostra em todos os conglomerados,Общий размер выборки по всем кластерам,Total Ukuran Sampel di Semua Cluster
+manage_studies,Manage Studies,Administrar estudios,Gérer les études,Gerir estudos,Управление исследованиями,Kelola Studi
+manage_samples,Manage Samples,Administrar muestras,Gérer les échantillons,Gerir amostras,Управление выборками,Kelola Sampel
+create_sample,Create Sample,Crear muestra,Créer un échantillon,Criar amostra,Создать выборку,Buat Sampel
+delete_sample,Delete Sample,Eliminar muestra,Supprimer l'échantillon,Eliminar amostra,Удалить образец,Hapus Sampel
+manage_supervisors,Manage Supervisors,Administrar supervisores,Gérer les superviseurs,Gerir supervisores,Управление супервизорами,Kelola Supervisor
+home,Home,Pantalla de inicio,Écran d'accueil,Início,Главная,Rumah
+manage_enumeration_areas,Manage Enumeration Areas,Administrar áreas de enumeración,Gérer les zones de dénombrement,Gerir áreas de enumeração,Управление участками переписи,Kelola Area Pencacahan
+please_confirm,Please Confirm,"Por favor, confirme","SVP, confirmez","Por favor, confirmar","Пожалуйста, подтвердите",Mohon Konfirmasi
+import_enumeration,Import Enumeration Data,Importar datos de enumeración,Importez les données d'énumération,Importar dados de enumeração,Импорт данных перечисления,Impor Data Pencacahan
+export_configuration,Export Configuration,Exportar configuración,Exportez la configuration,Exportar configuração,Экспорт конфигурации,Konfigurasi Ekspor
+delete_study_message,Are you sure you want to permanently delete this study?,¿Está seguro de que desea eliminar permanentemente este estudio?,Êtes-vous sûr de vouloir supprimer définitivement cette étude ?,Tem a certeza de que deseja eliminar permanentemente este estudo?,"Вы уверены, что хотите безвозвратно удалить это исследование?",Apakah Anda yakin ingin menghapus studi ini secara permanen?
+delete_field_message,Are you sure you want to permanently delete this field?,¿Está seguro de que desea eliminar permanentemente este campo?,Êtes-vous sûr de vouloir supprimer définitivement ce champ ?,Tem a certeza de que deseja eliminar permanentemente este campo?,"Вы уверены, что хотите безвозвратно удалить это поле?",Apakah Anda yakin ingin menghapus bidang ini secara permanen?
+delete_rule_message,Are you sure you want to permanently delete this rule?,¿Está seguro de que desea eliminar permanentemente esta regla?,Êtes-vous sûr de vouloir supprimer définitivement cette règle ?,Tem a certeza de que deseja eliminar permanentemente esta regra?,"Вы уверены, что хотите навсегда удалить это правило?",Apakah Anda yakin ingin menghapus aturan ini secara permanen?
+delete_team_message,Are you sure you want to permanently delete this team?,¿Está seguro de que desea eliminar permanentemente este equipo?,Êtes-vous sûr de vouloir supprimer définitivement cette équipe ?,Tem a certeza de que deseja eliminar permanentemente esta equipa?,"Вы уверены, что хотите навсегда удалить эту команду?",Apakah Anda yakin ingin menghapus tim ini secara permanen?
+delete_configuration_message,Are you sure you want to permanently delete this configuration?,¿Está seguro de que desea eliminar permanentemente esta configuración?,Êtes-vous sûr de vouloir supprimer définitivement cette configuration ?,Tem a certeza de que deseja eliminar permanentemente esta configuração?,"Вы уверены, что хотите навсегда удалить эту конфигурацию?",Apakah Anda yakin ingin menghapus konfigurasi ini secara permanen?
+delete_household_message,Are you sure you want to permanently delete this household?,¿Está seguro de que desea eliminar permanentemente este hogar?,Êtes-vous sûr de vouloir supprimer définitivement ce ménage ?,Tem a certeza de que deseja eliminar permanentemente este agregado familiar?,"Вы уверены, что хотите навсегда удалить это домохозяйство?",Apakah Anda yakin ingin menghapus rumah tangga ini secara permanen?
+create_field_rule_message,You must create at least one field before you can create a rule,Debe crear al menos un campo antes de poder crear una regla,Vous devez créer au moins un champ avant de pouvoir créer une règle.,Você deve criar pelo menos um campo antes de criar uma regra,Перед созданием правила необходимо создать хотя бы одно поле,Anda harus membuat setidaknya satu bidang sebelum dapat membuat aturan
+create_rule_filter_message,You must create at least one rule before you can create a filter,Debe crear al menos una regla antes de poder crear un filtro,Vous devez créer au moins une règle avant de pouvoir créer un filtre,Você deve criar pelo menos um campo antes de criar uma regra,Перед созданием фильтра необходимо создать хотя бы одно правило,Anda harus membuat setidaknya satu aturan sebelum dapat membuat filter
+select_import_method_message,Select an import method,Seleccione un método de importación,Sélectionnez une méthode d'importation,Selecione um método de importação,Выберите метод импорта,Pilih metode impor
+select_export_message,Select an export method,Seleccione un método de exportación,Sélectionnez une méthode d'exportation,Selecione um método de exportação,Выберите метод экспорта,Pilih metode ekspor
+clear_selections_message,Are you sure you want clear all selections?,¿Está seguro de que desea borrar todas las selecciones?,Etes-vous sûr de vouloir effacer toutes les sélections ?,Tem a certeza de que deseja apagar todas as selecções?,"Вы уверены, что хотите снять все выделения?",Apakah Anda yakin ingin menghapus semua pilihan?
+team_name_message,You must enter a team name,Debe introducir un nombre de equipo,Vous devez saisir un nom d'équipe,Você deve inserir um nome de equipe,Необходимо ввести имя команды,Anda harus memasukkan nama tim
+configuration_documents_message,The configuration has been saved to the Documents directory.,La configuración se ha guardado en el directorio Documentos.,La configuration a été sauvegardée dans le répertoire Documents.,A configuração foi guardada no diretório Documentos.,Конфигурация была сохранена в директории Documents.,Konfigurasi telah disimpan ke direktori Dokumen.
+delete_enum_area_message,Are you sure you want to permanently delete Enumeration Area,¿Está seguro de que desea borrar permanentemente el Área de Enumeración?,Etes-vous sûr de vouloir supprimer définitivement la zone de dénombrement ?,Tem a certeza de que deseja eliminar permanentemente a Área de Enumeração,"Вы уверены, что хотите навсегда удалить область пересчета",Apakah Anda yakin ingin menghapus Area Enumerasi secara permanen
+no_study_ea,You do not have a study associated with this EA.,No tiene ningún estudio asociado a esta Área de Enumeración.,Vous n'avez pas d'étude associée à cette zone de dénombrement.,Não tem um estudo associado a esta Área de Enumeração.,"У вас нет исследования, связанного с этим экспертом.",Anda tidak memiliki studi yang terkait dengan EA ini.
+filename_export_message,Enter a file name for the export,Introduzca un nombre de archivo para la exportación,Entrez un nom de fichier pour l'exportation,Insira um nome de ficheiro para a exportação,Введите имя файла для экспорта,Masukkan nama file untuk ekspor
+select_task,Select a task,Seleccione una tarea,Sélectionnez une tâche,Selecione uma tarefa,Выберите задачу,Pilih tugas
+yes,Yes,Sí,Oui,Sim,Да,Ya
+no,No,No,Non,Não,Нет,TIDAK
+qr_code,QR Code,Código QR,Code QR,Código QR,QR-код,Kode QR
+file_system,File System,Sistema de archivos,Système de fichiers,Sistema de ficheiros,Файловая система,Berkas sistem
+survey,Survey,Encuesta,Enquête,Questionário,Опрос,Survei
+undefined,Undefined,Sin definir,Non défini,Indefinido,Неопределенный,Belum diartikan
+enter_name,Please enter a name,"Por favor, introduzca un nombre",Veuillez saisir un nom,"Por favor, insira um nome","Пожалуйста, введите имя",Silakan masukkan nama
+desired_gps_position,Please enter the minimum desired GPS precision,"Por favor, introduzca la precisión GPS mínima deseada",Veuillez saisir la précision GPS minimale souhaitée,"Por favor, insira a precisão GPS mínima pretendida",Введите минимальную желаемую точность GPS,Silakan masukkan presisi GPS minimum yang diinginkan
+import_configuration,Import Configuration,Configuración de importación,Configuration de l'importation,Importar configuração,Конфигурация импорта,Konfigurasi Impor
+select_import_method,Select an import method,Seleccione un método de importación,Sélectionnez une méthode d'importation,Selecione um método de importação,Выберите метод импорта,Pilih metode impor
+select_configuration,Select a configuration,Seleccione una configuración,Sélectionner une configuration,Selecione uma configuração,Выберите конфигурацию,Pilih konfigurasi
+home_not_exist,Home does not exist,La hogar no existe ,Le domicile n'existe pas,O agregado familiar não existe,Дом не существует,Rumah tidak ada
+reason_incomplete,Oops! Please select a reason for incomplete,"¡Oops! Por favor, seleccione una razón para incompleto",Oups ! Veuillez sélectionner une raison pour l'incomplétude,"Oops! Por favor, seleccione um razão para incompleto","Упс! Пожалуйста, выберите причину неполного заполнения",Ups! Silakan pilih alasan untuk tidak lengkap
+enter_enum_area_name,Enter the Enumeration Area name,Introduzca el nombre del área de enumeración,Saisir le nom de la zone d'énumération,Insira o nome da área de enumeração,Введите название области перечисления,Masukkan nama Area Pencacahan
+select_enumeration,Select an Enumeration Area,Seleccione un Área de Enumeración,Sélectionner une zone d'énumération,Selecione uma área de enumeração,Выберите область пересчета,Pilih Area Pencacahan
+select_time,Select Time,Seleccione la hora,Sélectionner l'heure,Selecione a hora,Выберите время,Pilih Waktu
+select_date,Select Date,Seleccione la fecha,Sélectionnez la date,Selecione a data,Выберите дату,Pilih Tanggal
+your_pin_is,Your PIN is:,Su PIN es,Votre code PIN est :,O seu PIN é:,Ваш PIN-код:,PIN Anda adalah:
+incorrect_answer_message,Oops! Incorrect answer.  Please try again.,"¡Uy! Respuesta incorrecta.  Por favor, inténtelo de nuevo.",Oups ! Réponse incorrecte.  Veuillez réessayer.,"Oops! Resposta incorrecta.  Por favor, tente novamente.","Oops! Неправильный ответ.  Пожалуйста, попробуйте еще раз.",Ups! Jawaban yang salah. Silakan coba lagi.
+enter_other_question,Enter Other Question,Introduzca otra pregunta,Saisir une autre question,Insira outra pergunta,Введите другой вопрос,Masukkan Pertanyaan Lainnya
+reenter_pin,Please re-enter the PIN,Vuelva a introducir el PIN,Veuillez saisir à nouveau le code PIN,Volte a insirar o PIN,"Пожалуйста, введите PIN-код повторно",Silakan masukkan kembali PIN
+enter_pin,Please enter a PIN,"Por favor, introduzca un PIN",Veuillez saisir un code PIN,"Por favor, insira um PIN","Пожалуйста, введите PIN-код",Silakan masukkan PIN
+other_question,Other Question,Otra pregunta,Autre question,Outra pergunta,Другой вопрос,Pertanyaan lain
+enter_answer,Please enter an answer.,"Por favor, introduzca una respuesta.",Veuillez saisir une réponse.,"Por favor, insira uma resposta.","Пожалуйста, введите ответ.",Silakan masukkan jawaban.
+pin_not_match,The PIN's do not match,Los PIN no coinciden,Les codes PIN ne correspondent pas,Os PIN's não coincidem,PIN-коды не совпадают,PINnya tidak cocok
+enter_file_name,You must enter a file name,Debe introducir un nombre de archivo,Vous devez saisir un nom de fichier,Tem de insirar um nome de ficheiro,Необходимо ввести имя файла,Anda harus memasukkan nama file
+pin_incorrect,The current PIN is incorrect,El PIN actual es incorrecto,Le code PIN actuel est incorrect,O PIN atual está incorreto,Текущий PIN-код неверен,PIN saat ini salah
+config_not_found,Fatal! Configuration not found.,Fallo Configuración no encontrada.,Erreur fatale ! La configuration n'a pas été trouvée.,Fatal! Configuração não encontrada.,Fatal! Конфигурация не найдена.,Fatal! Konfigurasi tidak ditemukan.
+missing_parameter_rule,Fatal! Missing required parameter: rule,¡Fatal! Falta el parámetro requerido: regla,Fatal ! Paramètre requis manquant : règle,Fatal! Parâmetro obrigatório em falta: regra,Fatal! Отсутствует необходимый параметр: правило,Fatal! Parameter yang diperlukan tidak ada: aturan
+ok,Ok,Ok,Ok,Ok,Хорошо,Oke
+wifi_disabled,WiFi disabled,WiFi desactivado,WiFi désactivé,WiFi desativado,WiFi отключен,Wi-Fi dinonaktifkan
+wifi_disabled_message,WiFi is disabled. Please make sure Wifi is turned on,"El WiFi está desactivado. Por favor, asegúrese de que el Wifi está activado",Le WiFi est désactivé. Veuillez vous assurer que le Wifi est activé,O WiFi está desativado. Certifique-se de que o Wi-Fi está ativado,"WiFi отключен. Пожалуйста, убедитесь, что WiFi включен",Wi-Fi dinonaktifkan. Harap pastikan Wifi dihidupkan
+additional_info,Additional Info,Información adicional,Informations complémentaires,Informações adicionais,Дополнительная информация,Informasi tambahan
+incomplete,Incomplete,Incompleto,Incomplet,Incompleto,Неполный,Tidak lengkap
+does_not_exist,Does not exist,No existe,N'existe pas,Não existe,Не существует,Tidak ada
+other,Other,Otros,Autre,Outros,Другое,Lainnya
+notes,Notes,Notas,Notes (en anglais),Notas,Примечания,Catatan
+oops,Oops!,¡Vaya!,Oups !,Oops!,Упс!,Ups!
+field_is_required,field is required,campo obligatorio,le champ est obligatoire,o campo é obrigatório,поле обязательно для заполнения,lapangan diperlukan
+number,Number,Número,Numéro,Número,Число,Nomor
+text,Text,Texto,Texte,Texto,Текст,Teks
+checkbox,Checkbox,Casilla de chequeo,Case à cocher,Caixa de seleção,Флажок,kotak centang
+connected,Connected,Conectado,Connecté,Ligado,Подключено,Terhubung
+forgot_pin,Forgot PIN,PIN olvidado,PIN oublié,Esqueci-me do PIN,Забыл PIN-код,Lupa PINnya
+reset_pin,Reset PIN,Restablecer PIN,Réinitialiser le code PIN,Redefinir PIN,Сбросить PIN-код,Setel ulang PIN
+personally_identifiable,Personally Identifiable Information,Información personal identificable,Informations personnelles identifiables,Informações de identificação pessoal,Персональная информация,Informasi Identifikasi Pribadi
+integer_only,Integer Only,Sólo números enteros,Nombre entier seulement,Apenas números inteiros,Только целое число,Hanya Bilangan Bulat
+required,Required,Requerido,Obligatoire,Necessário,Требуется,Diperlukan
+time,Time,Hora,L'heure,Hora,Время,Waktu
+date,Date,Fecha,La date,Data,Дата,Tanggal
+dropdown,Dropdown,Menú de opciones,Question déroulante,Lista suspensa,Выпадающее окно,tarik-turun
+fields,Fields,Campos,Les Champs,Campos,Поля,Bidang
+rules,Rules,Reglas,Les Règles,Regras,Правила,Aturan
+simple_random,Simple Random Sampling,Muestreo aleatorio simple,Échantillonnage aléatoire simple,Amostragem aleatória simples,Простая случайная выборка,Contoh acak sederhana
+cluster_sampling,Cluster Sampling,Muestreo por conglomerados,Échantillonnage en grappes,Amostragem por conglomerados,Кластерная выборка,Pengambilan Sampel Klaster
+subset_overlap,Subsets: May Overlap,Subconjuntos: Pueden solaparse,Sous-ensembles : Peuvent se chevaucher,Subconjuntos: Podem sobrepor-se,Подмножества: Могут пересекаться,Subset: Mungkin Tumpang Tindih
+strata_exclusive,Strata: Mutually Exclusive,Estratos: Mutuamente excluyentes,Strates : Exclusivité mutuelle,Estratos: Mutuamente exclusivos,Страты: Взаимоисключающие,Strata: Saling Eksklusif
+numberhouseholds,# of Households,# de hogares,#  de ménages,# Número de agregados familiares,# домохозяйств,# Rumah Tangga
+percenthouseholds,% of all Households,% de todos los hogares,% de tous les ménages,% de todos os agregados familiares,% от всех домохозяйств,% dari seluruh Rumah Tangga
+percenttotal,% of total population,% de la población total,% de la population totale,% da população total,% от общей численности населения,% dari total populasi
+equal,Equal,Igual,Egaux,Igual,Равно,Setara
+not_equal,Not Equal,No iguales,Non égaux,Não igual,Не равны,Tidak sama
+less_than,Less Than,Menor que,Inférieur à,Menor que,Меньше,Kurang dari
+greater_than,Greater Than,Mayor que,Supérieur à,Maior que,Больше чем,Lebih besar dari
+greater_than_equal,Greater Than Or Equal,Mayor que o igual,Supérieur ou égal,Maior que ou igual,"Больше, чем или равно",Lebih Besar Dari Atau Sama Dengan
+add_condition,Add Condition,Añadir condición,Ajoutez une condition,Adicionar condição,Добавить условие,Tambahkan Kondisi
+select_rule,Select Rule,Seleccionar regla,Sélectionnez une règle,Selecionar regra,Выберите правило,Pilih Aturan
+teams,Teams,Equipos,Équipes,Equipas,Команды,Tim
+select_location,Select Location,Seleccionar ubicación,Sélectionnez le lieu,Selecionar localização,Выбрать местоположение,Pilih lokasi
+current_location,Current,Actual,Actuel,Atual,Текущее,Saat ini
+tap_the_map,Tap on the map to add a new location,Pulse en el mapa para añadir una nueva ubicación,Tapez sur la carte pour ajouter un nouveau lieu,Toque no mapa para adicionar uma nova localização,"Нажмите на карту, чтобы добавить новое местоположение",Ketuk pada peta untuk menambahkan lokasi baru
+complete,Complete,Completar,Complet,Completar,Завершить,Menyelesaikan
+reason_incomplete_label,Reason Incomplete,Razón Incompleto,Motif Incomplet,Razão Incompleto,Причина незавершенности,Alasan Tidak Lengkap
+warning,Warning!,Advertencia,Attention!,Aviso!,Внимание!,Peringatan!
+duplicate_warning,Adding this new location is extremely close to an existing location.  Are you sure that you want to add it?,Añadir esta nueva ubicación está extremadamente cerca de una ubicación existente.  ¿Está seguro de que desea añadirla?,L'ajout de ce nouveau lieu est extrêmement proche d'un lieu existant.  Êtes-vous sûr de vouloir l'ajouter ?,A adição desta nova localização é extremamente próxima de uma localização existente.  Tem a certeza de que pretende adicioná-la?,"Добавление нового местоположения происходит очень близко к существующему местоположению.  Вы уверены, что хотите добавить его?",Menambahkan lokasi baru ini sangat dekat dengan lokasi yang sudah ada. Apakah Anda yakin ingin menambahkannya?
+missing_team,Configuration is missing a Team definition,A la configuración le falta una definición de Equipo,Il manque une définition d'équipe à la configuration,A configuração não tem uma definição de Equipa,В конфигурации отсутствует определение команды,Konfigurasi tidak memiliki definisi Tim
+collection_teams,Collection Teams,Equipos de recogida,Équipes de collecte,Equipes de coleta,Коллективные команды,Tim Pengumpul
+begin_field_block,Begin Field Block,Iniciar bloque de campo,Début d'une série de variables,Iniciar bloqueio de campo,Начало блока по полю,Mulai Blok Lapangan
+save_and_end_block,Save and End Block,Guardar y finalizar bloque,Sauvegarder et terminer la série de variables,Salvar e terminar o bloco,Сохранить и завершить блок,Simpan dan Akhiri Blokir
+add_another_field,Save and Add Another Field,Guardar y añadir otro campo,Enregistrer et ajouter un autre champ,Salvar e adicionar outro campo,Сохранить и добавить другое поле,Simpan dan Tambahkan Bidang Lain
+current_location_not_set,Current Location Not Set,Ubicación actual no establecida,L'emplacement actuel n'est pas défini,Localização atual não definida,Текущее местоположение не установлено,Lokasi Saat Ini Tidak Ditetapkan
+option_item_name,Enter the Option Item Name,Introduzca el nombre de la opción,Saisir le nom de l'élément de l'option,Introduzir o nome do item de opção,Введите имя элемента опции,Masukkan Nama Item Opsi
+export_collection_data,Export Collection Data,Exportar datos de recogida,Exporter les données de la collection,Exportar dados de coleta,Экспорт данных коллекции,Ekspor Data Pengumpulan
+import_field_data,Import Field Data,Importar datos de campo,Importer des données de champ,Importar dados de campo,Импортировать данные поля,Impor Data Bidang
+select_a_date,Select a Date,Seleccione una fecha,Sélectionner une date,Selecionar uma data,Выберите дату,Pilih Tanggal
+select,Select,Seleccione,Sélectionner,Selecionar,Выберите,Pilih
+team_name,Team Name,Nombre del equipo,Nom de l'équipe,Nome da equipe,Имя команды,Nama tim
+launch_survey,Launch Survey,Iniciar encuesta,Lancer l'enquête,Lançar questionário,Запустить опрос,Peluncuran Survei
+mark_as_incomplete,Mark as Incomplete,Marcar como incompleta,Marquer comme incomplet,Marcar como Incompleto,Пометить как незавершенный,Tandai sebagai Tidak Lengkap
+enter_current_pin,Enter Current Pin,Introducir PIN actual,Saisir le code PIN actuel,Insirar o PIN atual,Введите текущий PIN-код,Masukkan Pin Saat Ini
+enter_new_pin,Re-Enter New PIN,Vuelva a introducir el nuevo PIN,Saisissez à nouveau votre code PIN,Introduzir novamente o novo PIN,Повторный ввод нового PIN-кода,Masukkan kembali PIN Baru
+re_enter_new_pin,Re-Enter New PIN,Vuelva a introducir el nuevo PIN,Saisissez à nouveau votre code PIN,Introduzir novamente o novo PIN,Повторно ввести новый PIN-код,Masukkan kembali PIN Baru
+select_a_time,Select a Time,Seleccione una hora,Sélectionner une heure,Selecionar uma hora,Выбрать время,Pilih Waktu
+UUID,UUID,UUID,UUID,UUID,UUID,UUID
+latitude,Latitude,Latitud,Latitude,Latitude,Широта,Garis Lintang
+longitude,Longitude,Longitud,Longitude,Longitude,Долгота,Garis bujur
+last_updated,Last Updated,Última actualización,Dernière mise à jour,Última atualização,Последнее обновление,Terakhir Diperbarui
+status,Status,Estado,Statut,Estado,Статус,Status
+description,Description,Descripción,Description de l'image,Descrição,Описание,Keterangan
+add_image,Add Image,Añadir imagen,Ajouter une image,Adicionar imagem,Добавить изображение,Menambahkan gambar
+enumeration_areas,Enumeration Areas,Áreas de Enumeración,Zones de dénombrement,Áreas de enumeração,Области перечисления,Daerah Pencacahan
+enter_team_name,Enter Team Name,Introducir nombre de equipo,Saisir le nom de l'équipe,Insira nome da equipe,Введите название команды,Masukkan Nama Tim
+assign_households,Assign Households,Asignar hogares,Assigner les ménages,Atribuir agregados familiares,Назначить домохозяйства,Tetapkan Rumah Tangga
+sampling_type,Sampling Type,Tipo de Muestreo,Type d'échantillonnage,Tipo de amostragem,Тип выборки,Jenis Pengambilan Sampel
+generating_qr_code,Generating QR Code…,Generar Código QR...,Générer un code QR...,Gerar código QR...,Генерация QR-кода...,Menghasilkan Kode QR…
+samples,Samples,Muestras,Échantillons,Amostras,Образцы,Sampel
+you_don_t_have_any_samples_for_this_study,You do not have any samples for this study,No tiene muestras para este estudio,Vous n'avez pas d'échantillons pour cette étude,Não tem amostras para este estudo,У вас нет образцов для этого исследования,Anda tidak memiliki sampel untuk penelitian ini
+enum_saved_doc,Enumeration has been saved to the Documents directory.,Enumeración se ha guardado en el directorio Documentos.,L'énumération a été sauvegardée dans le répertoire Documents.,A enumeração foi guardada no diretório Documentos.,В директорию Документы сохранен файл Перепись.,Pencacahan telah disimpan ke direktori Dokumen.
+config_saved_doc,Configuration has been saved to the Documents directory.,La configuración se ha guardado en el directorio Documentos.,Configuration a été sauvegardé dans le répertoire Documents.,A configuração foi guardada no diretório Documentos.,Конфигурация сохранена в каталоге Документы.,Konfigurasi telah disimpan ke direktori Dokumen.
+nobody_home,Nobody home,Nadie en casa,Personne à la maison,Ninguém em casa,Никто не дома,Tidak ada orang di rumah
+export_enum_data,Export Enumeration Data,Exportar datos de enumeración,Exporter des données de recensement,Exportar dados de enumeração,Экспорт данных переписи населения,Ekspor Data Pencacahan
+delete_landmark_message,Are you sure you want to permanently delete this landmark?,¿Está seguro de que desea eliminar definitivamente este hito?,Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?,Tem a certeza de que pretende eliminar permanentemente esta referência?,"Вы уверены, что хотите безвозвратно удалить этот ориентир?",Apakah Anda yakin ingin menghapus landmark ini secara permanen?
+subaddress,Subaddress,Subdirección,Sous-adresse,Sub-endereço,Субадрес,Subalamat
+sampled,Sampled,Muestreo,Échantillonné,Amostragem,Выборочный,diambil sampelnya
+completed_enumeration,Completed Enumeration,Enumeración completada,Dénombrement terminé,Enumeração concluída,Завершенное перечисление,Pencacahan Komplit
+incomplete_enumeration,Incomplete Enumeration,Enumeración incompleta,Dénombrement incomplet,Enumeração Incompleta,Неполный сбор,Pencacahan Tidak Lengkap
+dismiss,Dismiss,Descartar,Supprimer,Excluir,Удалить,Membubarkan
+delete,Delete,Borrar,Supprimer,Eliminar,Удалить,Menghapus
+launching_odk_collect_application,Launching ODK Collect Application...,Lanzamiento de la aplicación ODK Collect...,Lancement de l'application ODK Collect...,Iniciar a aplicação ODK Collect...,Запуск приложения ODK Collect...,Meluncurkan Aplikasi ODK Collect...
+filters,Filters (combines rules),Filtros (combina reglas),Filtres (combine des règles),Filtros (combina regras),Фильтры (объединяет правила),Filter (menggabungkan aturan)
+new_location,Identify Location,Identificar ubicación,Identifier le lieu,Identificar a localização,Идентифицировать местоположение,Identifikasi Lokasi
+delete_configuration,The current configuration will be replaced by the import.  Would you like to proceed?,La configuración actual será reemplazada por la importación.  ¿Desea continuar?,La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?,A configuração atual será substituída pela importação. Deseja prosseguir? ,Текущая конфигурация будет заменена импортом.  Желаете ли вы продолжить?,Konfigurasi saat ini akan digantikan oleh impor. Apakah Anda ingin melanjutkan?
+total_population,Total Population Size,Tamaño total de la población,Taille totale de la population,Tamanho total da população,Общий размер популяции,Jumlah Populasi Total
+enter_the_total_population_size,Enter the total population size,Introduzca el tamaño total de la población,Saisissez la taille totale de la population,Introduza o tamanho total da população,Введите общий размер популяции.,Masukkan jumlah populasi total
+total_population_size_error,The total population size must be greater than 0,El tamaño total de la población debe ser superior a 0,La taille totale de la population doit être supérieure à 0,O tamanho total da população tem de ser superior a 0,Размер генеральной совокупности должен быть больше 0,Ukuran total populasi harus lebih besar dari 0
+sample_size_error,The sample size must be greater than 0,El tamaño de la muestra debe ser superior a 0,La taille de l'échantillon doit être supérieure à 0,O tamanho da amostra deve ser maior que 0,Размер выборки должен быть больше 0,Ukuran sampel harus lebih besar dari 0
+simple_random_sampling_label,Total Sample Size Across All Clusters,Tamaño total de la muestra en todas las agrupaciones,Taille totale de l'échantillon pour toutes les grappes,Tamanho total da amostra em todos os clusters,Общий размер выборки по всем кластерам,Total Ukuran Sampel di Semua Cluster
+cluster_sampling_label,Sample Size Per Cluster,Tamaño de la muestra por conglomerado,Taille de l'échantillon par grappe,Tamanho da amostra por agrupamento,Размер выборки для каждого кластера,Ukuran Sampel Per Cluster
+show_enumeration_info,Show Enumeration Info,Mostrar información de enumeración,Afficher les informations sur le dénombrement,Mostrar informações de enumeração,Показать информацию о населенном пункте,Tampilkan Info Pencacahan
+please_enter_a_name,Please enter a name for this field.,Introduzca un nombre para este campo.,Veuillez saisir un nom pour ce champ.,Introduza um nome para este campo.,"Пожалуйста, введите имя для этого поля.",Silakan masukkan nama untuk bidang ini.
+please_enter_a_subaddress,Please enter a unique sub-address.,Introduzca una subdirección única.,Veuillez saisir une sous-adresse unique.,Introduza um sub-endereço único.,Укажите уникальный субадрес.,Silakan masukkan sub-alamat unik.
+please_select_team_boundary,Please select the team boundary.,"Por favor, seleccione el límite del equipo.",Veuillez sélectionner le périmètre de l'équipe.,Seleccione o limite da equipa.,"Пожалуйста, выберите границу группы.",Silakan pilih batas tim.
+enum_area_name_property,Enter the value of the Enumeration Area Name property,Introduzca el valor de la propiedad Nombre del área de enumeración,Saisir la valeur de la propriété Nom de la zone d'énumération,Introduzir o valor da propriedade Nome da área de enumeração,"Введите значение свойства ""Имя области перечисления"".",Masukkan nilai properti Nama Area Pencacahan
+downloading_map_tiles,Downloading Map Tiles...,Descargando Mosaicos de Mapa...,Téléchargement des tuiles de carte...,Descarregamento de Map Tiles...,Загрузка плиток карты...,Mengunduh Ubin Peta...
+style_pack_download_failed,Map Style Pack Download Failed,Fallo en la descarga del paquete de estilos de mapa,Échec du téléchargement du Map Style Pack,Falha no download do pacote de estilos de mapa,Загрузка пакета стилей карты не удалась,Pengunduhan Paket Gaya Peta Gagal
+tile_pack_download_failed,Map Tile Pack Download Failed,Descarga fallida del paquete de mosaicos de mapa,Le téléchargement du Map Tile Pack a échoué,Falha na transferência do pacote de mosaicos de mapas,Загрузка пакета плиток карты не удалась,Pengunduhan Paket Ubin Peta Gagal
+download_map_tiles_now,Would you like to download map tiles now?,¿Desea descargar los mosaicos de mapa ahora?,Voulez-vous télécharger les tuiles de carte maintenant ?,Gostaria de descarregar agora as peças do mapa?,Вы хотите загрузить плитки карты сейчас?,Apakah Anda ingin mengunduh petak peta sekarang?
+delete_map_tile_region,Are you sure you want to delete this Map Tile Region?,¿Está seguro de que desea eliminar esta Región de Baldosas de Mapa?,Êtes-vous sûr de vouloir supprimer cette région de tuiles de carte ?,Tem a certeza de que pretende apagar esta Região de Map Tile?,"Вы уверены, что хотите удалить этот регион картографических плиток?",Apakah Anda yakin ingin menghapus Wilayah Petak Peta ini?
+import_enumeration_area,Import Enumeration Area,Importar área de enumeración,Importez une zone de dénombrement,Importar área de enumeração,Импортировать область перечисления,Daerah Pencacahan Impor
+create_enumeration_area,Create Enumeration Area,Crear área de enumeración,Créez une zone de dénombrement,Criar área de enumeração,Создать область переписи населения,Buat Area Pencacahan
+add_household,Add Household,Añadir hogar,Ajoutez un ménage,Adicionar agregado familiar,Добавить домохозяйство,Tambahkan Rumah Tangga
+define_map_tile_cache_region,Define map tile cache region,Definir región de caché de map tiles,Définir la région de cache des tuiles de la carte,Definir região de cache de mosaicos,Определить регион кэширования картографических плиток,Tentukan wilayah cache ubin peta
+download_map_tiles,Download map tiles,Descargar mosaicos de mapa,Téléchargez les tuiles de la carte,Descarregar mosaicos do mapa,Загрузить плитки карты,Unduh ubin peta
+center_on_location,Center on location,Centrar en ubicación,Centrez sur l'emplacement,Centrar na localização,Центрирование по местоположению,Pusatkan pada lokasi
+less_than_equal,Less Than Or Equal,Menor o igual que,Inférieur ou égal,Menor que ou igual,Меньше или равно,Kurang Dari Atau Sama
+gps_accuracy_error,GPS accuracy is less than the required accuracy,La precisión del GPS es inferior a la requerida,La précision du GPS est inférieure à la précision requise,A precisão do GPS é inferior à precisão exigida,Точность GPS меньше требуемой точности,Akurasi GPS kurang dari akurasi yang dibutuhkan
+gps_location_error,You are currently too far away from this location,Se encuentra demasiado lejos de esta ubicación,Vous êtes actuellement trop loin de cet emplacement,Está atualmente demasiado longe desta localização,Вы находитесь слишком далеко от этого места,Anda saat ini terlalu jauh dari lokasi ini
+good,GOOD,BUENA,BON,BOA,ХОРОШО,BAGUS
+poor,POOR,POBRE,MAUVAIS,RUIM,ПЛОХО,MISKIN
+unknown,UNKNOWN,DESCONOCIDO,INCONNU,DESCONHECIDA,НЕИЗВЕСТНО,TIDAK DIKENAL
+legend,Legend,Leyenda,Légende,Legenda,Легенда,Legenda
+select_date_type,Please select the Date type,Seleccione el tipo de fecha,Veuillez sélectionner le type de date,Seleccione o tipo de data,"Пожалуйста, выберите тип даты",Silakan pilih jenis Tanggal
+contains,Contains,Contiene,Contient,Contém,Содержит,Mengandung
+collection_saved_doc,Collection has been saved to the Documents directory,La colección se ha guardado en el directorio Documentos,La collection a été enregistrée dans le répertoire Documents,A coleção foi guardada no diretório Documentos,Коллекция была сохранена в каталоге Документы,Koleksi telah disimpan ke direktori Dokumen
+invalid_operator,The selected operator is not valid for the selected rule,El operador seleccionado no es válido para la regla seleccionada,L'opérateur sélectionné n'est pas valide pour la règle sélectionnée,O operador selecionado não é válido para a regra selecionada,Выбранный оператор не действителен для выбранного правила,Operator yang dipilih tidak valid untuk aturan yang dipilih
+about_gpssample,About GPSSample,Acerca de GPSSample,À propos de GPSSample,Sobre o GPSSample,О компании GPSSample,Tentang Contoh GPS
+privacy_statement,Privacy Statement,Declaración de privacidad,Déclaration de confidentialité,Declaração de privacidade,Положение о конфиденциальности,Pernyataan Privasi
+terms_and_conditions,Terms and Conditions,Condiciones de uso,Conditions d'utilisation,Termos e Condições,Условия и положения,syarat dan Ketentuan
+show_map,Show Map,Mostrar mapa,Afficher la carte,Mostrar mapa,Показать карту,Tampilkan Peta
+number_of_residents,Number of Residents,Número de residentes,Nombre de résidents,Número de residentes,Количество жителей,Jumlah Penduduk
+end_user_license_agreement,End User License Agreement,Acuerdo de licencia de usuario final,Accord de licence pour l'utilisateur final,Contrato de Licença de Utilizador Final,Лицензионное соглашение с конечным пользователем,Perjanjian Lisensi Pengguna Akhir
+code_of_conduct,Code of Conduct,Código de conducta,Code de conduite,Código de Conduta,Кодекс поведения,Kode etik
+clear_map,Are you sure you want to clear the map?,¿Estás seguro de que quieres borrar el mapa?,Êtes-vous sûr de vouloir effacer la carte ?,Tens a certeza de que queres limpar o mapa?,"Вы уверены, что хотите очистить карту?",Apakah Anda yakin ingin menghapus peta?
+delete_point,Are you sure you want to remove the last point?,¿Estás seguro de que quieres eliminar el último punto?,Êtes-vous sûr de vouloir supprimer le dernier point ?,Tem a certeza de que pretende remover o último ponto?,"Вы уверены, что хотите удалить последнюю точку?",Apakah Anda yakin ingin menghapus poin terakhir?
+enumeration_area,Enumeration Area,Área de Enumeración,Zone de dénombrement,Área de enumeração,Зона переписи,Daerah Pencacahan
+please_select_a_role,Please select a role,Seleccione un rol,Veuillez sélectionner un rôle,"Por favor, seleccione uma função","Пожалуйста, выберите роль",Silakan pilih peran
+please_enter_your_user_name,Please enter your user name,Introduzca su nombre de usuario,Veuillez saisir votre nom d'utilisateur,Introduza o seu nome de utilizador,"Пожалуйста, введите имя пользователя",Silakan masukkan nama pengguna Anda
+user_name_not_found,User name not found,Nombre de usuario no encontrado,Nom d'utilisateur non trouvé,Nome de utilizador não encontrado,Имя пользователя не найдено,Nama pengguna tidak ditemukan
+multi_families,Multi Households,Multihogares,Multi-ménages,Agregados familiares múltiplos,Многоквартирные дома,Multi Rumah Tangga
+is_multi_family,Is this a multi household location?,¿Se trata de una ubicación multihogar?,S'agit-il d'un lieu où vivent plusieurs ménages ?,Este é um local com vários agregados familiares?,Является ли это место расположения несколькими домохозяйствами?,Apakah ini lokasi multi rumah tangga?
+sample,Sample,Muestra,Exemple,Amostra,Образец,Sampel
+mark_status,Mark Status,Marca Estado,Statut de la marque,Estado da marca,Статус отметки,Tandai Status
+not_visited,Not Visited,No visitado,Non visitée,Não visitado,Не посещен,Tidak Dikunjungi
+incomplete_collection,Incomplete Survey,Encuesta incompleta,Enquête incomplète,Inquérito Incompleto,Незавершенный опрос,Survei Tidak Lengkap
+completed_collection,Completed Survey,Encuesta completada,Enquête terminée,Inquérito concluído,Завершенный опрос,Survei Selesai
+accuracy,Accuracy : ,Precisión : ,Précision : ,Exatidão : ,Точность ,Akurasi:
+subaddress_is_required,Subaddress is Required,Se requiere subdirección,La sous-adresse est requise,O subendereço é necessário,Требуется субадрес,Sub-alamat wajib diisi
+auto_increment_subaddress,Auto Increment Subaddress,Incremento automático de la subdirección,Incrémentation automatique de la sous-adresse,Incremento automático do subendereço,Автоматическое увеличение субадреса,Sub-Alamat Kenaikan Otomatis
+allow_manual_identification_of_locations,Allow manual identification of locations,Permitir la identificación manual de ubicaciones,Permettre l'identification manuelle des lieux,Permitir a identificação manual de localizações,Разрешить ручную идентификацию местоположений,Izinkan identifikasi lokasi secara manual
+proximity_warning_enabled,Proximity Warning Enabled,Aviso de proximidad activado,Avertissement de proximité activé,Aviso de proximidade ativado,Включено предупреждение о приближении,Peringatan Kedekatan Diaktifkan
+encryption_password,Encryption Password,Contraseña de encriptación,Mot de passe de cryptage,Palavra-passe de encriptação,Пароль шифрования,Kata Sandi Enkripsi
+enter_encryption_password,Enter Encryption Password,Introduzca la contraseña de encriptación,Entrer le mot de passe de cryptage,Introduzir palavra-passe de encriptação,Введите пароль шифрования,Masukkan Kata Sandi Enkripsi
+summary,Summary,Resumen,Résumé,Resumo,Резюме,Ringkasan
+num_enumeration_areas,# Enumeration Areas:,# Áreas de Enumeración:,# Zones de dénombrement :,# Áreas de Enumeração:,# Области перечисления:,# Area Pencacahan:
+num_hhs_enumerated,# HH\'s Enumerated:,# Hogares censados,# Ménages recensés :,# Agregados Familiares Enumerados:,# Перечисленные домохозяйства:,# HH Dihitung:
+num_hhs_eligible,# HH\'s Eligible:,# Hogares elegibles:,# Ménages éligibles :,# Agregados Familiares Elegíveis:,"# Домохозяйства, отвечающие критериям:",# HH yang Memenuhi Syarat:
+num_hhs_sampled,# HH\'s Sampled:,# Hogares muestreados,# Ménages échantillonnés :,# Agregados Familiares Amostrados:,"# Домохозяйства, попавшие в выборку:",# Sampel HH:
+num_hhs_surveyed,# HH\'s Surveyed:,# Hogares encuestados:,# Nombre de ménages enquêtés:,# Agregados Familiares Inquiridos:,# Обследованные домохозяйства:,# HH yang Disurvei:
+num_hhs_remaining_to_survey,# HH\'s Remaining to Survey:,# Hogares pendientes de encuestar:,# Ménages restant à enquêter :,# Agregados Familiares que Faltam Inquirir:,"# Домохозяйства, оставшиеся для опроса:",# Sisa HH yang Harus Disurvei:
+decryption_failed,Decryption failed.  Please try again.,La desencriptación ha fallado.  Inténtelo de nuevo.,Le décodage a échoué.  Veuillez réessayer.,"A descodificação falhou.  Por favor, tente novamente.","Расшифровка не удалась.  Пожалуйста, попробуйте еще раз.",Dekripsi gagal. Silakan coba lagi.
+rename_or_delete,Would you like to Rename or Delete the Enumeration Area ?,¿Desea cambiar el nombre o eliminar el área de enumeración?,Souhaitez-vous renommer ou supprimer la zone de dénombrement ?,Gostaria de mudar o nome ou eliminar a área de enumeração?,Вы хотите переименовать или удалить область переписи?,Apakah Anda ingin Mengganti Nama atau Menghapus Area Pencacahan?
+rename,Rename,Renombrar,Renommer,Mudar o nome,Переименовать,Ganti nama
+map_tile_boundary,Enter the length/width (Kilometers) of the desired map tile region,Introduzca la longitud/anchura (Kilómetros) de la región de mosaico de mapa deseada,Saisir la longueur/largeur (en kilomètres) de la région souhaitée.,Introduza o comprimento/largura (quilómetros) da região de mosaico pretendida,Введите длину/ширину (в километрах) желаемого региона картографической плитки,Masukkan panjang/lebar (Kilometer) wilayah petak peta yang diinginkan
+success,SUCCESS!,¡ÉXITO!,SUCCES !,SUCESSO!,УСПЕХ!,KESUKSESAN!
+error,ERROR!,¡ERROR!,ERREUR !,ERRO!,ОШИБКА!,KESALAHAN!
+import_failed,The import failed.,La importación ha fallado.,L'importation a échoué.,A importação falhou.,Импорт не удался.,Impor gagal.
+import_succeeded,The import was successful.,La importación se ha realizado correctamente.,L'importation a réussi.,A importação foi bem sucedida.,Импорт прошел успешно.,Impor berhasil.
+clear_map_tile_region,Clear map tile cache region,Borrar región de caché de mosaico de mapa,Effacer la région du cache des tuiles de la carte,Limpar a região da cache de mosaicos do mapa,Очистить кэш региона плитки карты,Hapus wilayah cache ubin peta
+import_request_failed,Received an Export Request while waiting for an Import Request,Recibida una solicitud de exportación a la espera de una solicitud de importación,Réception d'une demande d'exportation en attente d'une demande d'importation,Recebeu um pedido de exportação enquanto aguardava um pedido de importação,Получен запрос на экспорт в ожидании запроса на импорт,Menerima Permintaan Ekspor sambil menunggu Permintaan Impor
+export_request_failed,Received an Import Request while waiting for an Export Request,Recibida una Solicitud de Importación mientras se espera una Solicitud de Exportación,Réception d'une demande d'importation en attente d'une demande d'exportation,Recebeu um pedido de importação enquanto aguardava um pedido de exportação,Получен запрос на импорт в ожидании запроса на экспорт,Menerima Permintaan Impor sambil menunggu Permintaan Ekspor
+network_connection,Network Connection,Conexión a la red,Connexion au réseau,Ligação de rede,Сетевое подключение,Koneksi jaringan
+add_landmark,Add Landmark,Añadir punto de referencia,Ajoutez un point de repère,Adicionar ponto de referência,Добавить ориентир,Tambahkan Tengara
+enumerated,Enumerated,Censados,Recensés,Enumerados,Перечисленные,Dihitung
+surveyed,Surveyed,Encuestados,Enquêtés,Inquiridos,Обследованные,Disurvei
+meters,Meters,Metros,Mètres,Metros,Метры,Meter
+feet,Feet,Pies,Pieds,Pés,Футы,Kaki
+kilometers,Kilometers,Kilómetros,Kilomètres,Quilômetros ,километры,Kilometer
+miles,Miles,Millas,Miles,Milhas,Мили,mil
+importing_locations,Importing Locations…,,,,,
+saving_configuration,Saving Configuration…,,,,,
+polygon_is_self_intersecting,A polygon based on these points will be self-intersecting.,,,,,
+no_eligible_households,There are no eligible households to sample.,,,,,

@@ -287,7 +287,6 @@
     <string name="less_than_equal">"Меньше или равно"</string>
     <string name="gps_accuracy_error">"Точность GPS меньше требуемой точности"</string>
     <string name="gps_location_error">"Вы находитесь слишком далеко от этого места"</string>
-    <string name="accuracy">"Точность :"</string>
     <string name="good">"ХОРОШО"</string>
     <string name="poor">"ПЛОХО"</string>
     <string name="unknown">"НЕИЗВЕСТНО"</string>
@@ -316,6 +315,7 @@
     <string name="not_visited">"Не посещен"</string>
     <string name="incomplete_collection">"Незавершенный опрос"</string>
     <string name="completed_collection">"Завершенный опрос"</string>
+    <string name="accuracy">"Точность"</string>
     <string name="subaddress_is_required">"Требуется субадрес"</string>
     <string name="auto_increment_subaddress">"Автоматическое увеличение субадреса"</string>
     <string name="allow_manual_identification_of_locations">"Разрешить ручную идентификацию местоположений"</string>
