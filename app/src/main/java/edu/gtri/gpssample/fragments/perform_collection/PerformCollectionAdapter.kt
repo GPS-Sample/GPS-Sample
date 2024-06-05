@@ -61,7 +61,7 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val 
 
         if (enumerationItem.distance > 0)
         {
-            holder.thirdTextView.setText("Distance: ${String.format( "%.2f", enumerationItem.distance )} ${enumerationItem.distanceUnits}")
+            holder.thirdTextView.setText("Distance: ${String.format( "%.1f", enumerationItem.distance )} ${enumerationItem.distanceUnits}")
         }
 
         if (enumerationItem.collectionState == CollectionState.Complete)

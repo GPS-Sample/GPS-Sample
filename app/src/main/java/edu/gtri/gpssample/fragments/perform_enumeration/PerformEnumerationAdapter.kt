@@ -27,7 +27,7 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
     {
         this.mContext = parent.context
 
-        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        val viewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_collection, parent, false))
 
         viewHolder.itemView.isSelected = false
         allHolders.add(viewHolder)
@@ -47,7 +47,17 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
         val location = locations.get(holder.adapterPosition)
 
-        holder.dateTextView.setText( location.uuid )
+        if (location.enumerationItems.isNotEmpty() && location.enumerationItems.last().subAddress.isNotEmpty())
+        {
+            holder.firstTextView.setText( "${enumAreaName} : ${location.enumerationItems.last().subAddress}" )
+        }
+
+        holder.secondTextView.setText( location.uuid )
+
+        if (location.distance > 0)
+        {
+            holder.thirdTextView.setText("Distance: ${String.format( "%.1f", location.distance )} ${location.distanceUnits}")
+        }
 
         if (location.enumerationItems.size > 0)
         {
@@ -65,10 +75,12 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
             else
             {
                 var isComplete = true
+
                 for (enumerationItem in location.enumerationItems)
                 {
                     isComplete = isComplete && (enumerationItem.enumerationState == EnumerationState.Enumerated)
                 }
+
                 if (isComplete)
                 {
                     holder.checkImageView.visibility = View.VISIBLE
@@ -77,11 +89,6 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
                 {
                     holder.checkImageView.visibility = View.GONE
                 }
-            }
-
-            if (location.enumerationItems[0].subAddress.isNotEmpty())
-            {
-                holder.nameTextView.setText( "${enumAreaName} : ${location.enumerationItems.last().subAddress}" )
             }
         }
 
@@ -92,8 +99,9 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     {
-        val nameTextView: TextView = itemView.findViewById(R.id.name_text_view);
-        val dateTextView: TextView = itemView.findViewById(R.id.date_text_view);
+        val firstTextView: TextView = itemView.findViewById(R.id.first_text_view);
+        val secondTextView: TextView = itemView.findViewById(R.id.second_text_view);
+        val thirdTextView: TextView = itemView.findViewById(R.id.third_text_view);
         val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view)
     }
 }
