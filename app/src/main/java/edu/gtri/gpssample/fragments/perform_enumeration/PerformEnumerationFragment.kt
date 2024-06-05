@@ -579,7 +579,8 @@ class PerformEnumerationFragment : Fragment(),
                     val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue )
                     if (haversineCheck.withinBounds)
                     {
-                        val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                        val distance = String.format( "%.1f", haversineCheck.distance)
+                        val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
                         ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
                         return true
                     }
@@ -672,7 +673,8 @@ class PerformEnumerationFragment : Fragment(),
                         val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
                         if (haversineCheck.withinBounds)
                         {
-                            val message = "${resources.getString(R.string.duplicate_warning)} (${haversineCheck.distance}m)"
+                            val distance = String.format( "%.1f", haversineCheck.distance)
+                            val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
                             ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
                             return
                         }
