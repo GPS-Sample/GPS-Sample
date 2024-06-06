@@ -29,6 +29,7 @@ import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.ImageDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.io.ByteArrayOutputStream
@@ -275,6 +276,20 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         }
 
         binding.addPhotoImageView.setOnClickListener {
+
+            var size = 0
+
+            // get the total size of all image data
+            for (location in enumArea.locations)
+            {
+                size += location.imageData.length
+            }
+
+            if (size > 25 * 1024 * 1024)
+            {
+                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
+            }
+
             if (location.imageData.isEmpty())
             {
                 resultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
@@ -487,10 +502,19 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     {
         try
         {
-            // base64 encode the bitmap
+            var width = bitmap.width.toDouble()
+            var height = bitmap.height.toDouble()
+            val aspectRatio = width / height
+
+            width = 150.0
+            height = width / aspectRatio
+
+            val bm = Bitmap.createScaledBitmap( bitmap, width.toInt(), height.toInt(), false )
+
             val byteArrayOutputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+            bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
             val byteArray = byteArrayOutputStream.toByteArray()
+
             location.imageData = Base64.getEncoder().encodeToString(byteArray)
         }
         catch (e: Exception)

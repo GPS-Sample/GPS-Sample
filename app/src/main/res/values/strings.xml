@@ -356,6 +356,7 @@
     <string name="mark_current_location">Mark Current Location</string>
     <string name="delete_last_location">Delete Last Location</string>
     <string name="clear_map_and_start_over">Clear Map and Start Over</string>
+    <string name="image_size_warning">"You've exceeded 25Mb of Image Data. Adding more images will greatly impact data transfer performance."</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
