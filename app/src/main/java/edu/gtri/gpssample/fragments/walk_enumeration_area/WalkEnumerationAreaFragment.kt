@@ -137,6 +137,7 @@ class WalkEnumerationAreaFragment : Fragment(),
         if (config.enumAreas.isNotEmpty())
         {
             binding.saveButton.isEnabled = false
+            binding.walkButton.isEnabled = false
             binding.addPointButton.isEnabled = false
             binding.deletePointButton.isEnabled = false
         }
@@ -176,21 +177,28 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         binding.overlayView.setOnTouchListener(this)
 
-        binding.addPointButton.setOnClickListener {
-            if (BuildConfig.DEBUG)
+        binding.walkButton.setOnClickListener {
+
+            if (binding.walkButton.backgroundTintList == defaultColorList)
             {
-                if (binding.overlayView.visibility == View.VISIBLE)
+                binding.addPointButton.setBackgroundTintList(defaultColorList);
+                binding.walkButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else
+            {
+                if (polyLinePoints.isNotEmpty())
                 {
-                    binding.overlayView.visibility = View.GONE
-                    binding.addPointButton.setBackgroundTintList(defaultColorList);
+                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), kClearMapTag, this@WalkEnumerationAreaFragment)
                 }
                 else
                 {
-                    binding.overlayView.visibility = View.VISIBLE
-                    binding.addPointButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                    binding.walkButton.setBackgroundTintList(defaultColorList);
                 }
             }
-            else
+        }
+
+        binding.addPointButton.setOnClickListener {
+            if (binding.walkButton.backgroundTintList != defaultColorList) // walking...
             {
                 currentGPSLocation?.let { point ->
                     polyLinePoints.add( point )
@@ -211,6 +219,19 @@ class WalkEnumerationAreaFragment : Fragment(),
                             Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_LONG).show()
                         }
                     }
+                }
+            }
+            else
+            {
+                if (binding.overlayView.visibility == View.VISIBLE)
+                {
+                    binding.overlayView.visibility = View.GONE
+                    binding.addPointButton.setBackgroundTintList(defaultColorList);
+                }
+                else
+                {
+                    binding.overlayView.visibility = View.VISIBLE
+                    binding.addPointButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
             }
         }
@@ -450,6 +471,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                 }
 
                 binding.saveButton.isEnabled = false
+                binding.walkButton.isEnabled = false
                 binding.addPointButton.isEnabled = false
                 binding.deletePointButton.isEnabled = false
             }
@@ -499,9 +521,11 @@ class WalkEnumerationAreaFragment : Fragment(),
             polyLinePoints.clear()
             polylineAnnotation.points = polyLinePoints
             polylineAnnotationManager.update(polylineAnnotation)
+            binding.walkButton.isEnabled = true
             binding.saveButton.isEnabled = true
             binding.addPointButton.isEnabled = true
             binding.deletePointButton.isEnabled = true
+            binding.walkButton.setBackgroundTintList(defaultColorList);
 
             startPointAnnotation?.let {
                 pointAnnotationManager.delete( it )

@@ -17,6 +17,30 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
+            app:srcCompat="@drawable/walker_primary"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/walk_enumeration_area"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <ImageView
+            android:layout_marginStart="10dp"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             app:srcCompat="@drawable/add_location_blue"/>
 
         <TextView
@@ -24,7 +48,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="Mark Current Location"
+            android:text="@string/mark_current_location"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />
@@ -48,7 +72,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="Delete Last Location"
+            android:text="@string/delete_last_location"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />
@@ -73,7 +97,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="Clear Map and Start Over"
+            android:text="@string/clear_map_and_start_over"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />

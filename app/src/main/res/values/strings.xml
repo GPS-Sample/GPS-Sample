@@ -352,6 +352,11 @@
     <string name="saving_configuration">"Saving Configuration…"</string>
     <string name="polygon_is_self_intersecting">"A polygon based on these points will be self-intersecting."</string>
     <string name="no_eligible_households">"There are no eligible households to sample."</string>
+    <string name="walk_enumeration_area">Walk Enumeration Area</string>
+    <string name="mark_current_location">Mark Current Location</string>
+    <string name="delete_last_location">Delete Last Location</string>
+    <string name="clear_map_and_start_over">Clear Map and Start Over</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
