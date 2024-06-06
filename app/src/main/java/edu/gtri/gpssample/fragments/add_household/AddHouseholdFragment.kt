@@ -443,6 +443,8 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             enumerationItem.enumerationState = EnumerationState.Enumerated
         }
 
+        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+
         enumerationItem.enumerationNotes = notes
         enumerationItem.enumerationDate = Date().time
         enumerationItem.syncCode = enumerationItem.syncCode + 1

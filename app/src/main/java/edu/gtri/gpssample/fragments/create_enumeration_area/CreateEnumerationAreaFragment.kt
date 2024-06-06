@@ -847,7 +847,8 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         enumArea?.let{  enumArea ->
-            val location = Location( LocationType.Enumeration, -1, latitude, longitude, altitude, false, "")
+            val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+            val location = Location( timeZone, LocationType.Enumeration, -1, latitude, longitude, altitude, false, "")
             enumArea.locations.add(location)
             refreshMap()
         }
@@ -1341,7 +1342,8 @@ class CreateEnumerationAreaFragment : Fragment(),
                             altitude = it
                         }
 
-                        val location = Location( LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, altitude, false, "" )
+                        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                        val location = Location( timeZone, LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, altitude, false, "" )
 
                         enumArea.locations.add( location )
                         break // found! assuming that it can only exist in a single EA, for now!

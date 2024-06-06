@@ -299,7 +299,8 @@ class PerformEnumerationFragment : Fragment(),
                 currentGPSAccuracy?.let { accuracy ->
                     currentGPSLocation?.let { point ->
                         val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
-                        val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, true, "")
+                        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                        val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, true, "")
 
                         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         enumArea.locations.add(location)
@@ -594,7 +595,8 @@ class PerformEnumerationFragment : Fragment(),
             }
 
             val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
-            val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "")
+            val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+            val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "")
 
             if (gpsLocationIsGood( location ))
             {
@@ -688,7 +690,8 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
-                val location = Location( LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "")
+                val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "")
 
                 DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                 enumArea.locations.add(location)
@@ -740,7 +743,8 @@ class PerformEnumerationFragment : Fragment(),
             }
 
             val altitude = if (tag.altitude().isNaN()) 0.0 else tag.altitude()
-            val location = Location( LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), altitude, false, "")
+            val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+            val location = Location( timeZone, LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), altitude, false, "")
 
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)

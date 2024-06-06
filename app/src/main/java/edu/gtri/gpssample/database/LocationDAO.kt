@@ -94,6 +94,7 @@ class LocationDAO(private var dao: DAO)
 
         values.put( DAO.COLUMN_UUID, location.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
+        values.put( DAO.COLUMN_LOCATION_TIME_ZONE, location.timeZone )
         values.put( DAO.COLUMN_LOCATION_TYPE_ID, LocationTypeConverter.toIndex(location.type) )
         values.put( DAO.COLUMN_LOCATION_GPS_ACCURACY, location.gpsAccuracy )
         values.put( DAO.COLUMN_LOCATION_LATITUDE, location.latitude )
@@ -109,6 +110,7 @@ class LocationDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val timeZone = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_TIME_ZONE))
         val locationTypeId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_TYPE_ID))
         val gpsAccuracy = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_GPS_ACCURACY))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LOCATION_LATITUDE))
@@ -119,7 +121,7 @@ class LocationDAO(private var dao: DAO)
         val imageData = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IMAGE_DATA))
         val isMultiFamily = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_LOCATION_IS_MULTI_FAMILY)).toBoolean()
 
-        return Location( uuid, creationDate, 0.0, "", LocationTypeConverter.fromIndex(locationTypeId), gpsAccuracy, latitude, longitude, altitude, isLandmark, description, imageData, isMultiFamily, ArrayList<EnumerationItem>())
+        return Location( uuid, creationDate, timeZone, 0.0, "", LocationTypeConverter.fromIndex(locationTypeId), gpsAccuracy, latitude, longitude, altitude, isLandmark, description, imageData, isMultiFamily, ArrayList<EnumerationItem>())
     }
 
     fun getLocation( uuid: String ) : Location?

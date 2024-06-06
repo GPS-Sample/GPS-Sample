@@ -12,6 +12,7 @@ import kotlin.collections.ArrayList
 data class Location(
     var uuid : String,
     var creationDate: Long,
+    var timeZone: Int,
     var distance : Double,      // not stored in DB!
     var distanceUnits: String,  // not stored in DB!
     var type : LocationType,
@@ -25,8 +26,8 @@ data class Location(
     var isMultiFamily : Boolean,
     var enumerationItems: ArrayList<EnumerationItem>)
 {
-    constructor( type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String ) :
-            this( UUID.randomUUID().toString(), Date().time, 0.0, "", type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, ArrayList<EnumerationItem>())
+    constructor( timeZone: Int, type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String ) :
+            this( UUID.randomUUID().toString(), Date().time, timeZone, 0.0, "", type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, ArrayList<EnumerationItem>())
 
     fun equals( other: Location ) : Boolean
     {
