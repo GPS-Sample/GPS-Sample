@@ -2,6 +2,7 @@ package edu.gtri.gpssample.dialogs
 
 import android.app.AlertDialog
 import android.content.Context
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -23,7 +24,7 @@ class InputDialog
     {
     }
 
-    constructor( context: Context, qrVisible: Boolean, title: String, text: String?, leftButton: String, rightButton: String, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true )
+    constructor( context: Context, qrVisible: Boolean, title: String, text: String?, leftButton: String, rightButton: String, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true, inputNumber: Boolean = true )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -36,6 +37,11 @@ class InputDialog
         textView.text = title
 
         editText = view.findViewById<EditText>(R.id.edit_text)
+
+        if (inputNumber)
+        {
+            editText!!.inputType = InputType.TYPE_CLASS_NUMBER
+        }
 
         text?.let {
             editText!!.setText( it )

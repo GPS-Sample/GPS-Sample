@@ -13,6 +13,7 @@ enum class Keys( val value: String ) {
     kIsOnBoarding("IsOnBoarding"),
     kTermsAccepted("TermsAccepted"),
     kCollectionMode("CollectionMode"),
+    kStartSubaddress( "StartSubaddress"),
     kGpsAccuracyIsGood("GpsAccuracyIsGood"),
     kGpsLocationIsGood("GpsLocationIsGood"),
     kLaunchSurveyRequest("LaunchSurveyRequest"),

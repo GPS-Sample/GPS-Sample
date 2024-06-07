@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mapbox.maps.extension.style.expressions.dsl.generated.max
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -25,6 +26,7 @@ class AddMultiHouseholdFragment : Fragment()
     private lateinit var addMultiHouseholdAdapter: AddMultiHouseholdAdapter
 
     private var editMode = true
+    private var maxSubaddress = 0
     private var _binding: FragmentAddMultiHouseholdBinding? = null
     private val binding get() = _binding!!
 
@@ -49,6 +51,10 @@ class AddMultiHouseholdFragment : Fragment()
 
         arguments?.getBoolean(Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
+        }
+
+        arguments?.getInt(Keys.kStartSubaddress.value)?.let { startSubAddress ->
+            this.maxSubaddress = startSubAddress + 1
         }
 
         if (!editMode)
@@ -78,24 +84,8 @@ class AddMultiHouseholdFragment : Fragment()
         binding.addButton.setOnClickListener {
 
             val enumerationItem = EnumerationItem()
-
-            if (config.autoIncrementSubaddress)
-            {
-                var enumerationCount = 0
-
-                for (location in enumArea.locations)
-                {
-                    for (enumItem in location.enumerationItems)
-                    {
-                        if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
-                        {
-                            enumerationCount += 1
-                        }
-                    }
-                }
-
-                enumerationItem.subAddress = "${enumerationCount + 1}"
-            }
+            enumerationItem.subAddress = maxSubaddress.toString()
+            maxSubaddress += 1
 
             sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 

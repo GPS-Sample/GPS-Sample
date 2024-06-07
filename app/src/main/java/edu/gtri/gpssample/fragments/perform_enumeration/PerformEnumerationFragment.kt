@@ -60,6 +60,7 @@ class PerformEnumerationFragment : Fragment(),
     OnMapClickListener,
     OnCameraChangeListener,
     InfoDialog.InfoDialogDelegate,
+    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
@@ -94,7 +95,7 @@ class PerformEnumerationFragment : Fragment(),
     private val kAddHouseholdTag = 2
     private val kSelectHouseholdTag = 3
 
-    private var enumerationCount = 0
+    private var maxSubaddress = 0
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -106,10 +107,7 @@ class PerformEnumerationFragment : Fragment(),
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
 
-        if (BuildConfig.DEBUG)
-        {
-            setHasOptionsMenu(true)
-        }
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -339,9 +337,9 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
-        enumerationCount = 0
         var sampledCount = 0
         var surveyedCount = 0
+        var enumerationCount = 0
 
         for (location in enumArea.locations)
         {
@@ -349,6 +347,12 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
                 {
+                    enumItem.subAddress.toIntOrNull()?.let {
+                        if (it > maxSubaddress)
+                        {
+                            maxSubaddress = it
+                        }
+                    }
                     enumerationCount += 1
                 }
                 if (enumItem.samplingState == SamplingState.Sampled)
@@ -536,7 +540,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (config.autoIncrementSubaddress)
                     {
-                        enumerationItem.subAddress = "${enumerationCount + 1}"
+                        enumerationItem.subAddress = "${maxSubaddress + 1}"
                     }
 
                     sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
@@ -765,6 +769,7 @@ class PerformEnumerationFragment : Fragment(),
                         location.isMultiFamily = true
                         val bundle = Bundle()
                         bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
+                        bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
                         findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
                     }
                 }
@@ -1053,9 +1058,29 @@ class PerformEnumerationFragment : Fragment(),
         MapboxManager.cancelTilePackDownload()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    override fun didCancelText( tag: Any? )
+    {
+    }
+
+    override fun didEnterText( name: String, tag: Any? )
+    {
+        name.toIntOrNull()?.let {
+            maxSubaddress = it - 1
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
+    {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_enumerate_all, menu)
+
+        if (BuildConfig.DEBUG)
+        {
+            inflater.inflate(R.menu.menu_enumerate_all, menu)
+        }
+        else
+        {
+            inflater.inflate(R.menu.menu_set_subaddress, menu)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
@@ -1069,6 +1094,11 @@ class PerformEnumerationFragment : Fragment(),
                 enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
 
                 refreshMap()
+            }
+
+            R.id.set_subaddress ->
+            {
+                InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true )
             }
         }
 
