@@ -348,10 +348,15 @@
     <string name="feet">"Kaki"</string>
     <string name="kilometers">"Kilometer"</string>
     <string name="miles">"mil"</string>
-    <string name="importing_locations">""</string>
-    <string name="saving_configuration">""</string>
-    <string name="polygon_is_self_intersecting">""</string>
-    <string name="no_eligible_households">""</string>
+    <string name="importing_locations">"Mengimpor Lokasi…"</string>
+    <string name="saving_configuration">"Menyimpan Konfigurasi…"</string>
+    <string name="polygon_is_self_intersecting">"построенный по этим точкам"</string>
+    <string name="no_eligible_households">"Tidak ada rumah tangga yang memenuhi syarat untuk dijadikan sampel."</string>
+    <string name="walk_enumeration_area">"Area Pencacahan Jalan Kaki"</string>
+    <string name="mark_current_location">"Tandai Lokasi Saat Ini"</string>
+    <string name="delete_last_location">"Hapus Lokasi Terakhir"</string>
+    <string name="clear_map_and_start_over">"Hapus Peta dan Mulai dari Awal"</string>
+    <string name="image_size_warning">"Anda telah melampaui 25Mb Data Gambar. Menambahkan lebih banyak gambar akan sangat mempengaruhi kinerja transfer data."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

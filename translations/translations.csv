@@ -374,7 +374,12 @@ meters,Meters,Metros,Mètres,Metros,Метры,Meter
 feet,Feet,Pies,Pieds,Pés,Футы,Kaki
 kilometers,Kilometers,Kilómetros,Kilomètres,Quilômetros ,километры,Kilometer
 miles,Miles,Millas,Miles,Milhas,Мили,mil
-importing_locations,Importing Locations…,,,,,
-saving_configuration,Saving Configuration…,,,,,
-polygon_is_self_intersecting,A polygon based on these points will be self-intersecting.,,,,,
-no_eligible_households,There are no eligible households to sample.,,,,,
+importing_locations,Importing Locations…,Importando ubicaciones…,Importation d'emplacements...,Importar localizações...,Импорт местоположений...,Mengimpor Lokasi…
+saving_configuration,Saving Configuration…,Guardando configuración...,Sauvegarde de la configuration...,Guardar a configuração...,Сохранение конфигурации...,Menyimpan Konfigurasi…
+polygon_is_self_intersecting,A polygon based on these points will be self-intersecting.,Un polígono basado en estos puntos será auto-intersecante.,Un polygone basé sur ces points sera auto-intersecté.,Um polígono baseado nestes pontos será auto-intersectado.,"Многоугольник, построенный по этим точкам, будет самопересекающимся.",Sebuah poligon berdasarkan titik-titik ini akan berpotongan sendiri.
+no_eligible_households,There are no eligible households to sample.,No hay hogares elegibles para el muestreo.,Il n'y a pas de ménages éligibles à échantillonner.,Não existem agregados familiares elegíveis para amostragem.,Нет подходящих для выборки домохозяйств.,Tidak ada rumah tangga yang memenuhi syarat untuk dijadikan sampel.
+walk_enumeration_area,Walk Enumeration Area,Caminar por la area de enumeración,Marchez dans la zone de dénombrement,Percorrer a área de enumeração,Пройтись по зоне перечисления,Area Pencacahan Jalan Kaki
+mark_current_location,Mark Current Location,Marcar ubicación actual,Marquez l'emplacement actuel,Marcar localização atual,Отметить текущее местоположение,Tandai Lokasi Saat Ini
+delete_last_location,Delete Last Location,Borrar última ubicación,Supprimez le dernier emplacement,Apagar a última localização,Удалить последнее местоположение,Hapus Lokasi Terakhir
+clear_map_and_start_over,Clear Map and Start Over,Borrar mapa y volver a empezar,Effacez la carte et recommencer,Limpar mapa e começar de novo,Очистить карту и начать сначала,Hapus Peta dan Mulai dari Awal
+image_size_warning,You've exceeded 25Mb of Image Data. Adding more images will greatly impact data transfer performance.,Ha superado los 25Mb de Datos de Imagen. Añadir más imágenes tendrá un gran impacto en la transferencia de datos.,Vous avez dépassé les 25 MB de données d'image. L'ajout d'images supplémentaires aura un impact considérable sur les performances de transfert des données.,Excedeu 25 Mb de dados de imagem. A adição de mais imagens terá um grande impacto na transferência de dados.,Вы превысили 25 Мб данных изображений. Добавление дополнительных изображений сильно повлияет на производительность передачи данных.,Anda telah melampaui 25Mb Data Gambar. Menambahkan lebih banyak gambar akan sangat mempengaruhi kinerja transfer data.

@@ -348,10 +348,15 @@
     <string name="feet">"Pés"</string>
     <string name="kilometers">"Quilômetros"</string>
     <string name="miles">"Milhas"</string>
-    <string name="importing_locations">""</string>
-    <string name="saving_configuration">""</string>
-    <string name="polygon_is_self_intersecting">""</string>
-    <string name="no_eligible_households">""</string>
+    <string name="importing_locations">"Importar localizações..."</string>
+    <string name="saving_configuration">"Guardar a configuração..."</string>
+    <string name="polygon_is_self_intersecting">"Um polígono baseado nestes pontos será auto-intersectado."</string>
+    <string name="no_eligible_households">"Não existem agregados familiares elegíveis para amostragem."</string>
+    <string name="walk_enumeration_area">"Percorrer a área de enumeração"</string>
+    <string name="mark_current_location">"Marcar localização atual"</string>
+    <string name="delete_last_location">"Apagar a última localização"</string>
+    <string name="clear_map_and_start_over">"Limpar mapa e começar de novo"</string>
+    <string name="image_size_warning">"Excedeu 25 Mb de dados de imagem. A adição de mais imagens terá um grande impacto na transferência de dados."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
