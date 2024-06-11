@@ -86,6 +86,7 @@ class PerformCollectionFragment : Fragment(),
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
+    private val collectionTeamLocations = ArrayList<Location>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
     private val locationHashMap = java.util.HashMap<Long, Location>()
@@ -162,6 +163,15 @@ class PerformCollectionFragment : Fragment(),
             collectionTeam = it
         }
 
+        collectionTeamLocations.clear()
+
+        for (teamLocationUuid in collectionTeam.locationUuids)
+        {
+            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
+                collectionTeamLocations.add( location )
+            }
+        }
+
         val _user = (activity!!.application as? MainApplication)?.user
 
         _user?.let { user ->
@@ -178,7 +188,7 @@ class PerformCollectionFragment : Fragment(),
         val enumerationItems = ArrayList<EnumerationItem>()
         var errorShown = false
 
-        collectionTeam.locations.map { location ->
+        collectionTeamLocations.map { location ->
             for (enumurationItem in location.enumerationItems)
             {
                 if (enumurationItem.samplingState == SamplingState.Sampled)
@@ -479,7 +489,7 @@ class PerformCollectionFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in collectionTeam.locations)
+            for (location in collectionTeamLocations)
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
@@ -740,11 +750,11 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
-                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
+//                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
 
                 val enumerationItems = ArrayList<EnumerationItem>()
 
-                for (loc in collectionTeam.locations)
+                for (loc in collectionTeamLocations)
                 {
                     for (enumurationItem in loc.enumerationItems)
                     {
@@ -1022,11 +1032,11 @@ class PerformCollectionFragment : Fragment(),
         {
             R.id.survey ->
             {
-                TestUtils.surveyAll( enumArea )
-
-                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
-
-                refreshMap()
+//                TestUtils.surveyAll( enumArea )
+//
+//                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
+//
+//                refreshMap()
             }
         }
 

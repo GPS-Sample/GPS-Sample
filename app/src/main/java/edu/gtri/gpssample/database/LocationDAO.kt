@@ -161,6 +161,25 @@ class LocationDAO(private var dao: DAO)
         return uuids
     }
 
+    @SuppressLint("Range")
+    fun getCollectionTeamLocationUuids( collectionTeam: CollectionTeam ) : ArrayList<String>
+    {
+        val uuids = ArrayList<String>()
+
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM} WHERE ${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
+
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            uuids.add( cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_UUID)))
+        }
+
+        cursor.close()
+
+        return uuids
+    }
+
     fun getLocations( enumerationTeam: EnumerationTeam ) : ArrayList<Location>
     {
         val locations = ArrayList<Location>()

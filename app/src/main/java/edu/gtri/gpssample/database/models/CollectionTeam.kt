@@ -12,11 +12,11 @@ data class CollectionTeam(
     var enumAreaUuid: String,
     var name: String,
     var polygon: ArrayList<LatLon>,
-    var locations: ArrayList<Location>
+    var locationUuids: ArrayList<String> // the EnumArea is the single point keeper of locations, we don't want a copy of it here!
 )
 {
-    constructor( enumAreaUuid: String,  name: String, polygon: ArrayList<LatLon>, locations: ArrayList<Location>)
-            : this(UUID.randomUUID().toString(), Date().time, enumAreaUuid, name, polygon, locations )
+    constructor( enumAreaUuid: String,  name: String, polygon: ArrayList<LatLon>, locationUuids: ArrayList<String>)
+            : this(UUID.randomUUID().toString(), Date().time, enumAreaUuid, name, polygon, locationUuids )
 
     fun equals( other: CollectionTeam ): Boolean
     {

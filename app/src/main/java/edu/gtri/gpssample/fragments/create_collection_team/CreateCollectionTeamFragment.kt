@@ -53,7 +53,7 @@ class CreateCollectionTeamFragment : Fragment(),
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private var createMode = false
-    private val locations = ArrayList<Location>()
+    private val locationUuids = ArrayList<String>()
     private var intersectionPolygon: PolygonAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
@@ -161,7 +161,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locations ))
+            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
 
             collectionTeam?.let { team ->
                 enumArea.collectionTeams.add(team)
@@ -248,7 +248,7 @@ class CreateCollectionTeamFragment : Fragment(),
         p1?.let { p1 ->
             if (p1.action == MotionEvent.ACTION_UP)
             {
-                locations.clear()
+                locationUuids.clear()
 
                 val points1 = ArrayList<Coordinate>()
                 val points2 = ArrayList<Coordinate>()
@@ -297,7 +297,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                 val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
                                 if (geometry2.contains(geometry3))
                                 {
-                                    locations.add( location )
+                                    locationUuids.add( location.uuid )
                                 }
                             }
                         }

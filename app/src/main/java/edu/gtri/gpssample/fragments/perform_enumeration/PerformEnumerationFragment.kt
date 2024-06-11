@@ -149,6 +149,8 @@ class PerformEnumerationFragment : Fragment(),
             enumerationTeam = it
         }
 
+        enumerationTeamLocations.clear()
+
         for (teamLocationUuid in enumerationTeam.locationUuids)
         {
             enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->

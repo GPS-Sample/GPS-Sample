@@ -41,7 +41,7 @@ class CollectionTeamDAO(private var dao: DAO)
         return collectionTeam
     }
 
-    private fun updateConnectorTable( collectionTeam: CollectionTeam)
+    private fun updateConnectorTable( collectionTeam: CollectionTeam )
     {
         for (latLon in collectionTeam.polygon)
         {
@@ -57,14 +57,14 @@ class CollectionTeamDAO(private var dao: DAO)
             cursor.close()
         }
 
-        for (location in collectionTeam.locations)
+        for (locationUuid in collectionTeam.locationUuids)
         {
-            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
+            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${locationUuid}' AND ${DAO.COLUMN_COLLECTION_TEAM_UUID} = '${collectionTeam.uuid}'"
             val cursor = dao.writableDatabase.rawQuery(query, null)
             if (cursor.count == 0)
             {
                 val values = ContentValues()
-                values.put( DAO.COLUMN_LOCATION_UUID, location.uuid )
+                values.put( DAO.COLUMN_LOCATION_UUID, locationUuid )
                 values.put( DAO.COLUMN_COLLECTION_TEAM_UUID, collectionTeam.uuid )
                 dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM, null, values)
             }
@@ -101,10 +101,10 @@ class CollectionTeamDAO(private var dao: DAO)
         val enum_area_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
 
-        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, ArrayList<LatLon>(), ArrayList<Location>())
+        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, ArrayList<LatLon>(), ArrayList<String>())
 
         collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( collectionTeam.uuid )
-        collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
+        collectionTeam.locationUuids = DAO.locationDAO.getCollectionTeamLocationUuids( collectionTeam )
 
         return collectionTeam
     }

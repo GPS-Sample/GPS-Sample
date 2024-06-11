@@ -592,8 +592,8 @@ class ConfigurationFragment : Fragment(),
                         polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
                     }
 
-                    val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid,"S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
-                    enumArea.collectionTeams.add(collectionTeam!!)
+//                    val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid,"S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
+//                    enumArea.collectionTeams.add(collectionTeam!!)
 
                     for (location in enumArea.locations)
                     {
