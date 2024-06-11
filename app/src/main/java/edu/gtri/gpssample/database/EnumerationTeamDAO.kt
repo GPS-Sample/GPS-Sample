@@ -57,14 +57,14 @@ class EnumerationTeamDAO(private var dao: DAO)
             cursor.close()
         }
 
-        for (location in enumerationTeam.locations)
+        for (locationUuid in enumerationTeam.locationUuids)
         {
-            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${location.uuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
+            val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM} WHERE ${DAO.COLUMN_LOCATION_UUID} = '${locationUuid}' AND ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
             val cursor = dao.writableDatabase.rawQuery(query, null)
             if (cursor.count == 0)
             {
                 val values = ContentValues()
-                values.put( DAO.COLUMN_LOCATION_UUID, location.uuid )
+                values.put( DAO.COLUMN_LOCATION_UUID, locationUuid )
                 values.put( DAO.COLUMN_ENUMERATION_TEAM_UUID, enumerationTeam.uuid )
                 dao.writableDatabase.insert(DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM, null, values)
             }
@@ -95,10 +95,10 @@ class EnumerationTeamDAO(private var dao: DAO)
         val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
 
-        val enumerationTeam = EnumerationTeam(uuid, creationDate, enumAreaUuid, name, ArrayList<LatLon>(), ArrayList<Location>())
+        val enumerationTeam = EnumerationTeam(uuid, creationDate, enumAreaUuid, name, ArrayList<LatLon>(), ArrayList<String>())
 
         enumerationTeam.polygon = DAO.latLonDAO.getLatLonsWithEnumerationTeamId( enumerationTeam.uuid )
-        enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
+        enumerationTeam.locationUuids = DAO.locationDAO.getEnumerationTeamLocationUuids( enumerationTeam )
 
         return enumerationTeam
     }

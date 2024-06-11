@@ -151,7 +151,9 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
                 }
                 else
                 {
-                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                    location.isMultiFamily = true
+                    findNavController().popBackStack()
+//                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
                 }
             }
         }
@@ -353,6 +355,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         {
             enumArea.locations.remove( location )
             DAO.locationDAO.delete( location )
+            enumTeam.locationUuids.remove( location.uuid )
         }
 
         DAO.configDAO.getConfig( config.uuid )?.let {

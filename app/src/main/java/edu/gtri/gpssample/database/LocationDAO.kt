@@ -142,6 +142,25 @@ class LocationDAO(private var dao: DAO)
         return location
     }
 
+    @SuppressLint("Range")
+    fun getEnumerationTeamLocationUuids( enumerationTeam: EnumerationTeam ) : ArrayList<String>
+    {
+        val uuids = ArrayList<String>()
+
+        val query = "SELECT * FROM ${DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM} WHERE ${DAO.COLUMN_ENUMERATION_TEAM_UUID} = '${enumerationTeam.uuid}'"
+
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            uuids.add( cursor.getString(cursor.getColumnIndex(DAO.COLUMN_LOCATION_UUID)))
+        }
+
+        cursor.close()
+
+        return uuids
+    }
+
     fun getLocations( enumerationTeam: EnumerationTeam ) : ArrayList<Location>
     {
         val locations = ArrayList<Location>()
@@ -215,7 +234,7 @@ class LocationDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val location = buildLocation( cursor )
-           location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
+            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
             locations.add( location )
         }
 
@@ -226,9 +245,17 @@ class LocationDAO(private var dao: DAO)
 
     fun delete( location: Location )
     {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
-        val args = arrayOf(location.uuid)
-
+        var whereClause = "${DAO.COLUMN_UUID} = ?"
+        var args = arrayOf(location.uuid)
         dao.writableDatabase.delete(DAO.TABLE_LOCATION, whereClause, args)
+
+        // delete this location from all connector tables
+
+        whereClause = "${DAO.COLUMN_LOCATION_UUID} = ?"
+        args = arrayOf(location.uuid)
+
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_LOCATION__ENUM_AREA, whereClause, args)
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM, whereClause, args)
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM, whereClause, args)
     }
 }

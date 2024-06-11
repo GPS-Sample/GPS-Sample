@@ -86,6 +86,7 @@ class PerformEnumerationFragment : Fragment(),
     private var currentGPSLocation: Point? = null
     private val pointHashMap = HashMap<Long,Location>()
     private val polygonHashMap = HashMap<Long,EnumArea>()
+    private val enumerationTeamLocations = ArrayList<Location>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
@@ -146,6 +147,13 @@ class PerformEnumerationFragment : Fragment(),
 
         sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.let {
             enumerationTeam = it
+        }
+
+        for (teamLocationUuid in enumerationTeam.locationUuids)
+        {
+            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
+                enumerationTeamLocations.add( location )
+            }
         }
 
         (activity!!.application as? MainApplication)?.user?.let {
@@ -407,7 +415,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
 
-        performEnumerationAdapter.updateLocations( enumerationTeam.locations )
+        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
 
         for (polygonAnnotation in allPolygonAnnotations)
         {
@@ -481,7 +489,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
-            for (location in enumerationTeam.locations)
+            for (location in enumerationTeamLocations)
             {
                 if (!location.isLandmark)
                 {
@@ -531,6 +539,7 @@ class PerformEnumerationFragment : Fragment(),
 
             val bundle = Bundle()
             bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
+            bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
 
             if (location.enumerationItems.isEmpty())
             {
@@ -609,7 +618,8 @@ class PerformEnumerationFragment : Fragment(),
 
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-                enumerationTeam.locations.add(location)
+                enumerationTeamLocations.add(location)
+                enumerationTeam.locationUuids.add(location.uuid)
                 DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                 navigateToAddHouseholdFragment()
             }
@@ -702,7 +712,7 @@ class PerformEnumerationFragment : Fragment(),
 
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-                enumerationTeam.locations.add(location)
+                enumerationTeamLocations.add(location)
                 DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                 navigateToAddHouseholdFragment()
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
@@ -755,7 +765,7 @@ class PerformEnumerationFragment : Fragment(),
 
             sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-            enumerationTeam.locations.add(location)
+            enumerationTeamLocations.add(location)
             DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
             navigateToAddHouseholdFragment()
         }
@@ -1089,11 +1099,11 @@ class PerformEnumerationFragment : Fragment(),
         {
             R.id.enumerate ->
             {
-                TestUtils.enumerateAll( enumArea )
-
-                enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
-
-                refreshMap()
+//                TestUtils.enumerateAll( enumArea )
+//
+//                enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
+//
+//                refreshMap()
             }
 
             R.id.set_subaddress ->

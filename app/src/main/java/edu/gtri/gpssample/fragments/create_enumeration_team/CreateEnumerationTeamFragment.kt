@@ -50,8 +50,8 @@ class CreateEnumerationTeamFragment : Fragment(),
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
-    private val locations = ArrayList<Location>()
     private var createMode = false
+    private val locationUuids = ArrayList<String>()
     private var intersectionPolygon: PolygonAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
@@ -152,7 +152,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
 
-            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locations ))
+            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
 
             enumerationTeam?.let { team ->
                 enumArea.enumerationTeams.add(team)
@@ -262,14 +262,14 @@ class CreateEnumerationTeamFragment : Fragment(),
                             pointList.add( vertices )
                             intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000", 0.25)
 
-                            locations.clear()
+                            locationUuids.clear()
 
                             for (location in enumArea.locations)
                             {
                                 val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
                                 if (polygon.contains(geometry3))
                                 {
-                                    locations.add( location )
+                                    locationUuids.add( location.uuid )
                                 }
                             }
                         }
