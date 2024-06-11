@@ -306,10 +306,14 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
 
     private fun shouldDeleteCheckboxFieldOption(fieldOption: FieldOption)
     {
+        field.fieldOptions.remove(fieldOption)
+        createFieldCheckboxAdapter.updateFieldOptions( field.fieldOptions )
     }
 
     private fun shouldDeleteDropdownFieldOption(fieldOption: FieldOption)
     {
+        field.fieldOptions.remove(fieldOption)
+        createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
     }
 
     override fun onDestroyView()
