@@ -105,11 +105,25 @@ class ManageConfigurationsFragment : Fragment(),
 
         binding.overlayView.visibility = View.VISIBLE
 
+        (activity!!.application as MainApplication).user?.let { user ->
+            this.user = user
+        }
+
+        if (user.role != Role.Admin.value)
+        {
+            binding.addButton.visibility = View.GONE
+        }
+
         Thread {
             configurations = DAO.configDAO.getConfigs()
             activity!!.runOnUiThread {
                 binding.overlayView.visibility = View.GONE
                 manageConfigurationsAdapter.updateConfigurations(configurations)
+
+                if (user.role == Role.Enumerator.value && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
+                {
+                    binding.createButton.visibility = View.VISIBLE
+                }
             }
         }.start()
 
@@ -119,20 +133,6 @@ class ManageConfigurationsFragment : Fragment(),
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = manageConfigurationsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
-
-        (activity!!.application as MainApplication).user?.let { user ->
-            this.user = user
-
-            if (user.role != Role.Admin.toString())
-            {
-                binding.addButton.visibility = View.GONE
-            }
-
-            if (user.role == Role.Enumerator.toString() && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
-            {
-                binding.createButton.visibility = View.VISIBLE
-            }
-        }
 
         if (BuildConfig.DEBUG && (user.role == Role.Admin.toString() || user.role == Role.Supervisor.toString()))
         {
