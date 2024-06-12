@@ -36,6 +36,10 @@ class AddMultiHouseholdFragment : Fragment()
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        arguments?.getInt(Keys.kStartSubaddress.value)?.let { startSubAddress ->
+            this.maxSubaddress = startSubAddress
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -51,10 +55,6 @@ class AddMultiHouseholdFragment : Fragment()
 
         arguments?.getBoolean(Keys.kEditMode.value)?.let { editMode ->
             this.editMode = editMode
-        }
-
-        arguments?.getInt(Keys.kStartSubaddress.value)?.let { startSubAddress ->
-            this.maxSubaddress = startSubAddress + 1
         }
 
         if (!editMode)
@@ -81,11 +81,31 @@ class AddMultiHouseholdFragment : Fragment()
         binding.recyclerView.adapter = addMultiHouseholdAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
+        if (maxSubaddress == 0)
+        {
+            for (location in enumArea.locations)
+            {
+                for (enumItem in location.enumerationItems)
+                {
+                    if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                    {
+                        enumItem.subAddress.toIntOrNull()?.let {
+                            if (it > maxSubaddress)
+                            {
+                                maxSubaddress = it
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        maxSubaddress += 1
+
         binding.addButton.setOnClickListener {
 
             val enumerationItem = EnumerationItem()
             enumerationItem.subAddress = maxSubaddress.toString()
-            maxSubaddress += 1
 
             sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 
