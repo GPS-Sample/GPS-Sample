@@ -18,13 +18,13 @@ import edu.gtri.gpssample.database.models.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val enumAreaName: String) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
+class PerformCollectionAdapter(var items: List<Any>, val enumAreaName: String) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
 {
-    override fun getItemCount() = enumerationItems.size
+    override fun getItemCount() = items.size
 
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
-    lateinit var didSelectEnumerationItem: ((enumerationItem: EnumerationItem) -> Unit)
+    lateinit var didSelectItem: ((item: Any) -> Unit)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
@@ -38,9 +38,9 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val 
         return viewHolder
     }
 
-    fun updateEnumerationItems( enumerationItems: List<EnumerationItem> )
+    fun updateEnumerationItems( enumerationItems: List<Any> )
     {
-        this.enumerationItems = enumerationItems
+        this.items = items
         notifyDataSetChanged()
     }
 
@@ -48,33 +48,45 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, val 
     {
         holder.itemView.isSelected = false
 
-        val enumerationItem = enumerationItems.get(holder.adapterPosition)
+        val item = items.get( holder.adapterPosition )
 
-        holder.secondTextView.setText( enumerationItem.uuid )
-
-        if (enumerationItem.subAddress.isNotEmpty())
+        if (item is Location)
         {
-            holder.firstTextView.setText( "${enumAreaName} : ${enumerationItem.subAddress}" )
+            holder.firstTextView.setText( "${item.description}" )
+            holder.secondTextView.setText( item.uuid )
+            if (item.distance > 0)
+            {
+                holder.thirdTextView.setText("Distance: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
+            }
         }
-
-        holder.thirdTextView.setText("")
-
-        if (enumerationItem.distance > 0)
+        else if (item is EnumerationItem)
         {
-            holder.thirdTextView.setText("Distance: ${String.format( "%.1f", enumerationItem.distance )} ${enumerationItem.distanceUnits}")
-        }
+            holder.secondTextView.setText( item.uuid )
 
-        if (enumerationItem.collectionState == CollectionState.Complete)
-        {
-            holder.checkImageView.visibility = View.VISIBLE
-        }
-        else
-        {
-            holder.checkImageView.visibility = View.GONE
+            if (item.subAddress.isNotEmpty())
+            {
+                holder.firstTextView.setText( "${enumAreaName} : ${item.subAddress}" )
+            }
+
+            holder.thirdTextView.setText("")
+
+            if (item.distance > 0)
+            {
+                holder.thirdTextView.setText("Distance: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
+            }
+
+            if (item.collectionState == CollectionState.Complete)
+            {
+                holder.checkImageView.visibility = View.VISIBLE
+            }
+            else
+            {
+                holder.checkImageView.visibility = View.GONE
+            }
         }
 
         holder.itemView.setOnClickListener {
-            didSelectEnumerationItem( enumerationItem )
+            didSelectItem( item )
         }
     }
 

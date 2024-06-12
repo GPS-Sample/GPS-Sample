@@ -185,32 +185,39 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
-        val enumerationItems = ArrayList<EnumerationItem>()
+        val items = ArrayList<Any>()
         var errorShown = false
 
         collectionTeamLocations.map { location ->
-            for (enumurationItem in location.enumerationItems)
+            if (location.isLandmark)
             {
-                if (enumurationItem.samplingState == SamplingState.Sampled)
+                items.add( location )
+            }
+            else
+            {
+                for (enumurationItem in location.enumerationItems)
                 {
-                    // FIX THIS!!! why is the locationId sometimes NOT set?
-                    if (enumurationItem.locationUuid.isEmpty())
+                    if (enumurationItem.samplingState == SamplingState.Sampled)
                     {
-                        if (!errorShown)
+                        // FIX THIS!!! why is the locationId sometimes NOT set?
+                        if (enumurationItem.locationUuid.isEmpty())
                         {
-                            errorShown = true
-                            NotificationDialog( activity!!, "Oops!", "Found an EnumerationItem that is missing a Location")
-                        }
+                            if (!errorShown)
+                            {
+                                errorShown = true
+                                NotificationDialog( activity!!, "Oops!", "Found an EnumerationItem that is missing a Location")
+                            }
 
-                        enumurationItem.locationUuid = location.uuid
+                            enumurationItem.locationUuid = location.uuid
+                        }
+                        items.add( enumurationItem )
                     }
-                    enumerationItems.add( enumurationItem )
                 }
             }
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( enumerationItems, enumArea.name )
-        performCollectionAdapter.didSelectEnumerationItem = this::didSelectEnumerationItem
+        performCollectionAdapter = PerformCollectionAdapter( items, enumArea.name )
+        performCollectionAdapter.didSelectItem = this::didSelectItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
         binding.recyclerView.adapter = performCollectionAdapter
@@ -558,21 +565,30 @@ class PerformCollectionFragment : Fragment(),
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
-    private fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
+    private fun didSelectItem( item: Any )
     {
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-            DAO.locationDAO.getLocation( enumerationItem.locationUuid )?.let { location ->
-                sharedViewModel.locationViewModel.setCurrentLocation(location)
-                sharedViewModel.locationViewModel.setCurrentEnumerationItem(enumerationItem)
-                (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
-                (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-                (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
 
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.value, false )
-                bundle.putBoolean( Keys.kCollectionMode.value, true )
-                bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+            if (item is Location)
+            {
+                sharedViewModel.locationViewModel.setCurrentLocation(item)
+                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+            }
+            else if (item is EnumerationItem)
+            {
+                DAO.locationDAO.getLocation( item.locationUuid )?.let { location ->
+                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+                    sharedViewModel.locationViewModel.setCurrentEnumerationItem(item)
+                    (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = item.uuid
+                    (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                    (this.activity!!.application as? MainApplication)?.currentSubAddress = item.subAddress
+
+                    val bundle = Bundle()
+                    bundle.putBoolean( Keys.kEditMode.value, false )
+                    bundle.putBoolean( Keys.kCollectionMode.value, true )
+                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+                }
             }
         }
     }
@@ -829,42 +845,65 @@ class PerformCollectionFragment : Fragment(),
 
                     sharedViewModel.currentConfiguration?.value?.let { config ->
 
-                        for (enumerationItem in performCollectionAdapter.enumerationItems)
+                        for (item in performCollectionAdapter.items)
                         {
+                            var loc: Location? = null
                             val currentLatLng = LatLng( point.latitude(), point.longitude())
-                            DAO.locationDAO.getLocation( enumerationItem.locationUuid )?.let {
-                                val itemLatLng = LatLng( it.latitude, it.longitude )
-                                val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
-                                if (distance < 400) // display in meters or feet
-                                {
-                                    if (config.distanceFormat == DistanceFormat.Meters)
-                                    {
-                                        enumerationItem.distance = distance
-                                        enumerationItem.distanceUnits = resources.getString( R.string.meters )
-                                    }
-                                    else
-                                    {
-                                        enumerationItem.distance = distance * 3.28084
-                                        enumerationItem.distanceUnits = resources.getString( R.string.feet )
-                                    }
+
+                            if (item is Location)
+                            {
+                                loc = item
+                            }
+                            else if (item is EnumerationItem)
+                            {
+                                enumArea.locations.find { l -> l.uuid == item.locationUuid  }?.let {
+                                    loc = it
                                 }
-                                else // display in kilometers or miles
+                            }
+
+                            var distanceUnits = ""
+                            val itemLatLng = LatLng( loc!!.latitude, loc!!.longitude )
+                            var distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+
+                            if (distance < 400) // display in meters or feet
+                            {
+                                if (config.distanceFormat == DistanceFormat.Meters)
                                 {
-                                    if (config.distanceFormat == DistanceFormat.Meters)
-                                    {
-                                        enumerationItem.distance = distance / 1000.0
-                                        enumerationItem.distanceUnits = resources.getString( R.string.kilometers )
-                                    }
-                                    else
-                                    {
-                                        enumerationItem.distance = distance / 1609.34
-                                        enumerationItem.distanceUnits = resources.getString( R.string.miles )
-                                    }
+                                    distanceUnits = resources.getString( R.string.meters )
                                 }
+                                else
+                                {
+                                    distance = distance * 3.28084
+                                    distanceUnits = resources.getString( R.string.feet )
+                                }
+                            }
+                            else // display in kilometers or miles
+                            {
+                                if (config.distanceFormat == DistanceFormat.Meters)
+                                {
+                                    distance = distance / 1000.0
+                                    distanceUnits = resources.getString( R.string.kilometers )
+                                }
+                                else
+                                {
+                                    distance = distance / 1609.34
+                                    distanceUnits = resources.getString( R.string.miles )
+                                }
+                            }
+
+                            if (item is Location)
+                            {
+                                item.distance = distance
+                                item.distanceUnits = distanceUnits
+                            }
+                            else if (item is EnumerationItem)
+                            {
+                                item.distance = distance
+                                item.distanceUnits = distanceUnits
                             }
                         }
 
-                        performCollectionAdapter.updateEnumerationItems( performCollectionAdapter.enumerationItems )
+                        performCollectionAdapter.updateEnumerationItems( performCollectionAdapter.items )
                     }
                 }
             }

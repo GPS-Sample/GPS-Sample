@@ -59,7 +59,11 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
             holder.thirdTextView.setText("Distance: ${String.format( "%.1f", location.distance )} ${location.distanceUnits}")
         }
 
-        if (location.enumerationItems.size > 0)
+        if (location.isLandmark)
+        {
+            holder.firstTextView.setText( "${location.description}" )
+        }
+        else if (location.enumerationItems.size > 0)
         {
             if (!location.isMultiFamily)
             {
