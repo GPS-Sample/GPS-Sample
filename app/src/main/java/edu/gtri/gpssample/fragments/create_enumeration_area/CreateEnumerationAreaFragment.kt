@@ -1092,6 +1092,10 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (tag is Uri)
         {
+            activity!!.runOnUiThread {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+            }
+
             Thread {
                 val uri = tag as Uri
 
@@ -1107,6 +1111,12 @@ class CreateEnumerationAreaFragment : Fragment(),
                         activity!!.runOnUiThread {
                             Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                         }
+                    }
+                }
+
+                busyIndicatorDialog?.let {
+                    activity!!.runOnUiThread {
+                        it.alertDialog.cancel()
                     }
                 }
             }.start()
@@ -1301,10 +1311,6 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         if (points.isNotEmpty())
         {
-            activity!!.runOnUiThread {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
-            }
-
             var count = 0
 
             for (point in points)
@@ -1355,12 +1361,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                         enumArea.locations.add( location )
                         break // found! assuming that it can only exist in a single EA, for now!
                     }
-                }
-            }
-
-            busyIndicatorDialog?.let {
-                activity!!.runOnUiThread {
-                    it.alertDialog.cancel()
                 }
             }
         }
