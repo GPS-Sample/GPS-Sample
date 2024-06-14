@@ -100,11 +100,11 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
             resources.getString(R.string.yes), enumerationTeam, this)
     }
 
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         val enumerationTeam = tag as EnumerationTeam
         enumArea.enumerationTeams.remove(enumerationTeam)

@@ -286,7 +286,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
-                    didSelectLeftButton( kAddHouseholdTag )
+                    didSelectFirstButton( kAddHouseholdTag )
                 }
             }
             else
@@ -662,7 +662,7 @@ class PerformEnumerationFragment : Fragment(),
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
         if (tag is Point) // HH is too close to an existing HH, don't add it
         {
@@ -748,7 +748,7 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         if (tag is Point)
         {

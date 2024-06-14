@@ -360,7 +360,7 @@ class ManageConfigurationsFragment : Fragment(),
         }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
         if (tag == kImportTag)
         {
@@ -371,7 +371,7 @@ class ManageConfigurationsFragment : Fragment(),
         }
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         if (tag == kDeleteTag)
         {

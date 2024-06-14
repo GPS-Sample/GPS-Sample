@@ -148,11 +148,11 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddLandmarkFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         enumArea.locations.remove(location)
 

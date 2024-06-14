@@ -593,7 +593,7 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         var payload: String = ""
         var message: String = ""
@@ -657,7 +657,7 @@ class PerformCollectionFragment : Fragment(),
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
         // Launch connection screen
         view?.let{ view ->

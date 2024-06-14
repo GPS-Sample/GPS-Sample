@@ -3,7 +3,9 @@ package edu.gtri.gpssample.dialogs
 import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import edu.gtri.gpssample.R
 
@@ -11,15 +13,15 @@ class ConfirmationDialog
 {
     interface ConfirmationDialogDelegate
     {
-        fun didSelectLeftButton( tag: Any? )
-        fun didSelectRightButton( tag: Any? )
+        fun didSelectFirstButton( tag: Any? )
+        fun didSelectSecondButton( tag: Any? )
     }
 
     constructor()
     {
     }
 
-    constructor( context: Context?, title: String?, message: String?, leftButton: String, rightButton: String, tag: Any?, delegate: ConfirmationDialogDelegate )
+    constructor( context: Context?, title: String?, message: String?, firstButtonText: String, secondButtonText: String, tag: Any?, delegate: ConfirmationDialogDelegate, layoutVertically: Boolean = false )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -36,19 +38,34 @@ class ConfirmationDialog
         val textView = view.findViewById<TextView>(R.id.text_view)
         textView.text = message
 
-        val noButton = view.findViewById<Button>(R.id.left_button)
-        noButton.text = leftButton
+        val firstButton: Button
+        val secondButton: Button
 
-        noButton.setOnClickListener {
-            delegate.didSelectLeftButton(tag)
+        if (layoutVertically)
+        {
+            view.findViewById<LinearLayout>( R.id.horizontal_layout ).visibility = View.GONE
+            view.findViewById<LinearLayout>( R.id.vertical_layout ).visibility = View.VISIBLE
+            firstButton = view.findViewById<Button>(R.id.top_button)
+            secondButton = view.findViewById<Button>(R.id.bottom_button)
+        }
+        else
+        {
+            view.findViewById<LinearLayout>( R.id.vertical_layout ).visibility = View.GONE
+            view.findViewById<LinearLayout>( R.id.horizontal_layout ).visibility = View.VISIBLE
+            firstButton = view.findViewById<Button>(R.id.left_button)
+            secondButton = view.findViewById<Button>(R.id.right_button)
+        }
+
+        firstButton.text = firstButtonText
+        secondButton.text = secondButtonText
+
+        firstButton.setOnClickListener {
+            delegate.didSelectFirstButton(tag)
             alertDialog.dismiss()
         }
 
-        val yesButton = view.findViewById<Button>(R.id.right_button)
-        yesButton.text = rightButton
-
-        yesButton.setOnClickListener {
-            delegate.didSelectRightButton(tag)
+        secondButton.setOnClickListener {
+            delegate.didSelectSecondButton(tag)
             alertDialog.dismiss()
         }
     }

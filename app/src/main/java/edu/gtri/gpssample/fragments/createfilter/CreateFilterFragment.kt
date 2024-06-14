@@ -163,11 +163,11 @@ class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogD
             "Are you sure you want to delete this Filter Rule?", "No", "Yes", 0, this )
     }
 
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         selectedFilterRule?.let {rule->
             previousSelectedFilterRule?.let{previousRule->

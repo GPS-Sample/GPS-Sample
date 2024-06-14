@@ -286,7 +286,7 @@ class ConfigurationFragment : Fragment(),
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
         tag?.let {
             when(tag)
@@ -330,7 +330,7 @@ class ConfigurationFragment : Fragment(),
         }
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
             tag?.let { tag ->

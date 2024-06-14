@@ -1161,7 +1161,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
         if (tag is EnumArea)
         {
@@ -1169,7 +1169,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         if (tag is MapTileRegion)
         {

@@ -221,12 +221,12 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectLeftButton(tag: Any?)
+    override fun didSelectFirstButton(tag: Any?)
     {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectRightButton(tag: Any?)
+    override fun didSelectSecondButton(tag: Any?)
     {
         DAO.deleteAll( false )
 
