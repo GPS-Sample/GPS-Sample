@@ -54,6 +54,7 @@ class PerformCollectionAdapter(var items: List<Any>, val enumAreaName: String) :
         {
             holder.firstTextView.setText( "${item.description}" )
             holder.secondTextView.setText( item.uuid )
+            holder.locationImageView.visibility = View.VISIBLE
             if (item.distance > 0)
             {
                 holder.thirdTextView.setText("Distance: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
@@ -96,5 +97,6 @@ class PerformCollectionAdapter(var items: List<Any>, val enumAreaName: String) :
         val secondTextView: TextView = itemView.findViewById(R.id.second_text_view);
         val thirdTextView: TextView = itemView.findViewById(R.id.third_text_view);
         val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view)
+        val locationImageView: ImageView = itemView.findViewById(R.id.location_image_view)
     }
 }

@@ -62,6 +62,7 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
         if (location.isLandmark)
         {
             holder.firstTextView.setText( "${location.description}" )
+            holder.locationImageView.visibility = View.VISIBLE
         }
         else if (location.enumerationItems.size > 0)
         {
@@ -107,5 +108,6 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
         val secondTextView: TextView = itemView.findViewById(R.id.second_text_view);
         val thirdTextView: TextView = itemView.findViewById(R.id.third_text_view);
         val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view)
+        val locationImageView: ImageView = itemView.findViewById(R.id.location_image_view)
     }
 }

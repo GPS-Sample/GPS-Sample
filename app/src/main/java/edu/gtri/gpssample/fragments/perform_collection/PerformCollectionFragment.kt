@@ -178,6 +178,14 @@ class PerformCollectionFragment : Fragment(),
 
         collectionTeamLocations.clear()
 
+        for (location in enumArea.locations)
+        {
+            if (location.isLandmark)
+            {
+                collectionTeamLocations.add( location )
+            }
+        }
+
         for (teamLocationUuid in collectionTeam.locationUuids)
         {
             enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
@@ -757,6 +765,14 @@ class PerformCollectionFragment : Fragment(),
                 enumArea.locations = DAO.locationDAO.getLocations( collectionTeam )
 
                 collectionTeamLocations.clear()
+
+                for (location in enumArea.locations)
+                {
+                    if (location.isLandmark)
+                    {
+                        collectionTeamLocations.add( location )
+                    }
+                }
 
                 for (teamLocationUuid in collectionTeam.locationUuids)
                 {
