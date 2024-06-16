@@ -36,7 +36,15 @@ class ConfirmationDialog
         alertDialog.show()
 
         val textView = view.findViewById<TextView>(R.id.text_view)
-        textView.text = message
+
+        if (message != null && message.isNotEmpty())
+        {
+            textView.text = message
+        }
+        else
+        {
+            textView.visibility = View.GONE
+        }
 
         val firstButton: Button
         val secondButton: Button

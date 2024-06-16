@@ -420,7 +420,7 @@ class ConfigurationFragment : Fragment(),
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
                 config.selectedStudyUuid = study.uuid
                 sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-                ConfirmationDialog( activity, "", resources.getString(R.string.select_task), resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this)
+                ConfirmationDialog( activity, resources.getString(R.string.select_task), "", resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this, true)
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
         }
     }

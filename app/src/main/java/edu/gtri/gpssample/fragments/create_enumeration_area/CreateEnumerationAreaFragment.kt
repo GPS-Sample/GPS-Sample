@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -91,12 +92,14 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var editMode = false
     private var addHousehold = false
     private var features = JSONArray()
-    private var createEnumArea = false
     private var createMapTileCache = false
     private val binding get() = _binding!!
     private var showCurrentLocation = false
+    private var createEnumAreaLocation = false
+    private var createEnumAreaBoundary = false
     private var inputDialog: InputDialog? = null
     private val polygonHashMap = HashMap<Long,Any>()
+    private var point: com.mapbox.geojson.Point? = null
     private val pointHashMap = HashMap<Long,Location>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
@@ -108,6 +111,8 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var droppedPointAnnotations = ArrayList<PointAnnotation?>()
     private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
+    private val kEnumAreaNameTag: Int = 0
+    private val kEnumAreaLengthTag: Int = 1
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -214,7 +219,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
-            if (createEnumArea || addHousehold || createMapTileCache)
+            if (createEnumAreaBoundary || addHousehold || createMapTileCache)
             {
                 return@setOnClickListener
             }
@@ -234,9 +239,9 @@ class CreateEnumerationAreaFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            if (createEnumArea)
+            if (createEnumAreaBoundary)
             {
-                createEnumArea = false
+                createEnumAreaBoundary = false
 
                 if (droppedPointAnnotations.size > 2)
                 {
@@ -256,7 +261,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                     }
                     else
                     {
-                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false )
+                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, this, false )
                         binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
                         binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
                     }
@@ -276,17 +281,18 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
             else
             {
-                droppedPointAnnotations.clear()
-                createEnumArea = true
-                binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
-                binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                ConfirmationDialog( activity,
+                    resources.getString(R.string.creation_options), "",
+                    resources.getString(R.string.set_boundary),
+                    resources.getString(R.string.set_location),
+                    null,this@CreateEnumerationAreaFragment, true)
             }
         }
 
         binding.overlayView.setOnTouchListener(this)
 
         binding.mapTileRegionButton.setOnClickListener {
-            if (createEnumArea || addHousehold)
+            if (createEnumAreaBoundary || addHousehold)
             {
                 return@setOnClickListener
             }
@@ -312,7 +318,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.mapTileCacheButton.setOnClickListener {
-            if (createEnumArea || addHousehold || createMapTileCache)
+            if (createEnumAreaBoundary || addHousehold || createMapTileCache)
             {
                 return@setOnClickListener
             }
@@ -329,7 +335,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.addHouseholdButton.setOnClickListener {
-            if (createEnumArea || createMapTileCache)
+            if (createEnumAreaBoundary || createMapTileCache)
             {
                 return@setOnClickListener
             }
@@ -586,9 +592,17 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (editMode)
         {
-            if (createEnumArea)
+            if (createEnumAreaBoundary)
             {
                 droppedPointAnnotations.add( mapboxManager.addMarker( point, R.drawable.location_blue ))
+                return true
+            }
+            else if (createEnumAreaLocation)
+            {
+                this.point = point
+                binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+                val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag, this@CreateEnumerationAreaFragment )
+                inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
                 return true
             }
             else if (addHousehold)
@@ -1125,45 +1139,89 @@ class CreateEnumerationAreaFragment : Fragment(),
         {
             tag.name = name
         }
-        else
+        else if (tag is Int)
         {
-            createEnumArea = false
+            if (tag == kEnumAreaLengthTag)
+            {
+                name.toDoubleOrNull()?.let {
+                    val radius = it * 1000
+                    val r_earth = 6378000.0
 
-            val vertices = ArrayList<LatLon>()
+                    point?.let { point ->
+                        var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                        var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                        val northEast = LatLon( 0, latitude, longitude )
 
-            var creationDate = Date().time
+                        latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                        longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                        val southWest = LatLon( 0, latitude, longitude )
 
-            droppedPointAnnotations.map { pointAnnotation ->
-                pointAnnotation?.let{ pointAnnotation ->
-                    vertices.add( LatLon( creationDate++, pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
-                    pointAnnotationManager.delete( pointAnnotation )
+                        var p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
+                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+
+                        p =com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude )
+                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+
+                        p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude )
+                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+
+                        p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude )
+                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+
+                        p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
+                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+
+                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, this, false )
+                    }
                 }
             }
-
-            if (name.isEmpty())
+            if (tag == kEnumAreaNameTag)
             {
-                val enumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
-                unsavedEnumAreas.add( enumArea )
+                createEnumAreaBoundary = false
+
+                val vertices = ArrayList<LatLon>()
+
+                var creationDate = Date().time
+
+                droppedPointAnnotations.map { pointAnnotation ->
+                    pointAnnotation?.let{ pointAnnotation ->
+                        vertices.add( LatLon( creationDate++, pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
+                        pointAnnotationManager.delete( pointAnnotation )
+                    }
+                }
+
+                if (name.isEmpty())
+                {
+                    val enumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices )
+                    unsavedEnumAreas.add( enumArea )
+                }
+                else
+                {
+                    val enumArea = EnumArea( config.uuid, name, vertices )
+                    unsavedEnumAreas.add( enumArea )
+                }
+
+                val latLngBounds = GeoUtils.findGeobounds(vertices)
+                val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+                unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
+
+                refreshMap()
             }
-            else
-            {
-                val enumArea = EnumArea( config.uuid, name, vertices )
-                unsavedEnumAreas.add( enumArea )
-            }
-
-            val latLngBounds = GeoUtils.findGeobounds(vertices)
-            val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-            val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-            unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
-
-            refreshMap()
         }
     }
 
     override fun didSelectFirstButton(tag: Any?)
     {
-        if (tag is EnumArea)
+        if (tag == null)
+        {
+            createEnumAreaBoundary = true
+            droppedPointAnnotations.clear()
+            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
+            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        }
+        else if (tag is EnumArea)
         {
             inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), tag.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
         }
@@ -1171,7 +1229,13 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun didSelectSecondButton(tag: Any?)
     {
-        if (tag is MapTileRegion)
+        if (tag == null)
+        {
+            createEnumAreaLocation = true
+            droppedPointAnnotations.clear()
+            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        }
+        else if (tag is MapTileRegion)
         {
             config.mapTileRegions.remove( tag )
             unsavedMapTileRegions.remove( tag )

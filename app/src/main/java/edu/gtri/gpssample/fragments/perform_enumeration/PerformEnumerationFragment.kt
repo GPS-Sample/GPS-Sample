@@ -282,7 +282,7 @@ class PerformEnumerationFragment : Fragment(),
                 if (config.allowManualLocationEntry)
                 {
                     ConfirmationDialog( activity, resources.getString(R.string.select_location),
-                        "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this)
+                        "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this, true)
                 }
                 else
                 {

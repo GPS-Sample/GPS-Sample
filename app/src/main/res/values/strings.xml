@@ -357,7 +357,15 @@
     <string name="delete_last_location">"Delete Last Location"</string>
     <string name="clear_map_and_start_over">"Clear Map and Start Over"</string>
     <string name="image_size_warning">"You've exceeded 25Mb of Image Data. Adding more images will greatly impact data transfer performance."</string>
+
     <string name="subaddress_start">"Enter the starting # for the Subaddress"</string>
+    <string name="creation_options">"Creation Options"</string>
+    <string name="set_boundary">"Set Boundary"</string>
+    <string name="set_location">"Set Location"</string>
+
+    resources.getString(R.string.creation_options), "",
+    resources.getString(R.string.set_boundary),
+    resources.getString(R.string.set_location),
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
