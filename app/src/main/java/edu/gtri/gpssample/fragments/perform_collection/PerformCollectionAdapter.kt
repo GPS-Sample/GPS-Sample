@@ -40,7 +40,7 @@ class PerformCollectionAdapter(var items: List<Any>, val enumAreaName: String) :
 
     fun updateEnumerationItems( enumerationItems: List<Any> )
     {
-        this.items = items
+        this.items = enumerationItems
         notifyDataSetChanged()
     }
 

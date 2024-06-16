@@ -163,15 +163,6 @@ class PerformCollectionFragment : Fragment(),
             collectionTeam = it
         }
 
-        collectionTeamLocations.clear()
-
-        for (teamLocationUuid in collectionTeam.locationUuids)
-        {
-            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
-                collectionTeamLocations.add( location )
-            }
-        }
-
         val _user = (activity!!.application as? MainApplication)?.user
 
         _user?.let { user ->
@@ -185,8 +176,16 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
+        collectionTeamLocations.clear()
+
+        for (teamLocationUuid in collectionTeam.locationUuids)
+        {
+            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
+                collectionTeamLocations.add( location )
+            }
+        }
+
         val items = ArrayList<Any>()
-        var errorShown = false
 
         collectionTeamLocations.map { location ->
             if (location.isLandmark)
@@ -199,17 +198,6 @@ class PerformCollectionFragment : Fragment(),
                 {
                     if (enumurationItem.samplingState == SamplingState.Sampled)
                     {
-                        // FIX THIS!!! why is the locationId sometimes NOT set?
-                        if (enumurationItem.locationUuid.isEmpty())
-                        {
-                            if (!errorShown)
-                            {
-                                errorShown = true
-                                NotificationDialog( activity!!, "Oops!", "Found an EnumerationItem that is missing a Location")
-                            }
-
-                            enumurationItem.locationUuid = location.uuid
-                        }
                         items.add( enumurationItem )
                     }
                 }
@@ -766,22 +754,37 @@ class PerformCollectionFragment : Fragment(),
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
 
-//                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
+                enumArea.locations = DAO.locationDAO.getLocations( collectionTeam )
 
-                val enumerationItems = ArrayList<EnumerationItem>()
+                collectionTeamLocations.clear()
 
-                for (loc in collectionTeamLocations)
+                for (teamLocationUuid in collectionTeam.locationUuids)
                 {
-                    for (enumurationItem in loc.enumerationItems)
+                    enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
+                        collectionTeamLocations.add( location )
+                    }
+                }
+
+                val items = ArrayList<Any>()
+
+                collectionTeamLocations.map { location ->
+                    if (location.isLandmark)
                     {
-                        if (enumurationItem.samplingState == SamplingState.Sampled)
+                        items.add( location )
+                    }
+                    else
+                    {
+                        for (enumurationItem in location.enumerationItems)
                         {
-                            enumerationItems.add( enumurationItem )
+                            if (enumurationItem.samplingState == SamplingState.Sampled)
+                            {
+                                items.add( enumurationItem )
+                            }
                         }
                     }
                 }
 
-                performCollectionAdapter.updateEnumerationItems( enumerationItems )
+                performCollectionAdapter.updateEnumerationItems( items )
 
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     DAO.configDAO.getConfig( config.uuid )?.let {
