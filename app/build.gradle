@@ -15,19 +15,10 @@ android {
         minSdk 26
         targetSdk 33
         versionCode 11
-        versionName "1.0.0 #101"
+        versionName "1.0.0 #102"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
-//    splits {
-//        abi {
-//            enable true
-//            reset()
-//            include 'armeabi-v7a'
-//            universalApk false
-//        }
-//    }
 
     buildTypes {
         release {
