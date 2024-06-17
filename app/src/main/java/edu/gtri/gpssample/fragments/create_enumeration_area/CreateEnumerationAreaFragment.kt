@@ -219,7 +219,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
-            if (createEnumAreaBoundary || addHousehold || createMapTileCache)
+            if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache)
             {
                 return@setOnClickListener
             }
@@ -292,7 +292,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         binding.overlayView.setOnTouchListener(this)
 
         binding.mapTileRegionButton.setOnClickListener {
-            if (createEnumAreaBoundary || addHousehold)
+            if (createEnumAreaBoundary || createEnumAreaLocation|| addHousehold)
             {
                 return@setOnClickListener
             }
@@ -318,7 +318,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.mapTileCacheButton.setOnClickListener {
-            if (createEnumAreaBoundary || addHousehold || createMapTileCache)
+            if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache)
             {
                 return@setOnClickListener
             }
@@ -335,7 +335,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.addHouseholdButton.setOnClickListener {
-            if (createEnumAreaBoundary || createMapTileCache)
+            if (createEnumAreaBoundary || createEnumAreaLocation || createMapTileCache)
             {
                 return@setOnClickListener
             }
@@ -1178,6 +1178,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             if (tag == kEnumAreaNameTag)
             {
                 createEnumAreaBoundary = false
+                createEnumAreaLocation = false
 
                 val vertices = ArrayList<LatLon>()
 
