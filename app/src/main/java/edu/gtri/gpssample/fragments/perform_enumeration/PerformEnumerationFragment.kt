@@ -915,7 +915,7 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     lastLocationUpdateTime = Date().time
 
-                    for (loc in enumArea.locations)
+                    for (loc in enumerationTeamLocations)
                     {
                         val currentLatLng = LatLng( point.latitude(), point.longitude())
                         val itemLatLng = LatLng( loc.latitude, loc.longitude )
@@ -948,7 +948,7 @@ class PerformEnumerationFragment : Fragment(),
                         }
                     }
 
-                    performEnumerationAdapter.updateLocations( enumArea.locations )
+                    performEnumerationAdapter.updateLocations( enumerationTeamLocations )
                 }
             }
         }
