@@ -715,6 +715,7 @@ class PerformEnumerationFragment : Fragment(),
                 sharedViewModel.locationViewModel.setCurrentLocation(location)
 
                 enumerationTeamLocations.add(location)
+                enumerationTeam.locationUuids.add(location.uuid)
                 DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
                 navigateToAddHouseholdFragment()
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
@@ -768,6 +769,7 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.locationViewModel.setCurrentLocation(location)
 
             enumerationTeamLocations.add(location)
+            enumerationTeam.locationUuids.add(location.uuid)
             DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
             navigateToAddHouseholdFragment()
         }
