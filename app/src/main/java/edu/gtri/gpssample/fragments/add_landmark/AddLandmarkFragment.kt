@@ -180,10 +180,19 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         try
         {
-            // base64 encode the bitmap
+            var width = bitmap.width.toDouble()
+            var height = bitmap.height.toDouble()
+            val aspectRatio = width / height
+
+            width = 150.0
+            height = width / aspectRatio
+
+            val bm = Bitmap.createScaledBitmap( bitmap, width.toInt(), height.toInt(), false )
+
             val byteArrayOutputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+            bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
             val byteArray = byteArrayOutputStream.toByteArray()
+
             location.imageData = Base64.getEncoder().encodeToString(byteArray)
         }
         catch (e: Exception)

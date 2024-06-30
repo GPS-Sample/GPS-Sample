@@ -164,6 +164,14 @@ class PerformEnumerationFragment : Fragment(),
             }
         }
 
+        for (location in enumArea.locations)
+        {
+            if (location.isLandmark)
+            {
+                enumerationTeamLocations.add( location )
+            }
+        }
+
         (activity!!.application as? MainApplication)?.user?.let {
             user = it
         }
@@ -608,13 +616,16 @@ class PerformEnumerationFragment : Fragment(),
             if (config.proximityWarningIsEnabled)
             {
                 enumArea.locations.map{
-                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue )
-                    if (haversineCheck.withinBounds)
+                    if (!it.isLandmark)
                     {
-                        val distance = String.format( "%.1f", haversineCheck.distance)
-                        val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
-                        ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
-                        return true
+                        val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue )
+                        if (haversineCheck.withinBounds)
+                        {
+                            val distance = String.format( "%.1f", haversineCheck.distance)
+                            val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
+                            ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                            return true
+                        }
                     }
                 }
             }
@@ -704,13 +715,16 @@ class PerformEnumerationFragment : Fragment(),
                 if (config.proximityWarningIsEnabled)
                 {
                     enumArea.locations.map{
-                        val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
-                        if (haversineCheck.withinBounds)
+                        if (!it.isLandmark)
                         {
-                            val distance = String.format( "%.1f", haversineCheck.distance)
-                            val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
-                            ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
-                            return
+                            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
+                            if (haversineCheck.withinBounds)
+                            {
+                                val distance = String.format( "%.1f", haversineCheck.distance)
+                                val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
+                                ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                                return
+                            }
                         }
                     }
                 }

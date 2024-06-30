@@ -176,32 +176,13 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
+        val items = ArrayList<Any>()
         collectionTeamLocations.clear()
-
-        for (location in enumArea.locations)
-        {
-            if (location.isLandmark)
-            {
-                collectionTeamLocations.add( location )
-            }
-        }
 
         for (teamLocationUuid in collectionTeam.locationUuids)
         {
             enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
                 collectionTeamLocations.add( location )
-            }
-        }
-
-        val items = ArrayList<Any>()
-
-        collectionTeamLocations.map { location ->
-            if (location.isLandmark)
-            {
-                items.add( location )
-            }
-            else
-            {
                 for (enumurationItem in location.enumerationItems)
                 {
                     if (enumurationItem.samplingState == SamplingState.Sampled)
@@ -209,6 +190,15 @@ class PerformCollectionFragment : Fragment(),
                         items.add( enumurationItem )
                     }
                 }
+            }
+        }
+
+        for (location in enumArea.locations)
+        {
+            if (location.isLandmark)
+            {
+                items.add( location )
+                collectionTeamLocations.add( location )
             }
         }
 
