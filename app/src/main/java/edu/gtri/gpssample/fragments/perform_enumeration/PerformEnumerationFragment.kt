@@ -25,6 +25,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
+import com.mapbox.maps.extension.style.expressions.dsl.generated.has
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
@@ -65,6 +66,11 @@ class PerformEnumerationFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
+    companion object
+    {
+        private var hasShownStartSubAddressDialog = false
+    }
+
     private lateinit var user: User
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
@@ -374,6 +380,16 @@ class PerformEnumerationFragment : Fragment(),
                     surveyedCount += 1
                 }
             }
+        }
+
+        if (enumerationCount > 0)
+        {
+            hasShownStartSubAddressDialog = true
+        }
+        else if (!hasShownStartSubAddressDialog)
+        {
+            hasShownStartSubAddressDialog = true
+            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true )
         }
 
         binding.listItemEnumArea.titleLayout.visibility = View.GONE
