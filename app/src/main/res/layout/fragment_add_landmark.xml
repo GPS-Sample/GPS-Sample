@@ -158,6 +158,9 @@
                                 android:text="@string/description"
                                 android:textColor="@color/primary"
                                 android:textSize="17sp"
+                                android:autoSizeMinTextSize="8sp"
+                                android:autoSizeMaxTextSize="17sp"
+                                android:autoSizeTextType="uniform"
                                 android:textStyle="bold" />
 
                             <EditText
