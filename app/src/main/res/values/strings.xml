@@ -362,6 +362,7 @@
     <string name="creation_options">"Creation Options"</string>
     <string name="set_boundary">"Set Boundary"</string>
     <string name="set_location">"Set Location"</string>
+    <string name="update_boundary">"Update Boundary"</string>
 
     resources.getString(R.string.creation_options), "",
     resources.getString(R.string.set_boundary),
