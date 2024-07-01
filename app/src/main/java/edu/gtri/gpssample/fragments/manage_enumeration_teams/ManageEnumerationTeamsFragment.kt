@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.manage_enumeration_teams
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -83,14 +84,16 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ManageEnumerationTeamsFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun didSelectTeam(enumerationTeam: EnumerationTeam )
+    fun didSelectTeam( enumerationTeam: EnumerationTeam )
     {
-        sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumerationTeam )
+        DAO.enumerationTeamDAO.getEnumerationTeam( enumerationTeam.uuid )?.let {
+            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
 
-        enumArea.selectedCollectionTeamUuid = ""
-        enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
+            enumArea.selectedCollectionTeamUuid = ""
+            enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
 
-        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+        }
     }
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)

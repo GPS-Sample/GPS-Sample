@@ -397,7 +397,7 @@ class PerformEnumerationFragment : Fragment(),
         else if (!hasShownStartSubAddressDialog)
         {
             hasShownStartSubAddressDialog = true
-            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true )
+            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true )
         }
 
         binding.listItemEnumArea.titleLayout.visibility = View.GONE

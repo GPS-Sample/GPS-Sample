@@ -126,17 +126,17 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
             DAO.locationDAO.updateLocation( location, enumArea )
 
-//            val enumAreaId = enumArea.id
-//
-//            config.enumAreas = DAO.enumAreaDAO.getEnumAreas(config)
-//
-//            sharedViewModel.updateConfiguration()
-//
-//            enumAreaId?.let {
-//                DAO.enumAreaDAO.getEnumArea(it)?.let {
-//                    sharedViewModel.enumAreaViewModel.setCurrentEnumArea(it)
-//                }
-//            }
+            DAO.configDAO.getConfig( config.uuid )?.let {
+                sharedViewModel.setCurrentConfig( it )
+            }
+
+            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+            }
+
+            DAO.studyDAO.getStudy( study.uuid )?.let {
+                sharedViewModel.createStudyModel.setStudy( it )
+            }
 
             findNavController().popBackStack()
         }

@@ -18,10 +18,11 @@ import edu.gtri.gpssample.database.models.Location
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PerformCollectionAdapter(var items: List<Any>, val enumAreaName: String) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
+class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var locations: List<Location>, val enumAreaName: String) : RecyclerView.Adapter<PerformCollectionAdapter.ViewHolder>()
 {
-    override fun getItemCount() = items.size
+    override fun getItemCount() = enumerationItems.size + locations.size
 
+    var items = ArrayList<Any>()
     private var mContext: Context? = null
     private var allHolders = ArrayList<ViewHolder>()
     lateinit var didSelectItem: ((item: Any) -> Unit)
@@ -38,9 +39,14 @@ class PerformCollectionAdapter(var items: List<Any>, val enumAreaName: String) :
         return viewHolder
     }
 
-    fun updateEnumerationItems( enumerationItems: List<Any> )
+    fun updateItems( enumerationItems: List<EnumerationItem>, locations: List<Location> )
     {
-        this.items = enumerationItems
+        this.locations = locations
+        this.enumerationItems = enumerationItems
+
+        items.clear()
+        items.addAll( enumerationItems )
+        items.addAll( locations )
         notifyDataSetChanged()
     }
 

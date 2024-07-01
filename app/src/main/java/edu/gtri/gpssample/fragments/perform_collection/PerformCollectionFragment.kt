@@ -86,6 +86,7 @@ class PerformCollectionFragment : Fragment(),
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
+    private var landmarkLocations = ArrayList<Location>()
     private val collectionTeamLocations = ArrayList<Location>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
@@ -176,8 +177,8 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
-        val items = ArrayList<Any>()
         collectionTeamLocations.clear()
+        val enumerationItems = ArrayList<EnumerationItem>()
 
         for (teamLocationUuid in collectionTeam.locationUuids)
         {
@@ -187,22 +188,25 @@ class PerformCollectionFragment : Fragment(),
                 {
                     if (enumurationItem.samplingState == SamplingState.Sampled)
                     {
-                        items.add( enumurationItem )
+                        enumerationItems.add( enumurationItem )
                     }
                 }
             }
         }
 
+        landmarkLocations.clear()
+
         for (location in enumArea.locations)
         {
             if (location.isLandmark)
             {
-                items.add( location )
-                collectionTeamLocations.add( location )
+                landmarkLocations.add( location )
             }
         }
 
-        performCollectionAdapter = PerformCollectionAdapter( items, enumArea.name )
+        performCollectionAdapter = PerformCollectionAdapter( ArrayList<EnumerationItem>(), ArrayList<Location>(), enumArea.name )
+        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+
         performCollectionAdapter.didSelectItem = this::didSelectItem
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -755,42 +759,23 @@ class PerformCollectionFragment : Fragment(),
                 enumArea.locations = DAO.locationDAO.getLocations( collectionTeam )
 
                 collectionTeamLocations.clear()
-
-                for (location in enumArea.locations)
-                {
-                    if (location.isLandmark)
-                    {
-                        collectionTeamLocations.add( location )
-                    }
-                }
+                val enumerationItems = ArrayList<EnumerationItem>()
 
                 for (teamLocationUuid in collectionTeam.locationUuids)
                 {
                     enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
                         collectionTeamLocations.add( location )
-                    }
-                }
-
-                val items = ArrayList<Any>()
-
-                collectionTeamLocations.map { location ->
-                    if (location.isLandmark)
-                    {
-                        items.add( location )
-                    }
-                    else
-                    {
                         for (enumurationItem in location.enumerationItems)
                         {
                             if (enumurationItem.samplingState == SamplingState.Sampled)
                             {
-                                items.add( enumurationItem )
+                                enumerationItems.add( enumurationItem )
                             }
                         }
                     }
                 }
 
-                performCollectionAdapter.updateEnumerationItems( items )
+                performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
 
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     DAO.configDAO.getConfig( config.uuid )?.let {
@@ -912,7 +897,7 @@ class PerformCollectionFragment : Fragment(),
                             }
                         }
 
-                        performCollectionAdapter.updateEnumerationItems( performCollectionAdapter.items )
+                        performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
                     }
                 }
             }
