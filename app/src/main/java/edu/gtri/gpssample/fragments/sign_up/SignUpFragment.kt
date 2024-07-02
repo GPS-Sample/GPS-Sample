@@ -16,6 +16,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
@@ -55,7 +56,18 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             return
         }
 
-        binding.titleTextView.text = role + " " + resources.getString(R.string.sign_up)
+        when (role)
+        {
+            Role.Admin.value ->
+                binding.titleTextView.text = resources.getString(R.string.admin) + " " + resources.getString(R.string.sign_up)
+            Role.Supervisor.value ->
+                binding.titleTextView.text = resources.getString(R.string.supervisor) + " " + resources.getString(R.string.sign_up)
+            Role.Enumerator.value ->
+                binding.titleTextView.text = resources.getString(R.string.enumerator) + " " + resources.getString(R.string.sign_up)
+            Role.DataCollector.value ->
+                binding.titleTextView.text = resources.getString(R.string.data_collector) + " " + resources.getString(R.string.sign_up)
+        }
+
 
         ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
             .also { adapter ->
