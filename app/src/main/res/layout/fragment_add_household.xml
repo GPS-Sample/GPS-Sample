@@ -332,7 +332,7 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:padding="10dp"
-                        android:text="Location Image"
+                        android:text="@string/location_image"
                         android:textColor="@color/primary"
                         android:textSize="17sp"
                         android:textStyle="bold" />

@@ -363,6 +363,9 @@
     <string name="set_boundary">"Set Boundary"</string>
     <string name="set_location">"Set Location"</string>
     <string name="update_boundary">"Update Boundary"</string>
+    <string name="boundary_is_self_intersecting">"The boundary of this enumeration area is self-intersecting. Would you like to correct it?"</string>
+    <string name="location_image">Location Image</string>
+
 
     resources.getString(R.string.creation_options), "",
     resources.getString(R.string.set_boundary),

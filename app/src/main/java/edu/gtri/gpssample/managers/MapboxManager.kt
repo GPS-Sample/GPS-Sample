@@ -14,6 +14,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.*
 import com.mapbox.maps.plugin.annotation.generated.*
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
@@ -135,6 +136,17 @@ class MapboxManager(
             }
 
             coordinates.add( coordinates[0] )
+
+            return isSelfIntersectingPolygon( coordinates )
+        }
+
+        fun isSelfIntersectingPolygon3( latLons: java.util.ArrayList<LatLon> ) : Boolean
+        {
+            val coordinates = ArrayList<Coordinate>()
+            for (latLon in latLons)
+            {
+                coordinates.add( Coordinate( latLon.longitude, latLon.latitude ))
+            }
 
             return isSelfIntersectingPolygon( coordinates )
         }

@@ -42,10 +42,11 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import java.util.ArrayList
 
-class CreateSampleFragment : Fragment(), OnCameraChangeListener
+class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var study: Study
     private lateinit var config: Config
+    private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -106,8 +107,13 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
         sharedViewModel.currentConfiguration?.value?.let { config ->
             this.config = config
         }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
             this.study = study
+        }
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            this.enumArea = enumArea
         }
 
         binding.legendTextView.setOnClickListener {
@@ -238,6 +244,21 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
                 findNavController().navigate(R.id.action_navigate_to_ManageCollectionTeamsFragment)
             }
         }
+
+//        if (MapboxManager.isSelfIntersectingPolygon3( enumArea.vertices))
+//        {
+//            ConfirmationDialog( activity, resources.getString(R.string.oops),
+//                resources.getString(R.string.boundary_is_self_intersecting),
+//                resources.getString(R.string.no), resources.getString(R.string.yes), null, this@CreateSampleFragment)
+//        }
+    }
+
+    override fun didSelectFirstButton(tag: Any?)
+    {
+    }
+
+    override fun didSelectSecondButton(tag: Any?)
+    {
     }
 
     override fun onResume()
@@ -265,39 +286,36 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener
 
         allPolylineAnnotations.clear()
 
-        for (enumArea in config.enumAreas)
-        {
-            val points = java.util.ArrayList<Point>()
-            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-            enumArea.vertices.map {
-                points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        enumArea.vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        if (pointList.isNotEmpty())
+        {
+            mapboxManager.addPolygon(pointList,"#000000", 0.25)?.let{
+                allPolygonAnnotations.add( it )
             }
 
-            pointList.add( points )
+            mapboxManager.addPolyline( pointList[0], "#ff0000" )?.let {
+                allPolylineAnnotations.add( it )
+            }
 
-            if (pointList.isNotEmpty())
+            if (enumArea.uuid == config.selectedEnumAreaUuid)
             {
-                mapboxManager.addPolygon(pointList,"#000000", 0.25)?.let{
-                    allPolygonAnnotations.add( it )
-                }
+                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                    val cameraPosition = CameraOptions.Builder()
+                        .zoom(currentZoomLevel)
+                        .center(point)
+                        .build()
 
-                mapboxManager.addPolyline( pointList[0], "#ff0000" )?.let {
-                    allPolylineAnnotations.add( it )
-                }
-
-                if (enumArea.uuid == config.selectedEnumAreaUuid)
-                {
-                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                        val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                        val cameraPosition = CameraOptions.Builder()
-                            .zoom(currentZoomLevel)
-                            .center(point)
-                            .build()
-
-                        binding.mapView.getMapboxMap().setCamera(cameraPosition)
-                    }
+                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
                 }
             }
         }
