@@ -302,9 +302,94 @@
                         android:layout_marginEnd="20dp"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"/>
-
                 </LinearLayout>
              </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/image_card_view"
+            android:visibility="gone"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="4dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <TextView
+                        android:id="@+id/image_text_view"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:padding="10dp"
+                        android:text="Location Image"
+                        android:textColor="@color/primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp">
+
+                        <ImageView
+                            android:id="@+id/hide_image_view"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            app:srcCompat="@drawable/arrow_up_blue"/>
+
+                        <ImageView
+                            android:id="@+id/show_image_view"
+                            android:visibility="gone"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            app:srcCompat="@drawable/arrow_down_blue"/>
+                    </FrameLayout>
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/image_frame_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/image_view"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--                <FrameLayout-->
+<!--                    android:id="@+id/image_frame_layout"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:layout_marginTop="0dp"-->
+<!--                    android:layout_marginBottom="5dp"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="0dp">-->
+
+<!--                    <ImageView-->
+<!--                        android:id="@+id/image_view"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"/>-->
+<!--                </FrameLayout>-->
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.recyclerview.widget.RecyclerView

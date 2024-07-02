@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.add_household
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -32,6 +33,7 @@ import edu.gtri.gpssample.dialogs.ImageDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -270,6 +272,37 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             {
                 binding.additionalInfoLayout.visibility = View.VISIBLE
             }
+        }
+
+        if (location.imageData.isNotEmpty())
+        {
+            try
+            {
+                // base64 decode the bitmap
+                val byteArray = Base64.getDecoder().decode( location.imageData )
+                val byteArrayInputStream = ByteArrayInputStream(byteArray)
+                val bitmap = BitmapFactory.decodeStream(byteArrayInputStream)
+                binding.imageView.setImageBitmap(bitmap)
+            }
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTrace.toString())
+            }
+
+            binding.imageCardView.visibility = View.VISIBLE
+
+            binding.hideImageView.setOnClickListener {
+                binding.hideImageView.visibility = View.GONE
+                binding.showImageView.visibility = View.VISIBLE
+                binding.imageFrameLayout.visibility = View.GONE
+            }
+
+            binding.showImageView.setOnClickListener {
+                binding.hideImageView.visibility = View.VISIBLE
+                binding.showImageView.visibility = View.GONE
+                binding.imageFrameLayout.visibility = View.VISIBLE
+            }
+
         }
 
         binding.deleteImageView.setOnClickListener {
