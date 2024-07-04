@@ -59,6 +59,7 @@ class ConfigDAO(private var dao: DAO)
     {
         values.put( DAO.COLUMN_UUID, config.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, config.creationDate )
+        values.put( DAO.COLUMN_TIME_ZONE, config.timeZone )
         values.put( DAO.COLUMN_ENUM_AREA_UUID, config.selectedEnumAreaUuid )
         values.put( DAO.COLUMN_STUDY_UUID, config.selectedStudyUuid )
         values.put( DAO.COLUMN_CONFIG_NAME, config.name )
@@ -93,6 +94,34 @@ class ConfigDAO(private var dao: DAO)
         } ?: return false
     }
 
+    @SuppressLint("Range")
+    private fun buildConfig(cursor: Cursor ) : Config
+    {
+        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
+        val selectedEnumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
+        val selectedStudyUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
+        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val timeZone = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_TIME_ZONE))
+        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
+        val distanceFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX))
+        val dateFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT_INDEX))
+        val timeFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX))
+        val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
+        val encryptionPassword = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ENCRYPTION_PASSWORD))
+        val allowManualLocationEntry = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY)).toBoolean()
+        val subaddressIsRequired = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED)).toBoolean()
+        val autoIncrementSubaddress = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS)).toBoolean()
+        val proximityWarningIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED)).toBoolean()
+        val proximityWarningValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE))
+
+        // TODO: these should be lookup tables
+        val distanceFormat = DistanceFormatConverter.fromIndex(distanceFormatIndex)
+        val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
+        val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
+
+        return Config( uuid, creationDate, timeZone, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid )
+    }
+
     fun getConfig( uuid: String ): Config?
     {
         var config: Config? = null
@@ -113,33 +142,6 @@ class ConfigDAO(private var dao: DAO)
         cursor.close()
 
         return config
-    }
-
-    @SuppressLint("Range")
-    private fun buildConfig(cursor: Cursor ) : Config
-    {
-        val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val selectedEnumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
-        val selectedStudyUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STUDY_UUID))
-        val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
-        val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_NAME))
-        val distanceFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DISTANCE_FORMAT_INDEX))
-        val dateFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_DATE_FORMAT_INDEX))
-        val timeFormatIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_TIME_FORMAT_INDEX))
-        val minGpsPrecision = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_MIN_GPS_PRECISION))
-        val encryptionPassword = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ENCRYPTION_PASSWORD))
-        val allowManualLocationEntry = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_ALLOW_MANUAL_LOCATION_ENTRY)).toBoolean()
-        val subaddressIsRequired = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_SUBADDRESS_IS_REQUIRED)).toBoolean()
-        val autoIncrementSubaddress = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS)).toBoolean()
-        val proximityWarningIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED)).toBoolean()
-        val proximityWarningValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE))
-
-        // TODO: these should be lookup tables
-        val distanceFormat = DistanceFormatConverter.fromIndex(distanceFormatIndex)
-        val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
-        val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
-
-        return Config( uuid, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid )
     }
 
     fun getConfigs(): ArrayList<Config>

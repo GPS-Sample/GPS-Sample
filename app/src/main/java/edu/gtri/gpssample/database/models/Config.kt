@@ -30,6 +30,7 @@ import kotlin.collections.ArrayList
 data class Config(
     var uuid : String,
     var creationDate: Long,
+    var timeZone: Int,
     var name: String,
     var dateFormat: DateFormat,
     var timeFormat: TimeFormat,
@@ -47,18 +48,19 @@ data class Config(
     var selectedEnumAreaUuid: String,
     var mapTileRegions: ArrayList<MapTileRegion>)
 {
-    constructor(name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
-            : this(UUID.randomUUID().toString(), Date().time, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+    constructor(timeZone: Int, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
+            : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
                                     ArrayList<Study>(), ArrayList<EnumArea>(), "", "", ArrayList<MapTileRegion>())
-    constructor(uuid: String, creationDate: Long, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+    constructor(uuid: String, creationDate: Long, timeZone: Int, name: String, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String)
-            : this(uuid, creationDate, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+            : this(uuid, creationDate, timeZone, name, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
         ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, ArrayList<MapTileRegion>())
 
     fun equals( other: Config ): Boolean
     {
         if (this.uuid == other.uuid &&
             this.creationDate == other.creationDate &&
+            this.timeZone == other.timeZone &&
             this.name == other.name &&
             this.dateFormat == other.dateFormat &&
             this.timeFormat == other.timeFormat &&

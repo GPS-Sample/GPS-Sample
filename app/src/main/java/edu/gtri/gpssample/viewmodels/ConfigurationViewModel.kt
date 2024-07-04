@@ -17,6 +17,7 @@ import kotlin.collections.ArrayList
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.viewmodels.models.*
+import java.util.*
 
 class ConfigurationViewModel : ViewModel()
 {
@@ -160,7 +161,6 @@ class ConfigurationViewModel : ViewModel()
                 it.timeFormat = TimeFormatConverter.fromString(time)
             }
         }
-
     }
 
     fun onDateFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
@@ -172,12 +172,12 @@ class ConfigurationViewModel : ViewModel()
                 it.dateFormat = DateFormatConverter.fromString(date)
             }
         }
-
     }
 
     fun createNewConfiguration()
     {
-        val newConfig = Config("", DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 10 )
+        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+        val newConfig = Config(timeZone,"", DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 10 )
         _currentConfiguration = MutableLiveData(newConfig)
         //saveNewConfiguration()
     }
