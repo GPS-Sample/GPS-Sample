@@ -1,4 +1,4 @@
-﻿app_name,GPSSample::en,GPSSample::es,GPSSample::fr,GPSSample::pt,GPSSample::ru,GPSSample::id
+﻿app_name,GPSSample::en,GPSSample::es,GPSSample::fr,GPSSample::pt,GPSSample::ru,GPSSample::in
 action_settings,Settings,Configuración,Paramètres,Configurações,Настройки,Pengaturan
 action_sign_out,Sign Out,Cerrar sesión,Se déconnecter,Sair,Выйти из системы,Keluar
 next,Next,Siguiente,Écran suivant,Seguinte,Следующий,Berikutnya
@@ -43,7 +43,7 @@ samling_methods,Simple Random Sampling,Muestreo aleatorio simple,Échantillonnag
 samling_methods,Cluster Sampling,Muestreo por conglomerados,Échantillonnage en grappes,Amostragem por conglomerados,Кластерная выборка,Pengambilan Sampel Klaster
 samling_methods,Subsets: May Overlap,Subconjuntos: pueden superponerse,Sous-ensembles : peuvent se chevaucher,Subconjuntos: Podem sobrepor-se,Подмножества: Могут пересекаться,Subset: Mungkin Tumpang Tindih
 samling_methods,Strata: Mutually Exclusive,Estratos: Mutuamente excluyentes,Strates : mutuellement exclusives,Estratos: Mutuamente exclusivos,Страты: Взаимоисключающие,Strata: Saling Eksklusif
-admin,Admin,Administrador,Administrateur,Administrador,Администратор,Admin
+admin,Admin,Administrador,Administrateur,Administrador,Администратор,Panglingsir
 supervisor,Supervisor,Supervisor,Superviseur,Supervisor,Руководитель,Pengawas
 enumerator,Enumerator,Enumerador,Recenseur,Enumerador,Перечислитель,Pencacah
 surveyor,Surveyor,Encuestador,Arpenteur,Topógrafo,Исследователь,surveyor
@@ -64,7 +64,7 @@ reenter_your_pin,Re-enter your PIN,Vuelva a ingresar su PIN,Saisissez à nouveau
 back,Back,Atrás,Écran précédent,Voltar,Назад,Kembali
 cancel,Cancel,Anular,Annulez,Cancelar,Отменить,Membatalkan
 finish,Finish,Finalizar,Finir,Terminar,Завершить,Menyelesaikan
-save,Save,Grabar,Sauvegardez,Guardar,Сохранить,Menyimpan
+save,Save,Guardar,Sauvegardez,Guardar,Сохранить,Menyimpan
 done,Done,Hecho,Terminé,Concluído,Готово,Selesai
 select_role,Select your Role,Selecciona su rol,Sélectionnez votre rôle,Seleccione a sua função,Выберите свою роль,Pilih Peran Anda
 admin_select_role,Admin Select Role,Administrador - selecciona rol,Administrateur - Sélectionnez un rôle,Administrador - Selecionar função,Выберите роль Администратора,Admin Pilih Peran
@@ -174,7 +174,7 @@ survey,Survey,Encuesta,Enquête,Questionário,Опрос,Survei
 undefined,Undefined,Sin definir,Non défini,Indefinido,Неопределенный,Belum diartikan
 enter_name,Please enter a name,"Por favor, introduzca un nombre",Veuillez saisir un nom,"Por favor, insira um nome","Пожалуйста, введите имя",Silakan masukkan nama
 desired_gps_position,Please enter the minimum desired GPS precision,"Por favor, introduzca la precisión GPS mínima deseada",Veuillez saisir la précision GPS minimale souhaitée,"Por favor, insira a precisão GPS mínima pretendida",Введите минимальную желаемую точность GPS,Silakan masukkan presisi GPS minimum yang diinginkan
-import_configuration,Import Configuration,Configuración de importación,Configuration de l'importation,Importar configuração,Конфигурация импорта,Konfigurasi Impor
+import_configuration,Import Configuration,Configuración de importación,Importez la configuration,Importar configuração,Конфигурация импорта,Konfigurasi Impor
 select_import_method,Select an import method,Seleccione un método de importación,Sélectionnez une méthode d'importation,Selecione um método de importação,Выберите метод импорта,Pilih metode impor
 select_configuration,Select a configuration,Seleccione una configuración,Sélectionner une configuration,Selecione uma configuração,Выберите конфигурацию,Pilih konfigurasi
 home_not_exist,Home does not exist,La hogar no existe ,Le domicile n'existe pas,O agregado familiar não existe,Дом не существует,Rumah tidak ada
@@ -202,7 +202,7 @@ additional_info,Additional Info,Información adicional,Informations complémenta
 incomplete,Incomplete,Incompleto,Incomplet,Incompleto,Неполный,Tidak lengkap
 does_not_exist,Does not exist,No existe,N'existe pas,Não existe,Не существует,Tidak ada
 other,Other,Otros,Autre,Outros,Другое,Lainnya
-notes,Notes,Notas,Notes (en anglais),Notas,Примечания,Catatan
+notes,Notes,Notas,Notes,Notas,Примечания,Catatan
 oops,Oops!,¡Vaya!,Oups !,Oops!,Упс!,Ups!
 field_is_required,field is required,campo obligatorio,le champ est obligatoire,o campo é obrigatório,поле обязательно для заполнения,lapangan diperlukan
 number,Number,Número,Numéro,Número,Число,Nomor
@@ -383,3 +383,9 @@ mark_current_location,Mark Current Location,Marcar ubicación actual,Marquez l'e
 delete_last_location,Delete Last Location,Borrar última ubicación,Supprimez le dernier emplacement,Apagar a última localização,Удалить последнее местоположение,Hapus Lokasi Terakhir
 clear_map_and_start_over,Clear Map and Start Over,Borrar mapa y volver a empezar,Effacez la carte et recommencer,Limpar mapa e começar de novo,Очистить карту и начать сначала,Hapus Peta dan Mulai dari Awal
 image_size_warning,You've exceeded 25Mb of Image Data. Adding more images will greatly impact data transfer performance.,Ha superado los 25Mb de Datos de Imagen. Añadir más imágenes tendrá un gran impacto en la transferencia de datos.,Vous avez dépassé les 25 MB de données d'image. L'ajout d'images supplémentaires aura un impact considérable sur les performances de transfert des données.,Excedeu 25 Mb de dados de imagem. A adição de mais imagens terá um grande impacto na transferência de dados.,Вы превысили 25 Мб данных изображений. Добавление дополнительных изображений сильно повлияет на производительность передачи данных.,Anda telah melampaui 25Mb Data Gambar. Menambahkan lebih banyak gambar akan sangat mempengaruhi kinerja transfer data.
+subaddress_start,Enter the starting # for the Subaddress,Introduzca el número inicial de la subdirección,Saisissez le numéro de départ de la sous-adresse.,Introduzir o número inicial do subendereço,Введите начальный № для субадреса,Unggahang # pangawit anggén Subalamat
+creation_options,Creation Options,Opciones de creación,Options de création,Opções de criação,Параметры создания,Opsi Pakaryan
+set_location,Define Limits (lxw),Definir Límites (l x a),Définir les limites (l x l),Definir limites (c x l),Определите границы (д по ш),Tentuang Wates (p x l)
+set_boundary,Draw Boundary,Dibujar límite,Tracer la frontière,Desenhar limite,Нарисовать границу,Ngambar Wates
+update_boundary,Update Boundary,Actualizar límites,Mettre à jour les limites,Atualizar limites,Обновить границу,Unyarang wates
+location_image,Location Image,Imagen de ubicación,Image de l'emplacement,Imagem de localização,изображение местоположения,Gambar lokasi

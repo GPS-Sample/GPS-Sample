@@ -357,6 +357,12 @@
     <string name="delete_last_location">"Удалить последнее местоположение"</string>
     <string name="clear_map_and_start_over">"Очистить карту и начать сначала"</string>
     <string name="image_size_warning">"Вы превысили 25 Мб данных изображений. Добавление дополнительных изображений сильно повлияет на производительность передачи данных."</string>
+    <string name="subaddress_start">"Введите начальный № для субадреса"</string>
+    <string name="creation_options">"Параметры создания"</string>
+    <string name="set_location">"Определите границы (д по ш)"</string>
+    <string name="set_boundary">"Нарисовать границу"</string>
+    <string name="update_boundary">"Обновить границу"</string>
+    <string name="location_image">"изображение местоположения"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

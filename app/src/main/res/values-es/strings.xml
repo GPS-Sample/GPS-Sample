@@ -38,7 +38,7 @@
     <string name="back">"Atrás"</string>
     <string name="cancel">"Anular"</string>
     <string name="finish">"Finalizar"</string>
-    <string name="save">"Grabar"</string>
+    <string name="save">"Guardar"</string>
     <string name="done">"Hecho"</string>
     <string name="select_role">"Selecciona su rol"</string>
     <string name="admin_select_role">"Administrador - selecciona rol"</string>
@@ -357,6 +357,12 @@
     <string name="delete_last_location">"Borrar última ubicación"</string>
     <string name="clear_map_and_start_over">"Borrar mapa y volver a empezar"</string>
     <string name="image_size_warning">"Ha superado los 25Mb de Datos de Imagen. Añadir más imágenes tendrá un gran impacto en la transferencia de datos."</string>
+    <string name="subaddress_start">"Introduzca el número inicial de la subdirección"</string>
+    <string name="creation_options">"Opciones de creación"</string>
+    <string name="set_location">"Definir Límites (l x a)"</string>
+    <string name="set_boundary">"Dibujar límite"</string>
+    <string name="update_boundary">"Actualizar límites"</string>
+    <string name="location_image">"Imagen de ubicación"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

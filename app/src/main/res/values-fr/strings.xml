@@ -148,7 +148,7 @@
     <string name="undefined">"Non défini"</string>
     <string name="enter_name">"introduzca un nombre""</string>
     <string name="desired_gps_position">"introduzca la precisión GPS mínima deseada""</string>
-    <string name="import_configuration">"Configuration de l'importation"</string>
+    <string name="import_configuration">"Importez la configuration"</string>
     <string name="select_import_method">"Sélectionnez une méthode d'importation"</string>
     <string name="select_configuration">"Sélectionner une configuration"</string>
     <string name="home_not_exist">"Le domicile n'existe pas"</string>
@@ -176,7 +176,7 @@
     <string name="incomplete">"Incomplet"</string>
     <string name="does_not_exist">"N'existe pas"</string>
     <string name="other">"Autre"</string>
-    <string name="notes">"Notes (en anglais)"</string>
+    <string name="notes">"Notes"</string>
     <string name="oops">"Oups !"</string>
     <string name="field_is_required">"le champ est obligatoire"</string>
     <string name="number">"Numéro"</string>
@@ -357,6 +357,12 @@
     <string name="delete_last_location">"Supprimez le dernier emplacement"</string>
     <string name="clear_map_and_start_over">"Effacez la carte et recommencer"</string>
     <string name="image_size_warning">"Vous avez dépassé les 25 MB de données d'image. L'ajout d'images supplémentaires aura un impact considérable sur les performances de transfert des données."</string>
+    <string name="subaddress_start">"Saisissez le numéro de départ de la sous-adresse."</string>
+    <string name="creation_options">"Options de création"</string>
+    <string name="set_location">"Définir les limites (l x l)"</string>
+    <string name="set_boundary">"Tracer la frontière"</string>
+    <string name="update_boundary">"Mettre à jour les limites"</string>
+    <string name="location_image">"Image de l'emplacement"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

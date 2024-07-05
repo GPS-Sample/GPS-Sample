@@ -17,7 +17,7 @@
     <string name="sending_enum_data">"Mengirim Data Pencacahan"</string>
     <string name="receiving_data">"Menerima data"</string>
     <string name="configuration_received">"Konfigurasi Diterima"</string>
-    <string name="admin">"Admin"</string>
+    <string name="admin">"Panglingsir"</string>
     <string name="supervisor">"Pengawas"</string>
     <string name="enumerator">"Pencacah"</string>
     <string name="surveyor">"surveyor"</string>
@@ -357,6 +357,12 @@
     <string name="delete_last_location">"Hapus Lokasi Terakhir"</string>
     <string name="clear_map_and_start_over">"Hapus Peta dan Mulai dari Awal"</string>
     <string name="image_size_warning">"Anda telah melampaui 25Mb Data Gambar. Menambahkan lebih banyak gambar akan sangat mempengaruhi kinerja transfer data."</string>
+    <string name="subaddress_start">"Unggahang # pangawit anggén Subalamat"</string>
+    <string name="creation_options">"Opsi Pakaryan"</string>
+    <string name="set_location">"Tentuang Wates (p x l)"</string>
+    <string name="set_boundary">"Ngambar Wates"</string>
+    <string name="update_boundary">"Unyarang wates"</string>
+    <string name="location_image">"Gambar lokasi"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

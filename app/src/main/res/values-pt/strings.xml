@@ -357,6 +357,12 @@
     <string name="delete_last_location">"Apagar a última localização"</string>
     <string name="clear_map_and_start_over">"Limpar mapa e começar de novo"</string>
     <string name="image_size_warning">"Excedeu 25 Mb de dados de imagem. A adição de mais imagens terá um grande impacto na transferência de dados."</string>
+    <string name="subaddress_start">"Introduzir o número inicial do subendereço"</string>
+    <string name="creation_options">"Opções de criação"</string>
+    <string name="set_location">"Definir limites (c x l)"</string>
+    <string name="set_boundary">"Desenhar limite"</string>
+    <string name="update_boundary">"Atualizar limites"</string>
+    <string name="location_image">"Imagem de localização"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
