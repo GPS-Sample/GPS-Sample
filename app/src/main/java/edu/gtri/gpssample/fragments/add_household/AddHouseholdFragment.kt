@@ -197,9 +197,9 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.notesEditText.setText( enumerationItem.enumerationNotes )
             when (enumerationItem.enumerationIncompleteReason)
             {
-                "Nobody home" -> binding.nobodyHomeButton.isChecked = true
-                "Home does not exist" -> binding.doesNotExistButton.isChecked = true
-                "Other" -> binding.otherButton.isChecked = true
+                resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
+                resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
+                resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
             }
         }
         else if (enumerationItem.collectionState == CollectionState.Incomplete)
@@ -208,9 +208,9 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
             binding.notesEditText.setText( enumerationItem.collectionNotes )
             when (enumerationItem.collectionIncompleteReason)
             {
-                "Nobody home" -> binding.nobodyHomeButton.isChecked = true
-                "Home does not exist" -> binding.doesNotExistButton.isChecked = true
-                "Other" -> binding.otherButton.isChecked = true
+                resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
+                resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
+                resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
             }
         }
 
