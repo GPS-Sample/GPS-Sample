@@ -204,7 +204,7 @@
     <string name="not_equal">"Tidak sama"</string>
     <string name="less_than">"Kurang dari"</string>
     <string name="greater_than">"Lebih besar dari"</string>
-    <string name="greater_than_equal">""Lebih Besar Dari Atau Sama Dengan""</string>
+    <string name="greater_than_equal">"Lebih Besar Dari Atau Sama Dengan"</string>
     <string name="add_condition">"Tambahkan Kondisi"</string>
     <string name="select_rule">"Pilih Aturan"</string>
     <string name="teams">"Tim"</string>
