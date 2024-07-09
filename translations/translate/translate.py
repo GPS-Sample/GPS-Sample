@@ -4,8 +4,8 @@ def keywordCount(lines, keyword):
 	for i in range(1,lines.__len__()):
 		line = lines[i]
 
-		# split words separated by ','
-		components = line.split(',')
+		# split words separated by '\t'
+		components = line.split('\t')
   
 		if components[0] == keyword:
 			keywordCount += 1
@@ -13,7 +13,7 @@ def keywordCount(lines, keyword):
 	return keywordCount
 
 def translate(appName, language, index):    
-	inputFileName = "../translations.csv"
+	inputFileName = "../translations.tsv"
  
 	if (language == "en"):
 		outputFileName = "../../app/src/main/res/values/strings.xml"
@@ -33,8 +33,8 @@ def translate(appName, language, index):
 	for i in range(1,lines.__len__()):
 		line = lines[i]
   
-		# split words separated by ','
-		components = line.split(',')
+		# split words separated by '\t'
+		components = line.split('\t')
 
 		keyword = components[0]
     
@@ -48,8 +48,8 @@ def translate(appName, language, index):
 	for i in range(1,lines.__len__()):
 		line = lines[i]
 
-		# split words separated by ','
-		components = line.split(',')
+		# split words separated by '\t'
+		components = line.split('\t')
 
 		keyword = components[0]
     
@@ -72,16 +72,17 @@ def translate(appName, language, index):
 	outputFile.close()
 
 # get languages from the first line of the file
-inputFileName = "../translations.csv"
+inputFileName = "../translations.tsv"
 inputFile = open(inputFileName, 'r')
 line = inputFile.readline()
 inputFile.close()
 
-components = line.split(',')
+components = line.split('\t')
 
 for i in range(1,components.__len__()):    
 	component = components[i].split('::')
-	appName = component[0]
-	language = component[1].strip()
-	print( "processing language: " + language )
-	translate( appName, language, i )
+	if (component.__len__() > 1):
+		appName = component[0]
+		language = component[1].strip()
+		print( "processing language: " + language )
+		translate( appName, language, i )
