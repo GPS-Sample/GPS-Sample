@@ -363,6 +363,9 @@
     <string name="set_boundary">"Draw Boundary"</string>
     <string name="update_boundary">"Update Boundary"</string>
     <string name="location_image">"Location Image"</string>
+
+    <string name="review_all_teams">"Review All Teams"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

@@ -360,6 +360,25 @@ class PerformEnumerationFragment : Fragment(),
         var surveyedCount = 0
         var enumerationCount = 0
 
+        for (location in enumerationTeamLocations)
+        {
+            for (enumItem in location.enumerationItems)
+            {
+                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                {
+                    enumerationCount += 1
+                }
+                if (enumItem.samplingState == SamplingState.Sampled)
+                {
+                    sampledCount += 1
+                }
+                if (enumItem.collectionState == CollectionState.Complete)
+                {
+                    surveyedCount += 1
+                }
+            }
+        }
+
         for (location in enumArea.locations)
         {
             for (enumItem in location.enumerationItems)
@@ -372,15 +391,6 @@ class PerformEnumerationFragment : Fragment(),
                             maxSubaddress = it
                         }
                     }
-                    enumerationCount += 1
-                }
-                if (enumItem.samplingState == SamplingState.Sampled)
-                {
-                    sampledCount += 1
-                }
-                if (enumItem.collectionState == CollectionState.Complete)
-                {
-                    surveyedCount += 1
                 }
             }
         }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.CollectionTeam
 import edu.gtri.gpssample.database.models.EnumArea
@@ -74,6 +75,13 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
 
         binding.addButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateEnumerationTeamFragment)
+        }
+
+        binding.reviewAllTeamsButton.setOnClickListener {
+            if (enumArea.enumerationTeams.isNotEmpty())
+            {
+                findNavController().navigate(R.id.action_navigate_to_ReviewEnumerationFragment)
+            }
         }
     }
 

@@ -42,38 +42,13 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"/>
 
-        <ImageView
-            android:id="@+id/qr_image_view"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="200dp"
-            android:layout_height="200dp">
-        </ImageView>
-    </LinearLayout>
-
-    <RelativeLayout
-        android:visibility="gone"
-        android:id="@+id/progressBar"
-        android:background="@color/black"
-        android:alpha="1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
+        <Button
+            android:id="@+id/review_all_teams_button"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:text="@string/generating_qr_code"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:layout_above="@+id/progress_bar"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"/>
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            style="?android:attr/progressBarStyle"
-            android:indeterminateTint="@android:color/white"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
-    </RelativeLayout>
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/review_all_teams" />
+    </LinearLayout>
 </FrameLayout>

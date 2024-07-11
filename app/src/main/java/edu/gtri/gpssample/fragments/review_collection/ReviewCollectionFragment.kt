@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.fragments.perform_collection
+package edu.gtri.gpssample.fragments.review_collection
 
 import android.animation.ValueAnimator
 import android.content.Intent
@@ -48,7 +48,9 @@ import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
+import edu.gtri.gpssample.databinding.FragmentReviewCollectionBinding
 import edu.gtri.gpssample.dialogs.*
+import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionAdapter
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.TestUtils
@@ -62,19 +64,11 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class PerformCollectionFragment : Fragment(),
-    OnCameraChangeListener,
-    MapboxManager.MapTileCacheDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
+class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
 {
     private lateinit var user: User
     private lateinit var enumArea: EnumArea
     private lateinit var mapboxManager: MapboxManager
-    private lateinit var collectionTeam: CollectionTeam
-    private lateinit var defaultColorList: ColorStateList
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
@@ -87,42 +81,14 @@ class PerformCollectionFragment : Fragment(),
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private var landmarkLocations = ArrayList<Location>()
-    private val collectionTeamLocations = ArrayList<Location>()
-    private var busyIndicatorDialog: BusyIndicatorDialog? = null
-    private var _binding: FragmentPerformCollectionBinding? = null
+    private var _binding: FragmentReviewCollectionBinding? = null
     private val locationHashMap = java.util.HashMap<Long, Location>()
     private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
-    private val kExportTag = 2
-    private val fragmentResultListener = "PerformCollectionFragment"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setFragmentResultListener( fragmentResultListener ) { key, bundle ->
-            bundle.getString( Keys.kRequest.value )?.let { request ->
-                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                    if (gpsAccuracyIsGood() && gpsLocationIsGood(location))
-                    {
-                        when (request)
-                        {
-                            Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
-                            Keys.kLaunchSurveyRequest.value -> SurveyLaunchNotificationDialog(activity!!, this)
-                        }
-                    }
-                    else if (!gpsAccuracyIsGood())
-                    {
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
 
         val vm: ConfigurationViewModel by activityViewModels()
         val networkVm: NetworkViewModel by activityViewModels()
@@ -133,16 +99,11 @@ class PerformCollectionFragment : Fragment(),
         val samplingVm: SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
-
-        if (BuildConfig.DEBUG)
-        {
-            setHasOptionsMenu(true)
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
-        _binding = FragmentPerformCollectionBinding.inflate(inflater, container, false)
+        _binding = FragmentReviewCollectionBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -160,10 +121,6 @@ class PerformCollectionFragment : Fragment(),
             enumArea = it
         }
 
-        DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
-            collectionTeam = it
-        }
-
         val _user = (activity!!.application as? MainApplication)?.user
 
         _user?.let { user ->
@@ -177,19 +134,15 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
 
-        collectionTeamLocations.clear()
         val enumerationItems = ArrayList<EnumerationItem>()
 
-        for (teamLocationUuid in collectionTeam.locationUuids)
+        for (location in enumArea.locations)
         {
-            enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
-                collectionTeamLocations.add( location )
-                for (enumurationItem in location.enumerationItems)
+            for (enumurationItem in location.enumerationItems)
+            {
+                if (enumurationItem.samplingState == SamplingState.Sampled)
                 {
-                    if (enumurationItem.samplingState == SamplingState.Sampled)
-                    {
-                        enumerationItems.add( enumurationItem )
-                    }
+                    enumerationItems.add( enumurationItem )
                 }
             }
         }
@@ -214,10 +167,6 @@ class PerformCollectionFragment : Fragment(),
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-            binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + collectionTeam.name + " team)"
-        }
-
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
@@ -227,8 +176,6 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
         )
-
-        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
@@ -247,23 +194,10 @@ class PerformCollectionFragment : Fragment(),
                         }
                         else
                         {
-                            var count = 0
-
-                            for (enumerationItem in location.enumerationItems)
-                            {
-                                if (enumerationItem.samplingState == SamplingState.Sampled)
-                                {
-                                    count += 1
-
-                                    // This is really only necessary here for the enumerationItems.size == 1 case
-                                    // For size > 1, this will get set in the multiCollectionFragment
-                                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-                                }
-                            }
-
-                            if (count > 1)
+                            if (location.enumerationItems.size > 1)
                             {
                                 val bundle = Bundle()
+                                bundle.putBoolean( Keys.kEditMode.value, false)
                                 bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
                                 bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
 
@@ -271,15 +205,14 @@ class PerformCollectionFragment : Fragment(),
                             }
                             else
                             {
+                                sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0] )
                                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
+                                    (this@ReviewCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
+                                    (this@ReviewCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                                    (this@ReviewCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
 
                                     val bundle = Bundle()
-                                    bundle.putBoolean( Keys.kEditMode.value, false )
-                                    bundle.putBoolean( Keys.kCollectionMode.value, true )
-                                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+                                    bundle.putBoolean( Keys.kEditMode.value, false)
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                                 }
                             }
@@ -288,16 +221,6 @@ class PerformCollectionFragment : Fragment(),
                     true
                 }
             )
-        }
-
-        binding.mapTileCacheButton.setOnClickListener {
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                if (config.mapTileRegions.isNotEmpty())
-                {
-                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                    MapboxManager.loadStylePack( activity!!, this )
-                }
-            }
         }
 
         binding.legendTextView.setOnClickListener {
@@ -314,55 +237,6 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.setCenterOnCurrentLocation( false )
         }
 
-        binding.mapTileCacheButton.backgroundTintList?.let {
-            defaultColorList = it
-        }
-
-        sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
-            if (centerOnCurrentLocation)
-            {
-                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-            else
-            {
-                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-            }
-        }
-
-        binding.helpButton.setOnClickListener {
-            PerformCollectionHelpDialog( activity!! )
-        }
-
-        binding.centerOnLocationButton.setOnClickListener {
-            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
-                if (centerOnCurrentLocation)
-                {
-                    sharedViewModel.setCenterOnCurrentLocation( false )
-                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-                }
-                else
-                {
-                    sharedViewModel.setCenterOnCurrentLocation( true )
-                    binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                }
-                refreshMap()
-            }
-        }
-
-        binding.exportButton.setOnClickListener {
-            when(user.role)
-            {
-                Role.Supervisor.toString(), Role.Admin.toString() ->
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.export_configuration) , resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                }
-                Role.Enumerator.toString(), Role.DataCollector.toString() ->
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.export_collection_data), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                }
-            }
-        }
-
         updateSummaryInfo()
     }
 
@@ -372,21 +246,23 @@ class PerformCollectionFragment : Fragment(),
         var enumerationCount = 0
         var surveyedCount = 0
 
-        for (location in collectionTeamLocations)
-        {
-            for (enumItem in location.enumerationItems)
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            for (location in enumArea.locations)
             {
-                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                for (enumItem in location.enumerationItems)
                 {
-                    enumerationCount += 1
-                }
-                if (enumItem.samplingState == SamplingState.Sampled)
-                {
-                    sampledCount += 1
-                }
-                if (enumItem.collectionState == CollectionState.Complete)
-                {
-                    surveyedCount += 1
+                    if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                    {
+                        enumerationCount += 1
+                    }
+                    if (enumItem.samplingState == SamplingState.Sampled)
+                    {
+                        sampledCount += 1
+                    }
+                    if (enumItem.collectionState == CollectionState.Complete)
+                    {
+                        surveyedCount += 1
+                    }
                 }
             }
         }
@@ -401,7 +277,7 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformCollectionFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ReviewCollectionFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     fun refreshMap()
@@ -452,7 +328,7 @@ class PerformCollectionFragment : Fragment(),
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
-        collectionTeam.polygon.map {
+        enumArea.vertices.map {
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
@@ -474,7 +350,7 @@ class PerformCollectionFragment : Fragment(),
 
             val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
             currentZoomLevel?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
+                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
                 val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                 val cameraPosition = CameraOptions.Builder()
                     .zoom(currentZoomLevel)
@@ -484,7 +360,7 @@ class PerformCollectionFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
-            for (location in collectionTeamLocations)
+            for (location in enumArea.locations)
             {
                 if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                 {
@@ -573,231 +449,8 @@ class PerformCollectionFragment : Fragment(),
 
                     val bundle = Bundle()
                     bundle.putBoolean( Keys.kEditMode.value, false )
-                    bundle.putBoolean( Keys.kCollectionMode.value, true )
-                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                 }
-            }
-        }
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        var payload: String = ""
-        var message: String = ""
-        var fileName: String = ""
-
-        val user = (activity!!.application as MainApplication).user
-
-        var userName = user!!.name.replace(" ", "" ).uppercase()
-
-        if (userName.length > 3)
-        {
-            userName = userName.substring(0,3)
-        }
-
-        val role = user.role.toString().substring(0,1).uppercase()
-
-        val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-        val dateTime = LocalDateTime.now().format(formatter)
-        var version = ""
-        val versionName = BuildConfig.VERSION_NAME.split( "#" )
-        if (versionName.size == 2)
-        {
-            version = versionName[1]
-        }
-
-        val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-
-        when(user.role) {
-            Role.Admin.toString(),
-            Role.Supervisor.toString() ->
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}.json"
-                    payload = config.packMinimal()
-                    message = resources.getString(R.string.config_saved_doc)
-                }
-            }
-
-            Role.Enumerator.toString(),
-            Role.DataCollector.toString() ->
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                        fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                        payload = config.pack()
-                        message = resources.getString(R.string.collection_saved_doc)
-                    }
-                }
-            }
-        }
-
-        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
-        root.mkdirs()
-        val file = File(root, fileName)
-        val writer = FileWriter(file)
-        writer.append(payload)
-        writer.flush()
-        writer.close()
-
-        Toast.makeText(activity!!.applicationContext, message, Toast.LENGTH_SHORT).show()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectFirstButton(tag: Any?)
-    {
-        // Launch connection screen
-        view?.let{ view ->
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                sharedNetworkViewModel.setCurrentConfig(config)
-
-                when(user.role)
-                {
-                    Role.Admin.toString(),
-                    Role.Supervisor.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                        sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                        startHotspot(view)
-                    }
-
-                    Role.Enumerator.toString(),
-                    Role.DataCollector.toString() ->
-                    {
-                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                            sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                            sharedNetworkViewModel.networkClientModel.currentConfig = config
-                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                            getResult.launch(intent)
-                        }
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private val getResult =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
-
-                val jsonObject = JSONObject(payload);
-
-                Log.d("xxx", jsonObject.toString(2))
-
-                val ssid = jsonObject.getString(Keys.kSSID.value)
-                val pass = jsonObject.getString(Keys.kPass.value)
-                val serverIp = jsonObject.getString(Keys.kIpAddress.value)
-
-                Log.d("xxxx", "the ssid, pass, serverIP ${ssid}, ${pass}, ${serverIp}")
-
-                sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
-            }
-        }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun startHotspot(view : View)
-    {
-        sharedNetworkViewModel.createHotspot(view)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun shouldLaunchODK()
-    {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-            odk_result.launch(intent)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private val odk_result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val mainApplication = activity!!.application as MainApplication
-
-        mainApplication.currentSubAddress = mainApplication.defaultSubAddress
-        mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
-        mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
-
-        AdditionalInfoDialog( activity, "", "", this)
-    }
-
-    override fun didSelectCancelButton()
-    {
-    }
-
-    override fun didSelectSaveButton( incompleteReason: String, notes: String )
-    {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-
-            sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
-
-                sampledItem.collectionNotes = notes
-                sampledItem.collectionDate = Date().time
-                sampledItem.syncCode = sampledItem.syncCode + 1
-                sampledItem.collectionState = CollectionState.Complete
-
-                (activity!!.application as MainApplication).user?.let { user ->
-                    sampledItem.collectorName = user.name
-                }
-
-                if (incompleteReason.isNotEmpty())
-                {
-                    sampledItem.collectionState = CollectionState.Incomplete
-                    sampledItem.collectionIncompleteReason = incompleteReason
-                }
-
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
-
-                enumArea.locations = DAO.locationDAO.getLocations( collectionTeam )
-
-                collectionTeamLocations.clear()
-                val enumerationItems = ArrayList<EnumerationItem>()
-
-                for (teamLocationUuid in collectionTeam.locationUuids)
-                {
-                    enumArea.locations.find { location -> location.uuid == teamLocationUuid  }?.let { location ->
-                        collectionTeamLocations.add( location )
-                        for (enumurationItem in location.enumerationItems)
-                        {
-                            if (enumurationItem.samplingState == SamplingState.Sampled)
-                            {
-                                enumerationItems.add( enumurationItem )
-                            }
-                        }
-                    }
-                }
-
-                performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
-
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.getConfig( config.uuid )?.let {
-                        sharedViewModel.setCurrentConfig( it )
-                    }
-                }
-
-                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-                    }
-                }
-
-                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    DAO.studyDAO.getStudy( study.uuid )?.let {
-                        sharedViewModel.createStudyModel.setStudy( it )
-                    }
-                }
-
-                performCollectionAdapter.notifyDataSetChanged()
-
-                updateSummaryInfo()
-
-                refreshMap()
             }
         }
     }
@@ -997,81 +650,6 @@ class PerformCollectionFragment : Fragment(),
                 }.toJson()
             )
         }
-    }
-
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
-                }
-            }
-        }
-    }
-
-    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
-    {
-        busyIndicatorDialog?.let {
-            activity!!.runOnUiThread {
-                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
-            }
-        }
-    }
-
-    override fun tilePacksLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                }
-            }
-        }
-    }
-
-    override fun didPressCancelButton()
-    {
-        MapboxManager.cancelStylePackDownload()
-        MapboxManager.cancelTilePackDownload()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_survey_all, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        when (item.itemId)
-        {
-            R.id.survey ->
-            {
-//                TestUtils.surveyAll( enumArea )
-//
-//                collectionTeam.locations = DAO.locationDAO.getLocations( collectionTeam )
-//
-//                refreshMap()
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()

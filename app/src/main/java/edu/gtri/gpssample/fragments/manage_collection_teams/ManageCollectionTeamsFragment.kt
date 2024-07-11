@@ -94,6 +94,13 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
         binding.addButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateCollectionTeamFragment)
         }
+
+        binding.reviewAllTeamsButton.setOnClickListener {
+            if (enumArea.collectionTeams.isNotEmpty())
+            {
+                findNavController().navigate(R.id.action_navigate_to_ReviewCollectionFragment)
+            }
+        }
     }
 
     override fun onResume()
