@@ -184,7 +184,7 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             var height = bitmap.height.toDouble()
             val aspectRatio = width / height
 
-            width = 150.0
+            width = 200.0
             height = width / aspectRatio
 
             val bm = Bitmap.createScaledBitmap( bitmap, width.toInt(), height.toInt(), false )
