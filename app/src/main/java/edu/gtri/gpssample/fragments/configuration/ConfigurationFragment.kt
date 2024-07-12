@@ -44,6 +44,7 @@ import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -62,10 +63,14 @@ class ConfigurationFragment : Fragment(),
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
 
-    private val kDeleteTag = 1
-    private val kExportTag = 2
-    private val kImportTag = 3
-    private val kTaskTag =   4
+    private val kDeleteTag          = 1
+    private val kExportTag          = 2
+    private val kImportTag          = 3
+    private val kTaskTag            = 4
+    private val kFileLocationTag    = 5
+
+    val REQUEST_CODE_PICK_DIR = 1001
+    val REQUEST_CODE_PICK_FILE = 1002
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -325,6 +330,10 @@ class ConfigurationFragment : Fragment(),
                 kTaskTag -> {
                     findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
                 }
+
+                kFileLocationTag -> {
+                    exportToDefaultLocation()
+                }
                 else -> {}
             }
         }
@@ -338,7 +347,6 @@ class ConfigurationFragment : Fragment(),
                 when(tag)
                 {
                     kDeleteTag -> {
-//                        sharedViewModel.deleteConfig(config)
                         DAO.deleteAll()
                         findNavController().popBackStack()
                     }
@@ -347,15 +355,19 @@ class ConfigurationFragment : Fragment(),
                         val intent = Intent()
                             .setType("*/*")
                             .setAction(Intent.ACTION_GET_CONTENT)
-                        startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), 1023)
+                        startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), REQUEST_CODE_PICK_FILE)
                     }
 
                     kExportTag -> {
-                        exportToDevice()
+                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), kFileLocationTag, this, true)
                     }
 
                     kTaskTag -> {
                         findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
+                    }
+
+                    kFileLocationTag -> {
+                        exportToDevice()
                     }
                     else -> {}
                 }
@@ -374,8 +386,6 @@ class ConfigurationFragment : Fragment(),
                 enumArea.selectedEnumerationTeamUuid = ""
                 enumArea.selectedCollectionTeamUuid = ""
             }
-
-            val packedConfig = config.pack()
 
             val user = (activity!!.application as MainApplication).user
 
@@ -400,16 +410,70 @@ class ConfigurationFragment : Fragment(),
 
             val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}.json"
 
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
-            root.mkdirs()
-            val file = File(root, fileName)
-            val writer = FileWriter(file)
-            writer.append(packedConfig)
-            writer.flush()
-            writer.close()
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, fileName)
+            }
 
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc),
-                Toast.LENGTH_SHORT).show()
+            startActivityForResult( intent, REQUEST_CODE_PICK_DIR )
+        }
+    }
+
+    fun exportToDefaultLocation()
+    {
+        try
+        {
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+
+                config.selectedEnumAreaUuid = ""
+
+                for (enumArea in config.enumAreas)
+                {
+                    enumArea.selectedEnumerationTeamUuid = ""
+                    enumArea.selectedCollectionTeamUuid = ""
+                }
+
+                val packedConfig = config.pack()
+
+                val user = (activity!!.application as MainApplication).user
+
+                var userName = user!!.name.replace(" ", "" ).uppercase()
+
+                if (userName.length > 3)
+                {
+                    userName = userName.substring(0,3)
+                }
+
+                val role = user.role.toString().substring(0,1).uppercase()
+
+                val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
+                val dateTime = LocalDateTime.now().format(formatter)
+
+                var version = ""
+                val versionName = BuildConfig.VERSION_NAME.split( "#" )
+                if (versionName.size == 2)
+                {
+                    version = versionName[1]
+                }
+
+                val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}.json"
+
+                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
+                root.mkdirs()
+                val file = File(root, fileName)
+                val writer = FileWriter(file)
+                writer.append(packedConfig)
+                writer.flush()
+                writer.close()
+
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+            }
+        }
+        catch( ex: Exception )
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -427,61 +491,82 @@ class ConfigurationFragment : Fragment(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
+        try
         {
-            val uri = data?.data
-
-            uri?.let { uri ->
-                sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
-                    try
-                    {
-                        activity!!.getContentResolver().openInputStream(uri)?.let { inputStream ->
-
-                            binding.overlayView.visibility = View.VISIBLE
-
-                            Thread {
-                                val text = inputStream.bufferedReader().readText()
-
-                                val config = Config.unpack( text, currentConfig.encryptionPassword )
-
-                                if (config == null)
-                                {
-                                    activity!!.runOnUiThread {
-                                        binding.overlayView.visibility = View.GONE
-                                        InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
-                                    }
-                                }
-                                else
-                                {
-                                    DAO.instance().writableDatabase.beginTransaction()
-
-                                    DAO.configDAO.createOrUpdateConfig( config )
-
-                                    DAO.instance().writableDatabase.setTransactionSuccessful()
-                                    DAO.instance().writableDatabase.endTransaction()
-
-                                    DAO.configDAO.getConfig( config.uuid )?.let {
-                                        activity!!.runOnUiThread {
-                                            sharedViewModel.setCurrentConfig(it)
-                                            updateOverview()
-                                            binding.overlayView.visibility = View.GONE
-                                            enumerationAreasAdapter.updateEnumAreas(it.enumAreas)
-                                            InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
-                                        }
-                                    }
-                                }
-                            }.start()
+            if (requestCode == REQUEST_CODE_PICK_DIR && resultCode == Activity.RESULT_OK)
+            {
+                data?.data?.let { uri ->
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        val packedConfig = config.pack()
+                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                            FileOutputStream(it.fileDescriptor).use {
+                                it.write(packedConfig.toByteArray())
+                                it.close()
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    }
-                    catch( ex: java.lang.Exception )
-                    {
-                        binding.overlayView.visibility = View.GONE
-                        InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                     }
                 }
             }
+            else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == Activity.RESULT_OK)
+            {
+                val uri = data?.data
+
+                uri?.let { uri ->
+                    sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
+                        try
+                        {
+                            activity!!.getContentResolver().openInputStream(uri)?.let { inputStream ->
+
+                                binding.overlayView.visibility = View.VISIBLE
+
+                                Thread {
+                                    val text = inputStream.bufferedReader().readText()
+
+                                    val config = Config.unpack( text, currentConfig.encryptionPassword )
+
+                                    if (config == null)
+                                    {
+                                        activity!!.runOnUiThread {
+                                            binding.overlayView.visibility = View.GONE
+                                            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                                        }
+                                    }
+                                    else
+                                    {
+                                        DAO.instance().writableDatabase.beginTransaction()
+
+                                        DAO.configDAO.createOrUpdateConfig( config )
+
+                                        DAO.instance().writableDatabase.setTransactionSuccessful()
+                                        DAO.instance().writableDatabase.endTransaction()
+
+                                        DAO.configDAO.getConfig( config.uuid )?.let {
+                                            activity!!.runOnUiThread {
+                                                sharedViewModel.setCurrentConfig(it)
+                                                updateOverview()
+                                                binding.overlayView.visibility = View.GONE
+                                                enumerationAreasAdapter.updateEnumAreas(it.enumAreas)
+                                                InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+                                            }
+                                        }
+                                    }
+                                }.start()
+                            }
+                        }
+                        catch( ex: java.lang.Exception )
+                        {
+                            binding.overlayView.visibility = View.GONE
+                            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                        }
+                    }
+                }
+            }
+        }
+        catch( ex: java.lang.Exception )
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
         }
     }
 

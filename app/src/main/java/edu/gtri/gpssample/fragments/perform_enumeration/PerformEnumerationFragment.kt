@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.perform_enumeration
 
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -51,6 +52,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -96,6 +98,7 @@ class PerformEnumerationFragment : Fragment(),
     private val kExportTag = 1
     private val kAddHouseholdTag = 2
     private val kSelectHouseholdTag = 3
+    private val kFileLocationTag = 4
 
     private var maxSubaddress = 0
 
@@ -708,6 +711,12 @@ class PerformEnumerationFragment : Fragment(),
             return
         }
 
+        if (tag == kFileLocationTag)
+        {
+            exportToDefaultLocation()
+            return
+        }
+
         if (tag == kAddHouseholdTag)  // use current location
         {
             currentGPSLocation?.let { point ->
@@ -824,62 +833,169 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 kExportTag -> {
-                    val user = (activity!!.application as MainApplication).user
+                    ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), kFileLocationTag, this, true)
+                }
 
-                    var userName = user!!.name.replace(" ", "" ).uppercase()
+                kFileLocationTag -> {
+                    exportToDevice()
+                }
+            }
+        }
+    }
 
-                    if (userName.length > 3)
+    fun exportToDefaultLocation()
+    {
+        try
+        {
+            val user = (activity!!.application as MainApplication).user
+
+            var userName = user!!.name.replace(" ", "" ).uppercase()
+
+            if (userName.length > 3)
+            {
+                userName = userName.substring(0,3)
+            }
+
+            val role = user.role.toString().substring(0,1).uppercase()
+
+            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
+            val dateTime = LocalDateTime.now().format(formatter)
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
+            root.mkdirs()
+
+            var version = ""
+            val versionName = BuildConfig.VERSION_NAME.split( "#" )
+            if (versionName.size == 2)
+            {
+                version = versionName[1]
+            }
+
+            val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+
+            when(user.role)
+            {
+                Role.Admin.toString(),
+                Role.Supervisor.toString() ->
+                {
+                    val packedConfig = config.packMinimal()
+                    val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}.json"
+                    val file = File(root, fileName)
+                    val writer = FileWriter(file)
+                    writer.append(packedConfig)
+                    writer.flush()
+                    writer.close()
+
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                }
+
+                Role.Enumerator.toString() ->
+                {
+                    val packedConfig = config.pack()
+                    val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                    val file = File(root, fileName)
+                    val writer = FileWriter(file)
+                    writer.append(packedConfig)
+                    writer.flush()
+                    writer.close()
+
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        catch( ex: Exception )
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun exportToDevice()
+    {
+        var userName = user.name.replace(" ", "" ).uppercase()
+
+        if (userName.length > 3)
+        {
+            userName = userName.substring(0,3)
+        }
+
+        val role = user.role.toString().substring(0,1).uppercase()
+
+        val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
+        val dateTime = LocalDateTime.now().format(formatter)
+
+        var version = ""
+        val versionName = BuildConfig.VERSION_NAME.split( "#" )
+        if (versionName.size == 2)
+        {
+            version = versionName[1]
+        }
+
+        val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+        var fileName = ""
+
+        when(user.role)
+        {
+            Role.Admin.toString(),
+            Role.Supervisor.toString() ->
+            {
+                fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}.json"
+            }
+
+            Role.Enumerator.toString() ->
+            {
+                fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+            }
+        }
+
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+            putExtra(Intent.EXTRA_TITLE, fileName)
+        }
+
+        startActivityForResult( intent, REQUEST_CODE_PICK_DIR )
+    }
+
+    val REQUEST_CODE_PICK_DIR = 1001
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        try
+        {
+            if (requestCode == REQUEST_CODE_PICK_DIR && resultCode == Activity.RESULT_OK)
+            {
+                data?.data?.let { uri ->
+                    var packedConfig = ""
+
+                    when( user.role )
                     {
-                        userName = userName.substring(0,3)
-                    }
-
-                    val role = user.role.toString().substring(0,1).uppercase()
-
-                    val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-                    val dateTime = LocalDateTime.now().format(formatter)
-
-                    val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
-                    root.mkdirs()
-
-                    var version = ""
-                    val versionName = BuildConfig.VERSION_NAME.split( "#" )
-                    if (versionName.size == 2)
-                    {
-                        version = versionName[1]
-                    }
-
-                    val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-
-                    when(user.role)
-                    {
-                        Role.Supervisor.toString(), Role.Admin.toString() ->
+                        Role.Admin.toString(),
+                        Role.Supervisor.toString() ->
                         {
-                            val packedConfig = config.packMinimal()
-                            val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}.json"
-                            val file = File(root, fileName)
-                            val writer = FileWriter(file)
-                            writer.append(packedConfig)
-                            writer.flush()
-                            writer.close()
-
-                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved_doc), Toast.LENGTH_SHORT).show()
+                            packedConfig = config.packMinimal()
                         }
 
                         Role.Enumerator.toString() ->
                         {
-                            val packedConfig = config.pack()
-                            val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                            val file = File(root, fileName)
-                            val writer = FileWriter(file)
-                            writer.append(packedConfig)
-                            writer.flush()
-                            writer.close()
+                            packedConfig = config.pack()
+                        }
+                    }
 
-                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.enum_saved_doc), Toast.LENGTH_SHORT).show()
+                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                        FileOutputStream(it.fileDescriptor).use {
+                            it.write(packedConfig.toByteArray())
+                            it.close()
+                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
             }
+        }
+        catch (ex: java.lang.Exception)
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
         }
     }
 

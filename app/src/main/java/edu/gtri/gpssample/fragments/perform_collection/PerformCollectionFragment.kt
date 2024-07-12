@@ -1,6 +1,7 @@
 package edu.gtri.gpssample.fragments.perform_collection
 
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
@@ -57,6 +58,7 @@ import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -95,7 +97,9 @@ class PerformCollectionFragment : Fragment(),
     private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
     private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
-    private val kExportTag = 2
+    private val kExportTag = 1
+    private val kFileLocationTag = 2
+
     private val fragmentResultListener = "PerformCollectionFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -583,8 +587,88 @@ class PerformCollectionFragment : Fragment(),
 
     override fun didSelectSecondButton(tag: Any?)
     {
-        var payload: String = ""
-        var message: String = ""
+        when(tag)
+        {
+            kExportTag -> {
+                ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), kFileLocationTag, this, true)
+            }
+            kFileLocationTag ->
+            {
+                exportToDevice()
+            }
+        }
+    }
+
+    fun exportToDefaultLocation()
+    {
+        try
+        {
+            var payload: String = ""
+            var fileName: String = ""
+
+            val user = (activity!!.application as MainApplication).user
+
+            var userName = user!!.name.replace(" ", "" ).uppercase()
+
+            if (userName.length > 3)
+            {
+                userName = userName.substring(0,3)
+            }
+
+            val role = user.role.toString().substring(0,1).uppercase()
+
+            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
+            val dateTime = LocalDateTime.now().format(formatter)
+            var version = ""
+            val versionName = BuildConfig.VERSION_NAME.split( "#" )
+            if (versionName.size == 2)
+            {
+                version = versionName[1]
+            }
+
+            val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+
+            when(user.role) {
+                Role.Admin.toString(),
+                Role.Supervisor.toString() ->
+                {
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}.json"
+                        payload = config.packMinimal()
+                    }
+                }
+
+                Role.Enumerator.toString(),
+                Role.DataCollector.toString() ->
+                {
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                            fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                            payload = config.pack()
+                        }
+                    }
+                }
+            }
+
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
+            root.mkdirs()
+            val file = File(root, fileName)
+            val writer = FileWriter(file)
+            writer.append(payload)
+            writer.flush()
+            writer.close()
+
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+        }
+        catch( ex: Exception )
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun exportToDevice()
+    {
         var fileName: String = ""
 
         val user = (activity!!.application as MainApplication).user
@@ -609,72 +693,114 @@ class PerformCollectionFragment : Fragment(),
 
         val clusterName = enumArea.name.replace(" ", "" ).uppercase()
 
-        when(user.role) {
-            Role.Admin.toString(),
-            Role.Supervisor.toString() ->
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            when(user.role)
             {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
+                Role.Admin.toString(),
+                Role.Supervisor.toString() ->
+                {
                     fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}.json"
-                    payload = config.packMinimal()
-                    message = resources.getString(R.string.config_saved_doc)
                 }
-            }
 
-            Role.Enumerator.toString(),
-            Role.DataCollector.toString() ->
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                        fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                        payload = config.pack()
-                        message = resources.getString(R.string.collection_saved_doc)
-                    }
+                Role.Enumerator.toString(),
+                Role.DataCollector.toString() ->
+                {
+                    fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
                 }
             }
         }
 
-        val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
-        root.mkdirs()
-        val file = File(root, fileName)
-        val writer = FileWriter(file)
-        writer.append(payload)
-        writer.flush()
-        writer.close()
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+            putExtra(Intent.EXTRA_TITLE, fileName)
+        }
 
-        Toast.makeText(activity!!.applicationContext, message, Toast.LENGTH_SHORT).show()
+        startActivityForResult( intent, REQUEST_CODE_PICK_DIR )
+    }
+
+    val REQUEST_CODE_PICK_DIR = 1001
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        try
+        {
+            if (requestCode == REQUEST_CODE_PICK_DIR && resultCode == Activity.RESULT_OK)
+            {
+                data?.data?.let { uri ->
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        var packedConfig = ""
+
+                        when( user.role )
+                        {
+                            Role.Supervisor.toString(), Role.Admin.toString() ->
+                            {
+                                packedConfig = config.packMinimal()
+                            }
+
+                            Role.Enumerator.toString() ->
+                            {
+                                packedConfig = config.pack()
+                            }
+                        }
+
+                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                            FileOutputStream(it.fileDescriptor).use {
+                                it.write(packedConfig.toByteArray())
+                                it.close()
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (ex: java.lang.Exception)
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectFirstButton(tag: Any?)
     {
-        // Launch connection screen
-        view?.let{ view ->
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                sharedNetworkViewModel.setCurrentConfig(config)
+        when (tag)
+        {
+            kExportTag -> {
+                view?.let{ view ->
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        sharedNetworkViewModel.setCurrentConfig(config)
 
-                when(user.role)
-                {
-                    Role.Admin.toString(),
-                    Role.Supervisor.toString() ->
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                        sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                        startHotspot(view)
-                    }
+                        when(user.role)
+                        {
+                            Role.Admin.toString(),
+                            Role.Supervisor.toString() ->
+                            {
+                                sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                startHotspot(view)
+                            }
 
-                    Role.Enumerator.toString(),
-                    Role.DataCollector.toString() ->
-                    {
-                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                            sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                            sharedNetworkViewModel.networkClientModel.currentConfig = config
-                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                            getResult.launch(intent)
+                            Role.Enumerator.toString(),
+                            Role.DataCollector.toString() ->
+                            {
+                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                                    sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                    getResult.launch(intent)
+                                }
+                            }
+                            else -> {}
                         }
                     }
-                    else -> {}
                 }
+            }
+
+            kFileLocationTag -> {
+                exportToDefaultLocation()
             }
         }
     }
