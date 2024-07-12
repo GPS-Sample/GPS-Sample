@@ -363,6 +363,11 @@
     <string name="set_boundary">"Нарисовать границу"</string>
     <string name="update_boundary">"Обновить границу"</string>
     <string name="location_image">"изображение местоположения"</string>
+    <string name="review_all_teams">"Обзор всех команд"</string>
+    <string name="config_saved">"Конфигурация была сохранена."</string>
+    <string name="select_file_location">"Выберите местоположение файла"</string>
+    <string name="default_location">"Расположение по умолчанию"</string>
+    <string name="let_me_choose">"Позвольте мне выбрать"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

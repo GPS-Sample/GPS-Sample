@@ -363,6 +363,11 @@
     <string name="set_boundary">"Desenhar limite"</string>
     <string name="update_boundary">"Atualizar limites"</string>
     <string name="location_image">"Imagem de localização"</string>
+    <string name="review_all_teams">"Rever todas as equipas"</string>
+    <string name="config_saved">"A configuração foi guardada."</string>
+    <string name="select_file_location">"Selecionar a localização do ficheiro"</string>
+    <string name="default_location">"Localização predefinida"</string>
+    <string name="let_me_choose">"Deixem-me escolher"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

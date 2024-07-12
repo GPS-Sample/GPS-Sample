@@ -363,6 +363,11 @@
     <string name="set_boundary">"Ngambar Wates"</string>
     <string name="update_boundary">"Unyarang wates"</string>
     <string name="location_image">"Gambar lokasi"</string>
+    <string name="review_all_teams">"Tinjau Semua Tim"</string>
+    <string name="config_saved">"Konfigurasi telah disimpan."</string>
+    <string name="select_file_location">"Pilih lokasi file"</string>
+    <string name="default_location">"Lokasi bawaan"</string>
+    <string name="let_me_choose">"Biarkan aku memilih"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

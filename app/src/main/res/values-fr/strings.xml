@@ -363,6 +363,11 @@
     <string name="set_boundary">"Tracer la frontière"</string>
     <string name="update_boundary">"Mettre à jour les limites"</string>
     <string name="location_image">"Image de l'emplacement"</string>
+    <string name="review_all_teams">"Examinez toutes les équipes"</string>
+    <string name="config_saved">"La configuration a été enregistrée."</string>
+    <string name="select_file_location">"Sélectionnez l'emplacement du fichier"</string>
+    <string name="default_location">"Emplacement par défaut"</string>
+    <string name="let_me_choose">"Laissez-moi choisir"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

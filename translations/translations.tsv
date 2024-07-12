@@ -389,3 +389,8 @@ set_location	Define Limits (lxw)	Definir Límites (l x a)	Définir les limites (
 set_boundary	Draw Boundary	Dibujar límite	Tracer la frontière	Desenhar limite	Нарисовать границу	Ngambar Wates	
 update_boundary	Update Boundary	Actualizar límites	Mettre à jour les limites	Atualizar limites	Обновить границу	Unyarang wates	
 location_image	Location Image	Imagen de ubicación	Image de l'emplacement	Imagem de localização	изображение местоположения	Gambar lokasi	
+review_all_teams	Review All Teams	Revisar todos los equipos	Examinez toutes les équipes	Rever todas as equipas	Обзор всех команд	Tinjau Semua Tim	
+config_saved	Configuration has been saved.	Se ha guardado la configuración.	La configuration a été enregistrée.	A configuração foi guardada.	Конфигурация была сохранена.	Konfigurasi telah disimpan.	
+select_file_location	Select the file location	Seleccione la ubicación del archivo	Sélectionnez l'emplacement du fichier	Selecionar a localização do ficheiro	Выберите местоположение файла	Pilih lokasi file	
+default_location	Default location	Ubicación por defecto	Emplacement par défaut	Localização predefinida	Расположение по умолчанию	Lokasi bawaan	
+let_me_choose	Let me choose	Déjame elegir	Laissez-moi choisir	Deixem-me escolher	Позвольте мне выбрать	Biarkan aku memilih	
