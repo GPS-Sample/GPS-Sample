@@ -196,8 +196,14 @@ class LatLonDAO(private var dao: DAO)
 
     fun delete( latLon: LatLon )
     {
-        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        var whereClause = "${DAO.COLUMN_LAT_LON_UUID} = ?"
         val args = arrayOf(latLon.uuid)
+
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_ENUM_AREA__LAT_LON, whereClause, args)
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON, whereClause, args)
+        dao.writableDatabase.delete(DAO.CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON, whereClause, args)
+
+        whereClause = "${DAO.COLUMN_UUID} = ?"
 
         dao.writableDatabase.delete(DAO.TABLE_LAT_LON, whereClause, args)
     }

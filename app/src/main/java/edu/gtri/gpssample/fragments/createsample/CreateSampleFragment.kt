@@ -40,7 +40,7 @@ import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
-import java.util.ArrayList
+import java.util.*
 
 class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDialog.ConfirmationDialogDelegate
 {
@@ -352,10 +352,11 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
     {
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-            val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-            val northWest = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.southwest.longitude )
-            val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-            val southEast = LatLon( 0,latLngBounds.southwest.latitude, latLngBounds.northeast.longitude )
+            var creationDate = Date().time
+            val northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val northWest = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.southwest.longitude )
+            val southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            val southEast = LatLon( creationDate++,latLngBounds.southwest.latitude, latLngBounds.northeast.longitude )
 
             for (vertice in enumArea.vertices)
             {
@@ -368,7 +369,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
             enumArea.vertices.add( northEast )
             enumArea.vertices.add( southEast )
             enumArea.vertices.add( southWest )
-            enumArea.vertices.add( northWest )
 
             DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
 
