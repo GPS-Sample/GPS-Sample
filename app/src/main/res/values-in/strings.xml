@@ -368,6 +368,7 @@
     <string name="select_file_location">"Pilih lokasi file"</string>
     <string name="default_location">"Lokasi bawaan"</string>
     <string name="let_me_choose">"Biarkan aku memilih"</string>
+    <string name="boundary_is_self_intersecting">"Batas Wilayah Pencacahan ini berpotongan dengan sendirinya. Apakah Anda ingin memperbaiki batasnya?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

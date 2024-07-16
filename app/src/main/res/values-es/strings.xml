@@ -368,6 +368,7 @@
     <string name="select_file_location">"Seleccione la ubicación del archivo"</string>
     <string name="default_location">"Ubicación por defecto"</string>
     <string name="let_me_choose">"Déjame elegir"</string>
+    <string name="boundary_is_self_intersecting">"El límite de esta zona de enumeración es auto-intersecante. Desea corregir el límite?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

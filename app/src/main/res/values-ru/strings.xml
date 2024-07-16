@@ -368,6 +368,7 @@
     <string name="select_file_location">"Выберите местоположение файла"</string>
     <string name="default_location">"Расположение по умолчанию"</string>
     <string name="let_me_choose">"Позвольте мне выбрать"</string>
+    <string name="boundary_is_self_intersecting">"Граница этого района перечисления является самопересекающейся. Вы хотите исправить границу?"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
