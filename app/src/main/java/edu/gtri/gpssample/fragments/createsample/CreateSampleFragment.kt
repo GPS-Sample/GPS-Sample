@@ -245,12 +245,12 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
             }
         }
 
-//        if (MapboxManager.isSelfIntersectingPolygon3( enumArea.vertices))
-//        {
-//            ConfirmationDialog( activity, resources.getString(R.string.oops),
-//                resources.getString(R.string.boundary_is_self_intersecting),
-//                resources.getString(R.string.no), resources.getString(R.string.yes), null, this@CreateSampleFragment)
-//        }
+        if (MapboxManager.isSelfIntersectingPolygon3( enumArea.vertices))
+        {
+            ConfirmationDialog( activity, resources.getString(R.string.oops),
+                resources.getString(R.string.boundary_is_self_intersecting),
+                resources.getString(R.string.no), resources.getString(R.string.yes), null, this@CreateSampleFragment)
+        }
     }
 
     override fun didSelectFirstButton(tag: Any?)
@@ -259,6 +259,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
     override fun didSelectSecondButton(tag: Any?)
     {
+        redefineEnumerationAreaBoundary()
     }
 
     override fun onResume()
@@ -353,10 +354,12 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
             var creationDate = Date().time
-            val northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+
             val northWest = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.southwest.longitude )
-            val southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            val northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
             val southEast = LatLon( creationDate++,latLngBounds.southwest.latitude, latLngBounds.northeast.longitude )
+            val southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            val northWest2 = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.southwest.longitude )
 
             for (vertice in enumArea.vertices)
             {
@@ -369,6 +372,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
             enumArea.vertices.add( northEast )
             enumArea.vertices.add( southEast )
             enumArea.vertices.add( southWest )
+            enumArea.vertices.add( northWest2 )
 
             DAO.enumAreaDAO.createOrUpdateEnumArea( enumArea )
 
