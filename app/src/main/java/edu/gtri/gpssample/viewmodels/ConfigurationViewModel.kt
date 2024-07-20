@@ -49,10 +49,9 @@ class ConfigurationViewModel : ViewModel()
     val currentConfiguration : LiveData<Config>?
         get() = _currentConfiguration
 
+    val timeFormats = arrayOf( "", "" )
     val distanceFormats = arrayOf( "", "" )
-
-    val timeFormats : Array<String>
-        get() = TimeFormatConverter.array
+    val minimumGpsPrecisionFormats = arrayOf( "", "" )
 
     val dateFormats : Array<String>
         get() = DateFormatConverter.array
@@ -85,16 +84,53 @@ class ConfigurationViewModel : ViewModel()
     val timeFormatPosition : MutableLiveData<Int>
         get() = _timeFormatPosition
 
-    val currentConfigurationTimeFormat : String
-        get(){
+    val currentConfigurationMinimumGpsPrecision : String
+        get() {
             currentConfiguration?.value?.let {config ->
-                return config.timeFormat.format
+                if (config.distanceFormat == DistanceFormat.Meters)
+                {
+                    return "${config.minGpsPrecision} ${minimumGpsPrecisionFormats[0]}"
+                }
+                else
+                {
+                    return "${config.minGpsPrecision} ${minimumGpsPrecisionFormats[1]}"
+                }
+            }
+            return unavailable
+        }
+
+    val currentConfigurationProximityWarning : String
+        get() {
+            currentConfiguration?.value?.let {config ->
+                if (config.distanceFormat == DistanceFormat.Meters)
+                {
+                    return "${config.proximityWarningValue} ${minimumGpsPrecisionFormats[0]}"
+                }
+                else
+                {
+                    return "${config.proximityWarningValue} ${minimumGpsPrecisionFormats[1]}"
+                }
+            }
+            return unavailable
+        }
+
+    val currentConfigurationTimeFormat : String
+        get() {
+            currentConfiguration?.value?.let {config ->
+                if (config.timeFormat == TimeFormat.twelveHour)
+                {
+                    return timeFormats[0]
+                }
+                else
+                {
+                    return timeFormats[1]
+                }
             }
             return unavailable
         }
 
     val currentConfigurationDistanceFormat : String
-        get(){
+        get() {
             currentConfiguration?.value?.let {config ->
                 if (config.distanceFormat == DistanceFormat.Meters)
                 {
@@ -154,11 +190,14 @@ class ConfigurationViewModel : ViewModel()
 
     fun onTimeFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
-        if(position < timeFormats.size)
-        {
-            val time : String = timeFormats[position]
-            _currentConfiguration?.value?.let {
-                it.timeFormat = TimeFormatConverter.fromString(time)
+        _currentConfiguration?.value?.let {
+            if (position == 0)
+            {
+                it.timeFormat = TimeFormat.twelveHour
+            }
+            else
+            {
+                it.timeFormat = TimeFormat.twentyFourHour
             }
         }
     }

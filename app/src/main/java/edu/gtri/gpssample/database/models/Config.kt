@@ -88,18 +88,7 @@ data class Config(
 
     var minimumGPSPrecision : String
         get() {
-            if (distanceFormat == DistanceFormat.Meters)
-            {
-                return "${minGpsPrecision} meters"
-            }
-            else if (distanceFormat == DistanceFormat.Feet)
-            {
-                return "${minGpsPrecision} feet"
-            }
-            else
-            {
-                return minGpsPrecision.toString()
-            }
+            return minGpsPrecision.toString()
         }
         set(value){
             value.toIntOrNull()?.let {
@@ -110,18 +99,7 @@ data class Config(
 
     var proximityWarningStringValue : String
         get() {
-            if (distanceFormat == DistanceFormat.Meters)
-            {
-                return "${proximityWarningValue} meters"
-            }
-            else if (distanceFormat == DistanceFormat.Feet)
-            {
-                return "${proximityWarningValue} feet"
-            }
-            else
-            {
-                return proximityWarningValue.toString()
-            }
+            return proximityWarningValue.toString()
         }
         set(value){
             value.toIntOrNull()?.let {

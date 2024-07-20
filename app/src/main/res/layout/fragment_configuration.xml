@@ -185,7 +185,7 @@
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
-                            android:text="@={viewModel.currentConfiguration.minimumGPSPrecision}"/>
+                            android:text="@{viewModel.currentConfigurationMinimumGpsPrecision}"/>
 
                         <TextView
                             android:layout_width="match_parent"
@@ -313,7 +313,7 @@
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="20dp"
                             android:textSize="17sp"
-                            android:text="@{viewModel.currentConfiguration.proximityWarningStringValue}" />
+                            android:text="@{viewModel.currentConfigurationProximityWarning}"/>
                     </LinearLayout>
 
                     <Space

@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -102,6 +103,13 @@ class ManageConfigurationsFragment : Fragment(),
         val distanceFormats = resources.getTextArray( R.array.distance_formats )
         sharedViewModel.distanceFormats[0] = distanceFormats[0].toString()
         sharedViewModel.distanceFormats[1] = distanceFormats[1].toString()
+
+        val timeFormats = resources.getTextArray( R.array.time_formats )
+        sharedViewModel.timeFormats[0] = timeFormats[0].toString()
+        sharedViewModel.timeFormats[1] = timeFormats[1].toString()
+
+        sharedViewModel.minimumGpsPrecisionFormats[0] = resources.getString(R.string.meters)
+        sharedViewModel.minimumGpsPrecisionFormats[1] = resources.getString(R.string.feet)
 
         binding.overlayView.visibility = View.VISIBLE
 
