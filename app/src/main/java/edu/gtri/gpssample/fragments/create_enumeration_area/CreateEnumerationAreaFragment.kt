@@ -13,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
@@ -77,6 +79,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     OnCameraChangeListener,
     InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
+    DropdownDialog.DropdownDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
@@ -1322,14 +1325,58 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
-        super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
         {
             data?.data?.let { uri ->
-                inputDialog = InputDialog( activity!!, false, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
+                activity!!.getContentResolver().openInputStream(uri)?.let {
+                    val text = it.bufferedReader().readText()
+
+                    val featureCollection = FeatureCollection.fromJson( text )
+
+                    if (featureCollection.features.isNotEmpty())
+                    {
+                        val feature = featureCollection.features[0]
+                        val keys = ArrayList(feature.properties.keys)
+                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
+                    }
+                    else
+                    {
+                        didSelectSaveButton( text, "" )
+                    }
+                }
             }
         }
+    }
+
+    override fun didSelectSaveButton( json: String, response: String )
+    {
+        activity!!.runOnUiThread {
+            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+        }
+
+        Thread {
+            try
+            {
+                parseGeoJson( json, response )
+            }
+            catch( ex: Exception)
+            {
+                activity!!.runOnUiThread {
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            busyIndicatorDialog?.let {
+                activity!!.runOnUiThread {
+                    it.alertDialog.cancel()
+                }
+            }
+        }.start()
+    }
+
+    override fun didSelectCancelButton( json: String )
+    {
+        didSelectSaveButton( json, "" )
     }
 
     fun parseGeoJson( text: String, nameKey: String )
