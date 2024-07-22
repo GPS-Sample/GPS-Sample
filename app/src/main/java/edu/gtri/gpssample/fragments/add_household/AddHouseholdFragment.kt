@@ -23,14 +23,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
-import edu.gtri.gpssample.dialogs.AdditionalInfoDialog
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.ImageDialog
-import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.io.ByteArrayInputStream
@@ -39,7 +37,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate, ImageDialog.ImageDialogDelegate
+class AddHouseholdFragment : Fragment(),
+    ImageDialog.ImageDialogDelegate,
+    InputDialog.InputDialogDelegate,
+    ConfirmationDialog.ConfirmationDialogDelegate,
+    AdditionalInfoDialog.AdditionalInfoDialogDelegate
 {
     private var _binding: FragmentAddHouseholdBinding? = null
     private val binding get() = _binding!!
@@ -48,6 +50,7 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
     private lateinit var config: Config
     private lateinit var location: Location
     private lateinit var enumArea : EnumArea
+    private var inputDialog: InputDialog? = null
     private lateinit var enumTeam: EnumerationTeam
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -247,6 +250,10 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         binding.subaddressEditText.setText( enumerationItem.subAddress )
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
+
+        binding.subaddressEditText.setOnClickListener {
+            inputDialog = InputDialog( activity!!, true, resources.getString(R.string.subaddress), "", resources.getString(R.string.cancel), resources.getString(R.string.save), 0, this, false )
+        }
 
         if (enumerationItem.uuid.isNotEmpty())
         {
@@ -571,5 +578,31 @@ class AddHouseholdFragment : Fragment(), AdditionalInfoDialog.AdditionalInfoDial
         super.onDestroyView()
 
         _binding = null
+    }
+
+    override fun didCancelText(tag: Any?)
+    {
+    }
+
+    override fun didPressQrButton()
+    {
+        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+        getResult.launch(intent)
+    }
+
+    private val getResult =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == ResultCode.BarcodeScanned.value) {
+                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
+                inputDialog?.editText?.let { editText ->
+                    editText.setText( payload.toString())
+                }
+            }
+        }
+
+    override fun didEnterText(text: String, tag: Any?)
+    {
+        binding.subaddressEditText.setText( text )
     }
 }

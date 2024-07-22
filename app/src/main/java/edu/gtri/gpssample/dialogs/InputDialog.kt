@@ -13,7 +13,6 @@ class InputDialog
     interface InputDialogDelegate
     {
         fun didPressQrButton() {}
-
         fun didCancelText( tag: Any? )
         fun didEnterText( text: String, tag: Any? )
     }
