@@ -3,6 +3,7 @@ package edu.gtri.gpssample.activities
 import android.app.Application
 import android.content.*
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -123,8 +124,15 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
 
         intentFilter = IntentFilter()
         intentFilter.addAction(NetworkMonitorService.NETWORK_SERVICE_STATUS_KEY)
-        registerReceiver(networkStatusBroadcastReceiver, intentFilter)
 
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU)
+        {
+            registerReceiver(networkStatusBroadcastReceiver, intentFilter, RECEIVER_EXPORTED)
+        }
+        else
+        {
+            registerReceiver(networkStatusBroadcastReceiver, intentFilter)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle)
