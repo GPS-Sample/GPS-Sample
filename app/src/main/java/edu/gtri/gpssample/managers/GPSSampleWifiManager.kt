@@ -70,21 +70,21 @@ class GPSSampleWifiManager//( val fragment: Fragment )
         {
             try
             {
-                val oldWifiAdresses = NetworkUtils.getWifiApIpAddresses()
+                val oldInetAdresses = NetworkUtils.getInetAddresses()
                 val wifiManager = activity!!.applicationContext.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
 
-                wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback()
+                wifiManager.startLocalOnlyHotspot( object : WifiManager.LocalOnlyHotspotCallback()
                 {
-                    override fun onFailed(reason: Int) {
+                    override fun onFailed(reason: Int)
+                    {
                         super.onFailed(reason)
-                        // do somthing
-                        Log.d("HOTSPOT", "THIS FAILED")
                     }
 
-                    override fun onStopped() {
+                    override fun onStopped()
+                    {
                         super.onStopped()
-                        Log.d("HOTSPOT", "Stopped")
                     }
+
                     override fun onStarted(reservation: WifiManager.LocalOnlyHotspotReservation)
                     {
                         super.onStarted(reservation)
@@ -93,26 +93,25 @@ class GPSSampleWifiManager//( val fragment: Fragment )
 
                         val ssid = wifiConfiguration!!.SSID //reservation.softApConfiguration.ssid
                         val pass = wifiConfiguration!!.preSharedKey //reservation.softApConfiguration.passphrase
-                        //_hotspotSSID = MutableLiveData(ssid)
 
                         _hotspotSSID.value = ssid //.postValue(ssid)
                         _hotspotSSIDPassword.value = pass
-                        val newWifiAddresses = NetworkUtils.getWifiApIpAddresses()
+                        val newInetAddresses = NetworkUtils.getInetAddresses()
 
-                        if (oldWifiAdresses.isEmpty())
+                        if (oldInetAdresses.isEmpty())
                         {
-                            if (!newWifiAddresses.isEmpty())
+                            if (!newInetAddresses.isEmpty())
                             {
-                                serverInetAddress = newWifiAddresses[0]
+                                serverInetAddress = newInetAddresses[0]
                             }
                         }
                         else
                         {
-                            for (oldAddr in oldWifiAdresses)
+                            for (oldAddr in oldInetAdresses)
                             {
-                                for (newAddr in newWifiAddresses)
+                                for (newAddr in newInetAddresses)
                                 {
-                                    if (newAddr.hostAddress.equals( oldAddr.hostAddress ))
+                                    if (newAddr.hostAddress!!.equals( oldAddr.hostAddress ))
                                     {
                                         continue
                                     }
@@ -125,39 +124,35 @@ class GPSSampleWifiManager//( val fragment: Fragment )
                             }
                         }
 
-                        if (serverInetAddress != null)
-                        {
-                            val components = serverInetAddress!!.hostAddress.split(".")
-                            val broadcast_address = components[0] + "." + components[1] + "." + components[2] + ".255"
-                            broadcastInetAddress = InetAddress.getByName( broadcast_address )
-                            _hotspotIP.value = serverInetAddress!!.hostAddress
-                            _hotspotIP.postValue(serverInetAddress!!.hostAddress)
-                            _hotspotStarted = true
-                            delegate.didCreateHotspot(true, serverInetAddress!!)
-
+                        serverInetAddress?.let { serverInetAddress ->
+                            serverInetAddress.hostAddress?.let { hostAddress ->
+                                val components = hostAddress.split(".")
+                                val broadcast_address = components[0] + "." + components[1] + "." + components[2] + ".255"
+                                broadcastInetAddress = InetAddress.getByName( broadcast_address )
+                                _hotspotIP.value = hostAddress
+                                _hotspotIP.postValue(hostAddress)
+                                _hotspotStarted = true
+                                delegate.didCreateHotspot(true, serverInetAddress )
+                            }
                         }
-
                     }
-                },
-                    Handler())
-
-            } catch(e: Exception) {
-                Log.d( "xxTHE ERROR x", e.message!!)
+                }, Handler())
+            }
+            catch(e: Exception) {
+                Log.d( "xxx", e.stackTraceToString())
                 delegate.didCreateHotspot(false, null)
                 throw(e)
             }
 
         }
-        // the hotspot is up
-        else{
+        else // the hotspot is up
+        {
             serverInetAddress?.let {serverInetAddress ->
                 delegate.didCreateHotspot(true, serverInetAddress)
             }?: run {
                 delegate.didCreateHotspot(false, null)
             }
-
         }
-
     }
 
     fun getWifiApIpAddresses2(): ArrayList<InetAddress> {

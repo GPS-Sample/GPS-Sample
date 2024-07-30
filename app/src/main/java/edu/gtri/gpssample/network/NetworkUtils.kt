@@ -74,28 +74,35 @@ object NetworkUtils {
         return true
     }
 
-    fun getWifiApIpAddresses(): ArrayList<InetAddress> {
+    fun getInetAddresses(): ArrayList<InetAddress>
+    {
         val list = ArrayList<InetAddress>()
-        try {
-            val en: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
-            while (en.hasMoreElements()) {
-                val intf: NetworkInterface = en.nextElement()
-                if (intf.getName().contains("wlan")) {
-                    val enumIpAddr: Enumeration<InetAddress> = intf.getInetAddresses()
-                    while (enumIpAddr.hasMoreElements()) {
-                        val inetAddress: InetAddress = enumIpAddr.nextElement()
-                        if (!inetAddress.isLoopbackAddress()) {
-                            val inetAddr = inetAddress.hostAddress!!
-                            if (!inetAddr.contains(":")) {
-                                list.add( inetAddress)
-                            }
-                        }
+
+        try
+        {
+            val networkInterfaces: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
+
+            while (networkInterfaces.hasMoreElements())
+            {
+                val networkInterface: NetworkInterface = networkInterfaces.nextElement()
+                val inetAddresses: Enumeration<InetAddress> = networkInterface.getInetAddresses()
+
+                while (inetAddresses.hasMoreElements())
+                {
+                    val inetAddress: InetAddress = inetAddresses.nextElement()
+
+                    if (!inetAddress.isLoopbackAddress() && !inetAddress.hostAddress!!.contains(":"))
+                    {
+                        list.add( inetAddress )
                     }
                 }
             }
-        } catch (ex: Exception) {
-            Log.e("xxx", ex.toString())
         }
+        catch (ex: Exception)
+        {
+            Log.d("xxx", ex.stackTraceToString())
+        }
+
         return list
     }
 
