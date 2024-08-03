@@ -21,6 +21,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -31,11 +32,15 @@ import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.collections.HashMap
 
 class AddHouseholdFragment : Fragment(),
     ImageDialog.ImageDialogDelegate,
@@ -52,6 +57,7 @@ class AddHouseholdFragment : Fragment(),
     private lateinit var enumArea : EnumArea
     private var inputDialog: InputDialog? = null
     private lateinit var enumTeam: EnumerationTeam
+    private var propertyAdapter : PropertyAdapter? = null
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
@@ -251,8 +257,11 @@ class AddHouseholdFragment : Fragment(),
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
 
-        binding.subaddressEditText.setOnClickListener {
-            inputDialog = InputDialog( activity!!, true, resources.getString(R.string.subaddress), "", resources.getString(R.string.cancel), resources.getString(R.string.save), 0, this, false )
+        if (editMode)
+        {
+            binding.subaddressEditText.setOnClickListener {
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.subaddress), "", resources.getString(R.string.cancel), resources.getString(R.string.save), 0, this, false )
+            }
         }
 
         if (enumerationItem.uuid.isNotEmpty())
@@ -279,6 +288,27 @@ class AddHouseholdFragment : Fragment(),
             {
                 binding.additionalInfoLayout.visibility = View.VISIBLE
             }
+        }
+
+        if (location.properties.isNotEmpty())
+        {
+            val jsonObject = JSONObject( location.properties )
+
+            val keys = ArrayList<String>()
+            val values = ArrayList<String>()
+
+            for (key in jsonObject.keys())
+            {
+                keys.add( key )
+                values.add( jsonObject.getString(key))
+            }
+
+            propertyAdapter = PropertyAdapter( keys, values, editMode )
+
+            binding.propertyRecyclerView.visibility = View.VISIBLE
+            binding.propertyRecyclerView.adapter = propertyAdapter
+            binding.propertyRecyclerView.itemAnimator = DefaultItemAnimator()
+            binding.propertyRecyclerView.layoutManager = LinearLayoutManager(context)
         }
 
         if (location.imageData.isNotEmpty())
@@ -486,12 +516,33 @@ class AddHouseholdFragment : Fragment(),
             enumerationItem.enumerationState = EnumerationState.Enumerated
         }
 
-        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-
         enumerationItem.enumerationNotes = notes
         enumerationItem.enumerationDate = Date().time
         enumerationItem.syncCode = enumerationItem.syncCode + 1
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
+
+        propertyAdapter?.let { propertyAdapter ->
+            val jsonObject = JSONObject( location.properties )
+
+            val keys = ArrayList<String>()
+            val values = ArrayList<String>()
+
+            for (key in jsonObject.keys())
+            {
+                keys.add( key )
+                values.add( jsonObject.getString(key))
+            }
+
+            for (i in 0..(values.size-1))
+            {
+                if (values[i] != propertyAdapter.values[i])
+                {
+                    jsonObject.put( keys[i], propertyAdapter.values[i])
+                }
+            }
+
+            location.properties = jsonObject.toString()
+        }
 
         (activity!!.application as MainApplication).user?.let { user ->
             enumerationItem.enumeratorName = user.name

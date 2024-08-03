@@ -218,6 +218,12 @@
                             android:layout_width="0dp"
                             android:layout_height="50dp"/>
                     </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:visibility="gone"
+                        android:id="@+id/property_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
                 </LinearLayout>
 
                 <LinearLayout

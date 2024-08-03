@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
+import android.util.Property
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -79,6 +80,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     OnCameraChangeListener,
     InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
+    CheckboxDialog.CheckboxDialogDelegate,
     DropdownDialog.DropdownDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
@@ -102,8 +104,10 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var createEnumAreaBoundary = false
     private var inputDialog: InputDialog? = null
     private val polygonHashMap = HashMap<Long,Any>()
+    private var checkboxDialog: CheckboxDialog? = null
     private var point: com.mapbox.geojson.Point? = null
     private val pointHashMap = HashMap<Long,Location>()
+    private var propertySelections = ArrayList<String>()
     private val unsavedEnumAreas = ArrayList<EnumArea>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private val unsavedMapTileRegions = ArrayList<MapTileRegion>()
@@ -872,7 +876,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         enumArea?.let{  enumArea ->
             val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-            val location = Location( timeZone, LocationType.Enumeration, -1, latitude, longitude, altitude, false, "")
+            val location = Location( timeZone, LocationType.Enumeration, -1, latitude, longitude, altitude, false, "", "")
             enumArea.locations.add(location)
             refreshMap()
         }
@@ -1336,19 +1340,40 @@ class CreateEnumerationAreaFragment : Fragment(),
                     if (featureCollection.features.isNotEmpty())
                     {
                         val feature = featureCollection.features[0]
-                        val keys = ArrayList(feature.properties.keys)
-                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
+
+                        feature.geometry?.let { geometry ->
+                            val keys = ArrayList(feature.properties.keys)
+                            when (geometry) {
+                                is MultiPolygon -> {
+                                    DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
+                                }
+                                is Point -> {
+                                    checkboxDialog = CheckboxDialog( activity!!, "Please select the HH identifiers to import", keys, text, feature, this )
+                                }
+                                else -> {}
+                            }
+                        }
                     }
                     else
                     {
-                        didSelectSaveButton( text, "" )
+                        dropdownDidSelectSaveButton( text, "" )
                     }
                 }
             }
         }
     }
 
-    override fun didSelectSaveButton( json: String, response: String )
+    override fun checkboxDialogDidSelectSaveButton( json: String, selections: ArrayList<String> )
+    {
+        propertySelections = selections
+        dropdownDidSelectSaveButton( json, "" )
+    }
+
+    override fun checkboxDialogDidSelectCancelButton()
+    {
+    }
+
+    override fun dropdownDidSelectSaveButton( json: String, response: String )
     {
         activity!!.runOnUiThread {
             busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
@@ -1374,14 +1399,18 @@ class CreateEnumerationAreaFragment : Fragment(),
         }.start()
     }
 
-    override fun didSelectCancelButton( json: String )
+    override fun dropdownDidSelectCancelButton( json: String )
     {
-        didSelectSaveButton( json, "" )
+        dropdownDidSelectSaveButton( json, "" )
+    }
+
+    data class PointWithProperty( var point: Point, var property: String )
+    {
     }
 
     fun parseGeoJson( text: String, nameKey: String )
     {
-        val points = ArrayList<Point>()
+        val points = ArrayList<PointWithProperty>()
         val featureCollection = FeatureCollection.fromJson( text )
 
         featureCollection.forEach { feature ->
@@ -1413,8 +1442,36 @@ class CreateEnumerationAreaFragment : Fragment(),
                         unsavedMapTileRegions.add( MapTileRegion( northEast, southWest ))
                     }
                     is Point -> {
+                        val jsonArray = ArrayList<JSONObject>()
+
+                        var jsonString = ""
+
+                        for (selection in propertySelections)
+                        {
+                            if (selection.isNotEmpty())
+                            {
+                                val value = feature.getStringProperty( selection )
+
+                                if (jsonString.isEmpty())
+                                {
+                                    jsonString = "{"
+                                }
+                                else
+                                {
+                                    jsonString += ", "
+                                }
+
+                                jsonString += "\"${selection}\" : \"${value}\""
+                                val jsonObject = JSONObject()
+                                jsonObject.put( selection, value )
+                                jsonArray.add( jsonObject )
+                            }
+                        }
+
+                        jsonString += "}"
+
                         val point = geometry as Point
-                        points.add( point )
+                        points.add( PointWithProperty( point, jsonString ))
                     }
                     else -> {}
                 }
@@ -1460,17 +1517,17 @@ class CreateEnumerationAreaFragment : Fragment(),
                     val geometryFactory = GeometryFactory()
                     val geometry: Geometry = geometryFactory.createPolygon(enumAreaPoints.toTypedArray())
 
-                    val coordinate = Coordinate( point.coordinates.longitude, point.coordinates.latitude )
+                    val coordinate = Coordinate( point.point.coordinates.longitude, point.point.coordinates.latitude )
                     val geometry1 = geometryFactory.createPoint( coordinate )
                     if (geometry.contains( geometry1 ))
                     {
                         var altitude: Double = 0.0
-                        point.coordinates.altitude?.let {
+                        point.point.coordinates.altitude?.let {
                             altitude = it
                         }
 
                         val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                        val location = Location( timeZone, LocationType.Enumeration, -1, point.coordinates.latitude, point.coordinates.longitude, altitude, false, "" )
+                        val location = Location( timeZone, LocationType.Enumeration, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
 
                         enumArea.locations.add( location )
                         break // found! assuming that it can only exist in a single EA, for now!

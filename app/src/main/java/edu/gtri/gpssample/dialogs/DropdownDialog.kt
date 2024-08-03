@@ -11,8 +11,8 @@ class DropdownDialog
 {
     interface DropdownDialogDelegate
     {
-        fun didSelectSaveButton( json: String, response: String )
-        fun didSelectCancelButton( json: String )
+        fun dropdownDidSelectSaveButton( json: String, response: String )
+        fun dropdownDidSelectCancelButton( json: String )
     }
 
     constructor()
@@ -40,12 +40,12 @@ class DropdownDialog
         val secondButton = view.findViewById<Button>(R.id.right_button)
 
         firstButton.setOnClickListener {
-            delegate.didSelectCancelButton( json )
+            delegate.dropdownDidSelectCancelButton( json )
             alertDialog.dismiss()
         }
 
         secondButton.setOnClickListener {
-            delegate.didSelectSaveButton( json, spinner.selectedItem as String )
+            delegate.dropdownDidSelectSaveButton( json, spinner.selectedItem as String )
             alertDialog.dismiss()
         }
     }
