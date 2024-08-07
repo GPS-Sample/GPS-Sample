@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
     <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
+<!--    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />-->
 
     <application
         android:name=".application.MainApplication"
@@ -32,9 +32,6 @@
         android:theme="@style/Theme.GPSSample"
         tools:targetApi="31">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
