@@ -1554,7 +1554,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
+//        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
