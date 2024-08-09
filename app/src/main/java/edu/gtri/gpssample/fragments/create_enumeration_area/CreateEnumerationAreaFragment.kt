@@ -983,6 +983,15 @@ class CreateEnumerationAreaFragment : Fragment(),
         p1?.let { p1 ->
             if (p1.action == MotionEvent.ACTION_UP)
             {
+                if (polyLinePoints.size < 2)
+                {
+                    createMapTileCache = false
+                    binding.overlayView.visibility = View.GONE
+                    binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
+
+                    return false
+                }
+
                 val points = ArrayList<Coordinate>()
 
                 // close the polygon
