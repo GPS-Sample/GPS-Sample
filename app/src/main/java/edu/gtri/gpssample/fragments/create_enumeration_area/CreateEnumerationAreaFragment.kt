@@ -198,12 +198,15 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         )
 
-        showCurrentLocation = true
-        val locationComponentPlugin = binding.mapView.location
-        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-        binding.mapView.gestures.addOnMoveListener(onMoveListener)
-        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        if (config.enumAreas.isEmpty())
+        {
+            showCurrentLocation = true
+            val locationComponentPlugin = binding.mapView.location
+            locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+            locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+            binding.mapView.gestures.addOnMoveListener(onMoveListener)
+            binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        }
 
         binding.centerOnLocationButton.setOnClickListener {
             showCurrentLocation = !showCurrentLocation
