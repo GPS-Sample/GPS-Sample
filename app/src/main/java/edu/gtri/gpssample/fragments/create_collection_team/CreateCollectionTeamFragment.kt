@@ -214,9 +214,13 @@ class CreateCollectionTeamFragment : Fragment(),
                     {
                         val sampledItem = location.enumerationItems[0]
 
-                        if (sampledItem.samplingState == SamplingState.Sampled) {
-                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            mapboxManager.addMarker( point, R.drawable.home_light_blue )
+                        if (sampledItem.samplingState == SamplingState.Sampled)
+                        {
+                            if (!locationBelongsToTeam( location ))
+                            {
+                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                                mapboxManager.addMarker( point, R.drawable.home_light_blue )
+                            }
                         }
                     }
                     else
@@ -225,15 +229,34 @@ class CreateCollectionTeamFragment : Fragment(),
                         {
                             if (sampledItem.samplingState == SamplingState.Sampled)
                             {
-                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                mapboxManager.addMarker( point, R.drawable.multi_home_light_blue )
-                                break
+                                if (!locationBelongsToTeam( location ))
+                                {
+                                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                                    mapboxManager.addMarker( point, R.drawable.multi_home_light_blue )
+                                    break
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    fun locationBelongsToTeam( location: Location ) : Boolean
+    {
+        for (team in enumArea.collectionTeams)
+        {
+            for (locationUuid in team.locationUuids)
+            {
+                if (location.uuid == locationUuid)
+                {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     override fun onMapClick(point: Point): Boolean
@@ -297,7 +320,10 @@ class CreateCollectionTeamFragment : Fragment(),
                                 val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
                                 if (geometry2.contains(geometry3))
                                 {
-                                    locationUuids.add( location.uuid )
+                                    if (!locationBelongsToTeam(location))
+                                    {
+                                        locationUuids.add( location.uuid )
+                                    }
                                 }
                             }
                         }

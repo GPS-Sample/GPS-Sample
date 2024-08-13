@@ -201,11 +201,30 @@ class CreateEnumerationTeamFragment : Fragment(),
             {
                 if (!location.isLandmark)
                 {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    mapboxManager.addMarker( point, R.drawable.home_black )
+                    if (!locationBelongsToTeam( location ))
+                    {
+                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                        mapboxManager.addMarker( point, R.drawable.home_black )
+                    }
                 }
             }
         }
+    }
+
+    fun locationBelongsToTeam( location: Location ) : Boolean
+    {
+        for (team in enumArea.enumerationTeams)
+        {
+            for (locationUuid in team.locationUuids)
+            {
+                if (location.uuid == locationUuid)
+                {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     override fun onMapClick(point: Point): Boolean
@@ -269,7 +288,10 @@ class CreateEnumerationTeamFragment : Fragment(),
                                 val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
                                 if (polygon.contains(geometry3))
                                 {
-                                    locationUuids.add( location.uuid )
+                                    if (!locationBelongsToTeam(location))
+                                    {
+                                        locationUuids.add( location.uuid )
+                                    }
                                 }
                             }
                         }
