@@ -147,10 +147,11 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             {
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
+                editor.putInt( role, pin1 )
                 editor.putString( Keys.kUserName.value, name )
                 editor.commit()
 
-                val user = User( name, pin1, role, question, answer, false )
+                val user = User( name, role, question, answer, false )
                 DAO.userDAO.createUser( user )
 
                 val bundle = Bundle()

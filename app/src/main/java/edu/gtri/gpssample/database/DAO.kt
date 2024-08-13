@@ -21,7 +21,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_USER_ROLE + " TEXT" + "," +
                     COLUMN_USER_NAME + " TEXT" + "," +
-                    COLUMN_USER_PIN + " INTEGER" + "," +
                     COLUMN_USER_RECOVERY_QUESTION + " TEXT" + "," +
                     COLUMN_USER_RECOVERY_ANSWER + " TEXT" + "," +
                     COLUMN_USER_IS_ONLINE + " BOOLEAN" +
@@ -448,7 +447,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_USER = "user"
         const val COLUMN_USER_ROLE = "user_role"
         const val COLUMN_USER_NAME = "user_name"
-        const val COLUMN_USER_PIN = "user_pin"
         const val COLUMN_USER_RECOVERY_QUESTION = "user_recover_question"
         const val COLUMN_USER_RECOVERY_ANSWER = "user_recovery_answer"
         const val COLUMN_USER_IS_ONLINE = "user_is_online"
@@ -712,6 +710,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        private const val DATABASE_VERSION = 308
+        private const val DATABASE_VERSION = 309
     }
 }

@@ -105,8 +105,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             }
             else
             {
-                DAO.userDAO.getUser(binding.nameEditText.text.toString())?.let {
-                    ResetPinDialog( activity!!, it.pin.toString(), this@SignInFragment )
+                DAO.userDAO.getUser(binding.nameEditText.text.toString())?.let { user ->
+                    val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                    val pin = sharedPreferences.getInt( user.role!!, 0 )
+                    ResetPinDialog( activity!!, pin.toString(), this@SignInFragment )
                 } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }
@@ -126,12 +128,13 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
     fun checkPassword()
     {
-        val pin = binding.pinEditText.text.toString()
+        val pinText = binding.pinEditText.text.toString()
         val userName = binding.nameEditText.text.toString()
 
-        if (userName.isNotEmpty() && pin.isNotEmpty())
+        if (userName.isNotEmpty() && pinText.isNotEmpty())
         {
-            val user = DAO.userDAO.getUser(userName, pin)
+            val pin = pinText.toInt()
+            val user = DAO.userDAO.getUser(userName)
 
             user?.let { user ->
 
@@ -154,18 +157,23 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                 {
                     val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                     val editor = sharedPreferences.edit()
-                    editor.putString(Keys.kUserName.value, userName)
-                    editor.commit()
+                    val expectedPin = sharedPreferences.getInt( user.role!!, 0 )
 
-                    (activity!!.application as? MainApplication)?.user = user
+                    if (pin == expectedPin)
+                    {
+                        editor.putString(Keys.kUserName.value, userName)
+                        editor.commit()
 
-                    binding.pinEditText.setText("")
+                        (activity!!.application as? MainApplication)?.user = user
 
-                    setTitle( user )
+                        binding.pinEditText.setText("")
 
-                    val bundle = Bundle()
-                    bundle.putString(Keys.kRole.value, user.role)
-                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                        setTitle( user )
+
+                        val bundle = Bundle()
+                        bundle.putString(Keys.kRole.value, user.role)
+                        findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                    }
                 }
             }
         }
@@ -200,7 +208,9 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         user?.let {
             if (text == it.recoveryAnswer)
             {
-                NotificationDialog( activity!!, resources.getString(R.string.your_pin_is), it.pin.toString())
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val pin = sharedPreferences.getInt( user.role!!, 0 )
+                NotificationDialog( activity!!, resources.getString(R.string.your_pin_is), pin.toString())
             }
             else
             {
@@ -211,12 +221,17 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
     override fun didUpdatePin( pin: String )
     {
-        val userName = binding.nameEditText.text.toString()
-        val user = DAO.userDAO.getUser(userName)
+        if (pin.isNotEmpty())
+        {
+            val userName = binding.nameEditText.text.toString()
+            val user = DAO.userDAO.getUser(userName)
 
-        user?.let {
-            it.pin = pin.toInt()
-            DAO.userDAO.updateUser( it )
+            user?.let {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putInt( user.role, pin.toInt())
+                editor.commit()
+            }
         }
     }
 
@@ -233,7 +248,7 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
         val pin = binding.pinEditText.text.toString()
         val userName = binding.nameEditText.text.toString()
 
-        DAO.userDAO.getUser(userName, pin)?.let { user ->
+        DAO.userDAO.getUser(userName)?.let { user ->
             setTitle( user )
 
             val bundle = Bundle()

@@ -21,7 +21,7 @@
     <EditText
         android:id="@+id/current_pin_edit_text"
         android:hint="@string/enter_current_pin"
-        android:inputType="textCapWords"
+        android:inputType="number"
         android:imeOptions="actionDone"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
@@ -31,7 +31,7 @@
 
     <EditText
         android:id="@+id/pin1_edit_text"
-        android:inputType="textCapWords"
+        android:inputType="number"
         android:imeOptions="actionDone"
         android:hint="@string/enter_new_pin"
         android:layout_marginStart="20dp"
@@ -42,7 +42,7 @@
 
     <EditText
         android:id="@+id/pin2_edit_text"
-        android:inputType="textCapWords"
+        android:inputType="number"
         android:imeOptions="actionDone"
         android:hint="@string/re_enter_new_pin"
         android:layout_marginStart="20dp"
