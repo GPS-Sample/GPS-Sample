@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.security.ProviderInstaller
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -34,7 +35,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
+class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, ProviderInstaller.ProviderInstallListener
 {
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -75,6 +76,8 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+        ProviderInstaller.installIfNeededAsync(this, this)
 
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
@@ -182,12 +185,22 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("xxx", "MainActivity.onDestroy")
 
         this.unbindService( networkMonitorConnection)
         networkViewModel.shutdown()
     }
 
-    override fun didSelectOkButton(tag: Any?) {
+    override fun didSelectOkButton(tag: Any?)
+    {
+    }
+
+    override fun onProviderInstallFailed(p0: Int, p1: Intent?)
+    {
+        Log.d( "xxx", "onProviderInstallFailed")
+    }
+
+    override fun onProviderInstalled()
+    {
+        Log.d( "xxx", "onProviderInstalledPassed" )
     }
 }
