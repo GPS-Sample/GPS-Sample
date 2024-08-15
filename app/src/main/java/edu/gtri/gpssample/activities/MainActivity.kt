@@ -1,6 +1,5 @@
 package edu.gtri.gpssample.activities
 
-import android.app.Application
 import android.content.*
 import android.content.res.Configuration
 import android.os.Build
@@ -14,26 +13,18 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.security.ProviderInstaller
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
-import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
 import edu.gtri.gpssample.services.NetworkMonitorService
 import edu.gtri.gpssample.services.UDPBroadcastReceiverService
-import edu.gtri.gpssample.utils.EncryptionUtil
 import edu.gtri.gpssample.utils.NetworkConnectionStatus
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, ProviderInstaller.ProviderInstallListener
 {
@@ -77,19 +68,7 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
     {
         super.onCreate(savedInstanceState)
 
-        Thread {
-            try
-            {
-                ProviderInstaller.installIfNeeded(this )
-                Log.d( "xxx", "installIfNeeded PASSED" )
-            }
-            catch( ex: Exception )
-            {
-                Log.d( "xxx", ex.stackTraceToString())
-            }
-        }.start()
-
-//        ProviderInstaller.installIfNeededAsync(this, this)
+        ProviderInstaller.installIfNeededAsync(this, this)
 
         // build view models
         val viewModel: ConfigurationViewModel by viewModels()
@@ -123,15 +102,11 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
         }
 
         binding.toolbar.setOnClickListener {
-//            if (BuildConfig.DEBUG) {
-                (this.application as? MainApplication)?.currentFragment?.let {
-                    Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-//                }
+            (this.application as? MainApplication)?.currentFragment?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
         }
 
-//        val networkServiceIntent = Intent( this, NetworkMonitorService::class.java)
-//        ContextCompat.startForegroundService(this, networkServiceIntent)
         val networkMonitorIntent = Intent(this, NetworkMonitorService::class.java)
         this.bindService( networkMonitorIntent, networkMonitorConnection, Context.BIND_AUTO_CREATE)
 
