@@ -521,27 +521,30 @@ class AddHouseholdFragment : Fragment(),
         enumerationItem.syncCode = enumerationItem.syncCode + 1
         enumerationItem.subAddress = binding.subaddressEditText.text.toString()
 
-        propertyAdapter?.let { propertyAdapter ->
-            val jsonObject = JSONObject( location.properties )
+        if (location.properties.isNotEmpty())
+        {
+            propertyAdapter?.let { propertyAdapter ->
+                val jsonObject = JSONObject( location.properties )
 
-            val keys = ArrayList<String>()
-            val values = ArrayList<String>()
+                val keys = ArrayList<String>()
+                val values = ArrayList<String>()
 
-            for (key in jsonObject.keys())
-            {
-                keys.add( key )
-                values.add( jsonObject.getString(key))
-            }
-
-            for (i in 0..(values.size-1))
-            {
-                if (values[i] != propertyAdapter.values[i])
+                for (key in jsonObject.keys())
                 {
-                    jsonObject.put( keys[i], propertyAdapter.values[i])
+                    keys.add( key )
+                    values.add( jsonObject.getString(key))
                 }
-            }
 
-            location.properties = jsonObject.toString()
+                for (i in 0..(values.size-1))
+                {
+                    if (values[i] != propertyAdapter.values[i])
+                    {
+                        jsonObject.put( keys[i], propertyAdapter.values[i])
+                    }
+                }
+
+                location.properties = jsonObject.toString()
+            }
         }
 
         (activity!!.application as MainApplication).user?.let { user ->

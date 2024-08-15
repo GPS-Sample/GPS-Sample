@@ -1125,38 +1125,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
-        if (tag is Uri)
-        {
-            activity!!.runOnUiThread {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
-            }
-
-            Thread {
-                val uri = tag as Uri
-
-                val inputStream = activity!!.getContentResolver().openInputStream(uri)
-
-                inputStream?.let { inputStream ->
-                    try
-                    {
-                        parseGeoJson( inputStream.bufferedReader().readText(), name )
-                    }
-                    catch( ex: Exception)
-                    {
-                        activity!!.runOnUiThread {
-                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-
-                busyIndicatorDialog?.let {
-                    activity!!.runOnUiThread {
-                        it.alertDialog.cancel()
-                    }
-                }
-            }.start()
-        }
-        else if (tag is EnumArea)
+        if (tag is EnumArea)
         {
             tag.name = name
         }
@@ -1395,6 +1364,17 @@ class CreateEnumerationAreaFragment : Fragment(),
             try
             {
                 parseGeoJson( json, response )
+
+                if (showCurrentLocation && unsavedEnumAreas.isNotEmpty())
+                {
+                    activity!!.runOnUiThread {
+                        showCurrentLocation = false
+                        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                    }
+                }
             }
             catch( ex: Exception)
             {
@@ -1480,7 +1460,10 @@ class CreateEnumerationAreaFragment : Fragment(),
                             }
                         }
 
-                        jsonString += "}"
+                        if (jsonString.isNotEmpty())
+                        {
+                            jsonString += "}"
+                        }
 
                         val point = geometry as Point
                         points.add( PointWithProperty( point, jsonString ))
