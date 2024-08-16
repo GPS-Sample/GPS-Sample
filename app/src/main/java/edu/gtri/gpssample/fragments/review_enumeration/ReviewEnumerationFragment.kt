@@ -236,21 +236,6 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
         return false
     }
 
-    private fun gpsLocationIsGood( location: Location ) : Boolean
-    {
-        var editMode = false
-
-        if (gpsAccuracyIsGood())
-        {
-            currentGPSLocation?.let { point ->
-                val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
-                editMode = distance <= config.minGpsPrecision
-            }
-        }
-
-        return editMode
-    }
-
     private fun refreshMap()
     {
         binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
@@ -278,97 +263,106 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
 
         pointHashMap.clear()
 
-        val points = java.util.ArrayList<Point>()
-        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+        addPolygon( enumArea.vertices )
 
-        enumArea.vertices.map {
-            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        for (enumerationTeam in enumArea.enumerationTeams)
+        {
+            addPolygon( enumerationTeam.polygon )
         }
 
-        pointList.add( points )
+        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+            val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(currentZoomLevel)
+                .center(point)
+                .build()
 
-        if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
+            binding.mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+
+        for (location in enumArea.locations)
         {
-            val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.25 )
-
-            polygonAnnotation?.let { polygonAnnotation ->
-                polygonHashMap[polygonAnnotation.id] = enumArea
-                allPolygonAnnotations.add( polygonAnnotation)
-            }
-
-            val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#ff0000" )
-
-            polylineAnnotation?.let { polylineAnnotation ->
-                allPolylineAnnotations.add( polylineAnnotation)
-            }
-
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                val cameraPosition = CameraOptions.Builder()
-                    .zoom(currentZoomLevel)
-                    .center(point)
-                    .build()
-
-                binding.mapView.getMapboxMap().setCamera(cameraPosition)
-            }
-
-            for (location in enumArea.locations)
+            if (location.isLandmark)
             {
-                if (location.isLandmark)
-                {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
 
-                    pointAnnotation?.let {
-                        pointHashMap[pointAnnotation.id] = location
-                        allPointAnnotations.add( pointAnnotation )
-                    }
+                pointAnnotation?.let {
+                    pointHashMap[pointAnnotation.id] = location
+                    allPointAnnotations.add( pointAnnotation )
                 }
             }
+        }
 
-            for (location in enumArea.locations)
+        for (location in enumArea.locations)
+        {
+            if (!location.isLandmark)
             {
-                if (!location.isLandmark)
+                var resourceId = if (location.isMultiFamily) R.drawable.multi_home_black else R.drawable.home_black
+
+                var numComplete = 0
+
+                for (item in location.enumerationItems)
                 {
-                    var resourceId = if (location.isMultiFamily) R.drawable.multi_home_black else R.drawable.home_black
-
-                    var numComplete = 0
-
-                    for (item in location.enumerationItems)
+                    val enumerationItem = item as EnumerationItem?
+                    if(enumerationItem != null)
                     {
-                        val enumerationItem = item as EnumerationItem?
-                        if(enumerationItem != null)
+                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                         {
-                            if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-                            {
-                                resourceId = if (location.isMultiFamily) R.drawable.multi_home_red else R.drawable.home_red
-                                break
-                            }
-                            else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                            {
-                                numComplete++
-                            }
+                            resourceId = if (location.isMultiFamily) R.drawable.multi_home_red else R.drawable.home_red
+                            break
+                        }
+                        else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            numComplete++
                         }
                     }
+                }
 
-                    if (numComplete > 0 && numComplete == location.enumerationItems.size)
-                    {
-                        resourceId = if (location.isMultiFamily) R.drawable.multi_home_green else R.drawable.home_green
-                    }
+                if (numComplete > 0 && numComplete == location.enumerationItems.size)
+                {
+                    resourceId = if (location.isMultiFamily) R.drawable.multi_home_green else R.drawable.home_green
+                }
 
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                    val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
+                val pointAnnotation = mapboxManager.addMarker( point, resourceId )
 
-                    pointAnnotation?.let {
-                        pointHashMap[pointAnnotation.id] = location
-                        allPointAnnotations.add( pointAnnotation )
-                    }
+                pointAnnotation?.let {
+                    pointHashMap[pointAnnotation.id] = location
+                    allPointAnnotations.add( pointAnnotation )
                 }
             }
         }
 
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+    }
+
+    fun addPolygon( vertices: ArrayList<LatLon> )
+    {
+        val points = java.util.ArrayList<Point>()
+        val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+
+        vertices.map {
+            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+        }
+
+        pointList.add( points )
+
+        if (pointList.isNotEmpty() && pointList[0].isNotEmpty()) {
+            val polygonAnnotation = mapboxManager.addPolygon(pointList, "#000000", 0.25)
+
+            polygonAnnotation?.let { polygonAnnotation ->
+                polygonHashMap[polygonAnnotation.id] = enumArea
+                allPolygonAnnotations.add(polygonAnnotation)
+            }
+
+            val polylineAnnotation = mapboxManager.addPolyline(pointList[0], "#ff0000")
+
+            polylineAnnotation?.let { polylineAnnotation ->
+                allPolylineAnnotations.add(polylineAnnotation)
+            }
+        }
     }
 
     fun navigateToAddHouseholdFragment()
