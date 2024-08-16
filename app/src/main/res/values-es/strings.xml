@@ -369,6 +369,8 @@
     <string name="default_location">"Ubicación por defecto"</string>
     <string name="let_me_choose">"Déjame elegir"</string>
     <string name="boundary_is_self_intersecting">"El límite de esta zona de enumeración es auto-intersecante. Desea corregir el límite?"</string>
+    <string name="select_the_property_identifier">"Seleccione la variable del nombre del cluster"</string>
+    <string name="select_the_hh_identifiers">"Seleccione las variables domésticas a importar"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
@@ -410,5 +412,10 @@
         <item>"Muestreo por conglomerados"</item>
         <item>"Subconjuntos: pueden superponerse"</item>
         <item>"Estratos: Mutuamente excluyentes"</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>"dd/mm/aaaa"</item>
+        <item>"mm/dd/aaaa"</item>
+        <item>"aaaa/mm/dd"</item>
     </string-array>
 </resources>

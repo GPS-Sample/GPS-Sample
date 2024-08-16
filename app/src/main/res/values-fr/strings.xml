@@ -6,7 +6,7 @@
     <string name="next">"Écran suivant"</string>
     <string name="previous">"Écran précédent"</string>
     <string name="manager">"Responsable"</string>
-    <string name="client">"Énumération"</string>
+    <string name="client">"Dénombrement"</string>
     <string name="connected_clients">"Clients connectés"</string>
     <string name="create_hotspot">"Créer un hotspot"</string>
     <string name="create_server">"Créer un serveur"</string>
@@ -14,7 +14,7 @@
     <string name="connect_hotspot">"Se connecter au hotspot"</string>
     <string name="registering_device">"Enregistrement de l'appareil"</string>
     <string name="sending_command">"Envoi de la commande"</string>
-    <string name="sending_enum_data">"Envoi de données d'énumération"</string>
+    <string name="sending_enum_data">"Envoi de données de dénombrement"</string>
     <string name="receiving_data">"Réception des données"</string>
     <string name="configuration_received">"Configuration reçue"</string>
     <string name="admin">"Administrateur"</string>
@@ -63,7 +63,7 @@
     <string name="config_name">"Nom de la configuration"</string>
     <string name="study_name">"Nom de l'étude"</string>
     <string name="field_name">"Nom du champ"</string>
-    <string name="enumeration_fields">"Champs d'énumération"</string>
+    <string name="enumeration_fields">"Champs de dénombrement"</string>
     <string name="enter_config_name">"Entrez le nom de la configuration"</string>
     <string name="enter_study_name">"Entrez le nom de l'étude"</string>
     <string name="enter_field_name">"Entrez le nom du champ"</string>
@@ -71,12 +71,12 @@
     <string name="date_format">"Format de la date"</string>
     <string name="time_format">"Format horaire"</string>
     <string name="manage_enumerators">"Gérer les enquêteurs"</string>
-    <string name="collect_enumerations">"Collecter les énumérations"</string>
+    <string name="collect_enumerations">"Collectez les dénombrements"</string>
     <string name="generate_sample">"Générer un échantillon"</string>
     <string name="collect_samples">"Recueillir les échantillons"</string>
     <string name="min_gps_precision">"Précision GPS souhaitée"</string>
     <string name="enter_min_gps_precision">"Entrez la précision GPS souhaitée"</string>
-    <string name="define_enumeration_fields">"Définir les champs d'énumération"</string>
+    <string name="define_enumeration_fields">"Définir les champs de dénombrement"</string>
     <string name="define_enumeration_area">"Définir la zone de dénombrement"</string>
     <string name="define_sampling_method">"Définir la méthode d'échantillonnage"</string>
     <string name="studies">"Études"</string>
@@ -121,7 +121,7 @@
     <string name="home">"Écran d'accueil"</string>
     <string name="manage_enumeration_areas">"Gérer les zones de dénombrement"</string>
     <string name="please_confirm">""SVP, confirmez""</string>
-    <string name="import_enumeration">"Importez les données d'énumération"</string>
+    <string name="import_enumeration">"Importez les données de dénombrement"</string>
     <string name="export_configuration">"Exportez la configuration"</string>
     <string name="delete_study_message">"Êtes-vous sûr de vouloir supprimer définitivement cette étude ?"</string>
     <string name="delete_field_message">"Êtes-vous sûr de vouloir supprimer définitivement ce champ ?"</string>
@@ -150,16 +150,16 @@
     <string name="desired_gps_position">"Veuillez saisir la précision GPS minimale souhaitée"</string>
     <string name="import_configuration">"Importez la configuration"</string>
     <string name="select_import_method">"Sélectionnez une méthode d'importation"</string>
-    <string name="select_configuration">"Sélectionner une configuration"</string>
+    <string name="select_configuration">"Sélectionnez une configuration"</string>
     <string name="home_not_exist">"Le domicile n'existe pas"</string>
     <string name="reason_incomplete">"Oups ! Veuillez sélectionner une raison pour l'incomplétude"</string>
-    <string name="enter_enum_area_name">"Saisir le nom de la zone d'énumération"</string>
-    <string name="select_enumeration">"Sélectionner une zone d'énumération"</string>
-    <string name="select_time">"Sélectionner l'heure"</string>
+    <string name="enter_enum_area_name">"Saisissez le nom de la zone de dénombrement"</string>
+    <string name="select_enumeration">"Sélectionnez une zone de dénombrement"</string>
+    <string name="select_time">"Sélectionnez l'heure"</string>
     <string name="select_date">"Sélectionnez la date"</string>
     <string name="your_pin_is">"Votre code PIN est :"</string>
     <string name="incorrect_answer_message">"Oups ! Réponse incorrecte.  Veuillez réessayer."</string>
-    <string name="enter_other_question">"Saisir une autre question"</string>
+    <string name="enter_other_question">"Saisissez une autre question"</string>
     <string name="reenter_pin">"Veuillez saisir à nouveau le code PIN"</string>
     <string name="enter_pin">"Veuillez saisir un code PIN"</string>
     <string name="other_question">"Autre question"</string>
@@ -221,18 +221,18 @@
     <string name="save_and_end_block">"Sauvegarder et terminer la série de variables"</string>
     <string name="add_another_field">"Enregistrer et ajouter un autre champ"</string>
     <string name="current_location_not_set">"L'emplacement actuel n'est pas défini"</string>
-    <string name="option_item_name">"Saisir le nom de l'élément de l'option"</string>
-    <string name="export_collection_data">"Exporter les données de la collection"</string>
-    <string name="import_field_data">"Importer des données de champ"</string>
-    <string name="select_a_date">"Sélectionner une date"</string>
+    <string name="option_item_name">"Saisissez le nom de l'élément de l'option"</string>
+    <string name="export_collection_data">"Exporter les données de collecte"</string>
+    <string name="import_field_data">"Importez des données de terrain"</string>
+    <string name="select_a_date">"Sélectionnez une date"</string>
     <string name="select">"Sélectionner"</string>
     <string name="team_name">"Nom de l'équipe"</string>
-    <string name="launch_survey">"Lancer l'enquête"</string>
+    <string name="launch_survey">"Lancez l'enquête"</string>
     <string name="mark_as_incomplete">"Marquer comme incomplet"</string>
-    <string name="enter_current_pin">"Saisir le code PIN actuel"</string>
+    <string name="enter_current_pin">"Saisissez le code PIN actuel"</string>
     <string name="enter_new_pin">"Saisissez à nouveau votre code PIN"</string>
     <string name="re_enter_new_pin">"Saisissez à nouveau votre code PIN"</string>
-    <string name="select_a_time">"Sélectionner une heure"</string>
+    <string name="select_a_time">"Sélectionnez une heure"</string>
     <string name="UUID">"UUID"</string>
     <string name="latitude">"Latitude"</string>
     <string name="longitude">"Longitude"</string>
@@ -241,16 +241,16 @@
     <string name="description">"Description de l'image"</string>
     <string name="add_image">"Ajouter une image"</string>
     <string name="enumeration_areas">"Zones de dénombrement"</string>
-    <string name="enter_team_name">"Saisir le nom de l'équipe"</string>
+    <string name="enter_team_name">"Saisissez le nom de l'équipe"</string>
     <string name="assign_households">"Assigner les ménages"</string>
     <string name="sampling_type">"Type d'échantillonnage"</string>
     <string name="generating_qr_code">"Générer un code QR..."</string>
     <string name="samples">"Échantillons"</string>
     <string name="you_don_t_have_any_samples_for_this_study">"Vous n'avez pas d'échantillons pour cette étude"</string>
-    <string name="enum_saved_doc">"L'énumération a été sauvegardée dans le répertoire Documents."</string>
-    <string name="config_saved_doc">"Configuration a été sauvegardé dans le répertoire Documents."</string>
+    <string name="enum_saved_doc">"Le dénombrement a été sauvegardée dans le répertoire Documents."</string>
+    <string name="config_saved_doc">"Configuration suavegardée dans le répertoire Documents."</string>
     <string name="nobody_home">"Personne à la maison"</string>
-    <string name="export_enum_data">"Exporter des données de recensement"</string>
+    <string name="export_enum_data">"Exporter des données de dénombrement"</string>
     <string name="delete_landmark_message">"Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?"</string>
     <string name="subaddress">"Sous-adresse"</string>
     <string name="sampled">"Échantillonné"</string>
@@ -259,7 +259,7 @@
     <string name="dismiss">"Supprimer"</string>
     <string name="delete">"Supprimer"</string>
     <string name="launching_odk_collect_application">"Lancement de l'application ODK Collect..."</string>
-    <string name="filters">"Filtres (combine des règles)"</string>
+    <string name="filters">"Filtres (combinent des règles)"</string>
     <string name="new_location">"Identifier le lieu"</string>
     <string name="delete_configuration">"La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?"</string>
     <string name="total_population">"Taille totale de la population"</string>
@@ -272,7 +272,7 @@
     <string name="please_enter_a_name">"Veuillez saisir un nom pour ce champ."</string>
     <string name="please_enter_a_subaddress">"Veuillez saisir une sous-adresse unique."</string>
     <string name="please_select_team_boundary">"Veuillez sélectionner le périmètre de l'équipe."</string>
-    <string name="enum_area_name_property">"Saisir la valeur de la propriété Nom de la zone d'énumération"</string>
+    <string name="enum_area_name_property">"Saisissez la valeur de la propriété: Nom de la zone de dénombrement"</string>
     <string name="downloading_map_tiles">"Téléchargement des tuiles de carte..."</string>
     <string name="style_pack_download_failed">"Échec du téléchargement du Map Style Pack"</string>
     <string name="tile_pack_download_failed">"Le téléchargement du Map Tile Pack a échoué"</string>
@@ -281,7 +281,7 @@
     <string name="import_enumeration_area">"Importez une zone de dénombrement"</string>
     <string name="create_enumeration_area">"Créez une zone de dénombrement"</string>
     <string name="add_household">"Ajoutez un ménage"</string>
-    <string name="define_map_tile_cache_region">"Définir la région de cache des tuiles de la carte"</string>
+    <string name="define_map_tile_cache_region">"Définissez la région de cache des tuiles de la carte"</string>
     <string name="download_map_tiles">"Téléchargez les tuiles de la carte"</string>
     <string name="center_on_location">"Centrez sur l'emplacement"</string>
     <string name="less_than_equal">"Inférieur ou égal"</string>
@@ -293,7 +293,7 @@
     <string name="legend">"Légende"</string>
     <string name="select_date_type">"Veuillez sélectionner le type de date"</string>
     <string name="contains">"Contient"</string>
-    <string name="collection_saved_doc">"La collection a été enregistrée dans le répertoire Documents"</string>
+    <string name="collection_saved_doc">"La collecte a été enregistrée dans le répertoire Documents"</string>
     <string name="invalid_operator">"L'opérateur sélectionné n'est pas valide pour la règle sélectionnée"</string>
     <string name="about_gpssample">"À propos de GPSSample"</string>
     <string name="privacy_statement">"Déclaration de confidentialité"</string>
@@ -311,7 +311,7 @@
     <string name="multi_families">"Multi-ménages"</string>
     <string name="is_multi_family">"S'agit-il d'un lieu où vivent plusieurs ménages ?"</string>
     <string name="sample">"Exemple"</string>
-    <string name="mark_status">"Statut de la marque"</string>
+    <string name="mark_status">"Indiquez Statut"</string>
     <string name="not_visited">"Non visitée"</string>
     <string name="incomplete_collection">"Enquête incomplète"</string>
     <string name="completed_collection">"Enquête terminée"</string>
@@ -336,8 +336,8 @@
     <string name="success">"SUCCES !"</string>
     <string name="error">"ERREUR !"</string>
     <string name="import_failed">"L'importation a échoué."</string>
-    <string name="import_succeeded">"L'importation a réussi."</string>
-    <string name="clear_map_tile_region">"Effacer la région du cache des tuiles de la carte"</string>
+    <string name="import_succeeded">"Importation réussie"</string>
+    <string name="clear_map_tile_region">"Effacez la région du cache des tuiles de la carte"</string>
     <string name="import_request_failed">"Réception d'une demande d'exportation en attente d'une demande d'importation"</string>
     <string name="export_request_failed">"Réception d'une demande d'importation en attente d'une demande d'exportation"</string>
     <string name="network_connection">"Connexion au réseau"</string>
@@ -369,11 +369,13 @@
     <string name="default_location">"Emplacement par défaut"</string>
     <string name="let_me_choose">"Laissez-moi choisir"</string>
     <string name="boundary_is_self_intersecting">"Les limites de cette zone de dénombrement sont auto-intersectées. Souhaitez-vous corriger la limite ?"</string>
+    <string name="select_the_property_identifier">"Sélectionnez la variable du nom de la grappe"</string>
+    <string name="select_the_hh_identifiers">"Sélectionnez les variables du ménage à importer"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
         <item>"Nom de votre animal de compagnie préféré"</item>
-        <item>"4 derniers chiffre de votre numéro de téléphone portable"</item>
+        <item>"4 derniers chiffres de votre numéro de téléphone portable"</item>
         <item>"Votre aliment/nourriture favorit(e)"</item>
         <item>"Mois de naissance"</item>
         <item>"Autre question"</item>
@@ -410,5 +412,10 @@
         <item>"Échantillonnage en grappes"</item>
         <item>"Sous-ensembles : peuvent se chevaucher"</item>
         <item>"Strates : mutuellement exclusives"</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>"jj/mm/aaaa"</item>
+        <item>"mm/jj/aaaa"</item>
+        <item>"aaaa/mm/jj"</item>
     </string-array>
 </resources>

@@ -4,7 +4,7 @@ action_sign_out	Sign Out	Cerrar sesión	Se déconnecter	Sair	Выйти из с�
 next	Next	Siguiente	Écran suivant	Seguinte	Следующий	Berikutnya	
 previous	Previous	Anterior	Écran précédent	Anterior	Предыдущий	Sebelumnya	
 manager	Manager	Gerente	Responsable	Gerente	Менеджер	Pengelola	
-client	Enumeration	Enumeración	Énumération	Enumeração	Перечисление	Pencacahan	
+client	Enumeration	Enumeración	Dénombrement	Enumeração	Перечисление	Pencacahan	
 connected_clients	Connected Clients	Clientes conectados	Clients connectés	Clientes ligados	Подключенные клиенты	Klien yang Terhubung	
 create_hotspot	Create Hotspot	Crear punto de acceso	Créer un hotspot	Criar ponto de acesso	Создать точку доступа	Buat Hotspot	
 create_server	Create Server	Crear servidor	Créer un serveur	Criar servidor	Создать сервер	Buat Server	
@@ -12,13 +12,13 @@ create_qr_code	Create QR Code	Crear código QR	Créer un code QR	Criar código Q
 connect_hotspot	Connect To Hotspot	Conectar al punto de acceso	Se connecter au hotspot	Conectar-se a um ponto de acesso	Подключение к точке доступа	Hubungkan Ke Hotspot	
 registering_device	Registering Device	Registrando dispositivo 	Enregistrement de l'appareil	Registar dispositivo	Регистрация устройства	Mendaftarkan Perangkat	
 sending_command	Sending Command	Enviando comando	Envoi de la commande	Comando de envio	Отправка команды	Mengirim Perintah	
-sending_enum_data	Sending Enumeration Data	Enviando datos de enumeración	Envoi de données d'énumération	Enviar dados de enumeração	Отправка данных перечисления	Mengirim Data Pencacahan	
+sending_enum_data	Sending Enumeration Data	Enviando datos de enumeración	Envoi de données de dénombrement	Enviar dados de enumeração	Отправка данных перечисления	Mengirim Data Pencacahan	
 receiving_data	Receiving Data	Recibiendo datos	Réception des données	Recebendo dados	Получение данных	Menerima data	
 configuration_received	Configuration Received	Configuración recibida	Configuration reçue	Configuração recebida	Полученная конфигурация	Konfigurasi Diterima	
 forgot_pin_questions	Father's middle name	Segundo nombre del padre	Deuxième prénom de votre père	Nome do meio do pai	Отчество отца	Nama ayah	
 forgot_pin_questions	Mother's maiden name	Apellido de soltera de la madre	Nom de jeune fille de votre mère	Nome de solteira da mãe	Девичья фамилия матери	Nama Ibu	
 forgot_pin_questions	Favorite Pet's name	El nombre de tu mascota favorita	Nom de votre animal de compagnie préféré	Nome do animal de estimação favorito	Имя любимого домашнего животного	Nama binatang kesayangan	
-forgot_pin_questions	Last 4 digits of cell phone #	Últimas 4 cifras del número de celular	4 derniers chiffre de votre numéro de téléphone portable	Últimos 4 dígitos do número de telemóvel	Последние 4 цифры номера мобильного телефона	4 digit terakhir ponsel#	
+forgot_pin_questions	Last 4 digits of cell phone #	Últimas 4 cifras del número de celular	4 derniers chiffres de votre numéro de téléphone portable	Últimos 4 dígitos do número de telemóvel	Последние 4 цифры номера мобильного телефона	4 digit terakhir ponsel#	
 forgot_pin_questions	Favorite Food	Comida favorita	Votre aliment/nourriture favorit(e)	Comida favorita	Любимая еда	Makanan favorit	
 forgot_pin_questions	Birth Month	Mes de nacimiento	Mois de naissance	Mês de nascimento	Месяц рождения	Bulan lahir	
 forgot_pin_questions	Other Question	Otra pregunta	Autre question	Outra pergunta	Другой вопрос	Pertanyaan lain	
@@ -89,7 +89,7 @@ create_field	Create Field	Crear campo	Créer un champ	Criar campo	Создать
 config_name	Configuration Name	Nombre de la configuración	Nom de la configuration	Nome da configuração	Конфигурация имени	Nama Konfigurasi	
 study_name	Study Name	Nombre del estudio	Nom de l'étude	Nome do estudo	Имя исследования	Nama Studi	
 field_name	Field Name	Nombre del campo	Nom du champ	Nome do campo	Имя поля	Nama Bidang	
-enumeration_fields	Enumeration Fields	Campos de enumeración	Champs d'énumération	Campos de enumeração	Поля перечисления	Bidang Pencacahan	
+enumeration_fields	Enumeration Fields	Campos de enumeración	Champs de dénombrement	Campos de enumeração	Поля перечисления	Bidang Pencacahan	
 enter_config_name	Enter Configuration Name	Ingrese el nombre de la configuración	Entrez le nom de la configuration	Insirar nome da configuração	Введите имя конфигурации	Masukkan Nama Konfigurasi	
 enter_study_name	Enter Study Name	Ingrese el nombre del estudio	Entrez le nom de l'étude	Insirar nome do estudo	Введите имя исследования	Masukkan Nama Studi	
 enter_field_name	Enter Field Name	Ingrese el nombre del campo	Entrez le nom du champ	Insirar o nome do campo	Введите имя поля	Masukkan Nama Bidang	
@@ -97,12 +97,12 @@ preferred_units	Preferred Units	Unidades preferidas	Unités de préférence	Unid
 date_format	Date Format	Formato de fecha	Format de la date	Formato de data	Формат даты	Format tanggal	
 time_format	Time Format	Formato de hora	Format horaire	Formato da hora	Формат времени	Format waktu	
 manage_enumerators	Manage Enumerators	Administrar enumeradores	Gérer les enquêteurs	Gerir enumeradores	Управление счетчиками	Kelola Enumerator	
-collect_enumerations	Collect Enumerations	Recoger enumeraciones	Collecter les énumérations	Coletar enumerações	Сбор перечислений	Kumpulkan Enumerasi	
+collect_enumerations	Collect Enumerations	Recoger enumeraciones	Collectez les dénombrements	Coletar enumerações	Сбор перечислений	Kumpulkan Enumerasi	
 generate_sample	Generate Sample	Generar muestra	Générer un échantillon	Gerar amostra	Создасть выборку	Hasilkan Sampel	
 collect_samples	Collect Samples	Recoger muestras	Recueillir les échantillons	Coletar amostras	Сбор образцов	Kumpulkan Sampel	
 min_gps_precision	Desired GPS Precision	Precisión deseada de GPS	Précision GPS souhaitée	Precisão GPS pretendida	Желаемая точность GPS	Presisi GPS yang Diinginkan	
 enter_min_gps_precision	Enter Desired GPS Precision	Ingrese la precisión deseada de GPS 	Entrez la précision GPS souhaitée	Insirar a precisão GPS pretendida	Введите желаемую точность GPS	Masukkan Presisi GPS yang Diinginkan	
-define_enumeration_fields	Define Enumeration Fields	Definir campos de enumeración	Définir les champs d'énumération	Definir campos de enumeração	Определить поля перечисления	Tentukan Bidang Pencacahan	
+define_enumeration_fields	Define Enumeration Fields	Definir campos de enumeración	Définir les champs de dénombrement	Definir campos de enumeração	Определить поля перечисления	Tentukan Bidang Pencacahan	
 define_enumeration_area	Define Enumeration Area	Definir área de enumeración	Définir la zone de dénombrement	Definir área de enumeração	Определить область перечисления	Tentukan Area Pencacahan	
 define_sampling_method	Define Sampling Method	Definir método de muestreo	Définir la méthode d'échantillonnage	Definir método de amostragem	Определить метод выборки	Tentukan Metode Pengambilan Sampel	
 studies	Studies	Estudios	Études	Estudos	Исследования	Studi	
@@ -147,7 +147,7 @@ manage_supervisors	Manage Supervisors	Administrar supervisores	Gérer les superv
 home	Home	Pantalla de inicio	Écran d'accueil	Início	Главная	Rumah	
 manage_enumeration_areas	Manage Enumeration Areas	Administrar áreas de enumeración	Gérer les zones de dénombrement	Gerir áreas de enumeração	Управление участками переписи	Kelola Area Pencacahan	
 please_confirm	Please Confirm	"Por favor, confirme"	"SVP, confirmez"	"Por favor, confirmar"	"Пожалуйста, подтвердите"	Mohon Konfirmasi	
-import_enumeration	Import Enumeration Data	Importar datos de enumeración	Importez les données d'énumération	Importar dados de enumeração	Импорт данных перечисления	Impor Data Pencacahan	
+import_enumeration	Import Enumeration Data	Importar datos de enumeración	Importez les données de dénombrement	Importar dados de enumeração	Импорт данных перечисления	Impor Data Pencacahan	
 export_configuration	Export Configuration	Exportar configuración	Exportez la configuration	Exportar configuração	Экспорт конфигурации	Konfigurasi Ekspor	
 delete_study_message	Are you sure you want to permanently delete this study?	¿Está seguro de que desea eliminar permanentemente este estudio?	Êtes-vous sûr de vouloir supprimer définitivement cette étude ?	Tem a certeza de que deseja eliminar permanentemente este estudo?	"Вы уверены, что хотите безвозвратно удалить это исследование?"	Apakah Anda yakin ingin menghapus studi ini secara permanen?	
 delete_field_message	Are you sure you want to permanently delete this field?	¿Está seguro de que desea eliminar permanentemente este campo?	Êtes-vous sûr de vouloir supprimer définitivement ce champ ?	Tem a certeza de que deseja eliminar permanentemente este campo?	"Вы уверены, что хотите безвозвратно удалить это поле?"	Apakah Anda yakin ingin menghapus bidang ini secara permanen?	
@@ -176,16 +176,16 @@ enter_name	Please enter a name	"Por favor, introduzca un nombre"	Veuillez saisir
 desired_gps_position	Please enter the minimum desired GPS precision	"Por favor, introduzca la precisión GPS mínima deseada"	Veuillez saisir la précision GPS minimale souhaitée	"Por favor, insira a precisão GPS mínima pretendida"	Введите минимальную желаемую точность GPS	Silakan masukkan presisi GPS minimum yang diinginkan	
 import_configuration	Import Configuration	Configuración de importación	Importez la configuration	Importar configuração	Конфигурация импорта	Konfigurasi Impor	
 select_import_method	Select an import method	Seleccione un método de importación	Sélectionnez une méthode d'importation	Selecione um método de importação	Выберите метод импорта	Pilih metode impor	
-select_configuration	Select a configuration	Seleccione una configuración	Sélectionner une configuration	Selecione uma configuração	Выберите конфигурацию	Pilih konfigurasi	
+select_configuration	Select a configuration	Seleccione una configuración	Sélectionnez une configuration	Selecione uma configuração	Выберите конфигурацию	Pilih konfigurasi	
 home_not_exist	Home does not exist	La hogar no existe 	Le domicile n'existe pas	O agregado familiar não existe	Дом не существует	Rumah tidak ada	
 reason_incomplete	Oops! Please select a reason for incomplete	"¡Oops! Por favor, seleccione una razón para incompleto"	Oups ! Veuillez sélectionner une raison pour l'incomplétude	"Oops! Por favor, seleccione um razão para incompleto"	"Упс! Пожалуйста, выберите причину неполного заполнения"	Ups! Silakan pilih alasan untuk tidak lengkap	
-enter_enum_area_name	Enter the Enumeration Area name	Introduzca el nombre del área de enumeración	Saisir le nom de la zone d'énumération	Insira o nome da área de enumeração	Введите название области перечисления	Masukkan nama Area Pencacahan	
-select_enumeration	Select an Enumeration Area	Seleccione un Área de Enumeración	Sélectionner une zone d'énumération	Selecione uma área de enumeração	Выберите область пересчета	Pilih Area Pencacahan	
-select_time	Select Time	Seleccione la hora	Sélectionner l'heure	Selecione a hora	Выберите время	Pilih Waktu	
+enter_enum_area_name	Enter the Enumeration Area name	Introduzca el nombre del área de enumeración	Saisissez le nom de la zone de dénombrement	Insira o nome da área de enumeração	Введите название области перечисления	Masukkan nama Area Pencacahan	
+select_enumeration	Select an Enumeration Area	Seleccione un Área de Enumeración	Sélectionnez une zone de dénombrement	Selecione uma área de enumeração	Выберите область пересчета	Pilih Area Pencacahan	
+select_time	Select Time	Seleccione la hora	Sélectionnez l'heure	Selecione a hora	Выберите время	Pilih Waktu	
 select_date	Select Date	Seleccione la fecha	Sélectionnez la date	Selecione a data	Выберите дату	Pilih Tanggal	
 your_pin_is	Your PIN is:	Su PIN es	Votre code PIN est :	O seu PIN é:	Ваш PIN-код:	PIN Anda adalah:	
 incorrect_answer_message	Oops! Incorrect answer.  Please try again.	"¡Uy! Respuesta incorrecta.  Por favor, inténtelo de nuevo."	Oups ! Réponse incorrecte.  Veuillez réessayer.	"Oops! Resposta incorrecta.  Por favor, tente novamente."	"Oops! Неправильный ответ.  Пожалуйста, попробуйте еще раз."	Ups! Jawaban yang salah. Silakan coba lagi.	
-enter_other_question	Enter Other Question	Introduzca otra pregunta	Saisir une autre question	Insira outra pergunta	Введите другой вопрос	Masukkan Pertanyaan Lainnya	
+enter_other_question	Enter Other Question	Introduzca otra pregunta	Saisissez une autre question	Insira outra pergunta	Введите другой вопрос	Masukkan Pertanyaan Lainnya	
 reenter_pin	Please re-enter the PIN	Vuelva a introducir el PIN	Veuillez saisir à nouveau le code PIN	Volte a insirar o PIN	"Пожалуйста, введите PIN-код повторно"	Silakan masukkan kembali PIN	
 enter_pin	Please enter a PIN	"Por favor, introduzca un PIN"	Veuillez saisir un code PIN	"Por favor, insira um PIN"	"Пожалуйста, введите PIN-код"	Silakan masukkan PIN	
 other_question	Other Question	Otra pregunta	Autre question	Outra pergunta	Другой вопрос	Pertanyaan lain	
@@ -247,18 +247,18 @@ begin_field_block	Begin Field Block	Iniciar bloque de campo	Début d'une série 
 save_and_end_block	Save and End Block	Guardar y finalizar bloque	Sauvegarder et terminer la série de variables	Salvar e terminar o bloco	Сохранить и завершить блок	Simpan dan Akhiri Blokir	
 add_another_field	Save and Add Another Field	Guardar y añadir otro campo	Enregistrer et ajouter un autre champ	Salvar e adicionar outro campo	Сохранить и добавить другое поле	Simpan dan Tambahkan Bidang Lain	
 current_location_not_set	Current Location Not Set	Ubicación actual no establecida	L'emplacement actuel n'est pas défini	Localização atual não definida	Текущее местоположение не установлено	Lokasi Saat Ini Tidak Ditetapkan	
-option_item_name	Enter the Option Item Name	Introduzca el nombre de la opción	Saisir le nom de l'élément de l'option	Introduzir o nome do item de opção	Введите имя элемента опции	Masukkan Nama Item Opsi	
-export_collection_data	Export Collection Data	Exportar datos de recogida	Exporter les données de la collection	Exportar dados de coleta	Экспорт данных коллекции	Ekspor Data Pengumpulan	
-import_field_data	Import Field Data	Importar datos de campo	Importer des données de champ	Importar dados de campo	Импортировать данные поля	Impor Data Bidang	
-select_a_date	Select a Date	Seleccione una fecha	Sélectionner une date	Selecionar uma data	Выберите дату	Pilih Tanggal	
+option_item_name	Enter the Option Item Name	Introduzca el nombre de la opción	Saisissez le nom de l'élément de l'option	Introduzir o nome do item de opção	Введите имя элемента опции	Masukkan Nama Item Opsi	
+export_collection_data	Export Collection Data	Exportar datos de recogida	Exporter les données de collecte	Exportar dados de coleta	Экспорт данных коллекции	Ekspor Data Pengumpulan	
+import_field_data	Import Field Data	Importar datos de campo	Importez des données de terrain	Importar dados de campo	Импортировать данные поля	Impor Data Bidang	
+select_a_date	Select a Date	Seleccione una fecha	Sélectionnez une date	Selecionar uma data	Выберите дату	Pilih Tanggal	
 select	Select	Seleccione	Sélectionner	Selecionar	Выберите	Pilih	
 team_name	Team Name	Nombre del equipo	Nom de l'équipe	Nome da equipe	Имя команды	Nama tim	
-launch_survey	Launch Survey	Iniciar encuesta	Lancer l'enquête	Lançar questionário	Запустить опрос	Peluncuran Survei	
+launch_survey	Launch Survey	Iniciar encuesta	Lancez l'enquête	Lançar questionário	Запустить опрос	Peluncuran Survei	
 mark_as_incomplete	Mark as Incomplete	Marcar como incompleta	Marquer comme incomplet	Marcar como Incompleto	Пометить как незавершенный	Tandai sebagai Tidak Lengkap	
-enter_current_pin	Enter Current Pin	Introducir PIN actual	Saisir le code PIN actuel	Insirar o PIN atual	Введите текущий PIN-код	Masukkan Pin Saat Ini	
+enter_current_pin	Enter Current Pin	Introducir PIN actual	Saisissez le code PIN actuel	Insirar o PIN atual	Введите текущий PIN-код	Masukkan Pin Saat Ini	
 enter_new_pin	Re-Enter New PIN	Vuelva a introducir el nuevo PIN	Saisissez à nouveau votre code PIN	Introduzir novamente o novo PIN	Повторный ввод нового PIN-кода	Masukkan kembali PIN Baru	
 re_enter_new_pin	Re-Enter New PIN	Vuelva a introducir el nuevo PIN	Saisissez à nouveau votre code PIN	Introduzir novamente o novo PIN	Повторно ввести новый PIN-код	Masukkan kembali PIN Baru	
-select_a_time	Select a Time	Seleccione una hora	Sélectionner une heure	Selecionar uma hora	Выбрать время	Pilih Waktu	
+select_a_time	Select a Time	Seleccione una hora	Sélectionnez une heure	Selecionar uma hora	Выбрать время	Pilih Waktu	
 UUID	UUID	UUID	UUID	UUID	UUID	UUID	
 latitude	Latitude	Latitud	Latitude	Latitude	Широта	Garis Lintang	
 longitude	Longitude	Longitud	Longitude	Longitude	Долгота	Garis bujur	
@@ -267,16 +267,16 @@ status	Status	Estado	Statut	Estado	Статус	Status
 description	Description	Descripción	Description de l'image	Descrição	Описание	Keterangan	
 add_image	Add Image	Añadir imagen	Ajouter une image	Adicionar imagem	Добавить изображение	Menambahkan gambar	
 enumeration_areas	Enumeration Areas	Áreas de Enumeración	Zones de dénombrement	Áreas de enumeração	Области перечисления	Daerah Pencacahan	
-enter_team_name	Enter Team Name	Introducir nombre de equipo	Saisir le nom de l'équipe	Insira nome da equipe	Введите название команды	Masukkan Nama Tim	
+enter_team_name	Enter Team Name	Introducir nombre de equipo	Saisissez le nom de l'équipe	Insira nome da equipe	Введите название команды	Masukkan Nama Tim	
 assign_households	Assign Households	Asignar hogares	Assigner les ménages	Atribuir agregados familiares	Назначить домохозяйства	Tetapkan Rumah Tangga	
 sampling_type	Sampling Type	Tipo de Muestreo	Type d'échantillonnage	Tipo de amostragem	Тип выборки	Jenis Pengambilan Sampel	
 generating_qr_code	Generating QR Code…	Generar Código QR...	Générer un code QR...	Gerar código QR...	Генерация QR-кода...	Menghasilkan Kode QR…	
 samples	Samples	Muestras	Échantillons	Amostras	Образцы	Sampel	
 you_don_t_have_any_samples_for_this_study	You do not have any samples for this study	No tiene muestras para este estudio	Vous n'avez pas d'échantillons pour cette étude	Não tem amostras para este estudo	У вас нет образцов для этого исследования	Anda tidak memiliki sampel untuk penelitian ini	
-enum_saved_doc	Enumeration has been saved to the Documents directory.	Enumeración se ha guardado en el directorio Documentos.	L'énumération a été sauvegardée dans le répertoire Documents.	A enumeração foi guardada no diretório Documentos.	В директорию Документы сохранен файл Перепись.	Pencacahan telah disimpan ke direktori Dokumen.	
-config_saved_doc	Configuration has been saved to the Documents directory.	La configuración se ha guardado en el directorio Documentos.	Configuration a été sauvegardé dans le répertoire Documents.	A configuração foi guardada no diretório Documentos.	Конфигурация сохранена в каталоге Документы.	Konfigurasi telah disimpan ke direktori Dokumen.	
+enum_saved_doc	Enumeration has been saved to the Documents directory.	Enumeración se ha guardado en el directorio Documentos.	Le dénombrement a été sauvegardée dans le répertoire Documents.	A enumeração foi guardada no diretório Documentos.	В директорию Документы сохранен файл Перепись.	Pencacahan telah disimpan ke direktori Dokumen.	
+config_saved_doc	Configuration has been saved to the Documents directory.	La configuración se ha guardado en el directorio Documentos.	Configuration suavegardée dans le répertoire Documents.	A configuração foi guardada no diretório Documentos.	Конфигурация сохранена в каталоге Документы.	Konfigurasi telah disimpan ke direktori Dokumen.	
 nobody_home	Nobody home	Nadie en casa	Personne à la maison	Ninguém em casa	Никто не дома	Tidak ada orang di rumah	
-export_enum_data	Export Enumeration Data	Exportar datos de enumeración	Exporter des données de recensement	Exportar dados de enumeração	Экспорт данных переписи населения	Ekspor Data Pencacahan	
+export_enum_data	Export Enumeration Data	Exportar datos de enumeración	Exporter des données de dénombrement	Exportar dados de enumeração	Экспорт данных переписи населения	Ekspor Data Pencacahan	
 delete_landmark_message	Are you sure you want to permanently delete this landmark?	¿Está seguro de que desea eliminar definitivamente este hito?	Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?	Tem a certeza de que pretende eliminar permanentemente esta referência?	"Вы уверены, что хотите безвозвратно удалить этот ориентир?"	Apakah Anda yakin ingin menghapus landmark ini secara permanen?	
 subaddress	Subaddress	Subdirección	Sous-adresse	Sub-endereço	Субадрес	Subalamat	
 sampled	Sampled	Muestreo	Échantillonné	Amostragem	Выборочный	diambil sampelnya	
@@ -285,7 +285,7 @@ incomplete_enumeration	Incomplete Enumeration	Enumeración incompleta	Dénombrem
 dismiss	Dismiss	Descartar	Supprimer	Excluir	Удалить	Membubarkan	
 delete	Delete	Borrar	Supprimer	Eliminar	Удалить	Menghapus	
 launching_odk_collect_application	Launching ODK Collect Application...	Lanzamiento de la aplicación ODK Collect...	Lancement de l'application ODK Collect...	Iniciar a aplicação ODK Collect...	Запуск приложения ODK Collect...	Meluncurkan Aplikasi ODK Collect...	
-filters	Filters (combines rules)	Filtros (combina reglas)	Filtres (combine des règles)	Filtros (combina regras)	Фильтры (объединяет правила)	Filter (menggabungkan aturan)	
+filters	Filters (combines rules)	Filtros (combina reglas)	Filtres (combinent des règles)	Filtros (combina regras)	Фильтры (объединяет правила)	Filter (menggabungkan aturan)	
 new_location	Identify Location	Identificar ubicación	Identifier le lieu	Identificar a localização	Идентифицировать местоположение	Identifikasi Lokasi	
 delete_configuration	The current configuration will be replaced by the import.  Would you like to proceed?	La configuración actual será reemplazada por la importación.  ¿Desea continuar?	La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?	A configuração atual será substituída pela importação. Deseja prosseguir? 	Текущая конфигурация будет заменена импортом.  Желаете ли вы продолжить?	Konfigurasi saat ini akan digantikan oleh impor. Apakah Anda ingin melanjutkan?	
 total_population	Total Population Size	Tamaño total de la población	Taille totale de la population	Tamanho total da população	Общий размер популяции	Jumlah Populasi Total	
@@ -298,7 +298,7 @@ show_enumeration_info	Show Enumeration Info	Mostrar información de enumeración
 please_enter_a_name	Please enter a name for this field.	Introduzca un nombre para este campo.	Veuillez saisir un nom pour ce champ.	Introduza um nome para este campo.	"Пожалуйста, введите имя для этого поля."	Silakan masukkan nama untuk bidang ini.	
 please_enter_a_subaddress	Please enter a unique sub-address.	Introduzca una subdirección única.	Veuillez saisir une sous-adresse unique.	Introduza um sub-endereço único.	Укажите уникальный субадрес.	Silakan masukkan sub-alamat unik.	
 please_select_team_boundary	Please select the team boundary.	"Por favor, seleccione el límite del equipo."	Veuillez sélectionner le périmètre de l'équipe.	Seleccione o limite da equipa.	"Пожалуйста, выберите границу группы."	Silakan pilih batas tim.	
-enum_area_name_property	Enter the value of the Enumeration Area Name property	Introduzca el valor de la propiedad Nombre del área de enumeración	Saisir la valeur de la propriété Nom de la zone d'énumération	Introduzir o valor da propriedade Nome da área de enumeração	"Введите значение свойства ""Имя области перечисления""."	Masukkan nilai properti Nama Area Pencacahan	
+enum_area_name_property	Enter the value of the Enumeration Area Name property	Introduzca el valor de la propiedad Nombre del área de enumeración	Saisissez la valeur de la propriété: Nom de la zone de dénombrement	Introduzir o valor da propriedade Nome da área de enumeração	"Введите значение свойства ""Имя области перечисления""."	Masukkan nilai properti Nama Area Pencacahan	
 downloading_map_tiles	Downloading Map Tiles...	Descargando Mosaicos de Mapa...	Téléchargement des tuiles de carte...	Descarregamento de Map Tiles...	Загрузка плиток карты...	Mengunduh Ubin Peta...	
 style_pack_download_failed	Map Style Pack Download Failed	Fallo en la descarga del paquete de estilos de mapa	Échec du téléchargement du Map Style Pack	Falha no download do pacote de estilos de mapa	Загрузка пакета стилей карты не удалась	Pengunduhan Paket Gaya Peta Gagal	
 tile_pack_download_failed	Map Tile Pack Download Failed	Descarga fallida del paquete de mosaicos de mapa	Le téléchargement du Map Tile Pack a échoué	Falha na transferência do pacote de mosaicos de mapas	Загрузка пакета плиток карты не удалась	Pengunduhan Paket Ubin Peta Gagal	
@@ -307,7 +307,7 @@ delete_map_tile_region	Are you sure you want to delete this Map Tile Region?	¿E
 import_enumeration_area	Import Enumeration Area	Importar área de enumeración	Importez une zone de dénombrement	Importar área de enumeração	Импортировать область перечисления	Daerah Pencacahan Impor	
 create_enumeration_area	Create Enumeration Area	Crear área de enumeración	Créez une zone de dénombrement	Criar área de enumeração	Создать область переписи населения	Buat Area Pencacahan	
 add_household	Add Household	Añadir hogar	Ajoutez un ménage	Adicionar agregado familiar	Добавить домохозяйство	Tambahkan Rumah Tangga	
-define_map_tile_cache_region	Define map tile cache region	Definir región de caché de map tiles	Définir la région de cache des tuiles de la carte	Definir região de cache de mosaicos	Определить регион кэширования картографических плиток	Tentukan wilayah cache ubin peta	
+define_map_tile_cache_region	Define map tile cache region	Definir región de caché de map tiles	Définissez la région de cache des tuiles de la carte	Definir região de cache de mosaicos	Определить регион кэширования картографических плиток	Tentukan wilayah cache ubin peta	
 download_map_tiles	Download map tiles	Descargar mosaicos de mapa	Téléchargez les tuiles de la carte	Descarregar mosaicos do mapa	Загрузить плитки карты	Unduh ubin peta	
 center_on_location	Center on location	Centrar en ubicación	Centrez sur l'emplacement	Centrar na localização	Центрирование по местоположению	Pusatkan pada lokasi	
 less_than_equal	Less Than Or Equal	Menor o igual que	Inférieur ou égal	Menor que ou igual	Меньше или равно	Kurang Dari Atau Sama	
@@ -319,7 +319,7 @@ unknown	UNKNOWN	DESCONOCIDO	INCONNU	DESCONHECIDA	НЕИЗВЕСТНО	TIDAK DIKE
 legend	Legend	Leyenda	Légende	Legenda	Легенда	Legenda	
 select_date_type	Please select the Date type	Seleccione el tipo de fecha	Veuillez sélectionner le type de date	Seleccione o tipo de data	"Пожалуйста, выберите тип даты"	Silakan pilih jenis Tanggal	
 contains	Contains	Contiene	Contient	Contém	Содержит	Mengandung	
-collection_saved_doc	Collection has been saved to the Documents directory	La colección se ha guardado en el directorio Documentos	La collection a été enregistrée dans le répertoire Documents	A coleção foi guardada no diretório Documentos	Коллекция была сохранена в каталоге Документы	Koleksi telah disimpan ke direktori Dokumen	
+collection_saved_doc	Collection has been saved to the Documents directory	La colección se ha guardado en el directorio Documentos	La collecte a été enregistrée dans le répertoire Documents	A coleção foi guardada no diretório Documentos	Коллекция была сохранена в каталоге Документы	Koleksi telah disimpan ke direktori Dokumen	
 invalid_operator	The selected operator is not valid for the selected rule	El operador seleccionado no es válido para la regla seleccionada	L'opérateur sélectionné n'est pas valide pour la règle sélectionnée	O operador selecionado não é válido para a regra selecionada	Выбранный оператор не действителен для выбранного правила	Operator yang dipilih tidak valid untuk aturan yang dipilih	
 about_gpssample	About GPSSample	Acerca de GPSSample	À propos de GPSSample	Sobre o GPSSample	О компании GPSSample	Tentang Contoh GPS	
 privacy_statement	Privacy Statement	Declaración de privacidad	Déclaration de confidentialité	Declaração de privacidade	Положение о конфиденциальности	Pernyataan Privasi	
@@ -337,7 +337,7 @@ user_name_not_found	User name not found	Nombre de usuario no encontrado	Nom d'ut
 multi_families	Multi Households	Multihogares	Multi-ménages	Agregados familiares múltiplos	Многоквартирные дома	Multi Rumah Tangga	
 is_multi_family	Is this a multi household location?	¿Se trata de una ubicación multihogar?	S'agit-il d'un lieu où vivent plusieurs ménages ?	Este é um local com vários agregados familiares?	Является ли это место расположения несколькими домохозяйствами?	Apakah ini lokasi multi rumah tangga?	
 sample	Sample	Muestra	Exemple	Amostra	Образец	Sampel	
-mark_status	Mark Status	Marca Estado	Statut de la marque	Estado da marca	Статус отметки	Tandai Status	
+mark_status	Mark Status	Marca Estado	Indiquez Statut	Estado da marca	Статус отметки	Tandai Status	
 not_visited	Not Visited	No visitado	Non visitée	Não visitado	Не посещен	Tidak Dikunjungi	
 incomplete_collection	Incomplete Survey	Encuesta incompleta	Enquête incomplète	Inquérito Incompleto	Незавершенный опрос	Survei Tidak Lengkap	
 completed_collection	Completed Survey	Encuesta completada	Enquête terminée	Inquérito concluído	Завершенный опрос	Survei Selesai	
@@ -362,8 +362,8 @@ map_tile_boundary	Enter the length/width (Kilometers) of the desired map tile re
 success	SUCCESS!	¡ÉXITO!	SUCCES !	SUCESSO!	УСПЕХ!	KESUKSESAN!	
 error	ERROR!	¡ERROR!	ERREUR !	ERRO!	ОШИБКА!	KESALAHAN!	
 import_failed	The import failed.	La importación ha fallado.	L'importation a échoué.	A importação falhou.	Импорт не удался.	Impor gagal.	
-import_succeeded	The import was successful.	La importación se ha realizado correctamente.	L'importation a réussi.	A importação foi bem sucedida.	Импорт прошел успешно.	Impor berhasil.	
-clear_map_tile_region	Clear map tile cache region	Borrar región de caché de mosaico de mapa	Effacer la région du cache des tuiles de la carte	Limpar a região da cache de mosaicos do mapa	Очистить кэш региона плитки карты	Hapus wilayah cache ubin peta	
+import_succeeded	The import was successful.	La importación se ha realizado correctamente.	Importation réussie	A importação foi bem sucedida.	Импорт прошел успешно.	Impor berhasil.	
+clear_map_tile_region	Clear map tile cache region	Borrar región de caché de mosaico de mapa	Effacez la région du cache des tuiles de la carte	Limpar a região da cache de mosaicos do mapa	Очистить кэш региона плитки карты	Hapus wilayah cache ubin peta	
 import_request_failed	Received an Export Request while waiting for an Import Request	Recibida una solicitud de exportación a la espera de una solicitud de importación	Réception d'une demande d'exportation en attente d'une demande d'importation	Recebeu um pedido de exportação enquanto aguardava um pedido de importação	Получен запрос на экспорт в ожидании запроса на импорт	Menerima Permintaan Ekspor sambil menunggu Permintaan Impor	
 export_request_failed	Received an Import Request while waiting for an Export Request	Recibida una Solicitud de Importación mientras se espera una Solicitud de Exportación	Réception d'une demande d'importation en attente d'une demande d'exportation	Recebeu um pedido de importação enquanto aguardava um pedido de exportação	Получен запрос на импорт в ожидании запроса на экспорт	Menerima Permintaan Impor sambil menunggu Permintaan Ekspor	
 network_connection	Network Connection	Conexión a la red	Connexion au réseau	Ligação de rede	Сетевое подключение	Koneksi jaringan	
@@ -395,3 +395,8 @@ select_file_location	Select the file location	Seleccione la ubicación del archi
 default_location	Default location	Ubicación por defecto	Emplacement par défaut	Localização predefinida	Расположение по умолчанию	Lokasi bawaan	
 let_me_choose	Let me choose	Déjame elegir	Laissez-moi choisir	Deixem-me escolher	Позвольте мне выбрать	Biarkan aku memilih	
 boundary_is_self_intersecting	The boundary of this Enumeration Area is self-intersecting. Would you like to correct the boundary?	El límite de esta zona de enumeración es auto-intersecante. Desea corregir el límite?	Les limites de cette zone de dénombrement sont auto-intersectées. Souhaitez-vous corriger la limite ?	O limite desta Área de Enumeração é auto-intersectado. Gostaria de corrigir o limite?	Граница этого района перечисления является самопересекающейся. Вы хотите исправить границу?	Batas Wilayah Pencacahan ini berpotongan dengan sendirinya. Apakah Anda ingin memperbaiki batasnya?	
+select_the_property_identifier	Select the cluster name variable	Seleccione la variable del nombre del cluster	Sélectionnez la variable du nom de la grappe	Selecione a variável do nome do agregado	выберите переменную названия кластера	Pilih variabel nama klaster 	
+select_the_hh_identifiers	Select the household variables to import	Seleccione las variables domésticas a importar	Sélectionnez les variables du ménage à importer	Selecione as variáveis do agregado familiar a importar	выберите переменные домашнего хозяйства для импорта	Pilih variabel rumah tangga yang akan diimpor 	
+date_formats	dd/mm/yyyy	dd/mm/aaaa	jj/mm/aaaa	dd/mm/aaaa	дд/мм/гггг	dd/mm/yyyy 	
+date_formats	mm/dd/yyyy	mm/dd/aaaa	mm/jj/aaaa	mm/dd/aaaa	мм/dd/yyyy	mm/dd/yyyy 	
+date_formats	yyyy/mm/dd	aaaa/mm/dd	aaaa/mm/jj	aaaa/mm/dd	гггг/мм/дд	yyyy/mm/dd	

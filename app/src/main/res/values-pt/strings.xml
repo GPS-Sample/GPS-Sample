@@ -369,6 +369,8 @@
     <string name="default_location">"Localização predefinida"</string>
     <string name="let_me_choose">"Deixem-me escolher"</string>
     <string name="boundary_is_self_intersecting">"O limite desta Área de Enumeração é auto-intersectado. Gostaria de corrigir o limite?"</string>
+    <string name="select_the_property_identifier">"Selecione a variável do nome do agregado"</string>
+    <string name="select_the_hh_identifiers">"Selecione as variáveis do agregado familiar a importar"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
@@ -410,5 +412,10 @@
         <item>"Amostragem por conglomerados"</item>
         <item>"Subconjuntos: Podem sobrepor-se"</item>
         <item>"Estratos: Mutuamente exclusivos"</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>"dd/mm/aaaa"</item>
+        <item>"mm/dd/aaaa"</item>
+        <item>"aaaa/mm/dd"</item>
     </string-array>
 </resources>

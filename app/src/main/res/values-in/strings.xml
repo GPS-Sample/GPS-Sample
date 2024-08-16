@@ -369,6 +369,8 @@
     <string name="default_location">"Lokasi bawaan"</string>
     <string name="let_me_choose">"Biarkan aku memilih"</string>
     <string name="boundary_is_self_intersecting">"Batas Wilayah Pencacahan ini berpotongan dengan sendirinya. Apakah Anda ingin memperbaiki batasnya?"</string>
+    <string name="select_the_property_identifier">"Pilih variabel nama klaster"</string>
+    <string name="select_the_hh_identifiers">"Pilih variabel rumah tangga yang akan diimpor"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>
@@ -410,5 +412,10 @@
         <item>"Pengambilan Sampel Klaster"</item>
         <item>"Subset: Mungkin Tumpang Tindih"</item>
         <item>"Strata: Saling Eksklusif"</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>"dd/mm/yyyy"</item>
+        <item>"mm/dd/yyyy"</item>
+        <item>"yyyy/mm/dd"</item>
     </string-array>
 </resources>

@@ -369,6 +369,8 @@
     <string name="default_location">"Расположение по умолчанию"</string>
     <string name="let_me_choose">"Позвольте мне выбрать"</string>
     <string name="boundary_is_self_intersecting">"Граница этого района перечисления является самопересекающейся. Вы хотите исправить границу?"</string>
+    <string name="select_the_property_identifier">"выберите переменную названия кластера"</string>
+    <string name="select_the_hh_identifiers">"выберите переменные домашнего хозяйства для импорта"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
@@ -410,5 +412,10 @@
         <item>"Кластерная выборка"</item>
         <item>"Подмножества: Могут пересекаться"</item>
         <item>"Страты: Взаимоисключающие"</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>"дд/мм/гггг"</item>
+        <item>"мм/dd/yyyy"</item>
+        <item>"гггг/мм/дд"</item>
     </string-array>
 </resources>
