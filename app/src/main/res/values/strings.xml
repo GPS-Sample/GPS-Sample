@@ -370,6 +370,7 @@
     <string name="let_me_choose">"Let me choose"</string>
     <string name="boundary_is_self_intersecting">"The boundary of this Enumeration Area is self-intersecting. Would you like to correct the boundary?"</string>
     <string name="select_the_property_identifier">"Please select the property identifier that identifies the cluster name"</string>
+    <string name="select_the_hh_identifiers">"Please select the HH identifiers to import"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

@@ -1329,7 +1329,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                                     DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
                                 }
                                 is Point -> {
-                                    checkboxDialog = CheckboxDialog( activity!!, "Please select the HH identifiers to import", keys, text, feature, this )
+                                    checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), keys, text, feature, this )
                                 }
                                 else -> {}
                             }
