@@ -124,6 +124,16 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
             MapLegendDialog( activity!! )
         }
 
+        when(study.samplingMethod)
+        {
+            SamplingMethod.SimpleRandom-> binding.titleTextView.text = resources.getString(R.string.simple_random)
+            SamplingMethod.Cluster -> binding.titleTextView.text = resources.getString(R.string.cluster_sampling)
+            SamplingMethod.Subsets -> binding.titleTextView.text = resources.getString(R.string.subset_overlap)
+            SamplingMethod.Strata -> binding.titleTextView.text = resources.getString(R.string.strata_exclusive)
+            SamplingMethod.None -> TODO()
+        }
+
+
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,
             object : Style.OnStyleLoaded {
