@@ -50,11 +50,9 @@ class ConfigurationViewModel : ViewModel()
         get() = _currentConfiguration
 
     val timeFormats = arrayOf( "", "" )
+    val dateFormats = arrayOf( "", "", "" )
     val distanceFormats = arrayOf( "", "" )
     val minimumGpsPrecisionFormats = arrayOf( "", "" )
-
-    val dateFormats : Array<String>
-        get() = DateFormatConverter.array
 
     private var _centerOnCurrentLocation : MutableLiveData<Boolean>? = null
 
@@ -145,9 +143,18 @@ class ConfigurationViewModel : ViewModel()
         }
 
     val currentConfigurationDateFormat : String
-        get(){
+        get() {
             currentConfiguration?.value?.let {config ->
-                return config.dateFormat.format
+                if (config.dateFormat == DateFormat.DayMonthYear)
+                {
+                    return dateFormats[0]
+                }
+                else if (config.dateFormat == DateFormat.MonthDayYear)
+                    return dateFormats[1]
+                else
+                {
+                    return dateFormats[2]
+                }
             }
             return unavailable
         }

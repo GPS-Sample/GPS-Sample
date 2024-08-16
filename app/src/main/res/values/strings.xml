@@ -372,6 +372,12 @@
     <string name="select_the_property_identifier">"Please select the property identifier that identifies the cluster name"</string>
     <string name="select_the_hh_identifiers">"Please select the HH identifiers to import"</string>
 
+    <string-array name="date_formats">
+        <item>"dd/mm/yyyy"</item>
+        <item>"mm/dd/yyyy"</item>
+        <item>"yyyy/mm/dd"</item>
+    </string-array>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

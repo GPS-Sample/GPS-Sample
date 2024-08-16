@@ -108,6 +108,11 @@ class ManageConfigurationsFragment : Fragment(),
         sharedViewModel.timeFormats[0] = timeFormats[0].toString()
         sharedViewModel.timeFormats[1] = timeFormats[1].toString()
 
+        val dateFormats = resources.getTextArray( R.array.date_formats )
+        sharedViewModel.dateFormats[0] = dateFormats[0].toString()
+        sharedViewModel.dateFormats[1] = dateFormats[1].toString()
+        sharedViewModel.dateFormats[2] = dateFormats[2].toString()
+
         sharedViewModel.minimumGpsPrecisionFormats[0] = resources.getString(R.string.meters)
         sharedViewModel.minimumGpsPrecisionFormats[1] = resources.getString(R.string.feet)
 
