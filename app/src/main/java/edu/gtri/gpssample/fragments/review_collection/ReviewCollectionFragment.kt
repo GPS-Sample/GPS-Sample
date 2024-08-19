@@ -11,6 +11,7 @@ import android.os.Environment
 import android.util.Log
 import android.util.Log.ASSERT
 import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,6 +41,7 @@ import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
+import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -325,11 +327,11 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
             }
         }
 
-        addPolygon( enumArea.vertices )
+        addPolygon( enumArea.vertices, "" )
 
         for (enumerationTeam in enumArea.enumerationTeams)
         {
-            addPolygon( enumerationTeam.polygon )
+            addPolygon( enumerationTeam.polygon, enumerationTeam.name )
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
@@ -412,7 +414,7 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
-    fun addPolygon( vertices: ArrayList<LatLon> )
+    fun addPolygon( vertices: ArrayList<LatLon>, label: String )
     {
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
@@ -435,6 +437,28 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
             polylineAnnotation?.let { polylineAnnotation ->
                 allPolylineAnnotations.add(polylineAnnotation)
             }
+
+            val latLngBounds = GeoUtils.findGeobounds(vertices)
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            addViewAnnotationToPoint(point,label)
+        }
+    }
+
+    private fun addViewAnnotationToPoint(point: Point, label: String)
+    {
+        if (label.isNotEmpty())
+        {
+            val viewAnnotationManager = binding.mapView.viewAnnotationManager
+
+            val viewAnnotation = viewAnnotationManager.addViewAnnotation(
+                resId = R.layout.view_text_view,
+                options = viewAnnotationOptions
+                {
+                    geometry(point)
+                }
+            )
+
+            viewAnnotation.rootView.findViewById<TextView>( R.id.text_view ).text = label
         }
     }
 

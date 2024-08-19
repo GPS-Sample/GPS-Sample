@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import com.mapbox.bindgen.Value
@@ -13,6 +14,7 @@ import com.mapbox.common.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
 import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
