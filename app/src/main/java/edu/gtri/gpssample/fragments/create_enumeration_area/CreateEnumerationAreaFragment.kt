@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
@@ -51,6 +52,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -978,6 +980,28 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         polylineAnnotation?.let { polylineAnnotation ->
             allPolylineAnnotations.add( polylineAnnotation )
+        }
+
+        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+        val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+        addViewAnnotationToPoint(point,enumArea.name)
+    }
+
+    private fun addViewAnnotationToPoint(point: com.mapbox.geojson.Point, label: String)
+    {
+        if (label.isNotEmpty())
+        {
+            val viewAnnotationManager = binding.mapView.viewAnnotationManager
+
+            val viewAnnotation = viewAnnotationManager.addViewAnnotation(
+                resId = R.layout.view_text_view,
+                options = viewAnnotationOptions
+                {
+                    geometry(point)
+                }
+            )
+
+            viewAnnotation.rootView.findViewById<TextView>( R.id.text_view ).text = label
         }
     }
 
