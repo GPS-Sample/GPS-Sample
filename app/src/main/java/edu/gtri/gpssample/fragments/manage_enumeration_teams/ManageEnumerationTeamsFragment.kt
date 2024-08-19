@@ -71,7 +71,7 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
         binding.teamRecyclerView.adapter = manageEnumerationTeamsAdapter
         binding.teamRecyclerView.layoutManager = LinearLayoutManager(activity)
 
-        binding.titleTextView.text = enumArea.name + " Teams"
+        binding.titleTextView.text = enumArea.name + " " + resources.getString(R.string.teams)
 
         binding.addButton.setOnClickListener {
             findNavController().navigate(R.id.action_navigate_to_CreateEnumerationTeamFragment)
