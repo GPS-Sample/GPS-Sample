@@ -167,6 +167,7 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
                 requiredTextView.visibility = if (field.required) View.VISIBLE else View.GONE
 
                 val data = ArrayList<String>()
+                data.add( context!!.getString(R.string.select))
 
                 for (fieldDataOption in fieldData.fieldDataOptions)
                 {
@@ -177,9 +178,7 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
                 spinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, data )
 
                 fieldData.dropdownIndex?.let {
-                    spinner.setSelection( it )
-                } ?: run {
-                    spinner.setSelection( data.size-1 )
+                    spinner.setSelection(it + 1)
                 }
 
                 if (editMode)
@@ -188,8 +187,16 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
                     {
                         override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long)
                         {
-                            fieldData.dropdownIndex = position
-                        }
+                            if (position == 0)
+                            {
+                                fieldData.textValue = ""
+                                fieldData.dropdownIndex = null
+                            }
+                            else
+                            {
+                                fieldData.dropdownIndex = position-1
+                                fieldData.textValue = field.fieldOptions[position-1].name
+                            }                        }
 
                         override fun onNothingSelected(parent: AdapterView<*>)
                         {
