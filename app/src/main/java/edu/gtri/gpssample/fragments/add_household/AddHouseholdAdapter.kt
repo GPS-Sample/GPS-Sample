@@ -3,6 +3,7 @@ package edu.gtri.gpssample.fragments.add_household
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -118,7 +119,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
                     for (blockNumber in 1..numberOfBlocks)
                     {
-                        val blockFieldDataList = ArrayList<FieldData>()
+                        var blockFieldDataList = ArrayList<FieldData>()
 
                         // look for existing block FieldData items
                         for (blockFieldData in enumerationItem.fieldDataList)
@@ -131,23 +132,20 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                             }
                         }
 
-                        // check to see if the block size changed
-
-//                        if (blockFieldDataList.isNotEmpty() && blockFieldDataList.size !=numberOfBlocks)
-//                        {
-//                            for (bfd in blockFieldDataList)
-//                            {
-//                                enumerationItem.fieldDataList.remove( bfd )
-//                            }
-//
-//                            blockFieldDataList.clear()
-//                        }
-
-                        if (blockFieldDataList.isEmpty())
+                        if (blockFieldDataList.isNotEmpty())
                         {
+                            blockFieldDataList = ArrayList<FieldData>(blockFieldDataList.sortedBy {it.creationDate})
+                        }
+                        else
+                        {
+                            var count = 0
+                            val creationDate = Date().time
+
                             for (blockField in blockFields)
                             {
-                                val blockFieldData = FieldData(blockField,blockNumber)
+                                val blockFieldData = FieldData(creationDate + count, blockField, blockNumber )
+
+                                count += 1
 
                                 enumerationItem.fieldDataList.add(blockFieldData)
 
@@ -372,7 +370,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
     fun getBlockFields( uuid: String ) : ArrayList<Field>
     {
-        val filteredFieldList = ArrayList<Field>()
+        var filteredFieldList = ArrayList<Field>()
 
         for (field in fieldList)
         {
@@ -386,6 +384,8 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                 }
             }
         }
+
+        filteredFieldList = ArrayList<Field>(filteredFieldList.sortedBy {it.creationDate})
 
         return filteredFieldList
     }

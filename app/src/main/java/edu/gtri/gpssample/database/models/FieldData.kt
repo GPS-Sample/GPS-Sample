@@ -31,6 +31,9 @@ data class FieldData (
     constructor( field: Field, blockNumber: Int ) : this( UUID.randomUUID().toString(), Date().time, field, "", FieldType.None,
         "", null, null, null, blockNumber, ArrayList<FieldDataOption>())
 
+    constructor( creationDate: Long, field: Field, blockNumber: Int ) : this( UUID.randomUUID().toString(), creationDate, field, "", FieldType.None,
+        "", null, null, null, blockNumber, ArrayList<FieldDataOption>())
+
     constructor( field: Field,  name : String, type : FieldType, textValue: String,
                  numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :
             this( UUID.randomUUID().toString(), Date().time, field, name, type,  textValue,
