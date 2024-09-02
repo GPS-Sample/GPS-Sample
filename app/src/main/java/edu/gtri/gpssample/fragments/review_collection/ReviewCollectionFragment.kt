@@ -329,9 +329,9 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
 
         addPolygon( enumArea.vertices, "" )
 
-        for (enumerationTeam in enumArea.enumerationTeams)
+        for (collectionTeam in enumArea.collectionTeams)
         {
-            addPolygon( enumerationTeam.polygon, enumerationTeam.name )
+            addPolygon( collectionTeam.polygon, collectionTeam.name )
         }
 
         val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
