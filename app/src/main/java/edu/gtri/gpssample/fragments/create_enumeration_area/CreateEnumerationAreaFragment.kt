@@ -997,6 +997,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 resId = R.layout.view_text_view,
                 options = viewAnnotationOptions
                 {
+                    allowOverlap(true)
                     geometry(point)
                 }
             )

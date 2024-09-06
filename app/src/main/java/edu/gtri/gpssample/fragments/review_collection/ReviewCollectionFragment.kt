@@ -454,6 +454,7 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
                 resId = R.layout.view_text_view,
                 options = viewAnnotationOptions
                 {
+                    allowOverlap(true)
                     geometry(point)
                 }
             )

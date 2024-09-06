@@ -13,7 +13,7 @@
         android:focusable="false"
         android:gravity="center"
         android:text="A Team"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="16sp" />
 
 </LinearLayout>

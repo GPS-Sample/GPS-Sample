@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.*
+import com.google.android.gms.location.zza
 import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
@@ -28,6 +29,7 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.has
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.zoom
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
@@ -381,6 +383,7 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
                 resId = R.layout.view_text_view,
                 options = viewAnnotationOptions
                 {
+                    allowOverlap(true)
                     geometry(point)
                 }
             )
