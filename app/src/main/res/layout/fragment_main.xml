@@ -12,121 +12,100 @@
         android:layout_width="match_parent"
         android:layout_height="20dp" />
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:weightSum="4">
+        android:layout_height="40dp"
+        android:layout_margin="20dp"
+        android:paddingHorizontal="10dp"
+        android:text="@string/select_role"
+        android:textColor="@color/primary_textcolor"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center_vertical"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linearLayout"
+    <RadioGroup
+        android:id="@+id/radioGroupMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <RadioButton
+            android:id="@+id/admin_button"
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_alignParentTop="true"
-            android:layout_weight="3">
+            android:layout_height="wrap_content"
+            android:text="@string/admin"
+            android:textSize="20sp"/>
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_margin="20dp"
-                android:paddingHorizontal="10dp"
-                android:text="@string/select_role"
-                android:textColor="@color/primary_textcolor"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                app:layout_constraintBottom_toTopOf="@+id/radioGroupMode"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <RadioGroup
-                android:id="@+id/radioGroupMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginBottom="5dp"
-                android:gravity="center_horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/textView">
-            <RadioButton
-                android:id="@+id/admin_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/admin"
-                android:textSize="20sp"/>
-
-            <RadioButton
-                android:id="@+id/supervisor_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/supervisor"
-                android:textSize="20sp" />
-
-                <RadioButton
-                    android:id="@+id/enumerator_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/enumerator"
-                    android:textSize="20sp" />
-
-            <RadioButton
-                android:id="@+id/data_collector_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/data_collector"
-                android:textSize="20sp" />
-            </RadioGroup>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <RadioButton
+            android:id="@+id/supervisor_button"
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:text="@string/supervisor"
+            android:textSize="20sp" />
 
-            <Button
-                android:id="@+id/sign_in_button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="20dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:textColor="@color/white"
-                android:text="@string/sign_in" />
+        <RadioButton
+            android:id="@+id/enumerator_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/enumerator"
+            android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/sign_up_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center"
-                android:text="@string/not_registered"
-                android:textSize="17sp"
-                android:textColor="@color/blue"
-                app:layout_constraintBottom_toTopOf="@+id/version_text_view"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
+        <RadioButton
+            android:id="@+id/data_collector_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/data_collector"
+            android:textSize="20sp" />
+    </RadioGroup>
 
-            <TextView
-                android:id="@+id/version_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginBottom="357dp"
-                android:gravity="center"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sign_up_text_view" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+    <Space
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    <Button
+        android:id="@+id/sign_in_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:textColor="@color/white"
+        android:text="@string/sign_in" />
 
+    <TextView
+        android:id="@+id/sign_up_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="@string/not_registered"
+        android:textSize="17sp"
+        android:textColor="@color/blue"/>
+
+    <TextView
+        android:id="@+id/app_version_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:text="App Version 1.0.0 #105"/>
+
+    <TextView
+        android:id="@+id/db_version_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:text="Database Version #306"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

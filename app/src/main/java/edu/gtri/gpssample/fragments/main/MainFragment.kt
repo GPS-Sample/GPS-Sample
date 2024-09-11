@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.common.io.Resources
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -56,7 +57,8 @@ class MainFragment : Fragment()
 
         activity!!.setTitle( "GPSSample" )
 
-        binding.versionTextView.text = BuildConfig.VERSION_NAME
+        binding.appVersionTextView.text = resources.getString(R.string.app_version) + " " + BuildConfig.VERSION_NAME
+        binding.dbVersionTextView.text = resources.getString(R.string.db_version) + " #" + DAO.DATABASE_VERSION
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
 
