@@ -9,9 +9,10 @@
         android:id="@+id/text_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
+        android:background="@color/white"
         android:focusable="false"
         android:gravity="center"
+        android:padding="10dp"
         android:text="A Team"
         android:textColor="@color/black"
         android:textSize="16sp" />
