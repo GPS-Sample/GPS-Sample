@@ -371,6 +371,8 @@
     <string name="boundary_is_self_intersecting">"O limite desta Área de Enumeração é auto-intersectado. Gostaria de corrigir o limite?"</string>
     <string name="select_the_property_identifier">"Selecione a variável do nome do agregado"</string>
     <string name="select_the_hh_identifiers">"Selecione as variáveis do agregado familiar a importar"</string>
+    <string name="app_version">"Versão da aplicação"</string>
+    <string name="db_version">"Versão da base de dados"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

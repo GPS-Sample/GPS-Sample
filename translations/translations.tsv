@@ -400,3 +400,5 @@ select_the_hh_identifiers	Select the household variables to import	Seleccione la
 date_formats	dd/mm/yyyy	dd/mm/aaaa	jj/mm/aaaa	dd/mm/aaaa	дд/мм/гггг	dd/mm/yyyy 	
 date_formats	mm/dd/yyyy	mm/dd/aaaa	mm/jj/aaaa	mm/dd/aaaa	мм/dd/yyyy	mm/dd/yyyy 	
 date_formats	yyyy/mm/dd	aaaa/mm/dd	aaaa/mm/jj	aaaa/mm/dd	гггг/мм/дд	yyyy/mm/dd	
+app_version	Application Version	Versión de la aplicación	Version de l'application	Versão da aplicação	Версия приложения	Versi aplikasi 	
+db_version	Database Version	Versión de la base de datos	Version de la base de données	Versão da base de dados	Версия базы данных	Versi basis data	

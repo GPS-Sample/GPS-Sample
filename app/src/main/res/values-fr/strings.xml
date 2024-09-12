@@ -371,6 +371,8 @@
     <string name="boundary_is_self_intersecting">"Les limites de cette zone de dénombrement sont auto-intersectées. Souhaitez-vous corriger la limite ?"</string>
     <string name="select_the_property_identifier">"Sélectionnez la variable du nom de la grappe"</string>
     <string name="select_the_hh_identifiers">"Sélectionnez les variables du ménage à importer"</string>
+    <string name="app_version">"Version de l'application"</string>
+    <string name="db_version">"Version de la base de données"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
