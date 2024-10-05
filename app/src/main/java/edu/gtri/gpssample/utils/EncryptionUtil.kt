@@ -5,6 +5,7 @@ import android.util.Log
 import java.security.MessageDigest
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
@@ -15,39 +16,10 @@ object EncryptionUtil {
     const val kSalt = "c2xTT0lua0ZWbHdvZWlTTGs="
     const val kIv = "Y2Jma25sRkRMS1NHekNWTA=="
 
-    fun createKeys()
-    {
-        val secret = "GPS_SAMPLE CDC GTRI"
-        val digest = MessageDigest.getInstance("SHA-1")
-        val result = digest.digest(secret.toByteArray(Charsets.UTF_8))
-        val sb = StringBuilder()
-        for (b in result) {
-            sb.append(String.format("%02X", b))
-        }
-        val hashedPassword = sb.toString()
-
-        val saltString = "slSOInkFVlwoeiSLk"
-        val encodedSaltString: String = Base64.encodeToString(saltString.toByteArray(), 0)
-
-        val ivString = "cbfknlFDLKSGzCVL"
-        val encodedIvString: String = Base64.encodeToString(ivString.toByteArray(), 0)
-
-        Log.d("XXXXXXX", "secret key ${hashedPassword}")
-        Log.d("XXXXXXX","iv key ${encodedIvString}")
-        Log.d("XXXXXXX","salt string ${encodedSaltString}")
-
-        Log.d("XXXXXXXXXX", "---------- BIG TEST ")
-        val encrypted = Encrypt("ENCRYPT TEST","")
-        Log.d("XXXXXXXXXX", "Encrypted $encrypted")
-        val decrypted = Decrypt(encrypted,"")
-        Log.d("XXXXXXXXXX", "Decrypted $decrypted")
-        Log.d("XXXXXXXXXX", "DONE!!")
-    }
-
-
     fun Encrypt(strToEncrypt: String, password: String) :  String
     {
-        try {
+        try
+        {
             val secretKey = if (password.isNotEmpty()) password else kSecretKey
             val ivParameterSpec = IvParameterSpec(Base64.decode(kIv, Base64.DEFAULT))
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
@@ -56,15 +28,17 @@ object EncryptionUtil {
             val tmp = factory.generateSecret(spec)
             val secretKeySpec = SecretKeySpec(tmp.encoded, "AES")
 
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec)
 
             return Base64.encodeToString(
                 cipher.doFinal(strToEncrypt.toByteArray(Charsets.UTF_8)),
                 Base64.DEFAULT
             )
-        } catch (e: Exception) {
-            Log.d("XXXXX", "ERROR ${e.message}")
+        }
+        catch (e: Exception)
+        {
+            Log.d("xxx", e.stackTraceToString())
         }
 
         return ""
@@ -81,13 +55,14 @@ object EncryptionUtil {
             val tmp = factory.generateSecret(spec);
             val secretKeySpec =  SecretKeySpec(tmp.encoded, "AES")
 
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 
             return  String(cipher.doFinal(Base64.decode(strToDecrypt, Base64.DEFAULT)))
         }
-        catch (e : Exception) {
-            println("Error while decrypting: $e");
+        catch (e : Exception)
+        {
+            Log.d( "xxx",e.stackTraceToString());
         }
 
         return null
