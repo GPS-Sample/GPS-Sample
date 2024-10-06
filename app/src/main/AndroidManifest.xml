@@ -18,7 +18,6 @@
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
     <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-<!--    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />-->
 
     <application
         android:name=".application.MainApplication"
