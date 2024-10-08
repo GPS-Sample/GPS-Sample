@@ -3,32 +3,25 @@ package edu.gtri.gpssample.fragments.perform_collection
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.util.Log.ASSERT
 import android.view.*
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.*
-import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
@@ -38,7 +31,6 @@ import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
-import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.BuildConfig
@@ -52,7 +44,6 @@ import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
-import edu.gtri.gpssample.utils.TestUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -63,6 +54,7 @@ import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+
 
 class PerformCollectionFragment : Fragment(),
     OnCameraChangeListener,
@@ -102,6 +94,7 @@ class PerformCollectionFragment : Fragment(),
 
     private val fragmentResultListener = "PerformCollectionFragment"
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -113,7 +106,23 @@ class PerformCollectionFragment : Fragment(),
                         when (request)
                         {
                             Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
-                            Keys.kLaunchSurveyRequest.value -> SurveyLaunchNotificationDialog(activity!!, this)
+                            Keys.kLaunchSurveyRequest.value ->
+                            {
+                                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
+                                    if (enumerationItem.odkRecordUri.isNotEmpty())
+                                    {
+                                        val uri = Uri.parse( enumerationItem.odkRecordUri )
+                                        val intent = Intent(Intent.ACTION_EDIT)
+                                        intent.setData(uri)
+                                        odk_result.launch(intent)
+                                    }
+                                    else
+                                    {
+                                        // This will create a new ODK instance record
+                                        SurveyLaunchNotificationDialog(activity!!, this)
+                                    }
+                                }
+                            }
                         }
                     }
                     else if (!gpsAccuracyIsGood())
@@ -844,13 +853,28 @@ class PerformCollectionFragment : Fragment(),
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private val odk_result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val mainApplication = activity!!.application as MainApplication
 
-        mainApplication.currentSubAddress = mainApplication.defaultSubAddress
-        mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
-        mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
+        if (result.resultCode == Activity.RESULT_OK)
+        {
+            result.data?.data?.let { uri ->
+                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
+                    if (enumerationItem.odkRecordUri.isEmpty())
+                    {
+                        enumerationItem.odkRecordUri = uri.toString()
+                        Log.d( "xxx", enumerationItem.odkRecordUri )
+                        didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
+                    }
+                }
+            }
 
-        AdditionalInfoDialog( activity, "", "", this)
+            val mainApplication = activity!!.application as MainApplication
+
+            mainApplication.currentSubAddress = mainApplication.defaultSubAddress
+            mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
+            mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
+
+            AdditionalInfoDialog( activity, "", "", this)
+        }
     }
 
     override fun didSelectCancelButton()

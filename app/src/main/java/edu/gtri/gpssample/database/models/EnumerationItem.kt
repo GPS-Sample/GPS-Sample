@@ -34,7 +34,8 @@ data class EnumerationItem(
     var collectionIncompleteReason : String,
     var collectionNotes : String,
     var fieldDataList : ArrayList<FieldData>,
-    var locationUuid : String )
+    var locationUuid : String,
+    var odkRecordUri : String )
 {
     constructor() : this(
         "",
@@ -56,6 +57,7 @@ data class EnumerationItem(
         "",
         "",
         ArrayList<FieldData>(),
+        "",
         "")
 
     fun pack() : String

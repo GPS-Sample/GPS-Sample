@@ -86,6 +86,7 @@ class EnumerationItemDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE, enumerationItem.collectionDate )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON, enumerationItem.collectionIncompleteReason )
         values.put( DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES, enumerationItem.collectionNotes )
+        values.put( DAO.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI, enumerationItem.odkRecordUri )
     }
 
     @SuppressLint("Range")
@@ -107,6 +108,7 @@ class EnumerationItemDAO(private var dao: DAO)
         val collectionDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_DATE))
         val collectionIncompleteReason = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_INCOMPLETE_REASON))
         val collectionNotes = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_COLLECTION_NOTES))
+        val odkInstanceUri = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_ITEM_ODK_RECORD_URI))
 
         val fieldDataList = ArrayList<FieldData>()
 
@@ -130,7 +132,8 @@ class EnumerationItemDAO(private var dao: DAO)
             collectionIncompleteReason,
             collectionNotes,
             fieldDataList,
-            locationUuid
+            locationUuid,
+            odkInstanceUri
         )
     }
 
