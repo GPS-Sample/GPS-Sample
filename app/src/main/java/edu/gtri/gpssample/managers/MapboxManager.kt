@@ -157,6 +157,14 @@ class MapboxManager(
         {
             try
             {
+                val last = coordinates.size - 1
+
+                // close the polygon, if necc...
+                if (coordinates[0].x != coordinates[last].x || coordinates[0].y != coordinates[last].y)
+                {
+                    coordinates.add( coordinates[0] )
+                }
+
                 return !GeometryFactory().createPolygon(coordinates.toTypedArray()).isSimple
             }
             catch( ex: Exception )
