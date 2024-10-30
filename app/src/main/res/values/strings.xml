@@ -374,7 +374,6 @@
     <string name="app_version">"Application Version"</string>
     <string name="db_version">"Database Version"</string>
     <string name="team">"Team"</string>
-
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

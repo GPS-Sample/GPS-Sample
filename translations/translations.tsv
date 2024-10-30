@@ -32,7 +32,7 @@ field_types	Date	Fecha	Date	Data	Дата	Tanggal
 field_types	Checkbox	Casilla de chequeo	Case à cocher	Caixa de seleção	Флажок	kotak centang	
 field_types	Dropdown	Menú de opciones	Question déroulante	Lista suspensa	Выпадающее окно	tarik-turun	
 operators	Equal	Igual	Égal	Igual	Равно	Setara	
-operators	NotEqual	No igual	Inégal	Não igual	Не равно	Tidak sama	
+operators	NotEqual	No igual	Non égal	Não igual	Не равно	Tidak sama	
 operators	LessThan	Menor que	Plus petit que	Menor que	Меньше чем	Kurang dari	
 operators	GreaterThan	Mayor que	Plus grand que	Maior que	Больше чем	Lebih besar dari	
 operators	GreaterThanOrEqual	Mayor que o igual	Plus grand ou égal à	Maior ou igual a	Больше чем или равно	Lebih BesarDariAtauSama	
@@ -69,8 +69,8 @@ done	Done	Hecho	Terminé	Concluído	Готово	Selesai
 select_role	Select your Role	Selecciona su rol	Sélectionnez votre rôle	Seleccione a sua função	Выберите свою роль	Pilih Peran Anda	
 admin_select_role	Admin Select Role	Administrador - selecciona rol	Administrateur - Sélectionnez un rôle	Administrador - Selecionar função	Выберите роль Администратора	Admin Pilih Peran	
 supervisor_select_role	Supervisor Select Role	Supervisor - selecciona rol	Superviseur - Sélectionnez un rôle	Supervisor - Selecionar função	Выберите роль Супервайзера	Peran Pemilihan Supervisor	
-sign_in	Sign In	Iniciar sesión	S'identifier	Login	Войти	Masuk	
-sign_up	Sign Up	Registrarse	S'inscrire	Inscrever-se	Зарегистрироваться	Mendaftar	
+sign_in	Sign In	Iniciar sesión	S'identifier: 	Login	Войти	Masuk	
+sign_up	Sign Up	Registrarse	S'inscrire:	Inscrever-se	Зарегистрироваться	Mendaftar	
 sign_out	Sign Out	Cerrar sesión	Se déconnecter	Sair	Выйти из системы	Keluar	
 not_registered	Not registered?  Sign Up!	¿No estás registrado? ¡Regístrate!	Pas enregistré? S'inscrire!	Não está registado?  Registe-se!	Не зарегистрированы?  Зарегистрируйтесь!	Tidak terdaftar? Mendaftar!	
 name	Name	Nombre	Nom	Nome	Имя	Nama	
@@ -279,7 +279,7 @@ nobody_home	Nobody home	Nadie en casa	Personne à la maison	Ninguém em casa	Н�
 export_enum_data	Export Enumeration Data	Exportar datos de enumeración	Exporter des données de dénombrement	Exportar dados de enumeração	Экспорт данных переписи населения	Ekspor Data Pencacahan	
 delete_landmark_message	Are you sure you want to permanently delete this landmark?	¿Está seguro de que desea eliminar definitivamente este hito?	Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?	Tem a certeza de que pretende eliminar permanentemente esta referência?	"Вы уверены, что хотите безвозвратно удалить этот ориентир?"	Apakah Anda yakin ingin menghapus landmark ini secara permanen?	
 subaddress	Subaddress	Subdirección	Sous-adresse	Sub-endereço	Субадрес	Subalamat	
-sampled	Sampled	Muestreo	Échantillonné	Amostragem	Выборочный	diambil sampelnya	
+sampled	Sampled	Muestreo	Échantillonnés	Amostragem	Выборочный	diambil sampelnya	
 completed_enumeration	Completed Enumeration	Enumeración completada	Dénombrement terminé	Enumeração concluída	Завершенное перечисление	Pencacahan Komplit	
 incomplete_enumeration	Incomplete Enumeration	Enumeración incompleta	Dénombrement incomplet	Enumeração Incompleta	Неполный сбор	Pencacahan Tidak Lengkap	
 dismiss	Dismiss	Descartar	Supprimer	Excluir	Удалить	Membubarkan	
@@ -402,3 +402,4 @@ date_formats	mm/dd/yyyy	mm/dd/aaaa	mm/jj/aaaa	mm/dd/aaaa	мм/dd/yyyy	mm/dd/yyyy
 date_formats	yyyy/mm/dd	aaaa/mm/dd	aaaa/mm/jj	aaaa/mm/dd	гггг/мм/дд	yyyy/mm/dd	
 app_version	Application Version	Versión de la aplicación	Version de l'application	Versão da aplicação	Версия приложения	Versi aplikasi 	
 db_version	Database Version	Versión de la base de datos	Version de la base de données	Versão da base de dados	Версия базы данных	Versi basis data	
+team	Team	Equipo	Équipe	Equipa	команда	Tim	

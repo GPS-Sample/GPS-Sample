@@ -43,8 +43,8 @@
     <string name="select_role">"Sélectionnez votre rôle"</string>
     <string name="admin_select_role">"Administrateur - Sélectionnez un rôle"</string>
     <string name="supervisor_select_role">"Superviseur - Sélectionnez un rôle"</string>
-    <string name="sign_in">"S'identifier"</string>
-    <string name="sign_up">"S'inscrire"</string>
+    <string name="sign_in">"S'identifier:"</string>
+    <string name="sign_up">"S'inscrire:"</string>
     <string name="sign_out">"Se déconnecter"</string>
     <string name="not_registered">"Pas enregistré? S'inscrire!"</string>
     <string name="name">"Nom"</string>
@@ -253,7 +253,7 @@
     <string name="export_enum_data">"Exporter des données de dénombrement"</string>
     <string name="delete_landmark_message">"Êtes-vous sûr de vouloir supprimer définitivement ce point de repère ?"</string>
     <string name="subaddress">"Sous-adresse"</string>
-    <string name="sampled">"Échantillonné"</string>
+    <string name="sampled">"Échantillonnés"</string>
     <string name="completed_enumeration">"Dénombrement terminé"</string>
     <string name="incomplete_enumeration">"Dénombrement incomplet"</string>
     <string name="dismiss">"Supprimer"</string>
@@ -373,6 +373,7 @@
     <string name="select_the_hh_identifiers">"Sélectionnez les variables du ménage à importer"</string>
     <string name="app_version">"Version de l'application"</string>
     <string name="db_version">"Version de la base de données"</string>
+    <string name="team">"Équipe"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
@@ -399,7 +400,7 @@
     </string-array>
     <string-array name="operators">
         <item>"Égal"</item>
-        <item>"Inégal"</item>
+        <item>"Non égal"</item>
         <item>"Plus petit que"</item>
         <item>"Plus grand que"</item>
         <item>"Plus grand ou égal à"</item>

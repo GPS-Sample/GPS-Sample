@@ -373,6 +373,7 @@
     <string name="select_the_hh_identifiers">"выберите переменные домашнего хозяйства для импорта"</string>
     <string name="app_version">"Версия приложения"</string>
     <string name="db_version">"Версия базы данных"</string>
+    <string name="team">"команда"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

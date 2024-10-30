@@ -373,6 +373,7 @@
     <string name="select_the_hh_identifiers">"Seleccione las variables domésticas a importar"</string>
     <string name="app_version">"Versión de la aplicación"</string>
     <string name="db_version">"Versión de la base de datos"</string>
+    <string name="team">"Equipo"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

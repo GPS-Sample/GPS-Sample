@@ -373,6 +373,7 @@
     <string name="select_the_hh_identifiers">"Selecione as variáveis do agregado familiar a importar"</string>
     <string name="app_version">"Versão da aplicação"</string>
     <string name="db_version">"Versão da base de dados"</string>
+    <string name="team">"Equipa"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
