@@ -1127,11 +1127,11 @@ class PerformCollectionFragment : Fragment(),
             this.locationPuck = LocationPuck2D(
                 bearingImage = AppCompatResources.getDrawable(
                     activity!!,
-                    com.mapbox.maps.R.drawable.mapbox_user_puck_icon,
+                    R.drawable.mapbox_user_puck_icon,
                 ),
                 shadowImage = AppCompatResources.getDrawable(
                     activity!!,
-                    com.mapbox.maps.R.drawable.mapbox_user_icon_shadow,
+                    R.drawable.mapbox_user_icon_shadow,
                 ),
                 scaleExpression = interpolate {
                     linear()
