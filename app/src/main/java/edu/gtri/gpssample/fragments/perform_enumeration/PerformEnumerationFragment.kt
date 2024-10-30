@@ -182,7 +182,7 @@ class PerformEnumerationFragment : Fragment(),
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " team)"
+        binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " " +  resources.getString(R.string.team) + ")"
 
         binding.mapView.getMapboxMap().loadStyleUri(
             Style.MAPBOX_STREETS,

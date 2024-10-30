@@ -228,7 +228,7 @@ class PerformCollectionFragment : Fragment(),
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-            binding.titleTextView.text =  "Configuration " + enumArea.name + " (" + collectionTeam.name + " team)"
+            binding.titleTextView.text =  enumArea.name + " (" + collectionTeam.name + " " + resources.getString(R.string.team) + ")"
         }
 
         binding.mapView.getMapboxMap().loadStyleUri(

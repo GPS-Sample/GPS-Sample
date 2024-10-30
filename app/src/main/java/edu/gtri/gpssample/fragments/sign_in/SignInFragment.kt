@@ -66,7 +66,17 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             return
         }
 
-        binding.titleTextView.text = expectedRole + " " + resources.getString(R.string.sign_in)
+        var translatedRole = ""
+
+        when (expectedRole)
+        {
+            "Admin" -> translatedRole =  resources.getString( R.string.admin )
+            "Supervisor" -> translatedRole =  resources.getString( R.string.supervisor )
+            "Enumerator" -> translatedRole =  resources.getString( R.string.enumerator )
+            "DataColector" -> translatedRole =  resources.getString( R.string.data_collector )
+        }
+
+        binding.titleTextView.text = translatedRole + " " + resources.getString(R.string.sign_in)
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
         val userName = sharedPreferences.getString( Keys.kUserName.value, null)
