@@ -861,7 +861,7 @@ class PerformEnumerationFragment : Fragment(),
             val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
             val dateTime = LocalDateTime.now().format(formatter)
 
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Enumerated")
             root.mkdirs()
 
             var version = ""

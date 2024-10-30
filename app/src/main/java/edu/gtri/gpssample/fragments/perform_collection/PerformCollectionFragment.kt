@@ -659,7 +659,7 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
 
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
+            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Surveyed")
             root.mkdirs()
             val file = File(root, fileName)
             val writer = FileWriter(file)

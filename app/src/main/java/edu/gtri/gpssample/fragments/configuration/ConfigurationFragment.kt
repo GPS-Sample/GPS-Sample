@@ -459,7 +459,7 @@ class ConfigurationFragment : Fragment(),
 
                 val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}.json"
 
-                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample")
+                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations")
                 root.mkdirs()
                 val file = File(root, fileName)
                 val writer = FileWriter(file)
