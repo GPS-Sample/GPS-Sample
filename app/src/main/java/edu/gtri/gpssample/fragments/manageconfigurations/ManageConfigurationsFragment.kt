@@ -133,7 +133,7 @@ class ManageConfigurationsFragment : Fragment(),
                 binding.overlayView.visibility = View.GONE
                 manageConfigurationsAdapter.updateConfigurations(configurations)
 
-                if (user.role == Role.Enumerator.value && configurations.isNotEmpty() && configurations[0].selectedEnumAreaUuid.isEmpty())
+                if (user.role == Role.Enumerator.value && configurations.isNotEmpty()) // && configurations[0].selectedEnumAreaUuid.isEmpty())
                 {
                     binding.createButton.visibility = View.VISIBLE
                 }

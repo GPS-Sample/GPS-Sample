@@ -532,11 +532,13 @@ class WalkEnumerationAreaFragment : Fragment(),
                 startPointAnnotation = null
             }
 
-            if (config.enumAreas.isNotEmpty())
+            for (enumArea in config.enumAreas)
             {
-                DAO.enumAreaDAO.delete( config.enumAreas[0] )
-                config.enumAreas.clear()
+                DAO.enumAreaDAO.delete( enumArea )
             }
+
+            config.enumAreas.clear()
+            config.selectedEnumAreaUuid = ""
 
             if (config.mapTileRegions.isNotEmpty())
             {
