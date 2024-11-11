@@ -234,6 +234,7 @@
                     android:layout_height="wrap_content">
 
                      <TextView
+                         android:id="@+id/status_text_view"
                          android:text="@string/status"
                          android:textColor="@color/primary"
                          android:textSize="17sp"
@@ -252,6 +253,7 @@
                         android:text="@string/incomplete" />
 
                     <TextView
+                        android:id="@+id/reason_incomplete_text_view"
                         android:text="@string/reason_incomplete_label"
                         android:textColor="@color/primary"
                         android:textSize="17sp"
@@ -261,6 +263,7 @@
                         android:layout_height="wrap_content"/>
 
                     <RadioGroup
+                        android:id="@+id/reason_incomplete_radio_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <RadioButton

@@ -63,6 +63,7 @@ class AddHouseholdFragment : Fragment(),
     private lateinit var addHouseholdAdapter: AddHouseholdAdapter
 
     private var editMode = true
+    private var collectionMode = false
     private var fragmentResultListener = ""
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -98,6 +99,7 @@ class AddHouseholdFragment : Fragment(),
         }
 
         arguments?.getBoolean( Keys.kCollectionMode.value)?.let { collectionMode ->
+            this.collectionMode = collectionMode
             if (collectionMode)
             {
                 binding.launchSurveyButton.visibility = View.VISIBLE
@@ -200,26 +202,54 @@ class AddHouseholdFragment : Fragment(),
             }
         }
 
-        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+        if (!collectionMode)
         {
-            binding.incompleteCheckBox.isChecked = enumerationItem.enumerationIncompleteReason.isNotEmpty()
-            binding.notesEditText.setText( enumerationItem.enumerationNotes )
-            when (enumerationItem.enumerationIncompleteReason)
+            if (enumerationItem.enumerationState == EnumerationState.Enumerated)
             {
-                resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
-                resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
-                resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
+                if (enumerationItem.enumerationNotes.isNotEmpty())
+                {
+                    binding.statusTextView.visibility= View.GONE
+                    binding.incompleteCheckBox.visibility = View.GONE
+                    binding.reasonIncompleteTextView.visibility = View.GONE
+                    binding.reasonIncompleteRadioGroup.visibility = View.GONE
+                    binding.notesEditText.setText( enumerationItem.enumerationNotes )
+                }
+            }
+            else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+            {
+                binding.incompleteCheckBox.isChecked = enumerationItem.enumerationIncompleteReason.isNotEmpty()
+                binding.notesEditText.setText( enumerationItem.enumerationNotes )
+                when (enumerationItem.enumerationIncompleteReason)
+                {
+                    resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
+                    resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
+                    resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
+                }
             }
         }
-        else if (enumerationItem.collectionState == CollectionState.Incomplete)
+        else
         {
-            binding.incompleteCheckBox.isChecked = enumerationItem.collectionIncompleteReason.isNotEmpty()
-            binding.notesEditText.setText( enumerationItem.collectionNotes )
-            when (enumerationItem.collectionIncompleteReason)
+            if (enumerationItem.collectionState == CollectionState.Complete)
             {
-                resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
-                resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
-                resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
+                if (enumerationItem.collectionNotes.isNotEmpty())
+                {
+                    binding.statusTextView.visibility= View.GONE
+                    binding.incompleteCheckBox.visibility = View.GONE
+                    binding.reasonIncompleteTextView.visibility = View.GONE
+                    binding.reasonIncompleteRadioGroup.visibility = View.GONE
+                    binding.notesEditText.setText( enumerationItem.collectionNotes )
+                }
+            }
+            else if (enumerationItem.collectionState == CollectionState.Incomplete)
+            {
+                binding.incompleteCheckBox.isChecked = enumerationItem.collectionIncompleteReason.isNotEmpty()
+                binding.notesEditText.setText( enumerationItem.collectionNotes )
+                when (enumerationItem.collectionIncompleteReason)
+                {
+                    resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
+                    resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
+                    resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
+                }
             }
         }
 
@@ -257,13 +287,6 @@ class AddHouseholdFragment : Fragment(),
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
 
-        if (editMode)
-        {
-            binding.subaddressEditText.setOnClickListener {
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.subaddress), "", resources.getString(R.string.cancel), resources.getString(R.string.save), 0, this, false )
-            }
-        }
-
         if (enumerationItem.uuid.isNotEmpty())
         {
             binding.hideAdditionalInfoImageView.visibility = View.GONE
@@ -287,6 +310,20 @@ class AddHouseholdFragment : Fragment(),
             if (enumerationItem.enumerationState == EnumerationState.Incomplete || enumerationItem.collectionState == CollectionState.Incomplete)
             {
                 binding.additionalInfoLayout.visibility = View.VISIBLE
+            }
+            else if (!collectionMode)
+            {
+                if (enumerationItem.enumerationState == EnumerationState.Enumerated && enumerationItem.enumerationNotes.isNotEmpty())
+                {
+                    binding.additionalInfoLayout.visibility = View.VISIBLE
+                }
+            }
+            else
+            {
+                if (enumerationItem.collectionState == CollectionState.Complete && enumerationItem.collectionNotes.isNotEmpty())
+                {
+                    binding.additionalInfoLayout.visibility = View.VISIBLE
+                }
             }
         }
 
