@@ -328,11 +328,9 @@ class WalkEnumerationAreaFragment : Fragment(),
         for (enumArea in config.enumAreas)
         {
             addPolygon(enumArea)
-        }
-
-        for (mapTileRegion in config.mapTileRegions)
-        {
-            addPolygon( mapTileRegion )
+            enumArea.mapTileRegion?.let {
+                addPolygon( it )
+            }
         }
 
         binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
@@ -453,14 +451,14 @@ class WalkEnumerationAreaFragment : Fragment(),
                     name2 = "${resources.getString(R.string.enumeration_area)} 1"
                 }
 
-                val enumArea = EnumArea( config.uuid, name2, vertices )
-                config.enumAreas.add( enumArea )
-
                 val latLngBounds = GeoUtils.findGeobounds(vertices)
                 val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
                 val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
-                config.mapTileRegions.add( MapTileRegion( northEast, southWest ))
+                val mapTileRegion = MapTileRegion( northEast, southWest )
+
+                val enumArea = EnumArea( config.uuid, name2, vertices, mapTileRegion )
+                config.enumAreas.add( enumArea )
 
                 DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                     config.enumAreas[0].let { enumArea ->
@@ -539,12 +537,6 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             config.enumAreas.clear()
             config.selectedEnumAreaUuid = ""
-
-            if (config.mapTileRegions.isNotEmpty())
-            {
-                DAO.mapTileRegionDAO.delete( config.mapTileRegions[0] )
-                config.mapTileRegions.clear()
-            }
 
             DAO.configDAO.createOrUpdateConfig( config )
         }

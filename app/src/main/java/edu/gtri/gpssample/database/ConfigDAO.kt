@@ -38,11 +38,6 @@ class ConfigDAO(private var dao: DAO)
         createOrUpdateEnumAreas(config)
         createOrUpdateStudies(config)
 
-        for (mapTileRegion in config.mapTileRegions)
-        {
-            DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( mapTileRegion, config )
-        }
-
         return config
     }
 
@@ -138,7 +133,6 @@ class ConfigDAO(private var dao: DAO)
             config = buildConfig( cursor )
             config.studies = DAO.studyDAO.getStudies( config )
             config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-            config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
         }
 
         cursor.close()
@@ -157,7 +151,6 @@ class ConfigDAO(private var dao: DAO)
             val config = buildConfig( cursor )
             config.studies = DAO.studyDAO.getStudies( config )
             config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
-            config.mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
 
             configs.add( config)
         }
@@ -207,12 +200,6 @@ class ConfigDAO(private var dao: DAO)
         for (enumArea in enumAreas)
         {
             DAO.enumAreaDAO.delete( enumArea )
-        }
-
-        val mapTileRegions = DAO.mapTileRegionDAO.getMapTileRegions( config )
-        for (mapTileRegion in mapTileRegions)
-        {
-            DAO.mapTileRegionDAO.delete( mapTileRegion )
         }
 
         val whereClause = "${DAO.COLUMN_UUID} = ?"

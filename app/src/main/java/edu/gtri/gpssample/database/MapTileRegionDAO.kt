@@ -8,7 +8,7 @@ import edu.gtri.gpssample.database.models.*
 
 class MapTileRegionDAO(private var dao: DAO)
 {
-    fun createOrUpdateMapTileRegion( mapTileRegion: MapTileRegion, config: Config ) : MapTileRegion?
+    fun createOrUpdateMapTileRegion( mapTileRegion: MapTileRegion, enumArea: EnumArea ) : MapTileRegion?
     {
         val existingMapTileRegion = getMapTileRegion( mapTileRegion.uuid )
 
@@ -16,14 +16,14 @@ class MapTileRegionDAO(private var dao: DAO)
         {
             if (mapTileRegion.doesNotEqual( existingMapTileRegion ))
             {
-                updateMapTileRegion( mapTileRegion, config )
+                updateMapTileRegion( mapTileRegion, enumArea )
                 Log.d( "xxx", "Updated MapTileRegion with ID ${mapTileRegion.uuid}" )
             }
         }
         else
         {
             val values = ContentValues()
-            putMapTileRegion( mapTileRegion, config, values )
+            putMapTileRegion( mapTileRegion, enumArea, values )
             if (dao.writableDatabase.insert(DAO.TABLE_MAP_TILE_REGION, null, values) < 0)
             {
                 return null
@@ -34,10 +34,10 @@ class MapTileRegionDAO(private var dao: DAO)
         return mapTileRegion
     }
 
-    private fun putMapTileRegion( mapTileRegion: MapTileRegion, config: Config, values: ContentValues)
+    private fun putMapTileRegion( mapTileRegion: MapTileRegion, enumArea: EnumArea, values: ContentValues)
     {
         values.put( DAO.COLUMN_UUID, mapTileRegion.uuid )
-        values.put( DAO.COLUMN_CONFIG_UUID, config.uuid )
+        values.put( DAO.COLUMN_ENUM_AREA_UUID, enumArea.uuid )
         values.put( DAO.COLUMN_NORTH_EAST_LAT, mapTileRegion.northEast.latitude )
         values.put( DAO.COLUMN_NORTH_EAST_LON, mapTileRegion.northEast.longitude )
         values.put( DAO.COLUMN_SOUTH_WEST_LAT, mapTileRegion.southWest.latitude )
@@ -63,13 +63,13 @@ class MapTileRegionDAO(private var dao: DAO)
         return MapTileRegion( uuid, LatLon( 0, ne_lat, ne_lon ), LatLon( 0, sw_lat, sw_lon ))
     }
 
-    fun updateMapTileRegion( mapTileRegion: MapTileRegion, config: Config )
+    fun updateMapTileRegion( mapTileRegion: MapTileRegion, enumArea: EnumArea )
     {
         val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(mapTileRegion.uuid)
         val values = ContentValues()
 
-        putMapTileRegion( mapTileRegion, config, values )
+        putMapTileRegion( mapTileRegion, enumArea, values )
 
         dao.writableDatabase.update(DAO.TABLE_MAP_TILE_REGION, values, whereClause, args )
     }
@@ -91,23 +91,22 @@ class MapTileRegionDAO(private var dao: DAO)
         return mapTileRegion
     }
 
-    fun getMapTileRegions( config: Config ): ArrayList<MapTileRegion>
+    fun getMapTileRegion( enumArea: EnumArea ): MapTileRegion?
     {
-        val mapTileRegions = ArrayList<MapTileRegion>()
+        var mapTileRegion: MapTileRegion? = null
 
-        val query = "SELECT * FROM ${DAO.TABLE_MAP_TILE_REGION} where ${DAO.COLUMN_CONFIG_UUID}='${config.uuid}'"
+        val query = "SELECT * FROM ${DAO.TABLE_MAP_TILE_REGION} where ${DAO.COLUMN_ENUM_AREA_UUID}='${enumArea.uuid}'"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
-        while (cursor.moveToNext())
+        if (cursor.count > 0)
         {
-            val mapTileRegion = buildMapTileRegion(cursor)
-
-            mapTileRegions.add( mapTileRegion )
+            cursor.moveToNext()
+            mapTileRegion = buildMapTileRegion( cursor )
         }
 
         cursor.close()
 
-        return mapTileRegions
+        return mapTileRegion
     }
 
     fun getMapTileRegions(): ArrayList<MapTileRegion>

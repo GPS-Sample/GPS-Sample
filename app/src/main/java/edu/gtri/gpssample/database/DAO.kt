@@ -353,12 +353,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             val createTableMapTileRegion = ("CREATE TABLE " +
                     TABLE_MAP_TILE_REGION + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
-                    COLUMN_CONFIG_UUID + " TEXT" + "," +
+                    COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_NORTH_EAST_LAT + " REAL" + "," +
                     COLUMN_NORTH_EAST_LON + " REAL" + "," +
                     COLUMN_SOUTH_WEST_LAT + " REAL" + "," +
                     COLUMN_SOUTH_WEST_LON + " REAL" + "," +
-                    "FOREIGN KEY($COLUMN_CONFIG_UUID) REFERENCES $TABLE_CONFIG($COLUMN_UUID)" +
+                    "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableMapTileRegion)
         }
@@ -714,6 +714,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 307
+        const val DATABASE_VERSION = 308
     }
 }

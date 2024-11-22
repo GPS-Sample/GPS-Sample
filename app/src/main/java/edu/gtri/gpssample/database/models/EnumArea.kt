@@ -25,13 +25,14 @@ data class EnumArea (
     var enumerationTeams: ArrayList<EnumerationTeam>,
     var selectedEnumerationTeamUuid: String,
     var collectionTeams: ArrayList<CollectionTeam>,
-    var selectedCollectionTeamUuid: String )
+    var selectedCollectionTeamUuid: String,
+    var mapTileRegion: MapTileRegion?)
 {
     constructor( uuid: String, creationDate: Long, configUuid: String, name: String, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String )
-            : this(uuid, creationDate, configUuid, name, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid)
+            : this(uuid, creationDate, configUuid, name, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid, null)
 
-    constructor( configUuid: String, name: String, vertices: ArrayList<LatLon>)
-            : this(UUID.randomUUID().toString(), Date().time, configUuid, name, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "")
+    constructor( configUuid: String, name: String, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
+            : this(UUID.randomUUID().toString(), Date().time, configUuid, name, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion)
 
     fun equals( other: EnumArea ): Boolean
     {

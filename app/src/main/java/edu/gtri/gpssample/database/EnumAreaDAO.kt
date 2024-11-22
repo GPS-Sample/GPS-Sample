@@ -33,6 +33,10 @@ class EnumAreaDAO(private var dao: DAO)
             Log.d( "xxx", "Created EnumerationArea with ID ${enumArea.uuid}" )
         }
 
+        enumArea.mapTileRegion?.let {
+            DAO.mapTileRegionDAO.createOrUpdateMapTileRegion( it, enumArea )
+        }
+
         for (latLon in enumArea.vertices) {
             DAO.latLonDAO.createOrUpdateLatLon(latLon, enumArea, null)
         }
@@ -103,6 +107,7 @@ class EnumAreaDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             enumArea = buildEnumArea( cursor )
+            enumArea.mapTileRegion = DAO.mapTileRegionDAO.getMapTileRegion( enumArea )
             enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
@@ -125,6 +130,7 @@ class EnumAreaDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val enumArea = buildEnumArea( cursor )
+            enumArea.mapTileRegion = DAO.mapTileRegionDAO.getMapTileRegion( enumArea )
             enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
@@ -147,6 +153,7 @@ class EnumAreaDAO(private var dao: DAO)
         while (cursor.moveToNext())
         {
             val enumArea = buildEnumArea( cursor )
+            enumArea.mapTileRegion = DAO.mapTileRegionDAO.getMapTileRegion( enumArea )
             enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
@@ -161,6 +168,10 @@ class EnumAreaDAO(private var dao: DAO)
 
     fun delete( enumArea: EnumArea )
     {
+        enumArea.mapTileRegion?.let {
+            DAO.mapTileRegionDAO.delete( it )
+        }
+
         for (vertice in enumArea.vertices)
         {
             DAO.latLonDAO.delete( vertice )

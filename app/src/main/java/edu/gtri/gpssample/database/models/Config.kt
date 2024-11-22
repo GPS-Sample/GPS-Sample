@@ -46,16 +46,15 @@ data class Config(
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
     var selectedStudyUuid: String,
-    var selectedEnumAreaUuid: String,
-    var mapTileRegions: ArrayList<MapTileRegion>)
+    var selectedEnumAreaUuid: String)
 {
     constructor(timeZone: Int, name: String, dbVersion: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
             : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-                                    ArrayList<Study>(), ArrayList<EnumArea>(), "", "", ArrayList<MapTileRegion>())
+                                    ArrayList<Study>(), ArrayList<EnumArea>(), "", "")
     constructor(uuid: String, creationDate: Long, timeZone: Int, name: String, dbVersion: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String)
             : this(uuid, creationDate, timeZone, name, dbVersion, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-        ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, ArrayList<MapTileRegion>())
+                ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid)
 
     fun equals( other: Config ): Boolean
     {

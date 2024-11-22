@@ -304,12 +304,9 @@ class PerformCollectionFragment : Fragment(),
         }
 
         binding.mapTileCacheButton.setOnClickListener {
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                if (config.mapTileRegions.isNotEmpty())
-                {
-                    busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                    MapboxManager.loadStylePack( activity!!, this )
-                }
+            enumArea.mapTileRegion?.let {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                MapboxManager.loadStylePack( activity!!, this )
             }
         }
 
@@ -1161,8 +1158,10 @@ class PerformCollectionFragment : Fragment(),
             }
             else
             {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    MapboxManager.loadTilePacks( activity!!, config.mapTileRegions, this )
+                enumArea.mapTileRegion?.let {
+                    val mapTileRegions = ArrayList<MapTileRegion>()
+                    mapTileRegions.add( it )
+                    MapboxManager.loadTilePacks( activity!!, mapTileRegions, this )
                 }
             }
         }
