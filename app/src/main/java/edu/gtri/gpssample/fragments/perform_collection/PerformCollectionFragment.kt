@@ -555,6 +555,11 @@ class PerformCollectionFragment : Fragment(),
                             allPointAnnotations.add( pointAnnotation )
                             locationHashMap[pointAnnotation.id] = location
                         }
+
+                        if (location.enumerationItems.isNotEmpty())
+                        {
+                            mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, location.enumerationItems[0].subAddress, "#00FFFFFF")
+                        }
                     }
                 }
             }

@@ -316,6 +316,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
                 allPolylineAnnotations.add( it )
             }
 
+            val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, enumArea.name, "#80FFFFFF")
+
             if (enumArea.uuid == config.selectedEnumAreaUuid)
             {
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->

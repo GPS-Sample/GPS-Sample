@@ -16,5 +16,4 @@
         android:text="A Team"
         android:textColor="@color/black"
         android:textSize="16sp" />
-
 </LinearLayout>

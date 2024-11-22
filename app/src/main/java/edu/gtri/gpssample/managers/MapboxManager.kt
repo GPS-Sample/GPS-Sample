@@ -1,9 +1,12 @@
 package edu.gtri.gpssample.managers
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.widget.TextView
@@ -14,6 +17,7 @@ import com.mapbox.common.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
 import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.LatLon
@@ -80,6 +84,26 @@ class MapboxManager(
         }
 
         return null
+    }
+
+    fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
+    {
+        if (label.isNotEmpty())
+        {
+            val viewAnnotation = viewAnnotationManager.addViewAnnotation(
+                resId = R.layout.view_text_view,
+                options = viewAnnotationOptions
+                {
+                    allowOverlap(true)
+                    geometry(point)
+                }
+            )
+
+            viewAnnotation.rootView.findViewById<TextView>( R.id.text_view )?.let {
+                it.text = label
+                it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
+            }
+        }
     }
 
     private fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap?

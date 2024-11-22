@@ -369,26 +369,7 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
 
             val latLngBounds = GeoUtils.findGeobounds(vertices)
             val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            addViewAnnotationToPoint(point,label)
-        }
-    }
-
-    private fun addViewAnnotationToPoint(point: Point, label: String)
-    {
-        if (label.isNotEmpty())
-        {
-            val viewAnnotationManager = binding.mapView.viewAnnotationManager
-
-            val viewAnnotation = viewAnnotationManager.addViewAnnotation(
-                resId = R.layout.view_text_view,
-                options = viewAnnotationOptions
-                {
-                    allowOverlap(true)
-                    geometry(point)
-                }
-            )
-
-            viewAnnotation.rootView.findViewById<TextView>( R.id.text_view ).text = label
+            mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, label, "#80FFFFFF" )
         }
     }
 
