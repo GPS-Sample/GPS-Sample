@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.fragments.create_collection_team
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,21 +8,30 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.maps.model.LatLng
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
+import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.LocationConsumer
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.locationcomponent.location2
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.DistanceFormat
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
@@ -181,6 +191,8 @@ class CreateCollectionTeamFragment : Fragment(),
 
     fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -194,6 +206,28 @@ class CreateCollectionTeamFragment : Fragment(),
         {
             mapboxManager.addPolygon(pointList,"#000000", 0.25)
             mapboxManager.addPolyline( pointList[0], "#ff0000" )
+
+            for (collectionTeam in enumArea.collectionTeams)
+            {
+                val pts = java.util.ArrayList<Point>()
+                val ptList = java.util.ArrayList<java.util.ArrayList<Point>>()
+
+                collectionTeam.polygon.map {
+                    pts.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+                }
+
+                ptList.add( pts )
+
+                if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
+                {
+                    mapboxManager.addPolygon(ptList, "#000000", 0.25)
+                    mapboxManager.addPolyline( ptList[0], "#ff0000" )
+
+                    val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
+                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                    mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, collectionTeam.name, "#80FFFFFF" )
+                }
+            }
 
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
@@ -241,6 +275,8 @@ class CreateCollectionTeamFragment : Fragment(),
                 }
             }
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun locationBelongsToTeam( location: Location ) : Boolean

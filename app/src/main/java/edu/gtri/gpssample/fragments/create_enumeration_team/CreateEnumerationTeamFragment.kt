@@ -172,6 +172,8 @@ class CreateEnumerationTeamFragment : Fragment(),
 
     fun refreshMap()
     {
+        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -197,6 +199,28 @@ class CreateEnumerationTeamFragment : Fragment(),
                 binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
+            for (enumerationTeam in enumArea.enumerationTeams)
+            {
+                val pts = java.util.ArrayList<Point>()
+                val ptList = java.util.ArrayList<java.util.ArrayList<Point>>()
+
+                enumerationTeam.polygon.map {
+                    pts.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+                }
+
+                ptList.add( pts )
+
+                if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
+                {
+                    mapboxManager.addPolygon(ptList, "#000000", 0.25)
+                    mapboxManager.addPolyline( ptList[0], "#ff0000" )
+
+                    val latLngBounds = GeoUtils.findGeobounds(enumerationTeam.polygon)
+                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+                    mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, enumerationTeam.name, "#80FFFFFF" )
+                }
+            }
+
             for (location in enumArea.locations)
             {
                 if (!location.isLandmark)
@@ -209,6 +233,8 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun locationBelongsToTeam( location: Location ) : Boolean
