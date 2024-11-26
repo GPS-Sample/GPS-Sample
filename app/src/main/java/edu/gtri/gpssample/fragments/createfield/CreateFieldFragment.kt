@@ -103,10 +103,59 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
 
         sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
             field = currentField
-            currentField.fieldBlockUUID?.let {
+
+            if (currentField.fieldBlockUUID != null)
+            {
                 isBlockField = true
                 binding.blockButtonLayout.visibility = View.VISIBLE
                 binding.normalButtonLayout.visibility = View.GONE
+            }
+
+            if (field.name.isEmpty()) // auto number the field
+            {
+                sharedViewModel.createFieldModel.fieldBlockContainer.value = false
+
+                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                    var count = 1
+
+                    if (isBlockField)
+                    {
+                        // find the field block container
+                        var fieldContainer: Field? = null
+
+                        for (field in study.fields)
+                        {
+                            if (field.fieldBlockContainer && field.fieldBlockUUID == currentField.fieldBlockUUID)
+                            {
+                                fieldContainer = field
+                                break
+                            }
+                        }
+
+                        if (fieldContainer != null)
+                        {
+                            for (field in study.fields)
+                            {
+                                if (field.uuid != fieldContainer.uuid && field.fieldBlockUUID == fieldContainer.fieldBlockUUID)
+                                {
+                                    count += 1
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (field in study.fields)
+                        {
+                            if (field.fieldBlockContainer || field.fieldBlockUUID == null)
+                            {
+                                count += 1
+                            }
+                        }
+                    }
+
+                    field.name = "${count}. "
+                }
             }
         }
 
