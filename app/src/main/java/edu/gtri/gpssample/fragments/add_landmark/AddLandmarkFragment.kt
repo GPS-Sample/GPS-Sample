@@ -22,6 +22,8 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddLandmarkBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
+import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -63,16 +65,6 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
             config = it
         }
 
-        if (!this::config.isInitialized)
-        {
-            // app was closed to make room for the camera app, force re-start
-            val x = 0
-            val y = 1/x
-//            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
-//            findNavController().navigate(R.id.action_navigate_to_MainFragment)
-            return
-        }
-
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
             study = it
         }
@@ -96,11 +88,7 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         {
             try
             {
-                // base64 decode the bitmap
-                val byteArray = Base64.getDecoder().decode( location.imageData )
-                val byteArrayInputStream = ByteArrayInputStream(byteArray)
-                val bitmap = BitmapFactory.decodeStream(byteArrayInputStream)
-                binding.landmarkImageView.setImageBitmap(bitmap)
+                binding.landmarkImageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
             }
             catch( ex: Exception )
             {
@@ -114,7 +102,21 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
 
         binding.addPhotoImageView.setOnClickListener {
-            resultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+
+            // get the total size of all image data
+            var size = 0
+
+            for (location in enumArea.locations)
+            {
+                size += location.imageData.length
+            }
+
+            if (size > 25 * 1024 * 1024)
+            {
+                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
+            }
+
+            findNavController().navigate(R.id.action_navigate_to_CameraFragment)
         }
 
         binding.cancelButton.setOnClickListener {
@@ -159,46 +161,6 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         DAO.locationDAO.delete( location )
 
         findNavController().popBackStack()
-    }
-
-    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK)
-        {
-            if (result?.data != null)
-            {
-                if (this::location.isInitialized)  // activity may have been destroyed by the Camera app
-                {
-                    val bitmap = result.data?.extras?.get("data") as Bitmap
-                    binding.landmarkImageView.setImageBitmap(bitmap)
-                    saveBitmap( bitmap )
-                }
-            }
-        }
-    }
-
-    fun saveBitmap(bitmap: Bitmap)
-    {
-        try
-        {
-            var width = bitmap.width.toDouble()
-            var height = bitmap.height.toDouble()
-            val aspectRatio = width / height
-
-            width = 200.0
-            height = width / aspectRatio
-
-            val bm = Bitmap.createScaledBitmap( bitmap, width.toInt(), height.toInt(), false )
-
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-            val byteArray = byteArrayOutputStream.toByteArray()
-
-            location.imageData = Base64.getEncoder().encodeToString(byteArray)
-        }
-        catch (e: Exception)
-        {
-            Log.d( "xxx", e.stackTrace.toString())
-        }
     }
 
     override fun onDestroyView()

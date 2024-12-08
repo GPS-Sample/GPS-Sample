@@ -28,4 +28,5 @@ enum class FragmentNumber( val value: Int ) {
     PerformMultiCollectionFragment(1025 ),
     ReviewEnumerationFragment(1026 ),
     ReviewCollectionFragment(1027 ),
+    CameraFragment(1028 ),
 }

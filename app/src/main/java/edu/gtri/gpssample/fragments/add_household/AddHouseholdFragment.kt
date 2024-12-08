@@ -31,6 +31,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionFragment
+import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -109,16 +110,6 @@ class AddHouseholdFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
-        }
-
-        if (!this::config.isInitialized)
-        {
-            // app was closed to make room for the camera app, force re-start
-            val x = 0
-            val y = 1/x
-//            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
-//            findNavController().navigate(R.id.action_navigate_to_MainFragment)
-            return
         }
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let {
@@ -352,11 +343,7 @@ class AddHouseholdFragment : Fragment(),
         {
             try
             {
-                // base64 decode the bitmap
-                val byteArray = Base64.getDecoder().decode( location.imageData )
-                val byteArrayInputStream = ByteArrayInputStream(byteArray)
-                val bitmap = BitmapFactory.decodeStream(byteArrayInputStream)
-                binding.imageView.setImageBitmap(bitmap)
+                binding.imageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
             }
             catch( ex: Exception )
             {
@@ -386,9 +373,9 @@ class AddHouseholdFragment : Fragment(),
 
         binding.addPhotoImageView.setOnClickListener {
 
+            // get the total size of all image data
             var size = 0
 
-            // get the total size of all image data
             for (location in enumArea.locations)
             {
                 size += location.imageData.length
@@ -401,7 +388,7 @@ class AddHouseholdFragment : Fragment(),
 
             if (location.imageData.isEmpty())
             {
-                resultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+                findNavController().navigate(R.id.action_navigate_to_CameraFragment)
             }
             else
             {
@@ -619,49 +606,10 @@ class AddHouseholdFragment : Fragment(),
         findNavController().popBackStack()
     }
 
-    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK)
-        {
-            if (result?.data != null)
-            {
-                if (this::location.isInitialized)  // activity may have been destroyed by the Camera app
-                {
-                    val bitmap = result.data?.extras?.get("data") as Bitmap
-                    saveBitmap( bitmap )
-                    ImageDialog( activity!!, location.imageData, this )
-                }
-            }
-        }
-    }
-
-    fun saveBitmap(bitmap: Bitmap)
-    {
-        try
-        {
-            var width = bitmap.width.toDouble()
-            var height = bitmap.height.toDouble()
-            val aspectRatio = width / height
-
-            width = 200.0
-            height = width / aspectRatio
-
-            val bm = Bitmap.createScaledBitmap( bitmap, width.toInt(), height.toInt(), false )
-
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-            val byteArray = byteArrayOutputStream.toByteArray()
-
-            location.imageData = Base64.getEncoder().encodeToString(byteArray)
-        }
-        catch (e: Exception)
-        {
-            Log.d( "xxx", e.stackTrace.toString())
-        }
-    }
-
     override fun shouldDeleteImage()
     {
         location.imageData = ""
+        binding.imageCardView.visibility = View.GONE
     }
 
     override fun onDestroyView()
