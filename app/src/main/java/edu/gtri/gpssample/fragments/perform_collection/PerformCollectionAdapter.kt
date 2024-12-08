@@ -15,6 +15,7 @@ import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
+import edu.gtri.gpssample.utils.CameraUtils
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -60,7 +61,17 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
         {
             holder.firstTextView.setText( "${item.description}" )
             holder.secondTextView.setText( item.uuid )
-            holder.locationImageView.visibility = View.VISIBLE
+
+            if (item.imageData.isNotEmpty())
+            {
+                holder.photoImageView.visibility = View.VISIBLE
+                holder.photoImageView.setImageBitmap( CameraUtils.decodeString( item.imageData ))
+            }
+            else
+            {
+                holder.locationImageView.visibility = View.VISIBLE
+            }
+
             if (item.distance > 0)
             {
                 holder.thirdTextView.setText("Distance: ${String.format( "%.1f", item.distance )} ${item.distanceUnits}")
@@ -104,5 +115,6 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
         val thirdTextView: TextView = itemView.findViewById(R.id.third_text_view);
         val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view)
         val locationImageView: ImageView = itemView.findViewById(R.id.location_image_view)
+        val photoImageView: ImageView = itemView.findViewById(R.id.photo_image_view)
     }
 }
