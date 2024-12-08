@@ -386,14 +386,7 @@ class AddHouseholdFragment : Fragment(),
                 NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
             }
 
-            if (location.imageData.isEmpty())
-            {
-                findNavController().navigate(R.id.action_navigate_to_CameraFragment)
-            }
-            else
-            {
-                ImageDialog( activity!!, location.imageData, this )
-            }
+            findNavController().navigate(R.id.action_navigate_to_CameraFragment)
         }
 
         binding.cancelButton.setOnClickListener {

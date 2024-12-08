@@ -84,6 +84,15 @@ class CameraFragment : Fragment()
             }
         }
 
+        binding.deleteImageView.setOnClickListener {
+            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                location.imageData = ""
+                binding.cameraButton.text = "Take Photo"
+                binding.imageView.visibility = View.GONE
+                binding.viewFinder.visibility = View.VISIBLE
+            }
+        }
+
         binding.cancelButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -95,9 +104,9 @@ class CameraFragment : Fragment()
                         location.imageData = imageData
                     }
                 }
-
-                findNavController().popBackStack()
             }
+
+            findNavController().popBackStack()
         }
     }
 
@@ -138,6 +147,15 @@ class CameraFragment : Fragment()
             {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                    if (location.imageData.isNotEmpty())
+                    {
+                        binding.viewFinder.visibility = View.GONE
+                        binding.imageView.visibility = View.VISIBLE
+                        binding.cameraButton.text = "Retake Photo"
+                        binding.imageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
+                    }
+                }
             }
             catch (exc: Exception)
             {

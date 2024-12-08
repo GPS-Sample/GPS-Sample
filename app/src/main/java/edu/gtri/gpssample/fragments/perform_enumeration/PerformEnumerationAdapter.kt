@@ -12,6 +12,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
+import edu.gtri.gpssample.utils.CameraUtils
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -62,7 +63,16 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
         if (location.isLandmark)
         {
             holder.firstTextView.setText( "${location.description}" )
-            holder.locationImageView.visibility = View.VISIBLE
+
+            if (location.imageData.isNotEmpty())
+            {
+                holder.photoImageView.visibility = View.VISIBLE
+                holder.photoImageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
+            }
+            else
+            {
+                holder.locationImageView.visibility = View.VISIBLE
+            }
         }
         else if (location.enumerationItems.size > 0)
         {
@@ -109,5 +119,6 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
         val thirdTextView: TextView = itemView.findViewById(R.id.third_text_view);
         val checkImageView: ImageView = itemView.findViewById(R.id.check_image_view)
         val locationImageView: ImageView = itemView.findViewById(R.id.location_image_view)
+        val photoImageView: ImageView = itemView.findViewById(R.id.photo_image_view)
     }
 }
