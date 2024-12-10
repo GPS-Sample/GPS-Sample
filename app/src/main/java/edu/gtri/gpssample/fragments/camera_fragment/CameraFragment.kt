@@ -202,7 +202,6 @@ class CameraFragment : Fragment()
                         bitmap = CameraUtils.rotate( it, angle )
                         binding.imageView.setImageBitmap( bitmap )
                         binding.cameraButton.isEnabled = true
-                        Log.d( "xxx", "onImageSaved" )
                     }
                 }
             }
