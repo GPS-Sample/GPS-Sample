@@ -323,6 +323,39 @@ class MapboxManager(
 
             tileRegionsCancelable.clear()
         }
+
+        fun ArrayListOfLatLonToArrayListOfCoordinate( latLons: ArrayList<LatLon> ) : ArrayList<Coordinate>
+        {
+            val coordinates = ArrayList<Coordinate>()
+
+            latLons.map { latLon ->
+                coordinates.add( Coordinate( latLon.longitude, latLon.latitude ))
+            }
+
+            return coordinates
+        }
+
+        fun ArrayListOfPointToArrayListOfCoordinate( points: ArrayList<Point> ) : ArrayList<Coordinate>
+        {
+            val coordinates = ArrayList<Coordinate>()
+
+            points.map { point ->
+                coordinates.add( Coordinate( point.longitude(), point.latitude()))
+            }
+
+            return coordinates
+        }
+
+        fun ArrayListOfCoordinateToArrayListOfPoint( coordinates: Array<Coordinate> ) : ArrayList<Point>
+        {
+            val points = ArrayList<Point>()
+
+            coordinates.map {
+                points.add( Point.fromLngLat(it.x, it.y))
+            }
+
+            return points
+        }
     }
 }
 

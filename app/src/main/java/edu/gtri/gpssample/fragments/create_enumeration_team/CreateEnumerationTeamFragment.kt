@@ -266,16 +266,13 @@ class CreateEnumerationTeamFragment : Fragment(),
 
             if (p1.action == MotionEvent.ACTION_UP)
             {
-                val points1 = ArrayList<Coordinate>()
-                val points2 = ArrayList<Coordinate>()
+                val points1 = MapboxManager.ArrayListOfLatLonToArrayListOfCoordinate( enumArea.vertices )
 
-                // convert ArrayList<LatLon> to ArrayList<Coordinate>
-                enumArea.vertices.map {
-                    points1.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                // close the polygon, if necessary
+                if (!points1.first().equals(points1.last()))
+                {
+                    points1.add( points1[0])
                 }
-
-                // close the polygon
-                points1.add( points1[0])
 
                 // create a copy of the newly drawn polyline
                 val polyList = ArrayList<Point>( polyLinePoints )
@@ -283,40 +280,58 @@ class CreateEnumerationTeamFragment : Fragment(),
                 // close the polygon
                 polyList.add( polyLinePoints[0])
 
-                // convert ArrayList<Point> to ArrayList<Coordinate>
-                polyList.map {
-                    points2.add( Coordinate( it.longitude(), it.latitude()))
-                }
+                val points2 = MapboxManager.ArrayListOfPointToArrayListOfCoordinate( polyList )
 
-                // compute the intersection of points1 & points2
+                // compute the intersection of the EA (points1) & the newly drawn polygon (points2)
                 val geometryFactory = GeometryFactory()
-                val geometry1 = geometryFactory.createPolygon(points1.toTypedArray())
-                val geometry2 = geometryFactory.createPolygon(points2.toTypedArray())
+                val enumAreaPolygon = geometryFactory.createPolygon(points1.toTypedArray())
+                val selectionPolygon = geometryFactory.createPolygon(points2.toTypedArray())
 
                 try {
-                    geometry1.intersection(geometry2)?.let { polygon ->
-                        val vertices = ArrayList<Point>()
-
-                        polygon.boundary?.coordinates?.map {
-                            vertices.add( Point.fromLngLat(it.x, it.y))
-                        }
-
-                        if (vertices.isNotEmpty())
+                    enumAreaPolygon.intersection( selectionPolygon )?.let { intersectedPolygon ->
+                        if (!intersectedPolygon.isEmpty())
                         {
-                            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-                            pointList.add( vertices )
-                            intersectionPolygon = mapboxManager.addPolygon(pointList,"#ff0000", 0.25)
+                            var finalSelectedPolygon = intersectedPolygon.copy()
 
-                            locationUuids.clear()
-
-                            for (location in enumArea.locations)
+                            // subtract any existing teams from the selection
+                            for (enumTeam in enumArea.enumerationTeams)
                             {
-                                val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
-                                if (polygon.contains(geometry3))
-                                {
-                                    if (!locationBelongsToTeam(location))
+                                val points = MapboxManager.ArrayListOfLatLonToArrayListOfCoordinate( enumTeam.polygon )
+
+                                val teamPolygon = geometryFactory.createPolygon(points.toTypedArray())
+
+                                // compute the intersection of the selected polygon with the existing team polygon
+                                finalSelectedPolygon.intersection(teamPolygon)?.let { intersection ->
+                                    if (!intersection.isEmpty())
                                     {
-                                        locationUuids.add( location.uuid )
+                                        // subtract the intersected polygon from the selectionPolygon
+                                        finalSelectedPolygon.difference( intersection )?.let { remainder ->
+                                            finalSelectedPolygon = remainder
+                                        }
+                                    }
+                                }
+                            }
+
+                            finalSelectedPolygon.boundary?.coordinates?.let { coordinates ->
+
+                                val vertices = MapboxManager.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
+
+                                val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                                pointList.add( vertices )
+
+                                intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
+
+                                locationUuids.clear()
+
+                                for (location in enumArea.locations)
+                                {
+                                    val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                                    if (finalSelectedPolygon.contains(geometry3))
+                                    {
+                                        if (!locationBelongsToTeam( location ))
+                                        {
+                                            locationUuids.add( location.uuid )
+                                        }
                                     }
                                 }
                             }
