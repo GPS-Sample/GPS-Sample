@@ -54,16 +54,29 @@
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
 
-                <EditText
-                    android:id="@+id/field_name_edit_text"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:hint="@string/enter_field_name"
-                    android:text="@={viewModel.createFieldModel.CurrentField.name}"
-                    android:imeOptions="actionDone"
-                    android:inputType="textCapSentences" />
+                    android:layout_height="match_parent">
+
+                    <EditText
+                        android:id="@+id/field_index_edit_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="20dp"
+                        android:background="@null"
+                        android:text="1."/>
+
+                    <EditText
+                        android:id="@+id/field_name_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginEnd="20dp"
+                        android:hint="@string/enter_field_name"
+                        android:text="@={viewModel.createFieldModel.CurrentField.name}"
+                        android:imeOptions="actionDone"
+                        android:inputType="textCapSentences" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_marginTop="20dp"
@@ -100,9 +113,7 @@
                     android:layout_marginTop="40dp"
                     android:layout_marginEnd="20dp"
                     android:text="@string/begin_field_block"
-                    android:textSize="18sp"
-                    android:checked="@{viewModel.createFieldModel.CurrentField.fieldBlockContainer}"
-                    android:onCheckedChanged="@{viewModel.createFieldModel::onFieldBlockContainerSelected}"/>
+                    android:textSize="18sp"/>
 
                 <include
                     android:visibility="visible"

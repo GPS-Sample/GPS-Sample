@@ -23,7 +23,7 @@ import edu.gtri.gpssample.fragments.createfield.CreateFieldCheckboxAdapter
 import edu.gtri.gpssample.utils.DateUtils
 import java.util.*
 
-class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumerationItem: EnumerationItem, val fieldList: List<Field>, val filteredFieldDataList: List<FieldData>) :
+class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumerationItem: EnumerationItem, val fields: List<Field>, val filteredFieldDataList: List<FieldData>) :
     RecyclerView.Adapter<AddHouseholdAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
@@ -64,7 +64,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
             holder.itemView.isSelected = false
 
-            if (field.fieldBlockContainer)
+            if (field.fields != null)
             {
                 layoutBlockField( holder, field, fieldData )
             }
@@ -101,7 +101,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         }
 
         val titleView: TextView = numberLayout.findViewById<TextView>(R.id.title_text_view)
-        titleView.text = field.name
+        titleView.text = "${field.index}. ${field.name}"
 
         layoutBlockAdapter( fieldData, field, blockLayout )
     }
@@ -113,8 +113,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
             if (numberOfBlocks > 0)
             {
-                field.fieldBlockUUID?.let { fieldBlockUUID ->
-                    val blockFields = getBlockFields( fieldBlockUUID )
+                field.fields?.let { blockFields ->
                     val listOfLists = ArrayList<ArrayList<FieldData>>()
 
                     for (blockNumber in 1..numberOfBlocks)
@@ -124,8 +123,8 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                         // look for existing block FieldData items
                         for (blockFieldData in enumerationItem.fieldDataList)
                         {
-                            blockFieldData.field?.fieldBlockUUID?.let { uuid ->
-                                if (uuid == fieldBlockUUID && blockFieldData.blockNumber == blockNumber)
+                            blockFieldData.field?.parentUUID?.let { uuid ->
+                                if (uuid == field.uuid && blockFieldData.blockNumber == blockNumber)
                                 {
                                     blockFieldDataList.add(blockFieldData)
                                 }
@@ -348,7 +347,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         frameLayout?.let { layout ->
             layout.visibility = View.VISIBLE
             val titleView = layout.findViewById<TextView>(R.id.title_text_view)
-            titleView.text = field.name
+            titleView.text = "${field.index}. ${field.name}"
         }
     }
 
@@ -366,28 +365,6 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         {
             editText.setText( DateUtils.dateTimeString( date, config.dateFormat, config.timeFormat ))
         }
-    }
-
-    fun getBlockFields( uuid: String ) : ArrayList<Field>
-    {
-        var filteredFieldList = ArrayList<Field>()
-
-        for (field in fieldList)
-        {
-            if (!field.fieldBlockContainer)
-            {
-                field.fieldBlockUUID?.let { fieldBlockUUID ->
-                    if (uuid == field.fieldBlockUUID)
-                    {
-                        filteredFieldList.add( field )
-                    }
-                }
-            }
-        }
-
-        filteredFieldList = ArrayList<Field>(filteredFieldList.sortedBy {it.creationDate})
-
-        return filteredFieldList
     }
 
     override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)

@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.SampleType
@@ -56,20 +57,20 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
         super.onViewCreated(view, savedInstanceState)
 
-        createStudyAdapter =
-            CreateStudyAdapter(activity!!, listOf<Field>(), listOf<Rule>(), listOf<Filter>())
+        createStudyAdapter = CreateStudyAdapter(activity!!)
         createStudyAdapter.didSelectField = this::didSelectField
         createStudyAdapter.didSelectRule = this::didSelectRule
         createStudyAdapter.didSelectFilter = this::didSelectFilter
         createStudyAdapter.shouldAddField = this::shouldAddField
         createStudyAdapter.shouldAddRule = this::shouldAddRule
         createStudyAdapter.shouldAddFilter = this::shouldAddFilter
-        createStudyAdapter.didDeleteField = this::didDeleteField
-        createStudyAdapter.didDeleteRule = this::didDeleteRule
-        createStudyAdapter.didDeleteFilter = this::didDeleteFilter
+//        createStudyAdapter.didDeleteField = this::didDeleteField
+//        createStudyAdapter.didDeleteRule = this::didDeleteRule
+//        createStudyAdapter.didDeleteFilter = this::didDeleteFilter
 
         binding.apply {
             // Specify the fragment as the lifecycle owner
@@ -134,13 +135,14 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateStudyFragment.value.toString() + ": " + this.javaClass.simpleName
 
         sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-            createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
+            createStudyAdapter.updateStudy( study )
         }
     }
 
     private fun shouldAddField()
     {
-        sharedViewModel.createFieldModel.createNewField()
+        val field = Field( null, study.fields.size+1,"", FieldType.Text, false, false, false, false, false, false )
+        sharedViewModel.createFieldModel.setCurrentField( field )
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
     }
 
@@ -177,9 +179,8 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     private fun didSelectField( field: Field )
     {
-        val bundle = Bundle()
-        sharedViewModel.createFieldModel.setSelectedField(field)
-        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment, bundle )
+        sharedViewModel.createFieldModel.setCurrentField(field)
+        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
     }
 
     private fun didSelectRule( rule: Rule )
@@ -196,19 +197,19 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         findNavController().navigate( R.id.action_navigate_to_CreateFilterFragment, bundle )
     }
 
-    private fun didDeleteField( field: Field )
-    {
-        sharedViewModel.createFieldModel.setSelectedField(field)
-        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_field_message),
-            resources.getString(R.string.no), resources.getString(R.string.yes),DeleteMode.deleteFieldTag.value, this)
-    }
+//    private fun didDeleteField( field: Field )
+//    {
+//        sharedViewModel.createFieldModel.setCurrentField(field)
+//        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_field_message),
+//            resources.getString(R.string.no), resources.getString(R.string.yes),DeleteMode.deleteFieldTag.value, this)
+//    }
 
-    private fun didDeleteRule( rule: Rule )
-    {
-        sharedViewModel.deleteRule(rule)
-        ConfirmationDialog( activity, resources.getString( R.string.please_confirm),  resources.getString(R.string.delete_rule_message),
-            resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteRuleTag.value, this)
-    }
+//    private fun didDeleteRule( rule: Rule )
+//    {
+//        sharedViewModel.deleteRule(rule)
+//        ConfirmationDialog( activity, resources.getString( R.string.please_confirm),  resources.getString(R.string.delete_rule_message),
+//            resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteRuleTag.value, this)
+//    }
 
     private fun didDeleteFilter( filter: Filter )
     {
@@ -253,22 +254,21 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
                 sharedViewModel.deleteCurrentStudy()
                 findNavController().popBackStack()
             }
-            DeleteMode.deleteFieldTag.value -> {
-
-                sharedViewModel.deleteSelectedField()
-                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
-                }
-            }
-            DeleteMode.deleteRuleTag.value -> {
-                sharedViewModel.deleteSelectedRule()
-                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-                    createStudyAdapter.updateFieldsRulesFilters( study.fields, study.rules, study.filters )
-                }
-            }
-            DeleteMode.deleteFilterTag.value -> {
-
-            }
+//            DeleteMode.deleteFieldTag.value -> {
+//
+//                sharedViewModel.deleteSelectedField()
+//                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
+//                    createStudyAdapter.updateStudy( study )
+//                }
+//            }
+//            DeleteMode.deleteRuleTag.value -> {
+//                sharedViewModel.deleteSelectedRule()
+//                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
+//                    createStudyAdapter.updateStudy( study )
+//                }
+//            }
+//            DeleteMode.deleteFilterTag.value -> {
+//            }
         }
     }
 

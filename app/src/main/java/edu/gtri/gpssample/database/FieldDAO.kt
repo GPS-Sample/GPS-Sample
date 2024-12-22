@@ -33,6 +33,13 @@ class FieldDAO(private var dao: DAO)
             Log.d( "xxx", "Created Field with ID ${field.uuid}")
         }
 
+        field.fields?.let { fields ->
+            for (field in fields)
+            {
+                createOrUpdateField( field, study )
+            }
+        }
+
         for (fieldOption in field.fieldOptions)
         {
             DAO.fieldOptionDAO.createOrUpdateFieldOption( fieldOption, field )
@@ -44,12 +51,12 @@ class FieldDAO(private var dao: DAO)
     fun putField( field: Field, study : Study, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, field.uuid )
+        values.put( DAO.COLUMN_FIELD_PARENT_UUID, field.parentUUID )
         values.put( DAO.COLUMN_CREATION_DATE, field.creationDate )
         values.put( DAO.COLUMN_STUDY_UUID, study.uuid )
+        values.put( DAO.COLUMN_FIELD_INDEX, field.index )
         values.put( DAO.COLUMN_FIELD_NAME, field.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(field.type))
-        values.put( DAO.COLUMN_FIELD_BLOCK_CONTAINER, field.fieldBlockContainer )
-        values.put( DAO.COLUMN_FIELD_BLOCK_UUID, field.fieldBlockUUID )
         values.put( DAO.COLUMN_FIELD_PII, field.pii )
         values.put( DAO.COLUMN_FIELD_REQUIRED, field.required )
         values.put( DAO.COLUMN_FIELD_INTEGER_ONLY, field.integerOnly )
@@ -85,10 +92,10 @@ class FieldDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
+        val parentUUID = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_PARENT_UUID))
+        val index = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INDEX))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val typeIndex = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX))
-        val fieldBlockContainer = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_BLOCK_CONTAINER)).toBoolean()
-        val fieldBlockUUID = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_BLOCK_UUID))
         val pii = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_PII)).toBoolean()
         val required = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_REQUIRED)).toBoolean()
         val integerOnly = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_INTEGER_ONLY)).toBoolean()
@@ -98,7 +105,7 @@ class FieldDAO(private var dao: DAO)
 
         val type = FieldTypeConverter.fromIndex(typeIndex)
 
-        return Field(uuid, creationDate, name, type, fieldBlockContainer, fieldBlockUUID, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
+        return Field( uuid, creationDate, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>(), ArrayList<Field>())
     }
 
     fun getField( uuid : String ): Field?
@@ -111,6 +118,7 @@ class FieldDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             field = buildField( cursor )
+            field.fields = getBlockFields( field.uuid )
             field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
         }
 
@@ -119,19 +127,41 @@ class FieldDAO(private var dao: DAO)
         return field
     }
 
-    fun getFields(study : Study): ArrayList<Field>
+    fun getBlockFields( parentFieldUUID : String ): ArrayList<Field>?
     {
         val fields = ArrayList<Field>()
-        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_CREATION_DATE} ASC"
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_FIELD_PARENT_UUID} = '${parentFieldUUID}' ORDER BY ${DAO.COLUMN_FIELD_INDEX} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
         {
             val field = buildField( cursor )
             field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
-            val rules = DAO.ruleDAO.getRules(field)
-            study.rules.addAll(rules)
-            fields.add( field)
+            fields.add( field )
+        }
+
+        cursor.close()
+
+        return if (fields.isEmpty()) null else fields
+    }
+
+    fun getFields(study : Study): ArrayList<Field>
+    {
+        val fields = ArrayList<Field>()
+        val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_FIELD_INDEX} ASC"
+        val cursor = dao.writableDatabase.rawQuery(query, null)
+
+        while (cursor.moveToNext())
+        {
+            val field = buildField( cursor )
+            if (field.parentUUID == null)
+            {
+                field.fields = getBlockFields( field.uuid )
+                field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
+                val rules = DAO.ruleDAO.getRules(field)
+                study.rules.addAll(rules)
+                fields.add( field)
+            }
         }
 
         cursor.close()
@@ -157,6 +187,13 @@ class FieldDAO(private var dao: DAO)
 
     fun deleteField( field: Field )
     {
+        field.fields?.let { fields ->
+            for (field in fields)
+            {
+                deleteField( field )
+            }
+        }
+
         val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args = arrayOf(field.uuid)
 

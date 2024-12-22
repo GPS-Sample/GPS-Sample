@@ -91,9 +91,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_STUDY_UUID + " TEXT" + "," +
+                    COLUMN_FIELD_PARENT_UUID + " TEXT" + "," +
+                    COLUMN_FIELD_INDEX + " INTEGER" + "," +
                     COLUMN_FIELD_NAME + " TEXT" + "," +
-                    COLUMN_FIELD_BLOCK_CONTAINER + " INTEGER" + "," +
-                    COLUMN_FIELD_BLOCK_UUID + " TEXT" + "," +
 
                     // should be look up table
                     COLUMN_FIELD_TYPE_INDEX + " INTEGER" + "," +
@@ -478,8 +478,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         // Field Table
         const val TABLE_FIELD = "field"
         const val COLUMN_FIELD_NAME = "field_name"
-        const val COLUMN_FIELD_BLOCK_CONTAINER = "field_block_container"
-        const val COLUMN_FIELD_BLOCK_UUID = "field_block_uuid"
+        const val COLUMN_FIELD_INDEX = "field_index"
+        const val COLUMN_FIELD_PARENT_UUID = "field_parent_uuid"
         const val COLUMN_FIELD_TYPE_INDEX = "field_type_index"
         const val COLUMN_FIELD_PII = "field_pii"
         const val COLUMN_FIELD_REQUIRED = "field_required"
@@ -714,6 +714,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 308
+        const val DATABASE_VERSION = 309
     }
 }

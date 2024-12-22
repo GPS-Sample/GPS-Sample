@@ -16,20 +16,21 @@ import kotlin.collections.ArrayList
 data class Field(
     var uuid: String,
     var creationDate: Long,
+    var parentUUID: String?,
+    var index: Int,
     var name: String,
     var type: FieldType,
-    var fieldBlockContainer: Boolean,
-    var fieldBlockUUID: String?,
     var pii: Boolean,
     var required: Boolean,
     var integerOnly: Boolean,
     var numberOfResidents: Boolean,
     var date: Boolean,
     var time: Boolean,
-    var fieldOptions: ArrayList<FieldOption>)
+    var fieldOptions: ArrayList<FieldOption>,
+    var fields: ArrayList<Field>?)
 {
-    constructor(name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, numberOfResidents: Boolean, date: Boolean, time: Boolean)
-            : this(UUID.randomUUID().toString(), Date().time, name, type, false, null, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>())
+    constructor(parentUUID: String?, index: Int, name: String, type: FieldType, pii: Boolean, required: Boolean, integerOnly: Boolean, numberOfResidents: Boolean, date: Boolean, time: Boolean)
+            : this(UUID.randomUUID().toString(), Date().time, parentUUID, index, name, type, pii, required, integerOnly, numberOfResidents, date, time, ArrayList<FieldOption>(), null)
 
     fun copy() : Field
     {

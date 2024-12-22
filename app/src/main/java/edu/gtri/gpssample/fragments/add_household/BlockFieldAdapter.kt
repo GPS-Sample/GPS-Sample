@@ -226,7 +226,7 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
         frameLayout?.let { layout ->
             layout.visibility = View.VISIBLE
             val titleView = layout.findViewById<TextView>(R.id.title_text_view)
-            titleView.text = field.name
+            titleView.text = "${field.index}. ${field.name}"
         }
     }
 

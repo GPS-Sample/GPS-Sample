@@ -14,28 +14,42 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
+import edu.gtri.gpssample.database.models.Study
+import java.util.ArrayList
 
 
-class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rules: List<Rule>, var filters: List<Filter>) : BaseExpandableListAdapter()
+class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
 {
     lateinit var didSelectField: ((field: Field) -> Unit)
     lateinit var didSelectRule: ((rule: Rule) -> Unit)
     lateinit var didSelectFilter: ((filter: Filter) -> Unit)
 
-    lateinit var didDeleteField: ((field: Field) -> Unit)
-    lateinit var didDeleteRule: ((rule: Rule) -> Unit)
-    lateinit var didDeleteFilter: ((filter: Filter) -> Unit)
-
+//    lateinit var didDeleteField: ((field: Field) -> Unit)
+//    lateinit var didDeleteRule: ((rule: Rule) -> Unit)
+//    lateinit var didDeleteFilter: ((filter: Filter) -> Unit)
 
     lateinit var shouldAddField: (() -> Unit)
     lateinit var shouldAddRule: (() -> Unit)
     lateinit var shouldAddFilter: (() -> Unit)
 
-    fun updateFieldsRulesFilters( fields: List<Field>, rules: List<Rule>, filters: List<Filter> )
+    var fields = ArrayList<Field>()
+    var rules = ArrayList<Rule>()
+    var filters = ArrayList<Filter>()
+
+    fun updateStudy( study: Study )
     {
-        this.fields = fields
-        this.rules = rules
-        this.filters = filters
+        fields = ArrayList<Field>()
+
+        for (field in study.fields)
+        {
+            fields.add( field )
+            field.fields?.let { childFields ->
+                fields.addAll( childFields )
+            }
+        }
+
+        rules = study.rules
+        filters = study.filters
 
         notifyDataSetChanged()
     }
@@ -49,9 +63,9 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
     {
         when( p0 )
         {
-            0 -> return fields.size
-            1 -> return rules.size
-            2 -> return filters.size
+            0-> return fields.size
+            1-> return rules.size
+            2-> return filters.size
         }
 
         return 0
@@ -93,7 +107,7 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
 
         when( groupPosition )
         {
-            0 -> nameTextView.text = fields[childPosition].name
+            0 -> nameTextView.text = "${fields[childPosition].index}. ${fields[childPosition].name}"
             1 -> nameTextView.text = rules[childPosition].name
             2 -> nameTextView.text = filters[childPosition].name
         }
@@ -102,9 +116,9 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
         {
             val field = fields[childPosition]
 
-            if (!field.fieldBlockContainer && field.fieldBlockUUID != null)
+            if (field.parentUUID != null)
             {
-                nameTextView.text = "    " + fields[childPosition].name
+                nameTextView.text = "    ${fields[childPosition].index}. ${fields[childPosition].name}"
             }
         }
 
@@ -116,16 +130,6 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
                 2 -> didSelectFilter( filters[childPosition] )
             }
         }
-
-//        val deleteView = view!!.findViewById<View>(R.id.image_view) as ImageView
-//        deleteView.setOnClickListener{
-//            when( groupPosition )
-//            {
-//                0 -> didDeleteField( fields[childPosition] )
-//                1 -> didDeleteRule( rules[childPosition] )
-//                2 -> didDeleteFilter( filters[childPosition] )
-//            }
-//        }
 
         return view
     }
@@ -154,7 +158,7 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
 
     override fun getGroupView( groupPosition: Int, isExpanded: Boolean, childView: View?, viewGroup: ViewGroup?): View
     {
-        var view: View
+        val view: View
 
         if (childView == null)
         {
@@ -162,7 +166,7 @@ class CreateStudyAdapter( var context: Context, var fields: List<Field>, var rul
         }
         else
         {
-            view = childView!!
+            view = childView
         }
 
         val listTitleTextView = view.findViewById<TextView>(R.id.listGroupTitle)

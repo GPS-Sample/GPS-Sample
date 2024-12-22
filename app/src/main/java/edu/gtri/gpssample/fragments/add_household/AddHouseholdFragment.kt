@@ -175,7 +175,7 @@ class AddHouseholdFragment : Fragment(),
 
             for (field in study.fields)
             {
-                if (field.fieldBlockContainer || field.fieldBlockUUID == null)
+                if (field.parentUUID == null)
                 {
                     val fieldData = FieldData(creationDate++, field)
                     enumerationItem.fieldDataList.add(fieldData)
@@ -251,7 +251,7 @@ class AddHouseholdFragment : Fragment(),
         for (fieldData in enumerationItem.fieldDataList)
         {
             fieldData.field?.let { field ->
-                if (field.fieldBlockContainer || field.fieldBlockUUID == null)
+                if (field.parentUUID == null)
                 {
                     filteredFieldDataList.add( fieldData )
                 }

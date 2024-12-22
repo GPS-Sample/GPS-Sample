@@ -43,7 +43,6 @@ class ConfigurationViewModel : ViewModel()
     val locationViewModel : LocationViewModel = LocationViewModel()
     var teamViewModel : TeamViewModel = TeamViewModel()
     val createFilterRuleModel : CreateFilterRuleModel = CreateFilterRuleModel()
-    val performEnumerationModel: PerformEnumerationModel = PerformEnumerationModel()
 
     // Exposed LiveData each screen being controlled by the view model
     val currentConfiguration : LiveData<Config>?
@@ -166,21 +165,6 @@ class ConfigurationViewModel : ViewModel()
             _currentFragment = value
         }
 
-    val currentUserRole : Role
-        get(){
-            _currentFragment?.activity?.let{activity ->
-                val _user = (activity.application as MainApplication).user
-                _user?.let{
-
-                    Log.d("XXXX  ROLE", "the ROLE ${it.role}")
-                    return RoleConverter.getRole(it.role)
-                }
-
-            }
-            return Role.Undefined
-
-        }
-
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         _currentConfiguration?.value?.let {
@@ -228,16 +212,6 @@ class ConfigurationViewModel : ViewModel()
         //saveNewConfiguration()
     }
 
-    fun saveNewConfiguration()
-    {
-        _currentConfiguration?.value?.let{ configuration ->
-            DAO.instance().writableDatabase.beginTransaction()
-            DAO.configDAO.createOrUpdateConfig(configuration)
-            DAO.instance().writableDatabase.setTransactionSuccessful()
-            DAO.instance().writableDatabase.endTransaction()
-        }
-    }
-
     fun updateConfiguration()
     {
         _currentConfiguration?.value?.let{ configuration ->
@@ -253,63 +227,31 @@ class ConfigurationViewModel : ViewModel()
         _currentConfiguration = MutableLiveData(config)
     }
 
-    fun deleteConfig(config : Config)
-    {
-        DAO.configDAO.deleteConfig( config )
-    }
-
-    // Study
-
     fun addStudy()
     {
         currentConfiguration?.let{configuration->
             createStudyModel.addStudy(configuration.value)
         }
     }
+
     fun removeStudy(study: Study?)
     {
         currentConfiguration?.let { configuration ->
             createStudyModel.removeStudy(study, configuration.value)
         }
     }
+
     fun deleteCurrentStudy()
     {
         _currentConfiguration?.value?.let { configuration ->
             createStudyModel.currentStudy?.value?.let{study ->
                 createFilterModel.deleteSelectedFilter(study)
                 createRuleModel.deleteSelectedRule(study)
-                createFieldModel.deleteSelectedField(study)
+                createFieldModel.deleteCurrentField(study)
             }
             createStudyModel.deleteCurrentStudy(configuration)
         }
     }
-
-    //endregion
-    //region Enumerations
-    fun addEnumerationAreas(enumAreas : ArrayList<EnumArea> )
-    {
-        currentConfiguration?.value?.let{config ->
-            config.enumAreas = enumAreas
-        }
-    }
-    //endregion
-
-    //region Fields
-    fun addField()
-    {
-        createStudyModel.currentStudy?.value?.let{study ->
-            createFieldModel.addField(study)
-        }
-    }
-    fun deleteSelectedField()
-    {
-        createStudyModel.currentStudy?.value?.let { study ->
-            createFieldModel.deleteSelectedField(study)
-        }
-    }
-    //endregion
-
-    //region Rule
 
     fun addRule()
     {
@@ -322,29 +264,13 @@ class ConfigurationViewModel : ViewModel()
         createRuleModel.setSelectedRule(rule)
     }
 
-    fun deleteRule(rule:Rule)
-    {
-        createStudyModel.currentStudy?.value?.let { study ->
-            createRuleModel.deleteRule(rule, study)
-        }
-    }
-
-    fun deleteSelectedRule()
-    {
-        createStudyModel.currentStudy?.value?.let { study ->
-            createRuleModel.deleteSelectedRule(study)
-        }
-    }
-
     fun onRuleOperatorSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         createStudyModel.currentStudy?.value?.let{study ->
              createRuleModel.onRuleOperatorSelected(study, position)
         }
     }
-    //endregion
 
-    //region FilterRule
     fun onFirstRuleFieldSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         createStudyModel.currentStudy?.value?.let{study ->
@@ -384,31 +310,6 @@ class ConfigurationViewModel : ViewModel()
     {
         createStudyModel.currentStudy?.value?.let{study ->
             createFilterModel.addFilter(study)
-        }
-    }
-
-    fun replaceEnumArea(enumArea : EnumArea)
-    {
-        currentConfiguration?.value?.let{config ->
-
-            // this does not work, not sure why
-            // config.enumAreas.add(enumArea)
-
-            var found = false
-
-            for (i in 0..config.enumAreas.size-1)
-            {
-                if (config.enumAreas[i].uuid == enumArea.uuid)
-                {
-                    config.enumAreas.removeAt(i)
-                    config.enumAreas.add(enumArea)
-                    found = true
-                }
-                if (found)
-                {
-                    break
-                }
-            }
         }
     }
 }

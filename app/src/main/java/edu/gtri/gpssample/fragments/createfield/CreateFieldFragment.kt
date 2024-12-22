@@ -38,6 +38,7 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
     private val binding get() = _binding!!
 
     private lateinit var field: Field
+    private lateinit var study: Study
     private lateinit var checkboxLayout: LinearLayout
     private lateinit var checkboxRecyclerView: RecyclerView
     private lateinit var dropdownRecyclerView: RecyclerView
@@ -101,78 +102,50 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
             this.executePendingBindings()
         }
 
-        sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
-            field = currentField
-
-            if (currentField.fieldBlockUUID != null)
-            {
-                isBlockField = true
-                binding.blockButtonLayout.visibility = View.VISIBLE
-                binding.normalButtonLayout.visibility = View.GONE
-            }
-
-            if (field.name.isEmpty()) // auto number the field
-            {
-                sharedViewModel.createFieldModel.fieldBlockContainer.value = false
-
-                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    var count = 1
-
-                    if (isBlockField)
-                    {
-                        // find the field block container
-                        var fieldContainer: Field? = null
-
-                        for (field in study.fields)
-                        {
-                            if (field.fieldBlockContainer && field.fieldBlockUUID == currentField.fieldBlockUUID)
-                            {
-                                fieldContainer = field
-                                break
-                            }
-                        }
-
-                        if (fieldContainer != null)
-                        {
-                            for (field in study.fields)
-                            {
-                                if (field.uuid != fieldContainer.uuid && field.fieldBlockUUID == fieldContainer.fieldBlockUUID)
-                                {
-                                    count += 1
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (field in study.fields)
-                        {
-                            if (field.fieldBlockContainer || field.fieldBlockUUID == null)
-                            {
-                                count += 1
-                            }
-                        }
-                    }
-
-                    field.name = "${count}. "
-                }
-            }
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+            this.study = study
         }
 
-        sharedViewModel.createFieldModel.fieldBlockContainer.observe( this, androidx.lifecycle.Observer { checked ->
-            if (checked)
+        sharedViewModel.createFieldModel.currentField?.value?.let { field ->
+            this.field = field
+        }
+
+        field.parentUUID?.let {
+            isBlockField = true
+            binding.blockButtonLayout.visibility = View.VISIBLE
+            binding.normalButtonLayout.visibility = View.GONE
+        }
+
+        field.fields?.let {
+            binding.fieldBlockContainerCheckBox.isChecked = true
+        }
+
+        binding.fieldIndexEditText.setText( "${field.index}.")
+
+        binding.fieldBlockContainerCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
             {
-                binding.saveButton.text = resources.getString(R.string.next)
-            }
-            else
-            {
-                binding.saveButton.text = resources.getString(R.string.save)
+                if (isChecked)
+                {
+                    if (field.fields == null)
+                    {
+                        field.fields = ArrayList<Field>()
+                    }
+                    binding.saveButton.text = resources.getString(R.string.next)
+                }
+                else
+                {
+                    field.fields = null
+                    binding.saveButton.text = resources.getString(R.string.save)
+                }
             }
         })
 
         binding.deleteImageView.setOnClickListener {
             sharedViewModel.createStudyModel.currentStudy?.value?.let  { study ->
-                sharedViewModel.createFieldModel.deleteSelectedField( study )
+
+                sharedViewModel.createFieldModel.deleteCurrentField( study )
                 findNavController().popBackStack()
             }
         }
@@ -258,23 +231,29 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         }
 
         binding.saveButton.setOnClickListener {
-            sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
-
-                // Date type must be selected!
-                if (currentField.type == FieldType.Date && !currentField.date && !currentField.time)
+            if (field.type == FieldType.Date && !field.date && !field.time)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.select_date_type), Toast.LENGTH_LONG).show()
+            }
+            else
+            {
+                if (!study.fields.contains (field))
                 {
-                    Toast.makeText(activity!!.applicationContext, resources.getString( R.string.select_date_type), Toast.LENGTH_LONG).show()
+                    study.fields.add( field )
+                }
+
+                if (field.fields == null)
+                {
+                    findNavController().popBackStack()
                 }
                 else
                 {
-                    saveField()
+                    sharedViewModel.createFieldModel.setParentField( field )
 
-                    if (currentField.fieldBlockUUID == null)
-                    {
-                        findNavController().popBackStack()
-                    }
-                    else
-                    {
+                    field.fields?.let { fields ->
+                        val childField = Field( field.uuid, fields.size+1,"", FieldType.Text, false, false, false, false, false, false )
+                        fields.add( childField )
+                        sharedViewModel.createFieldModel.setCurrentField( childField )
                         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
                     }
                 }
@@ -292,17 +271,19 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
             }
             else
             {
-                saveField()
-                findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                sharedViewModel.createFieldModel.parentField?.value?.let { parentField ->
+
+                    parentField.fields?.let { fields ->
+                        val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false )
+                        fields.add( childField )
+                        sharedViewModel.createFieldModel.setCurrentField( childField )
+                        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                    }
+                }
             }
         }
 
         binding.endBlockButton.setOnClickListener {
-            if (binding.fieldNameEditText.text.isNotEmpty())
-            {
-                saveField()
-            }
-
             findNavController().popBackStack( R.id.CreateStudyFragment, false )
         }
     }
@@ -332,23 +313,6 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
                 val fieldOption = FieldOption( name )
                 field.fieldOptions.add( fieldOption )
                 createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
-            }
-        }
-    }
-
-    fun saveField()
-    {
-        sharedViewModel.createFieldModel.currentField?.value?.let { currentField ->
-            if (currentField.fieldBlockContainer)
-            {
-                currentField.fieldBlockUUID = UUID.randomUUID().toString()
-            }
-
-            sharedViewModel.addField()
-
-            currentField.fieldBlockUUID?.let{ fieldBlockUUID ->
-                sharedViewModel.createFieldModel.createNewField( fieldBlockUUID )
-                sharedViewModel.createFieldModel.setCurrentFieldBlockUUID( fieldBlockUUID )
             }
         }
     }

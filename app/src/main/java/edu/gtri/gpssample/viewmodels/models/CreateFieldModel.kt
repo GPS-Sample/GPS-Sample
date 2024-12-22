@@ -18,69 +18,66 @@ import kotlin.collections.ArrayDeque
 
 class CreateFieldModel
 {
+    private var _parentField : MutableLiveData<Field>? = null
     private var _currentField : MutableLiveData<Field>? = null
-    private var _currentFieldBlockUUID : MutableLiveData<String>? = null
     private var _fieldTypePosition : MutableLiveData<Int> = MutableLiveData(0)
     private var _fieldType: MutableLiveData<FieldType> = MutableLiveData( FieldType.Text )
-    private var _fieldBlockContainer : MutableLiveData<Boolean> = MutableLiveData(false)
 
     var currentField : LiveData<Field>? = _currentField
-    var currentFieldBlockUUID : LiveData<String>? = _currentFieldBlockUUID
+    var parentField : LiveData<Field>? = _parentField
     var fieldType : LiveData<FieldType> = _fieldType
-
-    val fieldBlockContainer : MutableLiveData<Boolean>
-        get() = _fieldBlockContainer
 
     val fieldTypePosition : MutableLiveData<Int>
         get() = _fieldTypePosition
 
     var fieldTypes : Array<String>? = null
 
-    fun createNewField()
+    fun setParentField(field : Field)
     {
-        val newField = Field( "", FieldType.Text, false, false, false, false, false, false)
-        _currentField = MutableLiveData(newField)
-        currentField = _currentField
+        _parentField = MutableLiveData(field)
+        parentField = _parentField
     }
 
-    fun createNewField( fieldBlockUUID: String )
-    {
-        val newField = Field( "", FieldType.Text, false, false, false, false, false, false)
-        newField.fieldBlockUUID = fieldBlockUUID
-        _currentField = MutableLiveData(newField)
-        currentField = _currentField
-    }
-
-    fun addField(study : Study)
-    {
-        currentField?.value?.let { field ->
-
-            if(!study.fields.contains(field))
-            {
-                study.fields.add(field)
-            }
-        }
-    }
-
-    fun setCurrentFieldBlockUUID( blockUUID: String? )
-    {
-        _currentFieldBlockUUID = MutableLiveData(blockUUID)
-        currentFieldBlockUUID = _currentFieldBlockUUID
-    }
-
-    fun setSelectedField(field : Field)
+    fun setCurrentField(field : Field)
     {
         _currentField = MutableLiveData(field)
         currentField = _currentField
     }
 
-
-    fun deleteSelectedField(study : Study)
+    fun deleteCurrentField(study : Study)
     {
-        _currentField?.value?.let{field ->
-            study.fields.remove(field)
-            DAO.fieldDAO.deleteField(field)
+        _currentField?.value?.let { currentField ->
+            if (study.fields.contains( currentField ))
+            {
+                study.fields.remove( currentField )
+            }
+
+            for (field in study.fields)
+            {
+                field.fields?.let { fields ->
+                    if (fields.contains( currentField ))
+                    {
+                        fields.remove( currentField )
+                    }
+                }
+            }
+
+            DAO.fieldDAO.deleteField( currentField )
+
+            // renumber all fields
+
+            for (i in 1..study.fields.size)
+            {
+                study.fields[i-1].index = i
+                study.fields[i-1].fields?.let { fields ->
+                    for (j in 1..fields.size)
+                    {
+                        fields[j-1].index = j
+                    }
+                }
+            }
         }
+
         _currentField = null
     }
 
@@ -111,25 +108,10 @@ class CreateFieldModel
         }
     }
 
-    fun onFieldBlockContainerSelected(buttonView : CompoundButton, isChecked : Boolean)
-    {
-        currentField?.value?.let{field ->
-            field.fieldBlockContainer = isChecked
-            _fieldBlockContainer.postValue(isChecked)
-        }
-    }
-
     fun onFieldIntegerOnlySelected(buttonView : CompoundButton, isChecked : Boolean)
     {
         currentField?.value?.let{field ->
             field.integerOnly = isChecked
-        }
-    }
-
-    fun onFieldNumberOfResidentsSelected(buttonView : CompoundButton, isChecked : Boolean)
-    {
-        currentField?.value?.let{field ->
-            field.numberOfResidents = isChecked
         }
     }
 
