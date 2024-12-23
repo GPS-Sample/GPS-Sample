@@ -43,6 +43,8 @@ class CreateRuleFragment : Fragment(),
     private lateinit var config: Config
     private lateinit var sharedViewModel : ConfigurationViewModel
 
+    private var fieldList = ArrayList<Field>()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -86,12 +88,14 @@ class CreateRuleFragment : Fragment(),
             this.rule = rule
         }
 
+        fieldList = sharedViewModel.createStudyModel.fieldList
+
         // for an existing rule, figure out which field was selected
 
-        rule.field?.let{ field->
-            for (i in 0..study.fields.size-1)
+        rule.field?.let { field->
+            for (i in 0..fieldList.size-1)
             {
-                if (study.fields[i].uuid == field.uuid)
+                if (fieldList[i].uuid == field.uuid)
                 {
                     sharedViewModel.createRuleModel.ruleFieldPosition.value = i
 
@@ -182,7 +186,7 @@ class CreateRuleFragment : Fragment(),
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
-                val field = study.fields[position]
+                val field = fieldList[position]
                 rule.field = field
                 setKeyboardInputType( field )
                 rule.operator = Operator.Equal

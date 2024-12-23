@@ -15,6 +15,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
+import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
 import java.util.*
 
@@ -79,7 +80,10 @@ class CreateStudyModel {
 
         }
 
-    val fieldList : Array<String>
+    val fieldNameList : Array<String>
+        get() = getFieldNames()
+
+    val fieldList : ArrayList<Field>
         get() = getFields()
 
     val ruleList : Array<String>
@@ -128,7 +132,27 @@ class CreateStudyModel {
 
     constructor()
 
-    fun getFields() : Array<String>
+    fun getFields() : ArrayList<Field>
+    {
+        val fieldList = ArrayList<Field>()
+
+        _currentStudy?.value?.fields?.let { fields ->
+            for (field in fields)
+            {
+                fieldList.add( field )
+                field.fields?.let { blockFields ->
+                    for (blockField in blockFields)
+                    {
+                        fieldList.add( blockField )
+                    }
+                }
+            }
+        }
+
+        return fieldList
+    }
+
+    fun getFieldNames() : Array<String>
     {
         val fieldList = ArrayList<String>()
 
@@ -136,6 +160,12 @@ class CreateStudyModel {
             for (field in fields)
             {
                 fieldList.add( field.name )
+                field.fields?.let { blockFields ->
+                    for (blockField in blockFields)
+                    {
+                        fieldList.add( blockField.name )
+                    }
+                }
             }
         }
 
