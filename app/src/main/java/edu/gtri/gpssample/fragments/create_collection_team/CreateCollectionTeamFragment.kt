@@ -356,13 +356,6 @@ class CreateCollectionTeamFragment : Fragment(),
 
                             finalSelectedPolygon.boundary?.coordinates?.let { coordinates ->
 
-                                val vertices = MapboxManager.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
-
-                                val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
-                                pointList.add( vertices )
-
-                                intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
-
                                 locationUuids.clear()
 
                                 for (location in enumArea.locations)
@@ -375,6 +368,43 @@ class CreateCollectionTeamFragment : Fragment(),
                                             locationUuids.add( location.uuid )
                                         }
                                     }
+                                }
+
+                                val count = locationUuids.size
+
+                                // now look for HH's that are in the selectionPolygon but outside of the EA
+                                for (location in enumArea.locations)
+                                {
+                                    val geometry3 = geometryFactory.createPoint( Coordinate( location.longitude, location.latitude))
+                                    if (selectionPolygon.contains(geometry3))
+                                    {
+                                        if (!locationBelongsToTeam( location ))
+                                        {
+                                            if (!locationUuids.contains( location.uuid ))
+                                            {
+                                                locationUuids.add(location.uuid)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (locationUuids.size == count)
+                                {
+                                    val vertices = MapboxManager.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
+
+                                    val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                                    pointList.add( vertices )
+
+                                    intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
+                                }
+                                else
+                                {
+                                    val vertices = MapboxManager.ArrayListOfCoordinateToArrayListOfPoint( selectionPolygon.coordinates )
+
+                                    val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+                                    pointList.add( vertices )
+
+                                    intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
                                 }
                             }
                         }
