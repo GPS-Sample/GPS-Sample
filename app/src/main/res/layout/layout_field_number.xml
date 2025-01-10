@@ -29,6 +29,46 @@
             android:onCheckedChanged="@{viewModel.createFieldModel::onFieldIntegerOnlySelected}"/>
 
         <CheckBox
+            android:id="@+id/minimum_number_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/minimum_value"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:visibility="gone"
+            android:id="@+id/minimum_number_edit_text"
+            android:hint="@string/enter_the_minimum_value"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <CheckBox
+            android:id="@+id/maximum_number_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/maximum_value"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:visibility="gone"
+            android:id="@+id/maximum_number_edit_text"
+            android:hint="@string/enter_the_maximum_value"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <CheckBox
             android:id="@+id/pii_checkBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

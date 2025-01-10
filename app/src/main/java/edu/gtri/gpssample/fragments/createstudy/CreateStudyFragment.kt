@@ -141,7 +141,7 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
 
     private fun shouldAddField()
     {
-        val field = Field( null, study.fields.size+1,"", FieldType.Text, false, false, false, false, false, false )
+        val field = Field( null, study.fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null )
         sharedViewModel.createFieldModel.setCurrentField( field )
         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
     }

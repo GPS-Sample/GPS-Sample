@@ -25,8 +25,84 @@
             android:layout_marginEnd="20dp"
             android:text="@string/date"
             android:textSize="18sp"
-            android:checked="@{viewModel.createFieldModel.CurrentField.date}"
-            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldDateSelected}"/>
+            android:checked="@{viewModel.createFieldModel.CurrentField.date}"/>
+<!--            android:onCheckedChanged="@{viewModel.createFieldModel::onFieldDateSelected}"/>-->
+
+        <CheckBox
+            android:visibility="gone"
+            android:id="@+id/minimum_date_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/minimum_value"
+            android:textSize="18sp"/>
+
+        <LinearLayout
+            android:id="@+id/minimum_date_layout"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/minimum_date_edit_text"
+                android:hint="@string/select_the_minimum_date"
+                android:focusable="false"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"/>
+
+            <Button
+                android:id="@+id/minimum_date_calendar_button"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/calendar_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp">
+            </Button>
+        </LinearLayout>
+
+        <CheckBox
+            android:visibility="gone"
+            android:id="@+id/maximum_date_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/maximum_value"
+            android:textSize="18sp"/>
+
+        <LinearLayout
+            android:id="@+id/maximum_date_layout"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/maximum_date_edit_text"
+                android:hint="@string/select_the_maximum_date"
+                android:focusable="false"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"/>
+
+            <Button
+                android:id="@+id/maximum_date_calendar_button"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/calendar_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp">
+            </Button>
+        </LinearLayout>
 
         <CheckBox
             android:id="@+id/time_checkBox"

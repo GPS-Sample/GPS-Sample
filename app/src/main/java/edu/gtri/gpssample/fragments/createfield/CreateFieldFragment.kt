@@ -23,16 +23,19 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.databinding.FragmentCreateFieldBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
+import edu.gtri.gpssample.database.models.FieldData
 import edu.gtri.gpssample.database.models.FieldOption
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.InputDialog
+import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
 import edu.gtri.gpssample.fragments.add_household.AddHouseholdAdapter
+import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
-class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
-
+class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate, DatePickerDialog.DatePickerDialogDelegate
 {
     private var _binding: FragmentCreateFieldBinding? = null
     private val binding get() = _binding!!
@@ -164,6 +167,114 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
         dropdownRecyclerView.adapter = createFieldDropdownAdapter
         dropdownRecyclerView.layoutManager = LinearLayoutManager(activity)
 
+        val minimumNumberCheckBox = view.findViewById<CheckBox>(R.id.minimum_number_checkBox)
+        val maximumNumberCheckBox = view.findViewById<CheckBox>(R.id.maximum_number_checkBox)
+        val minimumNumberEditText = view.findViewById<EditText>(R.id.minimum_number_edit_text)
+        val maximumNumberEditText = view.findViewById<EditText>(R.id.maximum_number_edit_text)
+
+        minimumNumberCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                if (isChecked)
+                {
+                    minimumNumberEditText.visibility = View.VISIBLE
+                }
+                else
+                {
+                    minimumNumberEditText.visibility = View.GONE
+                }
+            }
+        })
+
+        maximumNumberCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                if (isChecked)
+                {
+                    maximumNumberEditText.visibility = View.VISIBLE
+                }
+                else
+                {
+                    maximumNumberEditText.visibility = View.GONE
+                }
+            }
+        })
+
+        val minimumDateCheckBox = view.findViewById<CheckBox>(R.id.minimum_date_checkBox)
+        val maximumDateCheckBox = view.findViewById<CheckBox>(R.id.maximum_date_checkBox)
+        val minimumDateLayout = view.findViewById<LinearLayout>(R.id.minimum_date_layout)
+        val maximumDateLayout = view.findViewById<LinearLayout>(R.id.maximum_date_layout)
+        val minimumDateEditText = view.findViewById<EditText>(R.id.minimum_date_edit_text)
+        val maximumDateEditText = view.findViewById<EditText>(R.id.maximum_date_edit_text)
+        val minimumDateCalendarButton = view.findViewById<Button>(R.id.minimum_date_calendar_button)
+        val maximumDateCalendarButton = view.findViewById<Button>(R.id.maximum_date_calendar_button)
+
+        val dateCheckBox = view.findViewById<CheckBox>(R.id.date_checkBox)
+
+        dateCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                minimumDateEditText.setText("")
+                maximumDateEditText.setText("")
+
+                if (isChecked)
+                {
+                    field.date = true
+                    minimumDateCheckBox.visibility = View.VISIBLE
+                    maximumDateCheckBox.visibility = View.VISIBLE
+                }
+                else
+                {
+                    field.date = false
+                    minimumDateCheckBox.isChecked = false
+                    maximumDateCheckBox.isChecked = false
+                    minimumDateCheckBox.visibility = View.GONE
+                    maximumDateCheckBox.visibility = View.GONE
+                }
+            }
+        })
+
+        minimumDateCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                if (isChecked)
+                {
+                    minimumDateLayout.visibility = View.VISIBLE
+                }
+                else
+                {
+                    minimumDateLayout.visibility = View.GONE
+                }
+            }
+        })
+
+        maximumDateCheckBox.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener
+        {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean)
+            {
+                if (isChecked)
+                {
+                    maximumDateLayout.visibility = View.VISIBLE
+                }
+                else
+                {
+                    maximumDateLayout.visibility = View.GONE
+                }
+            }
+        })
+
+        minimumDateCalendarButton.setOnClickListener {
+            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", Date(), field, null, minimumDateEditText,this )
+        }
+
+        maximumDateCalendarButton.setOnClickListener {
+            DatePickerDialog( context!!, context?.getString(R.string.select_date) ?: "Select Date", Date(), field, null, maximumDateEditText,this )
+        }
+
         // respond to changes to the FieldType dropdown
         sharedViewModel.createFieldModel.fieldType.observe( this, androidx.lifecycle.Observer { fieldType ->
 
@@ -172,6 +283,19 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
             val dateLayout = view.findViewById<LinearLayout>(R.id.layout_field_date)
 
             binding.fieldBlockContainerCheckBox.visibility = View.GONE
+
+            minimumNumberCheckBox.isChecked = false
+            maximumNumberCheckBox.isChecked = false
+            minimumNumberEditText.visibility = View.GONE
+            maximumNumberEditText.visibility = View.GONE
+
+            minimumDateCheckBox.isChecked = false
+            maximumDateCheckBox.isChecked = false
+            minimumDateLayout.visibility = View.GONE
+            maximumDateLayout.visibility = View.GONE
+
+            minimumDateCheckBox.visibility = View.GONE
+            maximumDateCheckBox.visibility = View.GONE
 
             when (fieldType)
             {
@@ -192,6 +316,18 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
                     dateLayout.visibility = View.GONE
                     checkboxLayout.visibility = View.GONE
                     dropdownLayout.visibility = View.GONE
+
+                    field.minimum?.let {
+                        minimumNumberCheckBox.isChecked = true
+                        minimumNumberEditText.visibility = View.VISIBLE
+                        minimumNumberEditText.setText(it.toInt().toString())
+                    }
+
+                    field.maximum?.let {
+                        maximumNumberCheckBox.isChecked = true
+                        maximumNumberEditText.visibility = View.VISIBLE
+                        maximumNumberEditText.setText(it.toInt().toString())
+                    }
                 }
                 FieldType.Date -> {
                     textLayout.visibility = View.GONE
@@ -199,6 +335,26 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
                     dateLayout.visibility = View.VISIBLE
                     checkboxLayout.visibility = View.GONE
                     dropdownLayout.visibility = View.GONE
+
+                    field.minimum?.let {
+                        val date = Date( it.toLong())
+                        minimumDateCheckBox.isChecked = true
+                        minimumDateCheckBox.visibility = View.VISIBLE
+                        minimumDateLayout.visibility = View.VISIBLE
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            minimumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
+                        }
+                    }
+
+                    field.maximum?.let {
+                        val date = Date( it.toLong())
+                        maximumDateCheckBox.isChecked = true
+                        maximumDateCheckBox.visibility = View.VISIBLE
+                        maximumDateLayout.visibility = View.VISIBLE
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            maximumDateEditText.setText( DateUtils.dateString( date, config.dateFormat ))
+                        }
+                    }
                 }
                 FieldType.Checkbox -> {
                     textLayout.visibility = View.GONE
@@ -237,6 +393,30 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
             }
             else
             {
+                minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                    field.minimum = it
+                }
+
+                maximumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                    field.maximum = it
+                }
+
+                if (minimumDateEditText.tag is Double)
+                {
+                    field.minimum = minimumDateEditText.tag as Double
+                }
+
+                if (maximumDateEditText.tag is Double)
+                {
+                    field.maximum = maximumDateEditText.tag as Double
+                }
+
+                if (field.minimum != null && field.maximum !=null && field.minimum!! > field.maximum!!)
+                {
+                    Toast.makeText(activity!!.applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
                 if (!study.fields.contains (field))
                 {
                     study.fields.add( field )
@@ -251,7 +431,7 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
                     sharedViewModel.createFieldModel.setParentField( field )
 
                     field.fields?.let { fields ->
-                        val childField = Field( field.uuid, fields.size+1,"", FieldType.Text, false, false, false, false, false, false )
+                        val childField = Field( field.uuid, fields.size+1,"", FieldType.Text, false, false, false, false, false, false, null, null )
                         fields.add( childField )
                         sharedViewModel.createFieldModel.setCurrentField( childField )
                         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
@@ -274,7 +454,7 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
                 sharedViewModel.createFieldModel.parentField?.value?.let { parentField ->
 
                     parentField.fields?.let { fields ->
-                        val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false )
+                        val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false, null, null )
                         fields.add( childField )
                         sharedViewModel.createFieldModel.setCurrentField( childField )
                         findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
@@ -327,6 +507,36 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate
     {
         field.fieldOptions.remove(fieldOption)
         createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
+    }
+
+    override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            editText?.let { editText ->
+                if (editText.id == R.id.minimum_date_edit_text)
+                {
+                    val calendar = Calendar.getInstance()
+                    calendar.time = date
+                    calendar[Calendar.HOUR] = 0
+                    calendar[Calendar.MINUTE] = 0
+                    calendar[Calendar.SECOND] = 0
+                    calendar[Calendar.AM_PM] = Calendar.AM
+                    editText.tag = calendar.time.time.toDouble()
+                }
+                else if (editText.id == R.id.maximum_date_edit_text)
+                {
+                    val calendar = Calendar.getInstance()
+                    calendar.time = date
+                    calendar[Calendar.HOUR] = 11
+                    calendar[Calendar.MINUTE] = 59
+                    calendar[Calendar.SECOND] = 59
+                    calendar[Calendar.AM_PM] = Calendar.PM
+                    editText.tag = calendar.time.time.toDouble()
+                }
+
+                editText.setText( DateUtils.dateString( date, config.dateFormat ))
+            }
+        }
     }
 
     override fun onDestroyView()

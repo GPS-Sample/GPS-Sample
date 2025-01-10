@@ -374,6 +374,14 @@
     <string name="app_version">"Application Version"</string>
     <string name="db_version">"Database Version"</string>
     <string name="team">"Team"</string>
+    <string name="minimum_value">Minimum Value</string>
+    <string name="maximum_value">Maximum Value</string>
+    <string name="enter_the_minimum_value">Enter the minimum value</string>
+    <string name="enter_the_maximum_value">Enter the maximum value</string>
+    <string name="select_the_minimum_date">Select the minimum date</string>
+    <string name="select_the_maximum_date">Select the maximum date</string>
+    <string name="min_greater_than_max">The minimum value is greater than the maximum value</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

@@ -371,6 +371,24 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
     {
         if (field.date && !field.time)
         {
+            field.minimum?.let { minimum ->
+                if (date.time < minimum)
+                {
+                    val minDate = DateUtils.dateString( Date( minimum.toLong()), config.dateFormat )
+                    Toast.makeText(context!!.applicationContext, "The minimum allowed date is ${minDate}", Toast.LENGTH_LONG).show()
+                    return
+                }
+            }
+
+            field.maximum?.let { maximum ->
+                if (date.time > maximum)
+                {
+                    val maxDate = DateUtils.dateString( Date( maximum.toLong()), config.dateFormat )
+                    Toast.makeText(context!!.applicationContext, "The maximum allowed date is ${maxDate}", Toast.LENGTH_LONG).show()
+                    return
+                }
+            }
+
             fieldData?.let { fieldData ->
                 fieldData.dateValue = date.time
                 editText?.let { editText ->

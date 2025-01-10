@@ -412,6 +412,37 @@ class AddHouseholdFragment : Fragment(),
         }
 
         binding.saveButton.setOnClickListener {
+
+            for (fieldData in enumerationItem.fieldDataList) {
+                fieldData.field?.let { field ->
+                    if (field.type == FieldType.Number) {
+                        fieldData.numberValue?.let { numberValue ->
+                            field.minimum?.let { minVal ->
+                                if (numberValue < minVal) {
+                                    Toast.makeText(
+                                        context!!.applicationContext,
+                                        "${field.name}: " + "The minimum allowed value is" + " ${minVal}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    return@setOnClickListener
+                                }
+                            }
+
+                            field.maximum?.let { maxVal ->
+                                if (numberValue > maxVal) {
+                                    Toast.makeText(
+                                        context!!.applicationContext,
+                                        "${field.name}: " + "The maximum allowed value is" + " (${maxVal})",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    return@setOnClickListener
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (enumerationItem.enumerationState == EnumerationState.Incomplete)
             {
                 AdditionalInfoDialog( activity, enumerationItem.enumerationIncompleteReason, enumerationItem.enumerationNotes, this)
