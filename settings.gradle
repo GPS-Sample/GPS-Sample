@@ -5,6 +5,10 @@ pluginManagement {
         mavenCentral()
     }
 }
+
+Properties properties = new Properties()
+def MAPBOX_DOWNLOADS_TOKEN = properties.getProperty('MAPBOX_DOWNLOADS_TOKEN')
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
