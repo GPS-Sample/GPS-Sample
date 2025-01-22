@@ -1,5 +1,6 @@
 package edu.gtri.gpssample.activities
 
+import android.annotation.SuppressLint
 import android.content.*
 import android.content.res.Configuration
 import android.os.Build
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
         }
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
