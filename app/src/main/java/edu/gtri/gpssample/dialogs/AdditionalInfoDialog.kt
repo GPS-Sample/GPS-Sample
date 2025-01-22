@@ -15,7 +15,6 @@ import android.view.View
 import android.widget.*
 import edu.gtri.gpssample.R
 
-
 class AdditionalInfoDialog
 {
     interface AdditionalInfoDialogDelegate

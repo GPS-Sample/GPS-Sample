@@ -9,7 +9,6 @@ package edu.gtri.gpssample.network.models
 
 import java.math.BigInteger
 import java.security.MessageDigest
-
 import java.nio.ByteBuffer
 
 data class TCPHeader(val command : Int, val payloadSize : Int)
