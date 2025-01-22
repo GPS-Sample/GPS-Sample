@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.network
 
 import android.util.Log
@@ -5,8 +12,10 @@ import edu.gtri.gpssample.network.models.TCPHeader
 import edu.gtri.gpssample.network.models.TCPMessage
 import java.io.DataInputStream
 import java.net.Socket
+
 const val kSocketTimeout = 10000
 const val kTCPPort = 51234
+
 class TCPClient
 {
     interface TCPClientDelegate

@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.fragments.sign_in
 
 import android.content.SharedPreferences
@@ -33,7 +40,6 @@ import edu.gtri.gpssample.dialogs.ResetPinDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
-
 
 class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDialog.ResetPinDialogDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {

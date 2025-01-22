@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.fragments.create_enumeration_area
 
 import android.app.Activity
@@ -75,7 +82,6 @@ import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
-
 
 class CreateEnumerationAreaFragment : Fragment(),
     OnMapClickListener,

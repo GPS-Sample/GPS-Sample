@@ -1,20 +1,20 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.viewmodels.models
 
-import android.util.Log
-import android.view.View
-import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.constants.ConnectorConverter
-import edu.gtri.gpssample.constants.Operator
 import edu.gtri.gpssample.constants.OperatorConverter
-import edu.gtri.gpssample.constants.SampleTypeConverter
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
-import java.util.*
 
 class CreateRuleModel {
     private var _ruleFieldPosition : MutableLiveData<Int> = MutableLiveData(0)

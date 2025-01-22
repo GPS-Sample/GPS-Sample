@@ -1,12 +1,16 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.fragments.createstudy
 
-import android.R.attr.left
-import android.R.attr.right
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams
 import android.widget.BaseExpandableListAdapter
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,16 +21,11 @@ import edu.gtri.gpssample.database.models.Rule
 import edu.gtri.gpssample.database.models.Study
 import java.util.ArrayList
 
-
 class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
 {
     lateinit var didSelectField: ((field: Field) -> Unit)
     lateinit var didSelectRule: ((rule: Rule) -> Unit)
     lateinit var didSelectFilter: ((filter: Filter) -> Unit)
-
-//    lateinit var didDeleteField: ((field: Field) -> Unit)
-//    lateinit var didDeleteRule: ((rule: Rule) -> Unit)
-//    lateinit var didDeleteFilter: ((filter: Filter) -> Unit)
 
     lateinit var shouldAddField: (() -> Unit)
     lateinit var shouldAddRule: (() -> Unit)

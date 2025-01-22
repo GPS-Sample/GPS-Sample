@@ -1,12 +1,15 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.network
 
-import android.app.Activity
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.network.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -1,5 +1,11 @@
-package edu.gtri.gpssample.viewmodels.models
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
 
+package edu.gtri.gpssample.viewmodels.models
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -25,7 +31,6 @@ import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.*
 import java.lang.Thread.sleep
 import java.net.InetAddress
-
 
 private const val kDialogTimeout: Long = 400
 

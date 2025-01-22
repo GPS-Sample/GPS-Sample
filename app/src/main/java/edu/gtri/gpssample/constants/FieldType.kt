@@ -1,12 +1,11 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.constants
-import android.app.Activity
-import android.util.Log
-import java.util.*
-import android.view.View
-import android.widget.AdapterView
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 
 enum class FieldType (val format : String) {
     Text("Text"),

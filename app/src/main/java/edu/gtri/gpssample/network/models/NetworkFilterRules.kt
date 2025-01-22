@@ -1,11 +1,11 @@
-package edu.gtri.gpssample.network.models
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
 
-import edu.gtri.gpssample.database.models.Filter
-//import edu.gtri.gpssample.database.models.FilterRule
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+package edu.gtri.gpssample.network.models
 
 //@Serializable
 //data class NetworkFilterRules( var filterRules: List<FilterRule> )

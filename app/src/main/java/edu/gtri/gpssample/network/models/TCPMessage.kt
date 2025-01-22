@@ -1,14 +1,16 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.network.models
-import android.util.Log
+
 import java.math.BigInteger
 import java.security.MessageDigest
 
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
-import java.util.*
-import kotlin.text.Charsets.ISO_8859_1
-import kotlin.text.Charsets.UTF_16
-import kotlin.text.Charsets.UTF_8
 
 data class TCPHeader(val command : Int, val payloadSize : Int)
 {

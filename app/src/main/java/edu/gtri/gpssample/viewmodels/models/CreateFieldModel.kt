@@ -1,20 +1,22 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.viewmodels.models
 
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.CompoundButton
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.FieldTypeConverter
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Study
-import java.util.*
-import kotlin.collections.ArrayDeque
 
 class CreateFieldModel
 {
