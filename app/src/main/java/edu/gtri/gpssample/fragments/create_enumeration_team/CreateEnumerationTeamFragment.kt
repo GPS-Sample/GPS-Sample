@@ -60,6 +60,7 @@ class CreateEnumerationTeamFragment : Fragment(),
     private var createMode = false
     private val locationUuids = ArrayList<String>()
     private var intersectionPolygon: PolygonAnnotation? = null
+    private var intersectionPolyline: PolylineAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
 
@@ -123,6 +124,12 @@ class CreateEnumerationTeamFragment : Fragment(),
             {
                 intersectionPolygon?.let {
                     polygonAnnotationManager.delete( it )
+                    intersectionPolygon = null
+                }
+
+                intersectionPolyline?.let {
+                    polylineAnnotationManager.delete( it )
+                    intersectionPolyline = null
                 }
 
                 createMode = true
@@ -327,6 +334,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                                 pointList.add( vertices )
 
                                 intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
+                                intersectionPolyline = mapboxManager.addPolyline( vertices, "#0000ff" )
 
                                 locationUuids.clear()
 
@@ -347,7 +355,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
                 catch( ex: Exception )
                 {
-                    Log.d( "xxx", ex.stackTrace.toString())
+                    Log.d( "xxx", ex.stackTraceToString())
                 }
 
                 polyLinePoints.clear()

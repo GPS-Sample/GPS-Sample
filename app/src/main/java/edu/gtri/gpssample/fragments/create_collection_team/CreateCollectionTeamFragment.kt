@@ -62,6 +62,7 @@ class CreateCollectionTeamFragment : Fragment(),
     private var createMode = false
     private val locationUuids = ArrayList<String>()
     private var intersectionPolygon: PolygonAnnotation? = null
+    private var intersectionPolyline: PolylineAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
 
@@ -133,6 +134,12 @@ class CreateCollectionTeamFragment : Fragment(),
             {
                 intersectionPolygon?.let {
                     polygonAnnotationManager.delete( it )
+                    intersectionPolygon = null
+                }
+
+                intersectionPolyline?.let {
+                    polylineAnnotationManager.delete( it )
+                    intersectionPolyline = null
                 }
 
                 createMode = true
@@ -393,6 +400,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                     pointList.add( vertices )
 
                                     intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
+                                    intersectionPolyline = mapboxManager.addPolyline( vertices, "#0000ff" )
                                 }
                                 else
                                 {
@@ -402,6 +410,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                     pointList.add( vertices )
 
                                     intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
+                                    intersectionPolyline = mapboxManager.addPolyline( vertices, "#0000ff" )
                                 }
                             }
                         }
@@ -409,7 +418,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 }
                 catch( ex: Exception )
                 {
-                    Log.d( "xxx", ex.stackTrace.toString())
+                    Log.d( "xxx", ex.stackTraceToString())
                 }
 
                 polyLinePoints.clear()
