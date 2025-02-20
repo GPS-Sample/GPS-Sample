@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.add_household
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -184,55 +185,85 @@ class AddHouseholdFragment : Fragment(),
             }
         }
 
-        if (!collectionMode)
+        if (enumerationItem.uuid.isEmpty())
         {
-            if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+            binding.uuidLayout.visibility = View.GONE
+            binding.additionalInfoLayout.visibility = View.GONE
+        }
+        else
+        {
+            val components = enumerationItem.uuid.split("-" )
+            binding.UUIDEditText.setText( components[0] )
+        }
+
+        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+        {
+            binding.enumerationIncompleteCheckBox.isChecked = true
+            binding.enumerationIncompleteCheckBox.text = resources.getString( R.string.complete )
+            binding.enumerationReasonIncompleteLayout.visibility = View.GONE
+        }
+        else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+        {
+            binding.enumerationIncompleteCheckBox.isChecked = true
+            binding.enumerationIncompleteCheckBox.text = resources.getString( R.string.incomplete )
+            binding.enumerationReasonIncompleteLayout.visibility = View.VISIBLE
+            when (enumerationItem.enumerationIncompleteReason)
             {
-                if (enumerationItem.enumerationNotes.isNotEmpty())
-                {
-                    binding.statusTextView.visibility= View.GONE
-                    binding.incompleteCheckBox.visibility = View.GONE
-                    binding.reasonIncompleteTextView.visibility = View.GONE
-                    binding.reasonIncompleteRadioGroup.visibility = View.GONE
-                    binding.notesEditText.setText( enumerationItem.enumerationNotes )
-                }
-            }
-            else if (enumerationItem.enumerationState == EnumerationState.Incomplete)
-            {
-                binding.incompleteCheckBox.isChecked = enumerationItem.enumerationIncompleteReason.isNotEmpty()
-                binding.notesEditText.setText( enumerationItem.enumerationNotes )
-                when (enumerationItem.enumerationIncompleteReason)
-                {
-                    resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
-                    resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
-                    resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
-                }
+                resources.getString( R.string.nobody_home ) -> binding.enumerationNobodyHomeButton.isChecked = true
+                resources.getString( R.string.home_not_exist ) -> binding.enumerationDoesNotExistButton.isChecked = true
+                resources.getString( R.string.other ) -> binding.enumerationOtherButton.isChecked = true
             }
         }
         else
         {
-            if (enumerationItem.collectionState == CollectionState.Complete)
+            binding.enumerationStatusTextView.visibility = View.GONE
+            binding.enumerationIncompleteCheckBox.visibility = View.GONE
+            binding.enumerationReasonIncompleteLayout.visibility = View.GONE
+        }
+
+        if (enumerationItem.enumerationNotes.isNotEmpty())
+        {
+            binding.enumerationNotesEditText.setText( enumerationItem.enumerationNotes )
+        }
+        else
+        {
+            binding.enumerationNotesTextView.visibility = View.GONE
+            binding.enumerationNotesEditText.visibility = View.GONE
+        }
+
+        if (enumerationItem.collectionState == CollectionState.Complete)
+        {
+            binding.collectionIncompleteCheckBox.isChecked = true
+            binding.collectionIncompleteCheckBox.text = resources.getString( R.string.complete )
+            binding.collectionReasonIncompleteLayout.visibility = View.GONE
+        }
+        else if (enumerationItem.collectionState == CollectionState.Incomplete)
+        {
+            binding.collectionIncompleteCheckBox.isChecked = true
+            binding.collectionIncompleteCheckBox.text = resources.getString( R.string.incomplete )
+            binding.collectionReasonIncompleteLayout.visibility = View.VISIBLE
+            when (enumerationItem.collectionIncompleteReason)
             {
-                if (enumerationItem.collectionNotes.isNotEmpty())
-                {
-                    binding.statusTextView.visibility= View.GONE
-                    binding.incompleteCheckBox.visibility = View.GONE
-                    binding.reasonIncompleteTextView.visibility = View.GONE
-                    binding.reasonIncompleteRadioGroup.visibility = View.GONE
-                    binding.notesEditText.setText( enumerationItem.collectionNotes )
-                }
+                resources.getString( R.string.nobody_home ) -> binding.collectionNobodyHomeButton.isChecked = true
+                resources.getString( R.string.home_not_exist ) -> binding.collectionDoesNotExistButton.isChecked = true
+                resources.getString( R.string.other ) -> binding.collectionOtherButton.isChecked = true
             }
-            else if (enumerationItem.collectionState == CollectionState.Incomplete)
-            {
-                binding.incompleteCheckBox.isChecked = enumerationItem.collectionIncompleteReason.isNotEmpty()
-                binding.notesEditText.setText( enumerationItem.collectionNotes )
-                when (enumerationItem.collectionIncompleteReason)
-                {
-                    resources.getString( R.string.nobody_home ) -> binding.nobodyHomeButton.isChecked = true
-                    resources.getString( R.string.home_not_exist ) -> binding.doesNotExistButton.isChecked = true
-                    resources.getString( R.string.other ) -> binding.otherButton.isChecked = true
-                }
-            }
+        }
+        else
+        {
+            binding.collectionStatusTextView.visibility = View.GONE
+            binding.collectionIncompleteCheckBox.visibility = View.GONE
+            binding.collectionReasonIncompleteLayout.visibility = View.GONE
+        }
+
+        if (enumerationItem.collectionNotes.isNotEmpty())
+        {
+            binding.collectionNotesEditText.setText( enumerationItem.collectionNotes )
+        }
+        else
+        {
+            binding.collectionNotesTextView.visibility = View.GONE
+            binding.collectionNotesEditText.visibility = View.GONE
         }
 
         // filteredFieldDataList contains only non-block fields and block field containers
@@ -255,27 +286,9 @@ class AddHouseholdFragment : Fragment(),
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        if (enumerationItem.uuid.isEmpty())
-        {
-            binding.uuidLayout.visibility = View.GONE
-        }
-        else
-        {
-            val components = enumerationItem.uuid.split("-" )
-            binding.UUIDEditText.setText( components[0] )
-        }
-
         binding.subaddressEditText.setText( enumerationItem.subAddress )
         binding.latitudeEditText.setText( String.format( "%.6f", location.latitude ))
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
-
-        if (enumerationItem.uuid.isNotEmpty())
-        {
-            binding.hideAdditionalInfoImageView.visibility = View.GONE
-            binding.showAdditionalInfoImageView.visibility = View.VISIBLE
-            binding.defaultInfoLayout.visibility = View.GONE
-            binding.additionalInfoLayout.visibility = View.GONE
-        }
 
         binding.hideAdditionalInfoImageView.setOnClickListener {
             binding.hideAdditionalInfoImageView.visibility = View.GONE
@@ -289,23 +302,9 @@ class AddHouseholdFragment : Fragment(),
             binding.hideAdditionalInfoImageView.visibility = View.VISIBLE
             binding.defaultInfoLayout.visibility = View.VISIBLE
 
-            if (enumerationItem.enumerationState == EnumerationState.Incomplete || enumerationItem.collectionState == CollectionState.Incomplete)
+            if (enumerationItem.uuid.isNotEmpty())
             {
                 binding.additionalInfoLayout.visibility = View.VISIBLE
-            }
-            else if (!collectionMode)
-            {
-                if (enumerationItem.enumerationState == EnumerationState.Enumerated && enumerationItem.enumerationNotes.isNotEmpty())
-                {
-                    binding.additionalInfoLayout.visibility = View.VISIBLE
-                }
-            }
-            else
-            {
-                if (enumerationItem.collectionState == CollectionState.Complete && enumerationItem.collectionNotes.isNotEmpty())
-                {
-                    binding.additionalInfoLayout.visibility = View.VISIBLE
-                }
             }
         }
 
