@@ -33,7 +33,7 @@ class AddMultiHouseholdFragment : Fragment()
     private lateinit var addMultiHouseholdAdapter: AddMultiHouseholdAdapter
 
     private var editMode = true
-    private var maxSubaddress = 0
+    private var startSubaddress = 0
     private var _binding: FragmentAddMultiHouseholdBinding? = null
     private val binding get() = _binding!!
 
@@ -45,7 +45,7 @@ class AddMultiHouseholdFragment : Fragment()
         sharedViewModel = vm
 
         arguments?.getInt(Keys.kStartSubaddress.value)?.let { startSubAddress ->
-            this.maxSubaddress = startSubAddress
+            this.startSubaddress = startSubAddress
         }
     }
 
@@ -88,31 +88,10 @@ class AddMultiHouseholdFragment : Fragment()
         binding.recyclerView.adapter = addMultiHouseholdAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
-        if (maxSubaddress == 0)
-        {
-            for (location in enumArea.locations)
-            {
-                for (enumItem in location.enumerationItems)
-                {
-                    if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
-                    {
-                        enumItem.subAddress.toIntOrNull()?.let {
-                            if (it > maxSubaddress)
-                            {
-                                maxSubaddress = it
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        maxSubaddress += 1
-
         binding.addButton.setOnClickListener {
 
             val enumerationItem = EnumerationItem()
-            enumerationItem.subAddress = maxSubaddress.toString()
+            enumerationItem.subAddress = getNextSubaddress().toString()
 
             sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 
@@ -122,6 +101,36 @@ class AddMultiHouseholdFragment : Fragment()
         binding.backButton.setOnClickListener {
             findNavController().popBackStack()
         }
+    }
+
+    fun getNextSubaddress() : Int
+    {
+        var subAddress = 0
+
+        for (location in enumArea.locations)
+        {
+            for (enumItem in location.enumerationItems)
+            {
+                if (enumItem.enumerationState == EnumerationState.Enumerated || enumItem.enumerationState == EnumerationState.Incomplete)
+                {
+                    enumItem.subAddress.toIntOrNull()?.let {
+                        if (it > subAddress)
+                        {
+                            subAddress = it
+                        }
+                    }
+                }
+            }
+        }
+
+        subAddress += 1
+
+        if (subAddress < startSubaddress)
+        {
+            subAddress = startSubaddress
+        }
+
+        return subAddress
     }
 
     override fun onResume()
