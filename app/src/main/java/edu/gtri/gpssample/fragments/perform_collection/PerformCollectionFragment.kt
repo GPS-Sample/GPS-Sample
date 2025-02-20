@@ -755,7 +755,7 @@ class PerformCollectionFragment : Fragment(),
                                 packedConfig = config.packMinimal()
                             }
 
-                            Role.Enumerator.toString() ->
+                            Role.Enumerator.toString(), Role.DataCollector.toString() ->
                             {
                                 packedConfig = config.pack()
                             }
