@@ -117,7 +117,17 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
 
             if (field.parentUUID != null)
             {
-                nameTextView.text = "    ${fields[childPosition].index}. ${fields[childPosition].name}"
+                var parentIndex = 0
+
+                for (f in fields)
+                {
+                    if (f.uuid == field.parentUUID)
+                    {
+                        parentIndex = f.index
+                    }
+                }
+
+                nameTextView.text = "    ${parentIndex}.${fields[childPosition].index}. ${fields[childPosition].name}"
             }
         }
 

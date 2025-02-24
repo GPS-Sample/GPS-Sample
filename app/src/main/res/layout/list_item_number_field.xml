@@ -47,7 +47,7 @@
             <EditText
                 android:id="@+id/edit_text"
                 android:inputType="number"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionNext"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_width="match_parent"

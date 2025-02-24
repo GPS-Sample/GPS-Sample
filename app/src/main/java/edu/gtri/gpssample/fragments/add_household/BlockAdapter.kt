@@ -29,7 +29,7 @@ import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
 import java.util.*
 
-class BlockAdapter( val editMode: Boolean, val config: Config, val listOfLists: ArrayList<ArrayList<FieldData>>) : RecyclerView.Adapter<BlockAdapter.ViewHolder>()
+class BlockAdapter( val parentFieldIndex: Int, val editMode: Boolean, val config: Config, val listOfLists: ArrayList<ArrayList<FieldData>>) : RecyclerView.Adapter<BlockAdapter.ViewHolder>()
 {
     private var context: Context? = null
     private lateinit var blockFieldAdapter: BlockFieldAdapter
@@ -61,7 +61,7 @@ class BlockAdapter( val editMode: Boolean, val config: Config, val listOfLists: 
         val titleTextView = holder.linearLayout.findViewById<TextView>(R.id.title_text_view)
         titleTextView.text = "Item # ${position+1}"
 
-        blockFieldAdapter = BlockFieldAdapter( editMode, config, fieldDataList )
+        blockFieldAdapter = BlockFieldAdapter( parentFieldIndex, editMode, config, fieldDataList )
 
         val recyclerView: RecyclerView = holder.linearLayout.findViewById(R.id.recycler_view)
         recyclerView.adapter = blockFieldAdapter

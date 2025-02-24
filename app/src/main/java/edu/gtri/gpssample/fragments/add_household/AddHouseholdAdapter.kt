@@ -172,7 +172,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                         listOfLists.add( blockFieldDataList )
                     }
 
-                    blockAdapter = BlockAdapter( editMode, config, listOfLists )
+                    blockAdapter = BlockAdapter( field.index, editMode, config, listOfLists )
 
                     val recyclerView: RecyclerView = blockLayout.findViewById(R.id.recycler_view)
                     recyclerView.adapter = blockAdapter

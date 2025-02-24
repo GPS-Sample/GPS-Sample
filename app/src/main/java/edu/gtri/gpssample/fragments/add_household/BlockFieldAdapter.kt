@@ -31,7 +31,7 @@ import edu.gtri.gpssample.dialogs.TimePickerDialog
 import edu.gtri.gpssample.utils.DateUtils
 import java.util.*
 
-class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldDataList: List<FieldData>) :
+class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val config: Config, val fieldDataList: List<FieldData>) :
     RecyclerView.Adapter<BlockFieldAdapter.ViewHolder>(),
     DatePickerDialog.DatePickerDialogDelegate,
     TimePickerDialog.TimePickerDialogDelegate
@@ -234,7 +234,7 @@ class BlockFieldAdapter(val editMode: Boolean, val config: Config, val fieldData
         frameLayout?.let { layout ->
             layout.visibility = View.VISIBLE
             val titleView = layout.findViewById<TextView>(R.id.title_text_view)
-            titleView.text = "${field.index}. ${field.name}"
+            titleView.text = "${parentFieldIndex}.${field.index}. ${field.name}"
         }
     }
 
