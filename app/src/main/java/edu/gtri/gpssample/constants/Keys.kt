@@ -17,6 +17,7 @@ enum class Keys( val value: String ) {
     kEditMode("EditMode"),
     kUserName("UserName"),
     kIpAddress("IpAddress"),
+    kMapStyle("MAPBOX_STREETS"),
     kIsOnBoarding("IsOnBoarding"),
     kTermsAccepted("TermsAccepted"),
     kCollectionMode("CollectionMode"),

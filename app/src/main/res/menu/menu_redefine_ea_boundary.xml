@@ -4,6 +4,16 @@
     tools:context="edu.gtri.gpssample.MainActivity">
 
     <item
+        android:id="@+id/mapbox_streets"
+        android:title="Mapbox Streets"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/satellite_streets"
+        android:title="Satellite Streets"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/redefine_ea_boundary"
         android:title="@string/update_boundary"
         app:showAsAction="never"/>

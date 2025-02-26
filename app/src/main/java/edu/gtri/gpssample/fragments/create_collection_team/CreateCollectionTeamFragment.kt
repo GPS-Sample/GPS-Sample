@@ -7,9 +7,13 @@
 
 package edu.gtri.gpssample.fragments.create_collection_team
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +34,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -76,6 +81,8 @@ class CreateCollectionTeamFragment : Fragment(),
 
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -100,8 +107,14 @@ class CreateCollectionTeamFragment : Fragment(),
             study = _study
         }
 
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        var style = Style.MAPBOX_STREETS
+        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+            style = it
+        }
+
         binding.mapView.getMapboxMap().loadStyleUri(
-            Style.MAPBOX_STREETS,
+            style,
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
                     refreshMap()
@@ -457,6 +470,53 @@ class CreateCollectionTeamFragment : Fragment(),
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
         sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_map_style, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.mapbox_streets ->
+            {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    Style.MAPBOX_STREETS,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
+            }
+
+            R.id.satellite_streets ->
+            {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    Style.SATELLITE_STREETS,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()

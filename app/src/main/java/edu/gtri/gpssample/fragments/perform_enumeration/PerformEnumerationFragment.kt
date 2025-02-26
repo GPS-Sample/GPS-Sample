@@ -10,6 +10,7 @@ package edu.gtri.gpssample.fragments.perform_enumeration
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -191,8 +192,14 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " " +  resources.getString(R.string.team) + ")"
 
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        var style = Style.MAPBOX_STREETS
+        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+            style = it
+        }
+
         binding.mapView.getMapboxMap().loadStyleUri(
-            Style.MAPBOX_STREETS,
+            style,
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
                     initLocationComponent()
@@ -1248,32 +1255,50 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        if (BuildConfig.DEBUG)
-        {
-            inflater.inflate(R.menu.menu_enumerate_all, menu)
-        }
-        else
-        {
-            inflater.inflate(R.menu.menu_set_subaddress, menu)
-        }
+        inflater.inflate(R.menu.menu_set_subaddress, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId)
         {
-            R.id.enumerate ->
-            {
-//                TestUtils.enumerateAll( enumArea )
-//
-//                enumerationTeam.locations = DAO.locationDAO.getLocations( enumerationTeam )
-//
-//                refreshMap()
-            }
-
             R.id.set_subaddress ->
             {
                 InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true )
+            }
+
+            R.id.mapbox_streets ->
+            {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    Style.MAPBOX_STREETS,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
+            }
+
+            R.id.satellite_streets ->
+            {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    Style.SATELLITE_STREETS,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
             }
         }
 
