@@ -108,6 +108,8 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
         val samplingVm: SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -678,6 +680,53 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
                 }.toJson()
             )
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_map_style, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.mapbox_streets ->
+            {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    Style.MAPBOX_STREETS,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
+            }
+
+            R.id.satellite_streets ->
+            {
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    Style.SATELLITE_STREETS,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()
