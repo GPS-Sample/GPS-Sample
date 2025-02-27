@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.create_enumeration_area
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -19,6 +20,9 @@ import android.text.InputType
 import android.util.Log
 import android.util.Property
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -111,6 +115,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var showCurrentLocation = false
     private var createEnumAreaLocation = false
     private var createEnumAreaBoundary = false
+    private var mapStyle = Style.MAPBOX_STREETS
     private var inputDialog: InputDialog? = null
     private val polygonHashMap = HashMap<Long,Any>()
     private var checkboxDialog: CheckboxDialog? = null
@@ -128,11 +133,14 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -196,8 +204,13 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+            mapStyle = it
+        }
+
         binding.mapView.getMapboxMap().loadStyleUri(
-            Style.MAPBOX_STREETS,
+            mapStyle,
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
                     initLocationComponent()
@@ -395,7 +408,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     fun loadStyle( geoJson: String, completion: (style: Style) -> Unit )
     {
-        binding.mapView.getMapboxMap().loadStyle(style(Style.MAPBOX_STREETS) {
+        binding.mapView.getMapboxMap().loadStyle(style(mapStyle) {
 
                 +image("home_black") {
                     bitmap(BitmapFactory.decodeResource(this@CreateEnumerationAreaFragment.context!!.resources, R.drawable.home_black))
@@ -1613,6 +1626,55 @@ class CreateEnumerationAreaFragment : Fragment(),
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
         sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_map_style, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean
+    {
+        when (item.itemId)
+        {
+            R.id.mapbox_streets ->
+            {
+                mapStyle = Style.MAPBOX_STREETS
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, mapStyle )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    mapStyle,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
+            }
+
+            R.id.satellite_streets ->
+            {
+                mapStyle = Style.SATELLITE_STREETS
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                val editor = sharedPreferences.edit()
+                editor.putString( Keys.kMapStyle.value, mapStyle )
+                editor.commit()
+
+                binding.mapView.getMapboxMap().loadStyleUri(
+                    mapStyle,
+                    object : Style.OnStyleLoaded {
+                        override fun onStyleLoaded(style: Style) {
+                            refreshMap()
+                        }
+                    }
+                )
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroyView()

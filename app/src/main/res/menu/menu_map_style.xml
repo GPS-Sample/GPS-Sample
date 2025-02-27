@@ -4,11 +4,6 @@
     tools:context="edu.gtri.gpssample.MainActivity">
 
     <item
-        android:id="@+id/set_subaddress"
-        android:title="Start Subaddress"
-        app:showAsAction="never"/>
-
-    <item
         android:id="@+id/mapbox_streets"
         android:title="Mapbox Streets"
         app:showAsAction="never"/>
