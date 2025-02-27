@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.configuration
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -147,8 +148,14 @@ class ConfigurationFragment : Fragment(),
                 resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        var style = Style.MAPBOX_STREETS
+        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+            style = it
+        }
+
         binding.mapView.getMapboxMap().loadStyleUri(
-            Style.MAPBOX_STREETS,
+            style,
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
                     refreshMap()
