@@ -96,7 +96,8 @@ class CreateRuleModel {
         val newRule = Rule()
         if (study.fields.isNotEmpty())
         {
-            newRule.field = study.fields[0]
+            // HACK, hard coded index???
+            newRule.fieldUuid = study.fields[0].uuid
         }
         _currentRule = MutableLiveData(newRule)
         currentRule = _currentRule

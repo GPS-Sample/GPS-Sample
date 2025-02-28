@@ -56,12 +56,9 @@ class RuleDAO(private var dao: DAO)
     private fun putRule( rule: Rule, values: ContentValues )
     {
         values.put( DAO.COLUMN_UUID, rule.uuid )
+        values.put(DAO.COLUMN_FIELD_UUID, rule.fieldUuid)
         values.put( DAO.COLUMN_RULE_NAME, rule.name )
         values.put( DAO.COLUMN_RULE_VALUE, rule.value )
-
-        rule.field?.let { field ->
-            values.put(DAO.COLUMN_FIELD_UUID, field.uuid)
-        }
 
         rule.operator?.let{operator ->
             values.put( DAO.COLUMN_OPERATOR_ID, OperatorConverter.toIndex(operator) )
@@ -87,18 +84,18 @@ class RuleDAO(private var dao: DAO)
     private fun buildRule(cursor: Cursor): Rule?
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
-        val fieldId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
+        val fieldUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_NAME))
 
         // TODO:  this should be a lookup table
         val operatorId = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_OPERATOR_ID))
         val value = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_RULE_VALUE))
 
-        val field = DAO.fieldDAO.getField(fieldId)
+        val field = DAO.fieldDAO.getField(fieldUuid)
         val operator = OperatorConverter.fromIndex(operatorId)
 
-        field?.let{rule->
-            return Rule( uuid, field, name, value, operator, null )
+        field?.let { rule->
+            return Rule( uuid, fieldUuid, name, value, operator, null )
         }
 
         return null

@@ -58,12 +58,9 @@ class FieldDataDAO(private var dao: DAO)
             values.put( DAO.COLUMN_ENUMERATION_ITEM_UUID, it.uuid )
         }
 
-        fieldData.field?.let { field ->
-            values.put( DAO.COLUMN_FIELD_UUID, field.uuid )
-        }
-
         values.put( DAO.COLUMN_UUID, fieldData.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, fieldData.creationDate )
+        values.put( DAO.COLUMN_FIELD_UUID, fieldData.fieldUuid )
         values.put( DAO.COLUMN_FIELD_NAME, fieldData.name )
         values.put( DAO.COLUMN_FIELD_TYPE_INDEX, FieldTypeConverter.toIndex(fieldData.type))
         values.put( DAO.COLUMN_FIELD_DATA_TEXT_VALUE, fieldData.textValue )
@@ -85,7 +82,7 @@ class FieldDataDAO(private var dao: DAO)
     {
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
-        val field_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
+        val fieldUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_NAME))
         val type = FieldTypeConverter.fromIndex(cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_TYPE_INDEX)))
         val textValue = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_TEXT_VALUE))
@@ -94,9 +91,7 @@ class FieldDataDAO(private var dao: DAO)
         val dropdownIndex = cursor.getIntOrNull(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_DROPDOWN_INDEX))
         val blockNumber = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_FIELD_DATA_BLOCK_NUMBER))
 
-        val field = DAO.fieldDAO.getField(field_uuid)
-
-        return FieldData( uuid, creationDate, field, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
+        return FieldData( uuid, creationDate, fieldUuid, name, type, textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
     }
 
     fun updateFieldData( fieldData: FieldData )

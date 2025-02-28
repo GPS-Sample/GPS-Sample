@@ -23,6 +23,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.dialogs.DatePickerDialog
 import edu.gtri.gpssample.dialogs.TimePickerDialog
@@ -62,12 +63,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
     {
         val fieldData = filteredFieldDataList.get(holder.adapterPosition)
 
-        fieldData.field?.let { field ->
-
-            if (field.uuid.isEmpty())
-            {
-                return
-            }
+        DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
 
             holder.itemView.isSelected = false
 
@@ -130,10 +126,12 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                         // look for existing block FieldData items
                         for (blockFieldData in enumerationItem.fieldDataList)
                         {
-                            blockFieldData.field?.parentUUID?.let { uuid ->
-                                if (uuid == field.uuid && blockFieldData.blockNumber == blockNumber)
-                                {
-                                    blockFieldDataList.add(blockFieldData)
+                            DAO.fieldDAO.getField( blockFieldData.fieldUuid )?.let { blockField ->
+                                blockField.parentUUID?.let { uuid ->
+                                    if (uuid == field.uuid && blockFieldData.blockNumber == blockNumber)
+                                    {
+                                        blockFieldDataList.add(blockFieldData)
+                                    }
                                 }
                             }
                         }
@@ -149,7 +147,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
                             for (blockField in blockFields)
                             {
-                                val blockFieldData = FieldData(creationDate + count, blockField, blockNumber )
+                                val blockFieldData = FieldData(creationDate + count, blockField.uuid, blockNumber )
 
                                 count += 1
 

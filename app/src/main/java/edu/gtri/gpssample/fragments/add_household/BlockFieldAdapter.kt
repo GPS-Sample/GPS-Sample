@@ -23,6 +23,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.DateFormat
 import edu.gtri.gpssample.constants.FieldType
 import edu.gtri.gpssample.constants.TimeFormat
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.FieldData
@@ -61,13 +62,7 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
     {
         val fieldData = fieldDataList.get(holder.adapterPosition)
 
-        fieldData.field?.let { field ->
-
-            if (field.uuid.isEmpty())
-            {
-                return
-            }
-
+        DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
             holder.itemView.isSelected = false
 
             layoutNonBlockField( holder, field, fieldData )

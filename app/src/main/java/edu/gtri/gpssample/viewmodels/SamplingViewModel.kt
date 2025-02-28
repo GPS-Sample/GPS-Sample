@@ -153,7 +153,7 @@ class SamplingViewModel : ViewModel()
     {
         var validRule = false
 
-        fieldData.field?.let{field->
+        DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
             when (field.type) {
                 FieldType.Checkbox ->
                 {
@@ -447,13 +447,15 @@ class SamplingViewModel : ViewModel()
                         var validRule = false
                         var validFilterOperator = false
 
-                        filter.rule?.let{rule ->
-                            rule.field?.let{field ->
+                        filter.rule?.let{ rule ->
+                            DAO.fieldDAO.getField( rule.fieldUuid )?.let{ field ->
                                 for (fieldData in sampleItem.fieldDataList)
                                 {
-                                    if( fieldData.field?.name.equals( field.name))
-                                    {
-                                        validRule = validateRule(rule, fieldData)
+                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
+                                        if (field.name.equals( field.name))
+                                        {
+                                            validRule = validateRule(rule, fieldData)
+                                        }
                                     }
                                 }
                             }
@@ -477,35 +479,38 @@ class SamplingViewModel : ViewModel()
                                     filterOperator?.let{fo ->
                                         fo.rule?.let{nextRule ->
                                             // check next rule
-                                            nextRule.field?.let{field ->
+                                            DAO.fieldDAO.getField( nextRule.fieldUuid )?.let{ field ->
                                                 for (fieldData in sampleItem.fieldDataList)
                                                 {
-                                                    if( fieldData.field?.name.equals( field.name))
-                                                    {
-                                                        validNextRule = validateRule(nextRule, fieldData)
-                                                        // check the operator
-                                                        if(validNextRule)
+                                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
+                                                        if( field.name.equals( field.name ))
                                                         {
-                                                            when(fo.connector)
+                                                            validNextRule = validateRule(nextRule, fieldData)
+                                                            // check the operator
+                                                            if(validNextRule)
                                                             {
-                                                                Connector.AND->{
-                                                                    validFilterOperator = (validRule && validNextRule)
-                                                                }
-                                                                Connector.OR->{
-                                                                    validFilterOperator = (validRule || validNextRule)
-                                                                }
-                                                                Connector.NOT->{
-                                                                    validFilterOperator = (validRule && !validNextRule)
-                                                                }
-                                                                else->{
-                                                                    validFilterOperator = false
+                                                                when(fo.connector)
+                                                                {
+                                                                    Connector.AND->{
+                                                                        validFilterOperator = (validRule && validNextRule)
+                                                                    }
+                                                                    Connector.OR->{
+                                                                        validFilterOperator = (validRule || validNextRule)
+                                                                    }
+                                                                    Connector.NOT->{
+                                                                        validFilterOperator = (validRule && !validNextRule)
+                                                                    }
+                                                                    else->{
+                                                                        validFilterOperator = false
+                                                                    }
                                                                 }
                                                             }
                                                         }
-                                                        if(!validNextRule || !validFilterOperator)
-                                                        {
-                                                            break;
-                                                        }
+                                                    }
+
+                                                    if(!validNextRule || !validFilterOperator)
+                                                    {
+                                                        break;
                                                     }
                                                 }
                                             }
@@ -604,7 +609,7 @@ class SamplingViewModel : ViewModel()
                             {
                                 for (fieldData in enumerationItem.fieldDataList)
                                 {
-                                    fieldData.field?.let { field ->
+                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
                                         if (field.type == FieldType.Number && field.numberOfResidents)
                                         {
                                             total += 1

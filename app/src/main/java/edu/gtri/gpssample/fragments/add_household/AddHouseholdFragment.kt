@@ -169,7 +169,7 @@ class AddHouseholdFragment : Fragment(),
             {
                 if (field.parentUUID == null)
                 {
-                    val fieldData = FieldData(creationDate++, field)
+                    val fieldData = FieldData(creationDate++, field.uuid)
                     enumerationItem.fieldDataList.add(fieldData)
 
                     if (field.type == FieldType.Checkbox || field.type == FieldType.Dropdown)
@@ -272,7 +272,7 @@ class AddHouseholdFragment : Fragment(),
 
         for (fieldData in enumerationItem.fieldDataList)
         {
-            fieldData.field?.let { field ->
+            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
                 if (field.parentUUID == null)
                 {
                     filteredFieldDataList.add( fieldData )
@@ -404,7 +404,7 @@ class AddHouseholdFragment : Fragment(),
         binding.saveButton.setOnClickListener {
 
             for (fieldData in enumerationItem.fieldDataList) {
-                fieldData.field?.let { field ->
+                DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
                     if (field.type == FieldType.Number) {
                         fieldData.numberValue?.let { numberValue ->
                             field.minimum?.let { minVal ->
@@ -500,7 +500,7 @@ class AddHouseholdFragment : Fragment(),
         }
 
         for (fieldData in enumerationItem.fieldDataList) {
-            fieldData.field?.let { field ->
+            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
                 if (field.required) {
                     when (field.type) {
                         FieldType.Text -> {

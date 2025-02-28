@@ -99,7 +99,7 @@ class CreateRuleFragment : Fragment(),
 
         // for an existing rule, figure out which field was selected
 
-        rule.field?.let { field->
+        DAO.fieldDAO.getField( rule.fieldUuid )?.let { field->
             for (i in 0..fieldList.size-1)
             {
                 if (fieldList[i].uuid == field.uuid)
@@ -194,7 +194,7 @@ class CreateRuleFragment : Fragment(),
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
                 val field = fieldList[position]
-                rule.field = field
+                rule.fieldUuid = field.uuid
                 setKeyboardInputType( field )
                 rule.operator = Operator.Equal
                 sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( Operator.Equal )
@@ -264,7 +264,7 @@ class CreateRuleFragment : Fragment(),
         }
 
         binding.dateValueTextView.setOnClickListener {
-            rule.field?.let { field ->
+            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
                 val date = Date()
                 if (field.time && !field.date)
                 {
@@ -281,7 +281,7 @@ class CreateRuleFragment : Fragment(),
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
-                rule.field?.let { field ->
+                DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
                     val fieldOption = field.fieldOptions[position]
                     rule.value = fieldOption.name
                 }
@@ -308,7 +308,7 @@ class CreateRuleFragment : Fragment(),
             }
 
             rule.operator?.let { operator ->
-                rule.field?.let { field ->
+                DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
                     when (field.type)
                     {
                         FieldType.Text,

@@ -21,7 +21,7 @@ import java.util.*
 data class FieldData (
     var uuid : String,
     var creationDate : Long,
-    var field : Field?,
+    var fieldUuid : String,
     var name : String,
     var type : FieldType,
     var textValue : String,
@@ -31,19 +31,17 @@ data class FieldData (
     var blockNumber : Int?,
     var fieldDataOptions : ArrayList<FieldDataOption>)
 {
-    constructor( creationDate: Long, field: Field ) : this( UUID.randomUUID().toString(), creationDate, field, "", FieldType.None,
+    constructor( creationDate: Long, fieldUuid: String ) : this( UUID.randomUUID().toString(), creationDate, fieldUuid, "", FieldType.None,
         "", null, null, null, null, ArrayList<FieldDataOption>())
 
-    constructor( field: Field, blockNumber: Int ) : this( UUID.randomUUID().toString(), Date().time, field, "", FieldType.None,
+    constructor( fieldUuid: String, blockNumber: Int ) : this( UUID.randomUUID().toString(), Date().time, fieldUuid, "", FieldType.None,
         "", null, null, null, blockNumber, ArrayList<FieldDataOption>())
 
-    constructor( creationDate: Long, field: Field, blockNumber: Int ) : this( UUID.randomUUID().toString(), creationDate, field, "", FieldType.None,
+    constructor( creationDate: Long, fieldUuid: String, blockNumber: Int ) : this( UUID.randomUUID().toString(), creationDate, fieldUuid, "", FieldType.None,
         "", null, null, null, blockNumber, ArrayList<FieldDataOption>())
 
-    constructor( field: Field,  name : String, type : FieldType, textValue: String,
-                 numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :
-            this( UUID.randomUUID().toString(), Date().time, field, name, type,  textValue,
-                numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
+    constructor( fieldUuid: String,  name : String, type : FieldType, textValue: String, numberValue: Double, dateValue: Long, dropdownIndex: Int, blockNumber: Int ) :
+            this( UUID.randomUUID().toString(), Date().time, fieldUuid, name, type,  textValue, numberValue, dateValue, dropdownIndex, blockNumber, ArrayList<FieldDataOption>())
 
     fun equals( other: FieldData ) : Boolean
     {
