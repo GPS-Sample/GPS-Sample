@@ -214,6 +214,13 @@ data class Config(
         {
             try
             {
+                // check for a cleartext string
+
+                if (jsonString.isNotEmpty() && jsonString.first() == '{')
+                {
+                    return Json.decodeFromString<Config>( jsonString )
+                }
+
                 var clearText = jsonString
 
                 // step 1: decrypt the json string, if necessary
