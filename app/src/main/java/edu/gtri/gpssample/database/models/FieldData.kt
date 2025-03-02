@@ -23,7 +23,7 @@ data class FieldData (
     var creationDate : Long,
     var fieldUuid : String,
     var name : String,
-    var type : FieldType,
+    var type : FieldType, // not used!
     var textValue : String,
     var numberValue : Double?,
     var dateValue : Long?,
