@@ -413,7 +413,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (enumerationCount == 0)
         {
-            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true )
+            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true, true )
         }
 
         binding.listItemEnumArea.titleLayout.visibility = View.GONE

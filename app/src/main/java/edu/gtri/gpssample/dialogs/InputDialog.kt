@@ -30,7 +30,7 @@ class InputDialog
     {
     }
 
-    constructor( context: Context, qrVisible: Boolean, title: String, text: String?, leftButton: String, rightButton: String, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true, inputNumber: Boolean = false )
+    constructor( context: Context, qrVisible: Boolean, title: String, text: String?, leftButton: String, rightButton: String, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true, inputNumber: Boolean = false, cancelable: Boolean = false )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -55,7 +55,7 @@ class InputDialog
 
         val alertDialog = builder.create()
 
-        alertDialog.setCancelable(false)
+        alertDialog.setCancelable( cancelable )
         alertDialog.show()
 
         if (qrVisible)
