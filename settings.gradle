@@ -6,8 +6,22 @@ pluginManagement {
     }
 }
 
-Properties properties = new Properties()
-def MAPBOX_DOWNLOADS_TOKEN = properties.getProperty('MAPBOX_DOWNLOADS_TOKEN')
+// Function to read a property from local.properties
+def getLocalProperty(String key) {
+    def propertiesFile = new File(rootDir, "local.properties")
+    if (propertiesFile.exists()) {
+        def properties = new Properties()
+        properties.load(propertiesFile.newReader())
+        return properties.getProperty(key)
+    }
+    return null
+}
+
+// Get the MAPBOX_DOWNLOADS_TOKEN property
+def mapboxDownloadsToken = getLocalProperty("MAPBOX_DOWNLOADS_TOKEN")
+
+// Print for debugging (remove this in production)
+println "MAPBOX_DOWNLOADS_TOKEN: ${mapboxDownloadsToken}"
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -22,7 +36,7 @@ dependencyResolutionManagement {
             }
             credentials {
                 username = "mapbox"
-                password = MAPBOX_DOWNLOADS_TOKEN
+                password = mapboxDownloadsToken
             }
         }
     }
