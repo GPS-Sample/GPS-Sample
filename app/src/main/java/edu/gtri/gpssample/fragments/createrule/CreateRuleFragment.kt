@@ -99,7 +99,7 @@ class CreateRuleFragment : Fragment(),
 
         // for an existing rule, figure out which field was selected
 
-        DAO.fieldDAO.getField( rule.fieldUuid )?.let { field->
+        getField( rule.fieldUuid )?.let { field->
             for (i in 0..fieldList.size-1)
             {
                 if (fieldList[i].uuid == field.uuid)
@@ -264,7 +264,7 @@ class CreateRuleFragment : Fragment(),
         }
 
         binding.dateValueTextView.setOnClickListener {
-            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
+            getField( rule.fieldUuid )?.let { field ->
                 val date = Date()
                 if (field.time && !field.date)
                 {
@@ -281,7 +281,7 @@ class CreateRuleFragment : Fragment(),
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
-                DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
+                getField( rule.fieldUuid )?.let { field ->
                     val fieldOption = field.fieldOptions[position]
                     rule.value = fieldOption.name
                 }
@@ -308,7 +308,7 @@ class CreateRuleFragment : Fragment(),
             }
 
             rule.operator?.let { operator ->
-                DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
+                getField( rule.fieldUuid )?.let { field ->
                     when (field.type)
                     {
                         FieldType.Text,
@@ -369,6 +369,19 @@ class CreateRuleFragment : Fragment(),
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateRuleFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    fun getField( uuid: String ) : Field?
+    {
+        for (field in study.fields)
+        {
+            if (field.uuid == uuid)
+            {
+                return field
+            }
+        }
+
+        return null
     }
 
     fun setKeyboardInputType( field: Field )
