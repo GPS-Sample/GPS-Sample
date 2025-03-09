@@ -439,22 +439,18 @@ class SamplingViewModel : ViewModel()
                         continue
                     }
 
-                    // add in filters
-                    var validSample = false
+                    var validSample = true
 
                     for (filter in study.filters)
                     {
                         var validRule = false
-                        var validFilterOperator = false
 
-                        filter.rule?.let{ rule ->
-                            DAO.fieldDAO.getField( rule.fieldUuid )?.let{ field ->
-                                for (fieldData in sampleItem.fieldDataList)
-                                {
+                        filter.rule?.let { rule ->
+                            DAO.fieldDAO.getField( rule.fieldUuid )?.let { field ->
+                                for (fieldData in sampleItem.fieldDataList) {
                                     DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
-                                        if (field.name.equals( f.name))
-                                        {
-                                            validRule = validateRule(rule, fieldData)
+                                        if (field.name.equals( f.name )) {
+                                            validRule = validateRule( rule, fieldData )
                                         }
                                     }
                                     if (validRule)
@@ -466,67 +462,50 @@ class SamplingViewModel : ViewModel()
 
                             var filterOperator = rule.filterOperator
 
-                            if (filterOperator == null)
+                            while (filterOperator != null)
                             {
-                                if (validRule)
-                                {
-                                    validFilterOperator = true
-                                }
-                            }
-                            else
-                            {
-                                while (filterOperator != null)
-                                {
-                                    var validNextRule = false
+                                filterOperator.rule?.let { nextRule ->
+                                    DAO.fieldDAO.getField( nextRule.fieldUuid )?.let { nextField ->
+                                        for (fieldData in sampleItem.fieldDataList)
+                                        {
+                                            DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
+                                                if (nextField.name.equals( f.name ))
+                                                {
+                                                    val nextRuleValid = validateRule( nextRule, fieldData )
 
-                                    filterOperator.rule?.let { nextRule ->
-                                        DAO.fieldDAO.getField( nextRule.fieldUuid )?.let{ nextField ->
-                                            for (fieldData in sampleItem.fieldDataList)
-                                            {
-                                                DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { f ->
-                                                    if (nextField.name.equals( f.name ))
+                                                    when (filterOperator!!.connector)
                                                     {
-                                                        validNextRule = validateRule(nextRule, fieldData)
-                                                        // check the operator
-                                                        if (validNextRule)
-                                                        {
-                                                            when (filterOperator!!.connector)
-                                                            {
-                                                                Connector.AND-> {
-                                                                    validFilterOperator = (validRule && validNextRule)
-                                                                }
-                                                                Connector.OR-> {
-                                                                    validFilterOperator = (validRule || validNextRule)
-                                                                }
-                                                                Connector.NOT-> {
-                                                                    validFilterOperator = (validRule && !validNextRule)
-                                                                }
-                                                                else->{
-                                                                    validFilterOperator = false
-                                                                }
-                                                            }
+                                                        Connector.AND-> {
+                                                            validRule = (validRule && nextRuleValid)
+                                                        }
+                                                        Connector.OR-> {
+                                                            validRule = (validRule || nextRuleValid)
+                                                        }
+                                                        Connector.NOT-> {
+                                                            validRule = (validRule && !nextRuleValid)
+                                                        }
+                                                        else-> {
+                                                            validRule = false
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-
-                                        // check constraint
-                                        filterOperator = nextRule.filterOperator
                                     }
+
+                                    filterOperator = nextRule.filterOperator
                                 }
                             }
                         }
 
-                        validSample = validRule && validFilterOperator
-
-                        if(!validSample)
+                        if (!validRule)
                         {
+                            validSample = false
                             break;
                         }
                     }
 
-                    if(validSample)
+                    if (validSample)
                     {
                         sampleItem.enumerationEligibleForSampling = true
                         validSamples.add(sampleItem)

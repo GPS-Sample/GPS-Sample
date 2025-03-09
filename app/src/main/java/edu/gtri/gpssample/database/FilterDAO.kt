@@ -167,7 +167,7 @@ class FilterDAO(private var dao: DAO)
         // build the raw id list so we can sort it
         val rawFilterOperators = ArrayList<RawFilterOperator>()
 
-        val query = "SELECT * FROM ${DAO.TABLE_FILTEROPERATOR} WHERE ${DAO.COLUMN_FILTER_UUID} = '${filter.uuid}' ORDER BY ${DAO.COLUMN_FILTEROPERATOR_ORDER} DESC"
+        val query = "SELECT * FROM ${DAO.TABLE_FILTEROPERATOR} WHERE ${DAO.COLUMN_FILTER_UUID} = '${filter.uuid}' ORDER BY ${DAO.COLUMN_FILTEROPERATOR_ORDER} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext()) {
