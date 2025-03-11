@@ -367,7 +367,7 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
             {
                 var resourceId = 0
 
-                if (!location.isMultiFamily)
+                if (location.enumerationItems.size == 1)
                 {
                     val sampledItem = location.enumerationItems[0]
 

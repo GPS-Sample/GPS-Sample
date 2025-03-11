@@ -22,6 +22,7 @@ enum class Keys( val value: String ) {
     kTermsAccepted("TermsAccepted"),
     kCollectionMode("CollectionMode"),
     kStartSubaddress( "StartSubaddress"),
+    kIsMultiHousehold("IsMultiHousehold"),
     kGpsAccuracyIsGood("GpsAccuracyIsGood"),
     kGpsLocationIsGood("GpsLocationIsGood"),
     kLaunchSurveyRequest("LaunchSurveyRequest"),

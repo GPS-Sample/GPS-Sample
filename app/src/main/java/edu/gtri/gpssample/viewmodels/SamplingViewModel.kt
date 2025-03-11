@@ -103,7 +103,7 @@ class SamplingViewModel : ViewModel()
                     if (!location.isLandmark && location.enumerationItems.isNotEmpty())
                     {
                         var resourceId: Int
-                        if (!location.isMultiFamily)
+                        if (location.enumerationItems.size == 1)
                         {
                             val sampledItem = location.enumerationItems[0]
 

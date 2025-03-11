@@ -57,6 +57,7 @@ class AddHouseholdFragment : Fragment(),
 
     private var editMode = true
     private var collectionMode = false
+    private var isMultiHousehold = false
     private var fragmentResultListener = ""
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -100,6 +101,10 @@ class AddHouseholdFragment : Fragment(),
             }
         }
 
+        arguments?.getBoolean( Keys.kIsMultiHousehold.value)?.let { isMultiHousehold ->
+            this.isMultiHousehold = isMultiHousehold
+        }
+
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
         }
@@ -136,7 +141,7 @@ class AddHouseholdFragment : Fragment(),
             }
         }
 
-        if (editMode && enumerationItem.uuid.isNotEmpty())
+        if (editMode && enumerationItem.uuid.isNotEmpty() && !isMultiHousehold)
         {
             binding.addMultiButton.visibility = View.VISIBLE
 
@@ -147,9 +152,8 @@ class AddHouseholdFragment : Fragment(),
                 }
                 else
                 {
-                    location.isMultiFamily = true
                     findNavController().popBackStack()
-//                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
+                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment)
                 }
             }
         }
