@@ -319,7 +319,7 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
         {
             if (!location.isLandmark)
             {
-                var resourceId = if (location.isMultiFamily) R.drawable.multi_home_black else R.drawable.home_black
+                var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_black else R.drawable.home_black
 
                 var numComplete = 0
 
@@ -330,7 +330,7 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
                     {
                         if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                         {
-                            resourceId = if (location.isMultiFamily) R.drawable.multi_home_red else R.drawable.home_red
+                            resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_red else R.drawable.home_red
                             break
                         }
                         else if (enumerationItem.enumerationState == EnumerationState.Enumerated)
@@ -342,7 +342,7 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
 
                 if (numComplete > 0 && numComplete == location.enumerationItems.size)
                 {
-                    resourceId = if (location.isMultiFamily) R.drawable.multi_home_green else R.drawable.home_green
+                    resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_green else R.drawable.home_green
                 }
 
                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
@@ -399,15 +399,8 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener
 
             if (location.enumerationItems.size == 1)
             {
-                if (location.isMultiFamily)
-                {
-                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
-                }
-                else
-                {
-                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
-                }
+                sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
             }
             else
             {

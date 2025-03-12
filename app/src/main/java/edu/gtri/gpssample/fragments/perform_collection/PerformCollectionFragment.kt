@@ -510,7 +510,7 @@ class PerformCollectionFragment : Fragment(),
                 {
                     var resourceId = 0
 
-                    if (!location.isMultiFamily)
+                    if (location.enumerationItems.size == 1)
                     {
                         val sampledItem = location.enumerationItems[0]
 
@@ -568,7 +568,18 @@ class PerformCollectionFragment : Fragment(),
 
                         if (location.enumerationItems.isNotEmpty())
                         {
-                            mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, location.enumerationItems[0].subAddress, "#00FFFFFF")
+                            var subAddress = ""
+
+                            for (enumerationItem in location.enumerationItems)
+                            {
+                                if (enumerationItem.samplingState == SamplingState.Sampled)
+                                {
+                                    subAddress = enumerationItem.subAddress
+                                    break
+                                }
+                            }
+
+                            mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, subAddress, "#00FFFFFF")
                         }
                     }
                 }

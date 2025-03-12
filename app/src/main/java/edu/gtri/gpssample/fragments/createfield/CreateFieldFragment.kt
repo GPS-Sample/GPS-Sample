@@ -458,20 +458,69 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate, DatePic
             }
             else
             {
-                sharedViewModel.createFieldModel.parentField?.value?.let { parentField ->
+                minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                    field.minimum = it
+                }
 
-                    parentField.fields?.let { fields ->
-                        val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false, null, null )
-                        fields.add( childField )
-                        sharedViewModel.createFieldModel.setCurrentField( childField )
-                        findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                maximumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                    field.maximum = it
+                }
+
+                if (minimumDateEditText.tag is Double)
+                {
+                    field.minimum = minimumDateEditText.tag as Double
+                }
+
+                if (maximumDateEditText.tag is Double)
+                {
+                    field.maximum = maximumDateEditText.tag as Double
+                }
+
+                if (field.minimum != null && field.maximum !=null && field.minimum!! > field.maximum!!)
+                {
+                    Toast.makeText(activity!!.applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
+                }
+                else
+                {
+                    sharedViewModel.createFieldModel.parentField?.value?.let { parentField ->
+                        parentField.fields?.let { fields ->
+                            val childField = Field( parentField.uuid, fields.size+1, "", FieldType.Text, false, false, false, false, false, false, null, null )
+                            fields.add( childField )
+                            sharedViewModel.createFieldModel.setCurrentField( childField )
+                            findNavController().navigate( R.id.action_navigate_to_CreateFieldFragment )
+                        }
                     }
                 }
             }
         }
 
         binding.endBlockButton.setOnClickListener {
-            findNavController().popBackStack( R.id.CreateStudyFragment, false )
+            minimumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                field.minimum = it
+            }
+
+            maximumNumberEditText.text.toString().toDoubleOrNull()?.let {
+                field.maximum = it
+            }
+
+            if (minimumDateEditText.tag is Double)
+            {
+                field.minimum = minimumDateEditText.tag as Double
+            }
+
+            if (maximumDateEditText.tag is Double)
+            {
+                field.maximum = maximumDateEditText.tag as Double
+            }
+
+            if (field.minimum != null && field.maximum !=null && field.minimum!! > field.maximum!!)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString( R.string.min_greater_than_max ), Toast.LENGTH_LONG).show()
+            }
+            else
+            {
+                findNavController().popBackStack( R.id.CreateStudyFragment, false )
+            }
         }
     }
 

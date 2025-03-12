@@ -30,7 +30,7 @@ data class Location(
     var isLandmark: Boolean,
     var description: String,
     var imageData: String,
-    var isMultiFamily : Boolean,
+    var isMultiFamily : Boolean, // not used since build #106
     var properties : String,
     var enumerationItems: ArrayList<EnumerationItem>)
 {

@@ -738,7 +738,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 {
                     resourceName = "location_blue"
                 }
-                else if (!location.isMultiFamily)
+                else if (location.enumerationItems.size == 1)
                 {
                     if (location.enumerationItems.isNotEmpty())
                     {

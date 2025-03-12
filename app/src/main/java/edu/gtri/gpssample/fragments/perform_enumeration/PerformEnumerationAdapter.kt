@@ -81,9 +81,9 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
                 holder.locationImageView.visibility = View.VISIBLE
             }
         }
-        else if (location.enumerationItems.size > 0)
+        else if (location.enumerationItems.isNotEmpty())
         {
-            if (!location.isMultiFamily)
+            if (location.enumerationItems.size == 1)
             {
                 if (location.enumerationItems[0].enumerationState == EnumerationState.Enumerated)
                 {
