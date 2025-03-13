@@ -18,6 +18,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -25,11 +26,15 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -158,6 +163,7 @@ class ConfigurationFragment : Fragment(),
             style,
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
+                    initLocationComponent()
                     refreshMap()
                 }
             }
@@ -286,14 +292,14 @@ class ConfigurationFragment : Fragment(),
 
             }
 
-            val latLngBounds = GeoUtils.findGeobounds(enumVerts)
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            val cameraPosition = CameraOptions.Builder()
-                .zoom(10.0)
-                .center(point)
-                .build()
-
-            binding.mapView.getMapboxMap().setCamera(cameraPosition)
+//            val latLngBounds = GeoUtils.findGeobounds(enumVerts)
+//            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+//            val cameraPosition = CameraOptions.Builder()
+//                .zoom(10.0)
+//                .center(point)
+//                .build()
+//
+//            binding.mapView.getMapboxMap().setCamera(cameraPosition)
         }
     }
 
@@ -725,9 +731,37 @@ class ConfigurationFragment : Fragment(),
     {
     }
 
+    private fun initLocationComponent() {
+        binding.mapView.location.updateSettings {
+            this.enabled = true
+            this.locationPuck = LocationPuck2D(
+                scaleExpression = interpolate {
+                    linear()
+                    zoom()
+                    stop {
+                        literal(0.0)
+                        literal(0.6)
+                    }
+                    stop {
+                        literal(20.0)
+                        literal(1.0)
+                    }
+                }.toJson()
+            )
+        }
+
+        binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+    }
+
+    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
+        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+    }
+
     override fun onDestroyView()
     {
         super.onDestroyView()
+
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
 
         _binding = null
     }
