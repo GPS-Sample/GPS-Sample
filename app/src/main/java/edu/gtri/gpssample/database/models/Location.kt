@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.database.models
 
+import android.util.Log
 import edu.gtri.gpssample.constants.LocationType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -39,24 +40,14 @@ data class Location(
 
     fun equals( other: Location ) : Boolean
     {
-        if (this.uuid == other.uuid &&
-            this.creationDate == other.creationDate &&
-            this.uuid == other.uuid &&
-            this.type == other.type &&
-            this.gpsAccuracy == other.gpsAccuracy &&
-            this.latitude == other.latitude &&
-            this.longitude == other.longitude &&
-            this.altitude == other.altitude &&
-            this.isLandmark == other.isLandmark &&
-            this.description == other.description &&
-            this.imageData == other.imageData &&
-            this.isMultiFamily == other.isMultiFamily &&
-            this.properties == other.properties)
+        if (this.creationDate > other.creationDate) // new date is newer thant old date, should update
         {
-            return true
+            return false
         }
-
-        return false
+        else
+        {
+            return true // no need to update
+        }
     }
 
     fun doesNotEqual( location: Location ): Boolean

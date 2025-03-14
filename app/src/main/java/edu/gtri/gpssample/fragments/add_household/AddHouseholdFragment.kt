@@ -603,6 +603,8 @@ class AddHouseholdFragment : Fragment(),
             DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
         }
 
+        location.creationDate = Date().time
+
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
         DAO.configDAO.getConfig( config.uuid )?.let {
