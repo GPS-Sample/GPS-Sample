@@ -1,3 +1,0 @@
-server: gpssample.com
-email: russell.mitchell@gtri.gatech.edu
-password: How now brown cow?
