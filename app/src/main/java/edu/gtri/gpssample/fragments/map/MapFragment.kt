@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.map
 
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -19,17 +20,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
-import com.mapbox.geojson.Polygon
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.AnnotationConfig
-import com.mapbox.maps.plugin.annotation.AnnotationPlugin
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMoveListener
@@ -47,7 +46,9 @@ import edu.gtri.gpssample.databinding.FragmentMapBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.MapHelpDialog
+import edu.gtri.gpssample.dialogs.SelectMapTilesDialog
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.ArrayList
 
@@ -55,6 +56,7 @@ class MapFragment : Fragment(),
     View.OnTouchListener,
     InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
+    SelectMapTilesDialog.SelectMapTilesDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentMapBinding? = null
@@ -103,19 +105,25 @@ class MapFragment : Fragment(),
         }
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        var style = Style.MAPBOX_STREETS
-        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-            style = it
-        }
 
-        binding.mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style) {
+        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
+            if (TileServer.started)
+            {
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    initLocationComponent()
+                }
+            } else
+            {
+                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
                     initLocationComponent()
                 }
             }
-        )
+        } ?: run {
+            // no tiles have been loaded, no need to start the server, just load the default map style
+            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                initLocationComponent()
+            }
+        }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
@@ -165,8 +173,11 @@ class MapFragment : Fragment(),
             MapHelpDialog( activity!! )
         }
 
-        binding.clearMapButton.setOnClickListener {
+        binding.importButton.setOnClickListener {
+            pickFile()
+        }
 
+        binding.clearMapButton.setOnClickListener {
             defineMapRegion = false
             binding.overlayView.visibility = View.GONE
             binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
@@ -436,14 +447,7 @@ class MapFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.MAPBOX_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-//                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap(), null)
             }
 
             R.id.satellite_streets ->
@@ -453,18 +457,47 @@ class MapFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.SATELLITE_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-//                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap(), null)
+            }
+
+            R.id.select_map_tiles ->
+            {
+                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    {
+        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val editor = sharedPreferences.edit()
+        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
+        editor.commit()
+
+        TileServer.stopServer()
+
+        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+            TileServer.centerMap( activity!!, binding.mapView.getMapboxMap())
+        }
+    }
+
+    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let {
+            TileServer.stopServer()
+
+            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+                TileServer.centerMap( activity!!, binding.mapView.getMapboxMap())
+            }
+        }
+    }
+
+    private fun pickFile()
+    {
+        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
     }
 
     override fun onDestroyView()

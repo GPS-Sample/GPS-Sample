@@ -51,5 +51,4 @@
             android:insetBottom="0dp"
             android:text="@string/save" />
     </LinearLayout>
-
 </LinearLayout>

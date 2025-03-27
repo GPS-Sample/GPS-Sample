@@ -26,7 +26,7 @@ class BusyIndicatorDialog
     lateinit var alertDialog: AlertDialog
     lateinit var progressTextView: TextView
 
-    constructor( context: Context?, text: String, delegate: BusyIndicatorDialogDelegate, cancelable: Boolean = true )
+    constructor( context: Context?, text: String, delegate: BusyIndicatorDialogDelegate?, cancelable: Boolean = true )
     {
         val inflater = LayoutInflater.from(context)
 
@@ -54,7 +54,7 @@ class BusyIndicatorDialog
 
         cancelButton.setOnClickListener {
             alertDialog.dismiss()
-            delegate.didPressCancelButton()
+            delegate?.didPressCancelButton()
         }
     }
 

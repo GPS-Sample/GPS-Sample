@@ -18,6 +18,7 @@ enum class Keys( val value: String ) {
     kUserName("UserName"),
     kIpAddress("IpAddress"),
     kMapStyle("MAPBOX_STREETS"),
+    kMBTilesPath("MBTilesPath" ),
     kIsOnBoarding("IsOnBoarding"),
     kTermsAccepted("TermsAccepted"),
     kCollectionMode("CollectionMode"),

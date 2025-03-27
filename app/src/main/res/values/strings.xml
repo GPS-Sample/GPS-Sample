@@ -383,10 +383,12 @@
     <string name="min_greater_than_max">The minimum value is greater than the maximum value</string>
     <string name="enumeration_status">Enumeration Status</string>
     <string name="collection_status">Collection Status</string>
-    <string name="enumeration_reason_incomplete_label">"Enumeration Reason Incomplete"</string>
-    <string name="collection_reason_incomplete_label">"Collection Reason Incomplete"</string>
-    <string name="enumeration_notes">"Enumeration Notes"</string>
-    <string name="collection_notes">"Collection Notes"</string>
+    <string name="enumeration_reason_incomplete_label">Enumeration Reason Incomplete</string>
+    <string name="collection_reason_incomplete_label">Collection Reason Incomplete</string>
+    <string name="enumeration_notes">Enumeration Notes</string>
+    <string name="collection_notes">Collection Notes</string>
+    <string name="select_map_tiles">Select a map tileset</string>
+    <string name="loading_mapbox_tiles">Loading Mapbox Tiles...</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
