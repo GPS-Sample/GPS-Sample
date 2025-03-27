@@ -7,9 +7,12 @@
 
 package edu.gtri.gpssample.fragments.perform_multi_collection
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -56,6 +59,7 @@ class PerformMultiCollectionFragment : Fragment(),
 
     private val fragmentResultListener = "PerformMultiCollectionFragment"
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -68,7 +72,23 @@ class PerformMultiCollectionFragment : Fragment(),
                         when (request)
                         {
                             Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
-                            Keys.kLaunchSurveyRequest.value -> SurveyLaunchNotificationDialog(activity!!, this)
+                            Keys.kLaunchSurveyRequest.value ->
+                            {
+                                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
+                                    if (enumerationItem.odkRecordUri.isNotEmpty())
+                                    {
+                                        val uri = Uri.parse( enumerationItem.odkRecordUri )
+                                        val intent = Intent(Intent.ACTION_EDIT)
+                                        intent.setData(uri)
+                                        odk_result.launch(intent)
+                                    }
+                                    else
+                                    {
+                                        // This will create a new ODK instance record
+                                        SurveyLaunchNotificationDialog(activity!!, this)
+                                    }
+                                }
+                            }
                         }
                     }
                     else if (!gpsAccuracyIsGood)
@@ -162,17 +182,6 @@ class PerformMultiCollectionFragment : Fragment(),
     {
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private val odk_result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val mainApplication = activity!!.application as MainApplication
-
-        mainApplication.currentSubAddress = mainApplication.defaultSubAddress
-        mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
-        mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
-
-        AdditionalInfoDialog( activity, "", "", this)
-    }
-
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
         sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
@@ -191,6 +200,7 @@ class PerformMultiCollectionFragment : Fragment(),
                 if (incompleteReason.isNotEmpty())
                 {
                     sampledItem.collectionState = CollectionState.Incomplete
+                    sampledItem.collectionIncompleteReason = incompleteReason
                 }
 
                 DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
@@ -235,6 +245,30 @@ class PerformMultiCollectionFragment : Fragment(),
             val intent = Intent(Intent.ACTION_VIEW)
             intent.type = "vnd.android.cursor.dir/vnd.odk.form"
             odk_result.launch(intent)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private val odk_result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK)
+        {
+            result.data?.data?.let { uri ->
+                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
+                    if (enumerationItem.odkRecordUri.isEmpty())
+                    {
+                        enumerationItem.odkRecordUri = uri.toString()
+                        didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
+                    }
+                }
+            }
+
+            val mainApplication = activity!!.application as MainApplication
+
+            mainApplication.currentSubAddress = mainApplication.defaultSubAddress
+            mainApplication.currentEnumerationItemUUID = mainApplication.defaultEnumerationItemUUID
+            mainApplication.currentEnumerationAreaName = mainApplication.defaultEnumerationAreaName
+
+            AdditionalInfoDialog( activity, "", "", this)
         }
     }
 

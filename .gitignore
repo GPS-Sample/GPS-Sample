@@ -8,4 +8,5 @@ app/debug
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+app/release
+
