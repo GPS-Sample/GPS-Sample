@@ -884,7 +884,6 @@ class PerformCollectionFragment : Fragment(),
                     if (enumerationItem.odkRecordUri.isEmpty())
                     {
                         enumerationItem.odkRecordUri = uri.toString()
-                        Log.d( "xxx", enumerationItem.odkRecordUri )
                         didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
                     }
                 }
