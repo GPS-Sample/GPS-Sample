@@ -26,6 +26,9 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
@@ -57,6 +60,8 @@ class CreateConfigurationFragment : Fragment(),
     private lateinit var mapboxManager: MapboxManager
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
+    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -171,10 +176,9 @@ class CreateConfigurationFragment : Fragment(),
             return@addOnMapClickListener true
         }
 
-        val pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
-        val polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        val polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager.instance( activity!! )
 
         binding.addStudyButton.setOnClickListener{
             sharedViewModel.createStudyModel.createNewStudy()
@@ -225,8 +229,8 @@ class CreateConfigurationFragment : Fragment(),
 
                 pointList.add( points )
 
-                mapboxManager.addPolygon( pointList, "#000000", 0.25 )
-                mapboxManager.addPolyline( pointList[0], "#ff0000" )
+                mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
+                mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
             }
 
 //            val latLngBounds = GeoUtils.findGeobounds(enumVerts)

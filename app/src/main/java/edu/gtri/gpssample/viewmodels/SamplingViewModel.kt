@@ -117,7 +117,7 @@ class SamplingViewModel : ViewModel()
                                 }
 
                                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                                val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, resourceId )
                                 pointAnnotation?.let { pointAnnotation ->
                                     allPointAnnotations.add( pointAnnotation )
                                 }
@@ -136,7 +136,7 @@ class SamplingViewModel : ViewModel()
                             }
 
                             val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                            val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, resourceId )
                             pointAnnotation?.let { pointAnnotation ->
                                 allPointAnnotations.add( pointAnnotation )
                             }

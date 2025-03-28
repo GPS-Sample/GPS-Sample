@@ -121,7 +121,7 @@ class CreateEnumerationTeamFragment : Fragment(),
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager(binding.mapView)
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        mapboxManager = MapboxManager.instance( activity!! )
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
@@ -212,8 +212,8 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon(pointList,"#000000", 0.25)
-            mapboxManager.addPolyline( pointList[0], "#ff0000" )
+            mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
+            mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
 
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
@@ -239,8 +239,8 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
                 {
-                    mapboxManager.addPolygon(ptList, "#000000", 0.25)
-                    mapboxManager.addPolyline( ptList[0], "#ff0000" )
+                    mapboxManager.addPolygon( polygonAnnotationManager, ptList, "#000000", 0.25)
+                    mapboxManager.addPolyline( polylineAnnotationManager, ptList[0], "#ff0000" )
 
                     val latLngBounds = GeoUtils.findGeobounds(enumerationTeam.polygon)
                     val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
@@ -255,7 +255,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                     if (!locationBelongsToTeam( location ))
                     {
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        mapboxManager.addMarker( point, R.drawable.home_black )
+                        mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.home_black )
                     }
                 }
             }
@@ -346,8 +346,8 @@ class CreateEnumerationTeamFragment : Fragment(),
                                 val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                 pointList.add( vertices )
 
-                                intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
-                                intersectionPolyline = mapboxManager.addPolyline( vertices, "#0000ff" )
+                                intersectionPolygon = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#ff0000", 0.25 )
+                                intersectionPolyline = mapboxManager.addPolyline( polylineAnnotationManager, vertices, "#0000ff" )
 
                                 locationUuids.clear()
 

@@ -256,7 +256,7 @@ class PerformCollectionFragment : Fragment(),
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        mapboxManager = MapboxManager.instance( activity!! )
 
         pointAnnotationManager.apply {
             addClickListener(
@@ -458,7 +458,7 @@ class PerformCollectionFragment : Fragment(),
                     if (location.isLandmark)
                     {
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                        val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.location_blue )
 
                         pointAnnotation?.let {
                             locationHashMap[pointAnnotation.id] = location
@@ -480,13 +480,13 @@ class PerformCollectionFragment : Fragment(),
 
         if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
-            val polygonAnnotation = mapboxManager.addPolygon(pointList,"#000000", 0.25)
+            val polygonAnnotation = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
 
             polygonAnnotation?.let {
                 allPolygonAnnotations.add( it )
             }
 
-            val polylineAnnotation = mapboxManager.addPolyline(pointList[0],"#ff0000")
+            val polylineAnnotation = mapboxManager.addPolyline( polylineAnnotationManager, pointList[0],"#ff0000")
 
             polylineAnnotation?.let {
                 allPolylineAnnotations.add( it )
@@ -559,7 +559,7 @@ class PerformCollectionFragment : Fragment(),
                     {
                         // one point per location!
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( point, resourceId )
+                        val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, resourceId )
 
                         pointAnnotation?.let { pointAnnotation ->
                             allPointAnnotations.add( pointAnnotation )

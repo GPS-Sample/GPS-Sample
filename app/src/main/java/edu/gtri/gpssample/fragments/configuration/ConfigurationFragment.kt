@@ -29,6 +29,10 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
@@ -73,6 +77,9 @@ class ConfigurationFragment : Fragment(),
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private val kDeleteTag          = 1
     private val kExportTag          = 2
@@ -176,10 +183,10 @@ class ConfigurationFragment : Fragment(),
             return@addOnMapClickListener true
         }
 
-        val pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
-        val polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        val polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
+        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
+        mapboxManager = MapboxManager.instance( activity!! )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
 
@@ -287,8 +294,8 @@ class ConfigurationFragment : Fragment(),
 
                 pointList.add( points )
 
-                mapboxManager.addPolygon( pointList, "#000000", 0.25 )
-                mapboxManager.addPolyline( pointList[0], "#ff0000" )
+                mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
+                mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
 
             }
 

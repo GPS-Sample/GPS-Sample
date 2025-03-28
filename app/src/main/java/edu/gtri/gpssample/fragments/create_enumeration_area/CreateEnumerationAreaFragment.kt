@@ -200,7 +200,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        mapboxManager = MapboxManager.instance( activity!! )
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
@@ -624,7 +624,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         {
             if (createEnumAreaBoundary)
             {
-                droppedPointAnnotations.add( mapboxManager.addMarker( point, R.drawable.location_blue ))
+                droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.location_blue ))
                 return true
             }
             else if (createEnumAreaLocation)
@@ -964,7 +964,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         pointList.add( points )
 
-        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.0 )
+        val polygonAnnotation = mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.0 )
 
         polygonAnnotation?.let { polygonAnnotation ->
             polygonHashMap[polygonAnnotation.id] = mapTileRegion
@@ -972,7 +972,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         // create the polygon border
-        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#000000" )
+        val polylineAnnotation = mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#000000" )
 
         polylineAnnotation?.let { polylineAnnotation ->
             allPolylineAnnotations.add( polylineAnnotation )
@@ -990,7 +990,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         pointList.add( points )
 
-        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.25 )
+        val polygonAnnotation = mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
 
         polygonAnnotation?.let { polygonAnnotation ->
             polygonHashMap[polygonAnnotation.id] = enumArea
@@ -998,7 +998,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         // create the polygon border
-        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#ff0000" )
+        val polylineAnnotation = mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
 
         polylineAnnotation?.let { polylineAnnotation ->
             allPolylineAnnotations.add( polylineAnnotation )
@@ -1175,19 +1175,19 @@ class CreateEnumerationAreaFragment : Fragment(),
                         val southWest = LatLon( 0, latitude, longitude )
 
                         var p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
 
                         p =com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
 
                         p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
 
                         p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
 
                         p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( p, R.drawable.location_blue ))
+                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
 
                         inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, this, false )
                     }

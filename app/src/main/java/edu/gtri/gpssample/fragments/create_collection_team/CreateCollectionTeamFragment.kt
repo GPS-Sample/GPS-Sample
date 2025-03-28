@@ -131,7 +131,7 @@ class CreateCollectionTeamFragment : Fragment(),
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager(binding.mapView)
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        mapboxManager = MapboxManager.instance( activity!! )
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
@@ -221,8 +221,8 @@ class CreateCollectionTeamFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon(pointList,"#000000", 0.25)
-            mapboxManager.addPolyline( pointList[0], "#ff0000" )
+            mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
+            mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
 
             for (collectionTeam in enumArea.collectionTeams)
             {
@@ -237,8 +237,8 @@ class CreateCollectionTeamFragment : Fragment(),
 
                 if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
                 {
-                    mapboxManager.addPolygon(ptList, "#000000", 0.25)
-                    mapboxManager.addPolyline( ptList[0], "#ff0000" )
+                    mapboxManager.addPolygon( polygonAnnotationManager, ptList, "#000000", 0.25)
+                    mapboxManager.addPolyline( polylineAnnotationManager, ptList[0], "#ff0000" )
 
                     val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
                     val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
@@ -270,7 +270,7 @@ class CreateCollectionTeamFragment : Fragment(),
                             if (!locationBelongsToTeam( location ))
                             {
                                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                mapboxManager.addMarker( point, R.drawable.home_light_blue )
+                                mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.home_light_blue )
                             }
                         }
                     }
@@ -283,7 +283,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                 if (!locationBelongsToTeam( location ))
                                 {
                                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                    mapboxManager.addMarker( point, R.drawable.multi_home_light_blue )
+                                    mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.multi_home_light_blue )
                                     break
                                 }
                             }
@@ -412,8 +412,8 @@ class CreateCollectionTeamFragment : Fragment(),
                                     val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                     pointList.add( vertices )
 
-                                    intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
-                                    intersectionPolyline = mapboxManager.addPolyline( vertices, "#0000ff" )
+                                    intersectionPolygon = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#ff0000", 0.25 )
+                                    intersectionPolyline = mapboxManager.addPolyline( polylineAnnotationManager, vertices, "#0000ff" )
                                 }
                                 else
                                 {
@@ -422,8 +422,8 @@ class CreateCollectionTeamFragment : Fragment(),
                                     val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                     pointList.add( vertices )
 
-                                    intersectionPolygon = mapboxManager.addPolygon( pointList,"#ff0000", 0.25 )
-                                    intersectionPolyline = mapboxManager.addPolyline( vertices, "#0000ff" )
+                                    intersectionPolygon = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#ff0000", 0.25 )
+                                    intersectionPolyline = mapboxManager.addPolyline( polylineAnnotationManager, vertices, "#0000ff" )
                                 }
                             }
                         }

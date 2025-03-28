@@ -128,7 +128,7 @@ class MapFragment : Fragment(),
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        mapboxManager = MapboxManager.instance( activity!! )
 
         circleAnnotationManager = binding.mapView.annotations.createCircleAnnotationManager()
 
@@ -239,7 +239,7 @@ class MapFragment : Fragment(),
 
                     point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
                     point?.let {
-                        droppedPointAnnotation =  mapboxManager.addMarker( it, R.drawable.location_blue )
+                        droppedPointAnnotation =  mapboxManager.addMarker( pointAnnotationManager, it, R.drawable.location_blue )
                     }
                 }
             }
@@ -314,10 +314,10 @@ class MapFragment : Fragment(),
 
         pointList.add( points )
 
-        polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.0 )
+        polygonAnnotation = mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.0 )
 
         // create the polygon border
-        polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#000000" )
+        polylineAnnotation = mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#000000" )
     }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {

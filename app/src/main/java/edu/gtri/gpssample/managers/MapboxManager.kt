@@ -33,12 +33,7 @@ import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.concurrent.atomic.AtomicInteger
 
-class MapboxManager(
-    var context: Context,
-    var pointAnnotationManager: PointAnnotationManager?,
-    var polygonAnnotationManager: PolygonAnnotationManager?,
-    var polylineAnnotationManager: PolylineAnnotationManager?
-)
+class MapboxManager( var context: Context )
 {
     interface MapTileCacheDelegate
     {
@@ -47,7 +42,7 @@ class MapboxManager(
         fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     }
 
-    fun addMarker( point: Point, @DrawableRes resourceId: Int ) : PointAnnotation?
+    fun addMarker( pointAnnotationManager: PointAnnotationManager, point: Point, @DrawableRes resourceId: Int ) : PointAnnotation
     {
         val pointAnnotationOptions = PointAnnotationOptions().withPoint( point )
 
@@ -55,28 +50,20 @@ class MapboxManager(
             pointAnnotationOptions.withIconImage( bitmap )
         }
 
-        pointAnnotationManager?.let { pointAnnotationManager ->
-            return pointAnnotationManager.create(pointAnnotationOptions)
-        }
-
-        return null
+        return pointAnnotationManager.create(pointAnnotationOptions)
     }
 
-    fun addPolygon( points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : PolygonAnnotation?
+    fun addPolygon( polygonAnnotationManager: PolygonAnnotationManager, points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : PolygonAnnotation
     {
         val polygonAnnotationOptions = PolygonAnnotationOptions()
             .withPoints( points )
             .withFillColor( fillColor )
             .withFillOpacity( fillOpacity )
 
-        polygonAnnotationManager?.let { polygonAnnotationManager ->
-            return polygonAnnotationManager.create(polygonAnnotationOptions)
-        }
-
-        return null
+        return polygonAnnotationManager.create(polygonAnnotationOptions)
     }
 
-    fun addPolyline( points: List<Point>, color: String ) : PolylineAnnotation?
+    fun addPolyline( polylineAnnotationManager: PolylineAnnotationManager, points: List<Point>, color: String ) : PolylineAnnotation
     {
         val outlinePoints = ArrayList<Point>(points)
         outlinePoints.add( outlinePoints[0] )
@@ -86,11 +73,7 @@ class MapboxManager(
             .withLineColor(color)
             .withLineWidth(4.0)
 
-        polylineAnnotationManager?.let { polylineAnnotationManager ->
-            return polylineAnnotationManager.create(polylineAnnotationOptions)
-        }
-
-        return null
+        return polylineAnnotationManager.create(polylineAnnotationOptions)
     }
 
     fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
@@ -141,11 +124,23 @@ class MapboxManager(
 
     companion object
     {
+        var _instance: MapboxManager? = null
+
         private val STYLE_PACK_METADATA = "STYLE_PACK_METADATA"
         private val TILE_REGION_METADATA = "TILE_REGION_METADATA"
 
         private var stylePackCancelable: Cancelable? = null
         private var tileRegionsCancelable = ArrayList<Cancelable>()
+
+        fun instance( context: Context ) : MapboxManager
+        {
+            if (_instance == null)
+            {
+                _instance = MapboxManager( context )
+            }
+
+            return _instance!!
+        }
 
         fun isSelfIntersectingPolygon1( polylinePoints: java.util.ArrayList<Point> ) : Boolean
         {

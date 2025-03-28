@@ -156,7 +156,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
                     pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
                     polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
                     polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-                    mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+                    mapboxManager = MapboxManager.instance( activity!! )
 
                     refreshMap()
 
@@ -322,11 +322,11 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon(pointList,"#000000", 0.25)?.let{
+            mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)?.let{
                 allPolygonAnnotations.add( it )
             }
 
-            mapboxManager.addPolyline( pointList[0], "#ff0000" )?.let {
+            mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )?.let {
                 allPolylineAnnotations.add( it )
             }
 

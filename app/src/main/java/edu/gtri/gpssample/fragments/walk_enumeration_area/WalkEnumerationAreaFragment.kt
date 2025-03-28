@@ -181,7 +181,7 @@ class WalkEnumerationAreaFragment : Fragment(),
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager( activity!!, pointAnnotationManager, polygonAnnotationManager, polylineAnnotationManager )
+        mapboxManager = MapboxManager.instance( activity!! )
 
         val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
             .withPoints(polyLinePoints)
@@ -226,7 +226,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
                     if (polyLinePoints.size == 1)
                     {
-                        startPointAnnotation = mapboxManager.addMarker( point, R.drawable.location_blue )
+                        startPointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.location_blue )
                     }
                     else if (polyLinePoints.size > 2)
                     {
@@ -366,14 +366,14 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         pointList.add( points )
 
-        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.25 )
+        val polygonAnnotation = mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
 
         polygonAnnotation?.let { polygonAnnotation ->
             allPolygonAnnotations.add( polygonAnnotation)
         }
 
         // create the polygon border
-        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#ff0000" )
+        val polylineAnnotation = mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
 
         polylineAnnotation?.let { polylineAnnotation ->
             allPolylineAnnotations.add( polylineAnnotation )
@@ -398,14 +398,14 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         pointList.add( points )
 
-        val polygonAnnotation = mapboxManager.addPolygon( pointList, "#000000", 0.0 )
+        val polygonAnnotation = mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.0 )
 
         polygonAnnotation?.let { polygonAnnotation ->
             allPolygonAnnotations.add( polygonAnnotation)
         }
 
         // create the polygon border
-        val polylineAnnotation = mapboxManager.addPolyline( pointList[0], "#000000" )
+        val polylineAnnotation = mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#000000" )
 
         polylineAnnotation?.let { polylineAnnotation ->
             allPolylineAnnotations.add( polylineAnnotation )
