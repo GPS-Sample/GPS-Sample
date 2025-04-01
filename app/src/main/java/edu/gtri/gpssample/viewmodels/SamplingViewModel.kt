@@ -30,7 +30,7 @@ import kotlin.math.roundToInt
 class SamplingViewModel : ViewModel()
 {
     private lateinit var mapboxManager: MapboxManager
-    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private var pointAnnotationManager: PointAnnotationManager? = null
 
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentConfig : MutableLiveData<Config>? = null
@@ -414,7 +414,9 @@ class SamplingViewModel : ViewModel()
                 else -> {}
             }
 
-            setSampleAreasForMap(mapboxManager,pointAnnotationManager)
+            pointAnnotationManager?.let {
+                setSampleAreasForMap(mapboxManager, it)
+            }
         }
     }
 

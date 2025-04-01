@@ -4,6 +4,11 @@
     tools:context="edu.gtri.gpssample.MainActivity">
 
     <item
+        android:id="@+id/redefine_ea_boundary"
+        android:title="@string/update_boundary"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/mapbox_streets"
         android:title="Mapbox Streets"
         app:showAsAction="never"/>
@@ -14,7 +19,12 @@
         app:showAsAction="never"/>
 
     <item
-        android:id="@+id/redefine_ea_boundary"
-        android:title="@string/update_boundary"
+        android:id="@+id/import_map_tiles"
+        android:title="@string/import_map_tiles"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/select_map_tiles"
+        android:title="@string/select_map_tiles"
         app:showAsAction="never"/>
 </menu>

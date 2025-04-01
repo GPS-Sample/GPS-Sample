@@ -109,7 +109,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         binding.expandableListView.setAdapter(createStudyAdapter)
         binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
 
-
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog(
                 activity,

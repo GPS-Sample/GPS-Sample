@@ -58,6 +58,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentWalkEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import io.github.dellisd.spatialk.geojson.FeatureCollection
@@ -76,16 +77,19 @@ class WalkEnumerationAreaFragment : Fragment(),
     OnCameraChangeListener,
     InputDialog.InputDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
+    SelectMapTilesDialog.SelectMapTilesDialogDelegate
 {
     private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
-    private lateinit var polylineAnnotation: PolylineAnnotation
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var pointAnnotationManager: PointAnnotationManager
-    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
-    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
     private lateinit var defaultColorList : ColorStateList
+
+    private var pointAnnotationManager: PointAnnotationManager? = null
+    private var polygonAnnotationManager: PolygonAnnotationManager? = null
+    private var polylineAnnotationManager: PolylineAnnotationManager? = null
+
+    private var polylineAnnotation: PolylineAnnotation? = null
 
     private var inputDialog: InputDialog? = null
     private var startPointAnnotation : PointAnnotation? = null
@@ -163,24 +167,31 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        var style = Style.MAPBOX_STREETS
-        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-            style = it
-        }
-
-        binding.mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style) {
+        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
+            if (TileServer.started)
+            {
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                     initLocationComponent()
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            } else
+            {
+                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+                    initLocationComponent()
+                    createAnnotationManagers()
                     refreshMap()
                 }
             }
-        )
+        } ?: run {
+            // no tiles have been loaded, no need to start the server, just load the default map style
+            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                initLocationComponent()
+                createAnnotationManagers()
+                refreshMap()
+            }
+        }
 
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
-        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager.instance( activity!! )
 
         val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
@@ -188,7 +199,7 @@ class WalkEnumerationAreaFragment : Fragment(),
             .withLineColor("#ee4e8b")
             .withLineWidth(5.0)
 
-        polylineAnnotation = polylineAnnotationManager.create(polylineAnnotationOptions)
+        polylineAnnotation = polylineAnnotationManager?.create(polylineAnnotationOptions)
 
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
@@ -221,8 +232,10 @@ class WalkEnumerationAreaFragment : Fragment(),
             {
                 currentGPSLocation?.let { point ->
                     polyLinePoints.add( point )
-                    polylineAnnotation.points = polyLinePoints
-                    polylineAnnotationManager.update(polylineAnnotation)
+                    polylineAnnotation?.points = polyLinePoints
+                    polylineAnnotation?.let {
+                        polylineAnnotationManager?.update(it)
+                    }
 
                     if (polyLinePoints.size == 1)
                     {
@@ -320,6 +333,13 @@ class WalkEnumerationAreaFragment : Fragment(),
         }
     }
 
+    fun createAnnotationManagers()
+    {
+        pointAnnotationManager = mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
+        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
+        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(polylineAnnotationManager, binding.mapView)
+    }
+
     override fun onResume()
     {
         super.onResume()
@@ -332,14 +352,14 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         for (polygonAnnotation in allPolygonAnnotations)
         {
-            polygonAnnotationManager.delete( polygonAnnotation )
+            polygonAnnotationManager?.delete( polygonAnnotation )
         }
 
         allPolygonAnnotations.clear()
 
         for (polylineAnnotation in allPolylineAnnotations)
         {
-            polylineAnnotationManager.delete( polylineAnnotation )
+            polylineAnnotationManager?.delete( polylineAnnotation )
         }
 
         allPolylineAnnotations.clear()
@@ -416,7 +436,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     {
         droppedPointAnnotations.map { pointAnnotation ->
             pointAnnotation?.let{ pointAnnotation ->
-                pointAnnotationManager.delete( pointAnnotation )
+                pointAnnotationManager?.delete( pointAnnotation )
             }
         }
         droppedPointAnnotations.clear()
@@ -453,11 +473,13 @@ class WalkEnumerationAreaFragment : Fragment(),
             }
 
             polyLinePoints.clear()
-            polylineAnnotation.points = polyLinePoints
-            polylineAnnotationManager.update(polylineAnnotation)
+            polylineAnnotation?.points = polyLinePoints
+            polylineAnnotation?.let {
+                polylineAnnotationManager?.update(it)
+            }
 
             startPointAnnotation?.let {
-                pointAnnotationManager.delete( it )
+                pointAnnotationManager?.delete( it )
                 startPointAnnotation = null
             }
 
@@ -515,8 +537,10 @@ class WalkEnumerationAreaFragment : Fragment(),
                     polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude ))
                     polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
 
-                    polylineAnnotation.points = polyLinePoints
-                    polylineAnnotationManager.update(polylineAnnotation)
+                    polylineAnnotation?.points = polyLinePoints
+                    polylineAnnotation?.let {
+                        polylineAnnotationManager?.update(it)
+                    }
 
                     inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, this, false )
                 }
@@ -536,8 +560,10 @@ class WalkEnumerationAreaFragment : Fragment(),
         {
             isRecording = false
             polyLinePoints.clear()
-            polylineAnnotation.points = polyLinePoints
-            polylineAnnotationManager.update(polylineAnnotation)
+            polylineAnnotation?.points = polyLinePoints
+            polylineAnnotation?.let {
+                polylineAnnotationManager?.update(it)
+            }
             binding.walkButton.isEnabled = true
             binding.saveButton.isEnabled = true
             binding.addPointButton.isEnabled = true
@@ -545,7 +571,7 @@ class WalkEnumerationAreaFragment : Fragment(),
             binding.walkButton.setBackgroundTintList(defaultColorList);
 
             startPointAnnotation?.let {
-                pointAnnotationManager.delete( it )
+                pointAnnotationManager?.delete( it )
                 startPointAnnotation = null
             }
 
@@ -562,13 +588,15 @@ class WalkEnumerationAreaFragment : Fragment(),
         else if (tag == kDeletePointTag)
         {
             polyLinePoints.removeLast()
-            polylineAnnotation.points = polyLinePoints
-            polylineAnnotationManager.update(polylineAnnotation)
+            polylineAnnotation?.points = polyLinePoints
+            polylineAnnotation?.let {
+                polylineAnnotationManager?.update(it)
+            }
 
             if (polyLinePoints.isEmpty())
             {
                 startPointAnnotation?.let {
-                    pointAnnotationManager.delete( it )
+                    pointAnnotationManager?.delete( it )
                     startPointAnnotation = null
                 }
             }
@@ -741,14 +769,10 @@ class WalkEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.MAPBOX_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
             }
 
             R.id.satellite_streets ->
@@ -758,18 +782,54 @@ class WalkEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.SATELLITE_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            }
+
+            R.id.import_map_tiles ->
+            {
+                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+            }
+
+            R.id.select_map_tiles ->
+            {
+                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let {
+            TileServer.stopServer()
+
+            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+                createAnnotationManagers()
+                refreshMap()
+                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            }
+        }
+    }
+
+    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    {
+        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val editor = sharedPreferences.edit()
+        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
+        editor.commit()
+
+        TileServer.stopServer()
+
+        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+            createAnnotationManagers()
+            refreshMap()
+            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+        }
     }
 
     override fun onDestroyView()

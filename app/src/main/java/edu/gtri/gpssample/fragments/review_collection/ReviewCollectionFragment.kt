@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -61,6 +62,7 @@ import edu.gtri.gpssample.databinding.FragmentReviewCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionAdapter
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.TestUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -73,7 +75,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
+class ReviewCollectionFragment : Fragment(), OnCameraChangeListener, SelectMapTilesDialog.SelectMapTilesDialogDelegate
 {
     private lateinit var user: User
     private lateinit var enumArea: EnumArea
@@ -81,10 +83,11 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
-    private lateinit var pointAnnotationManager: PointAnnotationManager
-    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
-    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
+
+    private var pointAnnotationManager: PointAnnotationManager? = null
+    private var polygonAnnotationManager: PolygonAnnotationManager? = null
+    private var polylineAnnotationManager: PolylineAnnotationManager? = null
 
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
@@ -179,27 +182,56 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        var style = Style.MAPBOX_STREETS
-        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-            style = it
-        }
-
-        binding.mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style) {
+        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
+            if (TileServer.started)
+            {
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                     initLocationComponent()
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            } else
+            {
+                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+                    initLocationComponent()
+                    createAnnotationManagers()
                     refreshMap()
                 }
             }
-        )
+        } ?: run {
+            // no tiles have been loaded, no need to start the server, just load the default map style
+            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                initLocationComponent()
+                createAnnotationManagers()
+                refreshMap()
+            }
+        }
 
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
-        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager.instance( activity!! )
 
-        pointAnnotationManager.apply {
+        binding.legendTextView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
+        binding.legendImageView.setOnClickListener {
+            MapLegendDialog( activity!! )
+        }
+
+        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
+        if (centerOnCurrentLocation == null)
+        {
+            sharedViewModel.setCenterOnCurrentLocation( false )
+        }
+
+        updateSummaryInfo()
+    }
+
+    fun createAnnotationManagers() {
+        pointAnnotationManager = mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
+        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
+        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(polylineAnnotationManager, binding.mapView)
+
+        pointAnnotationManager?.apply {
             addClickListener(
                 OnPointAnnotationClickListener { pointAnnotation ->
                     locationHashMap[pointAnnotation.id]?.let { location ->
@@ -239,22 +271,6 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
                 }
             )
         }
-
-        binding.legendTextView.setOnClickListener {
-            MapLegendDialog( activity!! )
-        }
-
-        binding.legendImageView.setOnClickListener {
-            MapLegendDialog( activity!! )
-        }
-
-        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
-        if (centerOnCurrentLocation == null)
-        {
-            sharedViewModel.setCenterOnCurrentLocation( false )
-        }
-
-        updateSummaryInfo()
     }
 
     fun updateSummaryInfo()
@@ -303,21 +319,21 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
 
         for (polygonAnnotation in allPolygonAnnotations)
         {
-            polygonAnnotationManager.delete( polygonAnnotation )
+            polygonAnnotationManager?.delete( polygonAnnotation )
         }
 
         allPolygonAnnotations.clear()
 
         for (polylineAnnotation in allPolylineAnnotations)
         {
-            polylineAnnotationManager.delete( polylineAnnotation )
+            polylineAnnotationManager?.delete( polylineAnnotation )
         }
 
         allPolylineAnnotations.clear()
 
         for (pointAnnotation in allPointAnnotations)
         {
-            pointAnnotationManager.delete( pointAnnotation )
+            pointAnnotationManager?.delete( pointAnnotation )
         }
 
         allPointAnnotations.clear()
@@ -698,14 +714,10 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.MAPBOX_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
             }
 
             R.id.satellite_streets ->
@@ -715,18 +727,54 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.SATELLITE_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            }
+
+            R.id.import_map_tiles ->
+            {
+                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+            }
+
+            R.id.select_map_tiles ->
+            {
+                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let {
+            TileServer.stopServer()
+
+            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+                createAnnotationManagers()
+                refreshMap()
+                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            }
+        }
+    }
+
+    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    {
+        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val editor = sharedPreferences.edit()
+        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
+        editor.commit()
+
+        TileServer.stopServer()
+
+        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+            createAnnotationManagers()
+            refreshMap()
+            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+        }
     }
 
     override fun onDestroyView()

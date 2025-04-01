@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.mapbox.geojson.Point
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
@@ -55,15 +56,23 @@ class ConfigurationViewModel : ViewModel()
 
     private var _centerOnCurrentLocation : MutableLiveData<Boolean>? = null
 
+    private var _currentCenterPoint : MutableLiveData<Point>? = null
     private var _currentZoomLevel : MutableLiveData<Double>? = null
 
     var currentZoomLevel : LiveData<Double>? = _currentZoomLevel
+    var currentCenterPoint : LiveData<Point>? = _currentCenterPoint
     var centerOnCurrentLocation : LiveData<Boolean>? = _centerOnCurrentLocation
 
     fun setCurrentZoomLevel( zoomLevel: Double )
     {
         _currentZoomLevel = MutableLiveData(zoomLevel)
         currentZoomLevel = _currentZoomLevel
+    }
+
+    fun setCurrentCenterPoint( point: Point? )
+    {
+        _currentCenterPoint = MutableLiveData(point)
+        currentCenterPoint = _currentCenterPoint
     }
 
     fun setCenterOnCurrentLocation( value: Boolean )

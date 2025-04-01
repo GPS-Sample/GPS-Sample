@@ -7,7 +7,9 @@
 
 package edu.gtri.gpssample.managers
 
+import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -19,16 +21,21 @@ import android.util.Log
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.mapbox.bindgen.Value
 import com.mapbox.common.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
+import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
+import edu.gtri.gpssample.managers.TileServer.Companion.getBounds
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.concurrent.atomic.AtomicInteger
@@ -42,38 +49,50 @@ class MapboxManager( var context: Context )
         fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     }
 
-    fun addMarker( pointAnnotationManager: PointAnnotationManager, point: Point, @DrawableRes resourceId: Int ) : PointAnnotation
+    fun addMarker( pointAnnotationManager: PointAnnotationManager?, point: Point, @DrawableRes resourceId: Int ) : PointAnnotation?
     {
-        val pointAnnotationOptions = PointAnnotationOptions().withPoint( point )
+        pointAnnotationManager?.let {
+            val pointAnnotationOptions = PointAnnotationOptions().withPoint( point )
 
-        convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
-            pointAnnotationOptions.withIconImage( bitmap )
+            convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
+                pointAnnotationOptions.withIconImage( bitmap )
+            }
+
+            return pointAnnotationManager.create(pointAnnotationOptions)
         }
 
-        return pointAnnotationManager.create(pointAnnotationOptions)
+        return null
     }
 
-    fun addPolygon( polygonAnnotationManager: PolygonAnnotationManager, points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : PolygonAnnotation
+    fun addPolygon( polygonAnnotationManager: PolygonAnnotationManager?, points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : PolygonAnnotation?
     {
-        val polygonAnnotationOptions = PolygonAnnotationOptions()
-            .withPoints( points )
-            .withFillColor( fillColor )
-            .withFillOpacity( fillOpacity )
+        polygonAnnotationManager?.let {
+            val polygonAnnotationOptions = PolygonAnnotationOptions()
+                .withPoints( points )
+                .withFillColor( fillColor )
+                .withFillOpacity( fillOpacity )
 
-        return polygonAnnotationManager.create(polygonAnnotationOptions)
+            return polygonAnnotationManager.create(polygonAnnotationOptions)
+        }
+
+        return null
     }
 
-    fun addPolyline( polylineAnnotationManager: PolylineAnnotationManager, points: List<Point>, color: String ) : PolylineAnnotation
+    fun addPolyline( polylineAnnotationManager: PolylineAnnotationManager?, points: List<Point>, color: String ) : PolylineAnnotation?
     {
-        val outlinePoints = ArrayList<Point>(points)
-        outlinePoints.add( outlinePoints[0] )
+        polylineAnnotationManager?.let {
+            val outlinePoints = ArrayList<Point>(points)
+            outlinePoints.add( outlinePoints[0] )
 
-        val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-            .withPoints(outlinePoints)
-            .withLineColor(color)
-            .withLineWidth(4.0)
+            val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+                .withPoints(outlinePoints)
+                .withLineColor(color)
+                .withLineWidth(4.0)
 
-        return polylineAnnotationManager.create(polylineAnnotationOptions)
+            return polylineAnnotationManager.create(polylineAnnotationOptions)
+        }
+
+        return null
     }
 
     fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
@@ -94,6 +113,33 @@ class MapboxManager( var context: Context )
                 it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
             }
         }
+    }
+
+    fun createPointAnnotationManager( pointAnnotationManager: PointAnnotationManager?, mapView: MapView ) : PointAnnotationManager
+    {
+        pointAnnotationManager?.let {
+            mapView.annotations.removeAnnotationManager( it )
+        }
+
+        return mapView.annotations.createPointAnnotationManager()
+    }
+
+    fun createPolygonAnnotationManager( polygonAnnotationManager: PolygonAnnotationManager?, mapView: MapView ) : PolygonAnnotationManager
+    {
+        polygonAnnotationManager?.let {
+            mapView.annotations.removeAnnotationManager( it )
+        }
+
+        return mapView.annotations.createPolygonAnnotationManager()
+    }
+
+    fun createPolylineAnnotationManager( polylineAnnotationManager: PolylineAnnotationManager?, mapView: MapView ) : PolylineAnnotationManager
+    {
+        polylineAnnotationManager?.let {
+            mapView.annotations.removeAnnotationManager( it )
+        }
+
+        return mapView.annotations.createPolylineAnnotationManager()
     }
 
     private fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap?
@@ -357,6 +403,26 @@ class MapboxManager( var context: Context )
             }
 
             return points
+        }
+
+        fun centerMap( context: Context, mapboxMap: MapboxMap, zoomLevel: Double? = null )
+        {
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+
+            val zLevel = if (zoomLevel == null) 8.0 else zoomLevel
+
+            sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
+                getBounds( mbTilesPath )?.let { bounds ->
+                    val latLngBounds = LatLngBounds(LatLng(bounds.minLat, bounds.minLon), LatLng(bounds.maxLat, bounds.maxLon))
+                    val point = com.mapbox.geojson.Point.fromLngLat(latLngBounds.center.longitude,latLngBounds.center.latitude)
+                    val cameraPosition = CameraOptions.Builder()
+                        .zoom(zLevel)
+                        .center(point)
+                        .build()
+
+                    mapboxMap.setCamera(cameraPosition)
+                }
+            }
         }
     }
 }

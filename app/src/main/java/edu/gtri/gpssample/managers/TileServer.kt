@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.managers
 
 import android.app.Activity
@@ -241,24 +248,6 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
             db.close()
 
             return bounds
-        }
-
-        fun centerMap( context: Context, mapboxMap: MapboxMap )
-        {
-            val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
-
-            sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-                getBounds( mbTilesPath )?.let { bounds ->
-                    val latLngBounds = LatLngBounds(LatLng(bounds.minLat, bounds.minLon), LatLng(bounds.maxLat, bounds.maxLon))
-                    val point = com.mapbox.geojson.Point.fromLngLat(latLngBounds.center.longitude,latLngBounds.center.latitude)
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(6.0)
-                        .center(point)
-                        .build()
-
-                    mapboxMap.setCamera(cameraPosition)
-                }
-            }
         }
     }
 

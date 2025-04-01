@@ -51,6 +51,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -69,6 +70,7 @@ class PerformCollectionFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
+    SelectMapTilesDialog.SelectMapTilesDialogDelegate,
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var user: User
@@ -79,10 +81,11 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
-    private lateinit var pointAnnotationManager: PointAnnotationManager
-    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
-    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
+
+    private var pointAnnotationManager: PointAnnotationManager? = null
+    private var polygonAnnotationManager: PolygonAnnotationManager? = null
+    private var polylineAnnotationManager: PolylineAnnotationManager? = null
 
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
@@ -150,6 +153,8 @@ class PerformCollectionFragment : Fragment(),
         sharedNetworkViewModel = networkVm
         sharedNetworkViewModel.currentFragment = this
 
+        sharedViewModel.setCurrentCenterPoint( null )
+
         val samplingVm: SamplingViewModel by activityViewModels()
         samplingViewModel = samplingVm
         samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
@@ -179,6 +184,13 @@ class PerformCollectionFragment : Fragment(),
 
         DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
             collectionTeam = it
+        }
+
+        if (sharedViewModel.currentCenterPoint?.value == null)
+        {
+            val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            sharedViewModel.setCurrentCenterPoint( point )
         }
 
         val _user = (activity!!.application as? MainApplication)?.user
@@ -236,82 +248,34 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        var style = Style.MAPBOX_STREETS
-        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-            style = it
-        }
-
-        binding.mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style) {
+        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
+            if (TileServer.started)
+            {
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                     initLocationComponent()
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            } else
+            {
+                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+                    initLocationComponent()
+                    createAnnotationManagers()
                     refreshMap()
                 }
             }
-        )
+        } ?: run {
+            // no tiles have been loaded, no need to start the server, just load the default map style
+            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                initLocationComponent()
+                createAnnotationManagers()
+                refreshMap()
+            }
+        }
 
-        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
-        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
         mapboxManager = MapboxManager.instance( activity!! )
 
-        pointAnnotationManager.apply {
-            addClickListener(
-                OnPointAnnotationClickListener { pointAnnotation ->
-                    locationHashMap[pointAnnotation.id]?.let { location ->
-                        sharedViewModel.locationViewModel.setCurrentLocation(location)
-
-                        if (location.isLandmark)
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                        }
-                        else
-                        {
-                            var count = 0
-
-                            for (enumerationItem in location.enumerationItems)
-                            {
-                                if (enumerationItem.samplingState == SamplingState.Sampled)
-                                {
-                                    count += 1
-
-                                    // This is really only necessary here for the enumerationItems.size == 1 case
-                                    // For size > 1, this will get set in the multiCollectionFragment
-                                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-                                }
-                            }
-
-                            if (count > 1)
-                            {
-                                val bundle = Bundle()
-                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
-                                bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
-
-                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
-                            }
-                            else
-                            {
-                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
-
-                                    val bundle = Bundle()
-                                    bundle.putBoolean( Keys.kEditMode.value, false )
-                                    bundle.putBoolean( Keys.kCollectionMode.value, true )
-                                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
-                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-                                }
-                            }
-                        }
-                    }
-                    true
-                }
-            )
-        }
+        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         binding.mapTileCacheButton.setOnClickListener {
             enumArea.mapTileRegion?.let {
@@ -417,6 +381,72 @@ class PerformCollectionFragment : Fragment(),
         binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
     }
 
+    fun createAnnotationManagers() {
+        pointAnnotationManager =
+            mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
+        polygonAnnotationManager =
+            mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
+        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(
+            polylineAnnotationManager,
+            binding.mapView
+        )
+
+        pointAnnotationManager?.apply {
+            addClickListener(
+                OnPointAnnotationClickListener { pointAnnotation ->
+                    locationHashMap[pointAnnotation.id]?.let { location ->
+                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+                        if (location.isLandmark)
+                        {
+                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+                        }
+                        else
+                        {
+                            var count = 0
+
+                            for (enumerationItem in location.enumerationItems)
+                            {
+                                if (enumerationItem.samplingState == SamplingState.Sampled)
+                                {
+                                    count += 1
+
+                                    // This is really only necessary here for the enumerationItems.size == 1 case
+                                    // For size > 1, this will get set in the multiCollectionFragment
+                                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                                }
+                            }
+
+                            if (count > 1)
+                            {
+                                val bundle = Bundle()
+                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
+                                bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
+
+                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
+                            }
+                            else
+                            {
+                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
+                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
+
+                                    val bundle = Bundle()
+                                    bundle.putBoolean( Keys.kEditMode.value, false )
+                                    bundle.putBoolean( Keys.kCollectionMode.value, true )
+                                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+                                }
+                            }
+                        }
+                    }
+                    true
+                }
+            )
+        }
+    }
+
     override fun onResume()
     {
         super.onResume()
@@ -430,21 +460,21 @@ class PerformCollectionFragment : Fragment(),
 
         for (polygonAnnotation in allPolygonAnnotations)
         {
-            polygonAnnotationManager.delete( polygonAnnotation )
+            polygonAnnotationManager?.delete( polygonAnnotation )
         }
 
         allPolygonAnnotations.clear()
 
         for (polylineAnnotation in allPolylineAnnotations)
         {
-            polylineAnnotationManager.delete( polylineAnnotation )
+            polylineAnnotationManager?.delete( polylineAnnotation )
         }
 
         allPolylineAnnotations.clear()
 
         for (pointAnnotation in allPointAnnotations)
         {
-            pointAnnotationManager.delete( pointAnnotation )
+            pointAnnotationManager?.delete( pointAnnotation )
         }
 
         allPointAnnotations.clear()
@@ -492,16 +522,14 @@ class PerformCollectionFragment : Fragment(),
                 allPolylineAnnotations.add( it )
             }
 
-            val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-            currentZoomLevel?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
-                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                val cameraPosition = CameraOptions.Builder()
-                    .zoom(currentZoomLevel)
-                    .center(point)
-                    .build()
-
-                binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                sharedViewModel.currentCenterPoint?.value?.let { currentCenterPoint ->
+                    val cameraPosition = CameraOptions.Builder()
+                        .zoom(currentZoomLevel)
+                        .center(currentCenterPoint)
+                        .build()
+                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                }
             }
 
             for (location in collectionTeamLocations)
@@ -977,6 +1005,7 @@ class PerformCollectionFragment : Fragment(),
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
         sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+        sharedViewModel.setCurrentCenterPoint( binding.mapView.getMapboxMap().cameraState.center)
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
@@ -1244,14 +1273,10 @@ class PerformCollectionFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.MAPBOX_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
             }
 
             R.id.satellite_streets ->
@@ -1261,18 +1286,54 @@ class PerformCollectionFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.SATELLITE_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            }
+
+            R.id.import_map_tiles ->
+            {
+                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+            }
+
+            R.id.select_map_tiles ->
+            {
+                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let {
+            TileServer.stopServer()
+
+            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+                createAnnotationManagers()
+                refreshMap()
+                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            }
+        }
+    }
+
+    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    {
+        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val editor = sharedPreferences.edit()
+        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
+        editor.commit()
+
+        TileServer.stopServer()
+
+        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+            createAnnotationManagers()
+            refreshMap()
+            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+        }
     }
 
     override fun onDestroyView()

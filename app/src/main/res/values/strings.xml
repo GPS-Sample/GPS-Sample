@@ -389,6 +389,9 @@
     <string name="collection_notes">Collection Notes</string>
     <string name="select_map_tiles">Select a map tileset</string>
     <string name="loading_mapbox_tiles">Loading Mapbox Tiles...</string>
+    <string name="mapbox_streets">Mapbox Streets</string>
+    <string name="satellite_streets">Satellite Streets</string>
+    <string name="import_map_tiles">Import Map Tiles</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

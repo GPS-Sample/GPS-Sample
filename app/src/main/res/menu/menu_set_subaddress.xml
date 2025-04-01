@@ -17,4 +17,14 @@
         android:id="@+id/satellite_streets"
         android:title="Satellite Streets"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/import_map_tiles"
+        android:title="@string/import_map_tiles"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/select_map_tiles"
+        android:title="@string/select_map_tiles"
+        app:showAsAction="never"/>
 </menu>

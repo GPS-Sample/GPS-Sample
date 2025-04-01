@@ -8,9 +8,11 @@
 package edu.gtri.gpssample.fragments.createsample
 
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
@@ -45,13 +47,15 @@ import edu.gtri.gpssample.databinding.FragmentHotspotBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.dialogs.MapLegendDialog
+import edu.gtri.gpssample.dialogs.SelectMapTilesDialog
 import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import java.util.*
 
-class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDialog.ConfirmationDialogDelegate
+class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDialog.ConfirmationDialogDelegate, SelectMapTilesDialog.SelectMapTilesDialogDelegate
 {
     private lateinit var study: Study
     private lateinit var config: Config
@@ -59,9 +63,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
-    private lateinit var pointAnnotationManager: PointAnnotationManager
-    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
-    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
+
+    private var pointAnnotationManager: PointAnnotationManager? = null
+    private var polygonAnnotationManager: PolygonAnnotationManager? = null
+    private var polylineAnnotationManager: PolylineAnnotationManager? = null
 
     private var _binding: FragmentCreateSampleBinding? = null
     private val binding get() = _binding!!
@@ -143,27 +148,29 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
         }
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        var style = Style.MAPBOX_STREETS
-        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-            style = it
-        }
-
-        binding.mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style)
-                {
-                    pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager(binding.mapView)
-                    polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-                    polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-                    mapboxManager = MapboxManager.instance( activity!! )
-
+        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
+            if (TileServer.started)
+            {
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
                     refreshMap()
-
-                    samplingViewModel.setSampleAreasForMap( mapboxManager, pointAnnotationManager )
+                }
+            } else
+            {
+                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
                 }
             }
-        )
+        } ?: run {
+            // no tiles have been loaded, no need to start the server, just load the default map style
+            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                createAnnotationManagers()
+                refreshMap()
+            }
+        }
+
+        mapboxManager = MapboxManager.instance( activity!! )
 
         binding.infoButton.setOnClickListener{
             findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
@@ -277,6 +284,16 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
         }
     }
 
+    fun createAnnotationManagers() {
+        pointAnnotationManager = mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
+        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
+        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(polylineAnnotationManager, binding.mapView)
+
+        pointAnnotationManager?.let {
+            samplingViewModel.setSampleAreasForMap(mapboxManager, it)
+        }
+    }
+
     override fun didSelectFirstButton(tag: Any?)
     {
     }
@@ -299,14 +316,14 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
         for (polygonAnnotation in allPolygonAnnotations)
         {
-            polygonAnnotationManager.delete( polygonAnnotation )
+            polygonAnnotationManager?.delete( polygonAnnotation )
         }
 
         allPolygonAnnotations.clear()
 
         for (polylineAnnotation in allPolylineAnnotations)
         {
-            polylineAnnotationManager.delete( polylineAnnotation )
+            polylineAnnotationManager?.delete( polylineAnnotation )
         }
 
         allPolylineAnnotations.clear()
@@ -380,14 +397,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.MAPBOX_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
             }
 
             R.id.satellite_streets ->
@@ -397,18 +410,54 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                binding.mapView.getMapboxMap().loadStyleUri(
-                    Style.SATELLITE_STREETS,
-                    object : Style.OnStyleLoaded {
-                        override fun onStyleLoaded(style: Style) {
-                            refreshMap()
-                        }
-                    }
-                )
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            }
+
+            R.id.import_map_tiles ->
+            {
+                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+            }
+
+            R.id.select_map_tiles ->
+            {
+                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let {
+            TileServer.stopServer()
+
+            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+                createAnnotationManagers()
+                refreshMap()
+                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            }
+        }
+    }
+
+    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    {
+        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val editor = sharedPreferences.edit()
+        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
+        editor.commit()
+
+        TileServer.stopServer()
+
+        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+            createAnnotationManagers()
+            refreshMap()
+            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+        }
     }
 
     fun redefineEnumerationAreaBoundary()
