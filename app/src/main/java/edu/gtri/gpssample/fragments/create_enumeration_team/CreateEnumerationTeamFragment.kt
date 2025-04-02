@@ -489,6 +489,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
             TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
+                refreshMap()
                 MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
             }
         }
@@ -507,6 +508,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
             createAnnotationManagers()
+            refreshMap()
             MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
