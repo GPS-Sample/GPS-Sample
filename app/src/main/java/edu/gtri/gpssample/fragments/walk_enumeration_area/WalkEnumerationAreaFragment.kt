@@ -501,9 +501,17 @@ class WalkEnumerationAreaFragment : Fragment(),
                 val enumArea = EnumArea( config.uuid, name2, vertices, mapTileRegion )
                 config.enumAreas.add( enumArea )
 
+                var mapTilesPath = ""
+
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+
+                sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
+                    mapTilesPath = it
+                }
+
                 DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                     config.enumAreas[0].let { enumArea ->
-                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
+                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", mapTilesPath, enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
                             enumArea.enumerationTeams.add( enumerationTeam )
                         }
                     }

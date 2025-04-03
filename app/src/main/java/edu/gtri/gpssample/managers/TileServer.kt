@@ -238,8 +238,6 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
                 if (parts.size == 4)
                 {
-                    val lon = parts[0].toDouble()
-                    val lat = parts[1].toDouble()
                     bounds = Bounds(parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble(), parts[3].toDouble())
                 }
             }

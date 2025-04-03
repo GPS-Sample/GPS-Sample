@@ -193,7 +193,13 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
 
-            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
+            var mapTilesPath = ""
+
+            sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
+                mapTilesPath = it
+            }
+
+            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), mapTilesPath, polygon, locationUuids ))
 
             enumerationTeam?.let { team ->
                 enumArea.enumerationTeams.add(team)

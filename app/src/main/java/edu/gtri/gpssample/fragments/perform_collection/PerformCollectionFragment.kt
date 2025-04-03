@@ -248,6 +248,21 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+
+        if (collectionTeam.mbTilesPath.isNotEmpty())
+        {
+            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
+
+            if (mbTilesPath != collectionTeam.mbTilesPath)
+            {
+                TileServer.stopServer()
+            }
+
+            val editor = sharedPreferences.edit()
+            editor.putString( Keys.kMBTilesPath.value, collectionTeam.mbTilesPath )
+            editor.commit()
+        }
+
         sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
             if (TileServer.started)
             {

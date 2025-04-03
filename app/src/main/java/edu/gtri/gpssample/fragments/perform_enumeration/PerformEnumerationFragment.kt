@@ -206,6 +206,21 @@ class PerformEnumerationFragment : Fragment(),
         binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " " +  resources.getString(R.string.team) + ")"
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+
+        if (enumerationTeam.mbTilesPath.isNotEmpty())
+        {
+            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
+
+            if (mbTilesPath != enumerationTeam.mbTilesPath)
+            {
+                TileServer.stopServer()
+            }
+
+            val editor = sharedPreferences.edit()
+            editor.putString( Keys.kMBTilesPath.value, enumerationTeam.mbTilesPath )
+            editor.commit()
+        }
+
         sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
             if (TileServer.started)
             {
@@ -214,7 +229,8 @@ class PerformEnumerationFragment : Fragment(),
                     createAnnotationManagers()
                     refreshMap()
                 }
-            } else
+            }
+            else
             {
                 TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
                     initLocationComponent()

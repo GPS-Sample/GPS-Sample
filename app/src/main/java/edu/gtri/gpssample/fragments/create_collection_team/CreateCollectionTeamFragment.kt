@@ -200,7 +200,13 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
+            var mapTilesPath = ""
+
+            sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
+                mapTilesPath = it
+            }
+
+            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), mapTilesPath, polygon, locationUuids ))
 
             collectionTeam?.let { team ->
                 enumArea.collectionTeams.add(team)
