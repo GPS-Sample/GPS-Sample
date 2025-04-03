@@ -75,11 +75,35 @@ class TCPClient
                                 NetworkUtils.readFully( payloadArray, header.payloadSize, socket, "Client" )
                             }
 
-                            val payload = String(payloadArray)
-
-                            return TCPMessage(header, payload)
+                            return TCPMessage(header, payloadArray)
                         }
                     }
+                }
+            }
+        }
+        catch (ex: Exception)
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+            delegate.connectionString("Connection failed to ${inetAddress}")
+        }
+
+        return null
+    }
+
+    fun sendDataRequestMessage(inetAddress: String, message : TCPMessage, delegate: TCPClientDelegate) : TCPHeader?
+    {
+        try
+        {
+            socket?.let {socket ->
+                socket.outputStream.write( message.toByteArray())
+                delegate.sentData("TCP message: $message to $inetAddress")
+                socket.outputStream.flush()
+
+                val headerArray = ByteArray(TCPHeader.size )
+
+                if (NetworkUtils.readFully( headerArray, TCPHeader.size, socket, "Client" ) == TCPHeader.size)
+                {
+                    return TCPHeader.fromByteArray(headerArray)
                 }
             }
         }

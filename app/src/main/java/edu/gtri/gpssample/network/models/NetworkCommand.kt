@@ -66,6 +66,9 @@ data class NetworkCommand( var command: Int, var id: Int, val parm1: String, val
 
         const val NetworkEnumerationDataResponse = 2013
 
+        const val NetworkMBTileRequest          = 1014
+        const val NetworkMBTileResponse         = 2014
+
         fun unpack( byteArray: ByteArray, length: Int ) : NetworkCommand
         {
             return Json.decodeFromString<NetworkCommand>( String( byteArray, 0, length ) )

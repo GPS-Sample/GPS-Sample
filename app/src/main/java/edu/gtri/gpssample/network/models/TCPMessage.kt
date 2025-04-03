@@ -18,7 +18,8 @@ data class TCPHeader(val command : Int, val payloadSize : Int)
         const val key : String = "PUT HASH HERE"
         const val size = 4 + key.length + 4
 
-        fun fromByteArray(byteArray : ByteArray) : TCPHeader? {
+        fun fromByteArray(byteArray : ByteArray) : TCPHeader?
+        {
             val byteBuffer = ByteBuffer.wrap(byteArray)
             byteBuffer.position(0)
             val command = byteBuffer.int
@@ -36,62 +37,39 @@ data class TCPHeader(val command : Int, val payloadSize : Int)
     }
 }
 
+data class TCPMessage(val command : Int, val payload : ByteArray)
+{
+    constructor( header : TCPHeader, payload : ByteArray) : this(header.command, payload)
 
-data class TCPMessage(val command : Int, val payload : String?) {
+    val header = TCPHeader(command, payload.size)
 
-    constructor(header : TCPHeader, payload : String) : this(header.command, payload)
-
-    var header : TCPHeader = TCPHeader(command, payload?.toByteArray()?.size ?: 0)
-    fun toByteArray(): ByteArray? {
-        // need to deal with string encoding
-        val payloadBuffer = payload?.toByteArray()
+    fun toByteArray(): ByteArray?
+    {
         val keyBuffer = TCPHeader.key.toByteArray()
 
-        val size: Int = 4 + 4 + TCPHeader.key.length + (payload?.toByteArray()?.size ?: 0)
-//        val adjusted  = size - (payload?.length ?: 0)
-//        Log.d("XXXXXXXX ", "SIZE ${size} and adjusted ${adjusted}")
-//        Log.d("XXXXXXXX", "${payload?.toByteArray()?.size}")
-//        Log.d("XXXXXXXX", "payload size in header ${header.payloadSize}")
+        val size: Int = 4 + 4 + TCPHeader.key.length + payload.size
 
         val byteBuffer = ByteBuffer.allocate(size)
             .putInt(header.command)
             .put(keyBuffer)
             .putInt(header.payloadSize)
-            .put(payloadBuffer)
+            .put(payload)
 
-//        if(header.command == 2002)
-//        {
-//            val message = fromByteArray(byteBuffer.array())
-//            Log.d("xxxxxxx", "response ${message?.payload}")
-//        }
         return byteBuffer.array()
     }
-    companion object
+
+    fun toHeaderByteArray( payloadSize: Int ): ByteArray
     {
-        fun createMD5(input:String): String {
-            val md = MessageDigest.getInstance("MD5")
-            return BigInteger(1, md.digest(input.toByteArray())).toString(16).padStart(32, '0')
-        }
+        val header = TCPHeader(command, payloadSize)
+        val keyBuffer = TCPHeader.key.toByteArray()
 
-        fun fromByteArray(byteArray : ByteArray) : TCPMessage?
-        {
-            val byteBuffer = ByteBuffer.wrap(byteArray)
-            byteBuffer.position(0)
-            val command = byteBuffer.int
-            byteBuffer.position(Int.SIZE_BYTES)
-            val keyBytes : ByteArray = ByteArray(TCPHeader.key.length)
-            byteBuffer.get(keyBytes)
-            val key = String(keyBytes)
-            byteBuffer.position(Int.SIZE_BYTES + TCPHeader.key.length)
-            val payloadLength = byteBuffer.int
-            val payloadBytes = ByteArray(payloadLength)
-            byteBuffer.get(payloadBytes)
-            // check
-            if(key == TCPHeader.key) {
-                return TCPMessage(command, String(payloadBytes))
-            }
-            return null
-        }
+        val size: Int = 4 + 4 + TCPHeader.key.length
+
+        val byteBuffer = ByteBuffer.allocate(size)
+            .putInt(header.command)
+            .put(keyBuffer)
+            .putInt(payloadSize)
+
+        return byteBuffer.array()
     }
-
 }

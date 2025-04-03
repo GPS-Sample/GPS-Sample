@@ -149,8 +149,7 @@ class TCPServer
                         NetworkUtils.readFully( payloadArray, header.payloadSize, socket, "Server" )
                     }
 
-                    val payload = String(payloadArray)
-                    val tcpMessage = TCPMessage(header, payload)
+                    val tcpMessage = TCPMessage(header, payloadArray)
                     delegate.didReceiveTCPMessage( tcpMessage, socket )
                 }
             }

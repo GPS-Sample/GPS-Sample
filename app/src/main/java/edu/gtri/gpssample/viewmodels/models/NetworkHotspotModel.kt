@@ -30,6 +30,7 @@ import edu.gtri.gpssample.constants.NetworkStatus
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
+import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
@@ -40,6 +41,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import java.io.File
+import java.io.FileInputStream
+import java.io.OutputStream
 import java.net.InetAddress
 import java.net.Socket
 
@@ -198,14 +202,14 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 message.payload?.let { payload ->
 
                     // send response
-                    val retMessage = TCPMessage(NetworkCommand.NetworkDeviceRegistrationResponse, "")
+                    val retMessage = TCPMessage(NetworkCommand.NetworkDeviceRegistrationResponse, ByteArray(0 ))
 
                     socket.outputStream.write( retMessage.toByteArray())
                     socket.outputStream.flush()
 
                     val v1 = NetworkConnectionViewModel(socket)
 
-                    v1.updateName(payload)
+                    v1.updateName(String(payload))
 
                     _activity?.let{activity ->
                         v1.updateConnection(activity.getString(R.string.connected))
@@ -241,11 +245,40 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 {
                     config?.let { config->
                         val packedConfig = config.packMinimal()
-                        val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig )
+                        val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig.toByteArray() )
                         val byteArray = tcpMessage.toByteArray()
                         socket.outputStream.write(byteArray)
                         socket.outputStream.flush()
                         Log.d( "xxx", "Server: wrote ${byteArray!!.size}")
+                    }
+                }
+            }
+
+            NetworkCommand.NetworkMBTileRequest ->
+            {
+                val chunkSize = 1024 * 1024
+                val mbTilesFile = File( String( message.payload ))
+
+                if (mbTilesFile.exists())
+                {
+                    val fileSize = mbTilesFile.length()
+                    var bytesRead = 0
+
+                    FileInputStream(mbTilesFile).use { inputStream ->
+                        val tcpMessage = TCPMessage(NetworkCommand.NetworkMBTileResponse, ByteArray(0))
+                        socket.outputStream.write( tcpMessage.toHeaderByteArray( fileSize.toInt()))
+
+                        while (bytesRead < fileSize) {
+                            val remaining = fileSize - bytesRead
+                            val bytesToRead = if (remaining < chunkSize) remaining.toInt() else chunkSize
+                            val buffer = ByteArray(bytesToRead)
+                            val numRead = inputStream.read(buffer)
+                            if (numRead == -1) break
+                            socket.outputStream.write( buffer )
+                            bytesRead += numRead
+                        }
+
+                        socket.outputStream.flush()
                     }
                 }
             }
@@ -260,7 +293,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
 
                 message.payload?.let { payload ->
-                    val config = Config.unpack( payload, encryptionPassword )
+                    val config = Config.unpack( String(payload), encryptionPassword )
 
                     if (config == null)
                     {

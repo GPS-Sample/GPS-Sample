@@ -25,10 +25,12 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.network.*
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.*
+import java.io.File
 import java.lang.Thread.sleep
 import java.net.InetAddress
 
@@ -119,7 +121,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
             app?.user?.let { user ->
 
                 val payload = user.name
-                val message = TCPMessage(NetworkCommand.NetworkDeviceRegistrationRequest, payload)
+                val message = TCPMessage(NetworkCommand.NetworkDeviceRegistrationRequest, payload.toByteArray())
                 networkInfo?.let { networkInfo ->
                     val response = client.sendMessage(networkInfo.serverIP, message, this@NetworkClientModel)
                     // validate response
@@ -153,7 +155,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
     private fun sendConfigRequestCommand()
     {
-        val message = TCPMessage(NetworkCommand.NetworkConfigRequest, "")
+        var message = TCPMessage(NetworkCommand.NetworkConfigRequest, ByteArray(0 ))
+
         networkInfo?.let { networkInfo ->
             val response = client.sendMessage(networkInfo.serverIP, message, this)
             response?.let {
@@ -163,7 +166,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                 {
                     response.payload?.let { payload ->
 
-                        Config.unpack(payload, encryptionPassword)?.let { config ->
+                        Config.unpack(String(payload), encryptionPassword)?.let { config ->
 
                             DAO.instance().writableDatabase.beginTransaction()
 
@@ -172,10 +175,54 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                             DAO.instance().writableDatabase.setTransactionSuccessful()
                             DAO.instance().writableDatabase.endTransaction()
 
+                            // fetch mbTiles
+
+                            val tilePaths = ArrayList<String>()
+
+                            for (enumArea in config.enumAreas)
+                            {
+                                for (enumerationTeam in enumArea.enumerationTeams)
+                                {
+                                    if (enumerationTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( enumerationTeam.mbTilesPath ))
+                                    {
+                                        tilePaths.add( enumerationTeam.mbTilesPath )
+                                    }
+                                }
+
+                                for (collectionTeam in enumArea.collectionTeams)
+                                {
+                                    if (collectionTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( collectionTeam.mbTilesPath ))
+                                    {
+                                        tilePaths.add( collectionTeam.mbTilesPath )
+                                    }
+                                }
+
+                                for (tilePath in tilePaths)
+                                {
+                                    message = TCPMessage(NetworkCommand.NetworkMBTileRequest, tilePath.toByteArray())
+
+                                    client.sendDataRequestMessage(networkInfo.serverIP, message, this )?.let { header ->
+                                        var bytesRead = 0
+                                        val chunkSize = 1024 * 1024
+                                        val fileSize = header.payloadSize
+                                        val mbTilesFile = File( tilePath )
+
+                                        client.socket?.let { socket ->
+                                            while (bytesRead < fileSize) {
+                                                val remaining = fileSize - bytesRead
+                                                val bytesToRead = if (remaining < chunkSize) remaining else chunkSize
+                                                val buffer = ByteArray(bytesToRead)
+                                                NetworkUtils.readFully( buffer, bytesToRead, socket, "Server" )
+                                                mbTilesFile.appendBytes( buffer )
+                                                bytesRead += bytesToRead
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             configurationDelegate?.configurationReceived(config)
                             _dataReceived.postValue(NetworkStatus.DataReceived)
-
-                            sleep(kDialogTimeout)
                             connectDelegate?.didReceiveConfiguration(false)
                         } ?: run {
                             _dataReceived.postValue(NetworkStatus.DataReceivedError)
@@ -193,7 +240,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
             networkInfo?.let { networkInfo ->
                 val payload = config.pack()
 
-                val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload)
+                val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload.toByteArray())
                 client.sendMessage(networkInfo.serverIP, message, this, false)
 
                 sleep( 1000 )

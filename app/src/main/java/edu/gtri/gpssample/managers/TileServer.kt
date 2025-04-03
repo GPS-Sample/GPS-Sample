@@ -31,25 +31,27 @@ import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import fi.iki.elonen.NanoHTTPD
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import kotlin.io.path.name
 
 class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
-    private val db: SQLiteDatabase
+    private lateinit var db: SQLiteDatabase
     data class Bounds(val minLon: Double, val minLat: Double, val maxLon: Double, val maxLat: Double)
 
     init
     {
         val mbtilesFile = File( mbtilesPath )
 
-        if (!mbtilesFile.exists()) throw IllegalArgumentException("MBTiles file not found!")
+        if (mbtilesFile.exists())
+        {
+            db = SQLiteDatabase.openDatabase(mbtilesFile.path, null, SQLiteDatabase.OPEN_READONLY)
 
-        db = SQLiteDatabase.openDatabase(mbtilesFile.path, null, SQLiteDatabase.OPEN_READONLY)
+            start()
 
-        start()
-
-        instance = this
+            instance = this
+        }
     }
 
     override fun serve( session: IHTTPSession ): Response

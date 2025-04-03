@@ -238,8 +238,10 @@ class PerformEnumerationFragment : Fragment(),
                     refreshMap()
                 }
             }
-        } ?: run {
-            // no tiles have been loaded, no need to start the server, just load the default map style
+        }
+
+        if (!TileServer.started)
+        {
             TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                 initLocationComponent()
                 createAnnotationManagers()
