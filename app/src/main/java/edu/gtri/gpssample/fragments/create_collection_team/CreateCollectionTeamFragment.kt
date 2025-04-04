@@ -50,6 +50,7 @@ import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
+import java.io.File
 import java.util.*
 
 class CreateCollectionTeamFragment : Fragment(),
@@ -200,13 +201,20 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            var mapTilesPath = ""
+            var mbTilesPath = ""
+            var mbTilesSize: Long = 0
 
             sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-                mapTilesPath = it
+                val mbTilesFile = File( it )
+                if (mbTilesFile.exists() && mbTilesFile.length() > 0)
+                {
+                    mbTilesPath = it
+                    mbTilesSize = mbTilesFile.length()
+                }
             }
 
-            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), mapTilesPath, polygon, locationUuids ))
+            val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam(
+                CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), mbTilesPath, mbTilesSize, polygon, locationUuids ))
 
             collectionTeam?.let { team ->
                 enumArea.collectionTeams.add(team)

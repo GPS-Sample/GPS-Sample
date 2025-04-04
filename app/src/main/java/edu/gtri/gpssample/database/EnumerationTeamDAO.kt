@@ -86,6 +86,7 @@ class EnumerationTeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_UUID, enumerationTeam.enumAreaUuid )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_NAME, enumerationTeam.name )
         values.put( DAO.COLUMN_ENUMERATION_TEAM_MBTILESPATH, enumerationTeam.mbTilesPath )
+        values.put( DAO.COLUMN_ENUMERATION_TEAM_MBTILESSIZE, enumerationTeam.mbTilesSize )
     }
 
     fun exists( enumerationTeam: EnumerationTeam ): Boolean
@@ -103,8 +104,9 @@ class EnumerationTeamDAO(private var dao: DAO)
         val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_NAME))
         val mbTilesPath = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_MBTILESPATH))
+        val mbTilesSize = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_MBTILESSIZE))
 
-        val enumerationTeam = EnumerationTeam(uuid, creationDate, enumAreaUuid, name, mbTilesPath, ArrayList<LatLon>(), ArrayList<String>())
+        val enumerationTeam = EnumerationTeam(uuid, creationDate, enumAreaUuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<String>())
 
         enumerationTeam.polygon = DAO.latLonDAO.getLatLonsWithEnumerationTeamId( enumerationTeam.uuid )
         enumerationTeam.locationUuids = DAO.locationDAO.getEnumerationTeamLocationUuids( enumerationTeam )

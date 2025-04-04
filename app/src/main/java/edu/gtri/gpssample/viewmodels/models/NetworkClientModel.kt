@@ -177,35 +177,41 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
                             // fetch mbTiles
 
-                            val tilePaths = ArrayList<String>()
+                            val tilePaths = ArrayList<Pair<String,Long>>()
 
                             for (enumArea in config.enumAreas)
                             {
                                 for (enumerationTeam in enumArea.enumerationTeams)
                                 {
-                                    if (enumerationTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( enumerationTeam.mbTilesPath ))
+                                    if (enumerationTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( enumerationTeam.mbTilesPath, enumerationTeam.mbTilesSize )))
                                     {
-                                        tilePaths.add( enumerationTeam.mbTilesPath )
+                                        tilePaths.add( Pair( enumerationTeam.mbTilesPath, enumerationTeam.mbTilesSize ))
                                     }
                                 }
 
                                 for (collectionTeam in enumArea.collectionTeams)
                                 {
-                                    if (collectionTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( collectionTeam.mbTilesPath ))
+                                    if (collectionTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( collectionTeam.mbTilesPath, collectionTeam.mbTilesSize )))
                                     {
-                                        tilePaths.add( collectionTeam.mbTilesPath )
+                                        tilePaths.add( Pair( collectionTeam.mbTilesPath, collectionTeam.mbTilesSize ))
                                     }
                                 }
 
                                 for (tilePath in tilePaths)
                                 {
-                                    message = TCPMessage(NetworkCommand.NetworkMBTileRequest, tilePath.toByteArray())
+                                    val mbTilesFile = File( tilePath.first )
+
+                                    if (mbTilesFile.exists() && mbTilesFile.length() == tilePath.second)
+                                    {
+                                        continue
+                                    }
+
+                                    message = TCPMessage(NetworkCommand.NetworkMBTileRequest, tilePath.first.toByteArray())
 
                                     client.sendDataRequestMessage(networkInfo.serverIP, message, this )?.let { header ->
                                         var bytesRead = 0
                                         val chunkSize = 1024 * 1024
                                         val fileSize = header.payloadSize
-                                        val mbTilesFile = File( tilePath )
 
                                         client.socket?.let { socket ->
                                             while (bytesRead < fileSize) {

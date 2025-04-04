@@ -86,6 +86,7 @@ class CollectionTeamDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_UUID, collectionTeam.enumAreaUuid )
         values.put( DAO.COLUMN_COLLECTION_TEAM_NAME, collectionTeam.name )
         values.put( DAO.COLUMN_COLLECTION_TEAM_MBTILESPATH, collectionTeam.mbTilesPath )
+        values.put( DAO.COLUMN_COLLECTION_TEAM_MBTILESSIZE, collectionTeam.mbTilesSize )
     }
 
     fun exists(collectionTeam: CollectionTeam): Boolean
@@ -109,8 +110,9 @@ class CollectionTeamDAO(private var dao: DAO)
         val enum_area_uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_NAME))
         val mbTilesPath = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_MBTILESPATH))
+        val mbTilesSize = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_MBTILESSIZE))
 
-        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, mbTilesPath, ArrayList<LatLon>(), ArrayList<String>())
+        val collectionTeam = CollectionTeam(uuid, creationDate, enum_area_uuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<String>())
 
         collectionTeam.polygon = DAO.latLonDAO.getLatLonsWithCollectionTeamId( collectionTeam.uuid )
         collectionTeam.locationUuids = DAO.locationDAO.getCollectionTeamLocationUuids( collectionTeam )

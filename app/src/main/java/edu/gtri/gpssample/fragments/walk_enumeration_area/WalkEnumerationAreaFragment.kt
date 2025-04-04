@@ -70,6 +70,7 @@ import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
+import java.io.File
 import java.util.*
 
 class WalkEnumerationAreaFragment : Fragment(),
@@ -501,17 +502,22 @@ class WalkEnumerationAreaFragment : Fragment(),
                 val enumArea = EnumArea( config.uuid, name2, vertices, mapTileRegion )
                 config.enumAreas.add( enumArea )
 
-                var mapTilesPath = ""
+                var mbTilesPath = ""
+                var mbTilesSize: Long = 0
 
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-
                 sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-                    mapTilesPath = it
+                    val mbTilesFile = File( it )
+                    if (mbTilesFile.exists() && mbTilesFile.length() > 0)
+                    {
+                        mbTilesPath = it
+                        mbTilesSize = mbTilesFile.length()
+                    }
                 }
 
                 DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                     config.enumAreas[0].let { enumArea ->
-                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", mapTilesPath, enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
+                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", mbTilesPath, mbTilesSize, enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
                             enumArea.enumerationTeams.add( enumerationTeam )
                         }
                     }

@@ -182,6 +182,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_ENUMERATION_TEAM_NAME + " TEXT" + "," +
                     COLUMN_ENUMERATION_TEAM_MBTILESPATH + " TEXT" + "," +
+                    COLUMN_ENUMERATION_TEAM_MBTILESSIZE + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableEnumerationTeam)
@@ -193,6 +194,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_COLLECTION_TEAM_NAME + " TEXT" + "," +
                     COLUMN_COLLECTION_TEAM_MBTILESPATH + " TEXT" + "," +
+                    COLUMN_COLLECTION_TEAM_MBTILESSIZE + " INTEGER" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableCollectionTeam)
@@ -534,11 +536,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_ENUMERATION_TEAM = "enumeration_team"
         const val COLUMN_ENUMERATION_TEAM_NAME = "enumeration_team_name"
         const val COLUMN_ENUMERATION_TEAM_MBTILESPATH = "enumeration_team_mbtilespath"
+        const val COLUMN_ENUMERATION_TEAM_MBTILESSIZE = "enumeration_team_mbtilessize"
 
         // CollectionTeam Table
         const val TABLE_COLLECTION_TEAM = "collection_team"
         const val COLUMN_COLLECTION_TEAM_NAME = "collection_team_name"
         const val COLUMN_COLLECTION_TEAM_MBTILESPATH = "collection_team_mbtilespath"
+        const val COLUMN_COLLECTION_TEAM_MBTILESSIZE = "collection_team_mbtilessize"
 
         // Location Table
         const val TABLE_LOCATION = "location"
@@ -729,6 +733,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 311
+        const val DATABASE_VERSION = 312
     }
 }
