@@ -201,24 +201,30 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                                 {
                                     val mbTilesFile = File( tilePath.first )
 
-                                    if (mbTilesFile.exists() && mbTilesFile.length() == tilePath.second)
+                                    if (mbTilesFile.exists())
                                     {
-                                        continue
+                                        if (mbTilesFile.length() == tilePath.second) {
+                                            continue
+                                        }
+                                        else
+                                        {
+                                            mbTilesFile.delete()
+                                        }
                                     }
 
                                     message = TCPMessage(NetworkCommand.NetworkMBTileRequest, tilePath.first.toByteArray())
 
                                     client.sendDataRequestMessage(networkInfo.serverIP, message, this )?.let { header ->
-                                        var bytesRead = 0
-                                        val chunkSize = 1024 * 1024
+                                        var bytesRead: Long = 0
+                                        val chunkSize: Long = 1024 * 1024
                                         val fileSize = header.payloadSize
 
                                         client.socket?.let { socket ->
                                             while (bytesRead < fileSize) {
                                                 val remaining = fileSize - bytesRead
                                                 val bytesToRead = if (remaining < chunkSize) remaining else chunkSize
-                                                val buffer = ByteArray(bytesToRead)
-                                                NetworkUtils.readFully( buffer, bytesToRead, socket, "Server" )
+                                                val buffer = ByteArray(bytesToRead.toInt())
+                                                NetworkUtils.readFully( buffer, bytesToRead.toInt(), socket, "Server" )
                                                 mbTilesFile.appendBytes( buffer )
                                                 bytesRead += bytesToRead
                                             }

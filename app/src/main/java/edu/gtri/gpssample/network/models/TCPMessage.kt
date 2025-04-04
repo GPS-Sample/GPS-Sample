@@ -7,16 +7,14 @@
 
 package edu.gtri.gpssample.network.models
 
-import java.math.BigInteger
-import java.security.MessageDigest
 import java.nio.ByteBuffer
 
-data class TCPHeader(val command : Int, val payloadSize : Int)
+data class TCPHeader(val command : Int, val payloadSize : Long)
 {
     companion object
     {
-        const val key : String = "PUT HASH HERE"
-        const val size = 4 + key.length + 4
+        const val KEY : String = "PUT HASH HERE"
+        const val SIZE = Int.SIZE_BYTES + KEY.length + Long.SIZE_BYTES
 
         fun fromByteArray(byteArray : ByteArray) : TCPHeader?
         {
@@ -24,12 +22,12 @@ data class TCPHeader(val command : Int, val payloadSize : Int)
             byteBuffer.position(0)
             val command = byteBuffer.int
             byteBuffer.position(Int.SIZE_BYTES)
-            val keyBytes: ByteArray = ByteArray(TCPHeader.key.length)
+            val keyBytes = ByteArray(TCPHeader.KEY.length)
             byteBuffer.get(keyBytes)
             val key = String(keyBytes)
-            byteBuffer.position(Int.SIZE_BYTES + TCPHeader.key.length)
-            val payloadSize = byteBuffer.int
-            if(key == TCPHeader.key) {
+            byteBuffer.position(Int.SIZE_BYTES + KEY.length)
+            val payloadSize = byteBuffer.long
+            if (key == KEY) {
                 return TCPHeader(command, payloadSize)
             }
             return null;
@@ -41,34 +39,30 @@ data class TCPMessage(val command : Int, val payload : ByteArray)
 {
     constructor( header : TCPHeader, payload : ByteArray) : this(header.command, payload)
 
-    val header = TCPHeader(command, payload.size)
+    val header = TCPHeader(command, payload.size.toLong())
 
     fun toByteArray(): ByteArray?
     {
-        val keyBuffer = TCPHeader.key.toByteArray()
+        val keyBuffer = TCPHeader.KEY.toByteArray()
 
-        val size: Int = 4 + 4 + TCPHeader.key.length + payload.size
-
-        val byteBuffer = ByteBuffer.allocate(size)
+        val byteBuffer = ByteBuffer.allocate(TCPHeader.SIZE + payload.size )
             .putInt(header.command)
             .put(keyBuffer)
-            .putInt(header.payloadSize)
+            .putLong(header.payloadSize)
             .put(payload)
 
         return byteBuffer.array()
     }
 
-    fun toHeaderByteArray( payloadSize: Int ): ByteArray
+    fun toHeaderByteArray( payloadSize: Long ): ByteArray
     {
         val header = TCPHeader(command, payloadSize)
-        val keyBuffer = TCPHeader.key.toByteArray()
+        val keyBuffer = TCPHeader.KEY.toByteArray()
 
-        val size: Int = 4 + 4 + TCPHeader.key.length
-
-        val byteBuffer = ByteBuffer.allocate(size)
+        val byteBuffer = ByteBuffer.allocate( TCPHeader.SIZE )
             .putInt(header.command)
             .put(keyBuffer)
-            .putInt(payloadSize)
+            .putLong(payloadSize)
 
         return byteBuffer.array()
     }

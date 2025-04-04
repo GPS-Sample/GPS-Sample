@@ -61,18 +61,19 @@ class TCPClient
 
                 if (waitForResponse)
                 {
-                    val headerArray = ByteArray(TCPHeader.size )
+                    val headerArray = ByteArray(TCPHeader.SIZE)
 
-                    if (NetworkUtils.readFully( headerArray, TCPHeader.size, socket, "Client" ) == TCPHeader.size)
+                    if (NetworkUtils.readFully( headerArray, TCPHeader.SIZE, socket, "Client" ) == TCPHeader.SIZE)
                     {
                         val header = TCPHeader.fromByteArray(headerArray)
+
                         if (header != null)
                         {
-                            val payloadArray = ByteArray(header.payloadSize)
+                            val payloadArray = ByteArray(header.payloadSize.toInt())
 
                             if(header.payloadSize > 0)
                             {
-                                NetworkUtils.readFully( payloadArray, header.payloadSize, socket, "Client" )
+                                NetworkUtils.readFully( payloadArray, header.payloadSize.toInt(), socket, "Client" )
                             }
 
                             return TCPMessage(header, payloadArray)
@@ -99,9 +100,9 @@ class TCPClient
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()
 
-                val headerArray = ByteArray(TCPHeader.size )
+                val headerArray = ByteArray(TCPHeader.SIZE )
 
-                if (NetworkUtils.readFully( headerArray, TCPHeader.size, socket, "Client" ) == TCPHeader.size)
+                if (NetworkUtils.readFully( headerArray, TCPHeader.SIZE, socket, "Client" ) == TCPHeader.SIZE)
                 {
                     return TCPHeader.fromByteArray(headerArray)
                 }

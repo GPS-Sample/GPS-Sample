@@ -128,13 +128,13 @@ class TCPServer
         {
             delegate.clientConnected(socket)
 
-            val headerArray = ByteArray(TCPHeader.size)
+            val headerArray = ByteArray(TCPHeader.SIZE)
 
             while(socket.isConnected)
             {
-                val numRead = NetworkUtils.readFully( headerArray, TCPHeader.size, socket, "Server" )
+                val numRead = NetworkUtils.readFully( headerArray, TCPHeader.SIZE, socket, "Server" )
 
-                if (numRead != TCPHeader.size)
+                if (numRead != TCPHeader.SIZE)
                 {
                     break
                 }
@@ -142,11 +142,11 @@ class TCPServer
                 val header = TCPHeader.fromByteArray(headerArray)
 
                 header?.let { header ->
-                    val payloadArray = ByteArray(header.payloadSize)
+                    val payloadArray = ByteArray(header.payloadSize.toInt())
 
                     if(header.payloadSize > 0)
                     {
-                        NetworkUtils.readFully( payloadArray, header.payloadSize, socket, "Server" )
+                        NetworkUtils.readFully( payloadArray, header.payloadSize.toInt(), socket, "Server" )
                     }
 
                     val tcpMessage = TCPMessage(header, payloadArray)

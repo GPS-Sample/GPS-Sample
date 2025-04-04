@@ -266,7 +266,7 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                     FileInputStream(mbTilesFile).use { inputStream ->
                         val tcpMessage = TCPMessage(NetworkCommand.NetworkMBTileResponse, ByteArray(0))
-                        socket.outputStream.write( tcpMessage.toHeaderByteArray( fileSize.toInt()))
+                        socket.outputStream.write( tcpMessage.toHeaderByteArray( fileSize ))
 
                         while (bytesRead < fileSize) {
                             val remaining = fileSize - bytesRead
