@@ -172,6 +172,11 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
             val tempFile = File( activity.cacheDir, fileName )
 
+            if (tempFile.exists())
+            {
+                tempFile.delete()
+            }
+
             activity.contentResolver.openInputStream(uri)?.use { inputStream ->
                 FileOutputStream(tempFile).use { outputStream ->
                     inputStream.copyTo( outputStream )
