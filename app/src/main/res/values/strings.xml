@@ -392,6 +392,7 @@
     <string name="mapbox_streets">Mapbox Streets</string>
     <string name="satellite_streets">Satellite Streets</string>
     <string name="import_map_tiles">Import Map Tiles</string>
+    <string name="re_import">The selected file has already been imported.  Would you like to re-import it now?</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

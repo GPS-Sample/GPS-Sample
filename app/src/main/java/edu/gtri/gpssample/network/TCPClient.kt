@@ -57,7 +57,7 @@ class TCPClient
                 delegate.sentData("TCP message: $message to $inetAddress")
                 socket.outputStream.flush()
 
-                Log.d( "xxx", "Client: wrote ${message.toByteArray()!!.size}")
+//                Log.d( "xxx", "Client: wrote ${message.toByteArray()!!.size}")
 
                 if (waitForResponse)
                 {

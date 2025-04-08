@@ -116,6 +116,20 @@ class CreateCollectionTeamFragment : Fragment(),
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
 
+        if (enumArea.mbTilesPath.isNotEmpty())
+        {
+            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
+
+            if (mbTilesPath != enumArea.mbTilesPath)
+            {
+                TileServer.stopServer()
+            }
+
+            val editor = sharedPreferences.edit()
+            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
+            editor.commit()
+        }
+
         sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
             if (TileServer.started)
             {
@@ -201,20 +215,8 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            var mbTilesPath = ""
-            var mbTilesSize: Long = 0
-
-            sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-                val mbTilesFile = File( it )
-                if (mbTilesFile.exists() && mbTilesFile.length() > 0)
-                {
-                    mbTilesPath = it
-                    mbTilesSize = mbTilesFile.length()
-                }
-            }
-
             val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam(
-                CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), mbTilesPath, mbTilesSize, polygon, locationUuids ))
+                CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
 
             collectionTeam?.let { team ->
                 enumArea.collectionTeams.add(team)
@@ -511,7 +513,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_map_style, menu)
+        inflater.inflate(R.menu.menu_map_style_min, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean

@@ -16,6 +16,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.text.InputType
 import android.util.Log
 import android.util.Property
@@ -32,6 +33,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -86,6 +88,7 @@ import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
+import java.io.File
 import java.util.*
 
 class CreateEnumerationAreaFragment : Fragment(),
@@ -846,24 +849,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 addPolygon(enumArea)
             }
 
-            if (allEnumAreas.isNotEmpty())
-            {
-                val enumArea = allEnumAreas[0]
-                val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-
-                currentZoomLevel?.let { currentZoomLevel ->
-                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(currentZoomLevel)
-                        .center(point)
-                        .build()
-
-                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
-                }
-            }
-
-            binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 
@@ -1218,14 +1204,27 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 val mapTileRegion = MapTileRegion( northEast, southWest )
 
+                var mbTilesPath = ""
+                var mbTilesSize: Long = 0
+
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
+                    val mbTilesFile = File( it )
+                    if (mbTilesFile.exists() && mbTilesFile.length() > 0)
+                    {
+                        mbTilesPath = it
+                        mbTilesSize = mbTilesFile.length()
+                    }
+                }
+
                 if (name.isEmpty())
                 {
-                    val enumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", vertices, mapTileRegion )
+                    val enumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", mbTilesPath, mbTilesSize, vertices, mapTileRegion )
                     unsavedEnumAreas.add( enumArea )
                 }
                 else
                 {
-                    val enumArea = EnumArea( config.uuid, name, vertices, mapTileRegion )
+                    val enumArea = EnumArea( config.uuid, name, mbTilesPath, mbTilesSize, vertices, mapTileRegion )
                     unsavedEnumAreas.add( enumArea )
                 }
 
@@ -1256,6 +1255,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             createEnumAreaLocation = true
             droppedPointAnnotations.clear()
             binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            refreshMap()
         }
         else if (tag is MapTileRegion)
         {
@@ -1268,6 +1268,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             unsavedEnumAreas.remove( tag )
             config.enumAreas.remove( tag )
             DAO.enumAreaDAO.delete( tag )
+            refreshMap()
         }
         else if (tag is PointAnnotation)
         {
@@ -1283,9 +1284,17 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 DAO.locationDAO.delete(location)
             }
-        }
 
-        refreshMap()
+            refreshMap()
+        }
+        else if (tag is Uri)
+        {
+            TileServer.stopServer()
+
+            TileServer.startServer( activity!!, tag, binding.mapView.getMapboxMap()) {
+                refreshMap()
+            }
+        }
     }
 
     override fun stylePackLoaded( error: String )
@@ -1463,7 +1472,20 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                         val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                        val enumArea = EnumArea(config.uuid, name, vertices, mapTileRegion )
+                        var mbTilesPath = ""
+                        var mbTilesSize: Long = 0
+
+                        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                        sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
+                            val mbTilesFile = File( it )
+                            if (mbTilesFile.exists() && mbTilesFile.length() > 0)
+                            {
+                                mbTilesPath = it
+                                mbTilesSize = mbTilesFile.length()
+                            }
+                        }
+
+                        val enumArea = EnumArea(config.uuid, name, mbTilesPath, mbTilesSize, vertices, mapTileRegion )
 
                         unsavedEnumAreas.add(enumArea)
                     }
@@ -1682,11 +1704,20 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.stopServer()
+            if (TileServer.fileExists( activity!!, uri ))
+            {
+                ConfirmationDialog( activity, resources.getString(R.string.oops),
+                    resources.getString(R.string.re_import),
+                    resources.getString(R.string.no),
+                    resources.getString(R.string.yes), uri, this)
+            }
+            else
+            {
+                TileServer.stopServer()
 
-            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
-                refreshMap()
-                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+                    refreshMap()
+                }
             }
         }
     }
@@ -1704,7 +1735,6 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
             refreshMap()
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

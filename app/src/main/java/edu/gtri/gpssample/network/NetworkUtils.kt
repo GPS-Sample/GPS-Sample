@@ -24,19 +24,19 @@ object NetworkUtils {
 
         while( totalRead < totalNeeded)
         {
-            Log.d( "xxx", "${tag}: waiting on read..." )
+//            Log.d( "xxx", "${tag}: waiting on read..." )
             val numRead = socket.inputStream.read( byteArray, totalRead, totalNeeded - totalRead )
-            Log.d( "xxx", "${tag}: read ${numRead}")
+//            Log.d( "xxx", "${tag}: read ${numRead}")
             if (numRead < 0)
             {
                 break
             }
 
             totalRead += numRead
-            Log.d( "xxx", "${tag}: needed/read = ${totalNeeded} / ${totalRead}")
+//            Log.d( "xxx", "${tag}: needed/read = ${totalNeeded} / ${totalRead}")
         }
 
-        Log.d( "xxx", "${tag}: done reading.")
+//        Log.d( "xxx", "${tag}: done reading.")
 
         return totalRead
     }

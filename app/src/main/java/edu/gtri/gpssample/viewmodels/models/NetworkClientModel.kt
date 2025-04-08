@@ -25,6 +25,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.network.*
 import edu.gtri.gpssample.network.models.NetworkCommand
@@ -181,20 +182,14 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
                             for (enumArea in config.enumAreas)
                             {
-                                for (enumerationTeam in enumArea.enumerationTeams)
+                                if (enumArea.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize )))
                                 {
-                                    if (enumerationTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( enumerationTeam.mbTilesPath, enumerationTeam.mbTilesSize )))
-                                    {
-                                        tilePaths.add( Pair( enumerationTeam.mbTilesPath, enumerationTeam.mbTilesSize ))
-                                    }
+                                    tilePaths.add( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize ))
                                 }
 
-                                for (collectionTeam in enumArea.collectionTeams)
+                                if (enumArea.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize )))
                                 {
-                                    if (collectionTeam.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( collectionTeam.mbTilesPath, collectionTeam.mbTilesSize )))
-                                    {
-                                        tilePaths.add( Pair( collectionTeam.mbTilesPath, collectionTeam.mbTilesSize ))
-                                    }
+                                    tilePaths.add( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize ))
                                 }
 
                                 for (tilePath in tilePaths)

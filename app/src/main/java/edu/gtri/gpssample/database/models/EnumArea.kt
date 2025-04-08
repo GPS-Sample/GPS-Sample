@@ -27,6 +27,8 @@ data class EnumArea (
     var creationDate: Long,
     var configUuid: String,
     var name: String,
+    var mbTilesPath: String,
+    var mbTilesSize: Long,
     var vertices: ArrayList<LatLon>,
     var locations: ArrayList<Location>,
     var enumerationTeams: ArrayList<EnumerationTeam>,
@@ -35,11 +37,11 @@ data class EnumArea (
     var selectedCollectionTeamUuid: String,
     var mapTileRegion: MapTileRegion?)
 {
-    constructor( uuid: String, creationDate: Long, configUuid: String, name: String, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String )
-            : this(uuid, creationDate, configUuid, name, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid, null)
+    constructor( uuid: String, creationDate: Long, configUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String )
+            : this(uuid, creationDate, configUuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid,null)
 
-    constructor( configUuid: String, name: String, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
-            : this(UUID.randomUUID().toString(), Date().time, configUuid, name, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion)
+    constructor( configUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
+            : this(UUID.randomUUID().toString(), Date().time, configUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion)
 
     fun equals( other: EnumArea ): Boolean
     {

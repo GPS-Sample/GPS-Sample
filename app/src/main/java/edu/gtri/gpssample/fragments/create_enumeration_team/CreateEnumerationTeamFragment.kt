@@ -45,6 +45,7 @@ import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
 import edu.gtri.gpssample.dialogs.SelectMapTilesDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.managers.TileServer.Companion.mbTilesPath
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.locationtech.jts.geom.Coordinate
@@ -105,6 +106,20 @@ class CreateEnumerationTeamFragment : Fragment(),
         }
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+
+        if (enumArea.mbTilesPath.isNotEmpty())
+        {
+            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
+
+            if (mbTilesPath != enumArea.mbTilesPath)
+            {
+                TileServer.stopServer()
+            }
+
+            val editor = sharedPreferences.edit()
+            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
+            editor.commit()
+        }
 
         sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
             if (TileServer.started)
@@ -194,20 +209,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                 }
             }
 
-            var mbTilesPath = ""
-            var mbTilesSize: Long = 0
-
-            sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-                val mbTilesFile = File( it )
-                if (mbTilesFile.exists() && mbTilesFile.length() > 0)
-                {
-                    mbTilesPath = it
-                    mbTilesSize = mbTilesFile.length()
-                }
-            }
-
-            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam(
-                EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), mbTilesPath, mbTilesSize, polygon, locationUuids ))
+            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
 
             enumerationTeam?.let { team ->
                 enumArea.enumerationTeams.add(team)
@@ -450,7 +452,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_map_style, menu)
+        inflater.inflate(R.menu.menu_map_style_min, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean

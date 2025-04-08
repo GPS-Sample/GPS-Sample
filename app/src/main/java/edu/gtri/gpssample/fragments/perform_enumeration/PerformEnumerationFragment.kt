@@ -207,17 +207,17 @@ class PerformEnumerationFragment : Fragment(),
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
 
-        if (enumerationTeam.mbTilesPath.isNotEmpty())
+        if (enumArea.mbTilesPath.isNotEmpty())
         {
             val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
 
-            if (mbTilesPath != enumerationTeam.mbTilesPath)
+            if (mbTilesPath != enumArea.mbTilesPath)
             {
                 TileServer.stopServer()
             }
 
             val editor = sharedPreferences.edit()
-            editor.putString( Keys.kMBTilesPath.value, enumerationTeam.mbTilesPath )
+            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
             editor.commit()
         }
 

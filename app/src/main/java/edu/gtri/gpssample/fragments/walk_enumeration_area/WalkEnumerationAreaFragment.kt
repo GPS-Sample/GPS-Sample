@@ -499,9 +499,6 @@ class WalkEnumerationAreaFragment : Fragment(),
 
                 val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                val enumArea = EnumArea( config.uuid, name2, vertices, mapTileRegion )
-                config.enumAreas.add( enumArea )
-
                 var mbTilesPath = ""
                 var mbTilesSize: Long = 0
 
@@ -515,9 +512,12 @@ class WalkEnumerationAreaFragment : Fragment(),
                     }
                 }
 
+                val enumArea = EnumArea( config.uuid, name2, mbTilesPath, mbTilesSize, vertices, mapTileRegion )
+                config.enumAreas.add( enumArea )
+
                 DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                     config.enumAreas[0].let { enumArea ->
-                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", mbTilesPath, mbTilesSize, enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
+                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
                             enumArea.enumerationTeams.add( enumerationTeam )
                         }
                     }
@@ -818,12 +818,22 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.stopServer()
+            if (TileServer.fileExists( activity!!, uri ))
+            {
+                ConfirmationDialog( activity, resources.getString(R.string.oops),
+                    resources.getString(R.string.re_import),
+                    resources.getString(R.string.no),
+                    resources.getString(R.string.yes), uri, this)
+            }
+            else
+            {
+                TileServer.stopServer()
 
-            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+                    createAnnotationManagers()
+                    refreshMap()
+                    MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                }
             }
         }
     }

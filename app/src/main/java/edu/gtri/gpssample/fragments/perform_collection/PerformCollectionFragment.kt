@@ -249,17 +249,17 @@ class PerformCollectionFragment : Fragment(),
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
 
-        if (collectionTeam.mbTilesPath.isNotEmpty())
+        if (enumArea.mbTilesPath.isNotEmpty())
         {
             val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
 
-            if (mbTilesPath != collectionTeam.mbTilesPath)
+            if (mbTilesPath != enumArea.mbTilesPath)
             {
                 TileServer.stopServer()
             }
 
             val editor = sharedPreferences.edit()
-            editor.putString( Keys.kMBTilesPath.value, collectionTeam.mbTilesPath )
+            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
             editor.commit()
         }
 
@@ -1274,7 +1274,7 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_map_style, menu)
+        inflater.inflate(R.menu.menu_map_style_min, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean

@@ -148,6 +148,21 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
         }
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+
+        if (enumArea.mbTilesPath.isNotEmpty())
+        {
+            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
+
+            if (mbTilesPath != enumArea.mbTilesPath)
+            {
+                TileServer.stopServer()
+            }
+
+            val editor = sharedPreferences.edit()
+            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
+            editor.commit()
+        }
+
         sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
             if (TileServer.started)
             {
