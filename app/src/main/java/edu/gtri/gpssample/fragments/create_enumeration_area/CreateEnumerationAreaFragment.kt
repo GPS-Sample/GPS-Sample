@@ -333,30 +333,30 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         binding.overlayView.setOnTouchListener(this)
 
-        binding.mapTileRegionButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation|| addHousehold)
-            {
-                return@setOnClickListener
-            }
-
-            if (createMapTileCache)
-            {
-                createMapTileCache = false
-                binding.overlayView.visibility = View.GONE
-                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-            }
-            else
-            {
-                createMapTileCache = true
-                polyLinePoints.clear()
-                polylineAnnotation?.let { it ->
-                    it.points = polyLinePoints
-                    polylineAnnotationManager?.update(it)
-                }
-                binding.overlayView.visibility = View.VISIBLE
-                binding.mapTileRegionButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-        }
+//        binding.mapTileRegionButton.setOnClickListener {
+//            if (createEnumAreaBoundary || createEnumAreaLocation|| addHousehold)
+//            {
+//                return@setOnClickListener
+//            }
+//
+//            if (createMapTileCache)
+//            {
+//                createMapTileCache = false
+//                binding.overlayView.visibility = View.GONE
+//                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
+//            }
+//            else
+//            {
+//                createMapTileCache = true
+//                polyLinePoints.clear()
+//                polylineAnnotation?.let { it ->
+//                    it.points = polyLinePoints
+//                    polylineAnnotationManager?.update(it)
+//                }
+//                binding.overlayView.visibility = View.VISIBLE
+//                binding.mapTileRegionButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+//            }
+//        }
 
         binding.mapTileCacheButton.setOnClickListener {
             if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache)
@@ -997,46 +997,45 @@ class CreateEnumerationAreaFragment : Fragment(),
         p1?.let { p1 ->
             if (p1.action == MotionEvent.ACTION_UP)
             {
-                if (polyLinePoints.size < 2)
-                {
-                    createMapTileCache = false
-                    binding.overlayView.visibility = View.GONE
-                    binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-
-                    return false
-                }
-
-                val points = ArrayList<Coordinate>()
-
-                // close the polygon
-                polyLinePoints.add( polyLinePoints[0])
-
-                // convert ArrayList<Point> to ArrayList<Coordinate>
-                polyLinePoints.map {
-                    points.add( Coordinate( it.longitude(), it.latitude()))
-                }
-
-                polylineAnnotation?.let {
-                    it.points = polyLinePoints
-                    polylineAnnotationManager?.update(it)
-                }
-
-                createMapTileCache = false
-                binding.overlayView.visibility = View.GONE
-                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-
-                val vertices = ArrayList<LatLon>()
-
-                val points1 = ArrayList<Coordinate>()
-
-                var creationDate = Date().time
-
-                polylineAnnotation?.points?.map { point ->
-                    vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
-                    points1.add( Coordinate( point.longitude(), point.latitude()))
-                }
-
-                // TODO: Finish this!
+//                if (polyLinePoints.size  < 2)
+//                {
+//                    createMapTileCache = false
+//                    binding.overlayView.visibility = View.GONE
+//                    binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
+//
+//                    return false
+//                }
+//
+//                val points = ArrayList<Coordinate>()
+//
+//                // close the polygon
+//                polyLinePoints.add( polyLinePoints[0])
+//
+//                // convert ArrayList<Point> to ArrayList<Coordinate>
+//                polyLinePoints.map {
+//                    points.add( Coordinate( it.longitude(), it.latitude()))
+//                }
+//
+//                polylineAnnotation?.let {
+//                    it.points = polyLinePoints
+//                    polylineAnnotationManager?.update(it)
+//                }
+//
+//                createMapTileCache = false
+//                binding.overlayView.visibility = View.GONE
+//                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
+//
+//                val vertices = ArrayList<LatLon>()
+//
+//                val points1 = ArrayList<Coordinate>()
+//
+//                var creationDate = Date().time
+//
+//                polylineAnnotation?.points?.map { point ->
+//                    vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+//                    points1.add( Coordinate( point.longitude(), point.latitude()))
+//                }
+//
 //                val latLngBounds = GeoUtils.findGeobounds(vertices)
 //                val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
 //                val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )

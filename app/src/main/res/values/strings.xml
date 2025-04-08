@@ -278,7 +278,6 @@
     <string name="tile_pack_download_failed">"Map Tile Pack Download Failed"</string>
     <string name="download_map_tiles_now">"Would you like to download map tiles now?"</string>
     <string name="delete_map_tile_region">"Are you sure you want to delete this Map Tile Region?"</string>
-    <string name="import_enumeration_area">"Import Enumeration Area"</string>
     <string name="create_enumeration_area">"Create Enumeration Area"</string>
     <string name="add_household">"Add Household"</string>
     <string name="define_map_tile_cache_region">"Define map tile cache region"</string>
@@ -393,6 +392,7 @@
     <string name="satellite_streets">Satellite Streets</string>
     <string name="import_map_tiles">Import Map Tiles</string>
     <string name="re_import">The selected file has already been imported.  Would you like to re-import it now?</string>
+    <string name="import_enumeration_area">"Import GeoJSON or MBTiles"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

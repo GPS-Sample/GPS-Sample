@@ -122,14 +122,14 @@
                     android:insetBottom="0dp"
                     android:background="@drawable/add_house_blue" />
 
-                <Button
-                    android:id="@+id/map_tile_region_button"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:background="@drawable/crop" />
+<!--                <Button-->
+<!--                    android:id="@+id/map_tile_region_button"-->
+<!--                    android:layout_width="50dp"-->
+<!--                    android:layout_height="50dp"-->
+<!--                    android:layout_margin="5dp"-->
+<!--                    android:insetTop="0dp"-->
+<!--                    android:insetBottom="0dp"-->
+<!--                    android:background="@drawable/crop" />-->
 
                 <Button
                     android:id="@+id/map_tile_cache_button"
