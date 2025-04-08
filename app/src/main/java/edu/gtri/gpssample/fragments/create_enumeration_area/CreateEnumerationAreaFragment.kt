@@ -125,6 +125,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
     private val kAttachMBTiles: Int = 2
+    private val kImportTag: Int = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -255,11 +256,11 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
-            val intent = Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-
-            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
+            ConfirmationDialog( activity,
+                resources.getString(R.string.select_file_type), "",
+                resources.getString(R.string.import_geojson),
+                resources.getString(R.string.import_mbtiles),
+                kImportTag,this@CreateEnumerationAreaFragment, true)
         }
 
         binding.createEnumAreaButton.setOnClickListener {
@@ -1239,6 +1240,14 @@ class CreateEnumerationAreaFragment : Fragment(),
         {
             inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), tag.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
         }
+        else if (tag == kImportTag)
+        {
+            val intent = Intent()
+                .setType("application/geo+json")
+                .setAction(Intent.ACTION_GET_CONTENT)
+
+            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
+        }
     }
 
     override fun didSelectSecondButton(tag: Any?)
@@ -1289,6 +1298,10 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         }
         else if (tag == kAttachMBTiles)
+        {
+            filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+        }
+        else if (tag == kImportTag)
         {
             filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
         }
@@ -1347,37 +1360,43 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
-        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
-        {
-            data?.data?.let { uri ->
-                activity!!.getContentResolver().openInputStream(uri)?.let {
-                    val text = it.bufferedReader().readText()
+        try {
+            if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
+            {
+                data?.data?.let { uri ->
+                    activity!!.getContentResolver().openInputStream(uri)?.let {
+                        val text = it.bufferedReader().readText()
 
-                    val featureCollection = FeatureCollection.fromJson( text )
+                        val featureCollection = FeatureCollection.fromJson( text )
 
-                    if (featureCollection.features.isNotEmpty())
-                    {
-                        val feature = featureCollection.features[0]
+                        if (featureCollection.features.isNotEmpty())
+                        {
+                            val feature = featureCollection.features[0]
 
-                        feature.geometry?.let { geometry ->
-                            val keys = ArrayList(feature.properties.keys)
-                            when (geometry) {
-                                is MultiPolygon -> {
-                                    DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
+                            feature.geometry?.let { geometry ->
+                                val keys = ArrayList(feature.properties.keys)
+                                when (geometry) {
+                                    is MultiPolygon -> {
+                                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
+                                    }
+                                    is Point -> {
+                                        checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), keys, text, feature, this )
+                                    }
+                                    else -> {}
                                 }
-                                is Point -> {
-                                    checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), keys, text, feature, this )
-                                }
-                                else -> {}
                             }
                         }
-                    }
-                    else
-                    {
-                        dropdownDidSelectSaveButton( text, "" )
+                        else
+                        {
+                            dropdownDidSelectSaveButton( text, "" )
+                        }
                     }
                 }
             }
+        } catch( ex: Exception )
+        {
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+            Log.d( "xxx", ex.stackTraceToString())
         }
     }
 
