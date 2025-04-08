@@ -10,32 +10,19 @@ package edu.gtri.gpssample.fragments.createsample
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolygonOptions
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.SamplingMethod
@@ -43,11 +30,9 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
-import edu.gtri.gpssample.databinding.FragmentHotspotBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.dialogs.LaunchSurveyDialog
 import edu.gtri.gpssample.dialogs.MapLegendDialog
-import edu.gtri.gpssample.dialogs.SelectMapTilesDialog
+import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -55,7 +40,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import java.util.*
 
-class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDialog.ConfirmationDialogDelegate, SelectMapTilesDialog.SelectMapTilesDialogDelegate
+class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDialog.ConfirmationDialogDelegate, SelectionDialog.SelectionDialogDelegate
 {
     private lateinit var study: Study
     private lateinit var config: Config
@@ -438,7 +423,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
             R.id.select_map_tiles ->
             {
-                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
+                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
@@ -457,7 +442,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
         }
     }
 
-    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    override fun didMakeSelection( selection: String, tag: Int )
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 

@@ -8,74 +8,46 @@
 package edu.gtri.gpssample.fragments.review_collection
 
 import android.animation.ValueAnimator
-import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
-import android.util.Log.ASSERT
 import android.view.*
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.clearFragmentResultListener
-import androidx.fragment.app.setFragmentResultListener
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.model.*
-import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
-import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
-import com.mapbox.maps.viewannotation.viewAnnotationOptions
-import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
-import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.databinding.FragmentReviewCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionAdapter
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
-import edu.gtri.gpssample.utils.TestUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
-import org.json.JSONObject
-import java.io.File
-import java.io.FileWriter
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
-class ReviewCollectionFragment : Fragment(), OnCameraChangeListener, SelectMapTilesDialog.SelectMapTilesDialogDelegate
+class ReviewCollectionFragment : Fragment(), OnCameraChangeListener, SelectionDialog.SelectionDialogDelegate
 {
     private lateinit var user: User
     private lateinit var enumArea: EnumArea
@@ -740,7 +712,7 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener, SelectMapTi
 
             R.id.select_map_tiles ->
             {
-                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
+                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
@@ -759,7 +731,7 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener, SelectMapTi
         }
     }
 
-    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    override fun didMakeSelection( selection: String, tag: Int )
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 

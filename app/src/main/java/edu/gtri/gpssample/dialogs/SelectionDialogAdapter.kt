@@ -1,24 +1,26 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.dialogs
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationAdapter.ViewHolder
 
-class SelectMapTilesDialogAdapter(var items: List<String>, var delegate: SelectMapTilesDialogAdapterDelegate) : RecyclerView.Adapter<SelectMapTilesDialogAdapter.ViewHolder>()
+class SelectionDialogAdapter(var items: List<String>, var delegate: SelectionDialogAdapterDelegate) : RecyclerView.Adapter<SelectionDialogAdapter.ViewHolder>()
 {
-    interface SelectMapTilesDialogAdapterDelegate
+    interface SelectionDialogAdapterDelegate
     {
-        fun didSelectMapTiles( selection: String )
+        fun adapterDidMakeSelection( selection: String )
     }
 
     override fun getItemCount() = items.size
@@ -44,7 +46,7 @@ class SelectMapTilesDialogAdapter(var items: List<String>, var delegate: SelectM
 
         holder.textView.setOnClickListener {
             selection = item
-            delegate.didSelectMapTiles( selection )
+            delegate.adapterDidMakeSelection( selection )
         }
     }
 

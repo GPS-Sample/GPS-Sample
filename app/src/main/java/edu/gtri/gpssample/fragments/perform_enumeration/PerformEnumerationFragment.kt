@@ -28,21 +28,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.*
-import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.extension.style.expressions.dsl.generated.has
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
-import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.BuildConfig
@@ -57,7 +52,6 @@ import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
-import edu.gtri.gpssample.utils.TestUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
@@ -77,7 +71,7 @@ class PerformEnumerationFragment : Fragment(),
     MapboxManager.MapTileCacheDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    SelectMapTilesDialog.SelectMapTilesDialogDelegate
+    SelectionDialog.SelectionDialogDelegate
 {
     private lateinit var user: User
     private lateinit var config: Config
@@ -1336,7 +1330,7 @@ class PerformEnumerationFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
+                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
@@ -1355,7 +1349,7 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    override fun didMakeSelection( selection: String, tag: Int )
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 

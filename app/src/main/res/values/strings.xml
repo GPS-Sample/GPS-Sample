@@ -393,6 +393,7 @@
     <string name="import_map_tiles">Import Map Tiles</string>
     <string name="re_import">The selected file has already been imported.  Would you like to re-import it now?</string>
     <string name="import_enumeration_area">"Import GeoJSON or MBTiles"</string>
+    <string name="attach_mbtiles">Would you like to attach MBTiles to this area?</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>

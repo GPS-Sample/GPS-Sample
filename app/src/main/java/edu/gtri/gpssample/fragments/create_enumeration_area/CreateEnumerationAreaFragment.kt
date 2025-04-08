@@ -12,14 +12,10 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.text.InputType
 import android.util.Log
-import android.util.Property
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,37 +23,27 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.model.*
 import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.GeoJson
 import com.mapbox.maps.*
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
 import com.mapbox.maps.extension.style.image.image
 import com.mapbox.maps.extension.style.layers.addLayer
-import com.mapbox.maps.extension.style.layers.addLayerAt
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.layers.generated.symbolLayer
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
-import com.mapbox.maps.extension.style.sources.addSource
-import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
@@ -66,7 +52,6 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -101,7 +86,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     DropdownDialog.DropdownDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    SelectMapTilesDialog.SelectMapTilesDialogDelegate
+    SelectionDialog.SelectionDialogDelegate
 {
     private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
@@ -118,6 +103,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var createEnumAreaBoundary = false
     private var mapStyle = Style.MAPBOX_STREETS
     private var inputDialog: InputDialog? = null
+    private var selectedEnumArea: EnumArea? = null
     private val polygonHashMap = HashMap<Long,Any>()
     private var checkboxDialog: CheckboxDialog? = null
     private var point: com.mapbox.geojson.Point? = null
@@ -138,6 +124,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
+    private val kAttachMBTiles: Int = 2
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -1143,7 +1130,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (tag is EnumArea)
         {
-            tag.name = name
+            tag.name = name // handles re-name
         }
         else if (tag is Int)
         {
@@ -1181,6 +1168,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                     }
                 }
             }
+
             if (tag == kEnumAreaNameTag)
             {
                 createEnumAreaBoundary = false
@@ -1203,31 +1191,37 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                var mbTilesPath = ""
-                var mbTilesSize: Long = 0
-
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-                    val mbTilesFile = File( it )
-                    if (mbTilesFile.exists() && mbTilesFile.length() > 0)
-                    {
-                        mbTilesPath = it
-                        mbTilesSize = mbTilesFile.length()
-                    }
-                }
+//                var mbTilesPath = ""
+//                var mbTilesSize: Long = 0
+//
+//                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+//                sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
+//                    val mbTilesFile = File( it )
+//                    if (mbTilesFile.exists() && mbTilesFile.length() > 0)
+//                    {
+//                        mbTilesPath = it
+//                        mbTilesSize = mbTilesFile.length()
+//                    }
+//                }
 
                 if (name.isEmpty())
                 {
-                    val enumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", mbTilesPath, mbTilesSize, vertices, mapTileRegion )
-                    unsavedEnumAreas.add( enumArea )
+                    selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+                    unsavedEnumAreas.add( selectedEnumArea!! )
                 }
                 else
                 {
-                    val enumArea = EnumArea( config.uuid, name, mbTilesPath, mbTilesSize, vertices, mapTileRegion )
-                    unsavedEnumAreas.add( enumArea )
+                    selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
+                    unsavedEnumAreas.add( selectedEnumArea!! )
                 }
 
                 refreshMap()
+
+                ConfirmationDialog( activity, "",
+                    resources.getString(R.string.attach_mbtiles),
+                    resources.getString(R.string.no),
+                    resources.getString(R.string.yes), kAttachMBTiles, this)
+
             }
         }
     }
@@ -1293,6 +1287,10 @@ class CreateEnumerationAreaFragment : Fragment(),
             TileServer.startServer( activity!!, tag, binding.mapView.getMapboxMap()) {
                 refreshMap()
             }
+        }
+        else if (tag == kAttachMBTiles)
+        {
+            filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
         }
     }
 
@@ -1694,7 +1692,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
+                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
             }
         }
 
@@ -1705,13 +1703,28 @@ class CreateEnumerationAreaFragment : Fragment(),
         uri?.let {
             if (TileServer.fileExists( activity!!, uri ))
             {
-                ConfirmationDialog( activity, resources.getString(R.string.oops),
-                    resources.getString(R.string.re_import),
-                    resources.getString(R.string.no),
-                    resources.getString(R.string.yes), uri, this)
+                selectedEnumArea?.let {
+                    val (filePath,fileSize) = TileServer.filePathSize( activity!!, uri )
+                    it.mbTilesPath = filePath
+                    it.mbTilesSize = fileSize
+                    selectedEnumArea = null
+
+                    TileServer.stopServer()
+
+                    TileServer.startServer( activity!!, filePath, binding.mapView.getMapboxMap()) {
+                        refreshMap()
+                    }
+                }
             }
             else
             {
+                selectedEnumArea?.let {
+                    val (name, size) = TileServer.filePathSize(activity!!, uri)
+                    it.mbTilesPath = name
+                    it.mbTilesSize = size
+                    selectedEnumArea = null
+                }
+
                 TileServer.stopServer()
 
                 TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
@@ -1721,7 +1734,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    override fun didMakeSelection( selection: String, tag: Int )
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 

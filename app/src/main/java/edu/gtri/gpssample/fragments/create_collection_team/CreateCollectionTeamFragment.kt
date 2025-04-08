@@ -28,7 +28,6 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
@@ -41,7 +40,7 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
-import edu.gtri.gpssample.dialogs.SelectMapTilesDialog
+import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -50,14 +49,13 @@ import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
-import java.io.File
 import java.util.*
 
 class CreateCollectionTeamFragment : Fragment(),
     OnCameraChangeListener,
     OnMapClickListener,
     View.OnTouchListener,
-    SelectMapTilesDialog.SelectMapTilesDialogDelegate
+    SelectionDialog.SelectionDialogDelegate
 {
     private lateinit var study: Study
     private lateinit var config: Config
@@ -553,7 +551,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
+                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
@@ -572,7 +570,7 @@ class CreateCollectionTeamFragment : Fragment(),
         }
     }
 
-    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    override fun didMakeSelection( selection: String, tag: Int )
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 

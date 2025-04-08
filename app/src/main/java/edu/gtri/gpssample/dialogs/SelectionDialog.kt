@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2022-2025 Georgia Tech Research Institute
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * See the LICENSE file for the full license text.
+*/
+
 package edu.gtri.gpssample.dialogs
 
 import android.app.AlertDialog
@@ -8,32 +15,32 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
-import edu.gtri.gpssample.fragments.add_multi_household.AddMultiHouseholdAdapter
-import io.github.dellisd.spatialk.geojson.Feature
 
-class SelectMapTilesDialog : SelectMapTilesDialogAdapter.SelectMapTilesDialogAdapterDelegate
+class SelectionDialog : SelectionDialogAdapter.SelectionDialogAdapterDelegate
 {
-    interface SelectMapTilesDialogDelegate
+    interface SelectionDialogDelegate
     {
-        fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+        fun didMakeSelection( selection: String, tag: Int )
     }
 
     constructor()
     {
     }
 
+    var tag = 0
     lateinit var alertDialog: AlertDialog
-    lateinit var delegate: SelectMapTilesDialogDelegate
+    lateinit var delegate: SelectionDialogDelegate
 
-    constructor( context: Context?, items: List<String>, delegate: SelectMapTilesDialogDelegate )
+    constructor( context: Context?, items: List<String>, delegate: SelectionDialogDelegate, tag: Int = 0 )
     {
+        this.tag = tag
         this.delegate = delegate
 
         val inflater = LayoutInflater.from(context)
 
         val view = inflater.inflate(R.layout.dialog_select_map_tiles, null)
 
-        val selectMapTilesDialogAdapter = SelectMapTilesDialogAdapter( items, this )
+        val selectMapTilesDialogAdapter = SelectionDialogAdapter( items, this )
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
 
@@ -56,9 +63,9 @@ class SelectMapTilesDialog : SelectMapTilesDialogAdapter.SelectMapTilesDialogAda
         }
     }
 
-    override fun didSelectMapTiles( selection: String )
+    override fun adapterDidMakeSelection( selection: String )
     {
-        delegate.selectMapTilesDialogDidSelectSaveButton( selection )
+        delegate.didMakeSelection( selection, tag )
         alertDialog.dismiss()
     }
 }

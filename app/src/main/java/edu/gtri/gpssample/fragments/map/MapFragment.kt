@@ -46,11 +46,10 @@ import edu.gtri.gpssample.databinding.FragmentMapBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.MapHelpDialog
-import edu.gtri.gpssample.dialogs.SelectMapTilesDialog
+import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import io.github.dellisd.spatialk.geojson.dsl.point
 import java.util.ArrayList
 
 class MapFragment : Fragment(),
@@ -58,7 +57,7 @@ class MapFragment : Fragment(),
     InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    SelectMapTilesDialog.SelectMapTilesDialogDelegate
+    SelectionDialog.SelectionDialogDelegate
 {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -474,7 +473,7 @@ class MapFragment : Fragment(),
 
             R.id.select_map_tiles ->
             {
-                SelectMapTilesDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
+                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
@@ -492,7 +491,7 @@ class MapFragment : Fragment(),
         }
     }
 
-    override fun selectMapTilesDialogDidSelectSaveButton( selection: String )
+    override fun didMakeSelection( selection: String, tag: Int )
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 

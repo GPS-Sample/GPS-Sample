@@ -130,6 +130,11 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
         fun startServer( activity: Activity, mbTilesPath: String, mapboxMap: MapboxMap, completion: (()->Unit)? )
         {
+            val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
+            val editor = sharedPreferences.edit()
+            editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
+            editor.commit()
+
             instance?.let {
                 if (started)
                 {
@@ -253,6 +258,30 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
             db.close()
 
             return bounds
+        }
+
+        fun filePathSize( context: Context, uri: Uri ) : Pair<String, Long> {
+            val cursor = context.contentResolver.query(
+                uri,
+                arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE),
+                null,
+                null,
+                null
+            )
+
+            var fileSize = 0L
+            var fileName: String = ""
+
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    fileName = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+                    fileSize = it.getLong(it.getColumnIndexOrThrow(OpenableColumns.SIZE))
+                }
+            }
+
+            val tempFile = File(context.cacheDir, fileName)
+
+            return Pair( tempFile.absolutePath, fileSize )
         }
 
         fun fileExists( context: Context, uri: Uri ) : Boolean {
