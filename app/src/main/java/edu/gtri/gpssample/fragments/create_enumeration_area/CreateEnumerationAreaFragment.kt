@@ -1192,19 +1192,6 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 val mapTileRegion = MapTileRegion( northEast, southWest )
 
-//                var mbTilesPath = ""
-//                var mbTilesSize: Long = 0
-//
-//                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-//                sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-//                    val mbTilesFile = File( it )
-//                    if (mbTilesFile.exists() && mbTilesFile.length() > 0)
-//                    {
-//                        mbTilesPath = it
-//                        mbTilesSize = mbTilesFile.length()
-//                    }
-//                }
-
                 if (name.isEmpty())
                 {
                     selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
@@ -1222,7 +1209,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                     resources.getString(R.string.attach_mbtiles),
                     resources.getString(R.string.no),
                     resources.getString(R.string.yes), kAttachMBTiles, this)
-
             }
         }
     }

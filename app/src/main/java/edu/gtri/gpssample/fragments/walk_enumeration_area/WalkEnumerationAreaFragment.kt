@@ -75,6 +75,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     private var polylineAnnotation: PolylineAnnotation? = null
 
     private var inputDialog: InputDialog? = null
+    private var selectedEnumArea: EnumArea? = null
     private var startPointAnnotation : PointAnnotation? = null
 
     private var isRecording = false
@@ -92,7 +93,7 @@ class WalkEnumerationAreaFragment : Fragment(),
     private val kClearMapTag = 1
     private val kDeletePointTag = 2
     private val kEnumAreaName = 3
-    private val kEnumAreaRadius = 4
+    private val kAttachMBTiles: Int = 4
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -481,21 +482,8 @@ class WalkEnumerationAreaFragment : Fragment(),
 
                 val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                var mbTilesPath = ""
-                var mbTilesSize: Long = 0
-
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-                    val mbTilesFile = File( it )
-                    if (mbTilesFile.exists() && mbTilesFile.length() > 0)
-                    {
-                        mbTilesPath = it
-                        mbTilesSize = mbTilesFile.length()
-                    }
-                }
-
-                val enumArea = EnumArea( config.uuid, name2, mbTilesPath, mbTilesSize, vertices, mapTileRegion )
-                config.enumAreas.add( enumArea )
+                selectedEnumArea = EnumArea( config.uuid, name2, "", 0, vertices, mapTileRegion )
+                config.enumAreas.add( selectedEnumArea!! )
 
                 DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
                     config.enumAreas[0].let { enumArea ->
@@ -509,6 +497,11 @@ class WalkEnumerationAreaFragment : Fragment(),
                 binding.walkButton.isEnabled = false
                 binding.addPointButton.isEnabled = false
                 binding.deletePointButton.isEnabled = false
+
+                ConfirmationDialog( activity, "",
+                    resources.getString(R.string.attach_mbtiles),
+                    resources.getString(R.string.no),
+                    resources.getString(R.string.yes), kAttachMBTiles, this)
             }
         }
         else
@@ -596,6 +589,10 @@ class WalkEnumerationAreaFragment : Fragment(),
                     startPointAnnotation = null
                 }
             }
+        }
+        else if (tag == kAttachMBTiles)
+        {
+            filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
         }
 
         refreshMap()
@@ -802,13 +799,30 @@ class WalkEnumerationAreaFragment : Fragment(),
         uri?.let {
             if (TileServer.fileExists( activity!!, uri ))
             {
-                ConfirmationDialog( activity, resources.getString(R.string.oops),
-                    resources.getString(R.string.re_import),
-                    resources.getString(R.string.no),
-                    resources.getString(R.string.yes), uri, this)
+                selectedEnumArea?.let {
+                    val (filePath,fileSize) = TileServer.filePathSize( activity!!, uri )
+                    it.mbTilesPath = filePath
+                    it.mbTilesSize = fileSize
+                    selectedEnumArea = null
+
+                    TileServer.stopServer()
+
+                    TileServer.startServer( activity!!, filePath, binding.mapView.getMapboxMap()) {
+                        createAnnotationManagers()
+                        refreshMap()
+                        MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    }
+                }
             }
             else
             {
+                selectedEnumArea?.let {
+                    val (name, size) = TileServer.filePathSize(activity!!, uri)
+                    it.mbTilesPath = name
+                    it.mbTilesSize = size
+                    selectedEnumArea = null
+                }
+
                 TileServer.stopServer()
 
                 TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
