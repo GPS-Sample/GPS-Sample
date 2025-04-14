@@ -135,40 +135,41 @@ class WalkEnumerationAreaFragment : Fragment(),
             return
         }
 
+        if (sharedViewModel.currentZoomLevel?.value == null)
+        {
+            sharedViewModel.setCurrentZoomLevel( 16.0 )
+        }
+
         if (config.enumAreas.isNotEmpty())
         {
             binding.saveButton.isEnabled = false
             binding.walkButton.isEnabled = false
             binding.addPointButton.isEnabled = false
             binding.deletePointButton.isEnabled = false
-        }
 
-        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
+            val enumArea = config.enumAreas[0]
 
-        if (currentZoomLevel == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
+            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapView.getMapboxMap())
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-            if (TileServer.started)
+            if (enumArea.mbTilesPath.isNotEmpty())
+            {
+                TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
+                    initLocationComponent()
+                    createAnnotationManagers()
+                    refreshMap()
+                }
+            }
+            else
             {
                 TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                     initLocationComponent()
                     createAnnotationManagers()
                     refreshMap()
                 }
-            } else
-            {
-                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
-                    initLocationComponent()
-                    createAnnotationManagers()
-                    refreshMap()
-                }
             }
-        } ?: run {
-            // no tiles have been loaded, no need to start the server, just load the default map style
+        }
+        else
+        {
             TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                 initLocationComponent()
                 createAnnotationManagers()
@@ -797,38 +798,27 @@ class WalkEnumerationAreaFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            if (TileServer.fileExists( activity!!, uri ))
-            {
-                selectedEnumArea?.let {
-                    val (filePath,fileSize) = TileServer.filePathSize( activity!!, uri )
-                    it.mbTilesPath = filePath
-                    it.mbTilesSize = fileSize
-                    selectedEnumArea = null
+            selectedEnumArea?.let {
+                val (name, size) = TileServer.filePathSize(activity!!, uri)
+                it.mbTilesPath = name
+                it.mbTilesSize = size
+                selectedEnumArea = null
 
-                    TileServer.stopServer()
-
-                    TileServer.startServer( activity!!, filePath, binding.mapView.getMapboxMap()) {
+                if (TileServer.fileExists( activity!!, uri ))
+                {
+                    TileServer.startServer( activity!!, null, it.mbTilesPath, binding.mapView.getMapboxMap()) {
                         createAnnotationManagers()
                         refreshMap()
-                        MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                        TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
                     }
                 }
-            }
-            else
-            {
-                selectedEnumArea?.let {
-                    val (name, size) = TileServer.filePathSize(activity!!, uri)
-                    it.mbTilesPath = name
-                    it.mbTilesSize = size
-                    selectedEnumArea = null
-                }
-
-                TileServer.stopServer()
-
-                TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
-                    refreshMap()
-                    MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                else
+                {
+                    TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
+                        createAnnotationManagers()
+                        refreshMap()
+                        TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    }
                 }
             }
         }
@@ -838,17 +828,10 @@ class WalkEnumerationAreaFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-        editor.commit()
-
-        TileServer.stopServer()
-
-        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
             createAnnotationManagers()
             refreshMap()
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

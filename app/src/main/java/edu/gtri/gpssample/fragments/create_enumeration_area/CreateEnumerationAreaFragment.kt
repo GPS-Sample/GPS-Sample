@@ -183,33 +183,31 @@ class CreateEnumerationAreaFragment : Fragment(),
             binding.buttonLayout.visibility = View.GONE
         }
 
-        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-
-        if (currentZoomLevel == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 14.0 )
-        }
-
         binding.mapView.gestures.addOnMapClickListener(this )
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-            if (TileServer.started)
+        if (config.enumAreas.isNotEmpty())
+        {
+            val enumArea = config.enumAreas[0]
+
+            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapView.getMapboxMap())
+
+            if (enumArea.mbTilesPath.isNotEmpty())
             {
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
                     initLocationComponent()
                     refreshMap()
                 }
             }
             else
             {
-                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                     initLocationComponent()
                     refreshMap()
                 }
             }
-        } ?: run {
-            // no tiles have been loaded, no need to start the server, just load the default map style
+        }
+        else
+        {
             TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                 initLocationComponent()
                 refreshMap()
@@ -836,9 +834,9 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 addPolygon(enumArea)
             }
-
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
+
+        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun getAllEnumAreas() : ArrayList<EnumArea>
@@ -1277,9 +1275,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else if (tag is Uri)
         {
-            TileServer.stopServer()
-
-            TileServer.startServer( activity!!, tag, binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, tag, "", binding.mapView.getMapboxMap()) {
                 refreshMap()
             }
         }
@@ -1474,20 +1470,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                         val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                        var mbTilesPath = ""
-                        var mbTilesSize: Long = 0
-
-                        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                        sharedPreferences.getString( Keys.kMBTilesPath.value, "" )?.let {
-                            val mbTilesFile = File( it )
-                            if (mbTilesFile.exists() && mbTilesFile.length() > 0)
-                            {
-                                mbTilesPath = it
-                                mbTilesSize = mbTilesFile.length()
-                            }
-                        }
-
-                        val enumArea = EnumArea(config.uuid, name, mbTilesPath, mbTilesSize, vertices, mapTileRegion )
+                        val enumArea = EnumArea(config.uuid, name, "", 0, vertices, mapTileRegion )
 
                         unsavedEnumAreas.add(enumArea)
                     }
@@ -1706,34 +1689,26 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            if (TileServer.fileExists( activity!!, uri ))
-            {
-                selectedEnumArea?.let {
-                    val (filePath,fileSize) = TileServer.filePathSize( activity!!, uri )
-                    it.mbTilesPath = filePath
-                    it.mbTilesSize = fileSize
-                    selectedEnumArea = null
+            selectedEnumArea?.let {
+                val (filePath, fileSize) = TileServer.filePathSize(activity!!, uri)
 
-                    TileServer.stopServer()
+                it.mbTilesPath = filePath
+                it.mbTilesSize = fileSize
+                selectedEnumArea = null
 
-                    TileServer.startServer( activity!!, filePath, binding.mapView.getMapboxMap()) {
+                if (TileServer.fileExists( activity!!, uri ))
+                {
+                    TileServer.startServer( activity!!, null, filePath, binding.mapView.getMapboxMap()) {
                         refreshMap()
+                        TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
                     }
                 }
-            }
-            else
-            {
-                selectedEnumArea?.let {
-                    val (name, size) = TileServer.filePathSize(activity!!, uri)
-                    it.mbTilesPath = name
-                    it.mbTilesSize = size
-                    selectedEnumArea = null
-                }
-
-                TileServer.stopServer()
-
-                TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
-                    refreshMap()
+                else
+                {
+                    TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
+                        refreshMap()
+                        TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    }
                 }
             }
         }
@@ -1743,15 +1718,9 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-        editor.commit()
-
-        TileServer.stopServer()
-
-        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
             refreshMap()
+            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

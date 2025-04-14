@@ -134,9 +134,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-
-        if (currentZoomLevel == null)
+        if (sharedViewModel.currentZoomLevel?.value == null)
         {
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
@@ -203,38 +201,13 @@ class PerformEnumerationFragment : Fragment(),
 
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
-
-            if (mbTilesPath != enumArea.mbTilesPath)
-            {
-                TileServer.stopServer()
-            }
-
-            val editor = sharedPreferences.edit()
-            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
-            editor.commit()
-        }
-
-        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-            if (TileServer.started)
-            {
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    initLocationComponent()
-                    createAnnotationManagers()
-                    refreshMap()
-                }
-            }
-            else
-            {
-                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
-                    initLocationComponent()
-                    createAnnotationManagers()
-                    refreshMap()
-                }
+            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
+                initLocationComponent()
+                createAnnotationManagers()
+                refreshMap()
             }
         }
-
-        if (!TileServer.started)
+        else
         {
             TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                 initLocationComponent()
@@ -1339,12 +1312,10 @@ class PerformEnumerationFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.stopServer()
-
-            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
-                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
             }
         }
     }
@@ -1353,17 +1324,10 @@ class PerformEnumerationFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-        editor.commit()
-
-        TileServer.stopServer()
-
-        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
             createAnnotationManagers()
             refreshMap()
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

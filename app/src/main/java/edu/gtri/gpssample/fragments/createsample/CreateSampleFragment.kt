@@ -132,38 +132,15 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
             SamplingMethod.None -> TODO()
         }
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
-
-            if (mbTilesPath != enumArea.mbTilesPath)
-            {
-                TileServer.stopServer()
+            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
+                createAnnotationManagers()
+                refreshMap()
             }
-
-            val editor = sharedPreferences.edit()
-            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
-            editor.commit()
         }
-
-        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-            if (TileServer.started)
-            {
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
-                    refreshMap()
-                }
-            } else
-            {
-                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
-                    refreshMap()
-                }
-            }
-        } ?: run {
-            // no tiles have been loaded, no need to start the server, just load the default map style
+        else
+        {
             TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
@@ -432,12 +409,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.stopServer()
-
-            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
-                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
             }
         }
     }
@@ -446,17 +421,10 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-        editor.commit()
-
-        TileServer.stopServer()
-
-        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
             createAnnotationManagers()
             refreshMap()
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

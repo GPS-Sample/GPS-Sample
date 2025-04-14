@@ -98,9 +98,7 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener, SelectionD
     {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-
-        if (currentZoomLevel == null)
+        if (sharedViewModel.currentZoomLevel?.value == null)
         {
             sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
@@ -133,25 +131,16 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener, SelectionD
         binding.recyclerView.layoutManager = LinearLayoutManager(activity )
         binding.recyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-            if (TileServer.started)
-            {
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    initLocationComponent()
-                    createAnnotationManagers()
-                    refreshMap()
-                }
-            } else
-            {
-                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
-                    initLocationComponent()
-                    createAnnotationManagers()
-                    refreshMap()
-                }
+        if (enumArea.mbTilesPath.isNotEmpty())
+        {
+            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
+                initLocationComponent()
+                createAnnotationManagers()
+                refreshMap()
             }
-        } ?: run {
-            // no tiles have been loaded, no need to start the server, just load the default map style
+        }
+        else
+        {
             TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                 initLocationComponent()
                 createAnnotationManagers()
@@ -277,21 +266,11 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener, SelectionD
         pointHashMap.clear()
 
         addPolygon( enumArea.vertices, "" )
+        MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapView.getMapboxMap())
 
         for (enumerationTeam in enumArea.enumerationTeams)
         {
             addPolygon( enumerationTeam.polygon, enumerationTeam.name )
-        }
-
-        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-            val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            val cameraPosition = CameraOptions.Builder()
-                .zoom(currentZoomLevel)
-                .center(point)
-                .build()
-
-            binding.mapView.getMapboxMap().setCamera(cameraPosition)
         }
 
         for (location in enumArea.locations)
@@ -607,12 +586,10 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener, SelectionD
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.stopServer()
-
-            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
-                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
             }
         }
     }
@@ -621,17 +598,10 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener, SelectionD
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-        editor.commit()
-
-        TileServer.stopServer()
-
-        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
             createAnnotationManagers()
             refreshMap()
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

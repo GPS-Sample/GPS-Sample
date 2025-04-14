@@ -33,9 +33,11 @@ import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.managers.TileServer.Companion.getBounds
+import edu.gtri.gpssample.utils.GeoUtils
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.concurrent.atomic.AtomicInteger
@@ -405,24 +407,16 @@ class MapboxManager( var context: Context )
             return points
         }
 
-        fun centerMap( context: Context, mapboxMap: MapboxMap, zoomLevel: Double? = null )
+        fun centerMap(enumArea: EnumArea, zoomLevel: Double?, mapboxMap: MapboxMap)
         {
-            val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+            val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(zoomLevel)
+                .center(point)
+                .build()
 
-            val zLevel = if (zoomLevel == null) 8.0 else zoomLevel
-
-            sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-                getBounds( mbTilesPath )?.let { bounds ->
-                    val latLngBounds = LatLngBounds(LatLng(bounds.minLat, bounds.minLon), LatLng(bounds.maxLat, bounds.maxLon))
-                    val point = com.mapbox.geojson.Point.fromLngLat(latLngBounds.center.longitude,latLngBounds.center.latitude)
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(zLevel)
-                        .center(point)
-                        .build()
-
-                    mapboxMap.setCamera(cameraPosition)
-                }
-            }
+            mapboxMap.setCamera(cameraPosition)
         }
     }
 }

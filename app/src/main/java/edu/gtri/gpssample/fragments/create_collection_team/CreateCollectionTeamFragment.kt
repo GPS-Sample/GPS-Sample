@@ -112,51 +112,27 @@ class CreateCollectionTeamFragment : Fragment(),
             study = _study
         }
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            val mbTilesPath = sharedPreferences.getString( Keys.kMBTilesPath.value, null)
-
-            if (mbTilesPath != enumArea.mbTilesPath)
-            {
-                TileServer.stopServer()
+            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
+                createAnnotationManagers()
+                refreshMap()
             }
-
-            val editor = sharedPreferences.edit()
-            editor.putString( Keys.kMBTilesPath.value, enumArea.mbTilesPath )
-            editor.commit()
         }
-
-        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-            if (TileServer.started)
-            {
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
-                    refreshMap()
-                }
-            } else
-            {
-                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
-                    refreshMap()
-                }
-            }
-        } ?: run {
-            // no tiles have been loaded, no need to start the server, just load the default map style
+        else
+        {
             TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
             }
         }
 
-        mapboxManager = MapboxManager.instance( activity!! )
-
-        val currentZoomLevel = sharedViewModel.currentZoomLevel?.value
-        if (currentZoomLevel == null)
+        if (sharedViewModel.currentZoomLevel?.value == null)
         {
-            sharedViewModel.setCurrentZoomLevel( 14.0 )
+            sharedViewModel.setCurrentZoomLevel( 16.0 )
         }
+
+        mapboxManager = MapboxManager.instance( activity!! )
 
         binding.mapView.gestures.addOnMapClickListener(this )
 
@@ -256,6 +232,7 @@ class CreateCollectionTeamFragment : Fragment(),
         {
             mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
             mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
+            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapView.getMapboxMap())
 
             for (collectionTeam in enumArea.collectionTeams)
             {
@@ -277,17 +254,6 @@ class CreateCollectionTeamFragment : Fragment(),
                     val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
                     mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, collectionTeam.name, "#80FFFFFF" )
                 }
-            }
-
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                val cameraPosition = CameraOptions.Builder()
-                    .zoom(currentZoomLevel)
-                    .center(point)
-                    .build()
-
-                binding.mapView.getMapboxMap().setCamera(cameraPosition)
             }
 
             for (location in enumArea.locations)
@@ -560,12 +526,10 @@ class CreateCollectionTeamFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.stopServer()
-
-            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
-                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
             }
         }
     }
@@ -574,17 +538,10 @@ class CreateCollectionTeamFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-        editor.commit()
-
-        TileServer.stopServer()
-
-        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
             createAnnotationManagers()
             refreshMap()
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

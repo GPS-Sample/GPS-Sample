@@ -38,6 +38,9 @@ import kotlin.io.path.name
 class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private lateinit var db: SQLiteDatabase
+
+    private var started: Boolean = false
+
     data class Bounds(val minLon: Double, val minLat: Double, val maxLon: Double, val maxLat: Double)
 
     init
@@ -99,66 +102,45 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
         super.stop()
     }
 
+    private fun stopServer()
+    {
+        instance?.let {
+            if (it.started)
+            {
+                it.stop()
+                it.db.close()
+            }
+        }
+    }
+
     companion object
     {
-        var started: Boolean = false
-        var mbTilesPath: String? = null
-        var instance: TileServer? = null
         var rasterLayer: RasterLayer? = null
         var rasterSource: RasterSource? = null
 
-        fun startServer( activity: Activity, uri: Uri, mapboxMap: MapboxMap, completion: (()->Unit)? )
+        private var mbTilesPath: String = ""
+        private var instance: TileServer? = null
+
+        fun startServer( activity: Activity, uri: Uri?, tilesPath: String, mapboxMap: MapboxMap, completion: (()->Unit)? )
         {
             val busyIndicatorDialog = BusyIndicatorDialog( activity, activity.resources.getString(edu.gtri.gpssample.R.string.loading_mapbox_tiles), null, false )
 
             Thread {
-                mbTilesPath = copyMbTilesToCache( activity, uri )
+                mbTilesPath = tilesPath
 
-                val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
-                val editor = sharedPreferences.edit()
-                editor.putString( Keys.kMBTilesPath.value, mbTilesPath!! )
-                editor.commit()
+                uri?.let {
+                    mbTilesPath = copyMbTilesToCache( activity, uri )
+                }
 
-                instance = TileServer( mbTilesPath!! )
+                instance?.stopServer()
+
+                instance = TileServer( mbTilesPath )
 
                 activity.runOnUiThread {
                     loadMapboxStyle( activity, mapboxMap, completion )
                     busyIndicatorDialog.alertDialog.cancel()
                 }
             }.start()
-        }
-
-        fun startServer( activity: Activity, mbTilesPath: String, mapboxMap: MapboxMap, completion: (()->Unit)? )
-        {
-            val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
-            val editor = sharedPreferences.edit()
-            editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-            editor.commit()
-
-            instance?.let {
-                if (started)
-                {
-                    loadMapboxStyle( activity, mapboxMap, completion )
-                    return
-                }
-            }
-
-            mbTilesPath.let {
-                instance = TileServer( mbTilesPath )
-
-                loadMapboxStyle( activity, mapboxMap, completion )
-            }
-        }
-
-        fun stopServer()
-        {
-            instance?.let {
-                if (started)
-                {
-                    instance!!.stop()
-                    instance!!.db.close()
-                }
-            }
         }
 
         private fun copyMbTilesToCache( activity: Activity, uri: Uri ): String
@@ -236,28 +218,33 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
         fun getBounds(mbtilesPath: String): Bounds?
         {
-            val db = SQLiteDatabase.openDatabase( mbtilesPath, null, SQLiteDatabase.OPEN_READONLY )
-            var bounds: Bounds? = null
-
-            val cursor = db.rawQuery("SELECT value FROM metadata WHERE name = 'bounds'", null)
-
-            // returns minLon,minLat,maxLon,maxLat
-
-            if (cursor.moveToFirst())
+            if (mbtilesPath.isNotEmpty())
             {
-                val boundsStr = cursor.getString(0)
-                val parts = boundsStr.split(",")
+                val db = SQLiteDatabase.openDatabase( mbtilesPath, null, SQLiteDatabase.OPEN_READONLY )
+                var bounds: Bounds? = null
 
-                if (parts.size == 4)
+                val cursor = db.rawQuery("SELECT value FROM metadata WHERE name = 'bounds'", null)
+
+                // returns minLon,minLat,maxLon,maxLat
+
+                if (cursor.moveToFirst())
                 {
-                    bounds = Bounds(parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble(), parts[3].toDouble())
+                    val boundsStr = cursor.getString(0)
+                    val parts = boundsStr.split(",")
+
+                    if (parts.size == 4)
+                    {
+                        bounds = Bounds(parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble(), parts[3].toDouble())
+                    }
                 }
+
+                cursor.close()
+                db.close()
+
+                return bounds
             }
 
-            cursor.close()
-            db.close()
-
-            return bounds
+            return null
         }
 
         fun filePathSize( context: Context, uri: Uri ) : Pair<String, Long> {
@@ -306,6 +293,22 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
             val tempFile = File(context.cacheDir, fileName)
 
             return tempFile.exists() && tempFile.length() == fileSize
+        }
+
+        fun centerMap( mapboxMap: MapboxMap, zoomLevel: Double? = null )
+        {
+            val zLevel = if (zoomLevel == null) 8.0 else zoomLevel
+
+            getBounds( mbTilesPath )?.let { bounds ->
+                val latLngBounds = LatLngBounds(LatLng(bounds.minLat, bounds.minLon), LatLng(bounds.maxLat, bounds.maxLon))
+                val point = com.mapbox.geojson.Point.fromLngLat(latLngBounds.center.longitude,latLngBounds.center.latitude)
+                val cameraPosition = CameraOptions.Builder()
+                    .zoom(zLevel)
+                    .center(point)
+                    .build()
+
+                mapboxMap.setCamera(cameraPosition)
+            }
         }
     }
 

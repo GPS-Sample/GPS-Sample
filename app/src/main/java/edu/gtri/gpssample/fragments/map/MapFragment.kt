@@ -104,27 +104,9 @@ class MapFragment : Fragment(),
             lifecycleOwner = viewLifecycleOwner
         }
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        sharedPreferences.getString( Keys.kMBTilesPath.value, null)?.let { mbTilesPath ->
-            if (TileServer.started)
-            {
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    initLocationComponent()
-                    createAnnotationManagers()
-                }
-            } else
-            {
-                TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
-                    initLocationComponent()
-                    createAnnotationManagers()
-                }
-            }
-        } ?: run {
-            // no tiles have been loaded, no need to start the server, just load the default map style
-            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                initLocationComponent()
-                createAnnotationManagers()
-            }
+        TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+            initLocationComponent()
+            createAnnotationManagers()
         }
 
         mapboxManager = MapboxManager.instance( activity!! )
@@ -482,11 +464,9 @@ class MapFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.stopServer()
-
-            TileServer.startServer( activity!!, uri, binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
                 createAnnotationManagers()
-                MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
             }
         }
     }
@@ -495,16 +475,9 @@ class MapFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString( Keys.kMBTilesPath.value, mbTilesPath )
-        editor.commit()
-
-        TileServer.stopServer()
-
-        TileServer.startServer( activity!!, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
             createAnnotationManagers()
-            MapboxManager.centerMap( activity!!, binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 
