@@ -179,13 +179,6 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         mapboxManager = MapboxManager.instance( activity!! )
 
-        val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-            .withPoints(polyLinePoints)
-            .withLineColor("#ee4e8b")
-            .withLineWidth(5.0)
-
-        polylineAnnotation = polylineAnnotationManager?.create(polylineAnnotationOptions)
-
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
         }
@@ -323,6 +316,13 @@ class WalkEnumerationAreaFragment : Fragment(),
         pointAnnotationManager = mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
         polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
         polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(polylineAnnotationManager, binding.mapView)
+
+        val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+            .withPoints(polyLinePoints)
+            .withLineColor("#ee4e8b")
+            .withLineWidth(5.0)
+
+        polylineAnnotation = polylineAnnotationManager?.create(polylineAnnotationOptions)
     }
 
     override fun onResume()
