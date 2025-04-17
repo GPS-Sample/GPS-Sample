@@ -375,7 +375,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             else
             {
                 addHousehold = true
-                removeAllPolygonOnClickListeners()
+//                removeAllPolygonOnClickListeners()
                 binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
         }
@@ -654,16 +654,24 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
             else
             {
-                binding.mapView.getMapboxMap().queryRenderedFeatures(
-                    RenderedQueryGeometry(binding.mapView.getMapboxMap().pixelForCoordinate(point)!!),
-                    RenderedQueryOptions(listOf("LAYER_ID"), null)
-                ) {
-                    if (!it.isValue || it.value!!.isEmpty()) return@queryRenderedFeatures
-                    Log.d( "xxx", "selected HH" )
-                    Log.d( "xxx", it.value.toString())
-                    val selectedFeature = it.value!![0].feature
-                    // ... do things with selected feature
+                findEnumAreaOfLocation( getAllEnumAreas(), LatLng( point.latitude(), point.longitude()))?.let { enumArea ->
+                    ConfirmationDialog( activity, resources.getString(R.string.select_task),
+                        "${resources.getString(R.string.rename_or_delete)} ${enumArea.name}?",
+                        resources.getString(R.string.rename), resources.getString(R.string.delete), enumArea, this)
                 }
+
+//                binding.mapView.getMapboxMap().queryRenderedFeatures(
+//                    RenderedQueryGeometry(binding.mapView.getMapboxMap().pixelForCoordinate(point)!!),
+//                    RenderedQueryOptions(listOf("LAYER_ID"), null)
+//                ) {
+//                    if (!it.isValue || it.value!!.isEmpty()) return@queryRenderedFeatures
+//
+//                    Log.d( "xxx", "selected HH" )
+//                    Log.d( "xxx", it.value.toString())
+//
+//                    val selectedFeature = it.value!![0].feature
+//                    // ... do things with selected feature
+//                }
                 return true
             }
         }
@@ -696,33 +704,33 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         allPointAnnotations.clear()
 
-        removeAllPolygonOnClickListeners()
-
-        if (editMode)
-        {
-            polygonAnnotationManager?.apply {
-                addClickListener(
-                    OnPolygonAnnotationClickListener { polygonAnnotation ->
-                        val obj = polygonHashMap[polygonAnnotation.id]
-
-                        if (obj is EnumArea)
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.select_task),
-                                "${resources.getString(R.string.rename_or_delete)} ${obj.name}?",
-                                resources.getString(R.string.rename), resources.getString(R.string.delete), obj, this@CreateEnumerationAreaFragment)
-                        }
-                        else if (obj is MapTileRegion)
-                        {
-                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-                                resources.getString(R.string.delete_map_tile_region),
-                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
-                        }
-
-                        true
-                    }
-                )
-            }
-        }
+//        removeAllPolygonOnClickListeners()
+//
+//        if (editMode)
+//        {
+//            polygonAnnotationManager?.apply {
+//                addClickListener(
+//                    OnPolygonAnnotationClickListener { polygonAnnotation ->
+//                        val obj = polygonHashMap[polygonAnnotation.id]
+//
+//                        if (obj is EnumArea)
+//                        {
+//                            ConfirmationDialog( activity, resources.getString(R.string.select_task),
+//                                "${resources.getString(R.string.rename_or_delete)} ${obj.name}?",
+//                                resources.getString(R.string.rename), resources.getString(R.string.delete), obj, this@CreateEnumerationAreaFragment)
+//                        }
+//                        else if (obj is MapTileRegion)
+//                        {
+//                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
+//                                resources.getString(R.string.delete_map_tile_region),
+//                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
+//                        }
+//
+//                        true
+//                    }
+//                )
+//            }
+//        }
 
         val allEnumAreas = getAllEnumAreas()
 
@@ -904,14 +912,14 @@ class CreateEnumerationAreaFragment : Fragment(),
         return null
     }
 
-    fun removeAllPolygonOnClickListeners()
-    {
-        polygonAnnotationManager?.apply {
-            polygonAnnotationManager?.clickListeners?.removeAll {
-                true
-            }
-        }
-    }
+//    fun removeAllPolygonOnClickListeners()
+//    {
+//        polygonAnnotationManager?.apply {
+//            polygonAnnotationManager?.clickListeners?.removeAll {
+//                true
+//            }
+//        }
+//    }
 
     fun addPolygon( mapTileRegion: MapTileRegion )
     {
@@ -973,6 +981,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             allPolylineAnnotations.add( polylineAnnotation )
         }
 
+        // add the label
         val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
         val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
         mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, enumArea.name, "#80FFFFFF" )
@@ -1129,7 +1138,9 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (tag is EnumArea)
         {
+            mapboxManager.removeViewAnnotation( binding.mapView.viewAnnotationManager, tag.name, )
             tag.name = name // handles re-name
+            refreshMap()
         }
         else if (tag is Int)
         {
@@ -1251,9 +1262,11 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else if (tag is EnumArea)
         {
+            mapboxManager.removeViewAnnotation( binding.mapView.viewAnnotationManager, tag.name, )
             unsavedEnumAreas.remove( tag )
             config.enumAreas.remove( tag )
             DAO.enumAreaDAO.delete( tag )
+
             refreshMap()
         }
         else if (tag is PointAnnotation)

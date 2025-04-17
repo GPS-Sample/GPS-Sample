@@ -38,6 +38,7 @@ import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.managers.TileServer.Companion.getBounds
 import edu.gtri.gpssample.utils.GeoUtils
+import io.github.dellisd.spatialk.geojson.dsl.feature
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import java.util.concurrent.atomic.AtomicInteger
@@ -97,11 +98,29 @@ class MapboxManager( var context: Context )
         return null
     }
 
+    fun removeViewAnnotation(viewAnnotationManager: ViewAnnotationManager, label: String )
+    {
+        if (label.isNotEmpty())
+        {
+            for (annotation in viewAnnotationManager.annotations)
+            {
+                annotation.key.rootView.findViewById<TextView>( R.id.text_view )?.let {
+                    if (it.text == label)
+                    {
+                        viewAnnotationManager.removeViewAnnotation( annotation.key )
+                    }
+                }
+            }
+        }
+    }
+
     fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
     {
         if (label.isNotEmpty())
         {
-            val viewAnnotation = viewAnnotationManager.addViewAnnotation(
+            removeViewAnnotation(viewAnnotationManager, label)
+
+            val view = viewAnnotationManager.addViewAnnotation(
                 resId = R.layout.view_text_view,
                 options = viewAnnotationOptions
                 {
@@ -110,7 +129,7 @@ class MapboxManager( var context: Context )
                 }
             )
 
-            viewAnnotation.rootView.findViewById<TextView>( R.id.text_view )?.let {
+            view.rootView.findViewById<TextView>( R.id.text_view )?.let {
                 it.text = label
                 it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
             }
