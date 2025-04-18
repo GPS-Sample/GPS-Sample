@@ -77,14 +77,14 @@ class CameraFragment : Fragment()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         binding.cameraButton.setOnClickListener {
-            if (binding.cameraButton.text == "Take Photo")
+            if (binding.cameraButton.text == resources.getString(R.string.take_photo))
             {
                 binding.cameraButton.isEnabled = false
                 takePhoto()
             }
             else
             {
-                binding.cameraButton.text = "Take Photo"
+                binding.cameraButton.text = resources.getString(R.string.take_photo)
                 binding.imageView.visibility = View.GONE
                 binding.viewFinder.visibility = View.VISIBLE
             }
@@ -93,7 +93,7 @@ class CameraFragment : Fragment()
         binding.deleteImageView.setOnClickListener {
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                 location.imageData = ""
-                binding.cameraButton.text = "Take Photo"
+                binding.cameraButton.text = resources.getString(R.string.take_photo)
                 binding.imageView.visibility = View.GONE
                 binding.viewFinder.visibility = View.VISIBLE
             }
@@ -158,7 +158,7 @@ class CameraFragment : Fragment()
                     {
                         binding.viewFinder.visibility = View.GONE
                         binding.imageView.visibility = View.VISIBLE
-                        binding.cameraButton.text = "Retake Photo"
+                        binding.cameraButton.text = resources.getString(R.string.retake_photo)
                         binding.imageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
                     }
                 }
@@ -192,7 +192,7 @@ class CameraFragment : Fragment()
                 {
                     binding.viewFinder.visibility = View.VISIBLE
                     binding.imageView.visibility = View.GONE
-                    binding.cameraButton.text = "Take Photo"
+                    binding.cameraButton.text = resources.getString(R.string.take_photo)
                     binding.cameraButton.isEnabled = true
                 }
 
@@ -204,7 +204,7 @@ class CameraFragment : Fragment()
                         val angle = CameraUtils.getRotationAngle( this@CameraFragment.activity!!, uri )
                         binding.viewFinder.visibility = View.GONE
                         binding.imageView.visibility = View.VISIBLE
-                        binding.cameraButton.text = "Retake Photo"
+                        binding.cameraButton.text = resources.getString(R.string.retake_photo)
                         bitmap = CameraUtils.rotate( it, angle )
                         binding.imageView.setImageBitmap( bitmap )
                         binding.cameraButton.isEnabled = true
