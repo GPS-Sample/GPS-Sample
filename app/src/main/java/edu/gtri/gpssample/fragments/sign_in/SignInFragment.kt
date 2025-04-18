@@ -205,10 +205,10 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
     {
         when (user.role)
         {
-            Role.Admin.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.admin)}" )
-            Role.Supervisor.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.supervisor)}" )
-            Role.Enumerator.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.enumerator)}" )
-            Role.DataCollector.value -> activity!!.setTitle( "GPSSample - ${resources.getString(R.string.data_collector)}" )
+            Role.Admin.value -> activity!!.setTitle( "${resources.getString(R.string.admin)}" )
+            Role.Supervisor.value -> activity!!.setTitle( "${resources.getString(R.string.supervisor)}" )
+            Role.Enumerator.value -> activity!!.setTitle( "${resources.getString(R.string.enumerator)}" )
+            Role.DataCollector.value -> activity!!.setTitle( "${resources.getString(R.string.data_collector)}" )
         }
     }
 
