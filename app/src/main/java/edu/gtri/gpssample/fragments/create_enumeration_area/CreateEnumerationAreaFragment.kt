@@ -84,9 +84,10 @@ class CreateEnumerationAreaFragment : Fragment(),
     MapboxManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     DropdownDialog.DropdownDialogDelegate,
+    SelectionDialog.SelectionDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    SelectionDialog.SelectionDialogDelegate
+    MultiConfirmationDialog.MulitConfirmationDialogDelegate
 {
     private lateinit var config: Config
     private lateinit var mapboxManager: MapboxManager
@@ -654,10 +655,15 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
             else
             {
+                val items = ArrayList<String>()
+                items.add( resources.getString(R.string.rename ))
+                items.add( resources.getString(R.string.delete ))
+                items.add( resources.getString(R.string.attach_mbtiles ))
+                items.add( resources.getString(R.string.detach_mbtiles ))
+
                 findEnumAreaOfLocation( getAllEnumAreas(), LatLng( point.latitude(), point.longitude()))?.let { enumArea ->
-                    ConfirmationDialog( activity, resources.getString(R.string.select_task),
-                        "${resources.getString(R.string.rename_or_delete)} ${enumArea.name}?",
-                        resources.getString(R.string.rename), resources.getString(R.string.delete), enumArea, this)
+                    MultiConfirmationDialog( activity, resources.getString(R.string.select_task),
+                        "", items, enumArea, this)
                 }
 
 //                binding.mapView.getMapboxMap().queryRenderedFeatures(
@@ -1215,10 +1221,37 @@ class CreateEnumerationAreaFragment : Fragment(),
                 refreshMap()
 
                 ConfirmationDialog( activity, "",
-                    resources.getString(R.string.attach_mbtiles),
+                    resources.getString(R.string.attach_mbtiles_question),
                     resources.getString(R.string.no),
                     resources.getString(R.string.yes), kAttachMBTiles, this)
             }
+        }
+    }
+
+    override fun didSelectMultiButton( selection: String, tag: Any? )
+    {
+        val enumArea = tag as EnumArea
+        when (selection) {
+            resources.getString(R.string.rename) -> {
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
+            }
+            resources.getString(R.string.delete) -> {
+                mapboxManager.removeViewAnnotation( binding.mapView.viewAnnotationManager, tag.name, )
+                unsavedEnumAreas.remove( tag )
+                config.enumAreas.remove( tag )
+                DAO.enumAreaDAO.delete( tag )
+
+                refreshMap()
+            }
+            resources.getString(R.string.attach_mbtiles) -> {
+                selectedEnumArea = enumArea
+                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+            }
+            resources.getString(R.string.detach_mbtiles) -> {
+                enumArea.mbTilesSize = 0
+                enumArea.mbTilesPath = ""
+            }
+            else -> {}
         }
     }
 

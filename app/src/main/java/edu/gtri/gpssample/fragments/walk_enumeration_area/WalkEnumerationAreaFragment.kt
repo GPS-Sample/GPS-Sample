@@ -500,7 +500,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                 binding.deletePointButton.isEnabled = false
 
                 ConfirmationDialog( activity, "",
-                    resources.getString(R.string.attach_mbtiles),
+                    resources.getString(R.string.attach_mbtiles_question),
                     resources.getString(R.string.no),
                     resources.getString(R.string.yes), kAttachMBTiles, this)
             }
