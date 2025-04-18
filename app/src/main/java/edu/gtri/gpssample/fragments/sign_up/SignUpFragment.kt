@@ -65,16 +65,11 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
 
         when (role)
         {
-            Role.Admin.value ->
-                binding.titleTextView.text = resources.getString(R.string.admin) + " " + resources.getString(R.string.sign_up)
-            Role.Supervisor.value ->
-                binding.titleTextView.text = resources.getString(R.string.supervisor) + " " + resources.getString(R.string.sign_up)
-            Role.Enumerator.value ->
-                binding.titleTextView.text = resources.getString(R.string.enumerator) + " " + resources.getString(R.string.sign_up)
-            Role.DataCollector.value ->
-                binding.titleTextView.text = resources.getString(R.string.data_collector) + " " + resources.getString(R.string.sign_up)
+            Role.Admin.value -> binding.titleTextView.text = resources.getString(R.string.admin_sign_up)
+            Role.Supervisor.value -> binding.titleTextView.text = resources.getString(R.string.supervisor_sign_up)
+            Role.Enumerator.value -> binding.titleTextView.text = resources.getString(R.string.enumerator_sign_up)
+            Role.DataCollector.value -> binding.titleTextView.text = resources.getString(R.string.data_collector_sign_up)
         }
-
 
         ArrayAdapter.createFromResource(activity!!, R.array.forgot_pin_questions, android.R.layout.simple_spinner_item)
             .also { adapter ->

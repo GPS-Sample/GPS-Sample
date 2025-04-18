@@ -76,13 +76,13 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
         when (expectedRole)
         {
-            "Admin" -> translatedRole =  resources.getString( R.string.admin )
-            "Supervisor" -> translatedRole =  resources.getString( R.string.supervisor )
-            "Enumerator" -> translatedRole =  resources.getString( R.string.enumerator )
-            "DataColector" -> translatedRole =  resources.getString( R.string.data_collector )
+            Role.Admin.value -> translatedRole =  resources.getString( R.string.admin_sign_in )
+            Role.Supervisor.value -> translatedRole =  resources.getString( R.string.supervisor_sign_in )
+            Role.Enumerator.value -> translatedRole =  resources.getString( R.string.enumerator_sign_in )
+            Role.DataCollector.value -> translatedRole =  resources.getString( R.string.data_collector_sign_in )
         }
 
-        binding.titleTextView.text = translatedRole + " " + resources.getString(R.string.sign_in)
+        binding.titleTextView.text = translatedRole
 
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
         val userName = sharedPreferences.getString( Keys.kUserName.value, null)
