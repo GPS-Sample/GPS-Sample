@@ -93,7 +93,6 @@ class WalkEnumerationAreaFragment : Fragment(),
     private val kClearMapTag = 1
     private val kDeletePointTag = 2
     private val kEnumAreaName = 3
-    private val kAttachMBTiles: Int = 4
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -498,11 +497,6 @@ class WalkEnumerationAreaFragment : Fragment(),
                 binding.walkButton.isEnabled = false
                 binding.addPointButton.isEnabled = false
                 binding.deletePointButton.isEnabled = false
-
-                ConfirmationDialog( activity, "",
-                    resources.getString(R.string.attach_mbtiles_question),
-                    resources.getString(R.string.no),
-                    resources.getString(R.string.yes), kAttachMBTiles, this)
             }
         }
         else
@@ -591,10 +585,6 @@ class WalkEnumerationAreaFragment : Fragment(),
                 }
             }
         }
-        else if (tag == kAttachMBTiles)
-        {
-            filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-        }
 
         refreshMap()
     }
@@ -604,18 +594,6 @@ class WalkEnumerationAreaFragment : Fragment(),
         MapboxManager.cancelStylePackDownload()
         MapboxManager.cancelTilePackDownload()
     }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-//    {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (requestCode == 1023 && resultCode == Activity.RESULT_OK)
-//        {
-//            data?.data?.let { uri ->
-//                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enum_area_name_property), "", resources.getString(R.string.cancel), resources.getString(R.string.save), uri, this, false )
-//            }
-//        }
-//    }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
         binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
