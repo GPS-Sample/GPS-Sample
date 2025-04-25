@@ -1271,7 +1271,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         else if (tag == kImportTag)
         {
             val intent = Intent()
-                .setType("application/geo+json")
+                .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
 
             startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
