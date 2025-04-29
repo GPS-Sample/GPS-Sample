@@ -175,7 +175,7 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
         fun loadMapboxStyle( context: Context, mapboxMap: MapboxMap, completion: (()->Unit)?)
         {
-            if (rasterLayer == null)
+            if (instance != null && rasterLayer == null)
             {
                 val tileSet = TileSet.Builder("2.0", listOf("http://localhost:8080/{z}/{x}/{y}.png")).build()
 
@@ -197,8 +197,12 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
             mapboxMap.loadStyle(
                 style(styleUri = style) {
-                    +rasterSource!!
-                    +rasterLayer!!
+                    rasterSource?.let {
+                        +it
+                    }
+                    rasterLayer?.let {
+                        +it
+                    }
                 },
                 object : Style.OnStyleLoaded {
                     override fun onStyleLoaded(style: Style) {
