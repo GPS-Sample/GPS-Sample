@@ -9,11 +9,13 @@ package edu.gtri.gpssample.fragments.createconfiguration
 
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
@@ -44,6 +46,7 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
+import edu.gtri.gpssample.managers.MapManager.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -100,7 +103,19 @@ class CreateConfigurationFragment : Fragment(),
             findNavController().popBackStack()
         }
 
+        val items = ArrayList<String>()
+        val mapEngines = resources.getTextArray( R.array.map_engines )
+
+        for (mapEngine in mapEngines)
+        {
+            items.add( mapEngine.toString() )
+        }
+
+        binding.mapEngineSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
+
         sharedViewModel.currentConfiguration?.value?.let { config ->
+            binding.mapEngineSpinner.setSelection(config.mapEngineIndex)
+
             if (!config.proximityWarningIsEnabled)
             {
                 binding.proximityWarningEditText.visibility = View.GONE
@@ -159,15 +174,15 @@ class CreateConfigurationFragment : Fragment(),
             style = it
         }
 
-        binding.mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style) {
-                    initLocationComponent()
-                    refreshMap()
-                }
-            }
-        )
+        MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
+            binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+            refreshMap()
+        }
+
+//        binding.osmMapView.visibility = View.VISIBLE
+//        binding.mapView.visibility = View.GONE
+//        MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
+//        }
 
         binding.mapView.getMapboxMap().addOnMapClickListener {
             val bundle = Bundle()

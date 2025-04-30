@@ -61,6 +61,30 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:gravity="center_vertical"
+                    android:text="@string/map_engine"
+                    android:textSize="17sp"
+                    android:textColor="@color/primary_textcolor" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/spinner_frame">
+
+                    <Spinner
+                        android:id="@+id/map_engine_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:onItemSelected="@{viewModel::onMapEngineSelected}" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
                     android:text="@string/preferred_units"
                     android:textSize="17sp"
                     android:textColor="@color/primary_textcolor" />
@@ -78,8 +102,7 @@
                         android:layout_height="match_parent"
                         android:entries="@{viewModel.distanceFormats}"
                         android:selectedItemPosition="@={viewModel.distanceFormatPosition}"
-                        android:onItemSelected="@{viewModel::onDistanceFormatSelected}"
-                        />
+                        android:onItemSelected="@{viewModel::onDistanceFormatSelected}"/>
                 </FrameLayout>
 
                 <TextView
@@ -285,16 +308,26 @@
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
 
-                <com.mapbox.maps.MapView
-                    android:id="@+id/map_view"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    mapbox:mapbox_cameraTargetLat="33.77577524978659"
-                    mapbox:mapbox_cameraTargetLng="-84.39630379821243"
-                    mapbox:mapbox_cameraZoom="9.0">
-                </com.mapbox.maps.MapView>
+                    android:layout_marginEnd="20dp">
+
+                    <com.mapbox.maps.MapView
+                        android:id="@+id/map_view"
+                        android:visibility="visible"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp">
+                    </com.mapbox.maps.MapView>
+
+                    <org.osmdroid.views.MapView
+                        android:id="@+id/osm_map_view"
+                        android:visibility="gone"
+                        android:layout_width="fill_parent"
+                        android:layout_height="200dp">
+                    </org.osmdroid.views.MapView>
+                </FrameLayout>
 
                 <Space
                     android:layout_width="match_parent"

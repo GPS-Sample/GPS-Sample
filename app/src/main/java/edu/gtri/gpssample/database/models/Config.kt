@@ -40,6 +40,7 @@ data class Config(
     var timeZone: Int,
     var name: String,
     var dbVersion: Int,
+    var mapEngineIndex: Int,
     var dateFormat: DateFormat,
     var timeFormat: TimeFormat,
     var distanceFormat: DistanceFormat,
@@ -55,12 +56,12 @@ data class Config(
     var selectedStudyUuid: String,
     var selectedEnumAreaUuid: String)
 {
-    constructor(timeZone: Int, name: String, dbVersion: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
-            : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, dateFormat,timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-                                    ArrayList<Study>(), ArrayList<EnumArea>(), "", "")
-    constructor(uuid: String, creationDate: Long, timeZone: Int, name: String, dbVersion: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
+    constructor(timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
+            : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+                ArrayList<Study>(), ArrayList<EnumArea>(), "", "")
+    constructor(uuid: String, creationDate: Long, timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
                 minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String)
-            : this(uuid, creationDate, timeZone, name, dbVersion, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
+            : this(uuid, creationDate, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
                 ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid)
 
     fun equals( other: Config ): Boolean
@@ -69,6 +70,7 @@ data class Config(
             this.creationDate == other.creationDate &&
             this.timeZone == other.timeZone &&
             this.name == other.name &&
+            this.mapEngineIndex == other.mapEngineIndex &&
             this.dateFormat == other.dateFormat &&
             this.timeFormat == other.timeFormat &&
             this.distanceFormat == other.distanceFormat &&

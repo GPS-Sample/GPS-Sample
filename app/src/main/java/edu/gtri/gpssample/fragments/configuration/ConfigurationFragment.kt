@@ -16,6 +16,7 @@ import android.os.Environment
 import android.text.InputType
 import android.util.Log
 import android.view.*
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
@@ -54,6 +55,7 @@ import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
+import edu.gtri.gpssample.managers.MapManager.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -116,6 +118,7 @@ class ConfigurationFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
         binding?.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -166,15 +169,15 @@ class ConfigurationFragment : Fragment(),
             style = it
         }
 
-        binding.mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style) {
-                    initLocationComponent()
-                    refreshMap()
-                }
-            }
-        )
+        MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
+            binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+            refreshMap()
+        }
+
+//        binding.osmMapView.visibility = View.VISIBLE
+//        binding.mapView.visibility = View.GONE
+//        MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
+//        }
 
         binding.mapView.getMapboxMap().addOnMapClickListener {
             val bundle = Bundle()
@@ -189,6 +192,15 @@ class ConfigurationFragment : Fragment(),
         mapboxManager = MapboxManager.instance( activity!! )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
+            val items = ArrayList<String>()
+            val mapEngines = resources.getTextArray( R.array.map_engines )
+
+            for (mapEngine in mapEngines)
+            {
+                items.add( mapEngine.toString() )
+            }
+
+            binding.mapEngineText.text = items[config.mapEngineIndex]
 
             if (!config.proximityWarningIsEnabled)
             {

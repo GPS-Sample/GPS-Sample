@@ -174,6 +174,13 @@ class ConfigurationViewModel : ViewModel()
             _currentFragment = value
         }
 
+    fun onMapEngineSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
+    {
+        _currentConfiguration?.value?.let {
+            it.mapEngineIndex = position
+        }
+    }
+
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         _currentConfiguration?.value?.let {
@@ -216,7 +223,7 @@ class ConfigurationViewModel : ViewModel()
     fun createNewConfiguration()
     {
         val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-        val newConfig = Config(timeZone,"", DAO.DATABASE_VERSION, DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 10 )
+        val newConfig = Config(timeZone,"", DAO.DATABASE_VERSION, 0, DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 10 )
         _currentConfiguration = MutableLiveData(newConfig)
         //saveNewConfiguration()
     }

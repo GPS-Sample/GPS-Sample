@@ -41,6 +41,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_TIME_ZONE + " INTEGER" + "," +
                     COLUMN_CONFIG_NAME + " TEXT UNIQUE NOT NULL" + "," +
                     COLUMN_CONFIG_DB_VERSION + " INTEGER" + "," +
+                    COLUMN_CONFIG_MAP_ENGINE_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_DATE_FORMAT_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_TIME_FORMAT_INDEX + " INTEGER" + "," +
                     COLUMN_CONFIG_DISTANCE_FORMAT_INDEX + " INTEGER" + "," +
@@ -468,6 +469,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_CONFIG = "config"
         const val COLUMN_CONFIG_NAME = "config_name"
         const val COLUMN_CONFIG_DB_VERSION = "db_version"
+        const val COLUMN_CONFIG_MAP_ENGINE_INDEX = "config_map_engine_index"
         const val COLUMN_CONFIG_DISTANCE_FORMAT_INDEX = "config_distance_format_index"
         const val COLUMN_CONFIG_DATE_FORMAT_INDEX = "config_date_format_index"
         const val COLUMN_CONFIG_TIME_FORMAT_INDEX = "config_time_format_index"
@@ -729,6 +731,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 314
+        const val DATABASE_VERSION = 316
     }
 }
