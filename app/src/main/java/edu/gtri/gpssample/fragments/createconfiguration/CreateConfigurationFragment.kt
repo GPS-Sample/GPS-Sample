@@ -41,6 +41,7 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
@@ -168,27 +169,42 @@ class CreateConfigurationFragment : Fragment(),
             }
         }
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        var style = Style.MAPBOX_STREETS
-        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-            style = it
+        lateinit var config: Config
+
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
         }
 
-        MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
-            binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-            refreshMap()
+        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+        {
+            binding.osmMapView.visibility = View.VISIBLE
+            binding.mapView.visibility = View.GONE
+
+            MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
+                refreshMap()
+            }
         }
+        else if (config.mapEngineIndex == MapEngine.MapBox.value)
+        {
+            val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+            var style = Style.MAPBOX_STREETS
 
-//        binding.osmMapView.visibility = View.VISIBLE
-//        binding.mapView.visibility = View.GONE
-//        MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
-//        }
+            sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+                style = it
+            }
 
-        binding.mapView.getMapboxMap().addOnMapClickListener {
-            val bundle = Bundle()
-            bundle.putBoolean( Keys.kEditMode.value, true )
-            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-            return@addOnMapClickListener true
+            MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
+                binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                refreshMap()
+            }
+
+            // TODO: create a generic click listener in the MapManager
+            binding.mapView.getMapboxMap().addOnMapClickListener {
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.value, true )
+                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                return@addOnMapClickListener true
+            }
         }
 
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()

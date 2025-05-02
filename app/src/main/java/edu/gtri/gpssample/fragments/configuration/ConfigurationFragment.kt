@@ -10,6 +10,7 @@ package edu.gtri.gpssample.fragments.configuration
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -48,6 +49,7 @@ import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -163,27 +165,42 @@ class ConfigurationFragment : Fragment(),
                 resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
-        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-        var style = Style.MAPBOX_STREETS
-        sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-            style = it
+        lateinit var config: Config
+
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
         }
 
-        MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
-            binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-            refreshMap()
+        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+        {
+            binding.osmMapView.visibility = View.VISIBLE
+            binding.mapView.visibility = View.GONE
+
+            MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
+                refreshMap()
+            }
         }
+        else if (config.mapEngineIndex == MapEngine.MapBox.value)
+        {
+            val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+            var style = Style.MAPBOX_STREETS
 
-//        binding.osmMapView.visibility = View.VISIBLE
-//        binding.mapView.visibility = View.GONE
-//        MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
-//        }
+            sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+                style = it
+            }
 
-        binding.mapView.getMapboxMap().addOnMapClickListener {
-            val bundle = Bundle()
-            bundle.putBoolean( Keys.kEditMode.value, false )
-            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-            return@addOnMapClickListener true
+            MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
+                binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                refreshMap()
+            }
+
+            // TODO: create a generic click listener in the MapManager
+            binding.mapView.getMapboxMap().addOnMapClickListener {
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.value, false )
+                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                return@addOnMapClickListener true
+            }
         }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
