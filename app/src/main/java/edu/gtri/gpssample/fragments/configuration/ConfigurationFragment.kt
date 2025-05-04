@@ -62,6 +62,9 @@ import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.MapEventsOverlay
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
@@ -71,19 +74,16 @@ import java.util.*
 
 class ConfigurationFragment : Fragment(),
     ConfirmationDialog.ConfirmationDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
+    MapEventsReceiver
 {
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mapboxManager: MapboxManager
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
-    private lateinit var pointAnnotationManager: PointAnnotationManager
-    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
-    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     private val kDeleteTag          = 1
     private val kExportTag          = 2
@@ -177,6 +177,10 @@ class ConfigurationFragment : Fragment(),
             binding.mapView.visibility = View.GONE
 
             MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
+
+                val mapEventsOverlay = MapEventsOverlay(this)
+                binding.osmMapView.overlays.add(mapEventsOverlay)
+
                 refreshMap()
             }
         }
@@ -188,6 +192,10 @@ class ConfigurationFragment : Fragment(),
             sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
                 style = it
             }
+
+            MapManager.instance().createPointAnnotationManager( binding.mapView )
+            MapManager.instance().createPolygonAnnotationManager( binding.mapView )
+            MapManager.instance().createPolylineAnnotationManager( binding.mapView )
 
             MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
                 binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
@@ -202,11 +210,6 @@ class ConfigurationFragment : Fragment(),
                 return@addOnMapClickListener true
             }
         }
-
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
-        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager.instance( activity!! )
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             val items = ArrayList<String>()
@@ -323,19 +326,9 @@ class ConfigurationFragment : Fragment(),
 
                 pointList.add( points )
 
-                mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
-                mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
-
+                MapManager.instance().createPolygon( pointList, "#000000", 0.25 )
+                MapManager.instance().createPolyline( pointList[0], "#ff0000" )
             }
-
-//            val latLngBounds = GeoUtils.findGeobounds(enumVerts)
-//            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-//            val cameraPosition = CameraOptions.Builder()
-//                .zoom(10.0)
-//                .center(point)
-//                .build()
-//
-//            binding.mapView.getMapboxMap().setCamera(cameraPosition)
         }
     }
 
@@ -800,5 +793,15 @@ class ConfigurationFragment : Fragment(),
         binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
 
         _binding = null
+    }
+
+    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+        Log.d( "xxx", "singleTapConfirmedHelper")
+        return true
+    }
+
+    override fun longPressHelper(p: GeoPoint?): Boolean {
+        Log.d( "xxx", "longPressHelper")
+        return true
     }
 }
