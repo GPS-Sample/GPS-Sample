@@ -1327,7 +1327,14 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else if (tag == kAttachMBTiles)
         {
-            filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+            if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
+            {
+                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
+            }
+            else
+            {
+                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+            }
         }
         else if (tag == kImportTag)
         {
@@ -1735,27 +1742,27 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            selectedEnumArea?.let {
-                val (filePath, fileSize) = TileServer.filePathSize(activity!!, uri)
+            val (filePath, fileSize) = TileServer.filePathSize(activity!!, uri)
 
+            if (TileServer.fileExists( activity!!, uri ))
+            {
+                TileServer.startServer( activity!!, null, filePath, binding.mapView.getMapboxMap()) {
+                    refreshMap()
+                    TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                }
+            }
+            else
+            {
+                TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
+                    refreshMap()
+                    TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                }
+            }
+
+            selectedEnumArea?.let {
                 it.mbTilesPath = filePath
                 it.mbTilesSize = fileSize
                 selectedEnumArea = null
-
-                if (TileServer.fileExists( activity!!, uri ))
-                {
-                    TileServer.startServer( activity!!, null, filePath, binding.mapView.getMapboxMap()) {
-                        refreshMap()
-                        TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-                    }
-                }
-                else
-                {
-                    TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
-                        refreshMap()
-                        TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-                    }
-                }
             }
         }
     }
