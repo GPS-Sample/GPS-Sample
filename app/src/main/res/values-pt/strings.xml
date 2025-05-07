@@ -29,7 +29,7 @@
     <string name="continue_with_existing_study">"Continuar com o estudo existente"</string>
     <string name="admin_sign_in">"Login do Administrador"</string>
     <string name="supervisor_sign_in">"Login do Supervisor"</string>
-    <string name="data_collector_sign_in">"Login do coletor de dados"</string>
+    <string name="data_collector_sign_in">"Login do Coletor de dados"</string>
     <string name="admin_sign_up">"Registo do administrador"</string>
     <string name="supervisor_sign_up">"Registo do supervisor"</string>
     <string name="data_collector_sign_up">"Registo do coletor de dados"</string>
@@ -374,6 +374,35 @@
     <string name="app_version">"Versão da aplicação"</string>
     <string name="db_version">"Versão da base de dados"</string>
     <string name="team">"Equipa"</string>
+    <string name="enumerator_sign_in">"Registo de Enumerador"</string>
+    <string name="enumerator_sign_up">"Inscrição de Enumeradores"</string>
+    <string name="minimum_value">"Valor mínimo"</string>
+    <string name="maximum_value">"Valor máximo"</string>
+    <string name="enter_the_minimum_value">"Introduzir o valor mínimo"</string>
+    <string name="enter_the_maximum_value">"Introduzir o valor máximo"</string>
+    <string name="select_the_minimum_date">"Selecione a data mínima"</string>
+    <string name="select_the_maximum_date">"Selecione a data máxima"</string>
+    <string name="min_greater_than_max">"O valor mínimo é superior ao valor máximo"</string>
+    <string name="enumeration_status">"Estado da enumeração"</string>
+    <string name="collection_status">"Estado da recolha"</string>
+    <string name="enumeration_reason_incomplete_label">"Motivo da enumeração Incompleto"</string>
+    <string name="collection_reason_incomplete_label">"Motivo da recolha incompleta"</string>
+    <string name="enumeration_notes">"Notas de enumeração"</string>
+    <string name="collection_notes">"Notas de recolha"</string>
+    <string name="select_map_tiles">"Selecione um conjunto de mosaicos de mapas"</string>
+    <string name="loading_mapbox_tiles">"Carregar Mapbox Tiles"</string>
+    <string name="mapbox_streets">"Mapa de Ruas Mapbox"</string>
+    <string name="satellite_streets">"Mapa de ruas por satélite"</string>
+    <string name="import_map_tiles">"Importar mosaicos de mapas"</string>
+    <string name="re_import">"O ficheiro selecionado já foi importado.  Deseja voltar a importá-lo agora?"</string>
+    <string name="attach_mbtiles_question">"Gostaria de anexar MBTiles a esta área?"</string>
+    <string name="import_geojson">"Importar um ficheiro GeoJSON"</string>
+    <string name="import_mbtiles">"Importar um ficheiro MBTiles"</string>
+    <string name="select_file_type">"Selecione o tipo de ficheiro de importação"</string>
+    <string name="attach_mbtiles">"Anexar MapBox Tiles"</string>
+    <string name="detach_mbtiles">"Retirar MapBox Tiles"</string>
+    <string name="take_photo">"Tirar fotografia"</string>
+    <string name="retake_photo">"Voltar a tirar fotografia"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

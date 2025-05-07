@@ -374,6 +374,35 @@
     <string name="app_version">"Версия приложения"</string>
     <string name="db_version">"Версия базы данных"</string>
     <string name="team">"Команда"</string>
+    <string name="enumerator_sign_in">"Вход в систему"</string>
+    <string name="enumerator_sign_up">"Регистрация переписчика"</string>
+    <string name="minimum_value">"Минимальное значение"</string>
+    <string name="maximum_value">"Максимальное значение"</string>
+    <string name="enter_the_minimum_value">"Введите минимальное значение"</string>
+    <string name="enter_the_maximum_value">"Введите максимальное значение"</string>
+    <string name="select_the_minimum_date">"Выберите минимальную дату"</string>
+    <string name="select_the_maximum_date">"Выберите максимальную дату"</string>
+    <string name="min_greater_than_max">"Минимальное значение больше максимального"</string>
+    <string name="enumeration_status">"Статус перечисления"</string>
+    <string name="collection_status">"Статус коллекции"</string>
+    <string name="enumeration_reason_incomplete_label">"Причина незавершенности перечисления"</string>
+    <string name="collection_reason_incomplete_label">"Причина незавершенного сбора"</string>
+    <string name="enumeration_notes">"Примечания к перечислению"</string>
+    <string name="collection_notes">"Примечания к коллекции"</string>
+    <string name="select_map_tiles">"Выберите набор плиток для карты"</string>
+    <string name="loading_mapbox_tiles">"Загрузка тайлов Mapbox"</string>
+    <string name="mapbox_streets">"Mapbox Карта улиц"</string>
+    <string name="satellite_streets">"Спутниковая карта улиц"</string>
+    <string name="import_map_tiles">"Импорт картографических плиток"</string>
+    <string name="re_import">"Выбранный файл уже был импортирован.  Хотите ли вы импортировать его повторно?"</string>
+    <string name="attach_mbtiles_question">"Хотите ли вы прикрепить MBTiles к этой области?"</string>
+    <string name="import_geojson">"Импорт файла GeoJSON"</string>
+    <string name="import_mbtiles">"Импортировать файл MBTiles"</string>
+    <string name="select_file_type">"Выберите тип файла импорта"</string>
+    <string name="attach_mbtiles">"Прикрепить плитки MapBox"</string>
+    <string name="detach_mbtiles">"Отсоединить плитки MapBox"</string>
+    <string name="take_photo">"Сделать фото"</string>
+    <string name="retake_photo">"Сделать повторную фотографию"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

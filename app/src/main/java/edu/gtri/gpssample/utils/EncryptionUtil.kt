@@ -19,7 +19,6 @@ import javax.crypto.spec.SecretKeySpec
 
 object EncryptionUtil {
 
-    const val kSecretKey = "B08DC45F248BA92F28AA35AC6C157BBD9CC8A3DE"
     const val kSalt = "c2xTT0lua0ZWbHdvZWlTTGs="
     const val kIv = "Y2Jma25sRkRMS1NHekNWTA=="
 
@@ -27,10 +26,9 @@ object EncryptionUtil {
     {
         try
         {
-            val secretKey = if (password.isNotEmpty()) password else kSecretKey
             val ivParameterSpec = IvParameterSpec(Base64.decode(kIv, Base64.DEFAULT))
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val spec = PBEKeySpec(secretKey.toCharArray(), Base64.decode(kSalt, Base64.DEFAULT), 10000, 128)
+            val spec = PBEKeySpec(password.toCharArray(), Base64.decode(kSalt, Base64.DEFAULT), 10000, 128)
 
             val tmp = factory.generateSecret(spec)
             val secretKeySpec = SecretKeySpec(tmp.encoded, "AES")
@@ -54,11 +52,9 @@ object EncryptionUtil {
     fun Decrypt(strToDecrypt : String, password: String) : String? {
         try
         {
-            val secretKey = if (password.isNotEmpty()) password else kSecretKey
-
             val ivParameterSpec =  IvParameterSpec(Base64.decode(kIv, Base64.DEFAULT))
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val spec =  PBEKeySpec(secretKey.toCharArray(), Base64.decode(kSalt, Base64.DEFAULT), 10000, 128)
+            val spec =  PBEKeySpec(password.toCharArray(), Base64.decode(kSalt, Base64.DEFAULT), 10000, 128)
             val tmp = factory.generateSecret(spec);
             val secretKeySpec =  SecretKeySpec(tmp.encoded, "AES")
 
