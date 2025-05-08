@@ -403,6 +403,7 @@
     <string name="detach_mbtiles">"Separar fichas de MapBox"</string>
     <string name="take_photo">"Tomar foto"</string>
     <string name="retake_photo">"Volver a tomar foto"</string>
+    <string name="min_password_required">"La longitud mínima de la contraseña es de 6 caracteres"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
