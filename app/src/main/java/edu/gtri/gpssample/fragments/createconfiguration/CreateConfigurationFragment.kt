@@ -121,6 +121,12 @@ class CreateConfigurationFragment : Fragment(),
                 return@setOnClickListener
             }
 
+            if (binding.encryptionPasswordEditText.text.toString().length < 6)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.min_password_required), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             sharedViewModel.currentConfiguration?.value?.let {config ->
                 if (config.minGpsPrecision == 0)
                 {
