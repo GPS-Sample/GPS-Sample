@@ -403,6 +403,7 @@
     <string name="detach_mbtiles">"Retirar MapBox Tiles"</string>
     <string name="take_photo">"Tirar fotografia"</string>
     <string name="retake_photo">"Voltar a tirar fotografia"</string>
+    <string name="min_password_required">"O comprimento mínimo da palavra-passe é de 6 caracteres"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>

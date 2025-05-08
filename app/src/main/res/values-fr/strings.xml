@@ -403,6 +403,7 @@
     <string name="detach_mbtiles">"Détachez les tuiles MapBox"</string>
     <string name="take_photo">"Prenez une photo"</string>
     <string name="retake_photo">"Reprenez la photo"</string>
+    <string name="min_password_required">"La longueur minimale du mot de passe est de 6 caractères"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

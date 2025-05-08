@@ -403,6 +403,7 @@
     <string name="detach_mbtiles">"Отсоединить плитки MapBox"</string>
     <string name="take_photo">"Сделать фото"</string>
     <string name="retake_photo">"Сделать повторную фотографию"</string>
+    <string name="min_password_required">"Минимальная длина пароля составляет 6 символов"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
