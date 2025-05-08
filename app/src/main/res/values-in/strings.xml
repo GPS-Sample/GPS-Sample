@@ -403,6 +403,7 @@
     <string name="detach_mbtiles">"Lepaskan Petak MapBox"</string>
     <string name="take_photo">"Ambil Foto"</string>
     <string name="retake_photo">"Ambil Ulang Foto"</string>
+    <string name="min_password_required">"Panjang kata sandi minimal 6 karakter"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>
