@@ -10,17 +10,14 @@ package edu.gtri.gpssample.fragments.configuration
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -30,14 +27,6 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -58,8 +47,6 @@ import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.managers.MapManager.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
-import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.osmdroid.events.MapEventsReceiver
@@ -80,6 +67,7 @@ class ConfigurationFragment : Fragment(),
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var mapView: View
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
@@ -121,7 +109,7 @@ class ConfigurationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -173,19 +161,21 @@ class ConfigurationFragment : Fragment(),
 
         if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
         {
+            mapView = binding.osmMapView
             binding.osmMapView.visibility = View.VISIBLE
-            binding.mapView.visibility = View.GONE
+            binding.mapboxMapView.visibility = View.GONE
 
-            MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
+            MapManager.instance().initialize( activity!!, binding.osmMapView,"", MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude,0.0, 15.0 ) {
 
-                val mapEventsOverlay = MapEventsOverlay(this)
-                binding.osmMapView.overlays.add(mapEventsOverlay)
+                binding.osmMapView.overlays.add( MapEventsOverlay(this))
 
                 refreshMap()
             }
         }
         else if (config.mapEngineIndex == MapEngine.MapBox.value)
         {
+            mapView = binding.mapboxMapView
+
             val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
             var style = Style.MAPBOX_STREETS
 
@@ -193,17 +183,12 @@ class ConfigurationFragment : Fragment(),
                 style = it
             }
 
-            MapManager.instance().createPointAnnotationManager( binding.mapView )
-            MapManager.instance().createPolygonAnnotationManager( binding.mapView )
-            MapManager.instance().createPolylineAnnotationManager( binding.mapView )
-
-            MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
-                binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+            MapManager.instance().initialize( activity!!, binding.mapboxMapView, style, MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude,0.0, 10.0 ) {
+                binding.mapboxMapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 refreshMap()
             }
 
-            // TODO: create a generic click listener in the MapManager
-            binding.mapView.getMapboxMap().addOnMapClickListener {
+            binding.mapboxMapView.getMapboxMap().addOnMapClickListener {
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.value, false )
                 findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
@@ -308,6 +293,20 @@ class ConfigurationFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
+    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean
+    {
+        val bundle = Bundle()
+        bundle.putBoolean( Keys.kEditMode.value, false )
+        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+
+        return true
+    }
+
+    override fun longPressHelper(p: GeoPoint?): Boolean
+    {
+        return true
+    }
+
     fun refreshMap()
     {
         sharedViewModel.currentConfiguration?.value?.let {config ->
@@ -326,8 +325,8 @@ class ConfigurationFragment : Fragment(),
 
                 pointList.add( points )
 
-                MapManager.instance().createPolygon( pointList, "#000000", 0.25 )
-                MapManager.instance().createPolyline( pointList[0], "#ff0000" )
+                MapManager.instance().createPolygon( mapView, pointList, "#000000", 0.25 )
+                MapManager.instance().createPolyline( mapView, pointList[0], "#ff0000" )
             }
         }
     }
@@ -761,7 +760,7 @@ class ConfigurationFragment : Fragment(),
     }
 
     private fun initLocationComponent() {
-        binding.mapView.location.updateSettings {
+        binding.mapboxMapView.location.updateSettings {
             this.enabled = true
             this.locationPuck = LocationPuck2D(
                 scaleExpression = interpolate {
@@ -779,29 +778,19 @@ class ConfigurationFragment : Fragment(),
             )
         }
 
-        binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapboxMapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        binding.mapboxMapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
     }
 
     override fun onDestroyView()
     {
         super.onDestroyView()
 
-        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
 
         _binding = null
-    }
-
-    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-        Log.d( "xxx", "singleTapConfirmedHelper")
-        return true
-    }
-
-    override fun longPressHelper(p: GeoPoint?): Boolean {
-        Log.d( "xxx", "longPressHelper")
-        return true
     }
 }

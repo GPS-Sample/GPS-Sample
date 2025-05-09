@@ -3,14 +3,24 @@ package edu.gtri.gpssample.managers.MapManager
 import android.view.View
 import com.mapbox.maps.Style
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
+import com.google.android.gms.maps.model.LatLng
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationOptions
@@ -21,12 +31,15 @@ import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.locationcomponent.location
+import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.LatLon
+import edu.gtri.gpssample.utils.GeoUtils
 
 class MapManager
 {
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var polygonAnnotationManager: PolygonAnnotationManager? = null
-    private var polylineAnnotationManager: PolylineAnnotationManager?= null
+    var mapboxPointAnnotationManager: PointAnnotationManager? = null
+    var mapboxPolygonAnnotationManager: PolygonAnnotationManager? = null
+    var mapboxPolylineAnnotationManager: PolylineAnnotationManager?= null
 
     // public functions
 
@@ -42,46 +55,103 @@ class MapManager
         }
     }
 
-    fun createPointAnnotationManager( mapView: MapView )
+    fun createMapboxPointAnnotationManager( mapView: MapView )
     {
-        pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
+        mapboxPointAnnotationManager = mapView.annotations.createPointAnnotationManager()
     }
 
-    fun createPolylineAnnotationManager( mapView: MapView )
+    fun createMapboxPolylineAnnotationManager( mapView: MapView )
     {
-        polylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager()
+        mapboxPolylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager()
     }
 
-    fun createPolygonAnnotationManager( mapView: MapView )
+    fun createMapboxPolygonAnnotationManager( mapView: MapView )
     {
-        polygonAnnotationManager = mapView.annotations.createPolygonAnnotationManager()
+        mapboxPolygonAnnotationManager = mapView.annotations.createPolygonAnnotationManager()
     }
 
-    fun createPolygon( points: List<List<Point>>, fillColor: String, fillOpacity: Double )
+    fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : Any?
     {
-        polygonAnnotationManager?.let {
-            val polygonAnnotationOptions = PolygonAnnotationOptions()
-                .withPoints( points )
-                .withFillColor( fillColor )
-                .withFillOpacity( fillOpacity )
+        if (mapView is org.osmdroid.views.MapView)
+        {
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            mapboxPolygonAnnotationManager?.let {
+                val polygonAnnotationOptions = PolygonAnnotationOptions()
+                    .withPoints( points )
+                    .withFillColor( fillColor )
+                    .withFillOpacity( fillOpacity )
 
-            it.create(polygonAnnotationOptions)
+                return it.create(polygonAnnotationOptions)
+            }
+        }
+
+        return null
+    }
+
+    fun createPolyline( mapView: View, points: List<Point>, color: String ) : Any?
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            mapboxPolylineAnnotationManager?.let {
+                val outlinePoints = ArrayList<Point>(points)
+                outlinePoints.add( outlinePoints[0] )
+
+                val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+                    .withPoints(outlinePoints)
+                    .withLineColor(color)
+                    .withLineWidth(4.0)
+
+                return it.create(polylineAnnotationOptions)
+            }
+        }
+
+        return null
+    }
+
+    fun centerMap( enumArea: EnumArea, zoomLevel: Double?, mapView: View )
+    {
+        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(zoomLevel)
+                .center(point)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
         }
     }
 
-    fun createPolyline( points: List<Point>, color: String )
+    fun addMarker( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int ) : Any?
     {
-        polylineAnnotationManager?.let {
-            val outlinePoints = ArrayList<Point>(points)
-            outlinePoints.add( outlinePoints[0] )
-
-            val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-                .withPoints(outlinePoints)
-                .withLineColor(color)
-                .withLineWidth(4.0)
-
-            it.create(polylineAnnotationOptions)
+        if (mapView is org.osmdroid.views.MapView)
+        {
         }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            mapboxPointAnnotationManager?.let {
+                val pointAnnotationOptions = PointAnnotationOptions().withPoint( point )
+
+                convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
+                    pointAnnotationOptions.withIconImage( bitmap )
+                }
+
+                return it.create(pointAnnotationOptions)
+            }
+        }
+
+        return null
     }
 
     // private functions
@@ -97,9 +167,9 @@ class MapManager
 
     private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit))
     {
-        createPointAnnotationManager( mapView )
-        createPolygonAnnotationManager( mapView )
-        createPolylineAnnotationManager( mapView )
+        createMapboxPointAnnotationManager( mapView )
+        createMapboxPolygonAnnotationManager( mapView )
+        createMapboxPolylineAnnotationManager( mapView )
 
         mapView.getMapboxMap().loadStyleUri(
             style,
@@ -137,9 +207,37 @@ class MapManager
         )
     }
 
+    private fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap?
+    {
+        if (sourceDrawable == null)
+        {
+            return null
+        }
+
+        return if (sourceDrawable is BitmapDrawable)
+        {
+            sourceDrawable.bitmap
+        }
+        else
+        {
+            val constantState = sourceDrawable.constantState ?: return null
+            val drawable = constantState.newDrawable().mutate()
+            val bitmap: Bitmap = Bitmap.createBitmap(
+                drawable.intrinsicWidth, drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            bitmap
+        }
+    }
+
     companion object
     {
         private var _instance: MapManager? = null
+
+        val GEORGIA_TECH = LatLng( 33.77577524978659, -84.39630379821243 )
 
         fun instance() : MapManager
         {
