@@ -60,9 +60,9 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class ConfigurationFragment : Fragment(),
+    View.OnTouchListener,
     ConfirmationDialog.ConfirmationDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate,
-    MapEventsReceiver
+    BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -166,9 +166,6 @@ class ConfigurationFragment : Fragment(),
             binding.mapboxMapView.visibility = View.GONE
 
             MapManager.instance().initialize( activity!!, binding.osmMapView,"", MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude,0.0, 15.0 ) {
-
-                binding.osmMapView.overlays.add( MapEventsOverlay(this))
-
                 refreshMap()
             }
         }
@@ -187,14 +184,9 @@ class ConfigurationFragment : Fragment(),
                 binding.mapboxMapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 refreshMap()
             }
-
-            binding.mapboxMapView.getMapboxMap().addOnMapClickListener {
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.value, false )
-                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-                return@addOnMapClickListener true
-            }
         }
+
+        mapView.setOnTouchListener(this)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             val items = ArrayList<String>()
@@ -291,20 +283,6 @@ class ConfigurationFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean
-    {
-        val bundle = Bundle()
-        bundle.putBoolean( Keys.kEditMode.value, false )
-        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-
-        return true
-    }
-
-    override fun longPressHelper(p: GeoPoint?): Boolean
-    {
-        return true
     }
 
     fun refreshMap()
@@ -783,6 +761,18 @@ class ConfigurationFragment : Fragment(),
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
         binding.mapboxMapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+    }
+
+    override fun onTouch(p0: View, p1: MotionEvent?): Boolean
+    {
+        if (p1?.action == MotionEvent.ACTION_DOWN)
+        {
+            val bundle = Bundle()
+            bundle.putBoolean( Keys.kEditMode.value, false )
+            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+        }
+
+        return p0.performClick()
     }
 
     override fun onDestroyView()

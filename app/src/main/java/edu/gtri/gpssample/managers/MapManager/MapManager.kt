@@ -1,30 +1,31 @@
 package edu.gtri.gpssample.managers.MapManager
 
-import android.view.View
-import com.mapbox.maps.Style
+import android.R
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.gms.maps.model.LatLng
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
-import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.ScreenCoordinate
+import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
-import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationOptions
-import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
@@ -32,8 +33,10 @@ import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManage
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.database.models.EnumArea
-import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.utils.GeoUtils
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.Projection
+
 
 class MapManager
 {
@@ -53,6 +56,22 @@ class MapManager
         {
             initializeMapboxMap( mapView, style, lat, lon, alt, zoom, completion )
         }
+    }
+
+    fun getLocationFromPoint( mapView: View, motionEvent: MotionEvent ) : Pair<Double, Double>
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val point = mapView.getProjection().fromPixels(motionEvent.x.toInt(), motionEvent.y.toInt()) as GeoPoint
+            return Pair( point.getLatitude(), point.getLongitude())
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val point = mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(motionEvent.x.toDouble(),motionEvent.y.toDouble()))
+            return Pair( point.latitude(), point.longitude())
+        }
+
+        return Pair( 0.0, 0.0 )
     }
 
     fun createMapboxPointAnnotationManager( mapView: MapView )
