@@ -176,22 +176,21 @@ class ManageConfigurationsFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
+            var password = ""
+
             if (configurations.size == 1)
             {
                 encryptionPassword = configurations[0].encryptionPassword
+                password = "******"
+            }
 
-                if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()))
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
-                }
-                else
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
-                }
+            if ((configurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
+            {
+                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
             }
             else
             {
-                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "", resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
+                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
             }
         }
     }
@@ -399,7 +398,7 @@ class ManageConfigurationsFragment : Fragment(),
             configurations.clear()
             manageConfigurationsAdapter.updateConfigurations(configurations)
 
-            ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "******", resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
         }
         else if (tag == kImportTag)
         {
@@ -610,16 +609,12 @@ class ManageConfigurationsFragment : Fragment(),
 
     override fun didEnterText( name: String, tag: Any? )
     {
-        encryptionPassword = name
+        if (name != "******")
+        {
+            encryptionPassword = name
+        }
 
-        if ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString()) && (configurations.size > 0))
-        {
-            ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
-        }
-        else
-        {
-            ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
-        }
+        ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
     }
 
     override fun didCancelText( tag: Any? )
