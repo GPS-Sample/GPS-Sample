@@ -17,7 +17,7 @@
     <string name="sending_enum_data">"Mengirim Data Pencacahan"</string>
     <string name="receiving_data">"Menerima data"</string>
     <string name="configuration_received">"Konfigurasi Diterima"</string>
-    <string name="admin">"Panglingsir"</string>
+    <string name="admin">"Administrator"</string>
     <string name="supervisor">"Pengawas"</string>
     <string name="enumerator">"Pencacah"</string>
     <string name="surveyor">"surveyor"</string>
@@ -27,21 +27,21 @@
     <string name="data_collector">"Pengumpul data"</string>
     <string name="scan_qr_code">"Pindai kode QR"</string>
     <string name="continue_with_existing_study">"Lanjutkan dengan Studi yang ada"</string>
-    <string name="admin_sign_in">"Panglinsir Masuk"</string>
+    <string name="admin_sign_in">"Administrator Masuk"</string>
     <string name="supervisor_sign_in">"Pengawas Masuk"</string>
     <string name="data_collector_sign_in">"Masuk Pengumpul Data"</string>
-    <string name="admin_sign_up">"Panglinsir Daftar"</string>
+    <string name="admin_sign_up">"Administrator Daftar"</string>
     <string name="supervisor_sign_up">"Pendaftaran Pengawas"</string>
     <string name="data_collector_sign_up">"Pendaftaran Pengumpul Data"</string>
     <string name="enter_your_pin">"Masukkan PIN Anda"</string>
     <string name="reenter_your_pin">"Masukkan kembali PIN Anda"</string>
     <string name="back">"Kembali"</string>
-    <string name="cancel">"Membatalkan"</string>
+    <string name="cancel">"Batal"</string>
     <string name="finish">"Menyelesaikan"</string>
-    <string name="save">"Menyimpan"</string>
+    <string name="save">"Simpan"</string>
     <string name="done">"Selesai"</string>
     <string name="select_role">"Pilih Peran Anda"</string>
-    <string name="admin_select_role">"Admin Pilih Peran"</string>
+    <string name="admin_select_role">"Administrator Pilih Peran"</string>
     <string name="supervisor_select_role">"Peran Pemilihan Supervisor"</string>
     <string name="sign_in">"Masuk"</string>
     <string name="sign_up">"Mendaftar"</string>
@@ -51,7 +51,7 @@
     <string name="enter_your_name">"Masukkan nama Anda"</string>
     <string name="pin">"PIN"</string>
     <string name="forgot_pin_question">"Pertanyaan lupa PIN"</string>
-    <string name="forgot_pin_answer">"Lupa jawaban PIN"</string>
+    <string name="forgot_pin_answer">"Jawaban Lupa PIN"</string>
     <string name="enter_your_answer">"Masukkan jawaban Anda"</string>
     <string name="create_config">"Buat Konfigurasi"</string>
     <string name="delete_config">"Hapus Konfigurasi"</string>
@@ -101,7 +101,7 @@
     <string name="create_filter">"Buat Filter"</string>
     <string name="create_rule">"Buat Aturan"</string>
     <string name="enter_rule_name">"Masukkan Nama Aturan"</string>
-    <string name="field">"Bidang"</string>
+    <string name="field">"Isian Data"</string>
     <string name="operator">"Operator"</string>
     <string name="enter_value">"Masukkan Nilai"</string>
     <string name="value">"Nilai"</string>
@@ -122,7 +122,7 @@
     <string name="manage_enumeration_areas">"Kelola Area Pencacahan"</string>
     <string name="please_confirm">"Mohon Konfirmasi"</string>
     <string name="import_enumeration">"Impor Data Pencacahan"</string>
-    <string name="export_configuration">"Konfigurasi Ekspor"</string>
+    <string name="export_configuration">"Ekspor Konfigurasi"</string>
     <string name="delete_study_message">"Apakah Anda yakin ingin menghapus studi ini secara permanen?"</string>
     <string name="delete_field_message">"Apakah Anda yakin ingin menghapus bidang ini secara permanen?"</string>
     <string name="delete_rule_message">"Apakah Anda yakin ingin menghapus aturan ini secara permanen?"</string>
@@ -143,12 +143,12 @@
     <string name="yes">"Ya"</string>
     <string name="no">"TIDAK"</string>
     <string name="qr_code">"Kode QR"</string>
-    <string name="file_system">"Berkas sistem"</string>
+    <string name="file_system">"Transfer Berkas"</string>
     <string name="survey">"Survei"</string>
     <string name="undefined">"Belum diartikan"</string>
     <string name="enter_name">"Silakan masukkan nama"</string>
     <string name="desired_gps_position">"Silakan masukkan presisi GPS minimum yang diinginkan"</string>
-    <string name="import_configuration">"Konfigurasi Impor"</string>
+    <string name="import_configuration">"Impor Konfigurasi"</string>
     <string name="select_import_method">"Pilih metode impor"</string>
     <string name="select_configuration">"Pilih konfigurasi"</string>
     <string name="home_not_exist">"Rumah tidak ada"</string>
@@ -183,7 +183,7 @@
     <string name="text">"Teks"</string>
     <string name="checkbox">"kotak centang"</string>
     <string name="connected">"Terhubung"</string>
-    <string name="forgot_pin">"Lupa PINnya"</string>
+    <string name="forgot_pin">"Lupa PIN"</string>
     <string name="reset_pin">"Setel ulang PIN"</string>
     <string name="personally_identifiable">"Informasi Identifikasi Pribadi"</string>
     <string name="integer_only">"Hanya Bilangan Bulat"</string>
@@ -191,7 +191,7 @@
     <string name="time">"Waktu"</string>
     <string name="date">"Tanggal"</string>
     <string name="dropdown">"tarik-turun"</string>
-    <string name="fields">"Bidang"</string>
+    <string name="fields">"Isian"</string>
     <string name="rules">"Aturan"</string>
     <string name="simple_random">"Contoh acak sederhana"</string>
     <string name="cluster_sampling">"Pengambilan Sampel Klaster"</string>
@@ -214,20 +214,20 @@
     <string name="complete">"Menyelesaikan"</string>
     <string name="reason_incomplete_label">"Alasan Tidak Lengkap"</string>
     <string name="warning">"Peringatan!"</string>
-    <string name="duplicate_warning">"Menambahkan lokasi baru ini sangat dekat dengan lokasi yang sudah ada. Apakah Anda yakin ingin menambahkannya?"</string>
+    <string name="duplicate_warning">"Lokasi baru yang ditambahkan sangat dekat dengan lokasi yang sudah ada. Apakah Anda yakin ingin menambahkannya?"</string>
     <string name="missing_team">"Konfigurasi tidak memiliki definisi Tim"</string>
     <string name="collection_teams">"Tim Pengumpul"</string>
-    <string name="begin_field_block">"Mulai Blok Lapangan"</string>
-    <string name="save_and_end_block">"Simpan dan Akhiri Blokir"</string>
-    <string name="add_another_field">"Simpan dan Tambahkan Bidang Lain"</string>
+    <string name="begin_field_block">"Gunakan Blok Isian"</string>
+    <string name="save_and_end_block">"Simpan dan Akhiri Blok Isian"</string>
+    <string name="add_another_field">"Simpan dan Tambahkan Isian Lain"</string>
     <string name="current_location_not_set">"Lokasi Saat Ini Tidak Ditetapkan"</string>
     <string name="option_item_name">"Masukkan Nama Item Opsi"</string>
     <string name="export_collection_data">"Ekspor Data Pengumpulan"</string>
-    <string name="import_field_data">"Impor Data Bidang"</string>
+    <string name="import_field_data">"Impor Data Lapangan"</string>
     <string name="select_a_date">"Pilih Tanggal"</string>
     <string name="select">"Pilih"</string>
     <string name="team_name">"Nama tim"</string>
-    <string name="launch_survey">"Peluncuran Survei"</string>
+    <string name="launch_survey">"Mulai Survey"</string>
     <string name="mark_as_incomplete">"Tandai sebagai Tidak Lengkap"</string>
     <string name="enter_current_pin">"Masukkan Pin Saat Ini"</string>
     <string name="enter_new_pin">"Masukkan kembali PIN Baru"</string>
@@ -261,7 +261,7 @@
     <string name="launching_odk_collect_application">"Meluncurkan Aplikasi ODK Collect..."</string>
     <string name="filters">"Filter (menggabungkan aturan)"</string>
     <string name="new_location">"Identifikasi Lokasi"</string>
-    <string name="delete_configuration">"Konfigurasi saat ini akan digantikan oleh impor. Apakah Anda ingin melanjutkan?"</string>
+    <string name="delete_configuration">"Impor data akan menggantikan konfigurasi saat ini. Apakah Anda ingin melanjutkan?"</string>
     <string name="total_population">"Jumlah Populasi Total"</string>
     <string name="enter_the_total_population_size">"Masukkan jumlah populasi total"</string>
     <string name="total_population_size_error">"Ukuran total populasi harus lebih besar dari 0"</string>
@@ -278,13 +278,13 @@
     <string name="tile_pack_download_failed">"Pengunduhan Paket Ubin Peta Gagal"</string>
     <string name="download_map_tiles_now">"Apakah Anda ingin mengunduh petak peta sekarang?"</string>
     <string name="delete_map_tile_region">"Apakah Anda yakin ingin menghapus Wilayah Petak Peta ini?"</string>
-    <string name="import_enumeration_area">"Daerah Pencacahan Impor"</string>
+    <string name="import_enumeration_area">"Impor Area Pencacahan"</string>
     <string name="create_enumeration_area">"Buat Area Pencacahan"</string>
     <string name="add_household">"Tambahkan Rumah Tangga"</string>
-    <string name="define_map_tile_cache_region">"Tentukan wilayah cache ubin peta"</string>
-    <string name="download_map_tiles">"Unduh ubin peta"</string>
+    <string name="define_map_tile_cache_region">"Tentukan cache petak peta"</string>
+    <string name="download_map_tiles">"Unduh petak peta"</string>
     <string name="center_on_location">"Pusatkan pada lokasi"</string>
-    <string name="less_than_equal">"Kurang Dari Atau Sama"</string>
+    <string name="less_than_equal">"Kurang Dari Atau Sama Dengan"</string>
     <string name="gps_accuracy_error">"Akurasi GPS kurang dari akurasi yang dibutuhkan"</string>
     <string name="gps_location_error">"Anda saat ini terlalu jauh dari lokasi ini"</string>
     <string name="good">"BAGUS"</string>
@@ -295,12 +295,12 @@
     <string name="contains">"Mengandung"</string>
     <string name="collection_saved_doc">"Koleksi telah disimpan ke direktori Dokumen"</string>
     <string name="invalid_operator">"Operator yang dipilih tidak valid untuk aturan yang dipilih"</string>
-    <string name="about_gpssample">"Tentang Contoh GPS"</string>
+    <string name="about_gpssample">"Tentang GPSSample"</string>
     <string name="privacy_statement">"Pernyataan Privasi"</string>
-    <string name="terms_and_conditions">"syarat dan Ketentuan"</string>
+    <string name="terms_and_conditions">"Syarat dan Ketentuan"</string>
     <string name="show_map">"Tampilkan Peta"</string>
     <string name="number_of_residents">"Jumlah Penduduk"</string>
-    <string name="end_user_license_agreement">"Perjanjian Lisensi Pengguna Akhir"</string>
+    <string name="end_user_license_agreement">"Perjanjian Lisensi Pengguna"</string>
     <string name="code_of_conduct">"Kode etik"</string>
     <string name="clear_map">"Apakah Anda yakin ingin menghapus peta?"</string>
     <string name="delete_point">"Apakah Anda yakin ingin menghapus poin terakhir?"</string>
@@ -309,7 +309,7 @@
     <string name="please_enter_your_user_name">"Silakan masukkan nama pengguna Anda"</string>
     <string name="user_name_not_found">"Nama pengguna tidak ditemukan"</string>
     <string name="multi_families">"Multi Rumah Tangga"</string>
-    <string name="is_multi_family">"Apakah ini lokasi multi rumah tangga?"</string>
+    <string name="is_multi_family">"Apakah ini bangunan dengan banyak rumah tangga?"</string>
     <string name="sample">"Sampel"</string>
     <string name="mark_status">"Tandai Status"</string>
     <string name="not_visited">"Tidak Dikunjungi"</string>
@@ -317,23 +317,23 @@
     <string name="completed_collection">"Survei Selesai"</string>
     <string name="accuracy">"Akurasi:"</string>
     <string name="subaddress_is_required">"Sub-alamat wajib diisi"</string>
-    <string name="auto_increment_subaddress">"Sub-Alamat Kenaikan Otomatis"</string>
+    <string name="auto_increment_subaddress">"Pengurutan Sub-Alamat Otomatis"</string>
     <string name="allow_manual_identification_of_locations">"Izinkan identifikasi lokasi secara manual"</string>
     <string name="proximity_warning_enabled">"Peringatan Kedekatan Diaktifkan"</string>
-    <string name="encryption_password">"Kata Sandi Enkripsi"</string>
+    <string name="encryption_password">"Kata Sandi"</string>
     <string name="enter_encryption_password">"Masukkan Kata Sandi Enkripsi"</string>
     <string name="summary">"Ringkasan"</string>
     <string name="num_enumeration_areas">"# Area Pencacahan:"</string>
-    <string name="num_hhs_enumerated">"# HH Dihitung:"</string>
-    <string name="num_hhs_eligible">"# HH yang Memenuhi Syarat:"</string>
-    <string name="num_hhs_sampled">"# Sampel HH:"</string>
-    <string name="num_hhs_surveyed">"# HH yang Disurvei:"</string>
-    <string name="num_hhs_remaining_to_survey">"# Sisa HH yang Harus Disurvei:"</string>
+    <string name="num_hhs_enumerated">"# RT Dihitung:"</string>
+    <string name="num_hhs_eligible">"# RT yang Memenuhi Syarat:"</string>
+    <string name="num_hhs_sampled">"# Sampel RT:"</string>
+    <string name="num_hhs_surveyed">"# RT yang Disurvei:"</string>
+    <string name="num_hhs_remaining_to_survey">"# Sisa RT yang Harus Disurvei:"</string>
     <string name="decryption_failed">"Dekripsi gagal. Silakan coba lagi."</string>
     <string name="rename_or_delete">"Apakah Anda ingin Mengganti Nama atau Menghapus Area Pencacahan?"</string>
     <string name="rename">"Ganti nama"</string>
     <string name="map_tile_boundary">"Masukkan panjang/lebar (Kilometer) wilayah petak peta yang diinginkan"</string>
-    <string name="success">"KESUKSESAN!"</string>
+    <string name="success">"SUKSES!"</string>
     <string name="error">"KESALAHAN!"</string>
     <string name="import_failed">"Impor gagal."</string>
     <string name="import_succeeded">"Impor berhasil."</string>
@@ -341,7 +341,7 @@
     <string name="import_request_failed">"Menerima Permintaan Ekspor sambil menunggu Permintaan Impor"</string>
     <string name="export_request_failed">"Menerima Permintaan Impor sambil menunggu Permintaan Ekspor"</string>
     <string name="network_connection">"Koneksi jaringan"</string>
-    <string name="add_landmark">"Tambahkan Tengara"</string>
+    <string name="add_landmark">"Tambahkan Penanda"</string>
     <string name="enumerated">"Dihitung"</string>
     <string name="surveyed">"Disurvei"</string>
     <string name="meters">"Meter"</string>
@@ -357,18 +357,18 @@
     <string name="delete_last_location">"Hapus Lokasi Terakhir"</string>
     <string name="clear_map_and_start_over">"Hapus Peta dan Mulai dari Awal"</string>
     <string name="image_size_warning">"Anda telah melampaui 25Mb Data Gambar. Menambahkan lebih banyak gambar akan sangat mempengaruhi kinerja transfer data."</string>
-    <string name="subaddress_start">"Unggahang # pangawit anggén Subalamat"</string>
-    <string name="creation_options">"Opsi Pakaryan"</string>
-    <string name="set_location">"Tentuang Wates (p x l)"</string>
-    <string name="set_boundary">"Ngambar Wates"</string>
+    <string name="subaddress_start">"Masukkan awal nomor # Sub-Alamat"</string>
+    <string name="creation_options">"Opsi Pembuatan"</string>
+    <string name="set_location">"Tentukan bates (P X L)"</string>
+    <string name="set_boundary">"Menggambar bates"</string>
     <string name="update_boundary">"Unyarang wates"</string>
     <string name="location_image">"Gambar lokasi"</string>
     <string name="review_all_teams">"Tinjau Semua Tim"</string>
     <string name="config_saved">"Konfigurasi telah disimpan."</string>
     <string name="select_file_location">"Pilih lokasi file"</string>
-    <string name="default_location">"Lokasi bawaan"</string>
-    <string name="let_me_choose">"Biarkan aku memilih"</string>
-    <string name="boundary_is_self_intersecting">"Batas Wilayah Pencacahan ini berpotongan dengan sendirinya. Apakah Anda ingin memperbaiki batasnya?"</string>
+    <string name="default_location">"Lokasi Setalan bawaan"</string>
+    <string name="let_me_choose">"Pilih Lokasi Penyimpanan"</string>
+    <string name="boundary_is_self_intersecting">"Area Pencacahan ini mempunyai batas yang saling berpotongan. Apakah Anda ingin memperbaiki batasnya?"</string>
     <string name="select_the_property_identifier">"Pilih variabel nama klaster"</string>
     <string name="select_the_hh_identifiers">"Pilih variabel rumah tangga yang akan diimpor"</string>
     <string name="app_version">"Versi aplikasi"</string>
@@ -389,10 +389,10 @@
     <string name="collection_reason_incomplete_label">"Alasan Pengumpulan Tidak Lengkap"</string>
     <string name="enumeration_notes">"Catatan Pencacahan"</string>
     <string name="collection_notes">"Catatan Pengumpulan"</string>
-    <string name="select_map_tiles">"Pilih satu set petak peta"</string>
+    <string name="select_map_tiles">"Pilih Petak Peta"</string>
     <string name="loading_mapbox_tiles">"Memuat Petak Mapbox..."</string>
-    <string name="mapbox_streets">"Peta Jalan Mapbox"</string>
-    <string name="satellite_streets">"Peta Jalan Satelit"</string>
+    <string name="mapbox_streets">"Tampilan Jalan"</string>
+    <string name="satellite_streets">"Tampilan Satelit"</string>
     <string name="import_map_tiles">"Impor Petak Peta"</string>
     <string name="re_import">"File yang dipilih telah diimpor. Apakah Anda ingin mengimpornya kembali sekarang?"</string>
     <string name="attach_mbtiles_question">"Apakah Anda ingin melampirkan MBTiles ke area ini?"</string>
@@ -423,14 +423,14 @@
     </string-array>
     <string-array name="field_types">
         <item>"Teks"</item>
-        <item>"Nomor"</item>
+        <item>"Angka"</item>
         <item>"Tanggal"</item>
-        <item>"kotak centang"</item>
-        <item>"tarik-turun"</item>
+        <item>"Kotak centang"</item>
+        <item>"Menu Pilihan"</item>
     </string-array>
     <string-array name="operators">
-        <item>"Setara"</item>
-        <item>"Tidak sama"</item>
+        <item>"Sama dengan"</item>
+        <item>"Tidak Sama Dengan"</item>
         <item>"Kurang dari"</item>
         <item>"Lebih besar dari"</item>
         <item>"Lebih BesarDariAtauSama"</item>
