@@ -40,13 +40,13 @@
     <string name="finish">"Finalizar"</string>
     <string name="save">"Guardar"</string>
     <string name="done">"Hecho"</string>
-    <string name="select_role">"Selecciona su rol"</string>
-    <string name="admin_select_role">"Administrador - selecciona rol"</string>
-    <string name="supervisor_select_role">"Supervisor - selecciona rol"</string>
+    <string name="select_role">"Seleccione su rol"</string>
+    <string name="admin_select_role">"Administrador - seleccione rol"</string>
+    <string name="supervisor_select_role">"Supervisor - seleccione rol"</string>
     <string name="sign_in">"Iniciar sesión"</string>
     <string name="sign_up">"Registrarse"</string>
     <string name="sign_out">"Cerrar sesión"</string>
-    <string name="not_registered">"¿No estás registrado? ¡Regístrate!"</string>
+    <string name="not_registered">"¿No está registrado? ¡Regístrese!"</string>
     <string name="name">"Nombre"</string>
     <string name="enter_your_name">"Ingrese su nombre"</string>
     <string name="pin">"PIN"</string>
@@ -91,7 +91,7 @@
     <string name="field_type">"Tipo de campo"</string>
     <string name="enter_checkbox_text">"Ingrese el texto del elemento de la casilla de chequeo"</string>
     <string name="enter_dropdown_item_text">"Ingrese el texto del elemento del menú de opciones"</string>
-    <string name="add_another">"SUMA OTRO"</string>
+    <string name="add_another">"Añada otro"</string>
     <string name="delete_field">"Eliminar campo"</string>
     <string name="manage_this_study">"Administrar este estudio"</string>
     <string name="manage_study">"Administrar estudio"</string>
@@ -138,7 +138,7 @@
     <string name="configuration_documents_message">"La configuración se ha guardado en el directorio Documentos."</string>
     <string name="delete_enum_area_message">"¿Está seguro de que desea borrar permanentemente el Área de Enumeración?"</string>
     <string name="no_study_ea">"No tiene ningún estudio asociado a esta Área de Enumeración."</string>
-    <string name="filename_export_message">"Introduzca un nombre de archivo para la exportación"</string>
+    <string name="filename_export_message">"Ingrese un nombre de archivo para la exportación"</string>
     <string name="select_task">"Seleccione una tarea"</string>
     <string name="yes">"Sí"</string>
     <string name="no">"No"</string>
@@ -153,7 +153,7 @@
     <string name="select_configuration">"Seleccione una configuración"</string>
     <string name="home_not_exist">"La hogar no existe"</string>
     <string name="reason_incomplete">""¡Oops! Por favor, seleccione una razón para incompleto""</string>
-    <string name="enter_enum_area_name">"Introduzca el nombre del área de enumeración"</string>
+    <string name="enter_enum_area_name">"Ingrese el nombre del área de enumeración"</string>
     <string name="select_enumeration">"Seleccione un Área de Enumeración"</string>
     <string name="select_time">"Seleccione la hora"</string>
     <string name="select_date">"Seleccione la fecha"</string>
@@ -177,7 +177,7 @@
     <string name="does_not_exist">"No existe"</string>
     <string name="other">"Otros"</string>
     <string name="notes">"Notas"</string>
-    <string name="oops">"¡Vaya!"</string>
+    <string name="oops">"¡Atención!"</string>
     <string name="field_is_required">"campo obligatorio"</string>
     <string name="number">"Número"</string>
     <string name="text">"Texto"</string>
@@ -195,7 +195,7 @@
     <string name="rules">"Reglas"</string>
     <string name="simple_random">"Muestreo aleatorio simple"</string>
     <string name="cluster_sampling">"Muestreo por conglomerados"</string>
-    <string name="subset_overlap">"Subconjuntos: Pueden solaparse"</string>
+    <string name="subset_overlap">"Subconjuntos: Se pueden superponer"</string>
     <string name="strata_exclusive">"Estratos: Mutuamente excluyentes"</string>
     <string name="numberhouseholds">"# de hogares"</string>
     <string name="percenthouseholds">"% de todos los hogares"</string>
@@ -214,14 +214,14 @@
     <string name="complete">"Completar"</string>
     <string name="reason_incomplete_label">"Razón Incompleto"</string>
     <string name="warning">"Advertencia"</string>
-    <string name="duplicate_warning">"Añadir esta nueva ubicación está extremadamente cerca de una ubicación existente.  ¿Está seguro de que desea añadirla?"</string>
+    <string name="duplicate_warning">"Esta nueva ubicación está extremadamente cerca de una ubicación existente.  ¿Está seguro de que desea añadirla?"</string>
     <string name="missing_team">"A la configuración le falta una definición de Equipo"</string>
     <string name="collection_teams">"Equipos de recogida"</string>
-    <string name="begin_field_block">"Iniciar bloque de campo"</string>
+    <string name="begin_field_block">"Iniciar bloque de preguntas"</string>
     <string name="save_and_end_block">"Guardar y finalizar bloque"</string>
     <string name="add_another_field">"Guardar y añadir otro campo"</string>
     <string name="current_location_not_set">"Ubicación actual no establecida"</string>
-    <string name="option_item_name">"Introduzca el nombre de la opción"</string>
+    <string name="option_item_name">"Ingrese el nombre de la opción"</string>
     <string name="export_collection_data">"Exportar datos de recogida"</string>
     <string name="import_field_data">"Importar datos de campo"</string>
     <string name="select_a_date">"Seleccione una fecha"</string>
@@ -241,7 +241,7 @@
     <string name="description">"Descripción"</string>
     <string name="add_image">"Añadir imagen"</string>
     <string name="enumeration_areas">"Áreas de Enumeración"</string>
-    <string name="enter_team_name">"Introducir nombre de equipo"</string>
+    <string name="enter_team_name">"Ingresar nombre de equipo"</string>
     <string name="assign_households">"Asignar hogares"</string>
     <string name="sampling_type">"Tipo de Muestreo"</string>
     <string name="generating_qr_code">"Generar Código QR..."</string>
@@ -266,7 +266,7 @@
     <string name="enter_the_total_population_size">"Introduzca el tamaño total de la población"</string>
     <string name="total_population_size_error">"El tamaño total de la población debe ser superior a 0"</string>
     <string name="sample_size_error">"El tamaño de la muestra debe ser superior a 0"</string>
-    <string name="simple_random_sampling_label">"Tamaño total de la muestra en todas las agrupaciones"</string>
+    <string name="simple_random_sampling_label">"Tamaño total de la muestra en todos los conglomerados"</string>
     <string name="cluster_sampling_label">"Tamaño de la muestra por conglomerado"</string>
     <string name="show_enumeration_info">"Mostrar información de enumeración"</string>
     <string name="please_enter_a_name">"Introduzca un nombre para este campo."</string>
@@ -281,7 +281,7 @@
     <string name="import_enumeration_area">"Importar área de enumeración"</string>
     <string name="create_enumeration_area">"Crear área de enumeración"</string>
     <string name="add_household">"Añadir hogar"</string>
-    <string name="define_map_tile_cache_region">"Definir región de caché de map tiles"</string>
+    <string name="define_map_tile_cache_region">"Definir región de caché de mosaicos de mapa"</string>
     <string name="download_map_tiles">"Descargar mosaicos de mapa"</string>
     <string name="center_on_location">"Centrar en ubicación"</string>
     <string name="less_than_equal">"Menor o igual que"</string>
@@ -302,8 +302,8 @@
     <string name="number_of_residents">"Número de residentes"</string>
     <string name="end_user_license_agreement">"Acuerdo de licencia de usuario final"</string>
     <string name="code_of_conduct">"Código de conducta"</string>
-    <string name="clear_map">"¿Estás seguro de que quieres borrar el mapa?"</string>
-    <string name="delete_point">"¿Estás seguro de que quieres eliminar el último punto?"</string>
+    <string name="clear_map">"¿Está seguro de que quiere borrar el mapa?"</string>
+    <string name="delete_point">"¿Está seguro de que quiere eliminar el último punto?"</string>
     <string name="enumeration_area">"Área de Enumeración"</string>
     <string name="please_select_a_role">"Seleccione un rol"</string>
     <string name="please_enter_your_user_name">"Introduzca su nombre de usuario"</string>
@@ -311,8 +311,8 @@
     <string name="multi_families">"Multihogares"</string>
     <string name="is_multi_family">"¿Se trata de una ubicación multihogar?"</string>
     <string name="sample">"Muestra"</string>
-    <string name="mark_status">"Marca Estado"</string>
-    <string name="not_visited">"No visitado"</string>
+    <string name="mark_status">"Indicar estatus"</string>
+    <string name="not_visited">"No se ha visitado"</string>
     <string name="incomplete_collection">"Encuesta incompleta"</string>
     <string name="completed_collection">"Encuesta completada"</string>
     <string name="accuracy">"Precisión :"</string>
@@ -321,7 +321,7 @@
     <string name="allow_manual_identification_of_locations">"Permitir la identificación manual de ubicaciones"</string>
     <string name="proximity_warning_enabled">"Aviso de proximidad activado"</string>
     <string name="encryption_password">"Contraseña de encriptación"</string>
-    <string name="enter_encryption_password">"Introduzca la contraseña de encriptación"</string>
+    <string name="enter_encryption_password">"Ingrese la contraseña de encriptación"</string>
     <string name="summary">"Resumen"</string>
     <string name="num_enumeration_areas">"# Áreas de Enumeración:"</string>
     <string name="num_hhs_enumerated">"# Hogares censados"</string>
@@ -332,7 +332,7 @@
     <string name="decryption_failed">"La desencriptación ha fallado.  Inténtelo de nuevo."</string>
     <string name="rename_or_delete">"¿Desea cambiar el nombre o eliminar el área de enumeración?"</string>
     <string name="rename">"Renombrar"</string>
-    <string name="map_tile_boundary">"Introduzca la longitud/anchura (Kilómetros) de la región de mosaico de mapa deseada"</string>
+    <string name="map_tile_boundary">"Ingrese la longitud/anchura (Kilómetros) de la región de mosaico de mapa deseada"</string>
     <string name="success">"¡ÉXITO!"</string>
     <string name="error">"¡ERROR!"</string>
     <string name="import_failed">"La importación ha fallado."</string>
@@ -367,9 +367,9 @@
     <string name="config_saved">"Se ha guardado la configuración."</string>
     <string name="select_file_location">"Seleccione la ubicación del archivo"</string>
     <string name="default_location">"Ubicación por defecto"</string>
-    <string name="let_me_choose">"Déjame elegir"</string>
+    <string name="let_me_choose">"Permítame elegir"</string>
     <string name="boundary_is_self_intersecting">"El límite de esta zona de enumeración es auto-intersecante. Desea corregir el límite?"</string>
-    <string name="select_the_property_identifier">"Seleccione la variable del nombre del cluster"</string>
+    <string name="select_the_property_identifier">"Seleccione la variable del nombre del conglomerado"</string>
     <string name="select_the_hh_identifiers">"Seleccione las variables domésticas a importar"</string>
     <string name="app_version">"Versión de la aplicación"</string>
     <string name="db_version">"Versión de la base de datos"</string>
@@ -383,8 +383,8 @@
     <string name="select_the_minimum_date">"Seleccione la fecha mínima"</string>
     <string name="select_the_maximum_date">"Seleccione la fecha máxima"</string>
     <string name="min_greater_than_max">"El valor mínimo es mayor que el valor máximo"</string>
-    <string name="enumeration_status">"Estado de la enumeración"</string>
-    <string name="collection_status">"Estado de la colección"</string>
+    <string name="enumeration_status">"Situación de enumeración"</string>
+    <string name="collection_status">"Situación de colección"</string>
     <string name="enumeration_reason_incomplete_label">"Enumeración Motivo Incompleto"</string>
     <string name="collection_reason_incomplete_label">"Motivo de recogida incompleta"</string>
     <string name="enumeration_notes">"Notas de enumeración"</string>
@@ -402,12 +402,12 @@
     <string name="attach_mbtiles">"Adjuntar MapBox Tiles"</string>
     <string name="detach_mbtiles">"Separar fichas de MapBox"</string>
     <string name="take_photo">"Tomar foto"</string>
-    <string name="retake_photo">"Volver a tomar foto"</string>
+    <string name="retake_photo">"Tomar foto de nuevo"</string>
     <string name="min_password_required">"La longitud mínima de la contraseña es de 6 caracteres"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
-        <item>"El nombre de tu mascota favorita"</item>
+        <item>"El nombre de su mascota favorita"</item>
         <item>"Últimas 4 cifras del número de celular"</item>
         <item>"Comida favorita"</item>
         <item>"Mes de nacimiento"</item>
