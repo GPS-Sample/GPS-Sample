@@ -1,4 +1,4 @@
-package edu.gtri.gpssample.managers.MapManager
+package edu.gtri.gpssample.managers
 
 import android.R
 import android.content.Context

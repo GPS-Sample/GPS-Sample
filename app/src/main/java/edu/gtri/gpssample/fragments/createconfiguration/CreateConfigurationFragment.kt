@@ -47,7 +47,7 @@ import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
-import edu.gtri.gpssample.managers.MapManager.MapManager
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -87,7 +87,7 @@ class CreateConfigurationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
+        binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
 
@@ -186,7 +186,7 @@ class CreateConfigurationFragment : Fragment(),
             binding.osmMapView.visibility = View.VISIBLE
             binding.mapView.visibility = View.GONE
 
-            MapManager.instance().initialize( activity!!, binding.osmMapView,"",33.77577524978659, -84.39630379821243, 0.0, 15.0 ) {
+            MapManager.instance().initialize( activity!!, binding.osmMapView,"",MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 15.0 ) {
                 refreshMap()
             }
         }
@@ -199,7 +199,7 @@ class CreateConfigurationFragment : Fragment(),
                 style = it
             }
 
-            MapManager.instance().initialize( activity!!, binding.mapView, style,33.77577524978659, -84.39630379821243, 0.0, 10.0 ) {
+            MapManager.instance().initialize( activity!!, binding.mapView, style,MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 10.0 ) {
                 binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 refreshMap()
             }

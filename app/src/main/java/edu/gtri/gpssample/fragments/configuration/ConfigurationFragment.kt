@@ -46,7 +46,7 @@ import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
-import edu.gtri.gpssample.managers.MapManager.MapManager
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.osmdroid.events.MapEventsReceiver
