@@ -12,9 +12,12 @@ import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -54,6 +57,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.ArrayList
 
 class CreateConfigurationFragment : Fragment(),
+    View.OnTouchListener,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
@@ -113,6 +117,18 @@ class CreateConfigurationFragment : Fragment(),
         }
 
         binding.mapEngineSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
+
+        binding.mapEngineSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    config.mapEngineIndex = position
+                    selectMap()
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             binding.mapEngineSpinner.setSelection(config.mapEngineIndex)
@@ -175,43 +191,7 @@ class CreateConfigurationFragment : Fragment(),
             }
         }
 
-        lateinit var config: Config
-
-        sharedViewModel.currentConfiguration?.value?.let {
-            config = it
-        }
-
-        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-        {
-            binding.osmMapView.visibility = View.VISIBLE
-            binding.mapView.visibility = View.GONE
-
-            MapManager.instance().initialize( activity!!, binding.osmMapView,"",MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 15.0 ) {
-                refreshMap()
-            }
-        }
-        else if (config.mapEngineIndex == MapEngine.MapBox.value)
-        {
-            val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-            var style = Style.MAPBOX_STREETS
-
-            sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-                style = it
-            }
-
-            MapManager.instance().initialize( activity!!, binding.mapView, style,MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 10.0 ) {
-                binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-                refreshMap()
-            }
-
-            // TODO: create a generic click listener in the MapManager
-            binding.mapView.getMapboxMap().addOnMapClickListener {
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.value, true )
-                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-                return@addOnMapClickListener true
-            }
-        }
+        binding.mapOverlayView.setOnTouchListener(this)
 
         polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
         polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
@@ -225,6 +205,38 @@ class CreateConfigurationFragment : Fragment(),
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
         binding.studiesRecycler.adapter = manageStudiesAdapter
         binding.studiesRecycler.layoutManager = LinearLayoutManager(activity )
+    }
+
+    fun selectMap()
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+            {
+                binding.mapView.visibility = View.GONE
+                binding.osmMapView.visibility = View.VISIBLE
+
+                MapManager.instance().initialize( activity!!, binding.osmMapView,"",MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 15.0 ) {
+                    refreshMap()
+                }
+            }
+            else if (config.mapEngineIndex == MapEngine.MapBox.value)
+            {
+                binding.mapView.visibility = View.VISIBLE
+                binding.osmMapView.visibility = View.GONE
+
+                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                var style = Style.MAPBOX_STREETS
+
+                sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+                    style = it
+                }
+
+                MapManager.instance().initialize( activity!!, binding.mapView, style, MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 10.0 ) {
+                    binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                    refreshMap()
+                }
+            }
+        }
     }
 
     override fun onResume()
@@ -319,6 +331,20 @@ class CreateConfigurationFragment : Fragment(),
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
         binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+    }
+
+    override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
+        motionEvent?.let {
+            if (it.action == MotionEvent.ACTION_UP) {
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.value, true )
+                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+            }
+        }
+
+        view?.performClick()
+
+        return true
     }
 
     override fun onDestroyView()

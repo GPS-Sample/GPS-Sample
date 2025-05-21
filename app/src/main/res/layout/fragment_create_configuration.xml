@@ -75,8 +75,7 @@
                     <Spinner
                         android:id="@+id/map_engine_spinner"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:onItemSelected="@{viewModel::onMapEngineSelected}" />
+                        android:layout_height="match_parent"/>
                 </FrameLayout>
 
                 <TextView
@@ -324,9 +323,15 @@
                     <org.osmdroid.views.MapView
                         android:id="@+id/osm_map_view"
                         android:visibility="gone"
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="200dp">
                     </org.osmdroid.views.MapView>
+
+                    <View
+                        android:id="@+id/map_overlay_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp">
+                    </View>
                 </FrameLayout>
 
                 <Space

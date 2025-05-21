@@ -174,13 +174,6 @@ class ConfigurationViewModel : ViewModel()
             _currentFragment = value
         }
 
-    fun onMapEngineSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
-    {
-        _currentConfiguration?.value?.let {
-            it.mapEngineIndex = position
-        }
-    }
-
     fun onDistanceFormatSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
     {
         _currentConfiguration?.value?.let {
