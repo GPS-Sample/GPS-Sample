@@ -8,8 +8,6 @@
 package edu.gtri.gpssample.fragments.createconfiguration
 
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -28,23 +26,18 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.interpolate
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
-import com.mapbox.maps.plugin.gestures.addOnMapClickListener
-import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
@@ -52,9 +45,11 @@ import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
-import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.util.ArrayList
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
 
 class CreateConfigurationFragment : Fragment(),
     View.OnTouchListener,
@@ -216,6 +211,7 @@ class CreateConfigurationFragment : Fragment(),
                 binding.osmMapView.visibility = View.VISIBLE
 
                 MapManager.instance().initialize( activity!!, binding.osmMapView,"",MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 15.0 ) {
+                    initLocationComponent()
                     refreshMap()
                 }
             }
@@ -232,7 +228,7 @@ class CreateConfigurationFragment : Fragment(),
                 }
 
                 MapManager.instance().initialize( activity!!, binding.mapView, style, MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 10.0 ) {
-                    binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                    initLocationComponent()
                     refreshMap()
                 }
             }
@@ -307,30 +303,70 @@ class CreateConfigurationFragment : Fragment(),
     {
     }
 
-    private fun initLocationComponent() {
-        binding.mapView.location.updateSettings {
-            this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
-        }
+    private fun initLocationComponent()
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+            {
+                val locationProvider = GpsMyLocationProvider(activity)
+                val locationOverlay = MyLocationNewOverlay(locationProvider, binding.osmMapView)
 
-        binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                locationOverlay.enableMyLocation()
+
+                locationOverlay.runOnFirstFix {
+                    val myLocation = locationOverlay.getMyLocation();
+                    if (myLocation != null) {
+                        activity!!.runOnUiThread {
+                            binding.osmMapView.getController().animateTo(myLocation);
+                        }
+                    }
+                }
+
+                binding.osmMapView.getOverlays().add(locationOverlay)
+            }
+            else if (config.mapEngineIndex == MapEngine.MapBox.value)
+            {
+                binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+
+                binding.mapView.location.updateSettings {
+                    this.enabled = true
+                    this.locationPuck = LocationPuck2D(
+                        bearingImage = AppCompatResources.getDrawable(
+                            activity!!,
+                            R.drawable.mapbox_user_puck_icon,
+                        ),
+                        shadowImage = AppCompatResources.getDrawable(
+                            activity!!,
+                            R.drawable.mapbox_user_icon_shadow,
+                        ),
+                        scaleExpression = interpolate {
+                            linear()
+                            zoom()
+                            stop {
+                                literal(0.0)
+                                literal(0.6)
+                            }
+                            stop {
+                                literal(20.0)
+                                literal(1.0)
+                            }
+                        }.toJson()
+                    )
+                }
+
+                binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+            } else {}
+        }
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
         binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        removeOnIndicatorPositionChangedListener()
+    }
+
+    fun removeOnIndicatorPositionChangedListener()
+    {
+        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
     }
 
     override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {

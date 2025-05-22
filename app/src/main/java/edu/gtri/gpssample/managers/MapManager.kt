@@ -50,7 +50,7 @@ class MapManager
     {
         if (mapView is org.osmdroid.views.MapView)
         {
-            initializeOsmMap( context, mapView, lat, lon, alt, zoom )
+            initializeOsmMap( context, mapView, lat, lon, alt, zoom, completion )
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
@@ -175,13 +175,14 @@ class MapManager
 
     // private functions
 
-    private fun initializeOsmMap( context: Context, mapView: org.osmdroid.views.MapView, lat: Double, lon: Double, alt: Double, zoom: Double )
+    private fun initializeOsmMap( context: Context, mapView: org.osmdroid.views.MapView, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit) )
     {
         org.osmdroid.config.Configuration.getInstance().load( context, PreferenceManager.getDefaultSharedPreferences(context))
 
         mapView.controller.setZoom( zoom )
         mapView.setMultiTouchControls( true )
         mapView.controller.setCenter( org.osmdroid.util.GeoPoint( lat, lon, alt ))
+        completion()
     }
 
     private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit))
