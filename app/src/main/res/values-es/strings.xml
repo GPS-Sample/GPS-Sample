@@ -50,8 +50,8 @@
     <string name="name">"Nombre"</string>
     <string name="enter_your_name">"Ingrese su nombre"</string>
     <string name="pin">"PIN"</string>
-    <string name="forgot_pin_question">"Se olvidó la pregunta del PIN"</string>
-    <string name="forgot_pin_answer">"Se olvidó la respuesta del PIN"</string>
+    <string name="forgot_pin_question">"Olvidó la pregunta del PIN"</string>
+    <string name="forgot_pin_answer">"Olvidó la respuesta del PIN"</string>
     <string name="enter_your_answer">"Ingrese su respuesta"</string>
     <string name="create_config">"Crear configuración"</string>
     <string name="delete_config">"Eliminar configuración"</string>
@@ -259,7 +259,7 @@
     <string name="dismiss">"Descartar"</string>
     <string name="delete">"Borrar"</string>
     <string name="launching_odk_collect_application">"Lanzamiento de la aplicación ODK Collect..."</string>
-    <string name="filters">"Filtros (combina reglas)"</string>
+    <string name="filters">"Filtros (Combinación de reglas)"</string>
     <string name="new_location">"Identificar ubicación"</string>
     <string name="delete_configuration">"La configuración actual será reemplazada por la importación.  ¿Desea continuar?"</string>
     <string name="total_population">"Tamaño total de la población"</string>
@@ -357,7 +357,7 @@
     <string name="delete_last_location">"Borrar última ubicación"</string>
     <string name="clear_map_and_start_over">"Borrar mapa y volver a empezar"</string>
     <string name="image_size_warning">"Ha superado los 25Mb de Datos de Imagen. Añadir más imágenes tendrá un gran impacto en la transferencia de datos."</string>
-    <string name="subaddress_start">"Introduzca el número inicial de la subdirección"</string>
+    <string name="subaddress_start">"Ingrese el número inicial de la subdirección"</string>
     <string name="creation_options">"Opciones de creación"</string>
     <string name="set_location">"Definir Límites (l x a)"</string>
     <string name="set_boundary">"Dibujar límite"</string>
