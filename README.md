@@ -8,7 +8,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android-3B90C4.svg?style=flat)](https://www.android.com)
 [![Language](https://img.shields.io/badge/Language-Kotlin-blue.svg?style=flat)](https://kotlinlang.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg?style=flat)](LICENSE.md)
-[![Chat](https://img.shields.io/badge/Chat-on%20Discord-60C53A.svg?style=flat)](https://discord.gg/xJWY4ckr)
+[![Chat](https://img.shields.io/badge/Chat-on%20Discord-60C53A.svg?style=flat)](https://discord.com/invite/A8EYY9xV)
 [![Covenant](https://img.shields.io/badge/Contributor%20Covenant-1.19.24-469C9C.svg?style=flat)](CODE-OF-CONDUCT.pdf)
 
 ## About
@@ -95,7 +95,7 @@ If you are interested in fixing issues and contributing directly to the code bas
   
 ## Community
 
-The GPSSample community can be found on [Discord](https://discord.gg/xJWY4ckr) where you can ask questions, voice ideas, and share your projects with other people.
+The GPSSample community can be found on [Discord](https://discord.com/invite/A8EYY9xV) where you can ask questions, voice ideas, and share your projects with other people.
 
 Do note that our [Code of Conduct](CODE-OF-CONDUCT.pdf) applies to all GPSSample community channels. Users are **highly encouraged** to read and adhere to them to avoid repercussions.
 
