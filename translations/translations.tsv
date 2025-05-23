@@ -76,8 +76,8 @@ not_registered	Not registered?  Sign Up!	¿No está registrado? ¡Regístrese!	P
 name	Name	Nombre	Nom	Nome	Имя	Nama	
 enter_your_name	Enter your name	Ingrese su nombre	Entrez votre nom	Insira seu nome	Введите Ваше имя	Masukkan nama Anda	
 pin	PIN	PIN	PIN	PIN	PIN-код	PIN	
-forgot_pin_question	Forgot PIN question	Se olvidó la pregunta del PIN	Question liée au PIN oubliée?	Pergunta sobre o PIN esquecido	Забыли вопрос для PIN-кода	Pertanyaan lupa PIN	
-forgot_pin_answer	Forgot PIN answer	Se olvidó la respuesta del PIN	Réponse liée au PIN oubliée?	Resposta ao PIN esquecido	Забыли ответ для PIN-кода	Jawaban Lupa PIN	
+forgot_pin_question	Forgot PIN question	Olvidó la pregunta del PIN	Question liée au PIN oubliée?	Pergunta sobre o PIN esquecido	Забыли вопрос для PIN-кода	Pertanyaan lupa PIN	
+forgot_pin_answer	Forgot PIN answer	Olvidó la respuesta del PIN	Réponse liée au PIN oubliée?	Resposta ao PIN esquecido	Забыли ответ для PIN-кода	Jawaban Lupa PIN	
 enter_your_answer	Enter your answer	Ingrese su respuesta	Saisissez votre réponse	Insira sua resposta	Введите ответ	Masukkan jawaban Anda	
 create_config	Create Configuration	Crear configuración	Créer une configuration	Criar configuração	Создать конфигурацию	Buat Konfigurasi	
 delete_config	Delete Configuration	Eliminar configuración	Supprimer la configuration	Eliminar configuração	Удалить конфигурацию	Hapus Konfigurasi	
@@ -285,7 +285,7 @@ incomplete_enumeration	Incomplete Enumeration	Enumeración incompleta	Dénombrem
 dismiss	Dismiss	Descartar	Supprimer	Excluir	Пропустить	Membubarkan	
 delete	Delete	Borrar	Supprimer	Eliminar	Удалить	Menghapus	
 launching_odk_collect_application	Launching ODK Collect Application...	Lanzamiento de la aplicación ODK Collect...	Lancement de l'application ODK Collect...	Iniciar a aplicação ODK Collect...	Запуск приложения ODK Collect...	Meluncurkan Aplikasi ODK Collect...	
-filters	Filters (combines rules)	Filtros (combina reglas)	Filtres (combinent des règles)	Filtros (combina regras)	Фильтры (объединяет правила)	Filter (menggabungkan aturan)	
+filters	Filters (combines rules)	Filtros (Combinación de reglas)	Filtres (combinent des règles)	Filtros (combina regras)	Фильтры (объединяет правила)	Filter (menggabungkan aturan)	
 new_location	Identify Location	Identificar ubicación	Identifier le lieu	Identificar a localização	Идентифицировать местоположение	Identifikasi Lokasi	
 delete_configuration	The current configuration will be replaced by the import.  Would you like to proceed?	La configuración actual será reemplazada por la importación.  ¿Desea continuar?	La configuration actuelle sera remplacée par l'importation.  Souhaitez-vous continuer ?	A configuração atual será substituída pela importação. Deseja prosseguir? 	Текущая конфигурация будет заменена импортом.  Хотите продолжить?	Impor data akan menggantikan konfigurasi saat ini. Apakah Anda ingin melanjutkan?	
 total_population	Total Population Size	Tamaño total de la población	Taille totale de la population	Tamanho total da população	Общий размер популяции	Jumlah Populasi Total	
@@ -383,7 +383,7 @@ mark_current_location	Mark Current Location	Marcar ubicación actual	Marquez l'e
 delete_last_location	Delete Last Location	Borrar última ubicación	Supprimez le dernier emplacement	Apagar a última localização	Удалить последнее местоположение	Hapus Lokasi Terakhir	
 clear_map_and_start_over	Clear Map and Start Over	Borrar mapa y volver a empezar	Effacez la carte et recommencer	Limpar mapa e começar de novo	Очистить карту и начать сначала	Hapus Peta dan Mulai dari Awal	
 image_size_warning	You've exceeded 25Mb of Image Data. Adding more images will greatly impact data transfer performance.	Ha superado los 25Mb de Datos de Imagen. Añadir más imágenes tendrá un gran impacto en la transferencia de datos.	Vous avez dépassé les 25 MB de données d'image. L'ajout d'images supplémentaires aura un impact considérable sur les performances de transfert des données.	Excedeu 25 Mb de dados de imagem. A adição de mais imagens terá um grande impacto na transferência de dados.	Вы превысили 25 Мб данных изображений. Добавление дополнительных изображений сильно повлияет на производительность передачи данных.	Anda telah melampaui 25Mb Data Gambar. Menambahkan lebih banyak gambar akan sangat mempengaruhi kinerja transfer data.	
-subaddress_start	Enter the starting # for the Subaddress	Introduzca el número inicial de la subdirección	Saisissez le numéro de départ de la sous-adresse.	Introduzir o número inicial do subendereço	Введите начальный № для субадреса	Masukkan awal nomor # Sub-Alamat	
+subaddress_start	Enter the starting # for the Subaddress	Ingrese el número inicial de la subdirección	Saisissez le numéro de départ de la sous-adresse.	Introduzir o número inicial do subendereço	Введите начальный № для субадреса	Masukkan awal nomor # Sub-Alamat	
 creation_options	Creation Options	Opciones de creación	Options de création	Opções de criação	Параметры создания	Opsi Pembuatan	
 set_location	Define Limits (lxw)	Definir Límites (l x a)	Définir les limites (l x l)	Definir limites (c x l)	Определите границы (д/ш)	Tentukan bates (P X L)	
 set_boundary	Draw Boundary	Dibujar límite	Tracer la frontière	Desenhar limite	Нарисовать границу	Menggambar bates	
