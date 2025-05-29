@@ -1,7 +1,8 @@
 package edu.gtri.gpssample.managers
 
-import android.R
+import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -9,8 +10,6 @@ import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.gms.maps.model.LatLng
@@ -20,6 +19,7 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
+import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
@@ -31,11 +31,16 @@ import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
+import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.MapEngine
+import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.utils.GeoUtils
 import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.Projection
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 
 class MapManager
@@ -46,16 +51,152 @@ class MapManager
 
     // public functions
 
-    fun initialize( context: Context, mapView: View, style: String, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit) )
+    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, completion: (()->Unit) )
     {
-        if (mapView is org.osmdroid.views.MapView)
+        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
         {
-            initializeOsmMap( context, mapView, lat, lon, alt, zoom, completion )
+            mapBoxMapView.visibility = View.GONE
+            osmMapView.visibility = View.VISIBLE
+
+            initializeOsmMap( activity, osmMapView, GEORGIA_TECH.latitude, GEORGIA_TECH.longitude, 0.0, 18.0 ) {
+                completion()
+            }
         }
-        else if (mapView is com.mapbox.maps.MapView)
+        else if (config.mapEngineIndex == MapEngine.MapBox.value)
         {
-            initializeMapboxMap( mapView, style, lat, lon, alt, zoom, completion )
+            mapBoxMapView.visibility = View.VISIBLE
+            osmMapView.visibility = View.GONE
+
+            val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
+            var style = Style.MAPBOX_STREETS
+
+            sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
+                style = it
+            }
+
+            initializeMapboxMap( activity, mapBoxMapView, style, GEORGIA_TECH.latitude, GEORGIA_TECH.longitude, 0.0, 18.0 ) {
+                completion()
+            }
         }
+    }
+
+    fun initializeOsmMap( activity: Activity, mapView: org.osmdroid.views.MapView, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit) )
+    {
+        org.osmdroid.config.Configuration.getInstance().load( activity, PreferenceManager.getDefaultSharedPreferences(activity))
+
+        mapView.controller.setZoom( zoom )
+        mapView.setMultiTouchControls( true )
+        mapView.controller.setCenter( org.osmdroid.util.GeoPoint( lat, lon, alt ))
+
+        enableOsmMapLocationUpdates( activity, mapView )
+        completion()
+    }
+
+    fun initializeMapboxMap( activity: Activity, mapView: com.mapbox.maps.MapView, style: String, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit))
+    {
+        createMapboxPointAnnotationManager( mapView )
+        createMapboxPolygonAnnotationManager( mapView )
+        createMapboxPolylineAnnotationManager( mapView )
+
+        mapView.getMapboxMap().loadStyleUri(
+            style,
+            object : Style.OnStyleLoaded {
+                override fun onStyleLoaded(style: Style) {
+                    val point = com.mapbox.geojson.Point.fromLngLat( lon, lat, alt )
+                    val cameraPosition = CameraOptions.Builder()
+                        .zoom(zoom)
+                        .center(point)
+                        .build()
+
+                    mapView.getMapboxMap().setCamera( cameraPosition )
+
+                    mapView.location.updateSettings {
+                        this.enabled = true
+                        this.locationPuck = LocationPuck2D(
+                            scaleExpression = interpolate {
+                                linear()
+                                zoom()
+                                stop {
+                                    literal(0.0)
+                                    literal(0.6)
+                                }
+                                stop {
+                                    literal(20.0)
+                                    literal(1.0)
+                                }
+                            }.toJson()
+                        )
+                    }
+
+                    enableMapBoxLocationUpdates( activity, mapView )
+
+                    completion()
+                }
+            }
+        )
+    }
+
+    private var myLocationNewOverlay: MyLocationNewOverlay? = null
+
+    fun enableOsmMapLocationUpdates( activity: Activity, mapView: org.osmdroid.views.MapView )
+    {
+        val locationProvider = GpsMyLocationProvider( activity )
+        locationProvider.locationUpdateMinTime = 1000 // 1 second
+        locationProvider.locationUpdateMinDistance = 5f // 5 meters
+
+        if (myLocationNewOverlay != null)
+        {
+            mapView.getOverlays().remove( myLocationNewOverlay )
+        }
+
+        myLocationNewOverlay = MyLocationNewOverlay(locationProvider, mapView)
+
+        myLocationNewOverlay!!.enableMyLocation()
+        myLocationNewOverlay!!.enableFollowLocation()
+
+        mapView.getOverlays().add( myLocationNewOverlay )
+    }
+
+    private var onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener? = null
+
+    fun enableMapBoxLocationUpdates( activity: Activity, mapView: com.mapbox.maps.MapView )
+    {
+        if (onIndicatorPositionChangedListener != null)
+        {
+            mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener!!)
+        }
+
+        onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
+            mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        }
+
+        mapView.location.updateSettings {
+            this.enabled = true
+            this.locationPuck = LocationPuck2D(
+                bearingImage = AppCompatResources.getDrawable(
+                    activity,
+                    edu.gtri.gpssample.R.drawable.mapbox_user_puck_icon,
+                ),
+                shadowImage = AppCompatResources.getDrawable(
+                    activity,
+                    edu.gtri.gpssample.R.drawable.mapbox_user_icon_shadow,
+                ),
+                scaleExpression = Expression.interpolate {
+                    linear()
+                    zoom()
+                    stop {
+                        literal(0.0)
+                        literal(0.6)
+                    }
+                    stop {
+                        literal(20.0)
+                        literal(1.0)
+                    }
+                }.toJson()
+            )
+        }
+
+        mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener!!)
     }
 
     fun getLocationFromPoint( mapView: View, motionEvent: MotionEvent ) : Pair<Double, Double>
@@ -174,58 +315,6 @@ class MapManager
     }
 
     // private functions
-
-    private fun initializeOsmMap( context: Context, mapView: org.osmdroid.views.MapView, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit) )
-    {
-        org.osmdroid.config.Configuration.getInstance().load( context, PreferenceManager.getDefaultSharedPreferences(context))
-
-        mapView.controller.setZoom( zoom )
-        mapView.setMultiTouchControls( true )
-        mapView.controller.setCenter( org.osmdroid.util.GeoPoint( lat, lon, alt ))
-        completion()
-    }
-
-    private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit))
-    {
-        createMapboxPointAnnotationManager( mapView )
-        createMapboxPolygonAnnotationManager( mapView )
-        createMapboxPolylineAnnotationManager( mapView )
-
-        mapView.getMapboxMap().loadStyleUri(
-            style,
-            object : Style.OnStyleLoaded {
-                override fun onStyleLoaded(style: Style) {
-                    val point = com.mapbox.geojson.Point.fromLngLat( lon, lat, alt )
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(zoom)
-                        .center(point)
-                        .build()
-
-                    mapView.getMapboxMap().setCamera( cameraPosition )
-
-                    mapView.location.updateSettings {
-                        this.enabled = true
-                        this.locationPuck = LocationPuck2D(
-                            scaleExpression = interpolate {
-                                linear()
-                                zoom()
-                                stop {
-                                    literal(0.0)
-                                    literal(0.6)
-                                }
-                                stop {
-                                    literal(20.0)
-                                    literal(1.0)
-                                }
-                            }.toJson()
-                        )
-                    }
-
-                    completion()
-                }
-            }
-        )
-    }
 
     private fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap?
     {

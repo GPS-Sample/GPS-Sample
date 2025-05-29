@@ -9,7 +9,6 @@ package edu.gtri.gpssample.fragments.configuration
 
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -23,13 +22,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.gestures.addOnMapClickListener
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -38,7 +30,6 @@ import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
-import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -49,9 +40,6 @@ import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
-import org.osmdroid.events.MapEventsReceiver
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.MapEventsOverlay
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
@@ -67,7 +55,6 @@ class ConfigurationFragment : Fragment(),
     private var _binding: FragmentConfigurationBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mapView: View
     private lateinit var studiesAdapter: StudiesAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
@@ -153,40 +140,12 @@ class ConfigurationFragment : Fragment(),
                 resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
-        lateinit var config: Config
-
-        sharedViewModel.currentConfiguration?.value?.let {
-            config = it
-        }
-
-        if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-        {
-            mapView = binding.osmMapView
-            binding.osmMapView.visibility = View.VISIBLE
-            binding.mapboxMapView.visibility = View.GONE
-
-            MapManager.instance().initialize( activity!!, binding.osmMapView,"", MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude,0.0, 15.0 ) {
-                refreshMap()
-            }
-        }
-        else if (config.mapEngineIndex == MapEngine.MapBox.value)
-        {
-            mapView = binding.mapboxMapView
-
-            val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-            var style = Style.MAPBOX_STREETS
-
-            sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-                style = it
-            }
-
-            MapManager.instance().initialize( activity!!, binding.mapboxMapView, style, MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude,0.0, 10.0 ) {
-                binding.mapboxMapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-                refreshMap()
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) {
             }
         }
 
-        mapView.setOnTouchListener(this)
+        binding.mapOverlayView.setOnTouchListener(this)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             val items = ArrayList<String>()
@@ -285,29 +244,29 @@ class ConfigurationFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-    fun refreshMap()
-    {
-        sharedViewModel.currentConfiguration?.value?.let {config ->
-
-            val enumVerts = ArrayList<LatLon>()
-
-            for (enumArea in config.enumAreas)
-            {
-                val points = ArrayList<com.mapbox.geojson.Point>()
-                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-
-                enumArea.vertices.map {
-                    enumVerts.add(it)
-                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-                }
-
-                pointList.add( points )
-
-                MapManager.instance().createPolygon( mapView, pointList, "#000000", 0.25 )
-                MapManager.instance().createPolyline( mapView, pointList[0], "#ff0000" )
-            }
-        }
-    }
+//    fun refreshMap()
+//    {
+//        sharedViewModel.currentConfiguration?.value?.let {config ->
+//
+//            val enumVerts = ArrayList<LatLon>()
+//
+//            for (enumArea in config.enumAreas)
+//            {
+//                val points = ArrayList<com.mapbox.geojson.Point>()
+//                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+//
+//                enumArea.vertices.map {
+//                    enumVerts.add(it)
+//                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+//                }
+//
+//                pointList.add( points )
+//
+//                MapManager.instance().createPolygon( mapView, pointList, "#000000", 0.25 )
+//                MapManager.instance().createPolyline( mapView, pointList[0], "#ff0000" )
+//            }
+//        }
+//    }
 
     private fun didSelectStudy(study: Study)
     {
@@ -737,49 +696,23 @@ class ConfigurationFragment : Fragment(),
     {
     }
 
-    private fun initLocationComponent() {
-        binding.mapboxMapView.location.updateSettings {
-            this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
+    override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
+        motionEvent?.let {
+            if (it.action == MotionEvent.ACTION_UP) {
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.value, false )
+                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+            }
         }
 
-        binding.mapboxMapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-    }
+        view?.performClick()
 
-    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        binding.mapboxMapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
-    }
-
-    override fun onTouch(p0: View, p1: MotionEvent?): Boolean
-    {
-        if (p1?.action == MotionEvent.ACTION_DOWN)
-        {
-            val bundle = Bundle()
-            bundle.putBoolean( Keys.kEditMode.value, false )
-            findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
-        }
-
-        return p0.performClick()
+        return true
     }
 
     override fun onDestroyView()
     {
         super.onDestroyView()
-
-        binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
 
         _binding = null
     }

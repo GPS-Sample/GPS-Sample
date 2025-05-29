@@ -7,10 +7,8 @@
 
 package edu.gtri.gpssample.fragments.createconfiguration
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -18,38 +16,20 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.interpolate
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
-import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.databinding.FragmentCreateConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-
 
 class CreateConfigurationFragment : Fragment(),
     View.OnTouchListener,
@@ -60,11 +40,8 @@ class CreateConfigurationFragment : Fragment(),
     private val binding get() = _binding!!
     private var selectedStudy: Study? = null
 
-    private lateinit var mapboxManager: MapboxManager
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var manageStudiesAdapter: ManageStudiesAdapter
-    private lateinit var polygonAnnotationManager: PolygonAnnotationManager
-    private lateinit var polylineAnnotationManager: PolylineAnnotationManager
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -119,11 +96,14 @@ class CreateConfigurationFragment : Fragment(),
             {
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     config.mapEngineIndex = position
-                    selectMap()
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) {
+                    }
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+
+        binding.mapOverlayView.setOnTouchListener(this)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             binding.mapEngineSpinner.setSelection(config.mapEngineIndex)
@@ -186,12 +166,6 @@ class CreateConfigurationFragment : Fragment(),
             }
         }
 
-        binding.mapOverlayView.setOnTouchListener(this)
-
-        polygonAnnotationManager = binding.mapView.annotations.createPolygonAnnotationManager()
-        polylineAnnotationManager = binding.mapView.annotations.createPolylineAnnotationManager()
-        mapboxManager = MapboxManager.instance( activity!! )
-
         binding.addStudyButton.setOnClickListener{
             sharedViewModel.createStudyModel.createNewStudy()
             findNavController().navigate(R.id.action_navigate_to_CreateStudyFragment)
@@ -200,39 +174,6 @@ class CreateConfigurationFragment : Fragment(),
         binding.studiesRecycler.itemAnimator = DefaultItemAnimator()
         binding.studiesRecycler.adapter = manageStudiesAdapter
         binding.studiesRecycler.layoutManager = LinearLayoutManager(activity )
-    }
-
-    fun selectMap()
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-            {
-                binding.mapView.visibility = View.GONE
-                binding.osmMapView.visibility = View.VISIBLE
-
-                MapManager.instance().initialize( activity!!, binding.osmMapView,"",MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 15.0 ) {
-                    initLocationComponent()
-                    refreshMap()
-                }
-            }
-            else if (config.mapEngineIndex == MapEngine.MapBox.value)
-            {
-                binding.mapView.visibility = View.VISIBLE
-                binding.osmMapView.visibility = View.GONE
-
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                var style = Style.MAPBOX_STREETS
-
-                sharedPreferences.getString( Keys.kMapStyle.value, null)?.let {
-                    style = it
-                }
-
-                MapManager.instance().initialize( activity!!, binding.mapView, style, MapManager.GEORGIA_TECH.latitude, MapManager.GEORGIA_TECH.longitude, 0.0, 10.0 ) {
-                    initLocationComponent()
-                    refreshMap()
-                }
-            }
-        }
     }
 
     override fun onResume()
@@ -256,28 +197,28 @@ class CreateConfigurationFragment : Fragment(),
             resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
     }
 
-    fun refreshMap()
-    {
-        sharedViewModel.currentConfiguration?.value?.let {config ->
-
-            val enumVerts = ArrayList<LatLon>()
-
-            for (enumArea in config.enumAreas)
-            {
-                val points = ArrayList<com.mapbox.geojson.Point>()
-                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-
-                enumArea.vertices.map {
-                    enumVerts.add(it)
-                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-                }
-
-                pointList.add( points )
-
-                mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
-                mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
-            }
-
+//    fun refreshMap()
+//    {
+//        sharedViewModel.currentConfiguration?.value?.let {config ->
+//
+//            val enumVerts = ArrayList<LatLon>()
+//
+//            for (enumArea in config.enumAreas)
+//            {
+//                val points = ArrayList<com.mapbox.geojson.Point>()
+//                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+//
+//                enumArea.vertices.map {
+//                    enumVerts.add(it)
+//                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
+//                }
+//
+//                pointList.add( points )
+//
+//                mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
+//                mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
+//            }
+//
 //            val latLngBounds = GeoUtils.findGeobounds(enumVerts)
 //            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
 //            val cameraPosition = CameraOptions.Builder()
@@ -286,8 +227,8 @@ class CreateConfigurationFragment : Fragment(),
 //                .build()
 //
 //            binding.mapView.getMapboxMap().setCamera(cameraPosition)
-        }
-    }
+//        }
+//    }
 
     override fun didSelectFirstButton(tag: Any?)
     {
@@ -301,72 +242,6 @@ class CreateConfigurationFragment : Fragment(),
 
     override fun didPressCancelButton()
     {
-    }
-
-    private fun initLocationComponent()
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
-            {
-                val locationProvider = GpsMyLocationProvider(activity)
-                val locationOverlay = MyLocationNewOverlay(locationProvider, binding.osmMapView)
-
-                locationOverlay.enableMyLocation()
-
-                locationOverlay.runOnFirstFix {
-                    val myLocation = locationOverlay.getMyLocation();
-                    if (myLocation != null) {
-                        activity!!.runOnUiThread {
-                            binding.osmMapView.getController().animateTo(myLocation);
-                        }
-                    }
-                }
-
-                binding.osmMapView.getOverlays().add(locationOverlay)
-            }
-            else if (config.mapEngineIndex == MapEngine.MapBox.value)
-            {
-                binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-
-                binding.mapView.location.updateSettings {
-                    this.enabled = true
-                    this.locationPuck = LocationPuck2D(
-                        bearingImage = AppCompatResources.getDrawable(
-                            activity!!,
-                            R.drawable.mapbox_user_puck_icon,
-                        ),
-                        shadowImage = AppCompatResources.getDrawable(
-                            activity!!,
-                            R.drawable.mapbox_user_icon_shadow,
-                        ),
-                        scaleExpression = interpolate {
-                            linear()
-                            zoom()
-                            stop {
-                                literal(0.0)
-                                literal(0.6)
-                            }
-                            stop {
-                                literal(20.0)
-                                literal(1.0)
-                            }
-                        }.toJson()
-                    )
-                }
-
-                binding.mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-            } else {}
-        }
-    }
-
-    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
-        removeOnIndicatorPositionChangedListener()
-    }
-
-    fun removeOnIndicatorPositionChangedListener()
-    {
-        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
     }
 
     override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
@@ -386,8 +261,6 @@ class CreateConfigurationFragment : Fragment(),
     override fun onDestroyView()
     {
         super.onDestroyView()
-
-        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
 
         _binding = null
     }

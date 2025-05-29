@@ -357,6 +357,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
                         </org.osmdroid.views.MapView>
+
+                        <View
+                            android:id="@+id/map_overlay_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+                        </View>
                     </FrameLayout>
 
                     <Space

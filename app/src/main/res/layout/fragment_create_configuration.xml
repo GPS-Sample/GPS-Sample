@@ -314,7 +314,7 @@
                     android:layout_marginEnd="20dp">
 
                     <com.mapbox.maps.MapView
-                        android:id="@+id/map_view"
+                        android:id="@+id/mapbox_map_view"
                         android:visibility="visible"
                         android:layout_width="match_parent"
                         android:layout_height="200dp">
