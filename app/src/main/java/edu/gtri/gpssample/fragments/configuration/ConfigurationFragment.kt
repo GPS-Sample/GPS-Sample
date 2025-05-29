@@ -140,14 +140,12 @@ class ConfigurationFragment : Fragment(),
                 resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
         }
 
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) {
-            }
-        }
-
         binding.mapOverlayView.setOnTouchListener(this)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
+            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) {
+            }
+
             val items = ArrayList<String>()
             val mapEngines = resources.getTextArray( R.array.map_engines )
 
