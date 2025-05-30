@@ -3,13 +3,16 @@ package edu.gtri.gpssample.managers
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.gms.maps.model.LatLng
@@ -33,6 +36,9 @@ import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManage
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.viewannotation.ViewAnnotationManager
+import com.mapbox.maps.viewannotation.viewAnnotationOptions
+import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.database.models.Config
@@ -128,12 +134,36 @@ class MapManager
                         )
                     }
 
-                    enableMapBoxLocationUpdates( activity, mapView )
+                    enableMapboxLocationUpdates( activity, mapView )
 
                     completion()
                 }
             }
         )
+    }
+
+    fun enableLocationUpdates( activity: Activity, mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            enableOsmMapLocationUpdates( activity, mapView )
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            enableMapboxLocationUpdates( activity, mapView )
+        }
+    }
+
+    fun disableLocationUpdates( activity: Activity, mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            disableOsmMapLocationUpdates( activity, mapView )
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            disableMapboxLocationUpdates( activity, mapView )
+        }
     }
 
     private var myLocationNewOverlay: MyLocationNewOverlay? = null
@@ -157,9 +187,18 @@ class MapManager
         mapView.getOverlays().add( myLocationNewOverlay )
     }
 
+    fun disableOsmMapLocationUpdates( activity: Activity, mapView: org.osmdroid.views.MapView )
+    {
+        if (myLocationNewOverlay != null)
+        {
+            mapView.getOverlays().remove( myLocationNewOverlay )
+            myLocationNewOverlay = null
+        }
+    }
+
     private var onIndicatorPositionChangedListener: OnIndicatorPositionChangedListener? = null
 
-    fun enableMapBoxLocationUpdates( activity: Activity, mapView: com.mapbox.maps.MapView )
+    fun enableMapboxLocationUpdates( activity: Activity, mapView: com.mapbox.maps.MapView )
     {
         if (onIndicatorPositionChangedListener != null)
         {
@@ -197,6 +236,15 @@ class MapManager
         }
 
         mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener!!)
+    }
+
+    fun disableMapboxLocationUpdates( activity: Activity, mapView: com.mapbox.maps.MapView )
+    {
+        if (onIndicatorPositionChangedListener != null)
+        {
+            mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener!!)
+            onIndicatorPositionChangedListener = null
+        }
     }
 
     fun getLocationFromPoint( mapView: View, motionEvent: MotionEvent ) : Pair<Double, Double>
@@ -293,7 +341,7 @@ class MapManager
         }
     }
 
-    fun addMarker( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int ) : Any?
+    fun createMarker( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int ) : Any?
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -312,6 +360,77 @@ class MapManager
         }
 
         return null
+    }
+
+    fun removeViewAnnotation(viewAnnotationManager: ViewAnnotationManager, label: String )
+    {
+        if (label.isNotEmpty())
+        {
+            for (annotation in viewAnnotationManager.annotations)
+            {
+                annotation.key.rootView.findViewById<TextView>( R.id.text_view )?.let {
+                    if (it.text == label)
+                    {
+                        viewAnnotationManager.removeViewAnnotation( annotation.key )
+                    }
+                }
+            }
+        }
+    }
+
+    fun removeLabel( viewAnnotationManager: ViewAnnotationManager, mapView: View, label: String )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            if (label.isNotEmpty())
+            {
+                for (annotation in viewAnnotationManager.annotations)
+                {
+                    annotation.key.rootView.findViewById<TextView>( R.id.text_view )?.let {
+                        if (it.text == label)
+                        {
+                            viewAnnotationManager.removeViewAnnotation( annotation.key )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun addLabelToPoint(viewAnnotationManager: ViewAnnotationManager, mapView: View, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            addViewAnnotationToPoint( viewAnnotationManager, point, label, backgroundColor )
+        }
+    }
+
+    fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
+    {
+        if (label.isNotEmpty())
+        {
+            removeViewAnnotation(viewAnnotationManager, label)
+
+            val view = viewAnnotationManager.addViewAnnotation(
+                resId = R.layout.view_text_view,
+                options = viewAnnotationOptions
+                {
+                    allowOverlap(true)
+                    geometry(point)
+                }
+            )
+
+            view.rootView.findViewById<TextView>( R.id.text_view )?.let {
+                it.text = label
+                it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
+            }
+        }
     }
 
     // private functions
