@@ -119,6 +119,7 @@ class CreateFilterRuleModel {
         // set the current rule to the first one
         allRules.clear()
        // secondRules.clear()
+        _secondRule  = null
         _currentFilter?.value?.let { filter ->
 
             val rule = FilterUtils.findLastRule(filter)
