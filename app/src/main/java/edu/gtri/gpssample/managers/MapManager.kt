@@ -9,13 +9,17 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
 import android.preference.PreferenceManager
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
@@ -43,29 +47,47 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.utils.GeoUtils
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.views.overlay.Overlay
+import org.osmdroid.views.overlay.Polygon
 
 
 class MapManager
 {
+    interface MapManagerDelegate
+    {
+        fun onMarkerTapped( location: Location )
+        fun onZoomLevelChanged( zoomLevel: Double )
+    }
+
+    class OsmMarker(mapView: org.osmdroid.views.MapView, var location: Location) : org.osmdroid.views.overlay.Marker(mapView)
+    {
+    }
+
+    private var delegate: MapManagerDelegate? = null
+
     var mapboxPointAnnotationManager: PointAnnotationManager? = null
     var mapboxPolygonAnnotationManager: PolygonAnnotationManager? = null
     var mapboxPolylineAnnotationManager: PolylineAnnotationManager?= null
 
     // public functions
 
-    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, completion: (()->Unit) )
+    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
     {
+        this.delegate = delegate
+
         if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
         {
             mapBoxMapView.visibility = View.GONE
             osmMapView.visibility = View.VISIBLE
 
-            initializeOsmMap( activity, osmMapView, GEORGIA_TECH.latitude, GEORGIA_TECH.longitude, 0.0, 18.0 ) {
-                completion()
+            initializeOsmMap( activity, osmMapView, GEORGIA_TECH.latitude, GEORGIA_TECH.longitude, 0.0, 18.0, delegate ) {
+                completion( osmMapView )
             }
         }
         else if (config.mapEngineIndex == MapEngine.MapBox.value)
@@ -81,20 +103,40 @@ class MapManager
             }
 
             initializeMapboxMap( activity, mapBoxMapView, style, GEORGIA_TECH.latitude, GEORGIA_TECH.longitude, 0.0, 18.0 ) {
-                completion()
+                completion( mapBoxMapView )
             }
         }
     }
 
-    fun initializeOsmMap( activity: Activity, mapView: org.osmdroid.views.MapView, lat: Double, lon: Double, alt: Double, zoom: Double, completion: (()->Unit) )
+    fun initializeOsmMap( activity: Activity, mapView: org.osmdroid.views.MapView, lat: Double, lon: Double, alt: Double, zoom: Double, delegate: MapManagerDelegate? = null, completion: (()->Unit) )
     {
         org.osmdroid.config.Configuration.getInstance().load( activity, PreferenceManager.getDefaultSharedPreferences(activity))
 
+
+        mapView.minZoomLevel = 0.0
+        mapView.maxZoomLevel = 19.0
+        mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.controller.setZoom( zoom )
         mapView.setMultiTouchControls( true )
         mapView.controller.setCenter( org.osmdroid.util.GeoPoint( lat, lon, alt ))
 
-        enableOsmMapLocationUpdates( activity, mapView )
+//        enableOsmMapLocationUpdates( activity, mapView )
+
+        delegate?.let {
+            mapView.setMapListener(object : org.osmdroid.events.MapListener {
+                override fun onScroll(event: org.osmdroid.events.ScrollEvent?): Boolean {
+                    return true // You can handle scroll events here if needed
+                }
+
+                override fun onZoom(event: org.osmdroid.events.ZoomEvent?): Boolean {
+                    event?.let {
+                        delegate.onZoomLevelChanged( it.zoomLevel )
+                    }
+                    return true
+                }
+            })
+        }
+
         completion()
     }
 
@@ -166,33 +208,38 @@ class MapManager
         }
     }
 
-    private var myLocationNewOverlay: MyLocationNewOverlay? = null
-
     fun enableOsmMapLocationUpdates( activity: Activity, mapView: org.osmdroid.views.MapView )
     {
         val locationProvider = GpsMyLocationProvider( activity )
         locationProvider.locationUpdateMinTime = 1000 // 1 second
         locationProvider.locationUpdateMinDistance = 5f // 5 meters
 
-        if (myLocationNewOverlay != null)
+        for (overlay in mapView.overlays)
         {
-            mapView.getOverlays().remove( myLocationNewOverlay )
+            if (overlay is MyLocationNewOverlay)
+            {
+                mapView.overlays.remove( overlay )
+                break
+            }
         }
 
-        myLocationNewOverlay = MyLocationNewOverlay(locationProvider, mapView)
+        val myLocationNewOverlay = MyLocationNewOverlay(locationProvider, mapView)
 
-        myLocationNewOverlay!!.enableMyLocation()
-        myLocationNewOverlay!!.enableFollowLocation()
+        myLocationNewOverlay.enableMyLocation()
+        myLocationNewOverlay.enableFollowLocation()
 
         mapView.getOverlays().add( myLocationNewOverlay )
     }
 
     fun disableOsmMapLocationUpdates( activity: Activity, mapView: org.osmdroid.views.MapView )
     {
-        if (myLocationNewOverlay != null)
+        for (overlay in mapView.overlays)
         {
-            mapView.getOverlays().remove( myLocationNewOverlay )
-            myLocationNewOverlay = null
+            if (overlay is MyLocationNewOverlay)
+            {
+                mapView.overlays.remove( overlay )
+                break
+            }
         }
     }
 
@@ -247,20 +294,19 @@ class MapManager
         }
     }
 
-    fun getLocationFromPoint( mapView: View, motionEvent: MotionEvent ) : Pair<Double, Double>
+    fun getLocationFromPixelPoint( mapView: View, motionEvent: MotionEvent ) : Point
     {
         if (mapView is org.osmdroid.views.MapView)
         {
-            val point = mapView.getProjection().fromPixels(motionEvent.x.toInt(), motionEvent.y.toInt()) as GeoPoint
-            return Pair( point.getLatitude(), point.getLongitude())
+            val geoPoint = mapView.getProjection().fromPixels(motionEvent.x.toInt(), motionEvent.y.toInt()) as GeoPoint
+            return Point.fromLngLat( geoPoint.getLongitude(), geoPoint.getLatitude())
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
-            val point = mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(motionEvent.x.toDouble(),motionEvent.y.toDouble()))
-            return Pair( point.latitude(), point.longitude())
+            return mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(motionEvent.x.toDouble(),motionEvent.y.toDouble()))
         }
 
-        return Pair( 0.0, 0.0 )
+        return Point.fromLngLat( 0.0, 0.0 )
     }
 
     fun createMapboxPointAnnotationManager( mapView: MapView )
@@ -278,6 +324,37 @@ class MapManager
         mapboxPolygonAnnotationManager = mapView.annotations.createPolygonAnnotationManager()
     }
 
+    fun clearMap( mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val overlays = ArrayList<Overlay>()
+
+            for (overlay in mapView.overlays)
+            {
+                if (overlay is Polygon)
+                {
+                    overlays.add( overlay )
+                }
+                else if (overlay is org.osmdroid.views.overlay.Marker)
+                {
+                    overlays.add( overlay )
+                }
+            }
+
+            for (overlay in overlays)
+            {
+                mapView.overlays.remove( overlay )
+            }
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            mapboxPolygonAnnotationManager?.let {
+                it.deleteAll()
+            }
+        }
+    }
+
     fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : Any?
     {
         if (mapView is org.osmdroid.views.MapView)
@@ -290,6 +367,42 @@ class MapManager
                     .withPoints( points )
                     .withFillColor( fillColor )
                     .withFillOpacity( fillOpacity )
+
+                return it.create(polygonAnnotationOptions)
+            }
+        }
+
+        return null
+    }
+
+    fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: Int, fillOpacity: Int ) : Any?
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val geoPoints = ArrayList<GeoPoint>()
+            for (point in points[0])
+            {
+                geoPoints.add( GeoPoint(point.latitude(), point.longitude()))
+            }
+
+            val polygon = Polygon().apply {
+                setPoints(geoPoints)
+                fillPaint.color = fillColor
+                fillPaint.alpha = fillOpacity
+                outlinePaint.color = Color.RED
+                outlinePaint.strokeWidth = 5.0f
+            }
+
+            mapView.overlays.add(polygon)
+            mapView.invalidate()
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            mapboxPolygonAnnotationManager?.let {
+                val polygonAnnotationOptions = PolygonAnnotationOptions()
+                    .withPoints( points )
+                    .withFillColor( fillColor )
+                    .withFillOpacity( fillOpacity.toDouble() / 255.0 )
 
                 return it.create(polygonAnnotationOptions)
             }
@@ -321,6 +434,22 @@ class MapManager
         return null
     }
 
+    fun setZoomLevel( mapView: View, zoomLevel: Double )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel )
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(zoomLevel)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+    }
+
     fun centerMap( enumArea: EnumArea, zoomLevel: Double?, mapView: View )
     {
         val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
@@ -328,6 +457,9 @@ class MapManager
         if (mapView is org.osmdroid.views.MapView)
         {
             mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
+            zoomLevel?.let {
+                mapView.controller.setZoom( zoomLevel )
+            }
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
@@ -341,25 +473,42 @@ class MapManager
         }
     }
 
-    fun createMarker( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int ) : Any?
+    fun createMarker( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int, title: String = "" ) : Any?
+    {
+        return null
+    }
+
+    fun createMarker( context: Context, mapView: View, location: Location, @DrawableRes resourceId: Int, title: String = "" )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
+            val marker = OsmMarker( mapView, location )
+            marker.position = GeoPoint( location.latitude, location.longitude )
+            marker.setAnchor( org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_CENTER)
+
+            val icon: Drawable? = ContextCompat.getDrawable(context, resourceId)
+
+            marker.icon = icon
+            marker.title = title
+            mapView.overlays.add(marker)
+            mapView.invalidate()
+
+            marker.setOnMarkerClickListener { clickedMarker, mapView ->
+                delegate?.onMarkerTapped( marker.location )
+                true
+            }
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
             mapboxPointAnnotationManager?.let {
+                val point = Point.fromLngLat( location.longitude, location.latitude )
                 val pointAnnotationOptions = PointAnnotationOptions().withPoint( point )
 
                 convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
                     pointAnnotationOptions.withIconImage( bitmap )
                 }
-
-                return it.create(pointAnnotationOptions)
             }
         }
-
-        return null
     }
 
     fun removeViewAnnotation(viewAnnotationManager: ViewAnnotationManager, label: String )

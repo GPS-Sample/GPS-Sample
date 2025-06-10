@@ -248,6 +248,10 @@
             app:destination="@id/PerformEnumerationFragment" />
 
         <action
+            android:id="@+id/action_navigate_to_PerformOsmEnumerationFragment"
+            app:destination="@id/PerformOsmEnumerationFragment" />
+
+        <action
             android:id="@+id/action_navigate_to_ReviewEnumerationFragment"
             app:destination="@id/ReviewEnumerationFragment" />
 
@@ -349,6 +353,40 @@
     <fragment
         android:id="@+id/PerformEnumerationFragment"
         android:name="edu.gtri.gpssample.fragments.perform_enumeration.PerformEnumerationFragment"
+        tools:layout="@layout/fragment_perform_enumeration">
+        <action
+            android:id="@+id/action_navigate_to_HotspotFragment"
+            app:destination="@id/HotspotFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_NetworkConnectionDialogFragment"
+            app:destination="@id/NetworkConnectionDialogFragment" />
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddMultiHouseholdFragment"
+            app:destination="@id/AddMultiHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_PerformOsmEnumerationFragment"
+            app:destination="@id/PerformOsmEnumerationFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/PerformOsmEnumerationFragment"
+        android:name="edu.gtri.gpssample.fragments.perform_enumeration.PerformOsmEnumerationFragment"
         tools:layout="@layout/fragment_perform_enumeration">
         <action
             android:id="@+id/action_navigate_to_HotspotFragment"
