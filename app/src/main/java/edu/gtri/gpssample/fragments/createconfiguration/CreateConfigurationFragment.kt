@@ -94,6 +94,7 @@ class CreateConfigurationFragment : Fragment(),
         {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
             {
+                // Note! OnItemSelected fires automatically when the fragment is created
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     config.mapEngineIndex = position
                     MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) {
