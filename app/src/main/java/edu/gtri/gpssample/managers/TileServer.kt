@@ -122,25 +122,25 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
             }
         }
 
-        fun startServer( activity: Activity, uri: Uri?, tilesPath: String, completion: (()->Unit)? )
+        fun startServer( tilesPath: String )
         {
-            val busyIndicatorDialog = BusyIndicatorDialog( activity, activity.resources.getString(edu.gtri.gpssample.R.string.loading_mapbox_tiles), null, false )
+            mbTilesPath = tilesPath
 
-            Thread {
-                mbTilesPath = tilesPath
+            stopServer()
 
-                uri?.let {
-                    mbTilesPath = copyMbTilesToCache( activity, uri )
-                }
+            instance = TileServer( mbTilesPath )
 
-                stopServer()
+            if (rasterLayer == null)
+            {
+                val tileSet = TileSet.Builder("2.0", listOf("http://localhost:8080/{z}/{x}/{y}.png")).build()
 
-                instance = TileServer( mbTilesPath )
+                rasterSource = RasterSource.Builder("raster-source")
+                    .tileSet(tileSet)
+                    .tileSize(256)
+                    .build()
 
-                activity.runOnUiThread {
-                    busyIndicatorDialog.alertDialog.cancel()
-                }
-            }.start()
+                rasterLayer = RasterLayer("raster-layer", "raster-source").rasterOpacity(1.0)
+            }
         }
 
         fun startServer( activity: Activity, uri: Uri?, tilesPath: String, mapboxMap: MapboxMap, completion: (()->Unit)? )

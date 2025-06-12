@@ -803,8 +803,8 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         if (allEnumAreas.size > 0)
         {
-            sharedViewModel.currentZoomLevel?.value.let {
-                MapManager.instance().centerMap( allEnumAreas[0], mapView )
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                MapManager.instance().centerMap( allEnumAreas[0], currentZoomLevel, mapView )
 
             }
         }

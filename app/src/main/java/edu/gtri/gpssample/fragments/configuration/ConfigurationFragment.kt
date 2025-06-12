@@ -147,10 +147,9 @@ class ConfigurationFragment : Fragment(),
                 MapManager.instance().enableLocationUpdates( activity!!, mapView )
                 if (config.enumAreas.isNotEmpty())
                 {
-                    MapManager.instance().centerMap( config.enumAreas[0], mapView )
-                }
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                        MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
+                    }
                 }
             }
 

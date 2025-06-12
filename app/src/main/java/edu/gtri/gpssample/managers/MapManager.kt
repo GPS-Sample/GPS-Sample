@@ -27,6 +27,7 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.LocationPuck2D
@@ -52,6 +53,8 @@ import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Location
+import edu.gtri.gpssample.managers.TileServer.Companion.rasterLayer
+import edu.gtri.gpssample.managers.TileServer.Companion.rasterSource
 import edu.gtri.gpssample.utils.GeoUtils
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.util.GeoPoint
@@ -168,8 +171,15 @@ class MapManager
         createMapboxPolygonAnnotationManager( mapView )
         createMapboxPolylineAnnotationManager( mapView )
 
-        mapView.getMapboxMap().loadStyleUri(
-            style,
+        mapView.getMapboxMap().loadStyle(
+            com.mapbox.maps.extension.style.style(styleUri = style) {
+                rasterSource?.let {
+                    +it
+                }
+                rasterLayer?.let {
+                    +it
+                }
+            },
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
                     mapView.location.updateSettings {
@@ -191,6 +201,10 @@ class MapManager
                     }
 
 //                    enableMapboxLocationUpdates( activity, mapView )
+
+                    mapView.getMapboxMap().addOnCameraChangeListener { cameraChangedEventData ->
+                        delegate?.onZoomLevelChanged( mapView.getMapboxMap().cameraState.zoom )
+                    }
 
                     completion()
                 }
@@ -418,7 +432,16 @@ class MapManager
                     .withFillColor( fillColor )
                     .withFillOpacity( fillOpacity.toDouble() / 255.0 )
 
-                return it.create(polygonAnnotationOptions)
+                it.create(polygonAnnotationOptions)
+            }
+
+            mapboxPolylineAnnotationManager?.let {
+                val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
+                    .withPoints(points[0])
+                    .withLineColor(Color.RED)
+                    .withLineWidth(4.0)
+
+                it.create(polylineAnnotationOptions)
             }
         }
 
@@ -464,18 +487,20 @@ class MapManager
         }
     }
 
-    fun centerMap( enumArea: EnumArea, mapView: View )
+    fun centerMap( enumArea: EnumArea, zoomLevel: Double, mapView: View )
     {
         val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
 
         if (mapView is org.osmdroid.views.MapView)
         {
+            mapView.controller.setZoom( zoomLevel )
             mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
             val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
             val cameraPosition = CameraOptions.Builder()
+                .zoom( zoomLevel )
                 .center(point)
                 .build()
 
@@ -544,7 +569,7 @@ class MapManager
                 }
 
                 val pointAnnotation = pointAnnotationManager.create(pointAnnotationOptions)
-                pointAnnotation.textField = location.uuid
+                pointAnnotation.textField = title
 
                 pointAnnotationManager.apply {
                     addClickListener(
