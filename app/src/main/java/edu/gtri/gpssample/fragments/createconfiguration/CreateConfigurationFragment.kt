@@ -97,7 +97,11 @@ class CreateConfigurationFragment : Fragment(),
                 // Note! OnItemSelected fires automatically when the fragment is created
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     config.mapEngineIndex = position
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) {
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) { mapView ->
+                        MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                            MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                        }
                     }
                 }
             }

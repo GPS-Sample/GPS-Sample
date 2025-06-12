@@ -127,11 +127,6 @@ class CreateCollectionTeamFragment : Fragment(),
             }
         }
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         mapboxManager = MapboxManager.instance( activity!! )
 
         binding.mapView.gestures.addOnMapClickListener(this )

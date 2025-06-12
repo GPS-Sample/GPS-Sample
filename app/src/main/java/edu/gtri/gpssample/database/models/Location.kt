@@ -35,6 +35,9 @@ data class Location(
     var properties : String,
     var enumerationItems: ArrayList<EnumerationItem>)
 {
+    constructor( latitude: Double, longitude: Double, altitude: Double ) :
+            this( UUID.randomUUID().toString(), Date().time, 0, 0.0, "", LocationType.None, 0, latitude, longitude, altitude, false, "","", false, "", ArrayList<EnumerationItem>())
+
     constructor( timeZone: Int, type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String, properties: String ) :
             this( UUID.randomUUID().toString(), Date().time, timeZone, 0.0, "", type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, properties, ArrayList<EnumerationItem>())
 

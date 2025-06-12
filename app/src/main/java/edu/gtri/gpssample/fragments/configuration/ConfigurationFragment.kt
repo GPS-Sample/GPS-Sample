@@ -143,7 +143,15 @@ class ConfigurationFragment : Fragment(),
         binding.mapOverlayView.setOnTouchListener(this)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) {
+            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) { mapView ->
+                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                if (config.enumAreas.isNotEmpty())
+                {
+                    MapManager.instance().centerMap( config.enumAreas[0], mapView )
+                }
+                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                }
             }
 
             val items = ArrayList<String>()

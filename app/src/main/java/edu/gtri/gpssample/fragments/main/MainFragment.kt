@@ -23,9 +23,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.common.io.Resources
+import com.mapbox.maps.Style
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -38,17 +40,27 @@ import edu.gtri.gpssample.databinding.FragmentMainBinding
 import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
 import edu.gtri.gpssample.services.NetworkMonitorService.Companion.NETWORK_SERVICE_STATUS_KEY
 import edu.gtri.gpssample.utils.NetworkConnectionStatus
+import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class MainFragment : Fragment()
 {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private val id: Long = 4294967295
-
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+
+        val sharedViewModel : ConfigurationViewModel by activityViewModels()
+        sharedViewModel.setCurrentZoomLevel( 16.0 )
+
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        if (sharedPreferences.getString( Keys.kMapStyle.value, null ) == null)
+        {
+            val editor = sharedPreferences.edit()
+            editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
+            editor.commit()
+        }
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?

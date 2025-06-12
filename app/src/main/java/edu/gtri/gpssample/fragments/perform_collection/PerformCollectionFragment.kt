@@ -198,11 +198,6 @@ class PerformCollectionFragment : Fragment(),
             this.user = user
         }
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         collectionTeamLocations.clear()
         val enumerationItems = ArrayList<EnumerationItem>()
 

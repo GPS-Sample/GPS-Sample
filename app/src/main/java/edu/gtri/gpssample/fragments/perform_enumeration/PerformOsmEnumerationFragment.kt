@@ -67,6 +67,9 @@ import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
+import org.osmdroid.tileprovider.MapTileProviderBasic
+import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.views.overlay.TilesOverlay
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
@@ -79,7 +82,6 @@ class PerformOsmEnumerationFragment : Fragment(),
     MapManager.MapManagerDelegate,
     InfoDialog.InfoDialogDelegate,
     InputDialog.InputDialogDelegate,
-    SelectionDialog.SelectionDialogDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
@@ -135,11 +137,6 @@ class PerformOsmEnumerationFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
@@ -199,8 +196,18 @@ class PerformOsmEnumerationFragment : Fragment(),
 
         binding.titleTextView.text =  enumArea.name + " (" + enumerationTeam.name + " " +  resources.getString(R.string.team) + ")"
 
+        if (enumArea.mbTilesPath.isNotEmpty())
+        {
+            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
+            }
+        }
+
         MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
             this.mapView = mapView
+            MapManager.instance().centerMap( enumArea, mapView )
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+            }
             refreshMap()
         }
 
@@ -216,12 +223,6 @@ class PerformOsmEnumerationFragment : Fragment(),
             }
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
-        }
-
-        sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-            sharedViewModel.currentCenterPoint?.value?.let { currentCenterPoint ->
-                MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
-            }
         }
 
         binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
@@ -906,71 +907,7 @@ class PerformOsmEnumerationFragment : Fragment(),
     {
         sharedNetworkViewModel.createHotspot(view)
     }
-
-    private var lastLocationUpdateTime: Long = 0
-
-    private val locationConsumer = object : LocationConsumer
-    {
-        override fun onBearingUpdated(vararg bearing: Double, options: (ValueAnimator.() -> Unit)?) {
-        }
-
-        override fun onLocationUpdated(vararg location: Point, options: (ValueAnimator.() -> Unit)?)
-        {
-            if (location.size > 0)
-            {
-                val point = location.last()
-                binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
-                currentGPSLocation = point
-
-                if (Date().time - lastLocationUpdateTime > 3000)
-                {
-                    lastLocationUpdateTime = Date().time
-
-                    for (loc in enumerationTeamLocations)
-                    {
-                        val currentLatLng = LatLng( point.latitude(), point.longitude())
-                        val itemLatLng = LatLng( loc.latitude, loc.longitude )
-                        val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
-                        if (distance < 400) // display in meters or feet
-                        {
-                            if (config.distanceFormat == DistanceFormat.Meters)
-                            {
-                                loc.distance = distance
-                                loc.distanceUnits = resources.getString( R.string.meters )
-                            }
-                            else
-                            {
-                                loc.distance = distance * 3.28084
-                                loc.distanceUnits = resources.getString( R.string.feet )
-                            }
-                        }
-                        else // display in kilometers or miles
-                        {
-                            if (config.distanceFormat == DistanceFormat.Meters)
-                            {
-                                loc.distance = distance / 1000.0
-                                loc.distanceUnits = resources.getString( R.string.kilometers )
-                            }
-                            else
-                            {
-                                loc.distance = distance / 1609.34
-                                loc.distanceUnits = resources.getString( R.string.miles )
-                            }
-                        }
-                    }
-
-                    performEnumerationAdapter.updateLocations( enumerationTeamLocations )
-                }
-            }
-        }
-
-        override fun onPuckBearingAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
-        }
-
-        override fun onPuckLocationAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
-        }
-    }
-
+    
     override fun didPressCancelButton()
     {
         MapboxManager.cancelStylePackDownload()
@@ -1006,63 +943,28 @@ class PerformOsmEnumerationFragment : Fragment(),
 
             R.id.mapbox_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                val editor = sharedPreferences.edit()
+                val editor = activity!!.getSharedPreferences("default", 0).edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
-//                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
             }
 
             R.id.satellite_streets ->
             {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                val editor = sharedPreferences.edit()
+                val editor = activity!!.getSharedPreferences("default", 0).edit()
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
-//                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
-            }
-
-            R.id.import_map_tiles ->
-            {
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-
-            R.id.select_map_tiles ->
-            {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
-            TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
-//                createAnnotationManagers()
-                refreshMap()
-                TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-            }
-        }
-    }
-
-    override fun didMakeSelection( selection: String, tag: Int )
-    {
-        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
-//            createAnnotationManagers()
-            refreshMap()
-            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-        }
     }
 
     override fun onZoomLevelChanged( zoomLevel: Double )
@@ -1071,27 +973,28 @@ class PerformOsmEnumerationFragment : Fragment(),
         MapManager.instance().setZoomLevel( mapView, zoomLevel )
     }
 
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            for (location in locationResult.locations) {
-                val accuracy = location.accuracy.toInt() // in meters
+    private val locationCallback = object : LocationCallback()
+    {
+        override fun onLocationResult(locationResult: LocationResult)
+        {
+            val location = locationResult.locations.last()
+            val accuracy = location.accuracy.toInt() // in meters
 
-                currentGPSLocation = Point.fromLngLat( location.longitude, location.latitude )
-                currentGPSAccuracy = accuracy
+            currentGPSLocation = Point.fromLngLat( location.longitude, location.latitude )
+            currentGPSAccuracy = accuracy
 
-                if (accuracy <= config.minGpsPrecision)
-                {
-                    binding.accuracyLabelTextView.text = " " + resources.getString(R.string.good)
-                    binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
-                }
-                else
-                {
-                    binding.accuracyLabelTextView.text = " " + resources.getString(R.string.poor)
-                    binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
-                }
-
-                binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
+            if (accuracy <= config.minGpsPrecision)
+            {
+                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.good)
+                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
             }
+            else
+            {
+                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.poor)
+                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
+            }
+
+            binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
         }
     }
 

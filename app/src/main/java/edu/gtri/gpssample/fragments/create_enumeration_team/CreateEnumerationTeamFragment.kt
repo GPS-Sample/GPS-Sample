@@ -117,11 +117,6 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         mapboxManager = MapboxManager.instance( activity!! )
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         binding.mapView.gestures.addOnMapClickListener(this )
 
         binding.drawPolygonButton.setOnClickListener {

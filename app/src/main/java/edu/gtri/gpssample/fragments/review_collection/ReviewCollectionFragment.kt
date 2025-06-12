@@ -113,11 +113,6 @@ class ReviewCollectionFragment : Fragment(), OnCameraChangeListener, SelectionDi
             this.user = user
         }
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         val enumerationItems = ArrayList<EnumerationItem>()
 
         for (location in enumArea.locations)

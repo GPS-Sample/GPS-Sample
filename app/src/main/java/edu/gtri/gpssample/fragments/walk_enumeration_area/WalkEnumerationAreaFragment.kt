@@ -134,11 +134,6 @@ class WalkEnumerationAreaFragment : Fragment(),
             return
         }
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         if (config.enumAreas.isNotEmpty())
         {
             binding.saveButton.isEnabled = false

@@ -98,11 +98,6 @@ class ReviewEnumerationFragment : Fragment(), OnCameraChangeListener, SelectionD
     {
         super.onViewCreated(view, savedInstanceState)
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword

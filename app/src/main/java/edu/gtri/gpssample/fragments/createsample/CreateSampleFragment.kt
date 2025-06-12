@@ -91,11 +91,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
             createSampleFragment = this@CreateSampleFragment
         }
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         return binding.root
     }
 

@@ -102,17 +102,6 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
         super.stop()
     }
 
-    private fun stopServer()
-    {
-        instance?.let {
-            if (it.started)
-            {
-                it.stop()
-                it.db.close()
-            }
-        }
-    }
-
     companion object
     {
         var rasterLayer: RasterLayer? = null
@@ -120,6 +109,39 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
         private var mbTilesPath: String = ""
         private var instance: TileServer? = null
+
+        fun stopServer()
+        {
+            instance?.let {
+                if (it.started)
+                {
+                    it.stop()
+                    it.db.close()
+                    it.started = false
+                }
+            }
+        }
+
+        fun startServer( activity: Activity, uri: Uri?, tilesPath: String, completion: (()->Unit)? )
+        {
+            val busyIndicatorDialog = BusyIndicatorDialog( activity, activity.resources.getString(edu.gtri.gpssample.R.string.loading_mapbox_tiles), null, false )
+
+            Thread {
+                mbTilesPath = tilesPath
+
+                uri?.let {
+                    mbTilesPath = copyMbTilesToCache( activity, uri )
+                }
+
+                stopServer()
+
+                instance = TileServer( mbTilesPath )
+
+                activity.runOnUiThread {
+                    busyIndicatorDialog.alertDialog.cancel()
+                }
+            }.start()
+        }
 
         fun startServer( activity: Activity, uri: Uri?, tilesPath: String, mapboxMap: MapboxMap, completion: (()->Unit)? )
         {
@@ -132,7 +154,7 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
                     mbTilesPath = copyMbTilesToCache( activity, uri )
                 }
 
-                instance?.stopServer()
+                stopServer()
 
                 instance = TileServer( mbTilesPath )
 

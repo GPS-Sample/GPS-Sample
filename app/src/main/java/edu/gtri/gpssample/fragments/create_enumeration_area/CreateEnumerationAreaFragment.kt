@@ -147,11 +147,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        if (sharedViewModel.currentZoomLevel?.value == null)
-        {
-            sharedViewModel.setCurrentZoomLevel( 16.0 )
-        }
-
         binding.apply {
             // Specify the fragment as the lifecycle owner
             lifecycleOwner = viewLifecycleOwner
@@ -809,7 +804,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (allEnumAreas.size > 0)
         {
             sharedViewModel.currentZoomLevel?.value.let {
-                MapManager.instance().centerMap( allEnumAreas[0], it, mapView )
+                MapManager.instance().centerMap( allEnumAreas[0], mapView )
 
             }
         }
@@ -1698,6 +1693,11 @@ class CreateEnumerationAreaFragment : Fragment(),
     override fun didMakeSelection( selection: String, tag: Int )
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+
+        selectedEnumArea?.let {
+            it.mbTilesPath = mbTilesPath
+            selectedEnumArea = null
+        }
 
         TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
             refreshMap()
