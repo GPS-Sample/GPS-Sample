@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.create_collection_team
 
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -41,6 +42,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
 import edu.gtri.gpssample.dialogs.SelectionDialog
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -52,29 +54,25 @@ import org.locationtech.jts.geom.GeometryFactory
 import java.util.*
 
 class CreateCollectionTeamFragment : Fragment(),
-    OnCameraChangeListener,
-    OnMapClickListener,
     View.OnTouchListener,
-    SelectionDialog.SelectionDialogDelegate
+    MapManager.MapManagerDelegate
 {
     private lateinit var study: Study
+    private lateinit var mapView: View
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
+    private var fingerPolyline: Any? = null
     private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
 
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var polygonAnnotationManager: PolygonAnnotationManager? = null
-    private var polylineAnnotationManager: PolylineAnnotationManager? = null
-    private var polylineAnnotation: PolylineAnnotation? = null
-
-    private var createMode = false
-    private val locationUuids = ArrayList<String>()
-    private var intersectionPolygon: PolygonAnnotation? = null
-    private var intersectionPolyline: PolylineAnnotation? = null
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
+
+    private var createMode = false
+    private var intersectionPolygon: Any? = null
+    private val locationUuids = ArrayList<String>()
+    private val polyLinePoints = ArrayList<Point>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -114,22 +112,20 @@ class CreateCollectionTeamFragment : Fragment(),
 
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-            }
-        }
-        else
-        {
-            TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-            }
+            TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        mapboxManager = MapboxManager.instance( activity!! )
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+            this.mapView = mapView
 
-        binding.mapboxMapView.gestures.addOnMapClickListener(this )
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
+            }
+
+            refreshMap()
+        }
+
+        binding.mapOverlayView.visibility = View.GONE
 
         binding.drawPolygonButton.setOnClickListener {
 
@@ -142,16 +138,12 @@ class CreateCollectionTeamFragment : Fragment(),
             else
             {
                 intersectionPolygon?.let {
-                    polygonAnnotationManager?.delete( it )
+                    MapManager.instance().removePolygon( mapView, it )
                     intersectionPolygon = null
                 }
 
-                intersectionPolyline?.let {
-                    polylineAnnotationManager?.delete( it )
-                    intersectionPolyline = null
-                }
-
                 createMode = true
+                polyLinePoints.clear()
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.save_blue )
             }
@@ -168,24 +160,34 @@ class CreateCollectionTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            val polygon = ArrayList<LatLon>()
-
+            val polygonPoints = ArrayList<LatLon>()
             var creationDate = Date().time
 
-            intersectionPolygon?.points?.map { points ->
-                points.map { point ->
-                    polygon.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+            if (intersectionPolygon is MapManager.MapboxPolygon)
+            {
+                val mapboxPolygon = intersectionPolygon as MapManager.MapboxPolygon
+                mapboxPolygon.polygonAnnotation?.points?.map { points ->
+                    points.map { point ->
+                        polygonPoints.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+                    }
+                }
+            }
+            else if (intersectionPolygon is org.osmdroid.views.overlay.Polygon)
+            {
+                val osmPolygon = intersectionPolygon as org.osmdroid.views.overlay.Polygon
+                osmPolygon.points.map { point ->
+                    polygonPoints.add( LatLon( creationDate++, point.latitude, point.longitude ))
                 }
             }
 
-            if (polygon.isEmpty())
+            if (polygonPoints.isEmpty())
             {
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.please_select_team_boundary), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam(
-                CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
+                CollectionTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids ))
 
             collectionTeam?.let { team ->
                 enumArea.collectionTeams.add(team)
@@ -194,13 +196,6 @@ class CreateCollectionTeamFragment : Fragment(),
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
-    }
-
-    fun createAnnotationManagers()
-    {
-        pointAnnotationManager = mapboxManager.createPointAnnotationManager( pointAnnotationManager, binding.mapboxMapView )
-        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager( polygonAnnotationManager, binding.mapboxMapView )
-        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager( polylineAnnotationManager, binding.mapboxMapView )
     }
 
     override fun onResume()
@@ -212,8 +207,6 @@ class CreateCollectionTeamFragment : Fragment(),
 
     fun refreshMap()
     {
-        binding.mapboxMapView.getMapboxMap().removeOnCameraChangeListener( this )
-
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -225,9 +218,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
-            mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
-            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapboxMapView.getMapboxMap())
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40)
 
             for (collectionTeam in enumArea.collectionTeams)
             {
@@ -242,12 +233,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
                 if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
                 {
-                    mapboxManager.addPolygon( polygonAnnotationManager, ptList, "#000000", 0.25)
-                    mapboxManager.addPolyline( polylineAnnotationManager, ptList[0], "#ff0000" )
-
-                    val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
-                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    mapboxManager.addViewAnnotationToPoint( binding.mapboxMapView.viewAnnotationManager, point, collectionTeam.name, "#80FFFFFF" )
+                    MapManager.instance().createPolygon( mapView, ptList, Color.BLACK, 0x40 )
                 }
             }
 
@@ -264,7 +250,7 @@ class CreateCollectionTeamFragment : Fragment(),
                             if (!locationBelongsToTeam( location ))
                             {
                                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.home_light_blue )
+                                MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_light_blue )
                             }
                         }
                     }
@@ -276,8 +262,14 @@ class CreateCollectionTeamFragment : Fragment(),
                             {
                                 if (!locationBelongsToTeam( location ))
                                 {
+                                    var title = ""
+                                    if (location.enumerationItems.isNotEmpty())
+                                    {
+                                        title = location.enumerationItems.last().subAddress
+                                    }
+
                                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                    mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.multi_home_light_blue )
+                                    MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_light_blue, title )
                                     break
                                 }
                             }
@@ -286,8 +278,6 @@ class CreateCollectionTeamFragment : Fragment(),
                 }
             }
         }
-
-        binding.mapboxMapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun locationBelongsToTeam( location: Location ) : Boolean
@@ -306,18 +296,16 @@ class CreateCollectionTeamFragment : Fragment(),
         return false
     }
 
-    override fun onMapClick(point: Point): Boolean
-    {
-        return false
-    }
-
-    private val polyLinePoints = ArrayList<Point>()
-
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
         p1?.let { p1 ->
             if (p1.action == MotionEvent.ACTION_UP)
             {
+                fingerPolyline?.let {
+                    MapManager.instance().removePolyline( mapView, it )
+                    fingerPolyline = null
+                }
+
                 val points1 = MapboxManager.ArrayListOfLatLonToArrayListOfCoordinate( enumArea.vertices )
 
                 // close the polygon, if necessary
@@ -406,8 +394,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                     val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                     pointList.add( vertices )
 
-                                    intersectionPolygon = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#ff0000", 0.25 )
-                                    intersectionPolyline = mapboxManager.addPolyline( polylineAnnotationManager, vertices, "#0000ff" )
+                                    intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
                                 }
                                 else
                                 {
@@ -416,8 +403,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                     val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                     pointList.add( vertices )
 
-                                    intersectionPolygon = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#ff0000", 0.25 )
-                                    intersectionPolyline = mapboxManager.addPolyline( polylineAnnotationManager, vertices, "#0000ff" )
+                                    intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
                                 }
                             }
                         }
@@ -428,46 +414,27 @@ class CreateCollectionTeamFragment : Fragment(),
                     Log.d( "xxx", ex.stackTraceToString())
                 }
 
-                polyLinePoints.clear()
-                polylineAnnotation?.points = polyLinePoints
-                polylineAnnotation?.let {
-                    polylineAnnotationManager?.update(it)
-                }
-
                 createMode = false
                 binding.mapOverlayView.visibility = View.GONE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
             {
-                val point = binding.mapboxMapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                val point = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
                 polyLinePoints.add( point )
 
-                if (polylineAnnotation == null)
+                if (fingerPolyline == null)
                 {
-                    val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-                        .withPoints(polyLinePoints)
-                        .withLineColor("#ee4e8b")
-                        .withLineWidth(5.0)
-
-                    polylineAnnotation = polylineAnnotationManager?.create(polylineAnnotationOptions)
+                    fingerPolyline = MapManager.instance().createPolyline( mapView, polyLinePoints, Color.rgb( 0xee, 0x4e,0x8b) )
                 }
                 else
                 {
-                    polylineAnnotation?.points = polyLinePoints
-                    polylineAnnotation?.let {
-                        polylineAnnotationManager?.update(it)
-                    }
+                    MapManager.instance().updatePolyline( mapView, fingerPolyline!!, point )
                 }
             }
         }
 
         return true
-    }
-
-    override fun onCameraChanged(eventData: CameraChangedEventData)
-    {
-        sharedViewModel.setCurrentZoomLevel( binding.mapboxMapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -486,8 +453,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
-                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -499,45 +465,22 @@ class CreateCollectionTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
-                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
-            }
-
-            R.id.import_map_tiles ->
-            {
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-
-            R.id.select_map_tiles ->
-            {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
-            TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-                TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-            }
-        }
+    override fun onMarkerTapped( location: Location )
+    {
     }
 
-    override fun didMakeSelection( selection: String, tag: Int )
+    override fun onZoomLevelChanged( zoomLevel: Double )
     {
-        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
-            createAnnotationManagers()
-            refreshMap()
-            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-        }
+        sharedViewModel.setCurrentZoomLevel( zoomLevel )
     }
 
     override fun onDestroyView()

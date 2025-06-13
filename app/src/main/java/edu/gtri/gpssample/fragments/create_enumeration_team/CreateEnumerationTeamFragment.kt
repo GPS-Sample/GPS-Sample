@@ -394,6 +394,9 @@ class CreateEnumerationTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+                    refreshMap()
+                }
             }
 
             R.id.satellite_streets ->
@@ -403,6 +406,9 @@ class CreateEnumerationTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+                    refreshMap()
+                }
             }
         }
 
