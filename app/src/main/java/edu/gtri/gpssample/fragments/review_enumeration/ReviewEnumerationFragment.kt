@@ -91,8 +91,6 @@ class ReviewEnumerationFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
-            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-            sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
         }
 
         if (!this::config.isInitialized)
