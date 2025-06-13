@@ -949,14 +949,17 @@ class PerformEnumerationFragment : Fragment(),
         return super.onOptionsItemSelected(item)
     }
 
+    private var lastLocationUpdateTime: Long = 0
+
     private val locationCallback = object : LocationCallback()
     {
         override fun onLocationResult(locationResult: LocationResult)
         {
             val location = locationResult.locations.last()
             val accuracy = location.accuracy.toInt() // in meters
+            val point = Point.fromLngLat( location.longitude, location.latitude )
 
-            currentGPSLocation = Point.fromLngLat( location.longitude, location.latitude )
+            currentGPSLocation = point
             currentGPSAccuracy = accuracy
 
             if (accuracy <= config.minGpsPrecision)
@@ -971,6 +974,48 @@ class PerformEnumerationFragment : Fragment(),
             }
 
             binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
+
+            binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
+
+            if (Date().time - lastLocationUpdateTime > 3000)
+            {
+                lastLocationUpdateTime = Date().time
+
+                for (loc in enumArea.locations)
+                {
+                    val currentLatLng = LatLng( point.latitude(), point.longitude())
+                    val itemLatLng = LatLng( loc.latitude, loc.longitude )
+                    val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+                    if (distance < 400) // display in meters or feet
+                    {
+                        if (config.distanceFormat == DistanceFormat.Meters)
+                        {
+                            loc.distance = distance
+                            loc.distanceUnits = resources.getString( R.string.meters )
+                        }
+                        else
+                        {
+                            loc.distance = distance * 3.28084
+                            loc.distanceUnits = resources.getString( R.string.feet )
+                        }
+                    }
+                    else // display in kilometers or miles
+                    {
+                        if (config.distanceFormat == DistanceFormat.Meters)
+                        {
+                            loc.distance = distance / 1000.0
+                            loc.distanceUnits = resources.getString( R.string.kilometers )
+                        }
+                        else
+                        {
+                            loc.distance = distance / 1609.34
+                            loc.distanceUnits = resources.getString( R.string.miles )
+                        }
+                    }
+                }
+
+                performEnumerationAdapter.updateLocations( enumArea.locations )
+            }
         }
     }
 
