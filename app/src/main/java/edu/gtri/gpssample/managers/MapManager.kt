@@ -419,9 +419,19 @@ class MapManager
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
+            val newPoints = ArrayList<Point>( points[0] )
+            val newPointList = ArrayList<ArrayList<Point>>()
+
+            if (points[0].last() != points[0].first())
+            {
+                newPoints.add( newPoints.first())
+            }
+
+            newPointList.add( newPoints )
+
             mapboxPolygonAnnotationManager?.let {
                 val polygonAnnotationOptions = PolygonAnnotationOptions()
-                    .withPoints( points )
+                    .withPoints( newPointList )
                     .withFillColor( fillColor )
                     .withFillOpacity( fillOpacity.toDouble() / 255.0 )
 
@@ -430,7 +440,7 @@ class MapManager
 
             mapboxPolylineAnnotationManager?.let {
                 val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-                    .withPoints(points[0])
+                    .withPoints(newPointList[0])
                     .withLineColor(Color.RED)
                     .withLineWidth(4.0)
 
