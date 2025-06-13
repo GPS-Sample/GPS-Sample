@@ -185,13 +185,13 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.setCenterOnCurrentLocation( false )
         }
 
+        binding.addHouseholdButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
         if (enumArea.mbTilesPath.isNotEmpty())
         {
             TileServer.startServer( enumArea.mbTilesPath )
-        }
-
-        binding.addHouseholdButton.backgroundTintList?.let {
-            defaultColorList = it
         }
 
         MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
@@ -949,11 +949,6 @@ class PerformEnumerationFragment : Fragment(),
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onZoomLevelChanged( zoomLevel: Double )
-    {
-        sharedViewModel.setCurrentZoomLevel( zoomLevel )
-    }
-
     private val locationCallback = object : LocationCallback()
     {
         override fun onLocationResult(locationResult: LocationResult)
@@ -1053,6 +1048,11 @@ class PerformEnumerationFragment : Fragment(),
         {
             navigateToAddHouseholdFragment()
         }
+    }
+
+    override fun onZoomLevelChanged( zoomLevel: Double )
+    {
+        sharedViewModel.setCurrentZoomLevel( zoomLevel )
     }
 
     override fun onDestroyView()

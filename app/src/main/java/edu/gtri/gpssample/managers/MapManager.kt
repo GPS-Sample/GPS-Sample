@@ -10,34 +10,31 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
@@ -57,14 +54,15 @@ import edu.gtri.gpssample.managers.TileServer.Companion.rasterLayer
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterSource
 import edu.gtri.gpssample.utils.GeoUtils
 import org.osmdroid.tileprovider.MapTileProviderBasic
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class MapManager
 {
@@ -72,6 +70,12 @@ class MapManager
     {
         fun onMarkerTapped( location: Location )
         fun onZoomLevelChanged( zoomLevel: Double )
+    }
+
+    class MapboxPolygon
+    {
+        var polygonAnnotation: PolygonAnnotation? = null
+        var polylineAnnotation: PolylineAnnotation? = null
     }
 
     private var delegate: MapManagerDelegate? = null
@@ -322,21 +326,6 @@ class MapManager
         }
     }
 
-    fun getLocationFromPixelPoint( mapView: View, motionEvent: MotionEvent ) : Point
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-            val geoPoint = mapView.getProjection().fromPixels(motionEvent.x.toInt(), motionEvent.y.toInt()) as GeoPoint
-            return Point.fromLngLat( geoPoint.getLongitude(), geoPoint.getLatitude())
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            return mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(motionEvent.x.toDouble(),motionEvent.y.toDouble()))
-        }
-
-        return Point.fromLngLat( 0.0, 0.0 )
-    }
-
     fun createMapboxPointAnnotationManager( mapView: MapView )
     {
         mapboxPointAnnotationManager = mapView.annotations.createPointAnnotationManager()
@@ -405,6 +394,8 @@ class MapManager
 
     fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: Int, fillOpacity: Int ) : Any?
     {
+        val mapboxPolygon = MapboxPolygon()
+
         if (mapView is org.osmdroid.views.MapView)
         {
             val geoPoints = ArrayList<GeoPoint>()
@@ -418,11 +409,13 @@ class MapManager
                 fillPaint.color = fillColor
                 fillPaint.alpha = fillOpacity
                 outlinePaint.color = Color.RED
-                outlinePaint.strokeWidth = 5.0f
+                outlinePaint.strokeWidth = 4.0f
             }
 
             mapView.overlays.add(polygon)
             mapView.invalidate()
+
+            return polygon
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
@@ -432,7 +425,7 @@ class MapManager
                     .withFillColor( fillColor )
                     .withFillOpacity( fillOpacity.toDouble() / 255.0 )
 
-                it.create(polygonAnnotationOptions)
+                mapboxPolygon.polygonAnnotation = it.create(polygonAnnotationOptions)
             }
 
             mapboxPolylineAnnotationManager?.let {
@@ -441,26 +434,55 @@ class MapManager
                     .withLineColor(Color.RED)
                     .withLineWidth(4.0)
 
-                it.create(polylineAnnotationOptions)
+                mapboxPolygon.polylineAnnotation = it.create(polylineAnnotationOptions)
             }
+
+            return mapboxPolygon
         }
 
         return null
     }
 
-    fun createPolyline( mapView: View, points: List<Point>, color: String ) : Any?
+    fun removePolygon( mapView: View, polygon: Any )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
+            mapView.overlays.remove( polygon )
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val mapboxPolygon = polygon as MapboxPolygon
+            mapboxPolygonAnnotationManager?.delete( mapboxPolygon.polygonAnnotation!! )
+            mapboxPolylineAnnotationManager?.delete( mapboxPolygon.polylineAnnotation!! )
+        }
+    }
+
+    fun createPolyline( mapView: View, points: List<Point>, color: Int ) : Any?
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val geoPoints = ArrayList<GeoPoint>()
+            for (point in points)
+            {
+                geoPoints.add( GeoPoint(point.latitude(), point.longitude()))
+            }
+
+            val polyline = Polyline()
+            polyline.setPoints(geoPoints)
+            polyline.setColor(color)
+            polyline.setWidth(9f)
+
+            mapView.getOverlayManager().add(polyline);
+            mapView.invalidate();
+
+            return polyline
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
             mapboxPolylineAnnotationManager?.let {
-                val outlinePoints = ArrayList<Point>(points)
-                outlinePoints.add( outlinePoints[0] )
 
                 val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-                    .withPoints(outlinePoints)
+                    .withPoints(points)
                     .withLineColor(color)
                     .withLineWidth(4.0)
 
@@ -469,6 +491,37 @@ class MapManager
         }
 
         return null
+    }
+
+    fun updatePolyline( mapView: View, polyline: Any, point: Point )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val x = (polyline as Polyline).points
+            (polyline as Polyline).addPoint( GeoPoint( point.latitude(), point.longitude()))
+            val y = (polyline as Polyline).points
+            mapView.invalidate()
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val polylineAnnotation = polyline as PolylineAnnotation
+            val points = ArrayList<Point>( polylineAnnotation.points )
+            points.add( point )
+            polylineAnnotation.points = points
+            mapboxPolylineAnnotationManager?.update( polylineAnnotation )
+        }
+    }
+
+    fun removePolyline( mapView: View, polyline: Any )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.overlays.remove( polyline as Polyline )
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            mapboxPolylineAnnotationManager?.delete( polyline as PolylineAnnotation )
+        }
     }
 
     fun setZoomLevel( mapView: View, zoomLevel: Double )
@@ -656,6 +709,21 @@ class MapManager
                 it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
             }
         }
+    }
+
+    fun getLocationFromPixelPoint( mapView: View, motionEvent: MotionEvent ) : Point
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val geoPoint = mapView.getProjection().fromPixels(motionEvent.x.toInt(), motionEvent.y.toInt()) as GeoPoint
+            return Point.fromLngLat( geoPoint.getLongitude(), geoPoint.getLatitude())
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            return mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(motionEvent.x.toDouble(),motionEvent.y.toDouble()))
+        }
+
+        return Point.fromLngLat( 0.0, 0.0 )
     }
 
     // private functions

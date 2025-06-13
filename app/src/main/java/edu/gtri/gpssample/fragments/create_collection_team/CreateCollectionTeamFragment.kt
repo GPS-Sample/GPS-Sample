@@ -114,14 +114,14 @@ class CreateCollectionTeamFragment : Fragment(),
 
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
             }
         }
         else
         {
-            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+            TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
             }
@@ -129,14 +129,14 @@ class CreateCollectionTeamFragment : Fragment(),
 
         mapboxManager = MapboxManager.instance( activity!! )
 
-        binding.mapView.gestures.addOnMapClickListener(this )
+        binding.mapboxMapView.gestures.addOnMapClickListener(this )
 
         binding.drawPolygonButton.setOnClickListener {
 
             if (createMode)
             {
                 createMode = false
-                binding.overlayView.visibility = View.GONE
+                binding.mapOverlayView.visibility = View.GONE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
@@ -152,7 +152,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 }
 
                 createMode = true
-                binding.overlayView.visibility = View.VISIBLE
+                binding.mapOverlayView.visibility = View.VISIBLE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.save_blue )
             }
         }
@@ -193,14 +193,14 @@ class CreateCollectionTeamFragment : Fragment(),
             }
         }
 
-        binding.overlayView.setOnTouchListener(this)
+        binding.mapOverlayView.setOnTouchListener(this)
     }
 
     fun createAnnotationManagers()
     {
-        pointAnnotationManager = mapboxManager.createPointAnnotationManager( pointAnnotationManager, binding.mapView )
-        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager( polygonAnnotationManager, binding.mapView )
-        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager( polylineAnnotationManager, binding.mapView )
+        pointAnnotationManager = mapboxManager.createPointAnnotationManager( pointAnnotationManager, binding.mapboxMapView )
+        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager( polygonAnnotationManager, binding.mapboxMapView )
+        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager( polylineAnnotationManager, binding.mapboxMapView )
     }
 
     override fun onResume()
@@ -212,7 +212,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
     fun refreshMap()
     {
-        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+        binding.mapboxMapView.getMapboxMap().removeOnCameraChangeListener( this )
 
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
@@ -227,7 +227,7 @@ class CreateCollectionTeamFragment : Fragment(),
         {
             mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
             mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
-            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapView.getMapboxMap())
+            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapboxMapView.getMapboxMap())
 
             for (collectionTeam in enumArea.collectionTeams)
             {
@@ -247,7 +247,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
                     val latLngBounds = GeoUtils.findGeobounds(collectionTeam.polygon)
                     val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, collectionTeam.name, "#80FFFFFF" )
+                    mapboxManager.addViewAnnotationToPoint( binding.mapboxMapView.viewAnnotationManager, point, collectionTeam.name, "#80FFFFFF" )
                 }
             }
 
@@ -287,7 +287,7 @@ class CreateCollectionTeamFragment : Fragment(),
             }
         }
 
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+        binding.mapboxMapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun locationBelongsToTeam( location: Location ) : Boolean
@@ -435,12 +435,12 @@ class CreateCollectionTeamFragment : Fragment(),
                 }
 
                 createMode = false
-                binding.overlayView.visibility = View.GONE
+                binding.mapOverlayView.visibility = View.GONE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
             {
-                val point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                val point = binding.mapboxMapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
                 polyLinePoints.add( point )
 
                 if (polylineAnnotation == null)
@@ -467,7 +467,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
-        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+        sharedViewModel.setCurrentZoomLevel( binding.mapboxMapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -486,7 +486,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
                     createAnnotationManagers()
                     refreshMap()
                 }
@@ -499,7 +499,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
                     createAnnotationManagers()
                     refreshMap()
                 }
@@ -521,10 +521,10 @@ class CreateCollectionTeamFragment : Fragment(),
 
     val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
                 createAnnotationManagers()
                 refreshMap()
-                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
             }
         }
     }
@@ -533,10 +533,10 @@ class CreateCollectionTeamFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
             createAnnotationManagers()
             refreshMap()
-            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 

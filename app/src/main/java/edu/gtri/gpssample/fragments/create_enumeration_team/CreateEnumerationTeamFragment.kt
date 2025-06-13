@@ -8,6 +8,8 @@
 package edu.gtri.gpssample.fragments.create_enumeration_team
 
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -41,36 +43,34 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
 import edu.gtri.gpssample.dialogs.SelectionDialog
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
+import org.osmdroid.views.overlay.Polygon
 import java.util.*
 
 class CreateEnumerationTeamFragment : Fragment(),
-    OnCameraChangeListener,
-    OnMapClickListener,
     OnTouchListener,
-    SelectionDialog.SelectionDialogDelegate
+    MapManager.MapManagerDelegate
 {
     private lateinit var study: Study
+    private lateinit var mapView: View
+    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
-    private lateinit var mapboxManager: MapboxManager
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var _binding: FragmentCreateEnumerationTeamBinding? = null
     private val binding get() = _binding!!
 
     private var createMode = false
+    private var fingerPolyline: Any? = null
     private val locationUuids = ArrayList<String>()
-    private var polylineAnnotation: PolylineAnnotation? = null
-    private var intersectionPolygon: PolygonAnnotation? = null
-    private var intersectionPolyline: PolylineAnnotation? = null
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var polygonAnnotationManager: PolygonAnnotationManager? = null
-    private var polylineAnnotationManager: PolylineAnnotationManager? = null
+    private val polyLinePoints = ArrayList<Point>()
+    private var intersectionPolygon: Any? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -92,6 +92,10 @@ class CreateEnumerationTeamFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedViewModel.currentConfiguration?.value?.let { _config ->
+            config = _config
+        }
+
         sharedViewModel.createStudyModel.currentStudy?.value?.let {_study ->
             study = _study
         }
@@ -102,47 +106,39 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-            }
-        }
-        else
-        {
-            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-            }
+            TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        mapboxManager = MapboxManager.instance( activity!! )
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+            this.mapView = mapView
 
-        binding.mapView.gestures.addOnMapClickListener(this )
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
+            }
+
+            refreshMap()
+        }
+
+        binding.mapOverlayView.visibility = View.GONE
 
         binding.drawPolygonButton.setOnClickListener {
 
             if (createMode)
             {
                 createMode = false
-                binding.overlayView.visibility = View.GONE
+                binding.mapOverlayView.visibility = View.GONE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
             {
                 intersectionPolygon?.let {
-                    polygonAnnotationManager?.delete( it )
+                    MapManager.instance().removePolygon( mapView, it )
                     intersectionPolygon = null
                 }
 
-                intersectionPolyline?.let {
-                    polylineAnnotation?.let {
-                        polylineAnnotationManager?.delete(it)
-                    }
-                    intersectionPolyline = null
-                }
-
                 createMode = true
-                binding.overlayView.visibility = View.VISIBLE
+                polyLinePoints.clear()
+                binding.mapOverlayView.visibility = View.VISIBLE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.save_blue )
             }
         }
@@ -158,24 +154,35 @@ class CreateEnumerationTeamFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            val polygon = ArrayList<LatLon>()
+            val polygonPoints = ArrayList<LatLon>()
 
             var creationDate = Date().time
 
-            intersectionPolygon?.points?.map { points ->
-                points.map { point ->
-                    polygon.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+            if (intersectionPolygon is MapManager.MapboxPolygon)
+            {
+                val mapboxPolygon = intersectionPolygon as MapManager.MapboxPolygon
+                mapboxPolygon.polygonAnnotation?.points?.map { points ->
+                    points.map { point ->
+                        polygonPoints.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+                    }
+                }
+            }
+            else if (intersectionPolygon is org.osmdroid.views.overlay.Polygon)
+            {
+                val osmPolygon = intersectionPolygon as org.osmdroid.views.overlay.Polygon
+                osmPolygon.points.map { point ->
+                    polygonPoints.add( LatLon( creationDate++, point.latitude, point.longitude ))
                 }
             }
 
-            if (polygon.isEmpty())
+            if (polygonPoints.isEmpty())
             {
                 enumArea.vertices.map {
-                    polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
+                    polygonPoints.add( LatLon( creationDate++, it.latitude, it.longitude ))
                 }
             }
 
-            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygon, locationUuids ))
+            val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, binding.teamNameEditText.text.toString(), polygonPoints, locationUuids ))
 
             enumerationTeam?.let { team ->
                 enumArea.enumerationTeams.add(team)
@@ -183,14 +190,7 @@ class CreateEnumerationTeamFragment : Fragment(),
             }
         }
 
-        binding.overlayView.setOnTouchListener(this)
-    }
-
-    fun createAnnotationManagers()
-    {
-        pointAnnotationManager = mapboxManager.createPointAnnotationManager( pointAnnotationManager, binding.mapView )
-        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager( polygonAnnotationManager, binding.mapView )
-        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager( polylineAnnotationManager, binding.mapView )
+        binding.mapOverlayView.setOnTouchListener(this)
     }
 
     override fun onResume()
@@ -202,8 +202,6 @@ class CreateEnumerationTeamFragment : Fragment(),
 
     fun refreshMap()
     {
-        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
-
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
 
@@ -211,13 +209,16 @@ class CreateEnumerationTeamFragment : Fragment(),
             points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
         }
 
+        if (points.last() != points.first())
+        {
+            points.add( points.first())
+        }
+
         pointList.add( points )
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
-            mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
-            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapView.getMapboxMap())
+            MapManager.instance().createPolygon( mapView, pointList,Color.BLACK, 0x40)
 
             for (enumerationTeam in enumArea.enumerationTeams)
             {
@@ -232,12 +233,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
                 {
-                    mapboxManager.addPolygon( polygonAnnotationManager, ptList, "#000000", 0.25)
-                    mapboxManager.addPolyline( polylineAnnotationManager, ptList[0], "#ff0000" )
-
-                    val latLngBounds = GeoUtils.findGeobounds(enumerationTeam.polygon)
-                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, enumerationTeam.name, "#80FFFFFF" )
+                    MapManager.instance().createPolygon( mapView, ptList, Color.BLACK, 0x40 )
                 }
             }
 
@@ -248,13 +244,11 @@ class CreateEnumerationTeamFragment : Fragment(),
                     if (!locationBelongsToTeam( location ))
                     {
                         val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.home_black )
+                        MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_black )
                     }
                 }
             }
         }
-
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun locationBelongsToTeam( location: Location ) : Boolean
@@ -273,19 +267,17 @@ class CreateEnumerationTeamFragment : Fragment(),
         return false
     }
 
-    override fun onMapClick(point: Point): Boolean
-    {
-        return false
-    }
-
-    private val polyLinePoints = ArrayList<Point>()
-
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
     {
         p1?.let { p1 ->
 
             if (p1.action == MotionEvent.ACTION_UP)
             {
+                fingerPolyline?.let {
+                    MapManager.instance().removePolyline( mapView, it )
+                    fingerPolyline = null
+                }
+
                 val points1 = MapboxManager.ArrayListOfLatLonToArrayListOfCoordinate( enumArea.vertices )
 
                 // close the polygon, if necessary
@@ -339,8 +331,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                                 val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                 pointList.add( vertices )
 
-                                intersectionPolygon = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#ff0000", 0.25 )
-                                intersectionPolyline = mapboxManager.addPolyline( polylineAnnotationManager, vertices, "#0000ff" )
+                                intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList,Color.BLACK, 0x40 )
 
                                 locationUuids.clear()
 
@@ -364,46 +355,27 @@ class CreateEnumerationTeamFragment : Fragment(),
                     Log.d( "xxx", ex.stackTraceToString())
                 }
 
-                polyLinePoints.clear()
-                polylineAnnotation?.let { it ->
-                    it.points = polyLinePoints
-                    polylineAnnotationManager?.update(it)
-                }
-
                 createMode = false
-                binding.overlayView.visibility = View.GONE
+                binding.mapOverlayView.visibility = View.GONE
                 binding.drawPolygonButton.setBackgroundResource( R.drawable.draw )
             }
             else
             {
-                val point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                val point = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
                 polyLinePoints.add( point )
 
-                if (polylineAnnotation == null)
+                if (fingerPolyline == null)
                 {
-                    val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
-                        .withPoints(polyLinePoints)
-                        .withLineColor("#ee4e8b")
-                        .withLineWidth(5.0)
-
-                    polylineAnnotation = polylineAnnotationManager?.create(polylineAnnotationOptions)
+                    fingerPolyline = MapManager.instance().createPolyline( mapView, polyLinePoints, Color.rgb( 0xee, 0x4e,0x8b) )
                 }
                 else
                 {
-                    polylineAnnotation?.let { polylineAnnotation ->
-                        polylineAnnotation.points = polyLinePoints
-                        polylineAnnotationManager?.update(polylineAnnotation)
-                    }
+                    MapManager.instance().updatePolyline( mapView, fingerPolyline!!, point )
                 }
             }
         }
 
         return true
-    }
-
-    override fun onCameraChanged(eventData: CameraChangedEventData)
-    {
-        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -422,10 +394,6 @@ class CreateEnumerationTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
-                    refreshMap()
-                }
             }
 
             R.id.satellite_streets ->
@@ -435,45 +403,19 @@ class CreateEnumerationTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
-                    refreshMap()
-                }
-            }
-
-            R.id.import_map_tiles ->
-            {
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-
-            R.id.select_map_tiles ->
-            {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
             }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
-            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-            }
-        }
+    override fun onMarkerTapped( location: Location )
+    {
     }
 
-    override fun didMakeSelection( selection: String, tag: Int )
+    override fun onZoomLevelChanged( zoomLevel: Double )
     {
-        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
-            createAnnotationManagers()
-            refreshMap()
-            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-        }
+        sharedViewModel.setCurrentZoomLevel( zoomLevel )
     }
 
     override fun onDestroyView()

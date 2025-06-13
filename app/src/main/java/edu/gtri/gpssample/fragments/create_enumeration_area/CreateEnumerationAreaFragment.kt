@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
@@ -906,7 +907,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         // create the polygon border
-        val polyline = MapManager.instance().createPolyline( mapView, pointList[0], "#000000" )
+        val polyline = MapManager.instance().createPolyline( mapView, pointList[0], Color.BLACK )
 
         polylineAnnotation?.let {
             val polylineAnnotation = it as PolylineAnnotation
@@ -934,7 +935,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         // create the polygon border
-        val polyline = MapManager.instance().createPolyline( mapView, pointList[0], "#ff0000" )
+        val polyline = MapManager.instance().createPolyline( mapView, pointList[0], Color.RED )
 
         polyline?.let {
             val polylineAnnotation = polyline as PolylineAnnotation

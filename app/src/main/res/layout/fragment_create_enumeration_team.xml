@@ -46,17 +46,21 @@
         android:layout_height="0dp">
 
         <com.mapbox.maps.MapView
-            android:id="@+id/map_view"
+            android:id="@+id/mapbox_map_view"
+            android:visibility="visible"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            mapbox:mapbox_cameraTargetLat="33.77577524978659"
-            mapbox:mapbox_cameraTargetLng="-84.39630379821243"
-            mapbox:mapbox_cameraZoom="9.0">
+            android:layout_height="match_parent">
         </com.mapbox.maps.MapView>
 
-        <View
+        <org.osmdroid.views.MapView
+            android:id="@+id/osm_map_view"
             android:visibility="gone"
-            android:id="@+id/overlay_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </org.osmdroid.views.MapView>
+
+        <View
+            android:id="@+id/map_overlay_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         </View>
