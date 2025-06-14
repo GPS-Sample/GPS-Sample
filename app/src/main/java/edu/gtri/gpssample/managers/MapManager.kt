@@ -49,6 +49,7 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterLayer
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterSource
@@ -544,6 +545,27 @@ class MapManager
         {
             val cameraPosition = CameraOptions.Builder()
                 .zoom(zoomLevel)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+    }
+
+    fun centerMap( polygon: ArrayList<LatLon>, zoomLevel: Double, mapView: View )
+    {
+        val latLngBounds = GeoUtils.findGeobounds(polygon)
+
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel )
+            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom( zoomLevel )
+                .center(point)
                 .build()
 
             mapView.getMapboxMap().setCamera(cameraPosition)

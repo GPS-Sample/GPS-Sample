@@ -7,28 +7,38 @@
 
 package edu.gtri.gpssample.fragments.perform_collection
 
+import android.Manifest
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -49,6 +59,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -64,27 +75,24 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PerformCollectionFragment : Fragment(),
-    OnCameraChangeListener,
+    MapManager.MapManagerDelegate,
     MapboxManager.MapTileCacheDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
-    SelectionDialog.SelectionDialogDelegate,
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var user: User
+    private lateinit var mapView: View
+    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
-    private lateinit var mapboxManager: MapboxManager
     private lateinit var collectionTeam: CollectionTeam
     private lateinit var defaultColorList: ColorStateList
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
+    private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
-
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var polygonAnnotationManager: PolygonAnnotationManager? = null
-    private var polylineAnnotationManager: PolylineAnnotationManager? = null
 
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
@@ -93,10 +101,6 @@ class PerformCollectionFragment : Fragment(),
     private val collectionTeamLocations = ArrayList<Location>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
-    private val locationHashMap = java.util.HashMap<Long, Location>()
-    private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
-    private var allPolygonAnnotations = java.util.ArrayList<PolygonAnnotation>()
-    private var allPolylineAnnotations = java.util.ArrayList<PolylineAnnotation>()
 
     private val kExportTag = 1
     private val kFileLocationTag = 2
@@ -172,7 +176,8 @@ class PerformCollectionFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.currentConfiguration?.value?.let { config ->
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
             sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
         }
@@ -239,26 +244,55 @@ class PerformCollectionFragment : Fragment(),
             binding.titleTextView.text =  enumArea.name + " (" + collectionTeam.name + " " + resources.getString(R.string.team) + ")"
         }
 
+        binding.mapTileCacheButton.backgroundTintList?.let {
+            defaultColorList = it
+        }
+
+        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
+        if (centerOnCurrentLocation == null)
+        {
+            sharedViewModel.setCenterOnCurrentLocation( false )
+        }
+
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
-                initLocationComponent()
-                createAnnotationManagers()
-                refreshMap()
-            }
+            TileServer.startServer( enumArea.mbTilesPath )
         }
-        else
+
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+            this.mapView = mapView
+
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                MapManager.instance().centerMap( collectionTeam.polygon, currentZoomLevel, mapView )
+            }
+
+            sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
+                if (centerOnCurrentLocation)
+                {
+                    MapManager.instance().enableLocationUpdates(activity!!, mapView)
+                    binding.centerOnLocationButton.setBackgroundTintList( ColorStateList.valueOf( resources.getColor(android.R.color.holo_red_light)));
+                }
+                else
+                {
+                    MapManager.instance().disableLocationUpdates(activity!!, mapView)
+                    binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                }
+            }
+
+            refreshMap()
+        }
+
+        if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
-            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                initLocationComponent()
-                createAnnotationManagers()
-                refreshMap()
+            val locationRequest = LocationRequest.create().apply {
+                interval = 5000
+                fastestInterval = 2000
+                priority = Priority.PRIORITY_HIGH_ACCURACY
             }
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
+            fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
         }
-
-        mapboxManager = MapboxManager.instance( activity!! )
-
-        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         binding.mapTileCacheButton.setOnClickListener {
             enumArea.mapTileRegion?.let {
@@ -275,27 +309,6 @@ class PerformCollectionFragment : Fragment(),
             MapLegendDialog( activity!! )
         }
 
-        val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
-        if (centerOnCurrentLocation == null)
-        {
-            sharedViewModel.setCenterOnCurrentLocation( false )
-        }
-
-        binding.mapTileCacheButton.backgroundTintList?.let {
-            defaultColorList = it
-        }
-
-        sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
-            if (centerOnCurrentLocation)
-            {
-                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            }
-            else
-            {
-                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
-            }
-        }
-
         binding.helpButton.setOnClickListener {
             PerformCollectionHelpDialog( activity!! )
         }
@@ -305,11 +318,13 @@ class PerformCollectionFragment : Fragment(),
                 if (centerOnCurrentLocation)
                 {
                     sharedViewModel.setCenterOnCurrentLocation( false )
+                    MapManager.instance().disableLocationUpdates( activity!!, mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                 }
                 else
                 {
                     sharedViewModel.setCenterOnCurrentLocation( true )
+                    MapManager.instance().enableLocationUpdates( activity!!, mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
                 refreshMap()
@@ -364,71 +379,71 @@ class PerformCollectionFragment : Fragment(),
         binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
     }
 
-    fun createAnnotationManagers() {
-        pointAnnotationManager =
-            mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
-        polygonAnnotationManager =
-            mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
-        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(
-            polylineAnnotationManager,
-            binding.mapView
-        )
-
-        pointAnnotationManager?.apply {
-            addClickListener(
-                OnPointAnnotationClickListener { pointAnnotation ->
-                    locationHashMap[pointAnnotation.id]?.let { location ->
-                        sharedViewModel.locationViewModel.setCurrentLocation(location)
-
-                        if (location.isLandmark)
-                        {
-                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-                        }
-                        else
-                        {
-                            var count = 0
-
-                            for (enumerationItem in location.enumerationItems)
-                            {
-                                if (enumerationItem.samplingState == SamplingState.Sampled)
-                                {
-                                    count += 1
-
-                                    // This is really only necessary here for the enumerationItems.size == 1 case
-                                    // For size > 1, this will get set in the multiCollectionFragment
-                                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
-                                }
-                            }
-
-                            if (count > 1)
-                            {
-                                val bundle = Bundle()
-                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
-                                bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
-
-                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
-                            }
-                            else
-                            {
-                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
-
-                                    val bundle = Bundle()
-                                    bundle.putBoolean( Keys.kEditMode.value, false )
-                                    bundle.putBoolean( Keys.kCollectionMode.value, true )
-                                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
-                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-                                }
-                            }
-                        }
-                    }
-                    true
-                }
-            )
-        }
-    }
+//    fun createAnnotationManagers() {
+//        pointAnnotationManager =
+//            mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapboxMapView)
+//        polygonAnnotationManager =
+//            mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapboxMapView)
+//        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(
+//            polylineAnnotationManager,
+//            binding.mapboxMapView
+//        )
+//
+//        pointAnnotationManager?.apply {
+//            addClickListener(
+//                OnPointAnnotationClickListener { pointAnnotation ->
+//                    locationHashMap[pointAnnotation.id]?.let { location ->
+//                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+//
+//                        if (location.isLandmark)
+//                        {
+//                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+//                        }
+//                        else
+//                        {
+//                            var count = 0
+//
+//                            for (enumerationItem in location.enumerationItems)
+//                            {
+//                                if (enumerationItem.samplingState == SamplingState.Sampled)
+//                                {
+//                                    count += 1
+//
+//                                    // This is really only necessary here for the enumerationItems.size == 1 case
+//                                    // For size > 1, this will get set in the multiCollectionFragment
+//                                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+//                                }
+//                            }
+//
+//                            if (count > 1)
+//                            {
+//                                val bundle = Bundle()
+//                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
+//                                bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
+//
+//                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
+//                            }
+//                            else
+//                            {
+//                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+//                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
+//                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
+//                                    (this@PerformCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
+//
+//                                    val bundle = Bundle()
+//                                    bundle.putBoolean( Keys.kEditMode.value, false )
+//                                    bundle.putBoolean( Keys.kCollectionMode.value, true )
+//                                    bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+//                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+//                                }
+//                            }
+//                        }
+//                    }
+//                    true
+//                }
+//            )
+//        }
+//    }
 
     override fun onResume()
     {
@@ -439,48 +454,7 @@ class PerformCollectionFragment : Fragment(),
 
     fun refreshMap()
     {
-        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
-
-        for (polygonAnnotation in allPolygonAnnotations)
-        {
-            polygonAnnotationManager?.delete( polygonAnnotation )
-        }
-
-        allPolygonAnnotations.clear()
-
-        for (polylineAnnotation in allPolylineAnnotations)
-        {
-            polylineAnnotationManager?.delete( polylineAnnotation )
-        }
-
-        allPolylineAnnotations.clear()
-
-        for (pointAnnotation in allPointAnnotations)
-        {
-            pointAnnotationManager?.delete( pointAnnotation )
-        }
-
-        allPointAnnotations.clear()
-        locationHashMap.clear()
-
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            for (enumArea in config.enumAreas)
-            {
-                for (location in enumArea.locations)
-                {
-                    if (location.isLandmark)
-                    {
-                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, R.drawable.location_blue )
-
-                        pointAnnotation?.let {
-                            locationHashMap[pointAnnotation.id] = location
-                            allPointAnnotations.add( pointAnnotation )
-                        }
-                    }
-                }
-            }
-        }
+        MapManager.instance().clearMap( mapView )
 
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
@@ -493,25 +467,13 @@ class PerformCollectionFragment : Fragment(),
 
         if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
-            val polygonAnnotation = mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
 
-            polygonAnnotation?.let {
-                allPolygonAnnotations.add( it )
-            }
-
-            val polylineAnnotation = mapboxManager.addPolyline( polylineAnnotationManager, pointList[0],"#ff0000")
-
-            polylineAnnotation?.let {
-                allPolylineAnnotations.add( it )
-            }
-
-            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                sharedViewModel.currentCenterPoint?.value?.let { currentCenterPoint ->
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(currentZoomLevel)
-                        .center(currentCenterPoint)
-                        .build()
-                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
+            for (location in enumArea.locations)
+            {
+                if (location.isLandmark)
+                {
+                    MapManager.instance().createMarker( activity!!, mapView, location, R.drawable.location_blue, "" )
                 }
             }
 
@@ -568,36 +530,17 @@ class PerformCollectionFragment : Fragment(),
 
                     if (resourceId > 0)
                     {
-                        // one point per location!
-                        val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                        val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, resourceId )
-
-                        pointAnnotation?.let { pointAnnotation ->
-                            allPointAnnotations.add( pointAnnotation )
-                            locationHashMap[pointAnnotation.id] = location
-                        }
-
+                        var title = ""
                         if (location.enumerationItems.isNotEmpty())
                         {
-                            var subAddress = ""
-
-                            for (enumerationItem in location.enumerationItems)
-                            {
-                                if (enumerationItem.samplingState == SamplingState.Sampled)
-                                {
-                                    subAddress = enumerationItem.subAddress
-                                    break
-                                }
-                            }
-
-                            mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, subAddress, "#00FFFFFF")
+                            title = location.enumerationItems[0].subAddress
                         }
+
+                        MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
                     }
                 }
             }
         }
-
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     private fun didSelectItem( item: Any )
@@ -622,7 +565,7 @@ class PerformCollectionFragment : Fragment(),
                     bundle.putBoolean( Keys.kEditMode.value, false )
                     bundle.putBoolean( Keys.kCollectionMode.value, true )
                     bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
-                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                 }
             }
         }
@@ -985,133 +928,6 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
-    override fun onCameraChanged(eventData: CameraChangedEventData)
-    {
-        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
-        sharedViewModel.setCurrentCenterPoint( binding.mapView.getMapboxMap().cameraState.center)
-    }
-
-    private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener { point ->
-        sharedViewModel.centerOnCurrentLocation?.value?.let {
-            if (it)
-            {
-                binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(point).build())
-                binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
-            }
-        }
-    }
-
-    private var lastLocationUpdateTime: Long = 0
-
-    private val locationConsumer = object : LocationConsumer
-    {
-        override fun onBearingUpdated(vararg bearing: Double, options: (ValueAnimator.() -> Unit)?) {
-        }
-
-        override fun onLocationUpdated(vararg location: Point, options: (ValueAnimator.() -> Unit)?) {
-            if (location.size > 0)
-            {
-                val point = location.last()
-                binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
-                currentGPSLocation = point
-
-                if (Date().time - lastLocationUpdateTime > 3000)
-                {
-                    lastLocationUpdateTime = Date().time
-
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-
-                        for (item in performCollectionAdapter.items)
-                        {
-                            var loc: Location? = null
-                            val currentLatLng = LatLng( point.latitude(), point.longitude())
-
-                            if (item is Location)
-                            {
-                                loc = item
-                            }
-                            else if (item is EnumerationItem)
-                            {
-                                enumArea.locations.find { l -> l.uuid == item.locationUuid  }?.let {
-                                    loc = it
-                                }
-                            }
-
-                            var distanceUnits = ""
-                            val itemLatLng = LatLng( loc!!.latitude, loc!!.longitude )
-                            var distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
-
-                            if (distance < 400) // display in meters or feet
-                            {
-                                if (config.distanceFormat == DistanceFormat.Meters)
-                                {
-                                    distanceUnits = resources.getString( R.string.meters )
-                                }
-                                else
-                                {
-                                    distance = distance * 3.28084
-                                    distanceUnits = resources.getString( R.string.feet )
-                                }
-                            }
-                            else // display in kilometers or miles
-                            {
-                                if (config.distanceFormat == DistanceFormat.Meters)
-                                {
-                                    distance = distance / 1000.0
-                                    distanceUnits = resources.getString( R.string.kilometers )
-                                }
-                                else
-                                {
-                                    distance = distance / 1609.34
-                                    distanceUnits = resources.getString( R.string.miles )
-                                }
-                            }
-
-                            if (item is Location)
-                            {
-                                item.distance = distance
-                                item.distanceUnits = distanceUnits
-                            }
-                            else if (item is EnumerationItem)
-                            {
-                                item.distance = distance
-                                item.distanceUnits = distanceUnits
-                            }
-                        }
-
-                        performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
-                    }
-                }
-            }
-        }
-
-        override fun onPuckBearingAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
-        }
-
-        override fun onPuckLocationAnimatorDefaultOptionsUpdated(options: ValueAnimator.() -> Unit) {
-        }
-    }
-
-    private val onIndicatorAccurracyRadiusChangedListener = OnIndicatorAccuracyRadiusChangedListener {
-        val accuracy = it.toInt()
-        currentGPSAccuracy = accuracy
-
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            if (accuracy <= config.minGpsPrecision)
-            {
-                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.good)
-                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
-            }
-            else
-            {
-                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.poor)
-                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
-            }
-        }
-
-        binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
-    }
-
     private fun gpsAccuracyIsGood(): Boolean
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -1138,49 +954,6 @@ class PerformCollectionFragment : Fragment(),
         }
 
         return editMode
-    }
-
-    private fun initLocationComponent()
-    {
-        val locationComponentPlugin = binding.mapView.location
-
-        locationComponentPlugin.enabled = true
-        locationComponentPlugin.getLocationProvider()?.registerLocationConsumer( locationConsumer )
-        locationComponentPlugin.addOnIndicatorPositionChangedListener( onIndicatorPositionChangedListener )
-
-        val locationComponentPlugin2 = binding.mapView.location2
-        locationComponentPlugin2.enabled = true
-        locationComponentPlugin2.addOnIndicatorAccuracyRadiusChangedListener( onIndicatorAccurracyRadiusChangedListener )
-
-        locationComponentPlugin2.updateSettings2 {
-            this.showAccuracyRing = true
-        }
-
-        locationComponentPlugin.updateSettings {
-            this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                bearingImage = AppCompatResources.getDrawable(
-                    activity!!,
-                    R.drawable.mapbox_user_puck_icon,
-                ),
-                shadowImage = AppCompatResources.getDrawable(
-                    activity!!,
-                    R.drawable.mapbox_user_icon_shadow,
-                ),
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
-        }
     }
 
     override fun stylePackLoaded( error: String )
@@ -1256,8 +1029,7 @@ class PerformCollectionFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -1269,53 +1041,144 @@ class PerformCollectionFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
-            }
-
-            R.id.import_map_tiles ->
-            {
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-
-            R.id.select_map_tiles ->
-            {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
-            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+    private var lastLocationUpdateTime: Long = 0
+
+    private val locationCallback = object : LocationCallback()
+    {
+        override fun onLocationResult(locationResult: LocationResult)
+        {
+            val location = locationResult.locations.last()
+            val accuracy = location.accuracy.toInt() // in meters
+            val point = Point.fromLngLat( location.longitude, location.latitude )
+
+            currentGPSLocation = point
+            currentGPSAccuracy = accuracy
+
+            if (accuracy <= config.minGpsPrecision)
+            {
+                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.good)
+                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
+            }
+            else
+            {
+                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.poor)
+                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
+            }
+
+            binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
+
+            binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
+
+            if (Date().time - lastLocationUpdateTime > 3000)
+            {
+                lastLocationUpdateTime = Date().time
+
+                for (loc in enumArea.locations)
+                {
+                    val currentLatLng = LatLng( point.latitude(), point.longitude())
+                    val itemLatLng = LatLng( loc.latitude, loc.longitude )
+                    val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+                    if (distance < 400) // display in meters or feet
+                    {
+                        if (config.distanceFormat == DistanceFormat.Meters)
+                        {
+                            loc.distance = distance
+                            loc.distanceUnits = resources.getString( R.string.meters )
+                        }
+                        else
+                        {
+                            loc.distance = distance * 3.28084
+                            loc.distanceUnits = resources.getString( R.string.feet )
+                        }
+                    }
+                    else // display in kilometers or miles
+                    {
+                        if (config.distanceFormat == DistanceFormat.Meters)
+                        {
+                            loc.distance = distance / 1000.0
+                            loc.distanceUnits = resources.getString( R.string.kilometers )
+                        }
+                        else
+                        {
+                            loc.distance = distance / 1609.34
+                            loc.distanceUnits = resources.getString( R.string.miles )
+                        }
+                    }
+                }
+
+                performCollectionAdapter.updateItems( performCollectionAdapter.enumerationItems, performCollectionAdapter.locations )
             }
         }
     }
 
-    override fun didMakeSelection( selection: String, tag: Int )
+    override fun onMarkerTapped( location: Location )
     {
-        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
+        sharedViewModel.locationViewModel.setCurrentLocation(location)
 
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
-            createAnnotationManagers()
-            refreshMap()
-            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+        if (location.isLandmark)
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
         }
+        else
+        {
+            sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+            if (location.isLandmark)
+            {
+                findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
+            }
+            else
+            {
+                var count = 0
+
+                for (enumerationItem in location.enumerationItems)
+                {
+                    if (enumerationItem.samplingState == SamplingState.Sampled)
+                    {
+                        count += 1
+
+                        // This is really only necessary here for the enumerationItems.size == 1 case
+                        // For size > 1, this will get set in the multiCollectionFragment
+                        sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                    }
+                }
+
+                if (count > 1)
+                {
+                    val bundle = Bundle()
+                    bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
+                    bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
+
+                    findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
+                }
+                else
+                {
+                    didSelectItem( location.enumerationItems[0])
+                }
+            }
+        }
+    }
+
+    override fun onZoomLevelChanged( zoomLevel: Double )
+    {
+        sharedViewModel.setCurrentZoomLevel( zoomLevel )
     }
 
     override fun onDestroyView()
     {
         super.onDestroyView()
 
-        binding.mapView.location.getLocationProvider()?.unRegisterLocationConsumer( locationConsumer )
-        binding.mapView.location.removeOnIndicatorPositionChangedListener( onIndicatorPositionChangedListener )
+        fusedLocationClient.removeLocationUpdates( locationCallback )
+
         _binding = null
     }
 }

@@ -198,7 +198,7 @@ class PerformEnumerationFragment : Fragment(),
             this.mapView = mapView
 
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
+                MapManager.instance().centerMap( enumerationTeam.polygon, currentZoomLevel, mapView )
             }
 
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
@@ -230,8 +230,6 @@ class PerformEnumerationFragment : Fragment(),
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
         }
-
-        binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         binding.legendTextView.setOnClickListener {
             MapLegendDialog( activity!! )
@@ -443,7 +441,6 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (location.isLandmark)
                 {
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
                     MapManager.instance().createMarker( activity!!, mapView, location, R.drawable.location_blue, "" )
                 }
             }
@@ -484,7 +481,6 @@ class PerformEnumerationFragment : Fragment(),
                         title = location.enumerationItems[0].subAddress
                     }
 
-                    val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
                     MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
                 }
             }
