@@ -22,6 +22,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mapbox.geojson.Point
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -149,6 +150,12 @@ class ConfigurationFragment : Fragment(),
                 {
                     sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                         MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
+                    }
+                }
+                else
+                {
+                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                        MapManager.instance().centerMap( Point.fromLngLat( MapManager.GEORGIA_TECH.longitude, MapManager.GEORGIA_TECH.latitude), currentZoomLevel, mapView )
                     }
                 }
             }

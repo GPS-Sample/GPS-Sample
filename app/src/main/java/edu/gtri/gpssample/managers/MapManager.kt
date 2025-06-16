@@ -593,6 +593,24 @@ class MapManager
         }
     }
 
+    fun centerMap( point: Point, zoomLevel: Double, mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel )
+            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( point.latitude(), point.longitude(), point.altitude() ))
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val cameraPosition = CameraOptions.Builder()
+                .zoom( zoomLevel )
+                .center(point)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+    }
+
     fun createMarker( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int, title: String = "" ) : Any?
     {
         val location = Location( point.latitude(), point.longitude(), point.altitude())
