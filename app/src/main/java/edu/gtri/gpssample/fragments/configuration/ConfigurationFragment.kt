@@ -145,7 +145,11 @@ class ConfigurationFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) { mapView ->
+
+                binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+
                 MapManager.instance().enableLocationUpdates( activity!!, mapView )
+
                 if (config.enumAreas.isNotEmpty())
                 {
                     sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->

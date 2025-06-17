@@ -59,6 +59,18 @@
             android:layout_height="match_parent">
         </org.osmdroid.views.MapView>
 
+        <TextView
+            android:id="@+id/osm_label"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_gravity="bottom|start"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:text="OSM"
+            android:textStyle="normal" />
+
         <View
             android:id="@+id/map_overlay_view"
             android:layout_width="match_parent"

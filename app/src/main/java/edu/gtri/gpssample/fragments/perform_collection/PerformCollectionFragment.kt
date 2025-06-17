@@ -262,6 +262,8 @@ class PerformCollectionFragment : Fragment(),
         MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
             this.mapView = mapView
 
+            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 MapManager.instance().centerMap( collectionTeam.polygon, currentZoomLevel, mapView )
             }
