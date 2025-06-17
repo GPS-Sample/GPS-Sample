@@ -58,6 +58,7 @@ import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
@@ -120,7 +121,7 @@ class MapManager
 
         mapView.overlays.clear()
         mapView.minZoomLevel = 0.0
-        mapView.maxZoomLevel = 19.0
+        mapView.maxZoomLevel = 24.0
         mapView.setMultiTouchControls( true )
 
         var tileSource = TileSourceFactory.MAPNIK
@@ -149,8 +150,6 @@ class MapManager
         val customOverlay = TilesOverlay(customProvider, activity)
         customOverlay.setLoadingBackgroundColor(Color.TRANSPARENT)
         mapView.overlays.add(customOverlay)
-
-//        enableOsmMapLocationUpdates( activity, mapView )
 
         delegate?.let {
             mapView.setMapListener(object : org.osmdroid.events.MapListener {
@@ -204,8 +203,6 @@ class MapManager
                             }.toJson()
                         )
                     }
-
-//                    enableMapboxLocationUpdates( activity, mapView )
 
                     mapView.getMapboxMap().addOnCameraChangeListener { cameraChangedEventData ->
                         delegate?.onZoomLevelChanged( mapView.getMapboxMap().cameraState.zoom )
@@ -354,7 +351,11 @@ class MapManager
                 {
                     overlays.add( overlay )
                 }
-                else if (overlay is org.osmdroid.views.overlay.Marker)
+                else if (overlay is Polyline)
+                {
+                    overlays.add( overlay )
+                }
+                else if (overlay is Marker)
                 {
                     overlays.add( overlay )
                 }
@@ -364,36 +365,18 @@ class MapManager
             {
                 mapView.overlays.remove( overlay )
             }
+
+            mapView.invalidate()
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
-            mapboxPolygonAnnotationManager?.let {
-                it.deleteAll()
-            }
+            mapboxPolygonAnnotationManager?.deleteAll()
+            mapboxPolylineAnnotationManager?.deleteAll()
+            mapboxPointAnnotationManager?.deleteAll()
         }
     }
 
-    fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: String, fillOpacity: Double ) : Any?
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            mapboxPolygonAnnotationManager?.let {
-                val polygonAnnotationOptions = PolygonAnnotationOptions()
-                    .withPoints( points )
-                    .withFillColor( fillColor )
-                    .withFillOpacity( fillOpacity )
-
-                return it.create(polygonAnnotationOptions)
-            }
-        }
-
-        return null
-    }
-
-    fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: Int, fillOpacity: Int ) : Any?
+    fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: Int, fillOpacity: Int, borderColor: Int = Color.RED ) : Any?
     {
         val mapboxPolygon = MapboxPolygon()
 
@@ -409,8 +392,8 @@ class MapManager
                 setPoints(geoPoints)
                 fillPaint.color = fillColor
                 fillPaint.alpha = fillOpacity
-                outlinePaint.color = Color.RED
-                outlinePaint.strokeWidth = 4.0f
+                outlinePaint.color = borderColor
+                outlinePaint.strokeWidth = 10f
             }
 
             mapView.overlays.add(polygon)
@@ -442,7 +425,7 @@ class MapManager
             mapboxPolylineAnnotationManager?.let {
                 val polylineAnnotationOptions: PolylineAnnotationOptions = PolylineAnnotationOptions()
                     .withPoints(newPointList[0])
-                    .withLineColor(Color.RED)
+                    .withLineColor( borderColor )
                     .withLineWidth(4.0)
 
                 mapboxPolygon.polylineAnnotation = it.create(polylineAnnotationOptions)
@@ -481,7 +464,7 @@ class MapManager
             val polyline = Polyline()
             polyline.setPoints(geoPoints)
             polyline.setColor(color)
-            polyline.setWidth(9f)
+            polyline.setWidth(10f)
 
             mapView.getOverlayManager().add(polyline);
             mapView.invalidate();
@@ -688,77 +671,6 @@ class MapManager
         }
 
         return null
-    }
-
-    fun removeViewAnnotation(viewAnnotationManager: ViewAnnotationManager, label: String )
-    {
-        if (label.isNotEmpty())
-        {
-            for (annotation in viewAnnotationManager.annotations)
-            {
-                annotation.key.rootView.findViewById<TextView>( R.id.text_view )?.let {
-                    if (it.text == label)
-                    {
-                        viewAnnotationManager.removeViewAnnotation( annotation.key )
-                    }
-                }
-            }
-        }
-    }
-
-    fun removeLabel( viewAnnotationManager: ViewAnnotationManager, mapView: View, label: String )
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            if (label.isNotEmpty())
-            {
-                for (annotation in viewAnnotationManager.annotations)
-                {
-                    annotation.key.rootView.findViewById<TextView>( R.id.text_view )?.let {
-                        if (it.text == label)
-                        {
-                            viewAnnotationManager.removeViewAnnotation( annotation.key )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun addLabelToPoint(viewAnnotationManager: ViewAnnotationManager, mapView: View, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            addViewAnnotationToPoint( viewAnnotationManager, point, label, backgroundColor )
-        }
-    }
-
-    fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
-    {
-        if (label.isNotEmpty())
-        {
-            removeViewAnnotation(viewAnnotationManager, label)
-
-            val view = viewAnnotationManager.addViewAnnotation(
-                resId = R.layout.view_text_view,
-                options = viewAnnotationOptions
-                {
-                    allowOverlap(true)
-                    geometry(point)
-                }
-            )
-
-            view.rootView.findViewById<TextView>( R.id.text_view )?.let {
-                it.text = label
-                it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
-            }
-        }
     }
 
     fun getLocationFromPixelPoint( mapView: View, motionEvent: MotionEvent ) : Point

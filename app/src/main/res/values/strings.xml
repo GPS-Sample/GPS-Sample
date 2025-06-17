@@ -407,7 +407,7 @@
     <string name="map_engine">Map Engine</string>
 
     <string-array name="map_engines">
-        <item>Open Street Maps</item>
+        <item>Open Street Map</item>
         <item>MapBox</item>
     </string-array>
 
