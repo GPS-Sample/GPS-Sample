@@ -391,8 +391,6 @@
     <string name="collection_notes">"Collection Notes"</string>
     <string name="select_map_tiles">"Select a map tileset"</string>
     <string name="loading_mapbox_tiles">"Loading Mapbox Tiles..."</string>
-    <string name="mapbox_streets">"Mapbox Streets Map"</string>
-    <string name="satellite_streets">"Satellite Streets Map"</string>
     <string name="import_map_tiles">"Import Map Tiles"</string>
     <string name="re_import">"The selected file has already been imported.  Would you like to re-import it now?"</string>
     <string name="attach_mbtiles_question">"Would you like to attach MBTiles to this area?"</string>
@@ -405,6 +403,8 @@
     <string name="retake_photo">"Retake Photo"</string>
     <string name="min_password_required">"The minimum password length is 6 characters"</string>
     <string name="map_engine">Map Engine</string>
+    <string name="mapbox_streets">"Street Map"</string>
+    <string name="satellite_streets">"Satellite Map"</string>
 
     <string-array name="map_engines">
         <item>Open Street Map</item>

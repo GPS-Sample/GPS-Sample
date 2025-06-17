@@ -10,11 +10,11 @@
 
     <item
         android:id="@+id/mapbox_streets"
-        android:title="Mapbox Streets"
+        android:title="@string/mapbox_streets"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/satellite_streets"
-        android:title="Satellite Streets"
+        android:title="@string/satellite_streets"
         app:showAsAction="never"/>
 </menu>
