@@ -8,6 +8,8 @@
 package edu.gtri.gpssample.fragments.createsample
 
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -23,6 +25,7 @@ import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.SamplingMethod
@@ -33,6 +36,7 @@ import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.MapLegendDialog
 import edu.gtri.gpssample.dialogs.SelectionDialog
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -40,23 +44,17 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import java.util.*
 
-class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDialog.ConfirmationDialogDelegate, SelectionDialog.SelectionDialogDelegate
+class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate, ConfirmationDialog.ConfirmationDialogDelegate
 {
     private lateinit var study: Study
+    private lateinit var mapView: View
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
-    private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
 
-    private var pointAnnotationManager: PointAnnotationManager? = null
-    private var polygonAnnotationManager: PolygonAnnotationManager? = null
-    private var polylineAnnotationManager: PolylineAnnotationManager? = null
-
     private var _binding: FragmentCreateSampleBinding? = null
     private val binding get() = _binding!!
-    private var allPolygonAnnotations = ArrayList<PolygonAnnotation>()
-    private var allPolylineAnnotations = ArrayList<PolylineAnnotation>()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -129,20 +127,26 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
         if (enumArea.mbTilesPath.isNotEmpty())
         {
-            TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-            }
-        }
-        else
-        {
-            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-            }
+            TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        mapboxManager = MapboxManager.instance( activity!! )
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+            this.mapView = mapView
+
+            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+
+            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                MapManager.instance().centerMap( enumArea.vertices, currentZoomLevel, mapView )
+            }
+
+
+            samplingViewModel.refreshMap.observe(viewLifecycleOwner)
+            {
+                refreshMap()
+            }
+
+            refreshMap()
+        }
 
         binding.infoButton.setOnClickListener{
             findNavController().navigate(R.id.action_navigate_to_SamplingInfoDialogFragment)
@@ -256,16 +260,6 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
         }
     }
 
-    fun createAnnotationManagers() {
-        pointAnnotationManager = mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
-        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
-        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(polylineAnnotationManager, binding.mapView)
-
-        pointAnnotationManager?.let {
-            samplingViewModel.setSampleAreasForMap(mapboxManager, it)
-        }
-    }
-
     override fun didSelectFirstButton(tag: Any?)
     {
     }
@@ -279,26 +273,11 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateSampleFragment.value.toString() + ": " + this.javaClass.simpleName
-
     }
 
     fun refreshMap()
     {
-        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
-
-        for (polygonAnnotation in allPolygonAnnotations)
-        {
-            polygonAnnotationManager?.delete( polygonAnnotation )
-        }
-
-        allPolygonAnnotations.clear()
-
-        for (polylineAnnotation in allPolylineAnnotations)
-        {
-            polylineAnnotationManager?.delete( polylineAnnotation )
-        }
-
-        allPolylineAnnotations.clear()
+        MapManager.instance().clearMap( mapView )
 
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
@@ -311,39 +290,61 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
         if (pointList.isNotEmpty())
         {
-            mapboxManager.addPolygon( polygonAnnotationManager, pointList,"#000000", 0.25)?.let{
-                allPolygonAnnotations.add( it )
-            }
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+        }
 
-            mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )?.let {
-                allPolylineAnnotations.add( it )
-            }
+        for (enumArea in config.enumAreas)
+        {
+//            if (enumArea.uuid != config.selectedEnumAreaUuid)
+//            {
+//                continue
+//            }
 
-            val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, enumArea.name, "#80FFFFFF")
-
-            if (enumArea.uuid == config.selectedEnumAreaUuid)
+            for (location in enumArea.locations)
             {
-                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-                    val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-                    val cameraPosition = CameraOptions.Builder()
-                        .zoom(currentZoomLevel)
-                        .center(point)
-                        .build()
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                {
+                    var resourceId: Int
+                    var title = ""
 
-                    binding.mapView.getMapboxMap().setCamera(cameraPosition)
+                    if (location.enumerationItems.isNotEmpty())
+                    {
+                        title = location.enumerationItems[0].subAddress
+                    }
+
+                    if (location.enumerationItems.size == 1)
+                    {
+                        val sampledItem = location.enumerationItems[0]
+
+                        if (sampledItem.enumerationState == EnumerationState.Enumerated)
+                        {
+                            resourceId = R.drawable.home_green
+
+                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            {
+                                resourceId = R.drawable.home_light_blue
+                            }
+
+                            MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
+                        }
+                    }
+                    else
+                    {
+                        resourceId = R.drawable.multi_home_green
+
+                        for (sampledItem in location.enumerationItems)
+                        {
+                            if (sampledItem.samplingState == SamplingState.Sampled)
+                            {
+                                resourceId = R.drawable.multi_home_light_blue
+                            }
+                        }
+
+                        MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
+                    }
                 }
             }
         }
-
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
-    }
-
-    override fun onCameraChanged(eventData: CameraChangedEventData)
-    {
-        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
     }
 
     fun sampleGenerated()
@@ -369,8 +370,7 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -382,45 +382,13 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
-                    createAnnotationManagers()
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
                     refreshMap()
                 }
-            }
-
-            R.id.import_map_tiles ->
-            {
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-
-            R.id.select_map_tiles ->
-            {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ), this)
             }
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
-            TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
-                createAnnotationManagers()
-                refreshMap()
-                TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-            }
-        }
-    }
-
-    override fun didMakeSelection( selection: String, tag: Int )
-    {
-        val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
-
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
-            createAnnotationManagers()
-            refreshMap()
-            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
-        }
     }
 
     fun redefineEnumerationAreaBoundary()
@@ -452,6 +420,15 @@ class CreateSampleFragment : Fragment(), OnCameraChangeListener, ConfirmationDia
 
             refreshMap()
         }
+    }
+
+    override fun onMarkerTapped( location: Location )
+    {
+    }
+
+    override fun onZoomLevelChanged( zoomLevel: Double )
+    {
+        sharedViewModel.setCurrentZoomLevel( zoomLevel )
     }
 
     override fun onDestroyView()

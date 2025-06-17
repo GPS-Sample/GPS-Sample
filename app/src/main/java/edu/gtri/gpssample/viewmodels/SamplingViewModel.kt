@@ -29,15 +29,13 @@ import kotlin.math.roundToInt
 
 class SamplingViewModel : ViewModel()
 {
-    private lateinit var mapboxManager: MapboxManager
-    private var pointAnnotationManager: PointAnnotationManager? = null
-
     private var _currentStudy : MutableLiveData<Study>? = null
     private var _currentConfig : MutableLiveData<Config>? = null
     private var _currentEnumArea : MutableLiveData<EnumArea>? = null
     private var _currentSampledItemsForSampling : ArrayList<EnumerationItem> = ArrayList()
 
-    private var allPointAnnotations = java.util.ArrayList<PointAnnotation>()
+    private val _refreshMap = MutableLiveData<Unit>()
+    val refreshMap: LiveData<Unit> = _refreshMap
 
     var currentFragment : Fragment? = null
 
@@ -64,90 +62,6 @@ class SamplingViewModel : ViewModel()
         set(value){
             _currentEnumArea = MutableLiveData(value?.value)
         }
-
-    val samplingMethod: String
-        get()
-        {
-            currentStudy?.value?.let{study ->
-                currentFragment?.let{fragment ->
-                    return SamplingMethodConverter.internationalString(study.samplingMethod, fragment)
-                }
-
-                return study.samplingMethod.format
-            }
-            return ""
-        }
-
-    fun setSampleAreasForMap(mapboxManager: MapboxManager, pointAnnotationManager: PointAnnotationManager) : SamplingState
-    {
-        this.mapboxManager = mapboxManager
-        this.pointAnnotationManager = pointAnnotationManager
-
-        for (pointAnnotation in allPointAnnotations)
-        {
-            pointAnnotationManager.delete( pointAnnotation )
-        }
-
-        allPointAnnotations.clear()
-
-        currentConfig?.value?.let { config ->
-            for (enumArea in config.enumAreas)
-            {
-                if (enumArea.uuid != config.selectedEnumAreaUuid)
-                {
-                    continue
-                }
-
-                for (location in enumArea.locations)
-                {
-                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
-                    {
-                        var resourceId: Int
-                        if (location.enumerationItems.size == 1)
-                        {
-                            val sampledItem = location.enumerationItems[0]
-
-                            if (sampledItem.enumerationState == EnumerationState.Enumerated)
-                            {
-                                resourceId = R.drawable.home_green
-
-                                if (sampledItem.samplingState == SamplingState.Sampled)
-                                {
-                                    resourceId = R.drawable.home_light_blue
-                                }
-
-                                val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, resourceId )
-                                pointAnnotation?.let { pointAnnotation ->
-                                    allPointAnnotations.add( pointAnnotation )
-                                }
-                            }
-                        }
-                        else
-                        {
-                            resourceId = R.drawable.multi_home_green
-
-                            for (sampledItem in location.enumerationItems)
-                            {
-                                if (sampledItem.samplingState == SamplingState.Sampled)
-                                {
-                                    resourceId = R.drawable.multi_home_light_blue
-                                }
-                            }
-
-                            val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                            val pointAnnotation = mapboxManager.addMarker( pointAnnotationManager, point, resourceId )
-                            pointAnnotation?.let { pointAnnotation ->
-                                allPointAnnotations.add( pointAnnotation )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return SamplingState.None
-    }
 
     fun validateRule(rule : Rule, fieldData : FieldData) : Boolean
     {
@@ -414,9 +328,7 @@ class SamplingViewModel : ViewModel()
                 else -> {}
             }
 
-            pointAnnotationManager?.let {
-                setSampleAreasForMap(mapboxManager, it)
-            }
+            _refreshMap.value = Unit
         }
     }
 

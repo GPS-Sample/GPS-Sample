@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.preference.PreferenceManager
@@ -627,11 +628,20 @@ class MapManager
 
                         val paint = Paint().apply {
                             color = android.graphics.Color.BLACK
-                            textSize = 30f
+                            textSize = 40f
                             isAntiAlias = true
+                            textAlign = Paint.Align.LEFT
                         }
 
-                        canvas.drawText(title, screenPoint.x.toFloat()-10, screenPoint.y.toFloat()+10, paint)
+                        val textBounds = Rect()
+                        paint.getTextBounds(title, 0, title.length, textBounds)
+                        val textWidth = textBounds.width()
+                        val textHeight = textBounds.height()
+
+                        val x = screenPoint.x.toFloat() - textWidth / 2
+                        val y = screenPoint.y.toFloat() + textHeight / 2
+
+                        canvas.drawText(title, x, y, paint)
                     }
                 }
             }
