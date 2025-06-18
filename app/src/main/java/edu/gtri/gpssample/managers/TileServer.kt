@@ -39,8 +39,6 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 {
     private lateinit var db: SQLiteDatabase
 
-    private var started: Boolean = false
-
     data class Bounds(val minLon: Double, val minLat: Double, val maxLon: Double, val maxLat: Double)
 
     init
@@ -104,6 +102,7 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
 
     companion object
     {
+        var started: Boolean = false
         var rasterLayer: RasterLayer? = null
         var rasterSource: RasterSource? = null
 
@@ -113,11 +112,10 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
         fun stopServer()
         {
             instance?.let {
-                if (it.started)
+                if (started)
                 {
                     it.stop()
                     it.db.close()
-                    it.started = false
                 }
             }
         }

@@ -442,6 +442,8 @@ class WalkEnumerationAreaFragment : Fragment(),
                 binding.walkButton.isEnabled = false
                 binding.addPointButton.isEnabled = false
                 binding.deletePointButton.isEnabled = false
+
+                refreshMap()
             }
         }
         else
@@ -476,8 +478,6 @@ class WalkEnumerationAreaFragment : Fragment(),
                 }
             }
         }
-
-//        refreshMap()
     }
 
     override fun didSelectFirstButton(tag: Any?)

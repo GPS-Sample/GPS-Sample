@@ -139,18 +139,21 @@ class MapManager
         mapView.overlays.add(osmOverlay)
 
         // Custom tiles
-        val customTileSource = XYTileSource(
-            "CustomTiles",
-            0, 19, 256, ".png",
-            arrayOf("http://localhost:8080/tiles/"),
-            "© Custom Tiles"
-        )
+        if (TileServer.started)
+        {
+            val customTileSource = XYTileSource(
+                "CustomTiles",
+                0, 19, 256, ".png",
+                arrayOf("http://localhost:8080/tiles/"),
+                "© Custom Tiles"
+            )
 
-        val customProvider = MapTileProviderBasic(activity)
-        customProvider.tileSource = customTileSource
-        val customOverlay = TilesOverlay(customProvider, activity)
-        customOverlay.setLoadingBackgroundColor(Color.TRANSPARENT)
-        mapView.overlays.add(customOverlay)
+            val customProvider = MapTileProviderBasic(activity)
+            customProvider.tileSource = customTileSource
+            val customOverlay = TilesOverlay(customProvider, activity)
+            customOverlay.setLoadingBackgroundColor(Color.TRANSPARENT)
+            mapView.overlays.add(customOverlay)
+        }
 
         delegate?.let {
             mapView.setMapListener(object : org.osmdroid.events.MapListener {
@@ -628,7 +631,7 @@ class MapManager
 
                         val paint = Paint().apply {
                             color = android.graphics.Color.BLACK
-                            textSize = 40f
+                            textSize = 30f
                             isAntiAlias = true
                             textAlign = Paint.Align.LEFT
                         }
