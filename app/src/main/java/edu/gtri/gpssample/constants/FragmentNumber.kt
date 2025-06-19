@@ -36,5 +36,4 @@ enum class FragmentNumber( val value: Int ) {
     ReviewEnumerationFragment(1026 ),
     ReviewCollectionFragment(1027 ),
     CameraFragment(1028 ),
-    PerformOsmEnumerationFragment(1029 ),
 }

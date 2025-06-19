@@ -393,7 +393,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onResume()
 
-        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformOsmEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     private fun gpsAccuracyIsGood(): Boolean
