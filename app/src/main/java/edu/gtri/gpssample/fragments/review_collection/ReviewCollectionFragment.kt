@@ -197,53 +197,6 @@ class ReviewCollectionFragment : Fragment(),
         updateSummaryInfo()
     }
 
-//    fun createAnnotationManagers() {
-//        pointAnnotationManager = mapboxManager.createPointAnnotationManager(pointAnnotationManager, binding.mapView)
-//        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager(polygonAnnotationManager, binding.mapView)
-//        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager(polylineAnnotationManager, binding.mapView)
-//
-//        pointAnnotationManager?.apply {
-//            addClickListener(
-//                OnPointAnnotationClickListener { pointAnnotation ->
-//                    locationHashMap[pointAnnotation.id]?.let { location ->
-//                        sharedViewModel.locationViewModel.setCurrentLocation(location)
-//
-//                        if (location.isLandmark)
-//                        {
-//                            findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
-//                        }
-//                        else
-//                        {
-//                            if (location.enumerationItems.size > 1)
-//                            {
-//                                val bundle = Bundle()
-//                                bundle.putBoolean( Keys.kEditMode.value, false)
-//                                bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
-//                                bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
-//
-//                                findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
-//                            }
-//                            else
-//                            {
-//                                sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0] )
-//                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-//                                    (this@ReviewCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = location.enumerationItems[0].uuid
-//                                    (this@ReviewCollectionFragment.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
-//                                    (this@ReviewCollectionFragment.activity!!.application as? MainApplication)?.currentSubAddress = location.enumerationItems[0].subAddress
-//
-//                                    val bundle = Bundle()
-//                                    bundle.putBoolean( Keys.kEditMode.value, false)
-//                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-//                                }
-//                            }
-//                        }
-//                    }
-//                    true
-//                }
-//            )
-//        }
-//    }
-
     fun updateSummaryInfo()
     {
         var sampledCount = 0
@@ -320,7 +273,7 @@ class ReviewCollectionFragment : Fragment(),
             }
 
             pointList.add( points )
-            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40, Color.RED, collectionTeam.name )
         }
 
         for (location in enumArea.locations)
@@ -550,7 +503,6 @@ class ReviewCollectionFragment : Fragment(),
 
     override fun onMarkerTapped( location: Location )
     {
-//        didSelectLocation( location )
     }
 
     override fun onZoomLevelChanged( zoomLevel: Double )

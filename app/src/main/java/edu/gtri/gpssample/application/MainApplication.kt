@@ -10,6 +10,7 @@ package edu.gtri.gpssample.application
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatDelegate
 import edu.gtri.gpssample.database.models.Field
@@ -28,9 +29,12 @@ class MainApplication : Application()
     var currentSubAddress = defaultSubAddress
     var currentEnumerationAreaName = defaultEnumerationAreaName
     var currentEnumerationItemUUID = defaultEnumerationItemUUID
+
     override fun onCreate()
     {
         super.onCreate()
+
+        instance = this
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
@@ -49,4 +53,11 @@ class MainApplication : Application()
         val manager: NotificationManager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(serviceChannel)
     }
-}
+
+    companion object {
+        private var instance: MainApplication? = null
+
+        fun getContext(): Context {
+            return instance!!.applicationContext
+        }
+    }}

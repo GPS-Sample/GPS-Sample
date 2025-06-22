@@ -160,7 +160,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             viewModel = this.viewModel
 
             // Assign the fragment
-            createEnumerationAreaFragment = this@CreateEnumerationAreaFragment
+//            createEnumerationAreaFragment = this@CreateEnumerationAreaFragment
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -184,24 +184,24 @@ class CreateEnumerationAreaFragment : Fragment(),
             binding.buttonLayout.visibility = View.GONE
         }
 
-        binding.mapView.gestures.addOnMapClickListener(this )
+        binding.mapboxMapView.gestures.addOnMapClickListener(this )
 
         if (config.enumAreas.isNotEmpty())
         {
             val enumArea = config.enumAreas[0]
 
-            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapView.getMapboxMap())
+            MapboxManager.centerMap( enumArea, sharedViewModel.currentZoomLevel?.value, binding.mapboxMapView.getMapboxMap())
 
             if (enumArea.mbTilesPath.isNotEmpty())
             {
-                TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapView.getMapboxMap()) {
+                TileServer.startServer( activity!!, null, enumArea.mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
                     initLocationComponent()
                     refreshMap()
                 }
             }
             else
             {
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
                     initLocationComponent()
                     refreshMap()
                 }
@@ -209,7 +209,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else
         {
-            TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+            TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
                 initLocationComponent()
                 refreshMap()
             }
@@ -220,10 +220,10 @@ class CreateEnumerationAreaFragment : Fragment(),
         if (config.enumAreas.isEmpty())
         {
             showCurrentLocation = true
-            val locationComponentPlugin = binding.mapView.location
+            val locationComponentPlugin = binding.mapboxMapView.location
             locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
             locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-            binding.mapView.gestures.addOnMoveListener(onMoveListener)
+            binding.mapboxMapView.gestures.addOnMoveListener(onMoveListener)
             binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
         }
 
@@ -232,17 +232,17 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             if (showCurrentLocation)
             {
-                val locationComponentPlugin = binding.mapView.location
+                val locationComponentPlugin = binding.mapboxMapView.location
                 locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
                 locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-                binding.mapView.gestures.addOnMoveListener(onMoveListener)
+                binding.mapboxMapView.gestures.addOnMoveListener(onMoveListener)
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
-                binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-                binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-                binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+                binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -318,7 +318,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         }
 
-        binding.overlayView.setOnTouchListener(this)
+        binding.mapOverlayView.setOnTouchListener(this)
 
 //        binding.mapTileRegionButton.setOnClickListener {
 //            if (createEnumAreaBoundary || createEnumAreaLocation|| addHousehold)
@@ -405,14 +405,14 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     fun createAnnotationManagers()
     {
-        pointAnnotationManager = mapboxManager.createPointAnnotationManager( pointAnnotationManager, binding.mapView )
-        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager( polygonAnnotationManager, binding.mapView )
-        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager( polylineAnnotationManager, binding.mapView )
+        pointAnnotationManager = mapboxManager.createPointAnnotationManager( pointAnnotationManager, binding.mapboxMapView )
+        polygonAnnotationManager = mapboxManager.createPolygonAnnotationManager( polygonAnnotationManager, binding.mapboxMapView )
+        polylineAnnotationManager = mapboxManager.createPolylineAnnotationManager( polylineAnnotationManager, binding.mapboxMapView )
     }
 
     fun loadStyle( geoJson: String, completion: (style: Style) -> Unit )
     {
-        binding.mapView.getMapboxMap().loadStyle(style(mapStyle) {
+        binding.mapboxMapView.getMapboxMap().loadStyle(style(mapStyle) {
 
             TileServer.rasterSource?.let { rasterSource ->
                 +rasterSource
@@ -687,7 +687,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     private fun refreshMap()
     {
-        binding.mapView.getMapboxMap().removeOnCameraChangeListener( this )
+        binding.mapboxMapView.getMapboxMap().removeOnCameraChangeListener( this )
 
         for (polygonAnnotation in allPolygonAnnotations)
         {
@@ -850,7 +850,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         }
 
-        binding.mapView.getMapboxMap().addOnCameraChangeListener( this )
+        binding.mapboxMapView.getMapboxMap().addOnCameraChangeListener( this )
     }
 
     fun getAllEnumAreas() : ArrayList<EnumArea>
@@ -990,7 +990,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         // add the label
         val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
         val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-        mapboxManager.addViewAnnotationToPoint( binding.mapView.viewAnnotationManager, point, enumArea.name, "#80FFFFFF" )
+        mapboxManager.addViewAnnotationToPoint( binding.mapboxMapView.viewAnnotationManager, point, enumArea.name, "#80FFFFFF" )
     }
 
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
@@ -1090,7 +1090,7 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
             else
             {
-                val point = binding.mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                val point = binding.mapboxMapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
                 polyLinePoints.add( point )
 
                 if (polylineAnnotation == null)
@@ -1144,7 +1144,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         if (tag is EnumArea)
         {
-            mapboxManager.removeViewAnnotation( binding.mapView.viewAnnotationManager, tag.name, )
+            mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )
             tag.name = name // handles re-name
             refreshMap()
         }
@@ -1236,7 +1236,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
             }
             resources.getString(R.string.delete) -> {
-                mapboxManager.removeViewAnnotation( binding.mapView.viewAnnotationManager, tag.name, )
+                mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )
                 unsavedEnumAreas.remove( tag )
                 config.enumAreas.remove( tag )
                 DAO.enumAreaDAO.delete( tag )
@@ -1295,7 +1295,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else if (tag is EnumArea)
         {
-            mapboxManager.removeViewAnnotation( binding.mapView.viewAnnotationManager, tag.name, )
+            mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )
             unsavedEnumAreas.remove( tag )
             config.enumAreas.remove( tag )
             DAO.enumAreaDAO.delete( tag )
@@ -1321,7 +1321,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
         else if (tag is Uri)
         {
-            TileServer.startServer( activity!!, tag, "", binding.mapView.getMapboxMap()) {
+            TileServer.startServer( activity!!, tag, "", binding.mapboxMapView.getMapboxMap()) {
                 refreshMap()
             }
         }
@@ -1460,9 +1460,9 @@ class CreateEnumerationAreaFragment : Fragment(),
                 {
                     activity!!.runOnUiThread {
                         showCurrentLocation = false
-                        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-                        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-                        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+                        binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+                        binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+                        binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
                         binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                     }
                 }
@@ -1635,8 +1635,8 @@ class CreateEnumerationAreaFragment : Fragment(),
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
-        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
-        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(it)
+        binding.mapboxMapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
+        binding.mapboxMapView.gestures.focalPoint = binding.mapboxMapView.getMapboxMap().pixelForCoordinate(it)
     }
 
     private val onMoveListener = object : OnMoveListener {
@@ -1652,7 +1652,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     }
 
     private fun initLocationComponent() {
-        val locationComponentPlugin = binding.mapView.location
+        val locationComponentPlugin = binding.mapboxMapView.location
         locationComponentPlugin.updateSettings {
             this.enabled = true
             this.locationPuck = LocationPuck2D(
@@ -1681,14 +1681,14 @@ class CreateEnumerationAreaFragment : Fragment(),
     }
 
     private fun onCameraTrackingDismissed() {
-        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+        binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
     }
 
     override fun onCameraChanged(eventData: CameraChangedEventData)
     {
-        sharedViewModel.setCurrentZoomLevel( binding.mapView.getMapboxMap().cameraState.zoom )
+        sharedViewModel.setCurrentZoomLevel( binding.mapboxMapView.getMapboxMap().cameraState.zoom )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -1708,7 +1708,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
                 }
             }
@@ -1721,7 +1721,7 @@ class CreateEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                TileServer.loadMapboxStyle( activity!!, binding.mapView.getMapboxMap()) {
+                TileServer.loadMapboxStyle( activity!!, binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
                 }
             }
@@ -1746,16 +1746,16 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             if (TileServer.fileExists( activity!!, uri ))
             {
-                TileServer.startServer( activity!!, null, filePath, binding.mapView.getMapboxMap()) {
+                TileServer.startServer( activity!!, null, filePath, binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
-                    TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
                 }
             }
             else
             {
-                TileServer.startServer( activity!!, uri, "", binding.mapView.getMapboxMap()) {
+                TileServer.startServer( activity!!, uri, "", binding.mapboxMapView.getMapboxMap()) {
                     refreshMap()
-                    TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+                    TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
                 }
             }
 
@@ -1771,9 +1771,9 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapView.getMapboxMap()) {
+        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
             refreshMap()
-            TileServer.centerMap( binding.mapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
         }
     }
 
@@ -1781,9 +1781,9 @@ class CreateEnumerationAreaFragment : Fragment(),
     {
         super.onDestroyView()
 
-        binding.mapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
-        binding.mapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
-        binding.mapView.gestures.removeOnMoveListener(onMoveListener)
+        binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+        binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+        binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
 
         _binding = null
     }

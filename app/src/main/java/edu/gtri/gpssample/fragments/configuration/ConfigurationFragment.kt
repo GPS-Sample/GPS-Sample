@@ -31,6 +31,7 @@ import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.HotspotMode
 import edu.gtri.gpssample.constants.Keys
+import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
@@ -717,7 +718,16 @@ class ConfigurationFragment : Fragment(),
             if (it.action == MotionEvent.ACTION_UP) {
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.value, false )
-                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_CreateOsmEnumerationAreaFragment, bundle)
+                    }
+                    else if (config.mapEngineIndex == MapEngine.MapBox.value)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                    }
+                }
             }
         }
 

@@ -20,6 +20,7 @@ class ConfirmationDialog
 {
     interface ConfirmationDialogDelegate
     {
+        fun didCancelConfirmation() {}
         fun didSelectFirstButton( tag: Any? )
         fun didSelectSecondButton( tag: Any? )
     }
@@ -82,6 +83,10 @@ class ConfirmationDialog
         secondButton.setOnClickListener {
             delegate.didSelectSecondButton(tag)
             alertDialog.dismiss()
+        }
+
+        alertDialog.setOnCancelListener {
+            delegate.didCancelConfirmation()
         }
     }
 }

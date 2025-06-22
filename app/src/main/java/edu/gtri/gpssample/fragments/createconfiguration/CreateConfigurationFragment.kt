@@ -257,7 +257,16 @@ class CreateConfigurationFragment : Fragment(),
             if (it.action == MotionEvent.ACTION_UP) {
                 val bundle = Bundle()
                 bundle.putBoolean( Keys.kEditMode.value, true )
-                findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    if (config.mapEngineIndex == MapEngine.OpenStreetMap.value)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_CreateOsmEnumerationAreaFragment, bundle)
+                    }
+                    else if (config.mapEngineIndex == MapEngine.MapBox.value)
+                    {
+                        findNavController().navigate(R.id.action_navigate_to_CreateEnumerationAreaFragment, bundle)
+                    }
+                }
             }
         }
 

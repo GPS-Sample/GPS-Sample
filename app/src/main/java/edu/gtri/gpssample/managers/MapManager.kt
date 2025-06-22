@@ -20,6 +20,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.JsonObject
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
@@ -30,6 +31,7 @@ import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotation
@@ -46,8 +48,10 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
@@ -55,6 +59,7 @@ import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterLayer
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterSource
 import edu.gtri.gpssample.utils.GeoUtils
+import org.json.JSONObject
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -380,7 +385,24 @@ class MapManager
         }
     }
 
-    fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: Int, fillOpacity: Int, borderColor: Int = Color.RED ) : Any?
+    fun createTextLabel(context: Context, text: String): Bitmap {
+        val textView = TextView(context)
+        textView.text = text
+        textView.setTextColor(Color.BLACK)
+        textView.setBackgroundColor(Color.argb(128, 255, 255, 255))
+        textView.setPadding(10, 5, 10, 5)
+        textView.measure(
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        textView.layout(0, 0, textView.measuredWidth, textView.measuredHeight)
+        val bitmap = Bitmap.createBitmap(textView.width, textView.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        textView.draw(canvas)
+        return bitmap
+    }
+
+    fun createPolygon( mapView: View, points: List<List<Point>>, fillColor: Int, fillOpacity: Int, borderColor: Int = Color.RED, label: String = "" ) : Any?
     {
         val mapboxPolygon = MapboxPolygon()
 
@@ -397,10 +419,23 @@ class MapManager
                 fillPaint.color = fillColor
                 fillPaint.alpha = fillOpacity
                 outlinePaint.color = borderColor
-                outlinePaint.strokeWidth = 10f
+                outlinePaint.strokeWidth = 8f
             }
 
             mapView.overlays.add(polygon)
+
+            if (label.isNotEmpty())
+            {
+                val geoBounds = GeoUtils.findGeobounds( points[0] )
+                val marker = Marker(mapView)
+                marker.position = GeoPoint( geoBounds.center.latitude, geoBounds.center.longitude )
+                marker.icon = BitmapDrawable( MainApplication.getContext().resources, createTextLabel( MainApplication.getContext(), label ))
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                marker.infoWindow = null // Optional: disable default popup
+
+                mapView.overlays.add(marker)
+            }
+
             mapView.invalidate()
 
             return polygon
@@ -433,6 +468,18 @@ class MapManager
                     .withLineWidth(4.0)
 
                 mapboxPolygon.polylineAnnotation = it.create(polylineAnnotationOptions)
+            }
+
+            if (label.isNotEmpty())
+            {
+                val latLngBounds = GeoUtils.findGeobounds( points[0] )
+                val labelBitmap = createTextLabel(MainApplication.getContext(), label)
+
+                val pointAnnotationOptions = PointAnnotationOptions()
+                    .withPoint(Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude ))
+                    .withIconImage(labelBitmap)
+
+                mapboxPointAnnotationManager?.create(pointAnnotationOptions)
             }
 
             return mapboxPolygon
@@ -661,9 +708,12 @@ class MapManager
         {
             mapboxPointAnnotationManager?.let { pointAnnotationManager ->
                 val point = Point.fromLngLat( location.longitude, location.latitude )
-                val pointAnnotationOptions = PointAnnotationOptions().withPoint( point )
+                val jsonElement = JsonObject().apply { addProperty( "uuid", location.uuid ) }
+                val pointAnnotationOptions = PointAnnotationOptions()
+                    .withPoint( point )
+                    .withData( jsonElement )
 
-                convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
+                convertDrawableToBitmap( AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
                     pointAnnotationOptions.withIconImage( bitmap )
                 }
 
@@ -673,7 +723,11 @@ class MapManager
                 pointAnnotationManager.apply {
                     addClickListener(
                         OnPointAnnotationClickListener { pointAnnotation ->
-                            delegate?.onMarkerTapped( location )
+                            pointAnnotation.getData()?.asJsonObject?.get("uuid")?.asString?.let { uuid ->
+                                DAO.locationDAO.getLocation( uuid )?.let {
+                                    delegate?.onMarkerTapped( it )
+                                }
+                            }
                             true
                         }
                     )

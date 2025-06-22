@@ -144,6 +144,7 @@ class LocationDAO(private var dao: DAO)
         {
             cursor.moveToNext()
             location = buildLocation( cursor )
+            location.enumerationItems = DAO.enumerationItemDAO.getEnumerationItems( location )
         }
 
         cursor.close()

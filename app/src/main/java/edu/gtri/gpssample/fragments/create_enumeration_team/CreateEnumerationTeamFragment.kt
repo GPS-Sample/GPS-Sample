@@ -235,7 +235,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
                 {
-                    MapManager.instance().createPolygon( mapView, ptList, Color.BLACK, 0x40 )
+                    MapManager.instance().createPolygon( mapView, ptList, Color.BLACK, 0x40, Color.RED, enumerationTeam.name )
                 }
             }
 

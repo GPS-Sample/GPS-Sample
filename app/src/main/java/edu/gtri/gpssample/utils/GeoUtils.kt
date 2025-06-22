@@ -9,6 +9,7 @@ package edu.gtri.gpssample.utils
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.mapbox.geojson.Point
 import edu.gtri.gpssample.database.models.LatLon
 import kotlin.math.*
 
@@ -19,6 +20,18 @@ data class HaversineCheck(val distance : Double, var withinBounds : Boolean, val
 object GeoUtils {
     private const val earthRadius =  6371009.0
     private const val degreeConversion = PI / 180.0
+
+    fun findGeobounds(points : List<Point>) : LatLngBounds
+    {
+        val latLons = ArrayList<LatLon>()
+
+        for (point in points)
+        {
+            latLons.add( LatLon( 0, point.latitude(), point.longitude()))
+        }
+
+        return findGeobounds( latLons )
+    }
 
     fun findGeobounds(points : ArrayList<LatLon>) : LatLngBounds
     {

@@ -228,7 +228,7 @@ class ReviewEnumerationFragment : Fragment(),
             }
 
             pointList.add( points )
-            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40, Color.RED, enumerationTeam.name )
         }
 
         for (location in enumArea.locations)

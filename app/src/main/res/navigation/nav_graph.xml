@@ -132,6 +132,9 @@
             android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
             app:destination="@id/CreateEnumerationAreaFragment"/>
         <action
+            android:id="@+id/action_navigate_to_CreateOsmEnumerationAreaFragment"
+            app:destination="@id/CreateOsmEnumerationAreaFragment"/>
+        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
         <action
@@ -159,6 +162,9 @@
             android:id="@+id/action_navigate_to_CreateEnumerationAreaFragment"
             app:destination="@id/CreateEnumerationAreaFragment"/>
         <action
+            android:id="@+id/action_navigate_to_CreateOsmEnumerationAreaFragment"
+            app:destination="@id/CreateOsmEnumerationAreaFragment"/>
+        <action
             android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
             app:destination="@id/ManageConfigurationsFragment" />
         <action
@@ -171,6 +177,33 @@
     <fragment
         android:id="@+id/CreateEnumerationAreaFragment"
         android:name="edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment"
+        tools:layout="@layout/fragment_create_enumeration_area">
+
+        <action
+            android:id="@+id/action_navigate_to_AddHouseholdFragment"
+            app:destination="@id/AddHouseholdFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_AddLandmarkFragment"
+            app:destination="@id/AddLandmarkFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_CreateStudyFragment"
+            app:destination="@id/CreateStudyFragment"/>
+
+        <action
+            android:id="@+id/action_navigate_to_ManageConfigurationsFragment"
+            app:popUpTo="@id/ManageConfigurationsFragment"/>
+        <action
+            android:id="@+id/action_navigate_to_CreateConfigurationFragment"
+            app:destination="@id/CreateConfigurationFragment" />
+    </fragment>
+
+    <!--CreateOsmEnumerationAreaFragment-->
+
+    <fragment
+        android:id="@+id/CreateOsmEnumerationAreaFragment"
+        android:name="edu.gtri.gpssample.fragments.create_enumeration_area.CreateOsmEnumerationAreaFragment"
         tools:layout="@layout/fragment_create_enumeration_area">
 
         <action
