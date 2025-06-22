@@ -1012,7 +1012,7 @@ class PerformEnumerationFragment : Fragment(),
                     }
                 }
 
-                performEnumerationAdapter.updateLocations( enumArea.locations )
+                performEnumerationAdapter.updateLocations( enumerationTeamLocations )
             }
         }
     }

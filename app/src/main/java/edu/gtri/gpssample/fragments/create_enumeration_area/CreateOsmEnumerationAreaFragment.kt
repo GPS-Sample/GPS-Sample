@@ -387,9 +387,9 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                         {
                             when( enumerationItem.collectionState )
                             {
-                                CollectionState.Undefined -> R.drawable.home_light_blue
-                                CollectionState.Incomplete -> R.drawable.home_orange
-                                CollectionState.Complete -> R.drawable.home_purple
+                                CollectionState.Undefined -> resourceId = R.drawable.home_light_blue
+                                CollectionState.Incomplete -> resourceId = R.drawable.home_orange
+                                CollectionState.Complete -> resourceId = R.drawable.home_purple
                             }
                         }
                         else if (enumerationItem.enumerationState == EnumerationState.Undefined)
