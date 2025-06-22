@@ -252,7 +252,7 @@ class CreateCollectionTeamFragment : Fragment(),
                             if (!locationBelongsToTeam( location ))
                             {
                                 val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_light_blue )
+                                MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_light_blue, sampledItem.subAddress )
                             }
                         }
                     }
@@ -264,14 +264,8 @@ class CreateCollectionTeamFragment : Fragment(),
                             {
                                 if (!locationBelongsToTeam( location ))
                                 {
-                                    var title = ""
-                                    if (location.enumerationItems.isNotEmpty())
-                                    {
-                                        title = location.enumerationItems.last().subAddress
-                                    }
-
                                     val point = com.mapbox.geojson.Point.fromLngLat(location.longitude, location.latitude )
-                                    MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.home_light_blue, title )
+                                    MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.multi_home_light_blue, sampledItem.subAddress )
                                     break
                                 }
                             }
