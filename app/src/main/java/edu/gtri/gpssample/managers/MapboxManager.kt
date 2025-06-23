@@ -275,9 +275,11 @@ class MapboxManager( var context: Context )
                 .build()
 
             val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+            val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
 
             stylePackCancelable = offlineManager.loadStylePack(
-                Style.OUTDOORS,
+                mapStyle!!,
                 stylePackLoadOptions,
                 { progress ->
                 },
@@ -301,10 +303,12 @@ class MapboxManager( var context: Context )
         fun loadTilePacks( context: Context, mapTileRegions: ArrayList<MapTileRegion>, delegate: MapTileCacheDelegate )
         {
             val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+            val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
 
             val tilesetDescriptor = offlineManager.createTilesetDescriptor(
                 TilesetDescriptorOptions.Builder()
-                    .styleURI(Style.OUTDOORS)
+                    .styleURI(mapStyle!!)
                     .minZoom(9)
                     .maxZoom(16)
                     .build()
