@@ -102,7 +102,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var showCurrentLocation = false
     private var createEnumAreaLocation = false
     private var createEnumAreaBoundary = false
-    private var mapStyle = Style.MAPBOX_STREETS
     private var inputDialog: InputDialog? = null
     private var selectedEnumArea: EnumArea? = null
     private val polygonHashMap = HashMap<Long,Any>()
@@ -412,7 +411,10 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     fun loadStyle( geoJson: String, completion: (style: Style) -> Unit )
     {
-        binding.mapboxMapView.getMapboxMap().loadStyle(style(mapStyle) {
+        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        binding.mapboxMapView.getMapboxMap().loadStyle(style(mapStyle!!) {
 
             TileServer.rasterSource?.let { rasterSource ->
                 +rasterSource
@@ -1702,7 +1704,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         {
             R.id.mapbox_streets ->
             {
-                mapStyle = Style.MAPBOX_STREETS
+                val mapStyle = Style.MAPBOX_STREETS
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, mapStyle )
@@ -1715,7 +1717,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             R.id.satellite_streets ->
             {
-                mapStyle = Style.SATELLITE_STREETS
+                val mapStyle = Style.SATELLITE_STREETS
                 val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
                 val editor = sharedPreferences.edit()
                 editor.putString( Keys.kMapStyle.value, mapStyle )
