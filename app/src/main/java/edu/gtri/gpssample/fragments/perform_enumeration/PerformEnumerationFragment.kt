@@ -65,6 +65,7 @@ class PerformEnumerationFragment : Fragment(),
     MapManager.MapManagerDelegate,
     InfoDialog.InfoDialogDelegate,
     InputDialog.InputDialogDelegate,
+    MapboxManager.MapTileCacheDelegate,
     ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
@@ -86,6 +87,7 @@ class PerformEnumerationFragment : Fragment(),
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private val enumerationTeamLocations = ArrayList<Location>()
+    private var busyIndicatorDialog: BusyIndicatorDialog? = null
 
     private val kExportTag = 1
     private val kAddHouseholdTag = 2
@@ -243,6 +245,13 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.helpButton.setOnClickListener {
             PerformEnumerationHelpDialog( activity!! )
+        }
+
+        binding.mapTileCacheButton.setOnClickListener {
+            enumArea.mapTileRegion?.let {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                MapboxManager.loadStylePack( activity!!, this )
+            }
         }
 
         binding.centerOnLocationButton.setOnClickListener {
@@ -902,6 +911,55 @@ class PerformEnumerationFragment : Fragment(),
     {
         name.toIntOrNull()?.let {
             maxSubaddress = it - 1
+        }
+    }
+
+    override fun stylePackLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                enumArea.mapTileRegion?.let {
+                    val mapTileRegions = ArrayList<MapTileRegion>()
+                    mapTileRegions.add( it )
+                    MapboxManager.loadTilePacks( activity!!, mapTileRegions, this )
+                }
+            }
+        }
+    }
+
+    override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
+    {
+        busyIndicatorDialog?.let {
+            activity!!.runOnUiThread {
+                it.updateProgress(resources.getString(R.string.downloading_map_tiles) + " ${numLoaded}/${numNeeded}")
+            }
+        }
+    }
+
+    override fun tilePacksLoaded( error: String )
+    {
+        activity!!.runOnUiThread {
+            if (error.isNotEmpty())
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.tile_pack_download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                busyIndicatorDialog?.let{
+                    it.alertDialog.cancel()
+                }
+            }
         }
     }
 
