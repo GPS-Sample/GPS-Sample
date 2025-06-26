@@ -697,15 +697,6 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-    }
-
     fun exportToDefaultLocation()
     {
         try

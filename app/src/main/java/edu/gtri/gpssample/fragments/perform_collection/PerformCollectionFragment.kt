@@ -102,9 +102,6 @@ class PerformCollectionFragment : Fragment(),
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
 
-    private val kExportTag = 1
-    private val kFileLocationTag = 2
-
     private val fragmentResultListener = "PerformCollectionFragment"
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -172,6 +169,7 @@ class PerformCollectionFragment : Fragment(),
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
@@ -334,15 +332,64 @@ class PerformCollectionFragment : Fragment(),
         }
 
         binding.exportButton.setOnClickListener {
-            when(user.role)
+            var title = ""
+            if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
             {
-                Role.Supervisor.toString(), Role.Admin.toString() ->
+                title = resources.getString(R.string.export_configuration)
+            }
+            else
+            {
+                title = resources.getString(R.string.export_collection_data)
+            }
+            ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
                 {
-                    ConfirmationDialog( activity, resources.getString(R.string.export_configuration) , resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                }
-                Role.Enumerator.toString(), Role.DataCollector.toString() ->
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.export_collection_data), resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                    ConfirmationDialog.ButtonPress.Left -> {
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            sharedNetworkViewModel.setCurrentConfig(config)
+
+                            when(user.role)
+                            {
+                                Role.Admin.toString(),
+                                Role.Supervisor.toString() ->
+                                {
+                                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                    startHotspot(view)
+                                }
+
+                                Role.Enumerator.toString(),
+                                Role.DataCollector.toString() ->
+                                {
+                                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                                        sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                        getResult.launch(intent)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null,true ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    exportToDefaultLocation()
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                    exportToDevice()
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
+                            }
+                        }
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
                 }
             }
         }
@@ -507,20 +554,6 @@ class PerformCollectionFragment : Fragment(),
         }
     }
 
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        when(tag)
-        {
-            kExportTag -> {
-                ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), kFileLocationTag, this, true)
-            }
-            kFileLocationTag ->
-            {
-                exportToDevice()
-            }
-        }
-    }
-
     fun exportToDefaultLocation()
     {
         try
@@ -681,49 +714,6 @@ class PerformCollectionFragment : Fragment(),
         {
             Log.d( "xxx", ex.stackTraceToString())
             Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectFirstButton(tag: Any?)
-    {
-        when (tag)
-        {
-            kExportTag -> {
-                view?.let{ view ->
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                        sharedNetworkViewModel.setCurrentConfig(config)
-
-                        when(user.role)
-                        {
-                            Role.Admin.toString(),
-                            Role.Supervisor.toString() ->
-                            {
-                                sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                startHotspot(view)
-                            }
-
-                            Role.Enumerator.toString(),
-                            Role.DataCollector.toString() ->
-                            {
-                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                                    sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                    getResult.launch(intent)
-                                }
-                            }
-                            else -> {}
-                        }
-                    }
-                }
-            }
-
-            kFileLocationTag -> {
-                exportToDefaultLocation()
-            }
         }
     }
 
