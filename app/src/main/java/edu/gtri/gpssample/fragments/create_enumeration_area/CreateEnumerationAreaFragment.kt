@@ -124,8 +124,6 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
-    private val kAttachMBTiles: Int = 2
-    private val kImportTag: Int = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -157,9 +155,6 @@ class CreateEnumerationAreaFragment : Fragment(),
 
             // Assign the view model to a property in the binding class
             viewModel = this.viewModel
-
-            // Assign the fragment
-//            createEnumerationAreaFragment = this@CreateEnumerationAreaFragment
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -258,7 +253,24 @@ class CreateEnumerationAreaFragment : Fragment(),
                 resources.getString(R.string.select_file_type), "",
                 resources.getString(R.string.import_geojson),
                 resources.getString(R.string.import_mbtiles),
-                kImportTag,this@CreateEnumerationAreaFragment, true)
+                null, true ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                        val intent = Intent()
+                            .setType("*/*")
+                            .setAction(Intent.ACTION_GET_CONTENT)
+
+                        startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
 
         binding.createEnumAreaButton.setOnClickListener {
@@ -313,36 +325,30 @@ class CreateEnumerationAreaFragment : Fragment(),
                     resources.getString(R.string.creation_options), "",
                     resources.getString(R.string.set_boundary),
                     resources.getString(R.string.set_location),
-                    null,this@CreateEnumerationAreaFragment, true)
+                    null, true ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            createEnumAreaBoundary = true
+                            droppedPointAnnotations.clear()
+                            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
+                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            createEnumAreaLocation = true
+                            droppedPointAnnotations.clear()
+                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                            refreshMap()
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+
             }
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
-
-//        binding.mapTileRegionButton.setOnClickListener {
-//            if (createEnumAreaBoundary || createEnumAreaLocation|| addHousehold)
-//            {
-//                return@setOnClickListener
-//            }
-//
-//            if (createMapTileCache)
-//            {
-//                createMapTileCache = false
-//                binding.overlayView.visibility = View.GONE
-//                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-//            }
-//            else
-//            {
-//                createMapTileCache = true
-//                polyLinePoints.clear()
-//                polylineAnnotation?.let { it ->
-//                    it.points = polyLinePoints
-//                    polylineAnnotationManager?.update(it)
-//                }
-//                binding.overlayView.visibility = View.VISIBLE
-//                binding.mapTileRegionButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-//            }
-//        }
 
         binding.mapTileCacheButton.setOnClickListener {
             if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache)
@@ -375,7 +381,6 @@ class CreateEnumerationAreaFragment : Fragment(),
             else
             {
                 addHousehold = true
-//                removeAllPolygonOnClickListeners()
                 binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
         }
@@ -668,18 +673,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                         "", items, enumArea, this)
                 }
 
-//                binding.mapView.getMapboxMap().queryRenderedFeatures(
-//                    RenderedQueryGeometry(binding.mapView.getMapboxMap().pixelForCoordinate(point)!!),
-//                    RenderedQueryOptions(listOf("LAYER_ID"), null)
-//                ) {
-//                    if (!it.isValue || it.value!!.isEmpty()) return@queryRenderedFeatures
-//
-//                    Log.d( "xxx", "selected HH" )
-//                    Log.d( "xxx", it.value.toString())
-//
-//                    val selectedFeature = it.value!![0].feature
-//                    // ... do things with selected feature
-//                }
                 return true
             }
         }
@@ -711,34 +704,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         allPointAnnotations.clear()
-
-//        removeAllPolygonOnClickListeners()
-//
-//        if (editMode)
-//        {
-//            polygonAnnotationManager?.apply {
-//                addClickListener(
-//                    OnPolygonAnnotationClickListener { polygonAnnotation ->
-//                        val obj = polygonHashMap[polygonAnnotation.id]
-//
-//                        if (obj is EnumArea)
-//                        {
-//                            ConfirmationDialog( activity, resources.getString(R.string.select_task),
-//                                "${resources.getString(R.string.rename_or_delete)} ${obj.name}?",
-//                                resources.getString(R.string.rename), resources.getString(R.string.delete), obj, this@CreateEnumerationAreaFragment)
-//                        }
-//                        else if (obj is MapTileRegion)
-//                        {
-//                            ConfirmationDialog( activity, resources.getString(R.string.please_confirm),
-//                                resources.getString(R.string.delete_map_tile_region),
-//                                resources.getString(R.string.no), resources.getString(R.string.yes), obj, this@CreateEnumerationAreaFragment)
-//                        }
-//
-//                        true
-//                    }
-//                )
-//            }
-//        }
 
         val allEnumAreas = getAllEnumAreas()
 
@@ -920,15 +885,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         return null
     }
 
-//    fun removeAllPolygonOnClickListeners()
-//    {
-//        polygonAnnotationManager?.apply {
-//            polygonAnnotationManager?.clickListeners?.removeAll {
-//                true
-//            }
-//        }
-//    }
-
     fun addPolygon( mapTileRegion: MapTileRegion )
     {
         val points = ArrayList<com.mapbox.geojson.Point>()
@@ -1000,87 +956,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         p1?.let { p1 ->
             if (p1.action == MotionEvent.ACTION_UP)
             {
-//                if (polyLinePoints.size  < 2)
-//                {
-//                    createMapTileCache = false
-//                    binding.overlayView.visibility = View.GONE
-//                    binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-//
-//                    return false
-//                }
-//
-//                val points = ArrayList<Coordinate>()
-//
-//                // close the polygon
-//                polyLinePoints.add( polyLinePoints[0])
-//
-//                // convert ArrayList<Point> to ArrayList<Coordinate>
-//                polyLinePoints.map {
-//                    points.add( Coordinate( it.longitude(), it.latitude()))
-//                }
-//
-//                polylineAnnotation?.let {
-//                    it.points = polyLinePoints
-//                    polylineAnnotationManager?.update(it)
-//                }
-//
-//                createMapTileCache = false
-//                binding.overlayView.visibility = View.GONE
-//                binding.mapTileRegionButton.setBackgroundTintList(defaultColorList);
-//
-//                val vertices = ArrayList<LatLon>()
-//
-//                val points1 = ArrayList<Coordinate>()
-//
-//                var creationDate = Date().time
-//
-//                polylineAnnotation?.points?.map { point ->
-//                    vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
-//                    points1.add( Coordinate( point.longitude(), point.latitude()))
-//                }
-//
-//                val latLngBounds = GeoUtils.findGeobounds(vertices)
-//                val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-//                val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-//
-//                val mapTileRegion = MapTileRegion( northEast, southWest )
-//
-//                val geometryFactory = GeometryFactory()
-//                val geometry1 = geometryFactory.createPolygon(points1.toTypedArray())
-//
-//                val deleteList = ArrayList<MapTileRegion>()
-//
-//                val allMapTileRegions = getAllMapTileRegions()
-//
-//                for (mtr in allMapTileRegions)
-//                {
-//                    val points2 = ArrayList<Coordinate>()
-//                    points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
-//                    points2.add( Coordinate( mtr.northEast.longitude, mtr.southWest.latitude ))
-//                    points2.add( Coordinate( mtr.northEast.longitude, mtr.northEast.latitude ))
-//                    points2.add( Coordinate( mtr.southWest.longitude, mtr.northEast.latitude ))
-//                    points2.add( Coordinate( mtr.southWest.longitude, mtr.southWest.latitude ))
-//                    val geometry2 = geometryFactory.createPolygon(points2.toTypedArray())
-//                    if (geometry1.contains( geometry2 ))
-//                    {
-//                        deleteList.add( mtr )
-//                    }
-//                }
-//
-//                for (mtr in deleteList)
-//                {
-//                    if (config.mapTileRegions.contains( mtr ))
-//                    {
-//                        config.mapTileRegions.remove( mtr )
-//                    }
-//                    else if (unsavedMapTileRegions.contains( mtr ))
-//                    {
-//                        unsavedMapTileRegions.remove( mtr )
-//                    }
-//                }
-//
-//                unsavedMapTileRegions.add( mapTileRegion )
-
                 polyLinePoints.clear()
 
                 polylineAnnotation?.let {
@@ -1225,7 +1100,26 @@ class CreateEnumerationAreaFragment : Fragment(),
                 ConfirmationDialog( activity, "",
                     resources.getString(R.string.attach_mbtiles_question),
                     resources.getString(R.string.no),
-                    resources.getString(R.string.yes), kAttachMBTiles, this)
+                    resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
+                            {
+                                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
+                            }
+                            else
+                            {
+                                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+
             }
         }
     }
@@ -1254,93 +1148,6 @@ class CreateEnumerationAreaFragment : Fragment(),
                 enumArea.mbTilesPath = ""
             }
             else -> {}
-        }
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-        if (tag == null)
-        {
-            createEnumAreaBoundary = true
-            droppedPointAnnotations.clear()
-            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
-            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-        }
-        else if (tag is EnumArea)
-        {
-            inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), tag.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
-        }
-        else if (tag == kImportTag)
-        {
-            val intent = Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-
-            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
-        }
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        if (tag == null)
-        {
-            createEnumAreaLocation = true
-            droppedPointAnnotations.clear()
-            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            refreshMap()
-        }
-        else if (tag is MapTileRegion)
-        {
-//            config.mapTileRegions.remove( tag )
-//            unsavedMapTileRegions.remove( tag )
-//            DAO.mapTileRegionDAO.delete( tag )
-        }
-        else if (tag is EnumArea)
-        {
-            mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )
-            unsavedEnumAreas.remove( tag )
-            config.enumAreas.remove( tag )
-            DAO.enumAreaDAO.delete( tag )
-
-            refreshMap()
-        }
-        else if (tag is PointAnnotation)
-        {
-            val pointAnnotation = tag as PointAnnotation
-            pointHashMap[pointAnnotation.id]?.let { location ->
-                val allEnumAreas = getAllEnumAreas()
-
-                val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( location.latitude, location.longitude ))
-
-                enumArea?.let {
-                    enumArea.locations.remove(location)
-                }
-
-                DAO.locationDAO.delete(location)
-            }
-
-            refreshMap()
-        }
-        else if (tag is Uri)
-        {
-            TileServer.startServer( activity!!, tag, "", binding.mapboxMapView.getMapboxMap()) {
-                refreshMap()
-            }
-        }
-        else if (tag == kAttachMBTiles)
-        {
-            if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
-            {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
-            }
-            else
-            {
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-        }
-        else if (tag == kImportTag)
-        {
-            filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
         }
     }
 
@@ -1633,7 +1440,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     }
 
     private val onIndicatorBearingChangedListener = OnIndicatorBearingChangedListener {
-//        binding.mapView.getMapboxMap().setCamera(CameraOptions.Builder().bearing(it).build())
     }
 
     private val onIndicatorPositionChangedListener = OnIndicatorPositionChangedListener {
