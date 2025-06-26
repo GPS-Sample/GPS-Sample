@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.add_household
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
@@ -362,7 +363,43 @@ class AddHouseholdFragment : Fragment(),
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_household_message),
-                resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
+                resources.getString(R.string.no), resources.getString(R.string.yes), 0, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {}
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        location.enumerationItems.remove( enumerationItem )
+                        DAO.enumerationItemDAO.delete( enumerationItem )
+
+                        if (location.enumerationItems.size == 0)
+                        {
+                            enumArea.locations.remove( location )
+                            DAO.locationDAO.delete( location )
+                            enumTeam.locationUuids.remove( location.uuid )
+                        }
+
+                        DAO.configDAO.getConfig( config.uuid )?.let {
+                            sharedViewModel.setCurrentConfig( it )
+                        }
+
+                        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+                            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+                        }
+
+                        DAO.studyDAO.getStudy( study.uuid )?.let {
+                            sharedViewModel.createStudyModel.setStudy( it )
+                        }
+
+                        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
+                            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
+                        }
+
+                        findNavController().popBackStack()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {}
+                }
+            }
+
         }
 
         binding.addPhotoImageView.setOnClickListener {
@@ -460,33 +497,6 @@ class AddHouseholdFragment : Fragment(),
 
     override fun didSelectSecondButton(tag: Any?)
     {
-        location.enumerationItems.remove( enumerationItem )
-        DAO.enumerationItemDAO.delete( enumerationItem )
-
-        if (location.enumerationItems.size == 0)
-        {
-            enumArea.locations.remove( location )
-            DAO.locationDAO.delete( location )
-            enumTeam.locationUuids.remove( location.uuid )
-        }
-
-        DAO.configDAO.getConfig( config.uuid )?.let {
-            sharedViewModel.setCurrentConfig( it )
-        }
-
-        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-        }
-
-        DAO.studyDAO.getStudy( study.uuid )?.let {
-            sharedViewModel.createStudyModel.setStudy( it )
-        }
-
-        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
-            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
-        }
-
-        findNavController().popBackStack()
     }
 
     override fun didSelectCancelButton()
