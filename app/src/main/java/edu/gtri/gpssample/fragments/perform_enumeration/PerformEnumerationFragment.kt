@@ -89,11 +89,6 @@ class PerformEnumerationFragment : Fragment(),
     private val enumerationTeamLocations = ArrayList<Location>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
 
-    private val kExportTag = 1
-    private val kAddHouseholdTag = 2
-    private val kSelectHouseholdTag = 3
-    private val kFileLocationTag = 4
-
     private var maxSubaddress = 0
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -282,12 +277,24 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (config.allowManualLocationEntry)
                 {
-                    ConfirmationDialog( activity, resources.getString(R.string.select_location),
-                        "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), kAddHouseholdTag, this, true)
+                    ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
+                        when( buttonPressed )
+                        {
+                            ConfirmationDialog.ButtonPress.Left -> {
+                                addHouseholdButtonPress()
+                            }
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                dropMode = true
+                                binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                            }
+                            ConfirmationDialog.ButtonPress.None -> {
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    didSelectFirstButton( kAddHouseholdTag )
+                    addHouseholdButtonPress()
                 }
             }
             else
@@ -331,21 +338,54 @@ class PerformEnumerationFragment : Fragment(),
                 binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
 
-            when(user.role)
-            {
-                Role.Supervisor.toString(), Role.Admin.toString() ->
+            val title = if (user.role == Role.Enumerator.value) resources.getString(R.string.export_enum_data) else resources.getString(R.string.export_configuration)
+
+            ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
                 {
-                    ConfirmationDialog( activity, resources.getString(R.string.export_configuration) ,
-                        resources.getString(R.string.select_export_message),
-                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
-                }
-                Role.Enumerator.toString() ->
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.export_enum_data),
-                        resources.getString(R.string.select_export_message),
-                        resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                    ConfirmationDialog.ButtonPress.Left -> {
+                        sharedNetworkViewModel.setCurrentConfig(config)
+
+                        when(user.role)
+                        {
+                            Role.Admin.toString(),
+                            Role.Supervisor.toString() ->
+                            {
+                                sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                startHotspot(view)
+                            }
+
+                            Role.Enumerator.toString() ->
+                            {
+                                sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
+                                sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                getResult.launch(intent)
+                            }
+                        }
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    exportToDefaultLocation()
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                    exportToDevice()
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
+                            }
+                        }
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
                 }
             }
+
         }
 
         var sampledCount = 0
@@ -403,6 +443,84 @@ class PerformEnumerationFragment : Fragment(),
         super.onResume()
 
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.PerformEnumerationFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    private fun addHouseholdButtonPress()
+    {
+        currentGPSLocation?.let { point ->
+
+            if (config.proximityWarningIsEnabled)
+            {
+                enumArea.locations.map{
+                    if (!it.isLandmark)
+                    {
+                        val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
+                        if (haversineCheck.withinBounds)
+                        {
+                            val distance = String.format( "%.1f", haversineCheck.distance)
+                            val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
+                            pointIsTooClose( distance, message, point )
+                            return
+                        }
+                    }
+                }
+            }
+
+            var accuracy = -1
+
+            currentGPSAccuracy?.let {
+                accuracy = it
+            }
+
+            val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
+            val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+            val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "", "")
+
+            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+            enumArea.locations.add(location)
+
+            sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+            enumerationTeamLocations.add(location)
+            enumerationTeam.locationUuids.add(location.uuid)
+            DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+            navigateToAddHouseholdFragment()
+        } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
+    }
+
+    private fun pointIsTooClose( distance: String, message: String, point: Point )
+    {
+        ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    var accuracy = -1
+
+                    currentGPSAccuracy?.let {
+                        accuracy = it
+                    }
+
+                    val pt = tag as Point
+                    val altitude = if (pt.altitude().isNaN()) 0.0 else pt.altitude()
+                    val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                    val location = Location( timeZone, LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), altitude, false, "", "")
+
+                    DAO.locationDAO.createOrUpdateLocation( location, enumArea )
+                    enumArea.locations.add(location)
+
+                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+
+                    enumerationTeamLocations.add(location)
+                    enumerationTeam.locationUuids.add(location.uuid)
+                    DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
+                    navigateToAddHouseholdFragment()
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
     }
 
     private fun gpsAccuracyIsGood(): Boolean
@@ -519,7 +637,28 @@ class PerformEnumerationFragment : Fragment(),
 
                     sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
 
-                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), kSelectHouseholdTag, this)
+                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                        when( buttonPressed )
+                        {
+                            ConfirmationDialog.ButtonPress.Left -> {
+                                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                                    val bundle = Bundle()
+                                    bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
+                                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
+                                }
+                            }
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                                    val bundle = Bundle()
+                                    bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
+                                    bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
+                                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
+                                }
+                            }
+                            ConfirmationDialog.ButtonPress.None -> {
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -561,151 +700,10 @@ class PerformEnumerationFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun didSelectFirstButton(tag: Any?)
     {
-        if (tag is Point) // HH is too close to an existing HH, don't add it
-        {
-            return
-        }
-
-        if (tag == kSelectHouseholdTag) // HH is not multifamily
-        {
-            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                val bundle = Bundle()
-                bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
-            }
-
-            return
-        }
-
-        if (tag == kFileLocationTag)
-        {
-            exportToDefaultLocation()
-            return
-        }
-
-        if (tag == kAddHouseholdTag)  // use current location
-        {
-            currentGPSLocation?.let { point ->
-
-                if (config.proximityWarningIsEnabled)
-                {
-                    enumArea.locations.map{
-                        if (!it.isLandmark)
-                        {
-                            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
-                            if (haversineCheck.withinBounds)
-                            {
-                                val distance = String.format( "%.1f", haversineCheck.distance)
-                                val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
-                                ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
-                                return
-                            }
-                        }
-                    }
-                }
-
-                var accuracy = -1
-
-                currentGPSAccuracy?.let {
-                    accuracy = it
-                }
-
-                val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
-                val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "", "")
-
-                DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-                enumArea.locations.add(location)
-
-                sharedViewModel.locationViewModel.setCurrentLocation(location)
-
-                enumerationTeamLocations.add(location)
-                enumerationTeam.locationUuids.add(location.uuid)
-                DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-                navigateToAddHouseholdFragment()
-            } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
-
-            return
-        }
-
-        // Launch connection screen
-        view?.let{ view ->
-            sharedNetworkViewModel.setCurrentConfig(config)
-
-            when(user.role)
-            {
-                Role.Admin.toString(),
-                Role.Supervisor.toString() ->
-                {
-                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                    startHotspot(view)
-                }
-
-                Role.Enumerator.toString() ->
-                {
-                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                    sharedNetworkViewModel.networkClientModel.currentConfig = config
-                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                    getResult.launch(intent)
-                }
-            }
-        }
     }
 
     override fun didSelectSecondButton(tag: Any?)
     {
-        if (tag is Point)
-        {
-            var accuracy = -1
-
-            currentGPSAccuracy?.let {
-                accuracy = it
-            }
-
-            val altitude = if (tag.altitude().isNaN()) 0.0 else tag.altitude()
-            val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-            val location = Location( timeZone, LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), altitude, false, "", "")
-
-            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
-            enumArea.locations.add(location)
-
-            sharedViewModel.locationViewModel.setCurrentLocation(location)
-
-            enumerationTeamLocations.add(location)
-            enumerationTeam.locationUuids.add(location.uuid)
-            DAO.enumerationTeamDAO.updateConnectorTable( enumerationTeam )
-            navigateToAddHouseholdFragment()
-        }
-        else
-        {
-            when(tag)
-            {
-                kSelectHouseholdTag ->
-                {
-                    sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                        val bundle = Bundle()
-                        bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
-                        bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
-                        findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
-                    }
-                }
-
-                kAddHouseholdTag -> {
-                    dropMode = true
-                    binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                }
-
-                kExportTag -> {
-                    ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), kFileLocationTag, this, true)
-                }
-
-                kFileLocationTag -> {
-                    exportToDevice()
-                }
-            }
-        }
     }
 
     fun exportToDefaultLocation()
@@ -1096,7 +1094,7 @@ class PerformEnumerationFragment : Fragment(),
                                 {
                                     val distance = String.format( "%.1f", haversineCheck.distance)
                                     val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
-                                    ConfirmationDialog( activity, resources.getString(R.string.warning), message, resources.getString(R.string.no), resources.getString(R.string.yes), point, this)
+                                    pointIsTooClose( distance, message, point )
                                     return true
                                 }
                             }
