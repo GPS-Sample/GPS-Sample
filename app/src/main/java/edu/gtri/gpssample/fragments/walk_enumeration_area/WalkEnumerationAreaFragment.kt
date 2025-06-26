@@ -93,8 +93,6 @@ class WalkEnumerationAreaFragment : Fragment(),
     private var _binding: FragmentWalkEnumerationAreaBinding? = null
     private val polyLinePoints = ArrayList<com.mapbox.geojson.Point>()
 
-    private val kClearMapTag = 1
-    private val kDeletePointTag = 2
     private val kEnumAreaName = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -210,7 +208,7 @@ class WalkEnumerationAreaFragment : Fragment(),
             {
                 if (polyLinePoints.isNotEmpty())
                 {
-                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), kClearMapTag, this@WalkEnumerationAreaFragment)
+                    clearMap()
                 }
                 else
                 {
@@ -270,14 +268,40 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             if (polyLinePoints.size > 0)
             {
-                ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_point), resources.getString(R.string.no), resources.getString(R.string.yes), kDeletePointTag, this@WalkEnumerationAreaFragment)
+                ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_point), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            polyLinePoints.removeLast()
+
+                            MapManager.instance().clearMap( mapView )
+
+                            if (polyLinePoints.isNotEmpty())
+                            {
+                                startPoint?.let {
+                                    MapManager.instance().createMarker( activity!!, mapView, it, R.drawable.location_blue, "" )
+                                }
+                            }
+
+                            if (polyLinePoints.size > 1)
+                            {
+                                MapManager.instance().createPolyline( mapView, polyLinePoints, Color.RED )
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+
             }
         }
 
         binding.deleteEverythingButton.setOnClickListener {
             binding.mapOverlayView.visibility = View.GONE
-            binding.addPointButton.setBackgroundTintList(defaultColorList);
-            ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), kClearMapTag, this@WalkEnumerationAreaFragment)
+            binding.addPointButton.setBackgroundTintList(defaultColorList)
+            clearMap()
         }
 
         binding.centerOnLocationButton.setOnClickListener {
@@ -321,6 +345,40 @@ class WalkEnumerationAreaFragment : Fragment(),
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.WalkEnumerationAreaFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    private fun clearMap()
+    {
+        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.clear_map), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    isRecording = false
+
+                    MapManager.instance().clearMap( mapView )
+
+                    binding.walkButton.isEnabled = true
+                    binding.saveButton.isEnabled = true
+                    binding.addPointButton.isEnabled = true
+                    binding.deletePointButton.isEnabled = true
+                    binding.walkButton.setBackgroundTintList(defaultColorList);
+
+                    for (enumArea in config.enumAreas)
+                    {
+                        DAO.enumAreaDAO.delete( enumArea )
+                    }
+
+                    config.enumAreas.clear()
+                    config.selectedEnumAreaUuid = ""
+
+                    DAO.configDAO.createOrUpdateConfig( config )
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
     }
 
     private fun refreshMap()
@@ -476,54 +534,6 @@ class WalkEnumerationAreaFragment : Fragment(),
 
                     inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, this, false )
                 }
-            }
-        }
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        if (tag == kClearMapTag)
-        {
-            isRecording = false
-
-            MapManager.instance().clearMap( mapView )
-
-            binding.walkButton.isEnabled = true
-            binding.saveButton.isEnabled = true
-            binding.addPointButton.isEnabled = true
-            binding.deletePointButton.isEnabled = true
-            binding.walkButton.setBackgroundTintList(defaultColorList);
-
-            for (enumArea in config.enumAreas)
-            {
-                DAO.enumAreaDAO.delete( enumArea )
-            }
-
-            config.enumAreas.clear()
-            config.selectedEnumAreaUuid = ""
-
-            DAO.configDAO.createOrUpdateConfig( config )
-        }
-        else if (tag == kDeletePointTag)
-        {
-            polyLinePoints.removeLast()
-
-            MapManager.instance().clearMap( mapView )
-
-            if (polyLinePoints.isNotEmpty())
-            {
-                startPoint?.let {
-                    MapManager.instance().createMarker( activity!!, mapView, it, R.drawable.location_blue, "" )
-                }
-            }
-
-            if (polyLinePoints.size > 1)
-            {
-                MapManager.instance().createPolyline( mapView, polyLinePoints, Color.RED )
             }
         }
     }

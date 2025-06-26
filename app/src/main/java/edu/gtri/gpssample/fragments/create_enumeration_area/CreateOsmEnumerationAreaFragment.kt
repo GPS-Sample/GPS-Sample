@@ -116,7 +116,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
-    private val kAttachMBTiles: Int = 2
     private val kImportTag: Int = 3
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -232,7 +231,24 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 resources.getString(R.string.select_file_type), "",
                 resources.getString(R.string.import_geojson),
                 resources.getString(R.string.import_mbtiles),
-                kImportTag,this@CreateOsmEnumerationAreaFragment, true)
+                null, true ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                        val intent = Intent()
+                            .setType("*/*")
+                            .setAction(Intent.ACTION_GET_CONTENT)
+
+                        startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
 
         binding.createEnumAreaButton.setOnClickListener {
@@ -268,7 +284,27 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             else
             {
                 droppedPoints.clear()
-                ConfirmationDialog( activity, resources.getString(R.string.creation_options), "", resources.getString(R.string.set_boundary), resources.getString(R.string.set_location), null,this@CreateOsmEnumerationAreaFragment, true)
+                ConfirmationDialog( activity, resources.getString(R.string.creation_options), "", resources.getString(R.string.set_boundary), resources.getString(R.string.set_location), null, true ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            createEnumAreaBoundary = true
+                            binding.mapOverlayView.visibility = View.VISIBLE
+                            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
+                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            droppedPoints.clear()
+                            createEnumAreaLocation = true
+                            binding.mapOverlayView.visibility = View.VISIBLE
+                            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+
             }
         }
 
@@ -763,7 +799,26 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 ConfirmationDialog( activity, "",
                     resources.getString(R.string.attach_mbtiles_question),
                     resources.getString(R.string.no),
-                    resources.getString(R.string.yes), kAttachMBTiles, this)
+                    resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
+                            {
+                                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
+                            }
+                            else
+                            {
+                                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+
             }
         }
     }
@@ -801,67 +856,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         binding.mapTileCacheButton.backgroundTintList = defaultColorList
         binding.addHouseholdButton.backgroundTintList = defaultColorList
         binding.createEnumAreaButton.backgroundTintList = defaultColorList
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-        if (tag == null)
-        {
-            createEnumAreaBoundary = true
-            binding.mapOverlayView.visibility = View.VISIBLE
-            binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
-            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-        }
-        else if (tag is EnumArea)
-        {
-            inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), tag.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
-        }
-        else if (tag == kImportTag)
-        {
-            val intent = Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-
-            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_enumeration)), 1023)
-        }
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        if (tag == null)
-        {
-            droppedPoints.clear()
-            createEnumAreaLocation = true
-            binding.mapOverlayView.visibility = View.VISIBLE
-            binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
-        }
-        else if (tag is MapTileRegion)
-        {
-        }
-        else if (tag is EnumArea)
-        {
-            unsavedEnumAreas.remove( tag )
-            config.enumAreas.remove( tag )
-            DAO.enumAreaDAO.delete( tag )
-
-            refreshMap()
-        }
-        else if (tag == kAttachMBTiles)
-        {
-            if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
-            {
-                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
-            }
-            else
-            {
-                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-            }
-        }
-        else if (tag == kImportTag)
-        {
-            filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-        }
     }
 
     override fun stylePackLoaded( error: String )
