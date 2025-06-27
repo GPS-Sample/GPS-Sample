@@ -10,6 +10,7 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
@@ -186,7 +187,22 @@ class ManageConfigurationsFragment : Fragment(),
 
             if ((configurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
             {
-                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
+                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            DAO.deleteAll()
+                            configurations.clear()
+                            manageConfigurationsAdapter.updateConfigurations(configurations)
+                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "******", resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+
             }
             else
             {
@@ -377,38 +393,6 @@ class ManageConfigurationsFragment : Fragment(),
                 sharedNetworkViewModel.connectHotspot(ssid, pass, serverIp)
             }
         }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectFirstButton(tag: Any?)
-    {
-        if (tag == kImportTag)
-        {
-            sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
-            sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
-            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-            getResult.launch(intent)
-        }
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        if (tag == kDeleteTag)
-        {
-            DAO.deleteAll()
-            configurations.clear()
-            manageConfigurationsAdapter.updateConfigurations(configurations)
-
-            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "******", resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
-        }
-        else if (tag == kImportTag)
-        {
-            val intent = Intent()
-                .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-
-            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), 1023)
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
@@ -607,14 +591,34 @@ class ManageConfigurationsFragment : Fragment(),
         }
     }
 
-    override fun didEnterText( name: String, tag: Any? )
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun didEnterText(name: String, tag: Any? )
     {
         if (name != "******")
         {
             encryptionPassword = name
         }
 
-        ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+        ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                    sharedNetworkViewModel.networkClientModel.encryptionPassword = encryptionPassword
+                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.Configuration)
+                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                    getResult.launch(intent)
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    val intent = Intent()
+                        .setType("*/*")
+                        .setAction(Intent.ACTION_GET_CONTENT)
+
+                    startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), 1023)
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
     }
 
     override fun didCancelText( tag: Any? )
