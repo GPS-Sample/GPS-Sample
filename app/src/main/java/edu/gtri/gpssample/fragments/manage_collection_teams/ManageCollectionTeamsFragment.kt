@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.fragments.manage_collection_teams
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import androidx.activity.OnBackPressedCallback
@@ -129,20 +130,22 @@ class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.Confirmatio
 
     fun shouldDeleteTeam(collectionTeam: CollectionTeam)
     {
-        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_team_message),
-            resources.getString(R.string.no), resources.getString(R.string.yes), collectionTeam, this)
-    }
+        ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_team_message), resources.getString(R.string.no), resources.getString(R.string.yes), collectionTeam, false) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    val team = tag as CollectionTeam
+                    enumArea.collectionTeams.remove( team )
+                    manageCollectionTeamsAdapter.updateTeams(enumArea.collectionTeams)
+                    DAO.collectionTeamDAO.deleteTeam( team )
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
 
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        val collectionTeam = tag as CollectionTeam
-        enumArea.collectionTeams.remove(collectionTeam)
-        manageCollectionTeamsAdapter.updateTeams(enumArea.collectionTeams)
-        DAO.collectionTeamDAO.deleteTeam( collectionTeam )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
