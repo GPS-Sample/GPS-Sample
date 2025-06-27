@@ -363,7 +363,7 @@ class AddHouseholdFragment : Fragment(),
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_household_message),
-                resources.getString(R.string.no), resources.getString(R.string.yes), 0, false ) { buttonPressed, tag ->
+                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
                 when( buttonPressed )
                 {
                     ConfirmationDialog.ButtonPress.Left -> {}

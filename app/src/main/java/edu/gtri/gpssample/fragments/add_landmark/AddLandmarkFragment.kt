@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.fragments.add_landmark
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -89,8 +90,23 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_landmark_message),
-                resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
+            ConfirmationDialog( activity, resources.getString( R.string.please_confirm), resources.getString(R.string.delete_landmark_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        enumArea.locations.remove(location)
+
+                        DAO.locationDAO.delete( location )
+
+                        findNavController().popBackStack()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
 
         binding.addPhotoImageView.setOnClickListener {
@@ -140,19 +156,6 @@ class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddLandmarkFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        enumArea.locations.remove(location)
-
-        DAO.locationDAO.delete( location )
-
-        findNavController().popBackStack()
     }
 
     override fun onDestroyView()
