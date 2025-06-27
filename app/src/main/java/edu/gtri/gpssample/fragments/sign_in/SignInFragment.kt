@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.sign_in
 
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -156,8 +157,30 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
 
                 if (user.name == "@test-admin" && DAO.configDAO.getConfigs().isNotEmpty())
                 {
-                    ConfirmationDialog( activity, resources.getString(R.string.oops),
-                        "The test-admin is not allowed to view/edit a previously saved configuration.  Would you like to delete the saved configuration(s)?", resources.getString(R.string.no), resources.getString(R.string.yes), null, this@SignInFragment)
+                    ConfirmationDialog( activity, resources.getString(R.string.oops), "The test-admin is not allowed to view/edit a previously saved configuration.  Would you like to delete the saved configuration(s)?", resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                        when( buttonPressed )
+                        {
+                            ConfirmationDialog.ButtonPress.Left -> {
+                            }
+                            ConfirmationDialog.ButtonPress.Right -> {
+                                DAO.deleteAll( false )
+
+                                val pin = binding.pinEditText.text.toString()
+                                val userName = binding.nameEditText.text.toString()
+
+                                DAO.userDAO.getUser(userName)?.let { user ->
+                                    setTitle( user )
+
+                                    val bundle = Bundle()
+                                    bundle.putString(Keys.kRole.value, user.role)
+                                    findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
+                                }
+                            }
+                            ConfirmationDialog.ButtonPress.None -> {
+                            }
+                        }
+                    }
+
                     return
                 }
 
@@ -248,28 +271,6 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
                 editor.putInt( user.role, pin.toInt())
                 editor.commit()
             }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        DAO.deleteAll( false )
-
-        val pin = binding.pinEditText.text.toString()
-        val userName = binding.nameEditText.text.toString()
-
-        DAO.userDAO.getUser(userName)?.let { user ->
-            setTitle( user )
-
-            val bundle = Bundle()
-            bundle.putString(Keys.kRole.value, user.role)
-            findNavController().navigate(R.id.action_navigate_to_ManageConfigurationsFragment, bundle)
         }
     }
 
