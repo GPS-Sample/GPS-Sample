@@ -20,7 +20,7 @@ class BusyIndicatorDialog
 {
     interface BusyIndicatorDialogDelegate
     {
-        fun didPressCancelButton()
+        fun didPressCancelButton() {}
     }
 
     lateinit var alertDialog: AlertDialog

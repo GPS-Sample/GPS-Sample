@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.fragments.createconfiguration
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -33,8 +34,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class CreateConfigurationFragment : Fragment(),
     View.OnTouchListener,
-    ConfirmationDialog.ConfirmationDialogDelegate,
-    BusyIndicatorDialog.BusyIndicatorDialogDelegate
+    ConfirmationDialog.ConfirmationDialogDelegate
 {
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!
@@ -149,7 +149,7 @@ class CreateConfigurationFragment : Fragment(),
                 }
                 else
                 {
-                    val busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.saving_configuration), this, false )
+                    val busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.saving_configuration), null, false )
 
                     Thread {
                         sharedViewModel.updateConfiguration()
@@ -201,55 +201,18 @@ class CreateConfigurationFragment : Fragment(),
     private fun shouldDeleteStudy(study: Study)
     {
         selectedStudy = study
-        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message),
-            resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
-    }
+        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
 
-//    fun refreshMap()
-//    {
-//        sharedViewModel.currentConfiguration?.value?.let {config ->
-//
-//            val enumVerts = ArrayList<LatLon>()
-//
-//            for (enumArea in config.enumAreas)
-//            {
-//                val points = ArrayList<com.mapbox.geojson.Point>()
-//                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-//
-//                enumArea.vertices.map {
-//                    enumVerts.add(it)
-//                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-//                }
-//
-//                pointList.add( points )
-//
-//                mapboxManager.addPolygon( polygonAnnotationManager, pointList, "#000000", 0.25 )
-//                mapboxManager.addPolyline( polylineAnnotationManager, pointList[0], "#ff0000" )
-//            }
-//
-//            val latLngBounds = GeoUtils.findGeobounds(enumVerts)
-//            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-//            val cameraPosition = CameraOptions.Builder()
-//                .zoom(10.0)
-//                .center(point)
-//                .build()
-//
-//            binding.mapView.getMapboxMap().setCamera(cameraPosition)
-//        }
-//    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        sharedViewModel.removeStudy(selectedStudy)
-        manageStudiesAdapter.updateStudies(sharedViewModel.currentConfiguration?.value?.studies)
-    }
-
-    override fun didPressCancelButton()
-    {
     }
 
     override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {

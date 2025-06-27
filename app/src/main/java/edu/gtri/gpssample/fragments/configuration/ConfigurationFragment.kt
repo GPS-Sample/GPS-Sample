@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.configuration
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -62,12 +63,6 @@ class ConfigurationFragment : Fragment(),
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
 
-    private val kDeleteTag          = 1
-    private val kExportTag          = 2
-    private val kImportTag          = 3
-    private val kTaskTag            = 4
-    private val kFileLocationTag    = 5
-
     val REQUEST_CODE_PICK_DIR = 1001
     val REQUEST_CODE_PICK_FILE = 1002
 
@@ -94,6 +89,7 @@ class ConfigurationFragment : Fragment(),
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
@@ -127,19 +123,105 @@ class ConfigurationFragment : Fragment(),
 
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_configuration_message),
-                resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, this)
+                resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        DAO.deleteAll()
+                        findNavController().popBackStack()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
 
         binding.minGpsPrecisionEditText.setInputType(InputType.TYPE_CLASS_NUMBER)
 
         binding.importButton.setOnClickListener {
             ConfirmationDialog( activity, resources.getString(R.string.import_field_data), resources.getString(R.string.select_import_method_message),
-                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, this)
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.import_field_data))
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Import )
+
+                        sharedViewModel.currentConfiguration?.value?.let{ config ->
+
+                            config.selectedEnumAreaUuid = ""
+
+                            for (enumArea in config.enumAreas)
+                            {
+                                enumArea.selectedEnumerationTeamUuid = ""
+                                enumArea.selectedCollectionTeamUuid = ""
+                            }
+
+                            sharedNetworkViewModel.setCurrentConfig(config)
+                            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                            sharedNetworkViewModel.createHotspot(view)
+                        }
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        val intent = Intent()
+                            .setType("*/*")
+                            .setAction(Intent.ACTION_GET_CONTENT)
+                        startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), REQUEST_CODE_PICK_FILE)
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
 
         binding.exportButton.setOnClickListener {
             ConfirmationDialog( activity, resources.getString(R.string.export_configuration), resources.getString(R.string.select_export_message),
-                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kExportTag, this)
+                resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
+
+                        sharedViewModel.currentConfiguration?.value?.let{ config ->
+
+                            config.selectedEnumAreaUuid = ""
+
+                            for (enumArea in config.enumAreas)
+                            {
+                                enumArea.selectedEnumerationTeamUuid = ""
+                                enumArea.selectedCollectionTeamUuid = ""
+                            }
+
+                            sharedNetworkViewModel.setCurrentConfig(config)
+                            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                            sharedNetworkViewModel.createHotspot(view)
+                        }
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null, true) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    exportToDefaultLocation()
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                    exportToDevice()
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
+                            }
+                        }
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
@@ -290,91 +372,6 @@ class ConfigurationFragment : Fragment(),
         sharedViewModel.createStudyModel.setStudy(study)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didSelectFirstButton(tag: Any?)
-    {
-        tag?.let {
-            when(tag)
-            {
-                kImportTag, kExportTag -> {
-                    if (tag == kImportTag)
-                    {
-                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.import_field_data))
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Import )
-                    }
-                    else
-                    {
-
-                        sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                        sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export )
-                    }
-
-                    view?.let { view ->
-                        sharedViewModel.currentConfiguration?.value?.let{ config ->
-
-                            config.selectedEnumAreaUuid = ""
-
-                            for (enumArea in config.enumAreas)
-                            {
-                                enumArea.selectedEnumerationTeamUuid = ""
-                                enumArea.selectedCollectionTeamUuid = ""
-                            }
-
-                            sharedNetworkViewModel.setCurrentConfig(config)
-                            sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                            sharedNetworkViewModel.createHotspot(view)
-                        }
-                    }
-                }
-
-                kTaskTag -> {
-                    findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
-                }
-
-                kFileLocationTag -> {
-                    exportToDefaultLocation()
-                }
-                else -> {}
-            }
-        }
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            tag?.let { tag ->
-
-                when(tag)
-                {
-                    kDeleteTag -> {
-                        DAO.deleteAll()
-                        findNavController().popBackStack()
-                    }
-
-                    kImportTag -> {
-                        val intent = Intent()
-                            .setType("*/*")
-                            .setAction(Intent.ACTION_GET_CONTENT)
-                        startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), REQUEST_CODE_PICK_FILE)
-                    }
-
-                    kExportTag -> {
-                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), kFileLocationTag, this, true)
-                    }
-
-                    kTaskTag -> {
-                        findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
-                    }
-
-                    kFileLocationTag -> {
-                        exportToDevice()
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
-
     fun exportToDevice( )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -484,7 +481,20 @@ class ConfigurationFragment : Fragment(),
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
                 config.selectedStudyUuid = study.uuid
                 sharedViewModel.enumAreaViewModel.setCurrentEnumArea(enumArea)
-                ConfirmationDialog( activity, resources.getString(R.string.select_task), "", resources.getString(R.string.client), resources.getString(R.string.survey), kTaskTag, this, true)
+                ConfirmationDialog( activity, resources.getString(R.string.select_task), "", resources.getString(R.string.client), resources.getString(R.string.survey), null, true ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            findNavController().navigate( R.id.action_navigate_to_ManageEnumerationTeamsFragment )
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            findNavController().navigate( R.id.action_navigate_to_CreateSampleFragment )
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+
             } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.no_study_ea), Toast.LENGTH_SHORT).show()
         }
     }
