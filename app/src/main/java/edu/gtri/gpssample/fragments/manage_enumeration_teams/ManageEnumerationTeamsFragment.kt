@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.fragments.manage_enumeration_teams
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -113,21 +114,21 @@ class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.Confirmati
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)
     {
-        ConfirmationDialog( activity, resources.getString(R.string.delete_team_message),
-            resources.getString(R.string.delete_team_message), resources.getString(R.string.no),
-            resources.getString(R.string.yes), enumerationTeam, this)
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        val enumerationTeam = tag as EnumerationTeam
-        enumArea.enumerationTeams.remove(enumerationTeam)
-        manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
-        DAO.enumerationTeamDAO.deleteTeam( enumerationTeam )
+        ConfirmationDialog( activity, resources.getString(R.string.delete_team_message), resources.getString(R.string.delete_team_message), resources.getString(R.string.no), resources.getString(R.string.yes), enumerationTeam, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    val team = tag as EnumerationTeam
+                    enumArea.enumerationTeams.remove( team )
+                    manageEnumerationTeamsAdapter.updateTeams(enumArea.enumerationTeams)
+                    DAO.enumerationTeamDAO.deleteTeam( team )
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
     }
 
     override fun onDestroyView()
