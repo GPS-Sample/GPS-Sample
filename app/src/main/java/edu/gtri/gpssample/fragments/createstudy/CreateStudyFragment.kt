@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.fragments.createstudy
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
@@ -110,15 +111,19 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog(
-                activity,
-                resources.getString(R.string.please_confirm),
-                resources.getString(R.string.delete_study_message),
-                resources.getString(R.string.no),
-                resources.getString(R.string.yes),
-                DeleteMode.deleteStudyTag.value,
-                this
-            )
+            ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        sharedViewModel.deleteCurrentStudy()
+                        findNavController().popBackStack()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
         }
 
         binding.saveButton.setOnClickListener {
@@ -243,39 +248,6 @@ class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDel
         sharedViewModel.addStudy()
 
         findNavController().popBackStack()
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-//        findNavController().popBackStack()
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        val t = tag as Int
-
-        when( t )
-        {
-            DeleteMode.deleteStudyTag.value -> {
-                sharedViewModel.deleteCurrentStudy()
-                findNavController().popBackStack()
-            }
-//            DeleteMode.deleteFieldTag.value -> {
-//
-//                sharedViewModel.deleteSelectedField()
-//                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-//                    createStudyAdapter.updateStudy( study )
-//                }
-//            }
-//            DeleteMode.deleteRuleTag.value -> {
-//                sharedViewModel.deleteSelectedRule()
-//                sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
-//                    createStudyAdapter.updateStudy( study )
-//                }
-//            }
-//            DeleteMode.deleteFilterTag.value -> {
-//            }
-        }
     }
 
     override fun onDestroyView()
