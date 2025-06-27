@@ -254,19 +254,20 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate, Confirma
 
         if (MapboxManager.isSelfIntersectingPolygon3( enumArea.vertices))
         {
-            ConfirmationDialog( activity, resources.getString(R.string.oops),
-                resources.getString(R.string.boundary_is_self_intersecting),
-                resources.getString(R.string.no), resources.getString(R.string.yes), null, this@CreateSampleFragment)
+            ConfirmationDialog( activity, resources.getString(R.string.oops), resources.getString(R.string.boundary_is_self_intersecting), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        redefineEnumerationAreaBoundary()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        redefineEnumerationAreaBoundary()
     }
 
     override fun onResume()
