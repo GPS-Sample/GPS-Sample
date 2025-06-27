@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.fragments.createrule
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -293,7 +294,20 @@ class CreateRuleFragment : Fragment(),
         }
 
         binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity,  resources.getString(R.string.please_confirm), resources.getString(R.string.delete_rule_message), resources.getString(R.string.no), resources.getString(R.string.yes), 0, this)
+            ConfirmationDialog( activity,  resources.getString(R.string.please_confirm), resources.getString(R.string.delete_rule_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        sharedViewModel.createRuleModel.deleteSelectedRule( study )
+                        findNavController().popBackStack()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
+
         }
 
         binding.cancelButton.setOnClickListener {
@@ -401,16 +415,6 @@ class CreateRuleFragment : Fragment(),
         {
             binding.textValueEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
         }
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
-        sharedViewModel.createRuleModel.deleteSelectedRule( study )
-        findNavController().popBackStack()
     }
 
     override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
