@@ -32,9 +32,7 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class CreateConfigurationFragment : Fragment(),
-    View.OnTouchListener,
-    ConfirmationDialog.ConfirmationDialogDelegate
+class CreateConfigurationFragment : Fragment(), View.OnTouchListener
 {
     private var _binding: FragmentCreateConfigurationBinding? = null
     private val binding get() = _binding!!

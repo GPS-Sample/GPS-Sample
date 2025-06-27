@@ -44,7 +44,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import java.util.*
 
-class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate, ConfirmationDialog.ConfirmationDialogDelegate
+class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 {
     private lateinit var study: Study
     private lateinit var mapView: View

@@ -72,8 +72,7 @@ import java.util.*
 class WalkEnumerationAreaFragment : Fragment(),
     View.OnTouchListener,
     MapManager.MapManagerDelegate,
-    InputDialog.InputDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate
+    InputDialog.InputDialogDelegate
 {
     private lateinit var mapView: View
     private lateinit var config: Config

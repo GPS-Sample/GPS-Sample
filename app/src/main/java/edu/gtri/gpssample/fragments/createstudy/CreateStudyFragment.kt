@@ -43,7 +43,7 @@ enum class DeleteMode(val value : Int)
 
 }
 
-class CreateStudyFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class CreateStudyFragment : Fragment()
 {
     private lateinit var study: Study
     private var _binding: FragmentCreateStudyBinding? = null

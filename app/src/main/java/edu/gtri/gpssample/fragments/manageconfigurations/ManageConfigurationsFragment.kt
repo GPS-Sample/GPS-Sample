@@ -54,7 +54,6 @@ import kotlin.collections.ArrayList
 class ManageConfigurationsFragment : Fragment(),
     InputDialog.InputDialogDelegate,
     NetworkClientModel.ConfigurationDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate,
     NetworkViewModel.ManageConfigurationNetworkDelegate
 {
     private var _binding: FragmentManageConfigurationsBinding? = null

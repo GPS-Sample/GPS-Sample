@@ -52,7 +52,6 @@ import java.util.*
 
 class ConfigurationFragment : Fragment(),
     View.OnTouchListener,
-    ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private var _binding: FragmentConfigurationBinding? = null

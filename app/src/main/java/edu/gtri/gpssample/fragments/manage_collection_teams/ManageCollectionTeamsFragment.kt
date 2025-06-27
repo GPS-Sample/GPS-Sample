@@ -29,7 +29,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import kotlin.collections.ArrayList
 
-class ManageCollectionTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class ManageCollectionTeamsFragment : Fragment()
 {
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea

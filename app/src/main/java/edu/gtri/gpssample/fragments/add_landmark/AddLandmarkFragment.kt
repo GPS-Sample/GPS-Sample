@@ -25,7 +25,7 @@ import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class AddLandmarkFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class AddLandmarkFragment : Fragment()
 {
     private var _binding: FragmentAddLandmarkBinding? = null
     private val binding get() = _binding!!

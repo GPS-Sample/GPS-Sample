@@ -18,13 +18,6 @@ import edu.gtri.gpssample.R
 
 class ConfirmationDialog
 {
-    interface ConfirmationDialogDelegate
-    {
-        fun didCancelConfirmation() {}
-        fun didSelectFirstButton( tag: Any? ) {}
-        fun didSelectSecondButton( tag: Any? ) {}
-    }
-
     constructor()
     {
     }

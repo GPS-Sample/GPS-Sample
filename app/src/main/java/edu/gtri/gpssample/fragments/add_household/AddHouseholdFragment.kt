@@ -39,7 +39,6 @@ import java.util.*
 class AddHouseholdFragment : Fragment(),
     ImageDialog.ImageDialogDelegate,
     InputDialog.InputDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate
 {
     private var _binding: FragmentAddHouseholdBinding? = null
@@ -489,14 +488,6 @@ class AddHouseholdFragment : Fragment(),
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.AddHouseholdFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    override fun didSelectFirstButton(tag: Any?)
-    {
-    }
-
-    override fun didSelectSecondButton(tag: Any?)
-    {
     }
 
     override fun didSelectCancelButton()

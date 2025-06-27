@@ -85,7 +85,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     MapboxManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     MultiConfirmationDialog.MulitConfirmationDialogDelegate
 {
@@ -849,14 +848,14 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun didCancelConfirmation()
-    {
-        binding.mapOverlayView.visibility = View.GONE
-        binding.deleteButton.backgroundTintList = defaultColorList
-        binding.mapTileCacheButton.backgroundTintList = defaultColorList
-        binding.addHouseholdButton.backgroundTintList = defaultColorList
-        binding.createEnumAreaButton.backgroundTintList = defaultColorList
-    }
+//    override fun didCancelConfirmation()
+//    {
+//        binding.mapOverlayView.visibility = View.GONE
+//        binding.deleteButton.backgroundTintList = defaultColorList
+//        binding.mapTileCacheButton.backgroundTintList = defaultColorList
+//        binding.addHouseholdButton.backgroundTintList = defaultColorList
+//        binding.createEnumAreaButton.backgroundTintList = defaultColorList
+//    }
 
     override fun stylePackLoaded( error: String )
     {

@@ -40,8 +40,7 @@ import java.util.*
 
 class CreateRuleFragment : Fragment(),
     DatePickerDialog.DatePickerDialogDelegate,
-    TimePickerDialog.TimePickerDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate
+    TimePickerDialog.TimePickerDialogDelegate
 {
     private var _binding: FragmentCreateRuleBinding? = null
     private val binding get() = _binding!!

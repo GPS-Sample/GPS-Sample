@@ -77,7 +77,6 @@ import java.util.*
 class PerformCollectionFragment : Fragment(),
     MapManager.MapManagerDelegate,
     MapboxManager.MapTileCacheDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate

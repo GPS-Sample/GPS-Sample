@@ -30,7 +30,7 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.fragments.manage_collection_teams.ManageCollectionTeamsAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class ManageEnumerationTeamsFragment : Fragment(), ConfirmationDialog.ConfirmationDialogDelegate
+class ManageEnumerationTeamsFragment : Fragment()
 {
     private lateinit var study: Study
     private lateinit var enumArea: EnumArea

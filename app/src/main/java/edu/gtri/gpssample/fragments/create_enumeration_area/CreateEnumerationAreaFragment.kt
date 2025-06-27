@@ -85,7 +85,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     CheckboxDialog.CheckboxDialogDelegate,
     DropdownDialog.DropdownDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     MultiConfirmationDialog.MulitConfirmationDialogDelegate
 {

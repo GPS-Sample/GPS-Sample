@@ -66,7 +66,6 @@ class PerformEnumerationFragment : Fragment(),
     InfoDialog.InfoDialogDelegate,
     InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
-    ConfirmationDialog.ConfirmationDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private lateinit var user: User

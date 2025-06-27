@@ -32,7 +32,7 @@ import edu.gtri.gpssample.dialogs.SelectRuleDialogFragment
 import edu.gtri.gpssample.fragments.ManageStudies.CreateFilterAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
-class CreateFilterFragment : Fragment() , ConfirmationDialog.ConfirmationDialogDelegate
+class CreateFilterFragment : Fragment()
 {
     private var _binding: FragmentCreateFilterBinding? = null
     private val binding get() = _binding!!
