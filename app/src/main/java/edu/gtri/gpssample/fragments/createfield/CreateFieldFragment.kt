@@ -42,7 +42,7 @@ import edu.gtri.gpssample.utils.DateUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
-class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate, DatePickerDialog.DatePickerDialogDelegate
+class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegate
 {
     private var _binding: FragmentCreateFieldBinding? = null
     private val binding get() = _binding!!
@@ -57,8 +57,6 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate, DatePic
     private lateinit var dropdownLayout: LinearLayout
     private lateinit var sharedViewModel : ConfigurationViewModel
 
-    private val kCheckboxTag = 1
-    private val kDropdownTag = 2
     private var isBlockField = false
 
     val fieldTypes : Array<String>
@@ -384,13 +382,33 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate, DatePic
         val checkboxAddAnotherButton = checkboxLayout.findViewById<Button>(R.id.add_another_button)
 
         checkboxAddAnotherButton.setOnClickListener {
-            InputDialog( activity!!, false, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kCheckboxTag, this@CreateFieldFragment )
+            InputDialog( activity!!, false, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null ) { action, text, tag ->
+                when (action) {
+                    InputDialog.Action.DidCancel -> {}
+                    InputDialog.Action.DidEnterText -> {
+                        val fieldOption = FieldOption( text )
+                        field.fieldOptions.add( fieldOption )
+                        createFieldCheckboxAdapter.updateFieldOptions( field.fieldOptions )
+                    }
+                    InputDialog.Action.DidPressQRButton -> {}
+                }
+            }
         }
 
         val dropdownAddAnotherButton = dropdownLayout.findViewById<Button>(R.id.add_another_button)
 
         dropdownAddAnotherButton.setOnClickListener {
-            InputDialog( activity!!, false, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kDropdownTag, this@CreateFieldFragment )
+            InputDialog( activity!!, false, resources.getString(R.string.option_item_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+                when (action) {
+                    InputDialog.Action.DidCancel -> {}
+                    InputDialog.Action.DidEnterText -> {
+                        val fieldOption = FieldOption( text )
+                        field.fieldOptions.add( fieldOption )
+                        createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
+                    }
+                    InputDialog.Action.DidPressQRButton -> {}
+                }
+            }
         }
 
         binding.saveButton.setOnClickListener {
@@ -528,29 +546,6 @@ class CreateFieldFragment : Fragment(), InputDialog.InputDialogDelegate, DatePic
     {
         super.onResume()
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CreateFieldFragment.value.toString() + ": " + this.javaClass.simpleName
-    }
-
-    override fun didCancelText( tag: Any? )
-    {
-    }
-
-    override fun didEnterText( name: String, tag: Any? )
-    {
-        tag?.let {
-            val tag = it as Int
-            if (tag == kCheckboxTag)
-            {
-                val fieldOption = FieldOption( name )
-                field.fieldOptions.add( fieldOption )
-                createFieldCheckboxAdapter.updateFieldOptions( field.fieldOptions )
-            }
-            else if (tag == kDropdownTag)
-            {
-                val fieldOption = FieldOption( name )
-                field.fieldOptions.add( fieldOption )
-                createFieldDropdownAdapter.updateFieldOptions( field.fieldOptions )
-            }
-        }
     }
 
     private fun shouldDeleteCheckboxFieldOption(fieldOption: FieldOption)

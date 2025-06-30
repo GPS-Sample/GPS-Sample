@@ -38,7 +38,6 @@ import java.util.*
 
 class AddHouseholdFragment : Fragment(),
     ImageDialog.ImageDialogDelegate,
-    InputDialog.InputDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate
 {
     private var _binding: FragmentAddHouseholdBinding? = null
@@ -48,7 +47,6 @@ class AddHouseholdFragment : Fragment(),
     private lateinit var config: Config
     private lateinit var location: Location
     private lateinit var enumArea : EnumArea
-    private var inputDialog: InputDialog? = null
     private lateinit var enumTeam: EnumerationTeam
     private var propertyAdapter : PropertyAdapter? = null
     private lateinit var enumerationItem: EnumerationItem
@@ -638,31 +636,5 @@ class AddHouseholdFragment : Fragment(),
         super.onDestroyView()
 
         _binding = null
-    }
-
-    override fun didCancelText(tag: Any?)
-    {
-    }
-
-    override fun didPressQrButton()
-    {
-        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-        getResult.launch(intent)
-    }
-
-    private val getResult =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == ResultCode.BarcodeScanned.value) {
-                val payload = it.data!!.getStringExtra(Keys.kPayload.value)
-                inputDialog?.editText?.let { editText ->
-                    editText.setText( payload.toString())
-                }
-            }
-        }
-
-    override fun didEnterText(text: String, tag: Any?)
-    {
-        binding.subaddressEditText.setText( text )
     }
 }

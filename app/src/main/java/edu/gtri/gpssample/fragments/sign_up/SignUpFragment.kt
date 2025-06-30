@@ -29,7 +29,7 @@ import edu.gtri.gpssample.databinding.FragmentSignUpBinding
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.dialogs.InputDialog
 
-class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
+class SignUpFragment : Fragment()
 {
     private lateinit var role: String
     private lateinit var viewModel: SignUpViewModel
@@ -83,7 +83,16 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
             {
                 if (position == 7)
                 {
-                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@SignUpFragment )
+                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+                        when (action) {
+                            InputDialog.Action.DidCancel -> {}
+                            InputDialog.Action.DidEnterText -> {
+                                binding.otherQuestionTextView.text = text
+                                binding.otherQuestionTextView.visibility = View.VISIBLE
+                            }
+                            InputDialog.Action.DidPressQRButton -> {}
+                        }
+                    }
                 }
             }
 
@@ -130,7 +139,13 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
 
                 if (question.length == 0)
                 {
-                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@SignUpFragment )
+                    InputDialog( activity!!, false, resources.getString(R.string.enter_other_question), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+                        when (action) {
+                            InputDialog.Action.DidCancel -> {}
+                            InputDialog.Action.DidEnterText -> {}
+                            InputDialog.Action.DidPressQRButton -> {}
+                        }
+                    }
                     return@setOnClickListener
                 }
             }
@@ -162,16 +177,6 @@ class SignUpFragment : Fragment(), InputDialog.InputDialogDelegate
                 findNavController().navigate(R.id.action_navigate_to_SignInFragment, bundle)
             }
         }
-    }
-
-    override fun didCancelText( tag: Any? )
-    {
-    }
-
-    override fun didEnterText( name: String, tag: Any? )
-    {
-        binding.otherQuestionTextView.text = name
-        binding.otherQuestionTextView.visibility = View.VISIBLE
     }
 
     override fun onResume()

@@ -71,8 +71,7 @@ import java.util.*
 
 class WalkEnumerationAreaFragment : Fragment(),
     View.OnTouchListener,
-    MapManager.MapManagerDelegate,
-    InputDialog.InputDialogDelegate
+    MapManager.MapManagerDelegate
 {
     private lateinit var mapView: View
     private lateinit var config: Config
@@ -335,7 +334,16 @@ class WalkEnumerationAreaFragment : Fragment(),
                 // close the polygon
                 polyLinePoints.add( polyLinePoints[0] )
 
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, this, false )
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, false )  { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {createEnumArea( text )}
+                        InputDialog.Action.DidPressQRButton -> {
+                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                            getResult.launch(intent)
+                        }
+                    }
+                }
             }
         }
     }
@@ -428,23 +436,6 @@ class WalkEnumerationAreaFragment : Fragment(),
         MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40, Color.BLACK )
     }
 
-    override fun didCancelText( tag: Any? )
-    {
-        Log.d( "xxx", "xxx")
-//        droppedPointAnnotations.map { pointAnnotation ->
-//            pointAnnotation?.let{ pointAnnotation ->
-//                pointAnnotationManager?.delete( pointAnnotation )
-//            }
-//        }
-//        droppedPointAnnotations.clear()
-    }
-
-    override fun didPressQrButton()
-    {
-        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-        getResult.launch(intent)
-    }
-
     private val getResult =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
@@ -456,84 +447,49 @@ class WalkEnumerationAreaFragment : Fragment(),
             }
         }
 
-    override fun didEnterText( name: String, tag: Any? )
+    fun createEnumArea( name: String )
     {
-        if (tag == kEnumAreaName)
+        val vertices = ArrayList<LatLon>()
+
+        var creationDate = Date().time
+
+        for (point in polyLinePoints)
         {
-            val vertices = ArrayList<LatLon>()
+            vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+        }
 
-            var creationDate = Date().time
+        if (vertices.size > 2)
+        {
+            var name2 = name
 
-            for (point in polyLinePoints)
+            if (name2.isEmpty())
             {
-                vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+                name2 = "${resources.getString(R.string.enumeration_area)} 1"
             }
 
-            if (vertices.size > 2)
-            {
-                var name2 = name
+            val latLngBounds = GeoUtils.findGeobounds(vertices)
+            val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
 
-                if (name2.isEmpty())
-                {
-                    name2 = "${resources.getString(R.string.enumeration_area)} 1"
-                }
+            val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                val latLngBounds = GeoUtils.findGeobounds(vertices)
-                val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+            selectedEnumArea = EnumArea( config.uuid, name2, "", 0, vertices, mapTileRegion )
+            config.enumAreas.add( selectedEnumArea!! )
 
-                val mapTileRegion = MapTileRegion( northEast, southWest )
-
-                selectedEnumArea = EnumArea( config.uuid, name2, "", 0, vertices, mapTileRegion )
-                config.enumAreas.add( selectedEnumArea!! )
-
-                DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
-                    config.enumAreas[0].let { enumArea ->
-                        DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
-                            enumArea.enumerationTeams.add( enumerationTeam )
-                        }
+            DAO.configDAO.createOrUpdateConfig( config )?.let { config ->
+                config.enumAreas[0].let { enumArea ->
+                    DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "Auto Gen", enumArea.vertices, ArrayList<String>()))?.let { enumerationTeam ->
+                        enumArea.enumerationTeams.add( enumerationTeam )
                     }
                 }
-
-                binding.saveButton.isEnabled = false
-                binding.walkButton.isEnabled = false
-                binding.addPointButton.isEnabled = false
-                binding.deletePointButton.isEnabled = false
-
-                refreshMap()
             }
-        }
-        else
-        {
-            name.toDoubleOrNull()?.let {
-                val radius = it * 1000
-                val r_earth = 6378000.0
 
-                startPoint?.let { point ->
-                    var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
-                    var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                    val northEast = LatLon( 0, latitude, longitude )
+            binding.saveButton.isEnabled = false
+            binding.walkButton.isEnabled = false
+            binding.addPointButton.isEnabled = false
+            binding.deletePointButton.isEnabled = false
 
-                    latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
-                    longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                    val southWest = LatLon( 0, latitude, longitude )
-
-                    polyLinePoints.clear()
-                    val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude ))
-                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
-
-                    pointList.add( polyLinePoints )
-
-                    MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
-
-                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, this, false )
-                }
-            }
+            refreshMap()
         }
     }
 
@@ -547,7 +503,52 @@ class WalkEnumerationAreaFragment : Fragment(),
 
                 startPoint = binding.mapboxMapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
 
-                val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@WalkEnumerationAreaFragment )
+                val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {
+                            text.toDoubleOrNull()?.let {
+                                val radius = it * 1000
+                                val r_earth = 6378000.0
+
+                                startPoint?.let { point ->
+                                    var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                                    var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                                    val northEast = LatLon( 0, latitude, longitude )
+
+                                    latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                                    longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                                    val southWest = LatLon( 0, latitude, longitude )
+
+                                    polyLinePoints.clear()
+                                    val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+
+                                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
+                                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude ))
+                                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude ))
+                                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude ))
+                                    polyLinePoints.add( com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude ))
+
+                                    pointList.add( polyLinePoints )
+
+                                    MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+
+                                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaName, false )  { action, text, tag ->
+                                        when (action) {
+                                            InputDialog.Action.DidCancel -> {}
+                                            InputDialog.Action.DidEnterText -> {createEnumArea(text)}
+                                            InputDialog.Action.DidPressQRButton -> {
+                                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                                getResult.launch(intent)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        InputDialog.Action.DidPressQRButton -> {}
+                    }
+                }
                 inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             }
         }

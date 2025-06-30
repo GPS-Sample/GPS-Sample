@@ -14,14 +14,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.dialogs.ConfirmationDialog.ButtonPress
 
 class InputDialog
 {
-    interface InputDialogDelegate
-    {
-        fun didPressQrButton() {}
-        fun didCancelText( tag: Any? )
-        fun didEnterText( text: String, tag: Any? )
+    enum class Action {
+        DidPressQRButton,
+        DidEnterText,
+        DidCancel
     }
 
     var editText: EditText? = null
@@ -30,7 +30,7 @@ class InputDialog
     {
     }
 
-    constructor( context: Context, qrVisible: Boolean, title: String, text: String?, leftButton: String, rightButton: String, tag: Any?, delegate: InputDialogDelegate, required: Boolean = true, inputNumber: Boolean = false, cancelable: Boolean = false )
+    constructor( context: Context, qrVisible: Boolean, title: String, text: String?, leftButton: String, rightButton: String, tag: Any?, required: Boolean = true, inputNumber: Boolean = false, cancelable: Boolean = false, completion: ((action: Action, text: String, tag: Any? )->Unit))
     {
         val inflater = LayoutInflater.from(context)
 
@@ -63,7 +63,7 @@ class InputDialog
             val imageButton = view!!.findViewById<ImageButton>(R.id.qr_button)
             imageButton.visibility = View.VISIBLE
             imageButton.setOnClickListener {
-                delegate.didPressQrButton()
+                completion( Action.DidPressQRButton, "", tag )
             }
         }
 
@@ -72,7 +72,7 @@ class InputDialog
 
         cancelButton.setOnClickListener {
             alertDialog.dismiss()
-            delegate.didCancelText( tag )
+            completion( Action.DidCancel, "", tag )
         }
 
         val saveButton = view.findViewById<Button>(R.id.save_button)
@@ -84,9 +84,8 @@ class InputDialog
             {
                 alertDialog.dismiss()
 
-                delegate.didEnterText( editText!!.text.toString(), tag )
+                completion( Action.DidEnterText, editText!!.text.toString(), tag )
             }
         }
     }
-
 }

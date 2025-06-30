@@ -81,7 +81,6 @@ import java.util.*
 class CreateOsmEnumerationAreaFragment : Fragment(),
     View.OnTouchListener,
     MapManager.MapManagerDelegate,
-    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
@@ -272,7 +271,19 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     }
                     else
                     {
-                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, this, false )
+                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag ) { action, text, tag ->
+                            when (action) {
+                                InputDialog.Action.DidCancel -> {
+                                    createEnumAreaBoundary = false
+                                    binding.createEnumAreaButton.backgroundTintList = defaultColorList
+                                }
+                                InputDialog.Action.DidEnterText -> {createEnumArea( text )}
+                                InputDialog.Action.DidPressQRButton -> {
+                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                    getResult.launch(intent)
+                                }
+                            }
+                        }
                     }
                 }
                 else
@@ -631,16 +642,37 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     centerPoint = MapManager.instance().getLocationFromPixelPoint(mapView, p1)
                     binding.mapOverlayView.visibility = View.GONE
 
-                    val inputDialog = InputDialog(
-                        activity!!,
-                        false,
-                        resources.getString(R.string.map_tile_boundary),
-                        "",
-                        resources.getString(R.string.cancel),
-                        resources.getString(R.string.save),
-                        kEnumAreaLengthTag,
-                        this@CreateOsmEnumerationAreaFragment
-                    )
+                    val inputDialog = InputDialog(activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag ) { action, text, tag ->
+                        when (action) {
+                            InputDialog.Action.DidCancel -> {}
+                            InputDialog.Action.DidEnterText -> {
+                                text.toDoubleOrNull()?.let {
+                                    binding.mapOverlayView.visibility = View.GONE
+                                    binding.createEnumAreaButton.backgroundTintList = defaultColorList
+
+                                    radius = it * 1000
+                                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, false ) { action, text, tag ->
+                                        when (action) {
+                                            InputDialog.Action.DidCancel -> {
+                                                createEnumAreaLocation = false
+                                                binding.createEnumAreaButton.backgroundTintList = defaultColorList
+                                            }
+                                            InputDialog.Action.DidEnterText -> {
+                                                createEnumArea( text )
+                                            }
+                                            InputDialog.Action.DidPressQRButton -> {
+                                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                                getResult.launch(intent)
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                            InputDialog.Action.DidPressQRButton -> {}
+                        }
+                    }
+
 
                     inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
                 }
@@ -663,18 +695,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         return true
     }
 
-    override fun didCancelText( tag: Any? )
-    {
-        createEnumAreaLocation = false
-        binding.createEnumAreaButton.backgroundTintList = defaultColorList
-    }
-
-    override fun didPressQrButton()
-    {
-        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-        getResult.launch(intent)
-    }
-
     private val getResult =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
@@ -686,138 +706,116 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             }
         }
 
-    override fun didEnterText( name: String, tag: Any? )
+    fun createEnumArea( name: String )
     {
-        if (tag is EnumArea)
+        if (createEnumAreaBoundary)
         {
-            tag.name = name
+            createEnumAreaBoundary = false
+
+            val vertices = ArrayList<LatLon>()
+
+            var creationDate = Date().time
+
+            for (point in droppedPoints)
+            {
+                vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
+            }
+
+            val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+            pointList.add( droppedPoints )
+
+            val latLngBounds = GeoUtils.findGeobounds(vertices)
+            val northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+            val southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+            val mapTileRegion = MapTileRegion( northEast, southWest )
+
+            if (name.isEmpty())
+            {
+                selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+                unsavedEnumAreas.add( selectedEnumArea!! )
+            }
+            else
+            {
+                selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
+                unsavedEnumAreas.add( selectedEnumArea!! )
+            }
+
             refreshMap()
         }
-        else if (tag is Int)
+        else if (createEnumAreaLocation)
         {
-            if (tag == kEnumAreaLengthTag)
-            {
-                name.toDoubleOrNull()?.let {
-                    binding.mapOverlayView.visibility = View.GONE
-                    binding.createEnumAreaButton.backgroundTintList = defaultColorList
+            createEnumAreaLocation = false
 
-                    radius = it * 1000
-                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, this, false )
+            centerPoint?.let { centerPoint ->
+                val r_earth = 6378000.0
+                var creationDate = Date().time
+
+                var latitude  = centerPoint.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                var longitude = centerPoint.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                var northEast = LatLon( creationDate++, latitude, longitude )
+
+                latitude  = centerPoint.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                longitude = centerPoint.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                var southWest = LatLon( creationDate++, latitude, longitude )
+
+                val vertices = ArrayList<LatLon>()
+
+                vertices.add( LatLon( creationDate++, southWest.latitude, southWest.longitude ))
+                vertices.add( LatLon( creationDate++, northEast.latitude, southWest.longitude ))
+                vertices.add( LatLon( creationDate++, northEast.latitude, northEast.longitude ))
+                vertices.add( LatLon( creationDate++, southWest.latitude, northEast.longitude ))
+
+                val points = ArrayList<com.mapbox.geojson.Point>()
+                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
+
+                vertices.map {
+                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
                 }
-            }
-            else if (tag == kEnumAreaNameTag)
-            {
-                if (createEnumAreaBoundary)
+
+                pointList.add( points )
+
+                val latLngBounds = GeoUtils.findGeobounds(vertices)
+                northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+                val mapTileRegion = MapTileRegion( northEast, southWest )
+
+                if (name.isEmpty())
                 {
-                    createEnumAreaBoundary = false
+                    selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+                    unsavedEnumAreas.add( selectedEnumArea!! )
+                }
+                else
+                {
+                    selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
+                    unsavedEnumAreas.add( selectedEnumArea!! )
+                }
 
-                    val vertices = ArrayList<LatLon>()
+                refreshMap()
+            }
+        }
 
-                    var creationDate = Date().time
-
-                    for (point in droppedPoints)
+        ConfirmationDialog( activity, "",
+            resources.getString(R.string.attach_mbtiles_question),
+            resources.getString(R.string.no),
+            resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
                     {
-                        vertices.add( LatLon( creationDate++, point.latitude(), point.longitude()))
-                    }
-
-                    val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-                    pointList.add( droppedPoints )
-
-                    val latLngBounds = GeoUtils.findGeobounds(vertices)
-                    val northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                    val southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-                    val mapTileRegion = MapTileRegion( northEast, southWest )
-
-                    if (name.isEmpty())
-                    {
-                        selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
-                        unsavedEnumAreas.add( selectedEnumArea!! )
+                        SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
                     }
                     else
                     {
-                        selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
-                        unsavedEnumAreas.add( selectedEnumArea!! )
-                    }
-
-                    refreshMap()
-                }
-                else if (createEnumAreaLocation)
-                {
-                    createEnumAreaLocation = false
-
-                    centerPoint?.let { centerPoint ->
-                        val r_earth = 6378000.0
-                        var creationDate = Date().time
-
-                        var latitude  = centerPoint.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
-                        var longitude = centerPoint.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                        var northEast = LatLon( creationDate++, latitude, longitude )
-
-                        latitude  = centerPoint.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
-                        longitude = centerPoint.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                        var southWest = LatLon( creationDate++, latitude, longitude )
-
-                        val vertices = ArrayList<LatLon>()
-
-                        vertices.add( LatLon( creationDate++, southWest.latitude, southWest.longitude ))
-                        vertices.add( LatLon( creationDate++, northEast.latitude, southWest.longitude ))
-                        vertices.add( LatLon( creationDate++, northEast.latitude, northEast.longitude ))
-                        vertices.add( LatLon( creationDate++, southWest.latitude, northEast.longitude ))
-
-                        val points = ArrayList<com.mapbox.geojson.Point>()
-                        val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-
-                        vertices.map {
-                            points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-                        }
-
-                        pointList.add( points )
-
-                        val latLngBounds = GeoUtils.findGeobounds(vertices)
-                        northEast = LatLon( creationDate++, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                        southWest = LatLon( creationDate++, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-                        val mapTileRegion = MapTileRegion( northEast, southWest )
-
-                        if (name.isEmpty())
-                        {
-                            selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
-                            unsavedEnumAreas.add( selectedEnumArea!! )
-                        }
-                        else
-                        {
-                            selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
-                            unsavedEnumAreas.add( selectedEnumArea!! )
-                        }
-
-                        refreshMap()
+                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
                     }
                 }
-
-                ConfirmationDialog( activity, "",
-                    resources.getString(R.string.attach_mbtiles_question),
-                    resources.getString(R.string.no),
-                    resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                    when( buttonPressed )
-                    {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
-                            {
-                                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
-                            }
-                            else
-                            {
-                                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-                            }
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
-                        }
-                    }
+                ConfirmationDialog.ButtonPress.None -> {
                 }
-
             }
         }
     }
@@ -828,7 +826,17 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
         when (selection) {
             resources.getString(R.string.rename) -> {
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, false ) { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {
+                            (tag as EnumArea).name = text
+                            refreshMap()
+                        }
+                        InputDialog.Action.DidPressQRButton -> {}
+                    }
+                }
+
             }
             resources.getString(R.string.delete) -> {
                 MapManager.instance().clearMap( mapView )

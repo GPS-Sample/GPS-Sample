@@ -52,7 +52,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ManageConfigurationsFragment : Fragment(),
-    InputDialog.InputDialogDelegate,
     NetworkClientModel.ConfigurationDelegate,
     NetworkViewModel.ManageConfigurationNetworkDelegate
 {
@@ -66,9 +65,6 @@ class ManageConfigurationsFragment : Fragment(),
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var samplingViewModel: SamplingViewModel
-
-    private val kImportTag = 1
-    private val kDeleteTag = 2
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -103,6 +99,7 @@ class ManageConfigurationsFragment : Fragment(),
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
@@ -186,7 +183,7 @@ class ManageConfigurationsFragment : Fragment(),
 
             if ((configurations.size == 1) && ((user.role == Role.Enumerator.toString() || user.role == Role.DataCollector.toString())))
             {
-                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), kDeleteTag, false ) { buttonPressed, tag ->
+                ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.delete_configuration), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
                     when( buttonPressed )
                     {
                         ConfirmationDialog.ButtonPress.Left -> {
@@ -195,7 +192,13 @@ class ManageConfigurationsFragment : Fragment(),
                             DAO.deleteAll()
                             configurations.clear()
                             manageConfigurationsAdapter.updateConfigurations(configurations)
-                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "******", resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
+                            InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "******", resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, text, tag ->
+                                when (action) {
+                                    InputDialog.Action.DidCancel -> {}
+                                    InputDialog.Action.DidEnterText -> {didEnterPassword( text )}
+                                    InputDialog.Action.DidPressQRButton -> {}
+                                }
+                            }
                         }
                         ConfirmationDialog.ButtonPress.None -> {
                         }
@@ -205,7 +208,13 @@ class ManageConfigurationsFragment : Fragment(),
             }
             else
             {
-                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, this, false)
+                InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), password, resources.getString(R.string.cancel), resources.getString(R.string.next), null, false)  { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {didEnterPassword( text )}
+                        InputDialog.Action.DidPressQRButton -> {}
+                    }
+                }
             }
         }
     }
@@ -591,14 +600,14 @@ class ManageConfigurationsFragment : Fragment(),
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun didEnterText(name: String, tag: Any? )
+    fun didEnterPassword( password: String )
     {
-        if (name != "******")
+        if (password != "******")
         {
-            encryptionPassword = name
+            encryptionPassword = password
         }
 
-        ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), kImportTag, false ) { buttonPressed, tag ->
+        ConfirmationDialog( activity, resources.getString(R.string.import_configuration), resources.getString(R.string.select_import_method), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
             when( buttonPressed )
             {
                 ConfirmationDialog.ButtonPress.Left -> {
@@ -618,10 +627,6 @@ class ManageConfigurationsFragment : Fragment(),
                 }
             }
         }
-    }
-
-    override fun didCancelText( tag: Any? )
-    {
     }
 
     override fun onDestroyView()

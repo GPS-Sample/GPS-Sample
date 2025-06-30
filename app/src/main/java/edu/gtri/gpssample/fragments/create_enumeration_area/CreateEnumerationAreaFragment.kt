@@ -80,7 +80,6 @@ class CreateEnumerationAreaFragment : Fragment(),
     OnMapClickListener,
     View.OnTouchListener,
     OnCameraChangeListener,
-    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     DropdownDialog.DropdownDialogDelegate,
@@ -300,9 +299,22 @@ class CreateEnumerationAreaFragment : Fragment(),
                     }
                     else
                     {
-                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, this, false )
-                        binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
-                        binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, false ) { action, text, tag ->
+                            when (action) {
+                                InputDialog.Action.DidCancel -> {
+                                    droppedPointAnnotations.map { pointAnnotation ->
+                                        pointAnnotation?.let{ pointAnnotation ->
+                                            pointAnnotationManager?.delete( pointAnnotation )
+                                        }
+                                    }
+                                    droppedPointAnnotations.clear()
+                                }
+                                InputDialog.Action.DidEnterText -> {
+                                    createEnumArea( text )
+                                }
+                                InputDialog.Action.DidPressQRButton -> {}
+                            }
+                        }
                     }
                 }
                 else
@@ -647,7 +659,60 @@ class CreateEnumerationAreaFragment : Fragment(),
             {
                 this.point = point
                 binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
-                val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag, this@CreateEnumerationAreaFragment )
+                val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag ) { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {
+                            droppedPointAnnotations.map { pointAnnotation ->
+                                pointAnnotation?.let{ pointAnnotation ->
+                                    pointAnnotationManager?.delete( pointAnnotation )
+                                }
+                            }
+                            droppedPointAnnotations.clear()
+                        }
+                        InputDialog.Action.DidEnterText -> {
+                            text.toDoubleOrNull()?.let {
+                                val radius = it * 1000
+                                val r_earth = 6378000.0
+
+                                point?.let { point ->
+                                    var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                                    var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                                    val northEast = LatLon( 0, latitude, longitude )
+
+                                    latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                                    longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                                    val southWest = LatLon( 0, latitude, longitude )
+
+                                    var p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
+                                    droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
+
+                                    p =com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude )
+                                    droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
+
+                                    p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude )
+                                    droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
+
+                                    p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude )
+                                    droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
+
+                                    p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
+                                    droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
+
+                                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, false ) { action, text, tag ->
+                                        when (action) {
+                                            InputDialog.Action.DidCancel -> {}
+                                            InputDialog.Action.DidEnterText -> {
+                                                createEnumArea( text )
+                                            }
+                                            InputDialog.Action.DidPressQRButton -> {}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        InputDialog.Action.DidPressQRButton -> {}
+                    }
+                }
                 inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
                 return true
             }
@@ -989,22 +1054,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         return true
     }
 
-    override fun didCancelText( tag: Any? )
-    {
-        droppedPointAnnotations.map { pointAnnotation ->
-            pointAnnotation?.let{ pointAnnotation ->
-                pointAnnotationManager?.delete( pointAnnotation )
-            }
-        }
-        droppedPointAnnotations.clear()
-    }
-
-    override fun didPressQrButton()
-    {
-        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-        getResult.launch(intent)
-    }
-
     private val getResult =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) {
@@ -1016,109 +1065,61 @@ class CreateEnumerationAreaFragment : Fragment(),
             }
         }
 
-    override fun didEnterText( name: String, tag: Any? )
+    fun createEnumArea( name: String )
     {
-        if (tag is EnumArea)
-        {
-            mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )
-            tag.name = name // handles re-name
-            refreshMap()
-        }
-        else if (tag is Int)
-        {
-            if (tag == kEnumAreaLengthTag)
-            {
-                name.toDoubleOrNull()?.let {
-                    val radius = it * 1000
-                    val r_earth = 6378000.0
+        createEnumAreaBoundary = false
+        createEnumAreaLocation = false
 
-                    point?.let { point ->
-                        var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
-                        var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                        val northEast = LatLon( 0, latitude, longitude )
+        val vertices = ArrayList<LatLon>()
 
-                        latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
-                        longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                        val southWest = LatLon( 0, latitude, longitude )
+        var creationDate = Date().time
 
-                        var p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
-
-                        p =com.mapbox.geojson.Point.fromLngLat( northEast.longitude, southWest.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
-
-                        p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, southWest.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
-
-                        p = com.mapbox.geojson.Point.fromLngLat( southWest.longitude, northEast.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
-
-                        p = com.mapbox.geojson.Point.fromLngLat( northEast.longitude, northEast.latitude )
-                        droppedPointAnnotations.add( mapboxManager.addMarker( pointAnnotationManager, p, R.drawable.location_blue ))
-
-                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, this, false )
-                    }
-                }
+        droppedPointAnnotations.map { pointAnnotation ->
+            pointAnnotation?.let{ pointAnnotation ->
+                vertices.add( LatLon( creationDate++, pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
+                pointAnnotationManager?.delete( pointAnnotation )
             }
+        }
 
-            if (tag == kEnumAreaNameTag)
+        val latLngBounds = GeoUtils.findGeobounds(vertices)
+        val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+        val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+        val mapTileRegion = MapTileRegion( northEast, southWest )
+
+        if (name.isEmpty())
+        {
+            selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+            unsavedEnumAreas.add( selectedEnumArea!! )
+        }
+        else
+        {
+            selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
+            unsavedEnumAreas.add( selectedEnumArea!! )
+        }
+
+        refreshMap()
+
+        ConfirmationDialog( activity, "",
+            resources.getString(R.string.attach_mbtiles_question),
+            resources.getString(R.string.no),
+            resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+            when( buttonPressed )
             {
-                createEnumAreaBoundary = false
-                createEnumAreaLocation = false
-
-                val vertices = ArrayList<LatLon>()
-
-                var creationDate = Date().time
-
-                droppedPointAnnotations.map { pointAnnotation ->
-                    pointAnnotation?.let{ pointAnnotation ->
-                        vertices.add( LatLon( creationDate++, pointAnnotation.point.latitude(), pointAnnotation.point.longitude()))
-                        pointAnnotationManager?.delete( pointAnnotation )
-                    }
+                ConfirmationDialog.ButtonPress.Left -> {
                 }
-
-                val latLngBounds = GeoUtils.findGeobounds(vertices)
-                val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
-                val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
-
-                val mapTileRegion = MapTileRegion( northEast, southWest )
-
-                if (name.isEmpty())
-                {
-                    selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
-                    unsavedEnumAreas.add( selectedEnumArea!! )
-                }
-                else
-                {
-                    selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
-                    unsavedEnumAreas.add( selectedEnumArea!! )
-                }
-
-                refreshMap()
-
-                ConfirmationDialog( activity, "",
-                    resources.getString(R.string.attach_mbtiles_question),
-                    resources.getString(R.string.no),
-                    resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                    when( buttonPressed )
+                ConfirmationDialog.ButtonPress.Right -> {
+                    if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
                     {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            if (TileServer.getCachedFiles( activity!! ).isNotEmpty())
-                            {
-                                SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
-                            }
-                            else
-                            {
-                                filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
-                            }
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
-                        }
+                        SelectionDialog( activity!!, TileServer.getCachedFiles( activity!! ),this)
+                    }
+                    else
+                    {
+                        filePickerLauncher.launch(arrayOf("application/x-sqlite3", "application/octet-stream"))
                     }
                 }
-
+                ConfirmationDialog.ButtonPress.None -> {
+                }
             }
         }
     }
@@ -1128,7 +1129,20 @@ class CreateEnumerationAreaFragment : Fragment(),
         val enumArea = tag as EnumArea
         when (selection) {
             resources.getString(R.string.rename) -> {
-                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, this, false )
+                inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), enumArea.name, resources.getString(R.string.cancel), resources.getString(R.string.save), tag, false ) { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {
+                            mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, (tag as EnumArea).name, )
+                            (tag as EnumArea).name = text // handles re-name
+                            refreshMap()
+                        }
+                        InputDialog.Action.DidPressQRButton -> {
+                            val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                            getResult.launch(intent)
+                        }
+                    }
+                }
             }
             resources.getString(R.string.delete) -> {
                 mapboxManager.removeViewAnnotation( binding.mapboxMapView.viewAnnotationManager, tag.name, )

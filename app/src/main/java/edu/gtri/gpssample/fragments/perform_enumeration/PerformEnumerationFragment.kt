@@ -64,7 +64,6 @@ class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
     MapManager.MapManagerDelegate,
     InfoDialog.InfoDialogDelegate,
-    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
@@ -428,7 +427,17 @@ class PerformEnumerationFragment : Fragment(),
 
         if (enumerationCount == 0)
         {
-            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true, true )
+            InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "1", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true, true )  { action, text, tag ->
+                when (action) {
+                    InputDialog.Action.DidCancel -> {}
+                    InputDialog.Action.DidEnterText -> {
+                        text.toIntOrNull()?.let {
+                            maxSubaddress = it - 1
+                        }
+                    }
+                    InputDialog.Action.DidPressQRButton -> {}
+                }
+            }
         }
 
         binding.listItemEnumArea.titleLayout.visibility = View.GONE
@@ -891,17 +900,6 @@ class PerformEnumerationFragment : Fragment(),
         MapboxManager.cancelTilePackDownload()
     }
 
-    override fun didCancelText( tag: Any? )
-    {
-    }
-
-    override fun didEnterText( name: String, tag: Any? )
-    {
-        name.toIntOrNull()?.let {
-            maxSubaddress = it - 1
-        }
-    }
-
     override fun stylePackLoaded( error: String )
     {
         activity!!.runOnUiThread {
@@ -964,7 +962,17 @@ class PerformEnumerationFragment : Fragment(),
         {
             R.id.set_subaddress ->
             {
-                InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this, false, true )
+                InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true )  { action, text, tag ->
+                    when (action) {
+                        InputDialog.Action.DidCancel -> {}
+                        InputDialog.Action.DidEnterText -> {
+                            text.toIntOrNull()?.let {
+                                maxSubaddress = it - 1
+                            }
+                        }
+                        InputDialog.Action.DidPressQRButton -> {}
+                    }
+                }
             }
 
             R.id.mapbox_streets ->

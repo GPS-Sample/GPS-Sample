@@ -42,7 +42,7 @@ import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 
-class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDialog.ResetPinDialogDelegate
+class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
 {
     private lateinit var expectedRole: String
     private var _binding: FragmentSignInBinding? = null
@@ -105,7 +105,29 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             else
             {
                 DAO.userDAO.getUser(userName)?.let {
-                    InputDialog( activity!!, false, it.recoveryQuestion, "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@SignInFragment )
+                    InputDialog( activity!!, false, it.recoveryQuestion, "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+                        when (action) {
+                            InputDialog.Action.DidCancel -> {}
+                            InputDialog.Action.DidEnterText -> {
+                                val userName = binding.nameEditText.text.toString()
+                                val user = DAO.userDAO.getUser(userName)
+
+                                user?.let {
+                                    if (text == it.recoveryAnswer)
+                                    {
+                                        val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+                                        val pin = sharedPreferences.getInt( user.role!!, 0 )
+                                        NotificationDialog( activity!!, resources.getString(R.string.your_pin_is), pin.toString())
+                                    }
+                                    else
+                                    {
+                                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                            InputDialog.Action.DidPressQRButton -> {}
+                        }
+                    }
                 } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.user_name_not_found), Toast.LENGTH_SHORT).show()
             }
         }
@@ -232,29 +254,6 @@ class SignInFragment : Fragment(), InputDialog.InputDialogDelegate, ResetPinDial
             Role.Supervisor.value -> activity!!.setTitle( "${resources.getString(R.string.supervisor)}" )
             Role.Enumerator.value -> activity!!.setTitle( "${resources.getString(R.string.enumerator)}" )
             Role.DataCollector.value -> activity!!.setTitle( "${resources.getString(R.string.data_collector)}" )
-        }
-    }
-
-    override fun didCancelText( tag: Any? )
-    {
-    }
-
-    override fun didEnterText( text: String, tag: Any? )
-    {
-        val userName = binding.nameEditText.text.toString()
-        val user = DAO.userDAO.getUser(userName)
-
-        user?.let {
-            if (text == it.recoveryAnswer)
-            {
-                val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
-                val pin = sharedPreferences.getInt( user.role!!, 0 )
-                NotificationDialog( activity!!, resources.getString(R.string.your_pin_is), pin.toString())
-            }
-            else
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.incorrect_answer_message), Toast.LENGTH_SHORT).show()
-            }
         }
     }
 

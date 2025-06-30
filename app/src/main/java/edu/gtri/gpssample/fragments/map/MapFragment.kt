@@ -54,7 +54,6 @@ import java.util.ArrayList
 
 class MapFragment : Fragment(),
     View.OnTouchListener,
-    InputDialog.InputDialogDelegate,
     MapboxManager.MapTileCacheDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     SelectionDialog.SelectionDialogDelegate
@@ -232,44 +231,44 @@ class MapFragment : Fragment(),
             binding.overlayView.visibility = View.GONE
             binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
 
-            val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, this@MapFragment )
+            val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
+                when (action) {
+                    InputDialog.Action.DidCancel -> {
+                        defineMapRegion = false
+                    }
+                    InputDialog.Action.DidEnterText -> {
+                        defineMapRegion = false
+
+                        text.toDoubleOrNull()?.let {
+
+                            val radius = it * 1000
+
+                            point?.let { point ->
+                                val r_earth = 6378000.0
+
+                                var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
+                                var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                                val northEast = LatLon( 0, latitude, longitude )
+
+                                latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
+                                longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
+                                val southWest = LatLon( 0, latitude, longitude )
+
+                                mapTileRegion = MapTileRegion( northEast, southWest )
+
+                                mapTileRegion?.let {
+                                    addPolygon( it )
+                                }
+                            }
+                        }
+                    }
+                    InputDialog.Action.DidPressQRButton -> {}
+                }
+            }
             inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
 
         return true
-    }
-
-    override fun didCancelText( tag: Any? )
-    {
-        defineMapRegion = false
-    }
-
-    override fun didEnterText( name: String, tag: Any? )
-    {
-        defineMapRegion = false
-
-        name.toDoubleOrNull()?.let {
-
-            val radius = it * 1000
-
-            point?.let { point ->
-                val r_earth = 6378000.0
-
-                var latitude  = point.latitude()  + (radius / r_earth) * (180.0 / Math.PI)
-                var longitude = point.longitude() + (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                val northEast = LatLon( 0, latitude, longitude )
-
-                latitude  = point.latitude()  - (radius / r_earth) * (180.0 / Math.PI)
-                longitude = point.longitude() - (radius / r_earth) * (180.0 / Math.PI) / Math.cos(latitude * Math.PI/180.0)
-                val southWest = LatLon( 0, latitude, longitude )
-
-                mapTileRegion = MapTileRegion( northEast, southWest )
-
-                mapTileRegion?.let {
-                    addPolygon( it )
-                }
-            }
-        }
     }
 
     fun addPolygon( mapTileRegion: MapTileRegion )
