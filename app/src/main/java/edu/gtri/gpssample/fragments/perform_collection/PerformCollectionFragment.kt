@@ -1063,27 +1063,34 @@ class PerformCollectionFragment : Fragment(),
             }
             else
             {
-                var count = 0
-
-                for (enumerationItem in location.enumerationItems)
+                if (location.enumerationItems.size > 1)
                 {
-                    if (enumerationItem.samplingState == SamplingState.Sampled)
-                    {
-                        count += 1
+                    var count = 0
+                    var index = 0
 
-                        // This is really only necessary here for the enumerationItems.size == 1 case
-                        // For size > 1, this will get set in the multiCollectionFragment
-                        sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                    location.enumerationItems.forEachIndexed { i, enumerationItem ->
+                        if (enumerationItem.samplingState == SamplingState.Sampled)
+                        {
+                            count += 1
+                            index = i
+                            // This is really only necessary here for the enumerationItems.size == 1 case
+                            // For size > 1, this will get set in the multiCollectionFragment
+                            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                        }
                     }
-                }
 
-                if (count > 1)
-                {
-                    val bundle = Bundle()
-                    bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
-                    bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
+                    if (count > 1)
+                    {
+                        val bundle = Bundle()
+                        bundle.putBoolean( Keys.kGpsAccuracyIsGood.value, gpsAccuracyIsGood())
+                        bundle.putBoolean( Keys.kGpsLocationIsGood.value, gpsLocationIsGood( location ))
 
-                    findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
+                        findNavController().navigate(R.id.action_navigate_to_PerformMultiCollectionFragment, bundle)
+                    }
+                    else
+                    {
+                        didSelectItem( location.enumerationItems[index])
+                    }
                 }
                 else
                 {
