@@ -28,6 +28,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddHouseholdBinding
 import edu.gtri.gpssample.dialogs.*
@@ -133,7 +134,7 @@ class AddHouseholdFragment : Fragment(),
             binding.saveButton.visibility = View.GONE
             binding.subaddressEditText.inputType = InputType.TYPE_NULL
 
-            if (location.imageData.isEmpty())
+            if (location.imageUuid.isEmpty())
             {
                 binding.addPhotoImageView.visibility = View.GONE
             }
@@ -331,17 +332,9 @@ class AddHouseholdFragment : Fragment(),
             binding.propertyRecyclerView.layoutManager = LinearLayoutManager(context)
         }
 
-        if (location.imageData.isNotEmpty())
-        {
-            try
-            {
-                binding.imageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
-            }
-            catch( ex: Exception )
-            {
-                Log.d( "xxx", ex.stackTrace.toString())
-            }
-
+        ImageDAO.instance().getImage( location )?.let { image ->
+            val bitmap = CameraUtils.decodeString( image.data )
+            binding.imageView.setImageBitmap( bitmap )
             binding.imageCardView.visibility = View.VISIBLE
 
             binding.hideImageView.setOnClickListener {
@@ -355,7 +348,6 @@ class AddHouseholdFragment : Fragment(),
                 binding.showImageView.visibility = View.GONE
                 binding.imageFrameLayout.visibility = View.VISIBLE
             }
-
         }
 
         binding.deleteImageView.setOnClickListener {
@@ -402,17 +394,17 @@ class AddHouseholdFragment : Fragment(),
         binding.addPhotoImageView.setOnClickListener {
 
             // get the total size of all image data
-            var size = 0
-
-            for (location in enumArea.locations)
-            {
-                size += location.imageData.length
-            }
-
-            if (size > 25 * 1024 * 1024)
-            {
-                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
-            }
+//            var size = 0
+//
+//            for (location in enumArea.locations)
+//            {
+//                size += location.imageData.length
+//            }
+//
+//            if (size > 25 * 1024 * 1024)
+//            {
+//                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
+//            }
 
             findNavController().navigate(R.id.action_navigate_to_CameraFragment)
         }
@@ -627,7 +619,7 @@ class AddHouseholdFragment : Fragment(),
 
     override fun shouldDeleteImage()
     {
-        location.imageData = ""
+        location.imageUuid = ""
         binding.imageCardView.visibility = View.GONE
     }
 

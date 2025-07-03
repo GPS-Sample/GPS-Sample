@@ -29,6 +29,8 @@ import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
+import edu.gtri.gpssample.database.ImageDAO
+import edu.gtri.gpssample.database.models.Image
 import edu.gtri.gpssample.databinding.FragmentCameraBinding
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -92,7 +94,7 @@ class CameraFragment : Fragment()
 
         binding.deleteImageView.setOnClickListener {
             sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                location.imageData = ""
+                location.imageUuid = ""
                 binding.cameraButton.text = resources.getString(R.string.take_photo)
                 binding.imageView.visibility = View.GONE
                 binding.viewFinder.visibility = View.VISIBLE
@@ -105,9 +107,11 @@ class CameraFragment : Fragment()
 
         binding.saveButton.setOnClickListener {
             bitmap?.let { bitmap ->
-                CameraUtils.encodeBitmap( bitmap )?.let { imageData ->
-                    sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                        location.imageData = imageData
+                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                    CameraUtils.encodeBitmap( bitmap )?.let { imageData ->
+                        ImageDAO.instance().createImage( Image( location.uuid, imageData ))?.let { image ->
+                            location.imageUuid = image.uuid
+                        }
                     }
                 }
             }
@@ -154,12 +158,12 @@ class CameraFragment : Fragment()
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
                 sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                    if (location.imageData.isNotEmpty())
-                    {
+                    ImageDAO.instance().getImage( location )?.let { image ->
+                        val bitmap = CameraUtils.decodeString( image.data )
                         binding.viewFinder.visibility = View.GONE
                         binding.imageView.visibility = View.VISIBLE
                         binding.cameraButton.text = resources.getString(R.string.retake_photo)
-                        binding.imageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
+                        binding.imageView.setImageBitmap( bitmap )
                     }
                 }
             }

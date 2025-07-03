@@ -18,6 +18,7 @@ import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddLandmarkBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
@@ -77,16 +78,9 @@ class AddLandmarkFragment : Fragment()
         binding.longitudeEditText.setText( String.format( "%.6f", location.longitude ))
         binding.descriptionEditText.setText( location.description )
 
-        if (location.imageData.isNotEmpty())
-        {
-            try
-            {
-                binding.landmarkImageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
-            }
-            catch( ex: Exception )
-            {
-                Log.d( "xxx", ex.stackTrace.toString())
-            }
+        ImageDAO.instance().getImage( location )?.let { image ->
+            val bitmap = CameraUtils.decodeString( image.data )
+            binding.landmarkImageView.setImageBitmap( bitmap )
         }
 
         binding.deleteImageView.setOnClickListener {
@@ -112,17 +106,17 @@ class AddLandmarkFragment : Fragment()
         binding.addPhotoImageView.setOnClickListener {
 
             // get the total size of all image data
-            var size = 0
-
-            for (location in enumArea.locations)
-            {
-                size += location.imageData.length
-            }
-
-            if (size > 25 * 1024 * 1024)
-            {
-                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
-            }
+//            var size = 0
+//
+//            for (location in enumArea.locations)
+//            {
+//                size += location.imageData.length
+//            }
+//
+//            if (size > 25 * 1024 * 1024)
+//            {
+//                NotificationDialog( activity!!, resources.getString( R.string.warning), resources.getString( R.string.image_size_warning))
+//            }
 
             findNavController().navigate(R.id.action_navigate_to_CameraFragment)
         }

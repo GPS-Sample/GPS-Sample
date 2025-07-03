@@ -73,7 +73,7 @@ object CameraUtils
             var height = bitmap.height.toDouble()
             val aspectRatio = width / height
 
-            width = 200.0
+            width = 512.0
             height = width / aspectRatio
 
             val bm = Bitmap.createScaledBitmap( bitmap, width.toInt(), height.toInt(), false )

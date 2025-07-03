@@ -25,6 +25,7 @@ import com.google.android.gms.security.ProviderInstaller
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.ActivityMainBinding
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
@@ -84,15 +85,8 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
         val networkVm : NetworkViewModel by viewModels()
         networkViewModel = networkVm
 
-        if (savedInstanceState == null)
-        {
-            DAO.createSharedInstance(applicationContext)
-        }
-        else
-        {
-            // TODO: Figure out how to save the ViewModel state in onSaveInstanceState restore the state here...
-            DAO.createSharedInstance(applicationContext)
-        }
+        DAO.createSharedInstance( applicationContext )
+        ImageDAO.createSharedInstance( applicationContext )
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

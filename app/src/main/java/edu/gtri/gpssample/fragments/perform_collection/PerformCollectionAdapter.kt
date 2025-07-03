@@ -20,6 +20,7 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.distance
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.utils.CameraUtils
@@ -69,13 +70,11 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
             holder.firstTextView.setText( "${item.description}" )
             holder.secondTextView.setText( item.uuid )
 
-            if (item.imageData.isNotEmpty())
-            {
+            ImageDAO.instance().getImage( item )?.let { image ->
+                val bitmap = CameraUtils.decodeString( image.data )
                 holder.photoImageView.visibility = View.VISIBLE
-                holder.photoImageView.setImageBitmap( CameraUtils.decodeString( item.imageData ))
-            }
-            else
-            {
+                holder.photoImageView.setImageBitmap( bitmap )
+            } ?: {
                 holder.locationImageView.visibility = View.VISIBLE
             }
 

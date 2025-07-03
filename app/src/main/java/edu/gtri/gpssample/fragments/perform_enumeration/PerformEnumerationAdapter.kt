@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.EnumerationState
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.EnumerationItem
 import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.utils.CameraUtils
@@ -71,10 +72,14 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
         {
             holder.firstTextView.setText( "${location.description}" )
 
-            if (location.imageData.isNotEmpty())
+            if (location.imageUuid.isNotEmpty())
             {
                 holder.photoImageView.visibility = View.VISIBLE
-                holder.photoImageView.setImageBitmap( CameraUtils.decodeString( location.imageData ))
+
+                ImageDAO.instance().getImage( location )?.let { image ->
+                    val bitmap = CameraUtils.decodeString( image.data )
+                    holder.photoImageView.setImageBitmap( bitmap )
+                }
             }
             else
             {
