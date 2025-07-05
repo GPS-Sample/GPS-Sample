@@ -79,8 +79,9 @@ class AddLandmarkFragment : Fragment()
         binding.descriptionEditText.setText( location.description )
 
         ImageDAO.instance().getImage( location )?.let { image ->
-            val bitmap = CameraUtils.decodeString( image.data )
-            binding.landmarkImageView.setImageBitmap( bitmap )
+            CameraUtils.decodeString( image.data )?.let { bitmap ->
+                binding.landmarkImageView.setImageBitmap( bitmap )
+            }
         }
 
         binding.deleteImageView.setOnClickListener {

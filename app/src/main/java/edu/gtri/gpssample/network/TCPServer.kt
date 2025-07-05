@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.network
 
 import android.util.Log
+import edu.gtri.gpssample.network.TCPClient.TCPClientDelegate
 import edu.gtri.gpssample.network.models.TCPHeader
 import edu.gtri.gpssample.network.models.TCPMessage
 import kotlinx.coroutines.Dispatchers
@@ -122,6 +123,7 @@ class TCPServer
 
         }
     }
+
     private fun handleClient(socket: Socket, delegate: TCPServerDelegate)
     {
         try
@@ -163,5 +165,28 @@ class TCPServer
         }
 
         Log.d( "xxx", "Server: stopped waiting for TCP messages")
+    }
+
+
+    fun sendDataRequestMessage( socket: Socket, message : TCPMessage ) : TCPHeader?
+    {
+        try
+        {
+            socket.outputStream.write( message.toByteArray())
+            socket.outputStream.flush()
+
+            val headerArray = ByteArray(TCPHeader.SIZE )
+
+            if (NetworkUtils.readFully( headerArray, TCPHeader.SIZE, socket, "Client" ) == TCPHeader.SIZE)
+            {
+                return TCPHeader.fromByteArray(headerArray)
+            }
+        }
+        catch (ex: Exception)
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+        }
+
+        return null
     }
 }

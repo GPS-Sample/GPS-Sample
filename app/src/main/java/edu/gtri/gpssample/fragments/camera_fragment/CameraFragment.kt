@@ -159,11 +159,12 @@ class CameraFragment : Fragment()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
                 sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
                     ImageDAO.instance().getImage( location )?.let { image ->
-                        val bitmap = CameraUtils.decodeString( image.data )
-                        binding.viewFinder.visibility = View.GONE
-                        binding.imageView.visibility = View.VISIBLE
-                        binding.cameraButton.text = resources.getString(R.string.retake_photo)
-                        binding.imageView.setImageBitmap( bitmap )
+                        CameraUtils.decodeString( image.data )?.let { bitmap ->
+                            binding.viewFinder.visibility = View.GONE
+                            binding.imageView.visibility = View.VISIBLE
+                            binding.cameraButton.text = resources.getString(R.string.retake_photo)
+                            binding.imageView.setImageBitmap( bitmap )
+                        }
                     }
                 }
             }

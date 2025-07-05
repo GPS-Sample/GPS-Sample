@@ -71,10 +71,14 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
             holder.secondTextView.setText( item.uuid )
 
             ImageDAO.instance().getImage( item )?.let { image ->
-                val bitmap = CameraUtils.decodeString( image.data )
-                holder.photoImageView.visibility = View.VISIBLE
-                holder.photoImageView.setImageBitmap( bitmap )
-            } ?: {
+                CameraUtils.decodeString( image.data )?.let { bitmap ->
+                    holder.photoImageView.visibility = View.VISIBLE
+                    holder.photoImageView.setImageBitmap( bitmap )
+                }
+            }
+
+            if (holder.photoImageView.visibility != View.VISIBLE)
+            {
                 holder.locationImageView.visibility = View.VISIBLE
             }
 

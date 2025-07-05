@@ -74,14 +74,15 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
             if (location.imageUuid.isNotEmpty())
             {
-                holder.photoImageView.visibility = View.VISIBLE
-
                 ImageDAO.instance().getImage( location )?.let { image ->
-                    val bitmap = CameraUtils.decodeString( image.data )
-                    holder.photoImageView.setImageBitmap( bitmap )
+                    CameraUtils.decodeString( image.data )?.let { bitmap ->
+                        holder.photoImageView.visibility = View.VISIBLE
+                        holder.photoImageView.setImageBitmap( bitmap )
+                    }
                 }
             }
-            else
+
+            if (holder.photoImageView.visibility != View.VISIBLE)
             {
                 holder.locationImageView.visibility = View.VISIBLE
             }

@@ -54,7 +54,6 @@ class HotspotAdapter : RecyclerView.Adapter<HotspotAdapter.BindableViewHolder>()
         connections?.let{
             for(item in it)
             {
-                Log.d("xxxxxx", "ITEM ${item.name.value}  ${item.connection.value}")
             }
         }
 
@@ -65,7 +64,6 @@ class HotspotAdapter : RecyclerView.Adapter<HotspotAdapter.BindableViewHolder>()
     override fun onBindViewHolder(holder: BindableViewHolder, position: Int)
     {
         holder.itemView.isSelected = false
-        Log.d("xxxxxx", "position ${position}  ${connections[position].name.value}")
         holder.bind(connections[position])
 
     }
@@ -73,7 +71,6 @@ class HotspotAdapter : RecyclerView.Adapter<HotspotAdapter.BindableViewHolder>()
     class BindableViewHolder(private val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(networkConnectionViewModel: NetworkConnectionViewModel) {
-            Log.d("xxxxxx", "THE NAME ${networkConnectionViewModel.name.value}")
             binding.setVariable(BR.networkConnectionViewModel, networkConnectionViewModel)
         }
     }

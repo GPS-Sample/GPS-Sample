@@ -22,18 +22,25 @@ import androidx.lifecycle.MutableLiveData
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
+import edu.gtri.gpssample.database.models.Image
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.network.*
 import edu.gtri.gpssample.network.models.NetworkCommand
+import edu.gtri.gpssample.network.models.TCPHeader
 import edu.gtri.gpssample.network.models.TCPMessage
+import edu.gtri.gpssample.utils.CameraUtils
 import kotlinx.coroutines.*
 import java.io.File
 import java.lang.Thread.sleep
 import java.net.InetAddress
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+import java.util.Date
 
 private const val kDialogTimeout: Long = 400
 
@@ -156,7 +163,7 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
 
     private fun sendConfigRequestCommand()
     {
-        var message = TCPMessage(NetworkCommand.NetworkConfigRequest, ByteArray(0 ))
+        val message = TCPMessage(NetworkCommand.NetworkConfigRequest, ByteArray(0 ))
 
         networkInfo?.let { networkInfo ->
             val response = client.sendMessage(networkInfo.serverIP, message, this)
@@ -176,57 +183,8 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                             DAO.instance().writableDatabase.setTransactionSuccessful()
                             DAO.instance().writableDatabase.endTransaction()
 
-                            // fetch mbTiles
-
-                            val tilePaths = ArrayList<Pair<String,Long>>()
-
-                            for (enumArea in config.enumAreas)
-                            {
-                                if (enumArea.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize )))
-                                {
-                                    tilePaths.add( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize ))
-                                }
-
-                                if (enumArea.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize )))
-                                {
-                                    tilePaths.add( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize ))
-                                }
-
-                                for (tilePath in tilePaths)
-                                {
-                                    val mbTilesFile = File( tilePath.first )
-
-                                    if (mbTilesFile.exists())
-                                    {
-                                        if (mbTilesFile.length() == tilePath.second) {
-                                            continue
-                                        }
-                                        else
-                                        {
-                                            mbTilesFile.delete()
-                                        }
-                                    }
-
-                                    message = TCPMessage(NetworkCommand.NetworkMBTileRequest, tilePath.first.toByteArray())
-
-                                    client.sendDataRequestMessage(networkInfo.serverIP, message, this )?.let { header ->
-                                        var bytesRead: Long = 0
-                                        val chunkSize: Long = 1024 * 1024
-                                        val fileSize = header.payloadSize
-
-                                        client.socket?.let { socket ->
-                                            while (bytesRead < fileSize) {
-                                                val remaining = fileSize - bytesRead
-                                                val bytesToRead = if (remaining < chunkSize) remaining else chunkSize
-                                                val buffer = ByteArray(bytesToRead.toInt())
-                                                NetworkUtils.readFully( buffer, bytesToRead.toInt(), socket, "Server" )
-                                                mbTilesFile.appendBytes( buffer )
-                                                bytesRead += bytesToRead
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            fetchImages( config )
+                            fetchMbTiles( config )
 
                             configurationDelegate?.configurationReceived(config)
                             _dataReceived.postValue(NetworkStatus.DataReceived)
@@ -234,6 +192,104 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                         } ?: run {
                             _dataReceived.postValue(NetworkStatus.DataReceivedError)
                             connectDelegate?.didReceiveConfiguration(true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun fetchImages( config: Config )
+    {
+        for (enumArea in config.enumAreas)
+        {
+            for(location in enumArea.locations)
+            {
+                if (location.imageUuid.isNotEmpty())
+                {
+                    if (ImageDAO.instance().getImage( location.imageUuid ) == null)
+                    {
+                        Log.d( "xxx", "request image ${location.imageUuid}")
+                        networkInfo?.let { networkInfo ->
+                            val message = TCPMessage(NetworkCommand.NetworkImageRequest, location.imageUuid.toByteArray())
+
+                            client.sendDataRequestMessage(networkInfo.serverIP, message, this )?.let { header ->
+                                var bytesRead: Long = 0
+                                val chunkSize: Long = 1024 * 1024
+                                val totalSize = header.payloadSize
+
+                                val byteList = ArrayList<Byte>()
+
+                                client.socket?.let { socket ->
+                                    while (bytesRead < totalSize) {
+                                        val remaining = totalSize - bytesRead
+                                        val bytesToRead = if (remaining < chunkSize) remaining else chunkSize
+                                        val buffer = ByteArray(bytesToRead.toInt())
+                                        NetworkUtils.readFully( buffer, bytesToRead.toInt(), socket, "Server" )
+                                        buffer.forEach { byteList.add( it )}
+                                        bytesRead += bytesToRead
+                                    }
+
+                                    val imageData = String( byteList.toByteArray(), Charset.forName("UTF-16"))
+
+                                    // validate the image
+                                    CameraUtils.decodeString( imageData )?.let {
+                                        val image = Image( location.imageUuid, Date().time, location.uuid, imageData )
+                                        ImageDAO.instance().createImage( image )
+                                        Log.d( "xxx", "received image ${location.imageUuid}")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun fetchMbTiles( config: Config )
+    {
+        val tilePaths = ArrayList<Pair<String,Long>>()
+
+        for (enumArea in config.enumAreas)
+        {
+            if (enumArea.mbTilesPath.isNotEmpty() && !tilePaths.contains( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize )))
+            {
+                tilePaths.add( Pair( enumArea.mbTilesPath, enumArea.mbTilesSize ))
+            }
+
+            for (tilePath in tilePaths)
+            {
+                val mbTilesFile = File( tilePath.first )
+
+                if (mbTilesFile.exists())
+                {
+                    if (mbTilesFile.length() == tilePath.second) {
+                        continue
+                    }
+                    else
+                    {
+                        mbTilesFile.delete()
+                    }
+                }
+
+                val message = TCPMessage(NetworkCommand.NetworkMBTileRequest, tilePath.first.toByteArray())
+
+                networkInfo?.let { networkInfo ->
+                    client.sendDataRequestMessage(networkInfo.serverIP, message, this )?.let { header ->
+                        var bytesRead: Long = 0
+                        val chunkSize: Long = 1024 * 1024
+                        val fileSize = header.payloadSize
+
+                        client.socket?.let { socket ->
+                            while (bytesRead < fileSize) {
+                                val remaining = fileSize - bytesRead
+                                val bytesToRead = if (remaining < chunkSize) remaining else chunkSize
+                                val buffer = ByteArray(bytesToRead.toInt())
+                                NetworkUtils.readFully( buffer, bytesToRead.toInt(), socket, "Server" )
+                                mbTilesFile.appendBytes( buffer )
+                                bytesRead += bytesToRead
+                            }
                         }
                     }
                 }
@@ -250,11 +306,82 @@ class NetworkClientModel : NetworkModel(), TCPClient.TCPClientDelegate
                 val message = TCPMessage(NetworkCommand.NetworkEnumAreaExport, payload.toByteArray())
                 client.sendMessage(networkInfo.serverIP, message, this, false)
 
+                processImageRequests( config )
+
                 sleep( 1000 )
                 _commandSent.postValue(NetworkStatus.CommandSent)
                 connectDelegate?.didSendData(true)
             }
         }
+    }
+
+    fun processImageRequests( config: Config )
+    {
+        try
+        {
+            client.socket?.let { socket ->
+                val headerArray = ByteArray(TCPHeader.SIZE)
+
+                while(socket.isConnected)
+                {
+                    val numRead = NetworkUtils.readFully( headerArray, TCPHeader.SIZE, socket, "Server" )
+
+                    if (numRead != TCPHeader.SIZE)
+                    {
+                        break
+                    }
+
+                    val header = TCPHeader.fromByteArray(headerArray)
+
+                    header?.let { header ->
+                        val payloadArray = ByteArray(header.payloadSize.toInt())
+
+                        if (header.payloadSize > 0) {
+                            NetworkUtils.readFully(
+                                payloadArray,
+                                header.payloadSize.toInt(),
+                                socket,
+                                "Server"
+                            )
+                        }
+
+                        val message = TCPMessage( header, payloadArray )
+
+                        if (message.header.command == NetworkCommand.NetworkImageRequest)
+                        {
+                            if (message.payload.isEmpty())
+                            {
+                                Log.d( "xxx", "done with image requests" )
+                                return // end of image requests
+                            }
+
+                            val imageUuid = String( message.payload )
+
+                            Log.d( "xxx", "received image request for ${imageUuid}")
+
+                            ImageDAO.instance().getImage( imageUuid )?.let { image ->
+                                val tcpMessage = TCPMessage(NetworkCommand.NetworkImageResponse, ByteArray(0))
+
+                                val charArray = image.data.toCharArray()
+                                val byteBuffer = ByteBuffer.allocate(charArray.size * 2)
+                                charArray.forEach { byteBuffer.putChar(it) }
+                                val byteArray = byteBuffer.array()
+
+                                socket.outputStream.write( tcpMessage.toHeaderByteArray( byteArray.size.toLong()))
+                                socket.outputStream.write( byteArray )
+                                socket.outputStream.flush()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch( ex: Exception )
+        {
+            Log.d( "xxx", ex.stackTraceToString())
+        }
+
+        Log.d( "xxx", "Server: stopped waiting for TCP messages")
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

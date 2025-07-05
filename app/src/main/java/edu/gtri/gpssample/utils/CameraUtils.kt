@@ -92,10 +92,19 @@ object CameraUtils
         return null
     }
 
-    fun decodeString( imageData: String ) : Bitmap
+    fun decodeString( imageData: String ) : Bitmap?
     {
-        val byteArray = Base64.getDecoder().decode( imageData )
-        val byteArrayInputStream = ByteArrayInputStream(byteArray)
-        return BitmapFactory.decodeStream(byteArrayInputStream)
+        try
+        {
+            val byteArray = Base64.getDecoder().decode( imageData )
+            val byteArrayInputStream = ByteArrayInputStream(byteArray)
+            return BitmapFactory.decodeStream(byteArrayInputStream)
+        }
+        catch( ex: Exception )
+        {
+            Log.d( "xxx", ex.stackTrace.toString())
+        }
+
+        return null
     }
 }

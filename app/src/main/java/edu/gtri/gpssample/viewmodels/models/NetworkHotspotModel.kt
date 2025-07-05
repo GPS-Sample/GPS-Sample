@@ -28,12 +28,15 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.NetworkMode
 import edu.gtri.gpssample.constants.NetworkStatus
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.managers.GPSSampleWifiManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.network.NetworkUtils
 import edu.gtri.gpssample.network.TCPServer
 import edu.gtri.gpssample.network.models.NetworkCommand
 import edu.gtri.gpssample.network.models.TCPMessage
+import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkConnectionViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -46,6 +49,9 @@ import java.io.FileInputStream
 import java.io.OutputStream
 import java.net.InetAddress
 import java.net.Socket
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+import java.util.Date
 
 const val hotspotMessageTemplate = "SSID:"
 const val kNetworkTimeout = 5 //seconds
@@ -170,7 +176,6 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
 
                 hotspot?.let { hotspot ->
                     hotspot.startHotSpot(this@NetworkHotspotModel)
-
                 }
                 status = NetworkStatus.NetworkCreated
 
@@ -199,40 +204,37 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
         {
             NetworkCommand.NetworkDeviceRegistrationRequest ->
             {
-                message.payload?.let { payload ->
+                // send response
+                val retMessage = TCPMessage(NetworkCommand.NetworkDeviceRegistrationResponse, ByteArray(0 ))
 
-                    // send response
-                    val retMessage = TCPMessage(NetworkCommand.NetworkDeviceRegistrationResponse, ByteArray(0 ))
+                socket.outputStream.write( retMessage.toByteArray())
+                socket.outputStream.flush()
 
-                    socket.outputStream.write( retMessage.toByteArray())
-                    socket.outputStream.flush()
+                val v1 = NetworkConnectionViewModel(socket)
 
-                    val v1 = NetworkConnectionViewModel(socket)
+                v1.updateName(String(message.payload))
 
-                    v1.updateName(String(payload))
-
-                    _activity?.let{activity ->
-                        v1.updateConnection(activity.getString(R.string.connected))
-                    }?: run{
-                        v1.updateConnection("Connected")
-                    }
-
-                    v1.socket = socket
-                    var check : NetworkConnectionViewModel? = null
-                    for(client in clientConenctions)
-                    {
-                        if(client.name.value == v1.name.value)
-                        {
-                            check = client
-                            break
-                        }
-                    }
-                    clientConenctions.remove(check)
-                    clientConenctions.add(v1)
-                    _connections.postValue(clientConenctions)
-                    // create a new entry in the list
-                    // send an ack
+                _activity?.let{activity ->
+                    v1.updateConnection(activity.getString(R.string.connected))
+                }?: run{
+                    v1.updateConnection("Connected")
                 }
+
+                v1.socket = socket
+                var check : NetworkConnectionViewModel? = null
+                for(client in clientConenctions)
+                {
+                    if(client.name.value == v1.name.value)
+                    {
+                        check = client
+                        break
+                    }
+                }
+                clientConenctions.remove(check)
+                clientConenctions.add(v1)
+                _connections.postValue(clientConenctions)
+                // create a new entry in the list
+                // send an ack
             }
 
             NetworkCommand.NetworkConfigRequest ->
@@ -244,12 +246,12 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 else
                 {
                     config?.let { config->
+                        // Note! if config.selectedEnumAreaUuid is not set, packMinimal will return the full config
                         val packedConfig = config.packMinimal()
                         val tcpMessage = TCPMessage(NetworkCommand.NetworkConfigResponse, packedConfig.toByteArray() )
                         val byteArray = tcpMessage.toByteArray()
                         socket.outputStream.write(byteArray)
                         socket.outputStream.flush()
-                        Log.d( "xxx", "Server: wrote ${byteArray!!.size}")
                     }
                 }
             }
@@ -283,6 +285,26 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                 }
             }
 
+            NetworkCommand.NetworkImageRequest ->
+            {
+                val imageUuid = String( message.payload )
+
+                Log.d( "xxx", "received image request for ${imageUuid}")
+
+                ImageDAO.instance().getImage( imageUuid )?.let { image ->
+                    val tcpMessage = TCPMessage(NetworkCommand.NetworkImageResponse, ByteArray(0))
+
+                    val charArray = image.data.toCharArray()
+                    val byteBuffer = ByteBuffer.allocate(charArray.size * 2)
+                    charArray.forEach { byteBuffer.putChar(it) }
+                    val byteArray = byteBuffer.array()
+
+                    socket.outputStream.write( tcpMessage.toHeaderByteArray( byteArray.size.toLong()))
+                    socket.outputStream.write( byteArray )
+                    socket.outputStream.flush()
+                }
+            }
+
             NetworkCommand.NetworkEnumAreaExport,
             NetworkCommand.NetworkSampleAreaExport ->
             {
@@ -292,33 +314,81 @@ class NetworkHotspotModel : NetworkModel(), TCPServer.TCPServerDelegate, GPSSamp
                     return
                 }
 
-                message.payload?.let { payload ->
-                    val config = Config.unpack( String(payload), encryptionPassword )
+                val config = Config.unpack( String(message.payload), encryptionPassword )
 
-                    if (config == null)
-                    {
-                        delegate?.importFailed( MessageType.ImportFailed )
+                if (config == null)
+                {
+                    delegate?.importFailed( MessageType.ImportFailed )
+                }
+                else
+                {
+                    delegate?.didStartImport()
+
+                    DAO.instance().writableDatabase.beginTransaction()
+
+                    DAO.configDAO.createOrUpdateConfig( config )
+
+                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                    DAO.instance().writableDatabase.endTransaction()
+
+                    DAO.configDAO.getConfig( config.uuid )?.let {
+                        sharedViewModel?.setCurrentConfig(it)
                     }
-                    else
+
+                    fetchImages( config, socket )
+
+                    delegate?.didFinishImport()
+                }
+            }
+        }
+    }
+
+    fun fetchImages( config: Config, socket: Socket )
+    {
+        for (enumArea in config.enumAreas)
+        {
+            for(location in enumArea.locations)
+            {
+                if (location.imageUuid.isNotEmpty())
+                {
+                    if (ImageDAO.instance().getImage( location.imageUuid ) == null)
                     {
-                        delegate?.didStartImport()
+                        Log.d( "xxx", "request image ${location.imageUuid}")
+                        val message = TCPMessage(NetworkCommand.NetworkImageRequest, location.imageUuid.toByteArray())
 
-                        DAO.instance().writableDatabase.beginTransaction()
+                        tcpServer.sendDataRequestMessage( socket, message )?.let { header ->
+                            var bytesRead: Long = 0
+                            val chunkSize: Long = 1024 * 1024
+                            val totalSize = header.payloadSize
 
-                        DAO.configDAO.createOrUpdateConfig( config )
+                            val byteList = ArrayList<Byte>()
 
-                        DAO.instance().writableDatabase.setTransactionSuccessful()
-                        DAO.instance().writableDatabase.endTransaction()
+                            while (bytesRead < totalSize) {
+                                val remaining = totalSize - bytesRead
+                                val bytesToRead = if (remaining < chunkSize) remaining else chunkSize
+                                val buffer = ByteArray(bytesToRead.toInt())
+                                NetworkUtils.readFully( buffer, bytesToRead.toInt(), socket, "Server" )
+                                buffer.forEach { byteList.add( it )}
+                                bytesRead += bytesToRead
+                            }
 
-                        DAO.configDAO.getConfig( config.uuid )?.let {
-                            sharedViewModel?.setCurrentConfig(it)
+                            val imageData = String( byteList.toByteArray(), Charset.forName("UTF-16"))
+
+                            // validate the image
+                            CameraUtils.decodeString( imageData )?.let {
+                                val image = Image( location.imageUuid, Date().time, location.uuid, imageData )
+                                ImageDAO.instance().createImage( image )
+                                Log.d( "xxx", "received image ${location.imageUuid}")
+                            }
                         }
-
-                        delegate?.didFinishImport()
                     }
                 }
             }
         }
+
+        val message = TCPMessage(NetworkCommand.NetworkImageRequest, "".toByteArray())
+
+        tcpServer.sendDataRequestMessage( socket, message )
     }
 
     override fun didDisconnect(socket: Socket) {

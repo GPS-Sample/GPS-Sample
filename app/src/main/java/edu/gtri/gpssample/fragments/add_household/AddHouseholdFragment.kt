@@ -333,20 +333,21 @@ class AddHouseholdFragment : Fragment(),
         }
 
         ImageDAO.instance().getImage( location )?.let { image ->
-            val bitmap = CameraUtils.decodeString( image.data )
-            binding.imageView.setImageBitmap( bitmap )
-            binding.imageCardView.visibility = View.VISIBLE
+            CameraUtils.decodeString( image.data )?.let { bitmap ->
+                binding.imageView.setImageBitmap( bitmap )
+                binding.imageCardView.visibility = View.VISIBLE
 
-            binding.hideImageView.setOnClickListener {
-                binding.hideImageView.visibility = View.GONE
-                binding.showImageView.visibility = View.VISIBLE
-                binding.imageFrameLayout.visibility = View.GONE
-            }
+                binding.hideImageView.setOnClickListener {
+                    binding.hideImageView.visibility = View.GONE
+                    binding.showImageView.visibility = View.VISIBLE
+                    binding.imageFrameLayout.visibility = View.GONE
+                }
 
-            binding.showImageView.setOnClickListener {
-                binding.hideImageView.visibility = View.VISIBLE
-                binding.showImageView.visibility = View.GONE
-                binding.imageFrameLayout.visibility = View.VISIBLE
+                binding.showImageView.setOnClickListener {
+                    binding.hideImageView.visibility = View.VISIBLE
+                    binding.showImageView.visibility = View.GONE
+                    binding.imageFrameLayout.visibility = View.VISIBLE
+                }
             }
         }
 
