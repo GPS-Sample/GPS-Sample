@@ -610,7 +610,7 @@ class ManageConfigurationsFragment : Fragment(),
                                         sharedViewModel.setCurrentConfig( it )
                                     }
 
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_images_file), Toast.LENGTH_LONG).show()
+                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_image_file), Toast.LENGTH_LONG).show()
 
                                     val intent = Intent()
                                         .setType("*/*")

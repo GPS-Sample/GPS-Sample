@@ -411,8 +411,9 @@
     <string name="select_ea">"Select an Enumeration Area by tapping on it"</string>
     <string name="import_images">"Import Images"</string>
     <string name="select_configuration_file">"Select a configuration file"</string>
-    <string name="select_images_file">"Select an images file"</string>
-
+    <string name="select_image_file">"Select an image file"</string>
+    <string name="save_configuration_file">"Save the configuration file"</string>
+    <string name="save_image_file">"Save the image file"</string>
 
     <string-array name="map_engines">
         <item>Open Street Map</item>

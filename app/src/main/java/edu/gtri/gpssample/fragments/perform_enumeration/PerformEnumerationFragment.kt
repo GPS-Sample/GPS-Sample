@@ -843,10 +843,12 @@ class PerformEnumerationFragment : Fragment(),
         if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR)
         {
             fileName += ".json"
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_configuration_file), Toast.LENGTH_LONG).show()
         }
         else
         {
             fileName += "-img.json"
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_image_file), Toast.LENGTH_LONG).show()
         }
 
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
