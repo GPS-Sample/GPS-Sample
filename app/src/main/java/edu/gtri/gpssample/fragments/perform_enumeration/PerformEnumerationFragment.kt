@@ -83,6 +83,7 @@ class PerformEnumerationFragment : Fragment(),
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
 
+    private var dateTime = ""
     private var dropMode = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
@@ -90,6 +91,9 @@ class PerformEnumerationFragment : Fragment(),
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
 
     private var maxSubaddress = 0
+
+    private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+    private val REQUEST_CODE_PICK_IMAGE_DIR =  2001
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -796,8 +800,6 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    var dateTime = ""
-
     fun pickDir( requestCode: Int )
     {
         var userName = user.name.replace(" ", "" ).uppercase()
@@ -865,9 +867,6 @@ class PerformEnumerationFragment : Fragment(),
         dateTime = ""
         pickDir( REQUEST_CODE_PICK_CONFIG_DIR )
     }
-
-    val REQUEST_CODE_PICK_CONFIG_DIR = 1001
-    val REQUEST_CODE_PICK_IMAGE_DIR =  2001
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {

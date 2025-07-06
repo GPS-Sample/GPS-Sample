@@ -135,7 +135,6 @@ class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatab
         {
             _instance?.let {
                 it.writableDatabase.execSQL("DELETE FROM $TABLE_IMAGE")
-                it.writableDatabase.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_IMAGE'")
             }
         }
 

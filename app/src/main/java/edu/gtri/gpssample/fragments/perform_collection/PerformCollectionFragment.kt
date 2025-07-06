@@ -56,6 +56,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
@@ -83,7 +84,6 @@ class PerformCollectionFragment : Fragment(),
 {
     private lateinit var user: User
     private lateinit var mapView: View
-    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var collectionTeam: CollectionTeam
     private lateinit var defaultColorList: ColorStateList
@@ -93,6 +93,7 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
+    private var dateTime = ""
     private val binding get() = _binding!!
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
@@ -100,8 +101,10 @@ class PerformCollectionFragment : Fragment(),
     private val collectionTeamLocations = ArrayList<Location>()
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
-
     private val fragmentResultListener = "PerformCollectionFragment"
+
+    private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+    private val REQUEST_CODE_PICK_IMAGE_DIR =  2001
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -172,6 +175,8 @@ class PerformCollectionFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+
+        lateinit var config: Config
 
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
@@ -344,32 +349,30 @@ class PerformCollectionFragment : Fragment(),
                 when( buttonPressed )
                 {
                     ConfirmationDialog.ButtonPress.Left -> {
-                        sharedViewModel.currentConfiguration?.value?.let { config ->
-                            sharedNetworkViewModel.setCurrentConfig(config)
+                        sharedNetworkViewModel.setCurrentConfig(config)
 
-                            when(user.role)
+                        when(user.role)
+                        {
+                            Role.Admin.toString(),
+                            Role.Supervisor.toString() ->
                             {
-                                Role.Admin.toString(),
-                                Role.Supervisor.toString() ->
-                                {
-                                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                    startHotspot(view)
-                                }
-
-                                Role.Enumerator.toString(),
-                                Role.DataCollector.toString() ->
-                                {
-                                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                                        sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                        getResult.launch(intent)
-                                    }
-                                }
-                                else -> {}
+                                sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                startHotspot(view)
                             }
+
+                            Role.Enumerator.toString(),
+                            Role.DataCollector.toString() ->
+                            {
+                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                                    sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                    getResult.launch(intent)
+                                }
+                            }
+                            else -> {}
                         }
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
@@ -557,9 +560,6 @@ class PerformCollectionFragment : Fragment(),
     {
         try
         {
-            var payload: String = ""
-            var fileName: String = ""
-
             val user = (activity!!.application as MainApplication).user
 
             var userName = user!!.name.replace(" ", "" ).uppercase()
@@ -581,36 +581,63 @@ class PerformCollectionFragment : Fragment(),
             }
 
             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+            var configFileName = ""
+            var imageFileName = ""
+            var packedConfig: String = ""
+
+            lateinit var config: Config
+
+            sharedViewModel.currentConfiguration?.value?.let {
+                config = it
+            }
 
             when(user.role) {
                 Role.Admin.toString(),
                 Role.Supervisor.toString() ->
                 {
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                        fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}.json"
-                        payload = config.packMinimal()
-                    }
+                    val fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}"
+                    configFileName = fileName + ".json"
+                    imageFileName = fileName + "-img.json"
+                    packedConfig = config.packMinimal()
                 }
 
                 Role.Enumerator.toString(),
                 Role.DataCollector.toString() ->
                 {
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                            fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                            payload = config.pack()
-                        }
-                    }
+                    val fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}"
+                    configFileName = fileName + ".json"
+                    imageFileName = fileName + "-img.json"
+                    packedConfig = config.pack()
                 }
             }
 
             val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Surveyed")
             root.mkdirs()
-            val file = File(root, fileName)
+            val file = File(root, configFileName)
             val writer = FileWriter(file)
-            writer.append(payload)
+            writer.append(packedConfig)
             writer.flush()
             writer.close()
+
+            val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+            // check for images
+            for (location in enumArea.locations)
+            {
+                ImageDAO.instance().getImage( location )?.let {
+                    imageList.images.add( it )
+                }
+            }
+
+            if (imageList.images.isNotEmpty())
+            {
+                val payload = imageList.pack( config.encryptionPassword )
+                val file = File(root, imageFileName)
+                val writer = FileWriter(file)
+                writer.append(payload)
+                writer.flush()
+                writer.close()
+            }
 
             Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
         }
@@ -623,11 +650,13 @@ class PerformCollectionFragment : Fragment(),
 
     fun exportToDevice()
     {
-        var fileName: String = ""
+        dateTime = ""
+        pickDir( REQUEST_CODE_PICK_CONFIG_DIR )
+    }
 
-        val user = (activity!!.application as MainApplication).user
-
-        var userName = user!!.name.replace(" ", "" ).uppercase()
+    fun pickDir( requestCode: Int )
+    {
+        var userName = user.name.replace(" ", "" ).uppercase()
 
         if (userName.length > 3)
         {
@@ -636,8 +665,12 @@ class PerformCollectionFragment : Fragment(),
 
         val role = user.role.toString().substring(0,1).uppercase()
 
-        val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-        val dateTime = LocalDateTime.now().format(formatter)
+        if (dateTime.isEmpty())
+        {
+            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
+            dateTime = LocalDateTime.now().format(formatter)
+        }
+
         var version = ""
         val versionName = BuildConfig.VERSION_NAME.split( "#" )
         if (versionName.size == 2)
@@ -646,22 +679,32 @@ class PerformCollectionFragment : Fragment(),
         }
 
         val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+        var fileName = ""
 
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-            when(user.role)
+        when(user.role)
+        {
+            Role.Admin.toString(),
+            Role.Supervisor.toString() ->
             {
-                Role.Admin.toString(),
-                Role.Supervisor.toString() ->
-                {
-                    fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}.json"
-                }
-
-                Role.Enumerator.toString(),
-                Role.DataCollector.toString() ->
-                {
-                    fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                }
+                fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}"
             }
+
+            Role.Enumerator.toString(),
+            Role.DataCollector.toString() ->
+            {
+                fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+            }
+        }
+
+        if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR)
+        {
+            fileName += ".json"
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_configuration_file), Toast.LENGTH_LONG).show()
+        }
+        else
+        {
+            fileName += "-img.json"
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_image_file), Toast.LENGTH_LONG).show()
         }
 
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -670,37 +713,81 @@ class PerformCollectionFragment : Fragment(),
             putExtra(Intent.EXTRA_TITLE, fileName)
         }
 
-        startActivityForResult( intent, REQUEST_CODE_PICK_DIR )
+        startActivityForResult( intent, requestCode )
     }
-
-    val REQUEST_CODE_PICK_DIR = 1001
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         try
         {
-            if (requestCode == REQUEST_CODE_PICK_DIR && resultCode == Activity.RESULT_OK)
+            lateinit var config: Config
+
+            sharedViewModel.currentConfiguration?.value?.let {
+                config = it
+            }
+
+            if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
             {
                 data?.data?.let { uri ->
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                        var packedConfig = ""
+                    var packedConfig = ""
 
-                        when( user.role )
+                    when( user.role )
+                    {
+                        Role.Supervisor.toString(), Role.Admin.toString() ->
                         {
-                            Role.Supervisor.toString(), Role.Admin.toString() ->
-                            {
-                                packedConfig = config.packMinimal()
-                            }
-
-                            Role.Enumerator.toString(), Role.DataCollector.toString() ->
-                            {
-                                packedConfig = config.pack()
-                            }
+                            packedConfig = config.packMinimal()
                         }
 
-                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                            FileOutputStream(it.fileDescriptor).use {
-                                it.write(packedConfig.toByteArray())
+                        Role.Enumerator.toString(), Role.DataCollector.toString() ->
+                        {
+                            packedConfig = config.pack()
+                        }
+                    }
+
+                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                        FileOutputStream(it.fileDescriptor).use {
+                            it.write(packedConfig.toByteArray())
+                            it.close()
+
+                            var hasImages = false
+
+                            for (location in enumArea.locations)
+                            {
+                                hasImages = true
+                            }
+
+                            if (hasImages)
+                            {
+                                pickDir( REQUEST_CODE_PICK_IMAGE_DIR )
+                            }
+                            else
+                            {
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+            else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode == Activity.RESULT_OK)
+            {
+                data?.data?.let { uri ->
+                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                        FileOutputStream(it.fileDescriptor).use {
+                            val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                            // check for images
+                            for (location in enumArea.locations)
+                            {
+                                ImageDAO.instance().getImage( location )?.let {
+                                    imageList.images.add( it )
+                                }
+                            }
+
+                            if (imageList.images.isNotEmpty())
+                            {
+                                val payload = imageList.pack( config.encryptionPassword )
+                                it.write(payload.toByteArray())
+                                it.flush()
                                 it.close()
                                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                             }
@@ -870,9 +957,9 @@ class PerformCollectionFragment : Fragment(),
 
         if (gpsAccuracyIsGood())
         {
-            currentGPSLocation?.let { point ->
-                val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
-                sharedViewModel.currentConfiguration?.value?.let { config ->
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                currentGPSLocation?.let { point ->
+                    val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
                     editMode = distance <= config.minGpsPrecision
                 }
             }
@@ -945,6 +1032,12 @@ class PerformCollectionFragment : Fragment(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
+        lateinit var config: Config
+
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
+        }
+
         when (item.itemId)
         {
             R.id.mapbox_streets ->
@@ -987,6 +1080,12 @@ class PerformCollectionFragment : Fragment(),
 
             currentGPSLocation = point
             currentGPSAccuracy = accuracy
+
+            lateinit var config: Config
+
+            sharedViewModel.currentConfiguration?.value?.let {
+                config = it
+            }
 
             if (accuracy <= config.minGpsPrecision)
             {
