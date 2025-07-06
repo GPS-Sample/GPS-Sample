@@ -670,6 +670,11 @@ class ManageConfigurationsFragment : Fragment(),
                 }
             }
         }
+        else if (requestCode == REQUEST_IMAGES && resultCode != Activity.RESULT_OK)
+        {
+            binding.overlayView.visibility = View.GONE
+            didReceiveConfiguration(false )
+        }
         else
         {
             binding.overlayView.visibility = View.GONE

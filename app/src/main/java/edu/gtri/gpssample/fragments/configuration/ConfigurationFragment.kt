@@ -63,8 +63,9 @@ class ConfigurationFragment : Fragment(),
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
 
-    val REQUEST_CODE_PICK_DIR = 1001
-    val REQUEST_CODE_PICK_FILE = 1002
+    val REQUEST_CODE_PICK_DIR   = 1001
+    val REQUEST_CONFIGURATION   = 1002
+    val REQUEST_IMAGES          = 1003
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,10 +168,11 @@ class ConfigurationFragment : Fragment(),
                         }
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_configuration_file), Toast.LENGTH_LONG).show()
                         val intent = Intent()
                             .setType("*/*")
                             .setAction(Intent.ACTION_GET_CONTENT)
-                        startActivityForResult(Intent.createChooser(intent, "Select an Enumeration"), REQUEST_CODE_PICK_FILE)
+                        startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_configuration)), REQUEST_CONFIGURATION)
                     }
                     ConfirmationDialog.ButtonPress.None -> {
                     }
@@ -519,7 +521,7 @@ class ConfigurationFragment : Fragment(),
                     }
                 }
             }
-            else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == Activity.RESULT_OK)
+            else if (requestCode == REQUEST_CONFIGURATION && resultCode == Activity.RESULT_OK)
             {
                 val uri = data?.data
 
@@ -553,13 +555,16 @@ class ConfigurationFragment : Fragment(),
                                         DAO.instance().writableDatabase.endTransaction()
 
                                         DAO.configDAO.getConfig( config.uuid )?.let {
-                                            activity!!.runOnUiThread {
-                                                sharedViewModel.setCurrentConfig(it)
-                                                updateOverview()
-                                                binding.overlayView.visibility = View.GONE
-                                                enumerationAreasAdapter.updateEnumAreas(it.enumAreas)
-                                                InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
-                                            }
+                                            sharedViewModel.setCurrentConfig(it)
+                                        }
+
+                                        activity!!.runOnUiThread {
+                                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_images_file), Toast.LENGTH_LONG).show()
+
+                                            val intent = Intent()
+                                                .setType("*/*")
+                                                .setAction(Intent.ACTION_GET_CONTENT)
+                                            startActivityForResult(Intent.createChooser(intent, "Select the image file"), REQUEST_IMAGES)
                                         }
                                     }
                                 }.start()
@@ -571,6 +576,60 @@ class ConfigurationFragment : Fragment(),
                             InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                         }
                     }
+                }
+            }
+            else if (requestCode == REQUEST_IMAGES && resultCode == Activity.RESULT_OK)
+            {
+                val uri = data?.data
+
+                uri?.let { uri ->
+
+                    try
+                    {
+                        val inputStream = activity!!.getContentResolver().openInputStream(uri)
+
+                        inputStream?.let {  inputStream ->
+                            binding.overlayView.visibility = View.VISIBLE
+
+                            Thread {
+                                val text = inputStream.bufferedReader().readText()
+
+                                sharedViewModel.currentConfiguration?.value?.let { config ->
+                                    ImageList.unpack( text, config.encryptionPassword )?.let { imageList ->
+                                        for (image in imageList.images)
+                                        {
+                                            if (ImageDAO.instance().getImage( image.uuid ) == null)
+                                            {
+                                                Log.d( "xxx", "processing image ${image.uuid}")
+                                                ImageDAO.instance().createImage( image )
+                                            }
+                                        }
+
+                                        activity!!.runOnUiThread {
+                                            updateOverview()
+                                            binding.overlayView.visibility = View.GONE
+                                            enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
+                                            InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+                                        }
+                                    }
+                                }
+                            }.start()
+                        }
+                    }
+                    catch( ex: Exception )
+                    {
+                        binding.overlayView.visibility = View.GONE
+                        InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                    }
+                }
+            }
+            else if (requestCode == REQUEST_IMAGES && resultCode != Activity.RESULT_OK)
+            {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    updateOverview()
+                    binding.overlayView.visibility = View.GONE
+                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
+                    InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
                 }
             }
         }
