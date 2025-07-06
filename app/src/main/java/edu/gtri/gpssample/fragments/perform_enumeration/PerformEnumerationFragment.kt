@@ -43,12 +43,14 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
+import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
@@ -734,36 +736,58 @@ class PerformEnumerationFragment : Fragment(),
             }
 
             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+            var configFileName = ""
+            var imageFileName = ""
+            var packedConfig: String = ""
 
             when(user.role)
             {
                 Role.Admin.toString(),
                 Role.Supervisor.toString() ->
                 {
-                    val packedConfig = config.packMinimal()
-                    val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}.json"
-                    val file = File(root, fileName)
-                    val writer = FileWriter(file)
-                    writer.append(packedConfig)
-                    writer.flush()
-                    writer.close()
-
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                    packedConfig = config.packMinimal()
+                    val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}"
+                    configFileName = fileName + ".json"
+                    imageFileName = fileName + "-img.json"
                 }
 
                 Role.Enumerator.toString() ->
                 {
-                    val packedConfig = config.pack()
+                    packedConfig = config.pack()
                     val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                    val file = File(root, fileName)
-                    val writer = FileWriter(file)
-                    writer.append(packedConfig)
-                    writer.flush()
-                    writer.close()
-
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                    configFileName = fileName + ".json"
+                    imageFileName = fileName + "-img.json"
                 }
             }
+
+            // write config file
+            val file = File(root, configFileName)
+            val writer = FileWriter(file)
+            writer.append(packedConfig)
+            writer.flush()
+            writer.close()
+
+            val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+            // check for images
+            for (location in enumArea.locations)
+            {
+                ImageDAO.instance().getImage( location )?.let {
+                    imageList.images.add( it )
+                }
+            }
+
+            if (imageList.images.isNotEmpty())
+            {
+                val payload = imageList.pack( config.encryptionPassword )
+                val file = File(root, imageFileName)
+                val writer = FileWriter(file)
+                writer.append(payload)
+                writer.flush()
+                writer.close()
+            }
+
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
         }
         catch( ex: Exception )
         {
@@ -772,7 +796,9 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    fun exportToDevice()
+    var dateTime = ""
+
+    fun pickDir( requestCode: Int )
     {
         var userName = user.name.replace(" ", "" ).uppercase()
 
@@ -784,7 +810,11 @@ class PerformEnumerationFragment : Fragment(),
         val role = user.role.toString().substring(0,1).uppercase()
 
         val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-        val dateTime = LocalDateTime.now().format(formatter)
+
+        if (dateTime.isEmpty())
+        {
+            dateTime = LocalDateTime.now().format(formatter)
+        }
 
         var version = ""
         val versionName = BuildConfig.VERSION_NAME.split( "#" )
@@ -801,13 +831,22 @@ class PerformEnumerationFragment : Fragment(),
             Role.Admin.toString(),
             Role.Supervisor.toString() ->
             {
-                fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}.json"
+                fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}"
             }
 
             Role.Enumerator.toString() ->
             {
-                fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}"
             }
+        }
+
+        if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR)
+        {
+            fileName += ".json"
+        }
+        else
+        {
+            fileName += "-img.json"
         }
 
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -816,16 +855,23 @@ class PerformEnumerationFragment : Fragment(),
             putExtra(Intent.EXTRA_TITLE, fileName)
         }
 
-        startActivityForResult( intent, REQUEST_CODE_PICK_DIR )
+        startActivityForResult( intent, requestCode )
     }
 
-    val REQUEST_CODE_PICK_DIR = 1001
+    fun exportToDevice()
+    {
+        dateTime = ""
+        pickDir( REQUEST_CODE_PICK_CONFIG_DIR )
+    }
+
+    val REQUEST_CODE_PICK_CONFIG_DIR = 1001
+    val REQUEST_CODE_PICK_IMAGE_DIR =  2001
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         try
         {
-            if (requestCode == REQUEST_CODE_PICK_DIR && resultCode == Activity.RESULT_OK)
+            if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
             {
                 data?.data?.let { uri ->
                     var packedConfig = ""
@@ -848,7 +894,48 @@ class PerformEnumerationFragment : Fragment(),
                         FileOutputStream(it.fileDescriptor).use {
                             it.write(packedConfig.toByteArray())
                             it.close()
-                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+
+                            var hasImages = false
+
+                            for (location in enumArea.locations)
+                            {
+                                hasImages = true
+                            }
+
+                            if (hasImages)
+                            {
+                                pickDir( REQUEST_CODE_PICK_IMAGE_DIR )
+                            }
+                            else
+                            {
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+            else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode == Activity.RESULT_OK)
+            {
+                data?.data?.let { uri ->
+                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                        FileOutputStream(it.fileDescriptor).use {
+                            val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                            // check for images
+                            for (location in enumArea.locations)
+                            {
+                                ImageDAO.instance().getImage( location )?.let {
+                                    imageList.images.add( it )
+                                }
+                            }
+
+                            if (imageList.images.isNotEmpty())
+                            {
+                                val payload = imageList.pack( config.encryptionPassword )
+                                it.write(payload.toByteArray())
+                                it.close()
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }

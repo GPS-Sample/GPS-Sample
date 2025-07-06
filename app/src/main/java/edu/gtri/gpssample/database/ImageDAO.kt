@@ -7,8 +7,10 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import edu.gtri.gpssample.database.DAO.Companion.TABLE_CONFIG
 import edu.gtri.gpssample.database.models.Image
 import edu.gtri.gpssample.database.models.Location
+import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.utils.CameraUtils
 
 class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
@@ -95,6 +97,14 @@ class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatab
         return null
     }
 
+    fun delete( image: Image )
+    {
+        val whereClause = "${DAO.COLUMN_UUID} = ?"
+        val args = arrayOf(image.uuid)
+
+        writableDatabase.delete(DAO.TABLE_MAP_TILE_REGION, whereClause, args)
+    }
+
     companion object
     {
         const val TABLE_IMAGE = "image"
@@ -106,7 +116,7 @@ class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatab
 
         private var _instance: ImageDAO? = null
 
-        public fun instance() : ImageDAO
+        fun instance() : ImageDAO
         {
             return _instance!!
         }
@@ -116,10 +126,17 @@ class ImageDAO(private var context: Context, name: String?, factory: SQLiteDatab
             if (_instance == null)
             {
                 _instance = ImageDAO( context, null, null, DATABASE_VERSION )
-                val db = _instance!!.writableDatabase
             }
 
             return _instance!!
+        }
+
+        fun deleteAll()
+        {
+            _instance?.let {
+                it.writableDatabase.execSQL("DELETE FROM $TABLE_IMAGE")
+                it.writableDatabase.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_IMAGE'")
+            }
         }
 
         private const val DATABASE_NAME = "GPSSampleImageDB.db"

@@ -35,6 +35,7 @@ import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
@@ -129,6 +130,7 @@ class ConfigurationFragment : Fragment(),
                     }
                     ConfirmationDialog.ButtonPress.Right -> {
                         DAO.deleteAll()
+                        ImageDAO.deleteAll()
                         findNavController().popBackStack()
                     }
                     ConfirmationDialog.ButtonPress.None -> {

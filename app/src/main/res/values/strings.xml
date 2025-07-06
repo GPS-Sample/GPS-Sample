@@ -400,13 +400,19 @@
     <string name="take_photo">"Take Photo"</string>
     <string name="retake_photo">"Retake Photo"</string>
     <string name="min_password_required">"The minimum password length is 6 characters"</string>
-    <string name="map_engine">Map Engine</string>
+
+    // all of these need to be updated!
     <string name="mapbox_streets">"Street Map"</string>
     <string name="satellite_streets">"Satellite Map"</string>
     <string name="attach_mbtiles">"Attach Map Tiles"</string>
     <string name="detach_mbtiles">"Detach Map Tiles"</string>
+    <string name="map_engine">Map Engine</string>
     <string name="define_center">"Tap the map to define the center point"</string>
     <string name="select_ea">"Select an Enumeration Area by tapping on it"</string>
+    <string name="import_images">"Import Images"</string>
+    <string name="select_configuration_file">"Select a configuration file"</string>
+    <string name="select_images_file">"Select an images file"</string>
+
 
     <string-array name="map_engines">
         <item>Open Street Map</item>
