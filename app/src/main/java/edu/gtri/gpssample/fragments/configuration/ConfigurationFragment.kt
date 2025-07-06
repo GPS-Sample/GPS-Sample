@@ -63,9 +63,10 @@ class ConfigurationFragment : Fragment(),
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
 
-    val REQUEST_CODE_PICK_DIR   = 1001
-    val REQUEST_CONFIGURATION   = 1002
-    val REQUEST_IMAGES          = 1003
+    val REQUEST_CODE_PICK_CONFIG_DIR    = 1001
+    val REQUEST_CODE_PICK_IMAGE_DIR     = 1002
+    val REQUEST_CONFIGURATION           = 1003
+    val REQUEST_IMAGES                  = 1004
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -375,6 +376,8 @@ class ConfigurationFragment : Fragment(),
         sharedViewModel.createStudyModel.setStudy(study)
     }
 
+    var imageFileName = ""
+
     fun exportToDevice( )
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -408,15 +411,19 @@ class ConfigurationFragment : Fragment(),
                 version = versionName[1]
             }
 
-            val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}.json"
+            val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}"
+            val configFileName = fileName + ".json"
+            imageFileName = fileName + "-img.json"
 
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/json"
-                putExtra(Intent.EXTRA_TITLE, fileName)
+                putExtra(Intent.EXTRA_TITLE, configFileName)
             }
 
-            startActivityForResult( intent, REQUEST_CODE_PICK_DIR )
+            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_configuration_file), Toast.LENGTH_LONG).show()
+
+            startActivityForResult( intent, REQUEST_CODE_PICK_CONFIG_DIR )
         }
     }
 
@@ -457,15 +464,40 @@ class ConfigurationFragment : Fragment(),
                     version = versionName[1]
                 }
 
-                val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}.json"
+                val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}"
+                val configFileName = fileName + ".json"
+                val imageFileName = fileName + "-img.json"
 
                 val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations")
                 root.mkdirs()
-                val file = File(root, fileName)
+                val file = File(root, configFileName)
                 val writer = FileWriter(file)
                 writer.append(packedConfig)
                 writer.flush()
                 writer.close()
+
+                val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                // check for images
+                for (enumArea in config.enumAreas)
+                {
+                    for (location in enumArea.locations)
+                    {
+                        ImageDAO.instance().getImage( location )?.let {
+                            imageList.images.add( it )
+                        }
+                    }
+                }
+
+                if (imageList.images.isNotEmpty())
+                {
+                    val payload = imageList.pack( config.encryptionPassword )
+                    val file = File(root, imageFileName)
+                    val writer = FileWriter(file)
+                    writer.append(payload)
+                    writer.flush()
+                    writer.close()
+                }
 
                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
             }
@@ -506,20 +538,85 @@ class ConfigurationFragment : Fragment(),
     {
         try
         {
-            if (requestCode == REQUEST_CODE_PICK_DIR && resultCode == Activity.RESULT_OK)
+            lateinit var config: Config
+
+            sharedViewModel.currentConfiguration?.value?.let {
+                config = it
+            }
+
+            if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
             {
                 data?.data?.let { uri ->
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                        val packedConfig = config.pack()
-                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                            FileOutputStream(it.fileDescriptor).use {
-                                it.write(packedConfig.toByteArray())
-                                it.close()
+                    val packedConfig = config.pack()
+                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                        FileOutputStream(it.fileDescriptor).use {
+                            it.write(packedConfig.toByteArray())
+                            it.close()
+
+                            val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                            // check for images
+                            for (enumArea in config.enumAreas)
+                            {
+                                for (location in enumArea.locations)
+                                {
+                                    ImageDAO.instance().getImage( location )?.let {
+                                        imageList.images.add( it )
+                                    }
+                                }
+                            }
+
+                            if (imageList.images.isNotEmpty())
+                            {
+                                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                    addCategory(Intent.CATEGORY_OPENABLE)
+                                    type = "application/json"
+                                    putExtra(Intent.EXTRA_TITLE, imageFileName)
+                                }
+
+                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_image_file), Toast.LENGTH_LONG).show()
+
+                                startActivityForResult( intent, REQUEST_CODE_PICK_IMAGE_DIR )
+                            }
+                            else
+                            {
                                 Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                 }
+            }
+            else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode == Activity.RESULT_OK)
+            {
+                data?.data?.let { uri ->
+                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                        val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                        // check for images
+                        for (enumArea in config.enumAreas)
+                        {
+                            for (location in enumArea.locations)
+                            {
+                                ImageDAO.instance().getImage( location )?.let {
+                                    imageList.images.add( it )
+                                }
+                            }
+                        }
+
+                        val payload = imageList.pack( config.encryptionPassword )
+
+                        FileOutputStream(it.fileDescriptor).use {
+                            it.write(payload.toByteArray())
+                            it.close()
+                        }
+
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode != Activity.RESULT_OK)
+            {
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
             }
             else if (requestCode == REQUEST_CONFIGURATION && resultCode == Activity.RESULT_OK)
             {
