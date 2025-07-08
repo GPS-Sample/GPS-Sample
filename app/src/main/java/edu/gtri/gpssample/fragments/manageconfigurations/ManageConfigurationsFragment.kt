@@ -191,6 +191,7 @@ class ManageConfigurationsFragment : Fragment(),
                         }
                         ConfirmationDialog.ButtonPress.Right -> {
                             DAO.deleteAll()
+                            ImageDAO.deleteAll()
                             configurations.clear()
                             manageConfigurationsAdapter.updateConfigurations(configurations)
                             InputDialog(activity!!, false, resources.getString(R.string.enter_encryption_password), "******", resources.getString(R.string.cancel), resources.getString(R.string.next), null, false )  { action, text, tag ->

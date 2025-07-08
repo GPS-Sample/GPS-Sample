@@ -30,6 +30,7 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.Study
 import edu.gtri.gpssample.database.models.User
@@ -186,6 +187,7 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
                             }
                             ConfirmationDialog.ButtonPress.Right -> {
                                 DAO.deleteAll( false )
+                                ImageDAO.deleteAll()
 
                                 val pin = binding.pinEditText.text.toString()
                                 val userName = binding.nameEditText.text.toString()

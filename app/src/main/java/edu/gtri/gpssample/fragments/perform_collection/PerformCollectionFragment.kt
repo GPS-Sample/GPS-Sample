@@ -337,6 +337,7 @@ class PerformCollectionFragment : Fragment(),
 
         binding.exportButton.setOnClickListener {
             var title = ""
+
             if (user.role == Role.Admin.value || user.role == Role.Supervisor.value)
             {
                 title = resources.getString(R.string.export_configuration)
@@ -345,52 +346,55 @@ class PerformCollectionFragment : Fragment(),
             {
                 title = resources.getString(R.string.export_collection_data)
             }
+
             ConfirmationDialog( activity, title, resources.getString(R.string.select_export_message), resources.getString(R.string.qr_code), resources.getString(R.string.file_system), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                        sharedNetworkViewModel.setCurrentConfig(config)
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            sharedNetworkViewModel.setCurrentConfig(config)
 
-                        when(user.role)
-                        {
-                            Role.Admin.toString(),
-                            Role.Supervisor.toString() ->
+                            when(user.role)
                             {
-                                sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                startHotspot(view)
-                            }
+                                Role.Admin.toString(),
+                                Role.Supervisor.toString() ->
+                                {
+                                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                    startHotspot(view)
+                                }
 
-                            Role.Enumerator.toString(),
-                            Role.DataCollector.toString() ->
-                            {
-                                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
-                                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
-                                    sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                    getResult.launch(intent)
+                                Role.Enumerator.toString(),
+                                Role.DataCollector.toString() ->
+                                {
+                                    sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {enumArea ->
+                                        sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.CollectionTeam)
+                                        sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                        val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                        getResult.launch(intent)
+                                    }
                                 }
-                            }
-                            else -> {}
-                        }
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null,true ) { buttonPressed, tag ->
-                            when( buttonPressed )
-                            {
-                                ConfirmationDialog.ButtonPress.Left -> {
-                                    exportToDefaultLocation()
-                                }
-                                ConfirmationDialog.ButtonPress.Right -> {
-                                    exportToDevice()
-                                }
-                                ConfirmationDialog.ButtonPress.None -> {
-                                }
+                                else -> {}
                             }
                         }
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            ConfirmationDialog( activity, resources.getString(R.string.select_file_location), "", resources.getString(R.string.default_location), resources.getString(R.string.let_me_choose), null,true ) { buttonPressed, tag ->
+                                when( buttonPressed )
+                                {
+                                    ConfirmationDialog.ButtonPress.Left -> {
+                                        exportToDefaultLocation()
+                                    }
+                                    ConfirmationDialog.ButtonPress.Right -> {
+                                        exportToDevice()
+                                    }
+                                    ConfirmationDialog.ButtonPress.None -> {
+                                    }
+                                }
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
                     }
                 }
             }
