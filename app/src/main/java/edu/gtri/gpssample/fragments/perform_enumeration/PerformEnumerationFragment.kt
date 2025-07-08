@@ -71,7 +71,6 @@ class PerformEnumerationFragment : Fragment(),
 {
     private lateinit var user: User
     private lateinit var mapView: View
-    private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private lateinit var enumerationTeam: EnumerationTeam
     private lateinit var defaultColorList : ColorStateList
@@ -121,16 +120,12 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onViewCreated(view, savedInstanceState)
 
+        lateinit var config: Config
+
         sharedViewModel.currentConfiguration?.value?.let {
             config = it
             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
             sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
-        }
-
-        if (!this::config.isInitialized)
-        {
-            Toast.makeText(activity!!.applicationContext, "currentConfiguration was not initialized.", Toast.LENGTH_LONG).show()
-            return
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
@@ -279,26 +274,28 @@ class PerformEnumerationFragment : Fragment(),
 
             if (gpsAccuracyIsGood())
             {
-                if (config.allowManualLocationEntry)
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
-                        when( buttonPressed )
-                        {
-                            ConfirmationDialog.ButtonPress.Left -> {
-                                addHouseholdButtonPress()
-                            }
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                dropMode = true
-                                binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
+                sharedViewModel.currentConfiguration?.value?.let { config ->
+                    if (config.allowManualLocationEntry)
+                    {
+                        ConfirmationDialog( activity, resources.getString(R.string.select_location), "", resources.getString(R.string.current_location), resources.getString(R.string.new_location), null, true ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    addHouseholdButtonPress()
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                    dropMode = true
+                                    binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
                             }
                         }
                     }
-                }
-                else
-                {
-                    addHouseholdButtonPress()
+                    else
+                    {
+                        addHouseholdButtonPress()
+                    }
                 }
             }
             else
@@ -348,25 +345,27 @@ class PerformEnumerationFragment : Fragment(),
                 when( buttonPressed )
                 {
                     ConfirmationDialog.ButtonPress.Left -> {
-                        sharedNetworkViewModel.setCurrentConfig(config)
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            sharedNetworkViewModel.setCurrentConfig(config)
 
-                        when(user.role)
-                        {
-                            Role.Admin.toString(),
-                            Role.Supervisor.toString() ->
+                            when(user.role)
                             {
-                                sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
-                                sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
-                                sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
-                                startHotspot(view)
-                            }
+                                Role.Admin.toString(),
+                                Role.Supervisor.toString() ->
+                                {
+                                    sharedNetworkViewModel.networkHotspotModel.setTitle(resources.getString(R.string.export_configuration))
+                                    sharedNetworkViewModel.networkHotspotModel.setHotspotMode( HotspotMode.Export)
+                                    sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
+                                    startHotspot(view)
+                                }
 
-                            Role.Enumerator.toString() ->
-                            {
-                                sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
-                                sharedNetworkViewModel.networkClientModel.currentConfig = config
-                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                getResult.launch(intent)
+                                Role.Enumerator.toString() ->
+                                {
+                                    sharedNetworkViewModel.networkClientModel.setClientMode(ClientMode.EnumerationTeam)
+                                    sharedNetworkViewModel.networkClientModel.currentConfig = config
+                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                    getResult.launch(intent)
+                                }
                             }
                         }
                     }
@@ -389,7 +388,6 @@ class PerformEnumerationFragment : Fragment(),
                     }
                 }
             }
-
         }
 
         var sampledCount = 0
@@ -463,18 +461,20 @@ class PerformEnumerationFragment : Fragment(),
     {
         currentGPSLocation?.let { point ->
 
-            if (config.proximityWarningIsEnabled)
-            {
-                enumArea.locations.map{
-                    if (!it.isLandmark)
-                    {
-                        val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
-                        if (haversineCheck.withinBounds)
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (config.proximityWarningIsEnabled)
+                {
+                    enumArea.locations.map{
+                        if (!it.isLandmark)
                         {
-                            val distance = String.format( "%.1f", haversineCheck.distance)
-                            val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
-                            pointIsTooClose( distance, message, point )
-                            return
+                            val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(),point.longitude()), config.proximityWarningValue)
+                            if (haversineCheck.withinBounds)
+                            {
+                                val distance = String.format( "%.1f", haversineCheck.distance)
+                                val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
+                                pointIsTooClose( distance, message, point )
+                                return
+                            }
                         }
                     }
                 }
@@ -539,8 +539,10 @@ class PerformEnumerationFragment : Fragment(),
 
     private fun gpsAccuracyIsGood(): Boolean
     {
-        currentGPSAccuracy?.let {
-            return (it <= config.minGpsPrecision)
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            currentGPSAccuracy?.let {
+                return (it <= config.minGpsPrecision)
+            }
         }
 
         return false
@@ -552,9 +554,11 @@ class PerformEnumerationFragment : Fragment(),
 
         if (gpsAccuracyIsGood())
         {
-            currentGPSLocation?.let { point ->
-                val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
-                editMode = distance <= config.minGpsPrecision
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                currentGPSLocation?.let { point ->
+                    val distance = GeoUtils.distanceBetween( LatLng( location.latitude, location.longitude ), LatLng( point.latitude(), point.longitude()))
+                    editMode = distance <= config.minGpsPrecision
+                }
             }
         }
 
@@ -644,9 +648,11 @@ class PerformEnumerationFragment : Fragment(),
                 {
                     val enumerationItem = EnumerationItem()
 
-                    if (config.autoIncrementSubaddress)
-                    {
-                        enumerationItem.subAddress = "${maxSubaddress + 1}"
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        if (config.autoIncrementSubaddress)
+                        {
+                            enumerationItem.subAddress = "${maxSubaddress + 1}"
+                        }
                     }
 
                     sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
@@ -744,54 +750,56 @@ class PerformEnumerationFragment : Fragment(),
             var imageFileName = ""
             var packedConfig: String = ""
 
-            when(user.role)
-            {
-                Role.Admin.toString(),
-                Role.Supervisor.toString() ->
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                when(user.role)
                 {
-                    packedConfig = config.packMinimal()
-                    val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}"
-                    configFileName = fileName + ".json"
-                    imageFileName = fileName + "-img.json"
+                    Role.Admin.toString(),
+                    Role.Supervisor.toString() ->
+                    {
+                        packedConfig = config.packMinimal()
+                        val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}"
+                        configFileName = fileName + ".json"
+                        imageFileName = fileName + "-img.json"
+                    }
+
+                    Role.Enumerator.toString() ->
+                    {
+                        packedConfig = config.pack()
+                        val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
+                        configFileName = fileName + ".json"
+                        imageFileName = fileName + "-img.json"
+                    }
                 }
 
-                Role.Enumerator.toString() ->
-                {
-                    packedConfig = config.pack()
-                    val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                    configFileName = fileName + ".json"
-                    imageFileName = fileName + "-img.json"
-                }
-            }
-
-            // write config file
-            val file = File(root, configFileName)
-            val writer = FileWriter(file)
-            writer.append(packedConfig)
-            writer.flush()
-            writer.close()
-
-            val imageList = ImageList( config.uuid, ArrayList<Image>())
-
-            // check for images
-            for (location in enumArea.locations)
-            {
-                ImageDAO.instance().getImage( location )?.let {
-                    imageList.images.add( it )
-                }
-            }
-
-            if (imageList.images.isNotEmpty())
-            {
-                val payload = imageList.pack( config.encryptionPassword )
-                val file = File(root, imageFileName)
+                // write config file
+                val file = File(root, configFileName)
                 val writer = FileWriter(file)
-                writer.append(payload)
+                writer.append(packedConfig)
                 writer.flush()
                 writer.close()
-            }
 
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                // check for images
+                for (location in enumArea.locations)
+                {
+                    ImageDAO.instance().getImage( location )?.let {
+                        imageList.images.add( it )
+                    }
+                }
+
+                if (imageList.images.isNotEmpty())
+                {
+                    val payload = imageList.pack( config.encryptionPassword )
+                    val file = File(root, imageFileName)
+                    val writer = FileWriter(file)
+                    writer.append(payload)
+                    writer.flush()
+                    writer.close()
+                }
+
+                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+            }
         }
         catch( ex: Exception )
         {
@@ -872,74 +880,76 @@ class PerformEnumerationFragment : Fragment(),
     {
         try
         {
-            if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
-            {
-                data?.data?.let { uri ->
-                    var packedConfig = ""
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
+                {
+                    data?.data?.let { uri ->
+                        var packedConfig = ""
 
-                    when( user.role )
-                    {
-                        Role.Admin.toString(),
-                        Role.Supervisor.toString() ->
+                        when( user.role )
                         {
-                            packedConfig = config.packMinimal()
-                        }
-
-                        Role.Enumerator.toString() ->
-                        {
-                            packedConfig = config.pack()
-                        }
-                    }
-
-                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                        FileOutputStream(it.fileDescriptor).use {
-                            it.write(packedConfig.toByteArray())
-                            it.close()
-
-                            var hasImages = false
-
-                            for (location in enumArea.locations)
+                            Role.Admin.toString(),
+                            Role.Supervisor.toString() ->
                             {
-                                hasImages = true
+                                packedConfig = config.packMinimal()
                             }
 
-                            if (hasImages)
+                            Role.Enumerator.toString() ->
                             {
-                                pickDir( REQUEST_CODE_PICK_IMAGE_DIR )
-                            }
-                            else
-                            {
-                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                                packedConfig = config.pack()
                             }
                         }
-                    }
-                }
-            }
-            else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode == Activity.RESULT_OK)
-            {
-                data?.data?.let { uri ->
-                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                        FileOutputStream(it.fileDescriptor).use {
-                            val imageList = ImageList( config.uuid, ArrayList<Image>())
 
-                            // check for images
-                            for (location in enumArea.locations)
-                            {
-                                ImageDAO.instance().getImage( location )?.let {
-                                    imageList.images.add( it )
+                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                            FileOutputStream(it.fileDescriptor).use {
+                                it.write(packedConfig.toByteArray())
+                                it.close()
+
+                                var hasImages = false
+
+                                for (location in enumArea.locations)
+                                {
+                                    hasImages = true
+                                }
+
+                                if (hasImages)
+                                {
+                                    pickDir( REQUEST_CODE_PICK_IMAGE_DIR )
+                                }
+                                else
+                                {
+                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                                 }
                             }
-
-                            if (imageList.images.isNotEmpty())
-                            {
-                                val payload = imageList.pack( config.encryptionPassword )
-                                it.write(payload.toByteArray())
-                                it.close()
-                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
-                            }
                         }
                     }
                 }
+                else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode == Activity.RESULT_OK)
+                {
+                    data?.data?.let { uri ->
+                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                            FileOutputStream(it.fileDescriptor).use {
+                                val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                                // check for images
+                                for (location in enumArea.locations)
+                                {
+                                    ImageDAO.instance().getImage( location )?.let {
+                                        imageList.images.add( it )
+                                    }
+                                }
+
+                                if (imageList.images.isNotEmpty())
+                                {
+                                    val payload = imageList.pack( config.encryptionPassword )
+                                    it.write(payload.toByteArray())
+                                    it.close()
+                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                } else {}
             }
         }
         catch (ex: java.lang.Exception)
@@ -1046,43 +1056,47 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
-        when (item.itemId)
-        {
-            R.id.set_subaddress ->
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            when (item.itemId)
             {
-                InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true )  { action, text, tag ->
-                    when (action) {
-                        InputDialog.Action.DidCancel -> {}
-                        InputDialog.Action.DidEnterText -> {
-                            text.toIntOrNull()?.let {
-                                maxSubaddress = it - 1
+                R.id.set_subaddress ->
+                {
+                    InputDialog( activity!!, false, resources.getString(R.string.subaddress_start), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null, false, true )  { action, text, tag ->
+                        when (action) {
+                            InputDialog.Action.DidCancel -> {}
+                            InputDialog.Action.DidEnterText -> {
+                                text.toIntOrNull()?.let {
+                                    maxSubaddress = it - 1
+                                }
                             }
+                            InputDialog.Action.DidPressQRButton -> {}
                         }
-                        InputDialog.Action.DidPressQRButton -> {}
                     }
                 }
-            }
 
-            R.id.mapbox_streets ->
-            {
-                val editor = activity!!.getSharedPreferences("default", 0).edit()
-                editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
-                editor.commit()
+                R.id.mapbox_streets ->
+                {
+                    val editor = activity!!.getSharedPreferences("default", 0).edit()
+                    editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
+                    editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
-                    refreshMap()
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+                        refreshMap()
+                    }
                 }
-            }
 
-            R.id.satellite_streets ->
-            {
-                val editor = activity!!.getSharedPreferences("default", 0).edit()
-                editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
-                editor.commit()
+                R.id.satellite_streets ->
+                {
+                    val editor = activity!!.getSharedPreferences("default", 0).edit()
+                    editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
+                    editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
-                    refreshMap()
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+                        refreshMap()
+                    }
                 }
+
+                else -> {}
             }
         }
 
@@ -1102,59 +1116,61 @@ class PerformEnumerationFragment : Fragment(),
             currentGPSLocation = point
             currentGPSAccuracy = accuracy
 
-            if (accuracy <= config.minGpsPrecision)
-            {
-                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.good)
-                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
-            }
-            else
-            {
-                binding.accuracyLabelTextView.text = " " + resources.getString(R.string.poor)
-                binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
-            }
-
-            binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
-
-            binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
-
-            if (Date().time - lastLocationUpdateTime > 3000)
-            {
-                lastLocationUpdateTime = Date().time
-
-                for (loc in enumArea.locations)
+            sharedViewModel.currentConfiguration?.value?.let { config ->
+                if (accuracy <= config.minGpsPrecision)
                 {
-                    val currentLatLng = LatLng( point.latitude(), point.longitude())
-                    val itemLatLng = LatLng( loc.latitude, loc.longitude )
-                    val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
-                    if (distance < 400) // display in meters or feet
-                    {
-                        if (config.distanceFormat == DistanceFormat.Meters)
-                        {
-                            loc.distance = distance
-                            loc.distanceUnits = resources.getString( R.string.meters )
-                        }
-                        else
-                        {
-                            loc.distance = distance * 3.28084
-                            loc.distanceUnits = resources.getString( R.string.feet )
-                        }
-                    }
-                    else // display in kilometers or miles
-                    {
-                        if (config.distanceFormat == DistanceFormat.Meters)
-                        {
-                            loc.distance = distance / 1000.0
-                            loc.distanceUnits = resources.getString( R.string.kilometers )
-                        }
-                        else
-                        {
-                            loc.distance = distance / 1609.34
-                            loc.distanceUnits = resources.getString( R.string.miles )
-                        }
-                    }
+                    binding.accuracyLabelTextView.text = " " + resources.getString(R.string.good)
+                    binding.accuracyLabelTextView.setTextColor( Color.parseColor("#0000ff"))
+                }
+                else
+                {
+                    binding.accuracyLabelTextView.text = " " + resources.getString(R.string.poor)
+                    binding.accuracyLabelTextView.setTextColor( Color.parseColor("#ff0000") )
                 }
 
-                performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
+
+                binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
+
+                if (Date().time - lastLocationUpdateTime > 3000)
+                {
+                    lastLocationUpdateTime = Date().time
+
+                    for (loc in enumArea.locations)
+                    {
+                        val currentLatLng = LatLng( point.latitude(), point.longitude())
+                        val itemLatLng = LatLng( loc.latitude, loc.longitude )
+                        val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+                        if (distance < 400) // display in meters or feet
+                        {
+                            if (config.distanceFormat == DistanceFormat.Meters)
+                            {
+                                loc.distance = distance
+                                loc.distanceUnits = resources.getString( R.string.meters )
+                            }
+                            else
+                            {
+                                loc.distance = distance * 3.28084
+                                loc.distanceUnits = resources.getString( R.string.feet )
+                            }
+                        }
+                        else // display in kilometers or miles
+                        {
+                            if (config.distanceFormat == DistanceFormat.Meters)
+                            {
+                                loc.distance = distance / 1000.0
+                                loc.distanceUnits = resources.getString( R.string.kilometers )
+                            }
+                            else
+                            {
+                                loc.distance = distance / 1609.34
+                                loc.distanceUnits = resources.getString( R.string.miles )
+                            }
+                        }
+                    }
+
+                    performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                }
             }
         }
     }
@@ -1170,18 +1186,20 @@ class PerformEnumerationFragment : Fragment(),
                     val point = MapManager.instance().getLocationFromPixelPoint(mapView, motionEvent )
                     binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
 
-                    if (config.proximityWarningIsEnabled)
-                    {
-                        enumArea.locations.map{
-                            if (!it.isLandmark)
-                            {
-                                val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(), point.longitude()), config.proximityWarningValue )
-                                if (haversineCheck.withinBounds)
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        if (config.proximityWarningIsEnabled)
+                        {
+                            enumArea.locations.map{
+                                if (!it.isLandmark)
                                 {
-                                    val distance = String.format( "%.1f", haversineCheck.distance)
-                                    val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
-                                    pointIsTooClose( distance, message, point )
-                                    return true
+                                    val haversineCheck = GeoUtils.isCloseTo( LatLng( it.latitude, it.longitude), LatLng(point.latitude(), point.longitude()), config.proximityWarningValue )
+                                    if (haversineCheck.withinBounds)
+                                    {
+                                        val distance = String.format( "%.1f", haversineCheck.distance)
+                                        val message = "${resources.getString(R.string.duplicate_warning)} (${distance}m)"
+                                        pointIsTooClose( distance, message, point )
+                                        return true
+                                    }
                                 }
                             }
                         }

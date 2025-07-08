@@ -618,8 +618,12 @@ class ManageConfigurationsFragment : Fragment(),
                                         .setAction(Intent.ACTION_GET_CONTENT)
                                     startActivityForResult(Intent.createChooser(intent, "Select the image file"), REQUEST_IMAGES)
                                 }
+                            } ?: run {
+                                activity!!.runOnUiThread {
+                                    binding.overlayView.visibility = View.GONE
+                                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                                }
                             }
-
                         }.start()
                     }
                 }
@@ -660,6 +664,12 @@ class ManageConfigurationsFragment : Fragment(),
                                     binding.overlayView.visibility = View.GONE
                                     didReceiveConfiguration(false )
                                 }
+                            } ?: run {
+                                activity!!.runOnUiThread {
+                                    binding.overlayView.visibility = View.GONE
+                                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                                    didReceiveConfiguration( false )
+                                }
                             }
                         }.start()
                     }
@@ -668,6 +678,7 @@ class ManageConfigurationsFragment : Fragment(),
                 {
                     binding.overlayView.visibility = View.GONE
                     InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                    didReceiveConfiguration( false )
                 }
             }
         }
