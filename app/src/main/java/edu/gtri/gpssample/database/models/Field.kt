@@ -5,6 +5,7 @@
  * See the LICENSE file for the full license text.
 */
 
+@file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
 package edu.gtri.gpssample.database.models
 
 import edu.gtri.gpssample.constants.FieldType

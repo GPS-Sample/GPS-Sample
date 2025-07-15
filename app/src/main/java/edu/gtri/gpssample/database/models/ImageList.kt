@@ -1,3 +1,4 @@
+@file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
 package edu.gtri.gpssample.database.models
 
 import android.util.Base64

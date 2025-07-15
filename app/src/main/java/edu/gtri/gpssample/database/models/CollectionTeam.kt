@@ -5,14 +5,16 @@
  * See the LICENSE file for the full license text.
 */
 
+@file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
 package edu.gtri.gpssample.database.models
 
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class CollectionTeam(
     var uuid : String,
     var creationDate: Long,
