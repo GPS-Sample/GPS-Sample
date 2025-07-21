@@ -9,12 +9,8 @@ package edu.gtri.gpssample.fragments.manageconfigurations
 
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -33,11 +29,10 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentManageConfigurationsBinding
-import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.dialogs.InputDialog
-import edu.gtri.gpssample.managers.MapboxManager
+import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
@@ -45,11 +40,6 @@ import edu.gtri.gpssample.viewmodels.models.NetworkClientModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
-import java.io.File
-import java.io.FileWriter
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlin.collections.ArrayList
 
 class ManageConfigurationsFragment : Fragment(),
@@ -66,6 +56,8 @@ class ManageConfigurationsFragment : Fragment(),
     private lateinit var sharedViewModel: ConfigurationViewModel
     private lateinit var sharedNetworkViewModel: NetworkViewModel
     private lateinit var samplingViewModel: SamplingViewModel
+
+    private val REQUEST_CONFIGURATION   = 1001
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -573,9 +565,6 @@ class ManageConfigurationsFragment : Fragment(),
         }
     }
 
-    private val REQUEST_CONFIGURATION   = 1001
-    private val REQUEST_IMAGES          = 2001
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         super.onActivityResult(requestCode, resultCode, data)
@@ -585,107 +574,46 @@ class ManageConfigurationsFragment : Fragment(),
             val uri = data?.data
 
             uri?.let { uri ->
-
                 try
                 {
-                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
+                    binding.overlayView.visibility = View.VISIBLE
 
-                    inputStream?.let {  inputStream ->
-                        binding.overlayView.visibility = View.VISIBLE
+                    val config = ZipUtils.unzip( activity!!, uri, encryptionPassword )
 
-                        Thread {
-                            val text = inputStream.bufferedReader().readText()
+                    if (config == null)
+                    {
+                        activity!!.runOnUiThread {
+                            binding.overlayView.visibility = View.GONE
+                            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                        }
+                    }
+                    else
+                    {
+                        DAO.instance().writableDatabase.beginTransaction()
 
-                            Config.unpack( text, encryptionPassword )?.let { config ->
-                                DAO.instance().writableDatabase.beginTransaction()
+                        DAO.configDAO.createOrUpdateConfig( config )
 
-                                DAO.configDAO.createOrUpdateConfig( config )
+                        DAO.instance().writableDatabase.setTransactionSuccessful()
+                        DAO.instance().writableDatabase.endTransaction()
 
-                                DAO.instance().writableDatabase.setTransactionSuccessful()
-                                DAO.instance().writableDatabase.endTransaction()
+                        DAO.configDAO.getConfig( config.uuid )?.let {
+                            sharedViewModel.setCurrentConfig(it)
+                        }
 
-                                activity!!.runOnUiThread {
-                                    configurations = DAO.configDAO.getConfigs()
-                                    manageConfigurationsAdapter.updateConfigurations( configurations )
-                                    configurations.find{ item -> item.uuid == config.uuid }?.let {
-                                        sharedViewModel.setCurrentConfig( it )
-                                    }
-
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_image_file), Toast.LENGTH_LONG).show()
-
-                                    val intent = Intent()
-                                        .setType("*/*")
-                                        .setAction(Intent.ACTION_GET_CONTENT)
-                                    startActivityForResult(Intent.createChooser(intent, "Select the image file"), REQUEST_IMAGES)
-                                }
-                            } ?: run {
-                                activity!!.runOnUiThread {
-                                    binding.overlayView.visibility = View.GONE
-                                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
-                                }
-                            }
-                        }.start()
+                        activity!!.runOnUiThread {
+                            binding.overlayView.visibility = View.GONE
+                            configurations = DAO.configDAO.getConfigs()
+                            manageConfigurationsAdapter.updateConfigurations(configurations)
+                            didReceiveConfiguration(false )
+                        }
                     }
                 }
-                catch( ex: Exception )
+                catch( ex: java.lang.Exception )
                 {
                     binding.overlayView.visibility = View.GONE
                     InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                 }
             }
-        }
-        else if (requestCode == REQUEST_IMAGES && resultCode == Activity.RESULT_OK)
-        {
-            val uri = data?.data
-
-            uri?.let { uri ->
-
-                try
-                {
-                    val inputStream = activity!!.getContentResolver().openInputStream(uri)
-
-                    inputStream?.let {  inputStream ->
-                        binding.overlayView.visibility = View.VISIBLE
-
-                        Thread {
-                            val text = inputStream.bufferedReader().readText()
-
-                            ImageList.unpack( text, encryptionPassword )?.let { imageList ->
-                                for (image in imageList.images)
-                                {
-                                    if (ImageDAO.instance().getImage( image.uuid ) == null)
-                                    {
-                                        Log.d( "xxx", "processing image ${image.uuid}")
-                                        ImageDAO.instance().createImage( image )
-                                    }
-                                }
-
-                                activity!!.runOnUiThread {
-                                    binding.overlayView.visibility = View.GONE
-                                    didReceiveConfiguration(false )
-                                }
-                            } ?: run {
-                                activity!!.runOnUiThread {
-                                    binding.overlayView.visibility = View.GONE
-                                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
-                                    didReceiveConfiguration( false )
-                                }
-                            }
-                        }.start()
-                    }
-                }
-                catch( ex: Exception )
-                {
-                    binding.overlayView.visibility = View.GONE
-                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
-                    didReceiveConfiguration( false )
-                }
-            }
-        }
-        else if (requestCode == REQUEST_IMAGES && resultCode != Activity.RESULT_OK)
-        {
-            binding.overlayView.visibility = View.GONE
-            didReceiveConfiguration(false )
         }
         else
         {

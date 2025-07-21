@@ -42,11 +42,10 @@ import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
 import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import java.io.File
-import java.io.FileOutputStream
-import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -64,9 +63,7 @@ class ConfigurationFragment : Fragment(),
     private lateinit var enumerationAreasAdapter: ConfigurationAdapter
 
     val REQUEST_CODE_PICK_CONFIG_DIR    = 1001
-    val REQUEST_CODE_PICK_IMAGE_DIR     = 1002
     val REQUEST_CONFIGURATION           = 1003
-    val REQUEST_IMAGES                  = 1004
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -211,7 +208,9 @@ class ConfigurationFragment : Fragment(),
                             when( buttonPressed )
                             {
                                 ConfirmationDialog.ButtonPress.Left -> {
-                                    exportToDefaultLocation()
+                                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                                        ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), false )
+                                    }
                                 }
                                 ConfirmationDialog.ButtonPress.Right -> {
                                     exportToDevice()
@@ -225,7 +224,6 @@ class ConfigurationFragment : Fragment(),
                     }
                 }
             }
-
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
@@ -293,6 +291,48 @@ class ConfigurationFragment : Fragment(),
         updateOverview()
     }
 
+    fun getFileName() : String
+    {
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            val user = (activity!!.application as MainApplication).user
+
+            var userName = user!!.name.replace(" ", "" ).uppercase()
+
+            if (userName.length > 3)
+            {
+                userName = userName.substring(0,3)
+            }
+
+            val role = user.role.toString().substring(0,1).uppercase()
+
+            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
+            val dateTime = LocalDateTime.now().format(formatter)
+
+            var version = ""
+            val versionName = BuildConfig.VERSION_NAME.split( "#" )
+            if (versionName.size == 2)
+            {
+                version = versionName[1]
+            }
+
+            val path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations"
+            val root = File( path )
+            root.mkdirs()
+
+            return "${role}-${userName}-${config.name}-${dateTime!!}-${version}"
+        }
+
+        return ""
+    }
+
+    fun getPathName() : String
+    {
+        val path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations"
+        val root = File( path )
+        root.mkdirs()
+        return path + "/" + getFileName()
+    }
+
     fun updateOverview()
     {
         sharedViewModel.currentConfiguration?.value?.let { config ->
@@ -347,36 +387,10 @@ class ConfigurationFragment : Fragment(),
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.ConfigurationFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
-//    fun refreshMap()
-//    {
-//        sharedViewModel.currentConfiguration?.value?.let {config ->
-//
-//            val enumVerts = ArrayList<LatLon>()
-//
-//            for (enumArea in config.enumAreas)
-//            {
-//                val points = ArrayList<com.mapbox.geojson.Point>()
-//                val pointList = ArrayList<ArrayList<com.mapbox.geojson.Point>>()
-//
-//                enumArea.vertices.map {
-//                    enumVerts.add(it)
-//                    points.add( com.mapbox.geojson.Point.fromLngLat(it.longitude, it.latitude ) )
-//                }
-//
-//                pointList.add( points )
-//
-//                MapManager.instance().createPolygon( mapView, pointList, "#000000", 0.25 )
-//                MapManager.instance().createPolyline( mapView, pointList[0], "#ff0000" )
-//            }
-//        }
-//    }
-
     private fun didSelectStudy(study: Study)
     {
         sharedViewModel.createStudyModel.setStudy(study)
     }
-
-    var imageFileName = ""
 
     fun exportToDevice( )
     {
@@ -390,122 +404,15 @@ class ConfigurationFragment : Fragment(),
                 enumArea.selectedCollectionTeamUuid = ""
             }
 
-            val user = (activity!!.application as MainApplication).user
-
-            var userName = user!!.name.replace(" ", "" ).uppercase()
-
-            if (userName.length > 3)
-            {
-                userName = userName.substring(0,3)
-            }
-
-            val role = user.role.toString().substring(0,1).uppercase()
-
-            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-            val dateTime = LocalDateTime.now().format(formatter)
-
-            var version = ""
-            val versionName = BuildConfig.VERSION_NAME.split( "#" )
-            if (versionName.size == 2)
-            {
-                version = versionName[1]
-            }
-
-            val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}"
-            val configFileName = fileName + ".json"
-            imageFileName = fileName + "-img.json"
+            val zipFileName = getFileName() + ".zip"
 
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/json"
-                putExtra(Intent.EXTRA_TITLE, configFileName)
+                putExtra(Intent.EXTRA_TITLE, zipFileName)
             }
-
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_configuration_file), Toast.LENGTH_LONG).show()
 
             startActivityForResult( intent, REQUEST_CODE_PICK_CONFIG_DIR )
-        }
-    }
-
-    fun exportToDefaultLocation()
-    {
-        try
-        {
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-
-                config.selectedEnumAreaUuid = ""
-
-                for (enumArea in config.enumAreas)
-                {
-                    enumArea.selectedEnumerationTeamUuid = ""
-                    enumArea.selectedCollectionTeamUuid = ""
-                }
-
-                val packedConfig = config.pack()
-
-                val user = (activity!!.application as MainApplication).user
-
-                var userName = user!!.name.replace(" ", "" ).uppercase()
-
-                if (userName.length > 3)
-                {
-                    userName = userName.substring(0,3)
-                }
-
-                val role = user.role.toString().substring(0,1).uppercase()
-
-                val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-                val dateTime = LocalDateTime.now().format(formatter)
-
-                var version = ""
-                val versionName = BuildConfig.VERSION_NAME.split( "#" )
-                if (versionName.size == 2)
-                {
-                    version = versionName[1]
-                }
-
-                val fileName = "${role}-${userName}-${config.name}-${dateTime!!}-${version}"
-                val configFileName = fileName + ".json"
-                val imageFileName = fileName + "-img.json"
-
-                val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations")
-                root.mkdirs()
-                val file = File(root, configFileName)
-                val writer = FileWriter(file)
-                writer.append(packedConfig)
-                writer.flush()
-                writer.close()
-
-                val imageList = ImageList( config.uuid, ArrayList<Image>())
-
-                // check for images
-                for (enumArea in config.enumAreas)
-                {
-                    for (location in enumArea.locations)
-                    {
-                        ImageDAO.instance().getImage( location )?.let {
-                            imageList.images.add( it )
-                        }
-                    }
-                }
-
-                if (imageList.images.isNotEmpty())
-                {
-                    val payload = imageList.pack( config.encryptionPassword )
-                    val file = File(root, imageFileName)
-                    val writer = FileWriter(file)
-                    writer.append(payload)
-                    writer.flush()
-                    writer.close()
-                }
-
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
-            }
-        }
-        catch( ex: Exception )
-        {
-            Log.d( "xxx", ex.stackTraceToString())
-            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -538,85 +445,33 @@ class ConfigurationFragment : Fragment(),
     {
         try
         {
-            lateinit var config: Config
-
-            sharedViewModel.currentConfiguration?.value?.let {
-                config = it
-            }
-
             if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
             {
                 data?.data?.let { uri ->
-                    val packedConfig = config.pack()
-                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                        FileOutputStream(it.fileDescriptor).use {
-                            it.write(packedConfig.toByteArray())
-                            it.close()
+                    sharedViewModel.currentConfiguration?.value?.let { config ->
+                        val pair = ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), false )
 
-                            val imageList = ImageList( config.uuid, ArrayList<Image>())
+                        val configFile = pair.first
+                        val imageFile = pair.second
 
-                            // check for images
-                            for (enumArea in config.enumAreas)
+                        if (configFile != null)
+                        {
+                            if (imageFile != null)
                             {
-                                for (location in enumArea.locations)
-                                {
-                                    ImageDAO.instance().getImage( location )?.let {
-                                        imageList.images.add( it )
-                                    }
-                                }
-                            }
-
-                            if (imageList.images.isNotEmpty())
-                            {
-                                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                                    addCategory(Intent.CATEGORY_OPENABLE)
-                                    type = "application/json"
-                                    putExtra(Intent.EXTRA_TITLE, imageFileName)
-                                }
-
-                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_image_file), Toast.LENGTH_LONG).show()
-
-                                startActivityForResult( intent, REQUEST_CODE_PICK_IMAGE_DIR )
+                                ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri )
+                                imageFile.delete()
                             }
                             else
                             {
-                                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                                ZipUtils.zipToUri( activity!!, listOf( configFile ), uri )
                             }
-                        }
-                    }
-                }
-            }
-            else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode == Activity.RESULT_OK)
-            {
-                data?.data?.let { uri ->
-                    activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                        val imageList = ImageList( config.uuid, ArrayList<Image>())
 
-                        // check for images
-                        for (enumArea in config.enumAreas)
-                        {
-                            for (location in enumArea.locations)
-                            {
-                                ImageDAO.instance().getImage( location )?.let {
-                                    imageList.images.add( it )
-                                }
-                            }
-                        }
-
-                        val payload = imageList.pack( config.encryptionPassword )
-
-                        FileOutputStream(it.fileDescriptor).use {
-                            it.write(payload.toByteArray())
-                            it.close()
+                            configFile.delete()
                         }
 
                         Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                     }
                 }
-            }
-            else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode != Activity.RESULT_OK)
-            {
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
             }
             else if (requestCode == REQUEST_CONFIGURATION && resultCode == Activity.RESULT_OK)
             {
@@ -626,45 +481,31 @@ class ConfigurationFragment : Fragment(),
                     sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
                         try
                         {
-                            activity!!.getContentResolver().openInputStream(uri)?.let { inputStream ->
+                            val config = ZipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword )
 
-                                binding.overlayView.visibility = View.VISIBLE
+                            if (config == null)
+                            {
+                                activity!!.runOnUiThread {
+                                    binding.overlayView.visibility = View.GONE
+                                    InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
+                                }
+                            }
+                            else
+                            {
+                                DAO.instance().writableDatabase.beginTransaction()
 
-                                Thread {
-                                    val text = inputStream.bufferedReader().readText()
+                                DAO.configDAO.createOrUpdateConfig( config )
 
-                                    val config = Config.unpack( text, currentConfig.encryptionPassword )
+                                DAO.instance().writableDatabase.setTransactionSuccessful()
+                                DAO.instance().writableDatabase.endTransaction()
 
-                                    if (config == null)
-                                    {
-                                        activity!!.runOnUiThread {
-                                            binding.overlayView.visibility = View.GONE
-                                            InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
-                                        }
-                                    }
-                                    else
-                                    {
-                                        DAO.instance().writableDatabase.beginTransaction()
+                                DAO.configDAO.getConfig( config.uuid )?.let {
+                                    sharedViewModel.setCurrentConfig(it)
+                                }
 
-                                        DAO.configDAO.createOrUpdateConfig( config )
-
-                                        DAO.instance().writableDatabase.setTransactionSuccessful()
-                                        DAO.instance().writableDatabase.endTransaction()
-
-                                        DAO.configDAO.getConfig( config.uuid )?.let {
-                                            sharedViewModel.setCurrentConfig(it)
-                                        }
-
-                                        activity!!.runOnUiThread {
-                                            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.select_image_file), Toast.LENGTH_LONG).show()
-
-                                            val intent = Intent()
-                                                .setType("*/*")
-                                                .setAction(Intent.ACTION_GET_CONTENT)
-                                            startActivityForResult(Intent.createChooser(intent, "Select the image file"), REQUEST_IMAGES)
-                                        }
-                                    }
-                                }.start()
+                                activity!!.runOnUiThread {
+                                    InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+                                }
                             }
                         }
                         catch( ex: java.lang.Exception )
@@ -673,60 +514,6 @@ class ConfigurationFragment : Fragment(),
                             InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                         }
                     }
-                }
-            }
-            else if (requestCode == REQUEST_IMAGES && resultCode == Activity.RESULT_OK)
-            {
-                val uri = data?.data
-
-                uri?.let { uri ->
-
-                    try
-                    {
-                        val inputStream = activity!!.getContentResolver().openInputStream(uri)
-
-                        inputStream?.let {  inputStream ->
-                            binding.overlayView.visibility = View.VISIBLE
-
-                            Thread {
-                                val text = inputStream.bufferedReader().readText()
-
-                                sharedViewModel.currentConfiguration?.value?.let { config ->
-                                    ImageList.unpack( text, config.encryptionPassword )?.let { imageList ->
-                                        for (image in imageList.images)
-                                        {
-                                            if (ImageDAO.instance().getImage( image.uuid ) == null)
-                                            {
-                                                Log.d( "xxx", "processing image ${image.uuid}")
-                                                ImageDAO.instance().createImage( image )
-                                            }
-                                        }
-
-                                        activity!!.runOnUiThread {
-                                            updateOverview()
-                                            binding.overlayView.visibility = View.GONE
-                                            enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
-                                            InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
-                                        }
-                                    }
-                                }
-                            }.start()
-                        }
-                    }
-                    catch( ex: Exception )
-                    {
-                        binding.overlayView.visibility = View.GONE
-                        InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
-                    }
-                }
-            }
-            else if (requestCode == REQUEST_IMAGES && resultCode != Activity.RESULT_OK)
-            {
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    updateOverview()
-                    binding.overlayView.visibility = View.GONE
-                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
-                    InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
                 }
             }
         }

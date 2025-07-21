@@ -600,10 +600,25 @@ class AddHouseholdFragment : Fragment(),
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
         DAO.configDAO.getConfig( config.uuid )?.let {
+            it.selectedStudyUuid = config.selectedStudyUuid
+            it.selectedEnumAreaUuid = config.selectedEnumAreaUuid
+
+            val enumAreas = it.enumAreas.filter {
+                it.uuid == config.selectedEnumAreaUuid
+            }
+
+            if (enumAreas.isNotEmpty())
+            {
+                enumAreas[0].selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
+                enumAreas[0].selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
+            }
+
             sharedViewModel.setCurrentConfig( it )
         }
 
         DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+            it.selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
+            it.selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
         }
 

@@ -52,6 +52,7 @@ import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.utils.GeoUtils
+import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
@@ -374,7 +375,7 @@ class PerformEnumerationFragment : Fragment(),
                             when( buttonPressed )
                             {
                                 ConfirmationDialog.ButtonPress.Left -> {
-                                    exportToDefaultLocation()
+                                    ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal())
                                 }
                                 ConfirmationDialog.ButtonPress.Right -> {
                                     exportToDevice()
@@ -717,13 +718,33 @@ class PerformEnumerationFragment : Fragment(),
         }
     }
 
-    fun exportToDefaultLocation()
+    fun shouldPackMinimal() : Boolean
     {
-        try
-        {
-            val user = (activity!!.application as MainApplication).user
+        (activity!!.application as MainApplication).user?.let { user->
+            when(user.role)
+            {
+                Role.Admin.value,
+                Role.Supervisor.value ->
+                {
+                    return true
+                }
 
-            var userName = user!!.name.replace(" ", "" ).uppercase()
+                Role.Enumerator.value,
+                Role.DataCollector.value ->
+                {
+                    return false
+                }
+                Role.Undefined.value -> {}
+            }
+        }
+
+        return false
+    }
+
+    fun getFileName() : String
+    {
+        (activity!!.application as MainApplication).user?.let { user ->
+            var userName = user.name.replace(" ", "" ).uppercase()
 
             if (userName.length > 3)
             {
@@ -735,9 +756,6 @@ class PerformEnumerationFragment : Fragment(),
             val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
             val dateTime = LocalDateTime.now().format(formatter)
 
-            val root = File(Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Enumerated")
-            root.mkdirs()
-
             var version = ""
             val versionName = BuildConfig.VERSION_NAME.split( "#" )
             if (versionName.size == 2)
@@ -746,134 +764,46 @@ class PerformEnumerationFragment : Fragment(),
             }
 
             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-            var configFileName = ""
-            var imageFileName = ""
-            var packedConfig: String = ""
 
-            sharedViewModel.currentConfiguration?.value?.let { config ->
-                when(user.role)
+            when(user.role)
+            {
+                Role.Admin.value,
+                Role.Supervisor.value ->
                 {
-                    Role.Admin.toString(),
-                    Role.Supervisor.toString() ->
-                    {
-                        packedConfig = config.packMinimal()
-                        val fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}"
-                        configFileName = fileName + ".json"
-                        imageFileName = fileName + "-img.json"
-                    }
-
-                    Role.Enumerator.toString() ->
-                    {
-                        packedConfig = config.pack()
-                        val fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-                        configFileName = fileName + ".json"
-                        imageFileName = fileName + "-img.json"
-                    }
+                    return "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}"
                 }
 
-                // write config file
-                val file = File(root, configFileName)
-                val writer = FileWriter(file)
-                writer.append(packedConfig)
-                writer.flush()
-                writer.close()
-
-                val imageList = ImageList( config.uuid, ArrayList<Image>())
-
-                // check for images
-                for (location in enumArea.locations)
+                Role.Enumerator.value,
+                Role.DataCollector.value ->
                 {
-                    ImageDAO.instance().getImage( location )?.let {
-                        imageList.images.add( it )
-                    }
+                    return "${role}-${userName}-${clusterName}-${dateTime!!}-${version}"
                 }
-
-                if (imageList.images.isNotEmpty())
-                {
-                    val payload = imageList.pack( config.encryptionPassword )
-                    val file = File(root, imageFileName)
-                    val writer = FileWriter(file)
-                    writer.append(payload)
-                    writer.flush()
-                    writer.close()
-                }
-
-                Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
+                Role.Undefined.value -> {}
             }
         }
-        catch( ex: Exception )
-        {
-            Log.d( "xxx", ex.stackTraceToString())
-            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
-        }
+
+        return ""
     }
 
-    fun pickDir( requestCode: Int )
+    fun getPathName() : String
     {
-        var userName = user.name.replace(" ", "" ).uppercase()
-
-        if (userName.length > 3)
-        {
-            userName = userName.substring(0,3)
-        }
-
-        val role = user.role.toString().substring(0,1).uppercase()
-
-        val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-
-        if (dateTime.isEmpty())
-        {
-            dateTime = LocalDateTime.now().format(formatter)
-        }
-
-        var version = ""
-        val versionName = BuildConfig.VERSION_NAME.split( "#" )
-        if (versionName.size == 2)
-        {
-            version = versionName[1]
-        }
-
-        val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-        var fileName = ""
-
-        when(user.role)
-        {
-            Role.Admin.toString(),
-            Role.Supervisor.toString() ->
-            {
-                fileName = "${role}-${userName}-${clusterName}-EN-${dateTime!!}-${version}"
-            }
-
-            Role.Enumerator.toString() ->
-            {
-                fileName = "${role}-${userName}-${clusterName}-${dateTime!!}-${version}"
-            }
-        }
-
-        if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR)
-        {
-            fileName += ".json"
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_configuration_file), Toast.LENGTH_LONG).show()
-        }
-        else
-        {
-            fileName += "-img.json"
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_image_file), Toast.LENGTH_LONG).show()
-        }
-
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
-            putExtra(Intent.EXTRA_TITLE, fileName)
-        }
-
-        startActivityForResult( intent, requestCode )
+        val path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Enumerated"
+        val root = File( path )
+        root.mkdirs()
+        return path + "/" + getFileName()
     }
 
     fun exportToDevice()
     {
-        dateTime = ""
-        pickDir( REQUEST_CODE_PICK_CONFIG_DIR )
+        val zipFileName = getFileName() + ".zip"
+
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+            putExtra(Intent.EXTRA_TITLE, zipFileName)
+        }
+
+        startActivityForResult( intent, REQUEST_CODE_PICK_CONFIG_DIR )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -884,72 +814,29 @@ class PerformEnumerationFragment : Fragment(),
                 if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
                 {
                     data?.data?.let { uri ->
-                        var packedConfig = ""
+                        val pair = ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal() )
 
-                        when( user.role )
+                        val configFile = pair.first
+                        val imageFile = pair.second
+
+                        if (configFile != null)
                         {
-                            Role.Admin.toString(),
-                            Role.Supervisor.toString() ->
+                            if (imageFile != null)
                             {
-                                packedConfig = config.packMinimal()
+                                ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri )
+                                imageFile.delete()
+                            }
+                            else
+                            {
+                                ZipUtils.zipToUri( activity!!, listOf( configFile ), uri )
                             }
 
-                            Role.Enumerator.toString() ->
-                            {
-                                packedConfig = config.pack()
-                            }
+                            configFile.delete()
                         }
 
-                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                            FileOutputStream(it.fileDescriptor).use {
-                                it.write(packedConfig.toByteArray())
-                                it.close()
-
-                                var hasImages = false
-
-                                for (location in enumArea.locations)
-                                {
-                                    hasImages = true
-                                }
-
-                                if (hasImages)
-                                {
-                                    pickDir( REQUEST_CODE_PICK_IMAGE_DIR )
-                                }
-                                else
-                                {
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                     }
                 }
-                else if (requestCode == REQUEST_CODE_PICK_IMAGE_DIR && resultCode == Activity.RESULT_OK)
-                {
-                    data?.data?.let { uri ->
-                        activity!!.applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                            FileOutputStream(it.fileDescriptor).use {
-                                val imageList = ImageList( config.uuid, ArrayList<Image>())
-
-                                // check for images
-                                for (location in enumArea.locations)
-                                {
-                                    ImageDAO.instance().getImage( location )?.let {
-                                        imageList.images.add( it )
-                                    }
-                                }
-
-                                if (imageList.images.isNotEmpty())
-                                {
-                                    val payload = imageList.pack( config.encryptionPassword )
-                                    it.write(payload.toByteArray())
-                                    it.close()
-                                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                    }
-                } else {}
             }
         }
         catch (ex: java.lang.Exception)
