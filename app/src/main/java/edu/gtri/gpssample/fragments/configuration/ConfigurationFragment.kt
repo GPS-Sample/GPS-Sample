@@ -449,27 +449,37 @@ class ConfigurationFragment : Fragment(),
             {
                 data?.data?.let { uri ->
                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                        val pair = ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), false )
-
-                        val configFile = pair.first
-                        val imageFile = pair.second
-
-                        if (configFile != null)
-                        {
-                            if (imageFile != null)
+                        ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), false ) { configFile, imageFile ->
+                            if (configFile != null)
                             {
-                                ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri )
-                                imageFile.delete()
+                                if (imageFile != null)
+                                {
+                                    ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri ) { error ->
+                                        if (error.isEmpty())
+                                        {
+                                            imageFile.delete()
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ZipUtils.zipToUri( activity!!, listOf( configFile ), uri ) { error ->
+                                        if (error.isEmpty())
+                                        {
+                                            configFile.delete()
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
                             }
-                            else
-                            {
-                                ZipUtils.zipToUri( activity!!, listOf( configFile ), uri )
-                            }
-
-                            configFile.delete()
                         }
-
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -479,31 +489,30 @@ class ConfigurationFragment : Fragment(),
 
                 uri?.let { uri ->
                     sharedViewModel.currentConfiguration?.value?.let { currentConfig ->
+                        binding.overlayView.visibility = View.VISIBLE
+
                         try
                         {
-                            val config = ZipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword )
-
-                            if (config == null)
-                            {
-                                activity!!.runOnUiThread {
+                            ZipUtils.unzip( activity!!, uri, currentConfig.encryptionPassword ) { config ->
+                                if (config == null)
+                                {
                                     binding.overlayView.visibility = View.GONE
                                     InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                                 }
-                            }
-                            else
-                            {
-                                DAO.instance().writableDatabase.beginTransaction()
+                                else
+                                {
+                                    DAO.instance().writableDatabase.beginTransaction()
 
-                                DAO.configDAO.createOrUpdateConfig( config )
+                                    DAO.configDAO.createOrUpdateConfig( config )
 
-                                DAO.instance().writableDatabase.setTransactionSuccessful()
-                                DAO.instance().writableDatabase.endTransaction()
+                                    DAO.instance().writableDatabase.setTransactionSuccessful()
+                                    DAO.instance().writableDatabase.endTransaction()
 
-                                DAO.configDAO.getConfig( config.uuid )?.let {
-                                    sharedViewModel.setCurrentConfig(it)
-                                }
+                                    DAO.configDAO.getConfig( config.uuid )?.let {
+                                        sharedViewModel.setCurrentConfig(it)
+                                    }
 
-                                activity!!.runOnUiThread {
+                                    binding.overlayView.visibility = View.GONE
                                     InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
                                 }
                             }

@@ -718,27 +718,38 @@ class PerformCollectionFragment : Fragment(),
                 if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR && resultCode == Activity.RESULT_OK)
                 {
                     data?.data?.let { uri ->
-                        val pair = ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal() )
-
-                        val configFile = pair.first
-                        val imageFile = pair.second
-
-                        if (configFile != null)
-                        {
-                            if (imageFile != null)
+                        ZipUtils.saveToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal()) { configFile, imageFile ->
+                            if (configFile != null)
                             {
-                                ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri )
-                                imageFile.delete()
+                                if (imageFile != null)
+                                {
+                                    ZipUtils.zipToUri( activity!!, listOf( configFile, imageFile ), uri ) { error ->
+                                        if (error.isEmpty())
+                                        {
+                                            imageFile.delete()
+                                            configFile.delete()
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ZipUtils.zipToUri( activity!!, listOf( configFile ), uri ) { error ->
+                                        if (error.isEmpty())
+                                        {
+                                            configFile.delete()
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
                             }
-                            else
-                            {
-                                ZipUtils.zipToUri( activity!!, listOf( configFile ), uri )
-                            }
-
-                            configFile.delete()
                         }
-
-                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.config_saved), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

@@ -578,29 +578,25 @@ class ManageConfigurationsFragment : Fragment(),
                 {
                     binding.overlayView.visibility = View.VISIBLE
 
-                    val config = ZipUtils.unzip( activity!!, uri, encryptionPassword )
-
-                    if (config == null)
-                    {
-                        activity!!.runOnUiThread {
+                    ZipUtils.unzip( activity!!, uri, encryptionPassword ) { config ->
+                        if (config == null)
+                        {
                             binding.overlayView.visibility = View.GONE
                             InfoDialog( activity!!, resources.getString(R.string.error), resources.getString(R.string.import_failed), resources.getString(R.string.ok), null, null)
                         }
-                    }
-                    else
-                    {
-                        DAO.instance().writableDatabase.beginTransaction()
+                        else
+                        {
+                            DAO.instance().writableDatabase.beginTransaction()
 
-                        DAO.configDAO.createOrUpdateConfig( config )
+                            DAO.configDAO.createOrUpdateConfig( config )
 
-                        DAO.instance().writableDatabase.setTransactionSuccessful()
-                        DAO.instance().writableDatabase.endTransaction()
+                            DAO.instance().writableDatabase.setTransactionSuccessful()
+                            DAO.instance().writableDatabase.endTransaction()
 
-                        DAO.configDAO.getConfig( config.uuid )?.let {
-                            sharedViewModel.setCurrentConfig(it)
-                        }
+                            DAO.configDAO.getConfig( config.uuid )?.let {
+                                sharedViewModel.setCurrentConfig(it)
+                            }
 
-                        activity!!.runOnUiThread {
                             binding.overlayView.visibility = View.GONE
                             configurations = DAO.configDAO.getConfigs()
                             manageConfigurationsAdapter.updateConfigurations(configurations)

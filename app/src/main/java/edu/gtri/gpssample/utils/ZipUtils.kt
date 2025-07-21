@@ -40,153 +40,178 @@ object ZipUtils
         }
     }
 
-    fun zipToUri( context: Context, files: List<File>, zipUri: Uri )
+    fun zipToUri( activity: Activity, files: List<File>, zipUri: Uri, completion: ( error: String )->Unit )
     {
-        context.contentResolver.openOutputStream(zipUri)?.use { outputStream ->
-            ZipOutputStream(BufferedOutputStream(outputStream)).use { zipOut ->
-                for (file in files)
-                {
-                    FileInputStream(file).use { input ->
-                        val entry = ZipEntry(file.name)
-                        zipOut.putNextEntry(entry)
-                        input.copyTo(zipOut)
-                        zipOut.closeEntry()
-                    }
-                }
-            }
-        }
-    }
-
-    fun unzip( context: Context, zipUri: Uri, password: String ) : Config?
-    {
-        var config: Config? = null
-
-        context.contentResolver.openInputStream(zipUri)?.use { inputStream ->
-            ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
-                var entry = zis.nextEntry
-
-                while (entry != null)
-                {
-                    val reader = BufferedReader(InputStreamReader(zis))
-                    val content = reader.readText()
-
-                    if (entry.name.contains( "-img"))
-                    {
-                        ImageList.unpack( content, password )?.let { imageList ->
-                            for (image in imageList.images)
-                            {
-                                if (ImageDAO.instance().getImage( image.uuid ) == null)
-                                {
-                                    Log.d( "xxx", "imported image with uuid: ${image.uuid}")
-                                    ImageDAO.instance().createImage( image )
-                                }
+        Thread {
+            try
+            {
+                activity.contentResolver.openOutputStream(zipUri)?.use { outputStream ->
+                    ZipOutputStream(BufferedOutputStream(outputStream)).use { zipOut ->
+                        for (file in files)
+                        {
+                            FileInputStream(file).use { input ->
+                                val entry = ZipEntry(file.name)
+                                zipOut.putNextEntry(entry)
+                                input.copyTo(zipOut)
+                                zipOut.closeEntry()
                             }
                         }
                     }
-                    else
-                    {
-                        config = Config.unpack( content, password )
-                        Log.d( "xxx", "imported Config" )
-                    }
+                }
 
-                    zis.closeEntry()
-                    entry = zis.nextEntry
+                activity.runOnUiThread {
+                    completion( "" )
                 }
             }
-        }
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTraceToString())
+                activity.runOnUiThread {
+                    completion( "Error writing to zip file")
+                }
+            }
+        }.start()
+    }
 
-        return config
+    fun unzip( activity: Activity, zipUri: Uri, password: String, completion: (config: Config?)->Unit )
+    {
+        Thread {
+            try
+            {
+                var config: Config? = null
+
+                activity.contentResolver.openInputStream(zipUri)?.use { inputStream ->
+                    ZipInputStream(BufferedInputStream(inputStream)).use { zis ->
+                        var entry = zis.nextEntry
+
+                        while (entry != null)
+                        {
+                            val reader = BufferedReader(InputStreamReader(zis))
+                            val content = reader.readText()
+
+                            if (entry.name.contains( "-img"))
+                            {
+                                ImageList.unpack( content, password )?.let { imageList ->
+                                    for (image in imageList.images)
+                                    {
+                                        if (ImageDAO.instance().getImage( image.uuid ) == null)
+                                        {
+                                            Log.d( "xxx", "imported image with uuid: ${image.uuid}")
+                                            ImageDAO.instance().createImage( image )
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                config = Config.unpack( content, password )
+                                Log.d( "xxx", "imported Config" )
+                            }
+
+                            zis.closeEntry()
+                            entry = zis.nextEntry
+                        }
+                    }
+                }
+
+                activity.runOnUiThread {
+                    completion( config )
+                }
+            }
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTraceToString())
+                activity.runOnUiThread {
+                    completion( null )
+                }
+            }
+        }.start()
     }
 
     fun exportToDefaultLocation( activity: Activity, config: Config, fileName: String, shouldPackMinimal: Boolean )
     {
-        try
-        {
-            val pair = saveToDefaultLocation( activity, config, fileName, shouldPackMinimal )
-
-            val configFile = pair.first
-            val imageFile = pair.second
-            val zipFileName = fileName + ".zip"
-
-            val zipFile = File(zipFileName)
-
-            if (configFile != null)
+        Thread {
+            try
             {
-                if (imageFile != null)
-                {
-                    zipToFile( listOf( configFile, imageFile ), zipFile )
-                    imageFile.delete()
-                }
-                else
-                {
-                    zipToFile( listOf( configFile ), zipFile )
-                }
+                saveToDefaultLocation( activity, config, fileName, shouldPackMinimal ) { configFile, imageFile ->
+                    val zipFileName = fileName + ".zip"
+                    val zipFile = File(zipFileName)
 
-                configFile.delete()
-            }
-        }
-        catch( ex: Exception )
-        {
-            Log.d( "xxx", ex.stackTraceToString())
-        }
-    }
+                    if (configFile != null)
+                    {
+                        if (imageFile != null)
+                        {
+                            zipToFile( listOf( configFile, imageFile ), zipFile )
+                            imageFile.delete()
+                        }
+                        else
+                        {
+                            zipToFile( listOf( configFile ), zipFile )
+                        }
 
-    fun saveToDefaultLocation( activity: Activity, config: Config, fileName: String, shouldPackMinimal: Boolean ) : Pair<File?, File?>
-    {
-        try
-        {
-//            config.selectedEnumAreaUuid = ""
-//
-//            for (enumArea in config.enumAreas)
-//            {
-//                enumArea.selectedEnumerationTeamUuid = ""
-//                enumArea.selectedCollectionTeamUuid = ""
-//            }
-
-            val configFileName = fileName + ".json"
-            val imageFileName = fileName + "-img.json"
-
-            val packedConfig = if (shouldPackMinimal) config.packMinimal() else config.pack()
-
-            val configFile = File(configFileName)
-            val writer = FileWriter(configFile)
-            writer.append(packedConfig)
-            writer.flush()
-            writer.close()
-
-            val imageList = ImageList( config.uuid, ArrayList<Image>())
-
-            // check for images
-            for (enumArea in config.enumAreas)
-            {
-                for (location in enumArea.locations)
-                {
-                    ImageDAO.instance().getImage( location )?.let {
-                        imageList.images.add( it )
+                        configFile.delete()
                     }
                 }
             }
-
-            var imageFile: File? = null
-
-            if (imageList.images.isNotEmpty())
+            catch( ex: Exception )
             {
-                val payload = imageList.pack( config.encryptionPassword )
-                imageFile = File(imageFileName)
-                val writer = FileWriter(imageFile)
-                writer.append(payload)
+                Log.d( "xxx", ex.stackTraceToString())
+            }
+        }.start()
+    }
+
+    fun saveToDefaultLocation( activity: Activity, config: Config, fileName: String, shouldPackMinimal: Boolean, completion: (configFile: File?, imageFile: File? )->Unit )
+    {
+        Thread {
+            try
+            {
+                val configFileName = fileName + ".json"
+                val imageFileName = fileName + "-img.json"
+
+                val packedConfig = if (shouldPackMinimal) config.packMinimal() else config.pack()
+
+                val configFile = File(configFileName)
+                val writer = FileWriter(configFile)
+                writer.append(packedConfig)
                 writer.flush()
                 writer.close()
+
+                val imageList = ImageList( config.uuid, ArrayList<Image>())
+
+                // check for images
+                for (enumArea in config.enumAreas)
+                {
+                    for (location in enumArea.locations)
+                    {
+                        ImageDAO.instance().getImage( location )?.let {
+                            imageList.images.add( it )
+                        }
+                    }
+                }
+
+                var imageFile: File? = null
+
+                if (imageList.images.isNotEmpty())
+                {
+                    val payload = imageList.pack( config.encryptionPassword )
+                    imageFile = File(imageFileName)
+                    val writer = FileWriter(imageFile)
+                    writer.append(payload)
+                    writer.flush()
+                    writer.close()
+                }
+
+                activity.runOnUiThread {
+                    completion( configFile, imageFile )
+                }
             }
-
-            return Pair( configFile, imageFile )
-        }
-        catch( ex: Exception )
-        {
-            Log.d( "xxx", ex.stackTraceToString())
-            Toast.makeText( activity.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
-        }
-
-        return Pair( null, null )
+            catch( ex: Exception )
+            {
+                Log.d( "xxx", ex.stackTraceToString())
+                activity.runOnUiThread {
+                    completion( null, null )
+                }
+            }
+        }.start()
     }
 }
