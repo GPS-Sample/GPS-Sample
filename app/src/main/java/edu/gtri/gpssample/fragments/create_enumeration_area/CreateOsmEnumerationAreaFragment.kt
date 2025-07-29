@@ -61,6 +61,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
+import edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment.PointWithProperty
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
@@ -83,6 +84,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     MapManager.MapManagerDelegate,
     MapboxManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
+    DropdownDialog.DropdownDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     MultiConfirmationDialog.MulitConfirmationDialogDelegate
@@ -415,6 +417,8 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             addPolygon(enumArea)
 
+            val markerProperties = ArrayList<MapManager.MarkerProperty>()
+
             for (location in enumArea.locations)
             {
                 var resourceId = R.drawable.home_black
@@ -502,7 +506,12 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                     title = location.enumerationItems[0].subAddress
                 }
 
-                MapManager.instance().createMarker( activity!!, mapView, location, resourceId, title )
+                markerProperties.add( MapManager.MarkerProperty( location, resourceId, title ))
+            }
+
+            if (markerProperties.isNotEmpty())
+            {
+                MapManager.instance().loadMarkers( activity!!, binding.osmMapView, markerProperties )
             }
         }
     }
@@ -935,7 +944,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                                 val keys = ArrayList(feature.properties.keys)
                                 when (geometry) {
                                     is MultiPolygon -> {
-//                                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
+                                        DropdownDialog( activity!!, resources.getString(R.string.select_the_property_identifier), keys, text, this )
                                     }
                                     is Point -> {
                                         checkboxDialog = CheckboxDialog( activity!!, resources.getString(R.string.select_the_hh_identifiers), keys, text, feature, this )
@@ -946,7 +955,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                         }
                         else
                         {
-//                            dropdownDidSelectSaveButton( text, "" )
+                            dropdownDidSelectSaveButton( text, "" )
                         }
                     }
                 }
@@ -961,11 +970,204 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     override fun checkboxDialogDidSelectSaveButton( json: String, selections: ArrayList<String> )
     {
         propertySelections = selections
-//        dropdownDidSelectSaveButton( json, "" )
+        dropdownDidSelectSaveButton( json, "" )
+    }
+
+    override fun dropdownDidSelectSaveButton( json: String, response: String )
+    {
+        activity!!.runOnUiThread {
+            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+        }
+
+        Thread {
+            try
+            {
+                parseGeoJson( json, response )
+
+//                if (showCurrentLocation && unsavedEnumAreas.isNotEmpty())
+//                {
+//                    activity!!.runOnUiThread {
+//                        showCurrentLocation = false
+//                        binding.mapboxMapView.location.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener)
+//                        binding.mapboxMapView.location.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener)
+//                        binding.mapboxMapView.gestures.removeOnMoveListener(onMoveListener)
+//                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+//                    }
+//                }
+            }
+            catch( ex: Exception)
+            {
+                activity!!.runOnUiThread {
+                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            busyIndicatorDialog?.let {
+                activity!!.runOnUiThread {
+                    it.alertDialog.cancel()
+                }
+            }
+        }.start()
+    }
+
+    override fun dropdownDidSelectCancelButton( json: String )
+    {
+        dropdownDidSelectSaveButton( json, "" )
     }
 
     override fun checkboxDialogDidSelectCancelButton()
     {
+    }
+
+    fun parseGeoJson( text: String, nameKey: String )
+    {
+        val points = ArrayList<edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment.PointWithProperty>()
+        val featureCollection = FeatureCollection.fromJson( text )
+
+        featureCollection.forEach { feature ->
+
+            var name = "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}"
+
+            feature.getStringProperty(nameKey)?.let {
+                name = it
+            }
+
+            feature.geometry?.let { geometry ->
+                when( geometry ) {
+                    is MultiPolygon -> {
+                        val multiPolygon = geometry as MultiPolygon
+
+                        var creationDate = Date().time
+
+                        val vertices = ArrayList<LatLon>()
+
+                        multiPolygon.coordinates[0][0].forEach { position ->
+                            vertices.add( LatLon( creationDate++, position.latitude, position.longitude ))
+                        }
+
+                        val latLngBounds = GeoUtils.findGeobounds(vertices)
+                        val northEast = LatLon( 0, latLngBounds.northeast.latitude, latLngBounds.northeast.longitude )
+                        val southWest = LatLon( 0, latLngBounds.southwest.latitude, latLngBounds.southwest.longitude )
+
+                        val mapTileRegion = MapTileRegion( northEast, southWest )
+
+                        val enumArea = EnumArea(config.uuid, name, "", 0, vertices, mapTileRegion )
+
+                        activity!!.runOnUiThread {
+                            sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
+                                MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
+                            }
+                        }
+
+                        unsavedEnumAreas.add(enumArea)
+                    }
+                    is Point -> {
+                        val jsonArray = ArrayList<JSONObject>()
+
+                        var jsonString = ""
+
+                        for (selection in propertySelections)
+                        {
+                            if (selection.isNotEmpty())
+                            {
+                                val value = feature.getStringProperty( selection )
+
+                                if (jsonString.isEmpty())
+                                {
+                                    jsonString = "{"
+                                }
+                                else
+                                {
+                                    jsonString += ", "
+                                }
+
+                                jsonString += "\"${selection}\" : \"${value}\""
+                                val jsonObject = JSONObject()
+                                jsonObject.put( selection, value )
+                                jsonArray.add( jsonObject )
+                            }
+                        }
+
+                        if (jsonString.isNotEmpty())
+                        {
+                            jsonString += "}"
+                        }
+
+                        val point = geometry as Point
+                        points.add(
+                            edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment.PointWithProperty(
+                                point,
+                                jsonString
+                            )
+                        )
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+        // figure out which enumArea contains each point
+
+        if (points.isNotEmpty())
+        {
+            var count = 0
+
+            for (point in points)
+            {
+                busyIndicatorDialog?.let {
+                    activity!!.runOnUiThread {
+                        it.updateProgress("${count}/${points.size}")
+                    }
+                }
+
+                count += 1
+
+                val allEnumAreas = ArrayList<EnumArea>()
+
+                if (config.enumAreas.isNotEmpty())
+                {
+                    allEnumAreas.addAll( config.enumAreas)
+                }
+
+                if (unsavedEnumAreas.isNotEmpty())
+                {
+                    allEnumAreas.addAll( unsavedEnumAreas )
+                }
+
+                for (enumArea in allEnumAreas)
+                {
+                    val enumAreaPoints = ArrayList<Coordinate>()
+
+                    enumArea.vertices.map {
+                        enumAreaPoints.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
+                    }
+
+                    val geometryFactory = GeometryFactory()
+                    val geometry: Geometry = geometryFactory.createPolygon(enumAreaPoints.toTypedArray())
+
+                    val coordinate = Coordinate( point.point.coordinates.longitude, point.point.coordinates.latitude )
+                    val geometry1 = geometryFactory.createPoint( coordinate )
+                    if (geometry.contains( geometry1 ))
+                    {
+                        var altitude: Double = 0.0
+                        point.point.coordinates.altitude?.let {
+                            altitude = it
+                        }
+
+                        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                        val location = Location( timeZone, LocationType.Enumeration, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
+
+                        enumArea.locations.add( location )
+                        break // found! assuming that it can only exist in a single EA, for now!
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            refreshMap()
+        }
     }
 
     data class PointWithProperty( var point: Point, var property: String )

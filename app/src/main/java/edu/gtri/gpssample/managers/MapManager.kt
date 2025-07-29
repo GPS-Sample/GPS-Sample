@@ -71,6 +71,7 @@ import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 
 class MapManager
 {
@@ -753,6 +754,69 @@ class MapManager
         }
 
         return Point.fromLngLat( 0.0, 0.0 )
+    }
+
+    fun getIconDrawable(context: Context, iconName: String): Drawable?
+    {
+        val resId = context.resources.getIdentifier( iconName, "drawable", context.packageName)
+        return if (resId != 0) ContextCompat.getDrawable(context, resId) else null
+    }
+
+    data class MarkerProperty( var location: Location, var resourceId: Int, var title: String )
+    {
+    }
+
+    fun loadMarkers( context: Context, mapView: org.osmdroid.views.MapView, markerProperties: ArrayList<MarkerProperty> )
+    {
+        val clusterer = RadiusMarkerClusterer(context)
+        clusterer.textPaint.color = Color.WHITE
+
+        for (markerProperty in markerProperties)
+        {
+            val marker = Marker(mapView)
+
+            marker.position = GeoPoint(markerProperty.location.latitude, markerProperty.location.longitude)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            marker.icon = ContextCompat.getDrawable(context, markerProperty.resourceId)
+            marker.title = markerProperty.title
+
+            clusterer.add(marker)
+        }
+
+        mapView.overlays.add(clusterer)
+        mapView.invalidate()
+    }
+
+    fun loadGeoJson( context: Context, mapView: org.osmdroid.views.MapView, geoJsonString: String )
+    {
+        val clusterer = RadiusMarkerClusterer(context)
+        clusterer.textPaint.color = Color.WHITE
+
+        val geoJson = JSONObject(geoJsonString)
+        val features = geoJson.getJSONArray("features")
+
+        for (i in 0 until features.length())
+        {
+            val feature = features.getJSONObject(i)
+            val geometry = feature.getJSONObject("geometry")
+            val coords = geometry.getJSONArray("coordinates")
+            val properties = feature.getJSONObject("properties")
+
+            val lat = coords.getDouble(1)
+            val lon = coords.getDouble(0)
+            val iconType = properties.getString("home_black")
+
+            val marker = Marker(mapView)
+            marker.position = GeoPoint(lat, lon)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            marker.icon = getIconDrawable(context, iconType) // Load the correct PNG
+            marker.title = properties.optString("name")
+
+            clusterer.add(marker)
+        }
+
+        mapView.overlays.add(clusterer)
+        mapView.invalidate()
     }
 
     // private functions
