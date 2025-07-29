@@ -55,7 +55,7 @@ class MainApplication : Application()
     }
 
     companion object {
-        private var instance: MainApplication? = null
+        lateinit var instance: MainApplication
 
         fun getContext(): Context {
             return instance!!.applicationContext

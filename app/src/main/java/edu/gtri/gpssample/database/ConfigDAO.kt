@@ -11,6 +11,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.database.Cursor
 import android.util.Log
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
@@ -21,7 +22,14 @@ class ConfigDAO(private var dao: DAO)
 {
     fun createOrUpdateConfig( config: Config ) : Config?
     {
-        val existingConfig = getConfig( config.uuid )
+        MainApplication.instance.user?.let { user ->
+            if (!config.validUsers.contains(user.uuid))
+            {
+                config.validUsers += " ${user.uuid} "
+            }
+        }
+
+        val existingConfig = getConfig(config.uuid)
 
         if (existingConfig != null)
         {
@@ -74,6 +82,7 @@ class ConfigDAO(private var dao: DAO)
         values.put( DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS, config.autoIncrementSubaddress )
         values.put( DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED, config.proximityWarningIsEnabled )
         values.put( DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE, config.proximityWarningValue )
+        values.put( DAO.COLUMN_CONFIG_VALID_USERS, config.validUsers )
 
         // TODO: these should be from lookup tables
         val dateFormatIndex = DateFormatConverter.toIndex(config.dateFormat)
@@ -119,13 +128,14 @@ class ConfigDAO(private var dao: DAO)
         val autoIncrementSubaddress = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS)).toBoolean()
         val proximityWarningIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED)).toBoolean()
         val proximityWarningValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE))
+        val validUsers = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_VALID_USERS))
 
         // TODO: these should be lookup tables
         val distanceFormat = DistanceFormatConverter.fromIndex(distanceFormatIndex)
         val dateFormat = DateFormatConverter.fromIndex(dateFormatIndex)
         val timeFormat = TimeFormatConverter.fromIndex(timeFormatIndex)
 
-        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid )
+        return Config( uuid, creationDate, timeZone, name, dbVersion, mapEngineIndex, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsRequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue, selectedStudyUuid, selectedEnumAreaUuid, validUsers )
     }
 
     fun getConfig( uuid: String ): Config?
@@ -152,19 +162,25 @@ class ConfigDAO(private var dao: DAO)
     fun getConfigs(): ArrayList<Config>
     {
         val configs = ArrayList<Config>()
-        val query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
 
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-        while (cursor.moveToNext())
-        {
-            val config = buildConfig( cursor )
-            config.studies = DAO.studyDAO.getStudies( config )
-            config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+        MainApplication.instance.user?.let { user ->
+            val query = "SELECT * FROM ${DAO.TABLE_CONFIG}"
+            val cursor = dao.writableDatabase.rawQuery(query, null)
 
-            configs.add( config)
+            while (cursor.moveToNext()) {
+                val config = buildConfig(cursor)
+
+                if (config.validUsers.contains(user.uuid))
+                {
+                    config.studies = DAO.studyDAO.getStudies( config )
+                    config.enumAreas = DAO.enumAreaDAO.getEnumAreas( config )
+
+                    configs.add( config)
+                }
+            }
+
+            cursor.close()
         }
-
-        cursor.close()
 
         return configs
     }

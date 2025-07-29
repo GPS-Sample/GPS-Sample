@@ -55,15 +55,16 @@ data class Config(
     var studies : ArrayList<Study>,
     var enumAreas : ArrayList<EnumArea>,
     var selectedStudyUuid: String,
-    var selectedEnumAreaUuid: String)
+    var selectedEnumAreaUuid: String,
+    var validUsers : String)
 {
     constructor(timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat, minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int)
             : this(UUID.randomUUID().toString(), Date().time, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-                ArrayList<Study>(), ArrayList<EnumArea>(), "", "")
+                ArrayList<Study>(), ArrayList<EnumArea>(), "", "", "")
     constructor(uuid: String, creationDate: Long, timeZone: Int, name: String, dbVersion: Int, mapEngine: Int, dateFormat: DateFormat, timeFormat: TimeFormat, distanceFormat: DistanceFormat,
-                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String)
+                minGpsPrecision: Int, encryptionPassword: String, allowManualLocationEntry: Boolean, subaddressIsrequired: Boolean, autoIncrementSubaddress: Boolean, proximityWarningIsEnabled: Boolean, proximityWarningValue: Int, selectedStudyUuid: String, selectedEnumAreaUuid: String, validUsers: String)
             : this(uuid, creationDate, timeZone, name, dbVersion, mapEngine, dateFormat, timeFormat, distanceFormat, minGpsPrecision, encryptionPassword, allowManualLocationEntry, subaddressIsrequired, autoIncrementSubaddress, proximityWarningIsEnabled, proximityWarningValue,
-                ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid)
+                ArrayList<Study>(), ArrayList<EnumArea>(), selectedStudyUuid, selectedEnumAreaUuid, validUsers)
 
     fun equals( other: Config ): Boolean
     {

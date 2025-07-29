@@ -54,6 +54,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CONFIG_PROXIMITY_WARNING_VALUE + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_STUDY_UUID + " TEXT" + "," +
+                    COLUMN_CONFIG_VALID_USERS + " TEXT" + "," +
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" + "," +
                     "FOREIGN KEY($COLUMN_STUDY_UUID) REFERENCES $TABLE_STUDY($COLUMN_UUID)" +
                     ") WITHOUT ROWID")
@@ -480,6 +481,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS = "config_auto_increment_subaddress"
         const val COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED = "config_proximity_warning_is_enabled"
         const val COLUMN_CONFIG_PROXIMITY_WARNING_VALUE = "config_proximity_warning_value"
+        const val COLUMN_CONFIG_VALID_USERS = "config_valid_users"
 
         // Study Table
         const val TABLE_STUDY = "study"
@@ -620,22 +622,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        fun showAll()
-        {
-//            deleteAll()
-            Log.d( "xxx", "configs: ${DAO.configDAO.getConfigs()}")
-            Log.d( "xxx", "studies: ${DAO.studyDAO.getStudies()}")
-            Log.d( "xxx", "fields: ${DAO.fieldDAO.getFields()}")
-            Log.d( "xxx", "rules: ${DAO.ruleDAO.getRules()}")
-            Log.d( "xxx", "filters: ${DAO.filterDAO.getFilters()}")
-            Log.d( "xxx", "fieldData: ${DAO.fieldDataDAO.getFieldData()}")
-            Log.d( "xxx", "enumAreas: ${DAO.enumAreaDAO.getEnumAreas()}")
-            Log.d( "xxx", "teams: ${DAO.enumerationTeamDAO.getEnumerationTeams()}")
-            Log.d( "xxx", "latLons: ${DAO.latLonDAO.getLatLons()}")
-            Log.d( "xxx", "locations: ${DAO.locationDAO.getLocations()}")
-            Log.d( "xxx", "enumerationItems: ${DAO.enumerationItemDAO.getEnumerationItems()}")
-        }
-
         fun deleteAll( includingUserTable: Boolean = false )
         {
             _instance?.let {
@@ -731,6 +717,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 317
+        const val DATABASE_VERSION = 318
     }
 }
