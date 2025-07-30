@@ -175,6 +175,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         {
             TileServer.startServer( config.enumAreas[0].mbTilesPath )
         }
+        else
+        {
+            TileServer.stopServer()
+        }
 
         binding.mapOverlayView.visibility = View.GONE
 
@@ -1055,6 +1059,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                         activity!!.runOnUiThread {
                             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                MapManager.instance().disableLocationUpdates( activity!!, mapView )
                                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                                 MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
                             }
@@ -1191,6 +1196,9 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+                    refreshMap()
+                }
             }
 
             R.id.satellite_streets ->
@@ -1201,6 +1209,9 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+                    refreshMap()
+                }
             }
 
             R.id.import_map_tiles ->
@@ -1248,9 +1259,17 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     {
         val mbTilesPath = activity!!.cacheDir.toString() + "/" + selection
 
-        TileServer.startServer( activity!!, null, mbTilesPath, binding.mapboxMapView.getMapboxMap()) {
-//            refreshMap()
-            TileServer.centerMap( binding.mapboxMapView.getMapboxMap(), sharedViewModel.currentZoomLevel?.value )
+        selectedEnumArea?.let {
+            it.mbTilesPath = mbTilesPath
+            val mbtilesFile = File( mbTilesPath )
+            it.mbTilesSize = mbtilesFile.length()
+            selectedEnumArea = null
+        }
+
+        TileServer.startServer( mbTilesPath )
+
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, this ) { mapView ->
+            refreshMap()
         }
     }
 
