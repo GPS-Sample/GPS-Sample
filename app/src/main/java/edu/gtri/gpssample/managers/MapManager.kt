@@ -713,13 +713,13 @@ class MapManager
                 val pointAnnotationOptions = PointAnnotationOptions()
                     .withPoint( point )
                     .withData( jsonElement )
+                    .withTextField( title )
 
                 convertDrawableToBitmap( AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
                     pointAnnotationOptions.withIconImage( bitmap )
                 }
 
                 val pointAnnotation = pointAnnotationManager.create(pointAnnotationOptions)
-                pointAnnotation.textField = title
 
                 pointAnnotationManager.apply {
                     addClickListener(
