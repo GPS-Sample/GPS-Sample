@@ -120,10 +120,9 @@ class ManageCollectionTeamsFragment : Fragment()
 
     fun didSelectTeam(collectionTeam: CollectionTeam)
     {
-        sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
-
         enumArea.selectedEnumerationTeamUuid = ""
         enumArea.selectedCollectionTeamUuid = collectionTeam.uuid
+        sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
 
         findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
     }

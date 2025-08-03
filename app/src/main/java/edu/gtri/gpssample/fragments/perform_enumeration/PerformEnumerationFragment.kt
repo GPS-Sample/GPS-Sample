@@ -133,8 +133,8 @@ class PerformEnumerationFragment : Fragment(),
             enumArea = it
         }
 
-        sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.let {
-            enumerationTeam = it
+        enumArea.enumerationTeams.find { it.uuid == sharedViewModel.currentEnumerationTeamUuid }?.let { enumerationTeam ->
+            this.enumerationTeam = enumerationTeam
         }
 
         if (sharedViewModel.currentCenterPoint?.value == null)
@@ -322,7 +322,7 @@ class PerformEnumerationFragment : Fragment(),
 
                         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         enumArea.locations.add(location)
-                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+                        sharedViewModel.currentLocationUuid = location.uuid
                         findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
                     } ?: Toast.makeText(activity!!.applicationContext, resources.getString(R.string.current_location_not_set), Toast.LENGTH_LONG).show()
                 }
@@ -494,7 +494,7 @@ class PerformEnumerationFragment : Fragment(),
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
 
-            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            sharedViewModel.currentLocationUuid = location.uuid
 
             enumerationTeamLocations.add(location)
             enumerationTeam.locationUuids.add(location.uuid)
@@ -525,7 +525,7 @@ class PerformEnumerationFragment : Fragment(),
                     DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                     enumArea.locations.add(location)
 
-                    sharedViewModel.locationViewModel.setCurrentLocation(location)
+                    sharedViewModel.currentLocationUuid = location.uuid
 
                     enumerationTeamLocations.add(location)
                     enumerationTeam.locationUuids.add(location.uuid)
@@ -637,8 +637,7 @@ class PerformEnumerationFragment : Fragment(),
 
     fun navigateToAddHouseholdFragment()
     {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-
+        enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
             val bundle = Bundle()
             bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
             bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
@@ -647,36 +646,34 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (gpsLocationIsGood( location ))
                 {
-                    val enumerationItem = EnumerationItem()
+                    DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
+                        location.enumerationItems.add( enumerationItem )
 
-                    sharedViewModel.currentConfiguration?.value?.let { config ->
-                        if (config.autoIncrementSubaddress)
-                        {
-                            enumerationItem.subAddress = "${maxSubaddress + 1}"
+                        sharedViewModel.currentConfiguration?.value?.let { config ->
+                            if (config.autoIncrementSubaddress)
+                            {
+                                enumerationItem.subAddress = "${maxSubaddress + 1}"
+                            }
                         }
-                    }
 
-                    sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                        sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
-                    ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                        when( buttonPressed )
-                        {
-                            ConfirmationDialog.ButtonPress.Left -> {
-                                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                        ConfirmationDialog( activity, resources.getString(R.string.please_confirm), resources.getString(R.string.is_multi_family), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
                                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment,bundle)
                                 }
-                            }
-                            ConfirmationDialog.ButtonPress.Right -> {
-                                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+                                ConfirmationDialog.ButtonPress.Right -> {
                                     val bundle = Bundle()
                                     bundle.putBoolean( Keys.kEditMode.value, gpsLocationIsGood( location ))
                                     bundle.putInt( Keys.kStartSubaddress.value, maxSubaddress)
                                     findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment,bundle)
                                 }
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
                             }
                         }
                     }
@@ -688,7 +685,7 @@ class PerformEnumerationFragment : Fragment(),
             }
             else if (location.enumerationItems.size == 1)
             {
-                sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
+                sharedViewModel.currentEnumerationItemUuid = location.enumerationItems[0].uuid
                 findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
             }
             else
@@ -706,7 +703,7 @@ class PerformEnumerationFragment : Fragment(),
             binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
         }
 
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
+        sharedViewModel.currentLocationUuid = location.uuid
 
         if (location.isLandmark)
         {
@@ -1117,7 +1114,7 @@ class PerformEnumerationFragment : Fragment(),
                         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         enumArea.locations.add(location)
 
-                        sharedViewModel.locationViewModel.setCurrentLocation(location)
+                        sharedViewModel.currentLocationUuid = location.uuid
 
                         enumerationTeamLocations.add(location)
                         enumerationTeam.locationUuids.add(location.uuid)
@@ -1139,7 +1136,7 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun onMarkerTapped( location: Location )
     {
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
+        sharedViewModel.currentLocationUuid = location.uuid
 
         if (location.isLandmark)
         {

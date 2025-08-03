@@ -110,17 +110,33 @@ class PerformCollectionFragment : Fragment(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val vm: ConfigurationViewModel by activityViewModels()
+        val networkVm: NetworkViewModel by activityViewModels()
+        sharedViewModel = vm
+        sharedNetworkViewModel = networkVm
+        sharedNetworkViewModel.currentFragment = this
+
+        sharedViewModel.setCurrentCenterPoint( null )
+
+        val samplingVm: SamplingViewModel by activityViewModels()
+        samplingViewModel = samplingVm
+        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
+            enumArea = it
+        }
+
         setFragmentResultListener( fragmentResultListener ) { key, bundle ->
             bundle.getString( Keys.kRequest.value )?.let { request ->
-                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                    if (gpsAccuracyIsGood() && gpsLocationIsGood(location))
-                    {
-                        when (request)
+                enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+                    location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                        if (gpsAccuracyIsGood() && gpsLocationIsGood(location))
                         {
-                            Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
-                            Keys.kLaunchSurveyRequest.value ->
+                            when (request)
                             {
-                                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
+                                Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
+                                Keys.kLaunchSurveyRequest.value ->
+                                {
                                     if (enumerationItem.odkRecordUri.isNotEmpty())
                                     {
                                         val uri = Uri.parse( enumerationItem.odkRecordUri )
@@ -136,30 +152,18 @@ class PerformCollectionFragment : Fragment(),
                                 }
                             }
                         }
-                    }
-                    else if (!gpsAccuracyIsGood())
-                    {
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
-                    }
-                    else
-                    {
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                        else if (!gpsAccuracyIsGood())
+                        {
+                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                        }
+                        else
+                        {
+                            Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
             }
         }
-
-        val vm: ConfigurationViewModel by activityViewModels()
-        val networkVm: NetworkViewModel by activityViewModels()
-        sharedViewModel = vm
-        sharedNetworkViewModel = networkVm
-        sharedNetworkViewModel.currentFragment = this
-
-        sharedViewModel.setCurrentCenterPoint( null )
-
-        val samplingVm: SamplingViewModel by activityViewModels()
-        samplingViewModel = samplingVm
-        samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
 
         setHasOptionsMenu(true)
     }
@@ -182,10 +186,6 @@ class PerformCollectionFragment : Fragment(),
             config = it
             sharedNetworkViewModel.networkHotspotModel.encryptionPassword = config.encryptionPassword
             sharedNetworkViewModel.networkClientModel.encryptionPassword = config.encryptionPassword
-        }
-
-        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
-            enumArea = it
         }
 
         DAO.collectionTeamDAO.getCollectionTeam( enumArea.selectedCollectionTeamUuid )?.let {
@@ -613,14 +613,15 @@ class PerformCollectionFragment : Fragment(),
 
             if (item is Location)
             {
-                sharedViewModel.locationViewModel.setCurrentLocation(item)
+                sharedViewModel.currentLocationUuid = item.uuid
                 findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
             }
             else if (item is EnumerationItem)
             {
-                DAO.locationDAO.getLocation( item.locationUuid )?.let { location ->
-                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-                    sharedViewModel.locationViewModel.setCurrentEnumerationItem(item)
+                enumArea.locations.find { it.uuid == item.locationUuid }?.let { location: Location ->
+                    sharedViewModel.currentLocationUuid = item.locationUuid
+                    sharedViewModel.currentEnumerationItemUuid = item.uuid
+
                     (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = item.uuid
                     (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                     (this.activity!!.application as? MainApplication)?.currentSubAddress = item.subAddress
@@ -629,6 +630,7 @@ class PerformCollectionFragment : Fragment(),
                     bundle.putBoolean( Keys.kEditMode.value, false )
                     bundle.putBoolean( Keys.kCollectionMode.value, true )
                     bundle.putString( Keys.kFragmentResultListener.value, fragmentResultListener )
+
                     findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
                 }
             }
@@ -791,11 +793,9 @@ class PerformCollectionFragment : Fragment(),
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun shouldLaunchODK()
     {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-            odk_result.launch(intent)
-        }
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.type = "vnd.android.cursor.dir/vnd.odk.form"
+        odk_result.launch(intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -804,11 +804,13 @@ class PerformCollectionFragment : Fragment(),
         if (result.resultCode == Activity.RESULT_OK)
         {
             result.data?.data?.let { uri ->
-                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
-                    if (enumerationItem.odkRecordUri.isEmpty())
-                    {
-                        enumerationItem.odkRecordUri = uri.toString()
-                        didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
+                enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+                    location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                        if (enumerationItem.odkRecordUri.isEmpty())
+                        {
+                            enumerationItem.odkRecordUri = uri.toString()
+                            didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
+                        }
                     }
                 }
             }
@@ -829,28 +831,26 @@ class PerformCollectionFragment : Fragment(),
 
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-
-            sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
-
-                sampledItem.collectionNotes = notes
-                sampledItem.collectionDate = Date().time
-                sampledItem.syncCode = sampledItem.syncCode + 1
-                sampledItem.collectionState = CollectionState.Complete
+        enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+            location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                enumerationItem.collectionNotes = notes
+                enumerationItem.collectionDate = Date().time
+                enumerationItem.syncCode = enumerationItem.syncCode + 1
+                enumerationItem.collectionState = CollectionState.Complete
 
                 (activity!!.application as MainApplication).user?.let { user ->
-                    sampledItem.collectorName = user.name
+                    enumerationItem.collectorName = user.name
                 }
 
                 if (incompleteReason.isNotEmpty())
                 {
-                    sampledItem.collectionState = CollectionState.Incomplete
-                    sampledItem.collectionIncompleteReason = incompleteReason
+                    enumerationItem.collectionState = CollectionState.Incomplete
+                    enumerationItem.collectionIncompleteReason = incompleteReason
                 }
 
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
+                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
 
-                enumArea.locations = DAO.locationDAO.getLocations( collectionTeam )
+//        enumArea.locations = DAO.locationDAO.getLocations( collectionTeam )
 
                 collectionTeamLocations.clear()
                 val enumerationItems = ArrayList<EnumerationItem>()
@@ -871,23 +871,23 @@ class PerformCollectionFragment : Fragment(),
 
                 performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
 
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.getConfig( config.uuid )?.let {
-                        sharedViewModel.setCurrentConfig( it )
-                    }
-                }
-
-                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-                    }
-                }
-
-                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    DAO.studyDAO.getStudy( study.uuid )?.let {
-                        sharedViewModel.createStudyModel.setStudy( it )
-                    }
-                }
+//        sharedViewModel.currentConfiguration?.value?.let { config ->
+//            DAO.configDAO.getConfig( config.uuid )?.let {
+//                sharedViewModel.setCurrentConfig( it )
+//            }
+//        }
+//
+//        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+//            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+//                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+//            }
+//        }
+//
+//        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+//            DAO.studyDAO.getStudy( study.uuid )?.let {
+//                sharedViewModel.createStudyModel.setStudy( it )
+//            }
+//        }
 
                 performCollectionAdapter.notifyDataSetChanged()
 
@@ -1104,7 +1104,7 @@ class PerformCollectionFragment : Fragment(),
 
     override fun onMarkerTapped( location: Location )
     {
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
+        sharedViewModel.currentLocationUuid = location.uuid
 
         if (location.isLandmark)
         {
@@ -1112,7 +1112,7 @@ class PerformCollectionFragment : Fragment(),
         }
         else
         {
-            sharedViewModel.locationViewModel.setCurrentLocation(location)
+            sharedViewModel.currentLocationUuid = location.uuid
 
             if (location.isLandmark)
             {
@@ -1132,7 +1132,7 @@ class PerformCollectionFragment : Fragment(),
                             index = i
                             // This is really only necessary here for the enumerationItems.size == 1 case
                             // For size > 1, this will get set in the multiCollectionFragment
-                            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                            sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
                         }
                     }
 

@@ -49,6 +49,7 @@ class PerformMultiCollectionFragment : Fragment(),
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var location: Location
+    private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performMultiCollectionAdapter: PerformMultiCollectionAdapter
 
@@ -66,45 +67,50 @@ class PerformMultiCollectionFragment : Fragment(),
 
         setFragmentResultListener( fragmentResultListener ) { key, bundle ->
             bundle.getString( Keys.kRequest.value )?.let { request ->
-                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                    if (gpsAccuracyIsGood && gpsLocationIsGood)
+                if (gpsAccuracyIsGood && gpsLocationIsGood)
+                {
+                    when (request)
                     {
-                        when (request)
+                        Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
+                        Keys.kLaunchSurveyRequest.value ->
                         {
-                            Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
-                            Keys.kLaunchSurveyRequest.value ->
+                            if (enumerationItem.odkRecordUri.isNotEmpty())
                             {
-                                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
-                                    if (enumerationItem.odkRecordUri.isNotEmpty())
-                                    {
-                                        val uri = Uri.parse( enumerationItem.odkRecordUri )
-                                        val intent = Intent(Intent.ACTION_EDIT)
-                                        intent.setData(uri)
-                                        odk_result.launch(intent)
-                                    }
-                                    else
-                                    {
-                                        // This will create a new ODK instance record
-                                        SurveyLaunchNotificationDialog(activity!!, this)
-                                    }
-                                }
+                                val uri = Uri.parse( enumerationItem.odkRecordUri )
+                                val intent = Intent(Intent.ACTION_EDIT)
+                                intent.setData(uri)
+                                odk_result.launch(intent)
+                            }
+                            else
+                            {
+                                // This will create a new ODK instance record
+                                SurveyLaunchNotificationDialog(activity!!, this)
                             }
                         }
                     }
-                    else if (!gpsAccuracyIsGood)
-                    {
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
-                    }
-                    else
-                    {
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
-                    }
+                }
+                else if (!gpsAccuracyIsGood)
+                {
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_accuracy_error), Toast.LENGTH_LONG).show()
+                }
+                else
+                {
+                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.gps_location_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
 
         val vm : ConfigurationViewModel by activityViewModels()
         sharedViewModel = vm
+
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+                this.location = location
+                this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                    this.enumerationItem = enumerationItem
+                }
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -124,10 +130,6 @@ class PerformMultiCollectionFragment : Fragment(),
 
         arguments?.getBoolean(Keys.kGpsLocationIsGood.value)?.let { gpsLocationIsGood ->
             this.gpsLocationIsGood = gpsLocationIsGood
-        }
-
-        sharedViewModel.locationViewModel.currentLocation?.value?.let {
-            location = it
         }
 
         val enumerationItems = ArrayList<EnumerationItem>()
@@ -168,7 +170,7 @@ class PerformMultiCollectionFragment : Fragment(),
             (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = enumerationItem.uuid
             (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
             (this.activity!!.application as? MainApplication)?.currentSubAddress = enumerationItem.subAddress
-            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+            sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
             val bundle = Bundle()
             bundle.putBoolean( Keys.kEditMode.value, false )
@@ -184,68 +186,60 @@ class PerformMultiCollectionFragment : Fragment(),
 
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+        enumerationItem.collectionNotes = notes
+        enumerationItem.collectionDate = Date().time
+        enumerationItem.syncCode = enumerationItem.syncCode + 1
+        enumerationItem.collectionState = CollectionState.Complete
 
-            sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { sampledItem ->
+        (activity!!.application as MainApplication).user?.let { user ->
+            enumerationItem.collectorName = user.name
+        }
 
-                sampledItem.collectionNotes = notes
-                sampledItem.collectionDate = Date().time
-                sampledItem.syncCode = sampledItem.syncCode + 1
-                sampledItem.collectionState = CollectionState.Complete
+        if (incompleteReason.isNotEmpty())
+        {
+            enumerationItem.collectionState = CollectionState.Incomplete
+            enumerationItem.collectionIncompleteReason = incompleteReason
+        }
 
-                (activity!!.application as MainApplication).user?.let { user ->
-                    sampledItem.collectorName = user.name
-                }
+        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
 
-                if (incompleteReason.isNotEmpty())
-                {
-                    sampledItem.collectionState = CollectionState.Incomplete
-                    sampledItem.collectionIncompleteReason = incompleteReason
-                }
+//        sharedViewModel.currentConfiguration?.value?.let { config ->
+//            DAO.configDAO.getConfig( config.uuid )?.let {
+//                sharedViewModel.setCurrentConfig( it )
+//            }
+//        }
+//
+//        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+//            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+//                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+//            }
+//        }
+//
+//        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+//            DAO.studyDAO.getStudy( study.uuid )?.let {
+//                sharedViewModel.createStudyModel.setStudy( it )
+//            }
+//        }
 
-                DAO.enumerationItemDAO.createOrUpdateEnumerationItem( sampledItem, location )
+        val enumerationItems = ArrayList<EnumerationItem>()
 
-                sharedViewModel.currentConfiguration?.value?.let { config ->
-                    DAO.configDAO.getConfig( config.uuid )?.let {
-                        sharedViewModel.setCurrentConfig( it )
-                    }
-                }
-
-                sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-                    DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-                        sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-                    }
-                }
-
-                sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-                    DAO.studyDAO.getStudy( study.uuid )?.let {
-                        sharedViewModel.createStudyModel.setStudy( it )
-                    }
-                }
-
-                val enumerationItems = ArrayList<EnumerationItem>()
-
-                for (enumurationItem in location.enumerationItems)
-                {
-                    if (enumurationItem.samplingState == SamplingState.Sampled)
-                    {
-                        enumerationItems.add( enumurationItem )
-                    }
-                }
-
-                performMultiCollectionAdapter.updateEnumerationItems( enumerationItems )
+        for (enumurationItem in location.enumerationItems)
+        {
+            if (enumurationItem.samplingState == SamplingState.Sampled)
+            {
+                enumerationItems.add( enumurationItem )
             }
         }
+
+        performMultiCollectionAdapter.updateEnumerationItems( enumerationItems )
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun shouldLaunchODK()
     {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.type = "vnd.android.cursor.dir/vnd.odk.form"
-            odk_result.launch(intent)
-        }
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.type = "vnd.android.cursor.dir/vnd.odk.form"
+        odk_result.launch(intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -253,12 +247,10 @@ class PerformMultiCollectionFragment : Fragment(),
         if (result.resultCode == Activity.RESULT_OK)
         {
             result.data?.data?.let { uri ->
-                sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let { enumerationItem ->
-                    if (enumerationItem.odkRecordUri.isEmpty())
-                    {
-                        enumerationItem.odkRecordUri = uri.toString()
-                        didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
-                    }
+                if (enumerationItem.odkRecordUri.isEmpty())
+                {
+                    enumerationItem.odkRecordUri = uri.toString()
+                    didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
                 }
             }
 

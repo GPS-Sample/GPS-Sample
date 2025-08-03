@@ -31,6 +31,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Image
+import edu.gtri.gpssample.database.models.Location
 import edu.gtri.gpssample.databinding.FragmentCameraBinding
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -51,6 +52,7 @@ class CameraFragment : Fragment()
     private var imageCapture: ImageCapture? = null
     private var bitmap: Bitmap?= null
 
+    private lateinit var location: Location
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -75,6 +77,12 @@ class CameraFragment : Fragment()
 
         startCamera()
 
+        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
+            enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+                this.location = location
+            }
+        }
+
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -93,12 +101,10 @@ class CameraFragment : Fragment()
         }
 
         binding.deleteImageView.setOnClickListener {
-            sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                location.imageUuid = ""
-                binding.cameraButton.text = resources.getString(R.string.take_photo)
-                binding.imageView.visibility = View.GONE
-                binding.viewFinder.visibility = View.VISIBLE
-            }
+            location.imageUuid = ""
+            binding.cameraButton.text = resources.getString(R.string.take_photo)
+            binding.imageView.visibility = View.GONE
+            binding.viewFinder.visibility = View.VISIBLE
         }
 
         binding.cancelButton.setOnClickListener {
@@ -107,11 +113,9 @@ class CameraFragment : Fragment()
 
         binding.saveButton.setOnClickListener {
             bitmap?.let { bitmap ->
-                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                    CameraUtils.encodeBitmap( bitmap )?.let { imageData ->
-                        ImageDAO.instance().createImage( Image( location.uuid, imageData ))?.let { image ->
-                            location.imageUuid = image.uuid
-                        }
+                CameraUtils.encodeBitmap( bitmap )?.let { imageData ->
+                    ImageDAO.instance().createImage( Image( location.uuid, imageData ))?.let { image ->
+                        location.imageUuid = image.uuid
                     }
                 }
             }
@@ -157,14 +161,12 @@ class CameraFragment : Fragment()
             {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
-                sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
-                    ImageDAO.instance().getImage( location )?.let { image ->
-                        CameraUtils.decodeString( image.data )?.let { bitmap ->
-                            binding.viewFinder.visibility = View.GONE
-                            binding.imageView.visibility = View.VISIBLE
-                            binding.cameraButton.text = resources.getString(R.string.retake_photo)
-                            binding.imageView.setImageBitmap( bitmap )
-                        }
+                ImageDAO.instance().getImage( location )?.let { image ->
+                    CameraUtils.decodeString( image.data )?.let { bitmap ->
+                        binding.viewFinder.visibility = View.GONE
+                        binding.imageView.visibility = View.VISIBLE
+                        binding.cameraButton.text = resources.getString(R.string.retake_photo)
+                        binding.imageView.setImageBitmap( bitmap )
                     }
                 }
             }

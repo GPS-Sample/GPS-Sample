@@ -49,6 +49,11 @@ class ConfigurationViewModel : ViewModel()
     val currentConfiguration : LiveData<Config>?
         get() = _currentConfiguration
 
+    var currentLocationUuid = ""
+    var currentCollectionTeamUuid = ""
+    var currentEnumerationTeamUuid = ""
+    var currentEnumerationItemUuid = ""
+
     val timeFormats = arrayOf( "", "" )
     val dateFormats = arrayOf( "", "", "" )
     val distanceFormats = arrayOf( "", "" )

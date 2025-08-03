@@ -16,21 +16,21 @@ import java.util.*
 
 class LocationViewModel
 {
-    private var _currentLocation : MutableLiveData<Location>? = null
-    private var _currentEnumerationItem : MutableLiveData<EnumerationItem>? = null
-
-    var currentLocation : LiveData<Location>? = _currentLocation
-    var currentEnumerationItem : LiveData<EnumerationItem>? = _currentEnumerationItem
-
-    fun setCurrentLocation(location: Location)
-    {
-        _currentLocation = MutableLiveData(location)
-        currentLocation = _currentLocation
-    }
-
-    fun setCurrentEnumerationItem(enumerationItem: EnumerationItem)
-    {
-        _currentEnumerationItem = MutableLiveData(enumerationItem)
-        currentEnumerationItem = _currentEnumerationItem
-    }
+//    private var _currentLocation : MutableLiveData<Location>? = null
+//    private var _currentEnumerationItem : MutableLiveData<EnumerationItem>? = null
+//
+//    var currentLocation : LiveData<Location>? = _currentLocation
+//    var currentEnumerationItem : LiveData<EnumerationItem>? = _currentEnumerationItem
+//
+//    fun setCurrentLocation(location: Location)
+//    {
+//        _currentLocation = MutableLiveData(location)
+//        currentLocation = _currentLocation
+//    }
+//
+//    fun setCurrentEnumerationItem(enumerationItem: EnumerationItem)
+//    {
+//        _currentEnumerationItem = MutableLiveData(enumerationItem)
+//        currentEnumerationItem = _currentEnumerationItem
+//    }
 }

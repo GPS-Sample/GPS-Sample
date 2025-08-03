@@ -25,6 +25,7 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
+import java.util.Date
 
 class AddLandmarkFragment : Fragment()
 {
@@ -63,12 +64,12 @@ class AddLandmarkFragment : Fragment()
             study = it
         }
 
-        sharedViewModel.locationViewModel.currentLocation?.value?.let {
-            location = it
-        }
-
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let{
             enumArea = it
+        }
+
+        enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+            this.location = location
         }
 
         val components = location.uuid.split("-" )
@@ -129,34 +130,35 @@ class AddLandmarkFragment : Fragment()
         binding.saveButton.setOnClickListener {
             location.description = binding.descriptionEditText.text.toString()
 
-            DAO.locationDAO.updateLocation( location, enumArea )
+            location.creationDate = Date().time
+            DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
-            DAO.configDAO.getConfig( config.uuid )?.let {
-                it.selectedStudyUuid = config.selectedStudyUuid
-                it.selectedEnumAreaUuid = config.selectedEnumAreaUuid
-
-                val enumAreas = it.enumAreas.filter {
-                    it.uuid == config.selectedEnumAreaUuid
-                }
-
-                if (enumAreas.isNotEmpty())
-                {
-                    enumAreas[0].selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-                    enumAreas[0].selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-                }
-
-                sharedViewModel.setCurrentConfig( it )
-            }
-
-            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-                it.selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-                it.selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-            }
-
-            DAO.studyDAO.getStudy( study.uuid )?.let {
-                sharedViewModel.createStudyModel.setStudy( it )
-            }
+//            DAO.configDAO.getConfig( config.uuid )?.let {
+//                it.selectedStudyUuid = config.selectedStudyUuid
+//                it.selectedEnumAreaUuid = config.selectedEnumAreaUuid
+//
+//                val enumAreas = it.enumAreas.filter {
+//                    it.uuid == config.selectedEnumAreaUuid
+//                }
+//
+//                if (enumAreas.isNotEmpty())
+//                {
+//                    enumAreas[0].selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
+//                    enumAreas[0].selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
+//                }
+//
+//                sharedViewModel.setCurrentConfig( it )
+//            }
+//
+//            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+//                it.selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
+//                it.selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
+//                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+//            }
+//
+//            DAO.studyDAO.getStudy( study.uuid )?.let {
+//                sharedViewModel.createStudyModel.setStudy( it )
+//            }
 
             findNavController().popBackStack()
         }

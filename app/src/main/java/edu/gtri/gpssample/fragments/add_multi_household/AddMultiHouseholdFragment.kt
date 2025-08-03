@@ -20,6 +20,7 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.max
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
+import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentAddMultiHouseholdBinding
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -69,16 +70,16 @@ class AddMultiHouseholdFragment : Fragment()
             binding.addButton.visibility = View.GONE
         }
 
-        sharedViewModel.locationViewModel.currentLocation?.value?.let {
-            location = it
+        sharedViewModel.currentConfiguration?.value?.let {
+            config = it
         }
 
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let {
             enumArea = it
         }
 
-        sharedViewModel.currentConfiguration?.value?.let {
-            config = it
+        enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+            this.location = location
         }
 
         addMultiHouseholdAdapter = AddMultiHouseholdAdapter( location.enumerationItems, enumArea.name )
@@ -89,17 +90,24 @@ class AddMultiHouseholdFragment : Fragment()
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
 
         binding.addButton.setOnClickListener {
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
+                location.enumerationItems.add(enumerationItem)
 
-            val enumerationItem = EnumerationItem()
-            enumerationItem.subAddress = getNextSubaddress().toString()
+                enumerationItem.subAddress = getNextSubaddress().toString()
 
-            sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+                sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
-            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
+            }
         }
 
         binding.backButton.setOnClickListener {
             findNavController().popBackStack()
+        }
+
+        if (location.enumerationItems.size == 1 && location.enumerationItems[0].enumerationDate == 0L)
+        {
+            findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment)
         }
     }
 
@@ -141,7 +149,7 @@ class AddMultiHouseholdFragment : Fragment()
 
     fun didSelectEnumerationItem( enumerationItem: EnumerationItem )
     {
-        sharedViewModel.locationViewModel.setCurrentEnumerationItem( enumerationItem )
+        sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
 
         val bundle = Bundle()
         bundle.putBoolean( Keys.kEditMode.value, editMode )

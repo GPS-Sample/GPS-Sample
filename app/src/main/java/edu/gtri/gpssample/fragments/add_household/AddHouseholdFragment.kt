@@ -48,7 +48,7 @@ class AddHouseholdFragment : Fragment(),
     private lateinit var config: Config
     private lateinit var location: Location
     private lateinit var enumArea : EnumArea
-    private lateinit var enumTeam: EnumerationTeam
+    private lateinit var enumerationTeam: EnumerationTeam
     private var propertyAdapter : PropertyAdapter? = null
     private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
@@ -116,16 +116,15 @@ class AddHouseholdFragment : Fragment(),
             enumArea = it
         }
 
-        sharedViewModel.teamViewModel.currentEnumerationTeam?.value?.let {
-            enumTeam = it
+        enumArea.enumerationTeams.find { it.uuid == sharedViewModel.currentEnumerationTeamUuid }?.let { enumerationTeam ->
+            this.enumerationTeam = enumerationTeam
         }
 
-        sharedViewModel.locationViewModel.currentLocation?.value?.let {
-            location = it
-        }
-
-        sharedViewModel.locationViewModel.currentEnumerationItem?.value?.let {
-            enumerationItem = it
+        enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+            this.location = location
+            this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                this.enumerationItem = enumerationItem
+            }
         }
 
         if (!editMode)
@@ -365,7 +364,7 @@ class AddHouseholdFragment : Fragment(),
                         {
                             enumArea.locations.remove( location )
                             DAO.locationDAO.delete( location )
-                            enumTeam.locationUuids.remove( location.uuid )
+                            enumerationTeam.locationUuids.remove( location.uuid )
                         }
 
                         DAO.configDAO.getConfig( config.uuid )?.let {
@@ -380,9 +379,9 @@ class AddHouseholdFragment : Fragment(),
                             sharedViewModel.createStudyModel.setStudy( it )
                         }
 
-                        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
-                            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
-                        }
+//                        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
+//                            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
+//                        }
 
                         findNavController().popBackStack()
                     }
@@ -585,50 +584,41 @@ class AddHouseholdFragment : Fragment(),
             enumerationItem.enumeratorName = user.name
         }
 
-        if (enumerationItem.uuid.isEmpty())
-        {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-            location.enumerationItems.add(enumerationItem)
-        }
-        else
-        {
-            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-        }
+        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
 
         location.creationDate = Date().time
-
         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
 
-        DAO.configDAO.getConfig( config.uuid )?.let {
-            it.selectedStudyUuid = config.selectedStudyUuid
-            it.selectedEnumAreaUuid = config.selectedEnumAreaUuid
-
-            val enumAreas = it.enumAreas.filter {
-                it.uuid == config.selectedEnumAreaUuid
-            }
-
-            if (enumAreas.isNotEmpty())
-            {
-                enumAreas[0].selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-                enumAreas[0].selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-            }
-
-            sharedViewModel.setCurrentConfig( it )
-        }
-
-        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-            it.selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
-            it.selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
-            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-        }
-
-        DAO.studyDAO.getStudy( study.uuid )?.let {
-            sharedViewModel.createStudyModel.setStudy( it )
-        }
-
-        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
-            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
-        }
+//        DAO.configDAO.getConfig( config.uuid )?.let {
+//            it.selectedStudyUuid = config.selectedStudyUuid
+//            it.selectedEnumAreaUuid = config.selectedEnumAreaUuid
+//
+//            val enumAreas = it.enumAreas.filter {
+//                it.uuid == config.selectedEnumAreaUuid
+//            }
+//
+//            if (enumAreas.isNotEmpty())
+//            {
+//                enumAreas[0].selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
+//                enumAreas[0].selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
+//            }
+//
+//            sharedViewModel.setCurrentConfig( it )
+//        }
+//
+//        DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
+//            it.selectedCollectionTeamUuid = enumArea.selectedCollectionTeamUuid
+//            it.selectedEnumerationTeamUuid = enumArea.selectedEnumerationTeamUuid
+//            sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
+//        }
+//
+//        DAO.studyDAO.getStudy( study.uuid )?.let {
+//            sharedViewModel.createStudyModel.setStudy( it )
+//        }
+//
+//        DAO.enumerationTeamDAO.getEnumerationTeam( enumTeam.uuid )?.let {
+//            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
+//        }
 
         findNavController().popBackStack()
     }

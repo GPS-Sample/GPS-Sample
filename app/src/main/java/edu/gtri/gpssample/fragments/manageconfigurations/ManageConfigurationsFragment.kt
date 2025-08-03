@@ -324,7 +324,7 @@ class ManageConfigurationsFragment : Fragment(),
 
                 enumTeam?.let { enumTeam ->
                     sharedViewModel.createStudyModel.setStudy( study )
-                    sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
+                    sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
                     sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                     findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                 }
@@ -363,7 +363,7 @@ class ManageConfigurationsFragment : Fragment(),
                 {
                     val collectionTeam = collectionTeams[0]
                     sharedViewModel.createStudyModel.setStudy( study )
-                    sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
+                    sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
                     sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                     samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
                     findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
@@ -472,7 +472,7 @@ class ManageConfigurationsFragment : Fragment(),
                             val enumArea = enumAreas[0]
 
                             sharedViewModel.createStudyModel.setStudy( study )
-                            sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
+                            sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
                             findNavController().navigate(R.id.action_navigate_to_PerformCollectionFragment)
@@ -482,7 +482,7 @@ class ManageConfigurationsFragment : Fragment(),
                             val enumTeam = enumTeams[0]
 
                             sharedViewModel.createStudyModel.setStudy( study )
-                            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( enumTeam )
+                            sharedViewModel.currentEnumerationTeamUuid = enumTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
                         }
@@ -521,7 +521,7 @@ class ManageConfigurationsFragment : Fragment(),
                             val collectionTeam = collectionTeams[0]
 
                             sharedViewModel.createStudyModel.setStudy( study )
-                            sharedViewModel.teamViewModel.setCurrentCollectionTeam( collectionTeam )
+                            sharedViewModel.currentCollectionTeamUuid = collectionTeam.uuid
                             sharedViewModel.enumAreaViewModel.setCurrentEnumArea( enumArea )
                             samplingViewModel.currentStudy = sharedViewModel.createStudyModel.currentStudy
 

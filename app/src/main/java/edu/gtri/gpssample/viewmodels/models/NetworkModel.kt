@@ -20,7 +20,6 @@ data class NetworkInfo(
 {
 }
 
-
 abstract class NetworkModel {
     abstract val type : NetworkMode
 
@@ -37,6 +36,4 @@ abstract class NetworkModel {
         {
             _viewModelScope = value
         }
-
-
 }

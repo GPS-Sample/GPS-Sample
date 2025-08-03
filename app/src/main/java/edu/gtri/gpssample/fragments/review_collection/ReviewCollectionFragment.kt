@@ -346,14 +346,14 @@ class ReviewCollectionFragment : Fragment(),
 
             if (item is Location)
             {
-                sharedViewModel.locationViewModel.setCurrentLocation(item)
+                sharedViewModel.currentLocationUuid = item.uuid
                 findNavController().navigate(R.id.action_navigate_to_AddLandmarkFragment)
             }
             else if (item is EnumerationItem)
             {
                 DAO.locationDAO.getLocation( item.locationUuid )?.let { location ->
-                    sharedViewModel.locationViewModel.setCurrentLocation(location)
-                    sharedViewModel.locationViewModel.setCurrentEnumerationItem(item)
+                    sharedViewModel.currentLocationUuid = location.uuid
+                    sharedViewModel.currentEnumerationItemUuid = item.uuid
                     (this.activity!!.application as? MainApplication)?.currentEnumerationItemUUID = item.uuid
                     (this.activity!!.application as? MainApplication)?.currentEnumerationAreaName = enumArea.name
                     (this.activity!!.application as? MainApplication)?.currentSubAddress = item.subAddress

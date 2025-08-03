@@ -102,14 +102,20 @@ class ManageEnumerationTeamsFragment : Fragment()
 
     fun didSelectTeam( enumerationTeam: EnumerationTeam )
     {
-        DAO.enumerationTeamDAO.getEnumerationTeam( enumerationTeam.uuid )?.let {
-            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
+        sharedViewModel.currentEnumerationTeamUuid = enumerationTeam.uuid
+        enumArea.selectedCollectionTeamUuid = ""
+        enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
 
-            enumArea.selectedCollectionTeamUuid = ""
-            enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
+        findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
 
-            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
-        }
+//        DAO.enumerationTeamDAO.getEnumerationTeam( enumerationTeam.uuid )?.let {
+//            sharedViewModel.teamViewModel.setCurrentEnumerationTeam( it )
+//
+//            enumArea.selectedCollectionTeamUuid = ""
+//            enumArea.selectedEnumerationTeamUuid = enumerationTeam.uuid
+//
+//            findNavController().navigate(R.id.action_navigate_to_PerformEnumerationFragment)
+//        }
     }
 
     private fun shouldDeleteTeam(enumerationTeam: EnumerationTeam)

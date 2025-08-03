@@ -276,27 +276,28 @@ class ReviewEnumerationFragment : Fragment(),
 
     fun navigateToAddHouseholdFragment()
     {
-        sharedViewModel.locationViewModel.currentLocation?.value?.let { location ->
+        enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
+            location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                val bundle = Bundle()
+                bundle.putBoolean( Keys.kEditMode.value, false)
+                bundle.putInt( Keys.kStartSubaddress.value, 0 )
 
-            val bundle = Bundle()
-            bundle.putBoolean( Keys.kEditMode.value, false)
-            bundle.putInt( Keys.kStartSubaddress.value, 0 )
-
-            if (location.enumerationItems.size == 1)
-            {
-                sharedViewModel.locationViewModel.setCurrentEnumerationItem( location.enumerationItems[0])
-                findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
-            }
-            else
-            {
-                findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
+                if (location.enumerationItems.size == 1)
+                {
+                    sharedViewModel.currentEnumerationItemUuid = location.enumerationItems[0].uuid
+                    findNavController().navigate(R.id.action_navigate_to_AddHouseholdFragment, bundle)
+                }
+                else
+                {
+                    findNavController().navigate(R.id.action_navigate_to_AddMultiHouseholdFragment, bundle)
+                }
             }
         }
     }
 
     private fun didSelectLocation( location: Location )
     {
-        sharedViewModel.locationViewModel.setCurrentLocation(location)
+        sharedViewModel.currentLocationUuid = location.uuid
 
         if (location.isLandmark)
         {

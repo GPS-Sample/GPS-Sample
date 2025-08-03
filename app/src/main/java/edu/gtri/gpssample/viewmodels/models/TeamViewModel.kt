@@ -14,21 +14,21 @@ import edu.gtri.gpssample.database.models.EnumerationTeam
 
 class TeamViewModel
 {
-    private var _currentEnumerationTeam : MutableLiveData<EnumerationTeam>? = null
-    private var _currentCollectionTeam : MutableLiveData<CollectionTeam>? = null
+//    private var _currentEnumerationTeam : MutableLiveData<EnumerationTeam>? = null
+//    private var _currentCollectionTeam : MutableLiveData<CollectionTeam>? = null
 
-    var currentEnumerationTeam : LiveData<EnumerationTeam>? = _currentEnumerationTeam
-    var currentCollectionTeam : LiveData<CollectionTeam>? = _currentCollectionTeam
+//    var currentEnumerationTeam : LiveData<EnumerationTeam>? = _currentEnumerationTeam
+//    var currentCollectionTeam : LiveData<CollectionTeam>? = _currentCollectionTeam
 
-    fun setCurrentEnumerationTeam(enumerationTeam: EnumerationTeam)
-    {
-        _currentEnumerationTeam = MutableLiveData(enumerationTeam)
-        currentEnumerationTeam = _currentEnumerationTeam
-    }
+//    fun setCurrentEnumerationTeam(enumerationTeam: EnumerationTeam)
+//    {
+//        _currentEnumerationTeam = MutableLiveData(enumerationTeam)
+//        currentEnumerationTeam = _currentEnumerationTeam
+//    }
 
-    fun setCurrentCollectionTeam(collectionTeam: CollectionTeam)
-    {
-        _currentCollectionTeam = MutableLiveData(collectionTeam)
-        currentCollectionTeam = _currentCollectionTeam
-    }
+//    fun setCurrentCollectionTeam(collectionTeam: CollectionTeam)
+//    {
+//        _currentCollectionTeam = MutableLiveData(collectionTeam)
+//        currentCollectionTeam = _currentCollectionTeam
+//    }
 }
