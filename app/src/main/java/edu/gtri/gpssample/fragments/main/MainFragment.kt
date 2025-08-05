@@ -51,10 +51,12 @@ class MainFragment : Fragment()
     {
         super.onCreate(savedInstanceState)
 
-        val sharedViewModel : ConfigurationViewModel by activityViewModels()
-        sharedViewModel.setCurrentZoomLevel( 16.0 )
-
         val sharedPreferences: SharedPreferences = activity!!.getSharedPreferences("default", 0)
+        val zoomLevel = sharedPreferences.getInt( Keys.kZoomLevel.value, 16 )
+
+        val sharedViewModel : ConfigurationViewModel by activityViewModels()
+        sharedViewModel.setCurrentZoomLevel( zoomLevel.toDouble())
+
         if (sharedPreferences.getString( Keys.kMapStyle.value, null ) == null)
         {
             val editor = sharedPreferences.edit()

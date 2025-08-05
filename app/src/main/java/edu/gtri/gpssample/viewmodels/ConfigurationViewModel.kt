@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.viewmodels
 
+import android.content.SharedPreferences
 import android.view.View
 import android.widget.AdapterView
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.mapbox.geojson.Point
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.*
@@ -72,6 +74,11 @@ class ConfigurationViewModel : ViewModel()
     {
         _currentZoomLevel = MutableLiveData(zoomLevel)
         currentZoomLevel = _currentZoomLevel
+
+        val sharedPreferences: SharedPreferences = MainApplication.getContext().getSharedPreferences("default", 0)
+        val editor = sharedPreferences.edit()
+        editor.putInt(Keys.kZoomLevel.value, zoomLevel.toInt())
+        editor.commit()
     }
 
     fun setCurrentCenterPoint( point: Point? )
