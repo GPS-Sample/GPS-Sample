@@ -9,6 +9,7 @@ package edu.gtri.gpssample.fragments.perform_enumeration
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -19,9 +20,14 @@ import android.os.Environment
 import android.os.Looper
 import android.util.Log
 import android.view.*
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.Space
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -62,6 +68,7 @@ import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.max
 
 class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
@@ -449,6 +456,8 @@ class PerformEnumerationFragment : Fragment(),
         binding.listItemEnumArea.numberEnumeratedTextView.text = "$enumerationCount"
         binding.listItemEnumArea.numberSampledTextView.text = "$sampledCount"
         binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
+
+        trimToolbarToFit( binding.toolbar )
     }
 
     override fun onResume()
@@ -536,6 +545,115 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
         }
+    }
+
+    fun trimToolbarToFit(toolbar: LinearLayout)
+    {
+        toolbar.post {
+            val displayMetrics = toolbar.resources.displayMetrics
+            val screenWidthPx = displayMetrics.widthPixels
+            val density = displayMetrics.density
+            val screenWidthDp = screenWidthPx / density
+
+            val moreButtonWidthDp = 60f // 50dp button + 5dp margin start + 5dp margin end
+            val minSpaceWidthDp = 50f
+
+            val allButtons = mutableListOf<View>()
+
+            // Collect only the buttons
+            for (i in 0 until toolbar.childCount) {
+                val child = toolbar.getChildAt(i)
+                if (child is Button) {
+                    allButtons.add(child)
+                }
+            }
+
+            // Remove all buttons from layout
+            allButtons.forEach { toolbar.removeView(it) }
+
+            var usedWidthDp = 0f
+            val visibleButtons = mutableListOf<View>()
+            val overflowButtons = mutableListOf<View>()
+
+            // Measure button width in dp (assuming fixed 50dp width and 5dp margins each side)
+            allButtons.forEach { button ->
+                val lp = button.layoutParams as? ViewGroup.MarginLayoutParams
+                val widthDp = 50f + ((lp?.marginStart ?: 0) + (lp?.marginEnd ?: 0)) / density
+
+                if (usedWidthDp + widthDp + moreButtonWidthDp > screenWidthDp) {
+                    overflowButtons.add(button)
+                } else {
+                    usedWidthDp += widthDp
+                    visibleButtons.add(button)
+                }
+            }
+
+            // Add visible buttons back
+            visibleButtons.forEach { toolbar.addView(it) }
+
+            // Add stretchable space before the "More" button if needed
+            if (overflowButtons.isNotEmpty()) {
+                // Calculate remaining space in dp
+                val remainingDp = screenWidthDp - usedWidthDp - moreButtonWidthDp
+                val spaceWidthDp = max(minSpaceWidthDp, remainingDp)
+
+                val space = Space(toolbar.context).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        1f // stretchable
+                    ).apply {
+                        val minWidthPx = (minSpaceWidthDp * density).toInt()
+                        this.width = minWidthPx
+                    }
+                }
+
+                toolbar.addView(space)
+
+                val moreButton = Button(toolbar.context).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        dpToPx(50),
+                        dpToPx(50)
+                    ).apply {
+                        marginStart = dpToPx(5)
+                        marginEnd = dpToPx(5)
+                    }
+                    background = getDrawable(context, R.drawable.more_button)
+                    setOnClickListener {
+                        showMoreMenu(context, it, overflowButtons)
+                    }
+                }
+
+                toolbar.addView(moreButton)
+            }
+        }
+    }
+
+    fun dpToPx(dp: Int): Int
+    {
+        return (dp * resources.displayMetrics.density).toInt()
+    }
+
+    fun showMoreMenu(context: Context, anchorView: View, overflowButtons: List<View>)
+    {
+        val popupMenu = PopupMenu(context, anchorView)
+
+        overflowButtons.forEachIndexed { index, view ->
+            val idName = context.resources.getResourceEntryName(view.id)
+            popupMenu.menu.add(0, view.id, index, idName.replace("_", " ").replaceFirstChar { it.uppercase() })
+        }
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId)
+            {
+                R.id.help_button ->
+                    binding.helpButton.performClick()
+            }
+            Toast.makeText(context, "${item.title} clicked", Toast.LENGTH_SHORT).show()
+            true
+        }
+
+        popupMenu.show()
     }
 
     private fun gpsAccuracyIsGood(): Boolean
