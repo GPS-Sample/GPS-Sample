@@ -151,6 +151,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
@@ -173,6 +174,15 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:background="@drawable/location_bubble" />
+
+        <Button
+            android:id="@+id/show_breadcrumbs_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:background="@drawable/navigate2" />
 
         <Button
             android:id="@+id/export_button"

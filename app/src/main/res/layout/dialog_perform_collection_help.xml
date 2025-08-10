@@ -63,6 +63,31 @@
         android:layout_height="40dp">
 
         <ImageView
+            android:layout_marginStart="10dp"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:srcCompat="@drawable/navigate2"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/show_breadcrumbs"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <ImageView
             android:id="@+id/undefined_image_view"
             android:layout_marginStart="10dp"
             android:layout_width="40dp"

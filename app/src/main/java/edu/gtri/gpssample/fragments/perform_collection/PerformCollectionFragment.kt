@@ -96,6 +96,7 @@ class PerformCollectionFragment : Fragment(),
 
     private var dateTime = ""
     private val binding get() = _binding!!
+    private var isShowingBreadcrumbs = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private var landmarkLocations = ArrayList<Location>()
@@ -400,6 +401,21 @@ class PerformCollectionFragment : Fragment(),
             }
         }
 
+        binding.showBreadcrumbsButton.setOnClickListener {
+            if (!isShowingBreadcrumbs)
+            {
+                isShowingBreadcrumbs = true
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else
+            {
+                isShowingBreadcrumbs = false
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+            }
+
+            refreshMap()
+        }
+
         updateSummaryInfo()
     }
 
@@ -532,6 +548,16 @@ class PerformCollectionFragment : Fragment(),
         if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+
+            if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+            {
+                for (breadcrumb in enumArea.breadcrumbs)
+                {
+                    MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
+                }
+
+                MapManager.instance().createPolyline( mapView, enumArea.breadcrumbs )
+            }
 
             for (location in enumArea.locations)
             {

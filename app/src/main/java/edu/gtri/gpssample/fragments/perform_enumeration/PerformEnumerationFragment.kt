@@ -635,9 +635,6 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
-            // Remove all buttons from layout
-            allButtons.forEach { toolbar.removeView(it) }
-
             var usedWidthDp = 0f
             val visibleButtons = mutableListOf<View>()
             val overflowButtons = mutableListOf<View>()
@@ -655,11 +652,20 @@ class PerformEnumerationFragment : Fragment(),
                 }
             }
 
-            // Add visible buttons back
-            visibleButtons.forEach { toolbar.addView(it) }
+            if (overflowButtons.isNotEmpty())
+            {
+                allButtons.clear()
 
-            // Add stretchable space before the "More" button if needed
-            if (overflowButtons.isNotEmpty()) {
+                for (i in 0 until toolbar.childCount) {
+                    val child = toolbar.getChildAt(i)
+                    allButtons.add(child)
+                }
+
+                // Remove everything from layout
+                allButtons.forEach { toolbar.removeView(it) }
+
+                // Add visible buttons back
+                visibleButtons.forEach { toolbar.addView(it) }
                 val space = Space(toolbar.context).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         0,
@@ -705,8 +711,8 @@ class PerformEnumerationFragment : Fragment(),
             when (view.id)
             {
                 R.id.help_button -> popupMenu.menu.add(0, view.id, index, "Help")
-                R.id.export_button -> popupMenu.menu.add(0, view.id, index, "Export")
-                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, "Delete")
+                R.id.export_button -> popupMenu.menu.add(0, view.id, index, "Export Configuration")
+                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, "Delete Breadcrumbs")
                 R.id.show_breadcrumbs_button ->
                 {
                     if (isShowingBreadcrumbs)
