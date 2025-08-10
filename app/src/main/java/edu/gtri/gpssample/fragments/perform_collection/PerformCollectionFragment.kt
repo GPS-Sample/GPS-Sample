@@ -676,68 +676,6 @@ class PerformCollectionFragment : Fragment(),
         startActivityForResult( intent, REQUEST_CODE_PICK_CONFIG_DIR )
     }
 
-    fun pickDir( requestCode: Int )
-    {
-        var userName = user.name.replace(" ", "" ).uppercase()
-
-        if (userName.length > 3)
-        {
-            userName = userName.substring(0,3)
-        }
-
-        val role = user.role.toString().substring(0,1).uppercase()
-
-        if (dateTime.isEmpty())
-        {
-            val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
-            dateTime = LocalDateTime.now().format(formatter)
-        }
-
-        var version = ""
-        val versionName = BuildConfig.VERSION_NAME.split( "#" )
-        if (versionName.size == 2)
-        {
-            version = versionName[1]
-        }
-
-        val clusterName = enumArea.name.replace(" ", "" ).uppercase()
-        var fileName = ""
-
-        when(user.role)
-        {
-            Role.Admin.toString(),
-            Role.Supervisor.toString() ->
-            {
-                fileName = "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}"
-            }
-
-            Role.Enumerator.toString(),
-            Role.DataCollector.toString() ->
-            {
-                fileName = "D-${userName}-${clusterName}-${dateTime!!}-${version}.json"
-            }
-        }
-
-        if (requestCode == REQUEST_CODE_PICK_CONFIG_DIR)
-        {
-            fileName += ".json"
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_configuration_file), Toast.LENGTH_LONG).show()
-        }
-        else
-        {
-            fileName += "-img.json"
-            Toast.makeText(activity!!.applicationContext, resources.getString(R.string.save_image_file), Toast.LENGTH_LONG).show()
-        }
-
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
-            putExtra(Intent.EXTRA_TITLE, fileName)
-        }
-
-        startActivityForResult( intent, requestCode )
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
         try

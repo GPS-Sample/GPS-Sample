@@ -5,12 +5,12 @@
 
     <item
         android:id="@+id/mapbox_streets"
-        android:title="@string/mapbox_streets"
+        android:title="@string/street_map"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/satellite_streets"
-        android:title="@string/satellite_streets"
+        android:title="@string/satellite_map"
         app:showAsAction="never"/>
 
     <item
