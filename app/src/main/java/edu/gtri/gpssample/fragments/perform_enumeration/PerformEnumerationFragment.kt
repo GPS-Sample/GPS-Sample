@@ -25,6 +25,7 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.appcompat.widget.PopupMenu
@@ -90,8 +91,9 @@ class PerformEnumerationFragment : Fragment(),
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
 
-    private var dateTime = ""
     private var dropMode = false
+    private var isShowingBreadcrumbs = false
+    private var isRecordingBreadcrumbs = false
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private val enumerationTeamLocations = ArrayList<Location>()
@@ -247,6 +249,34 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.helpButton.setOnClickListener {
             PerformEnumerationHelpDialog( activity!! )
+        }
+
+        binding.deleteBreadcrumbsButton.setOnClickListener {
+            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently remove all breadcrumbs?", resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                when( buttonPressed )
+                {
+                    ConfirmationDialog.ButtonPress.Left -> {
+                    }
+                    ConfirmationDialog.ButtonPress.Right -> {
+                        for (breadcrumb in enumArea.breadcrumbs)
+                        {
+                            DAO.breadcrumbDAO.delete( breadcrumb )
+                        }
+
+                        enumArea.breadcrumbs.clear()
+
+                        isShowingBreadcrumbs = false
+                        isRecordingBreadcrumbs = false
+                        binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                        binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                        binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
+
+                        refreshMap()
+                    }
+                    ConfirmationDialog.ButtonPress.None -> {
+                    }
+                }
+            }
         }
 
         binding.mapTileCacheButton.setOnClickListener {
@@ -458,6 +488,43 @@ class PerformEnumerationFragment : Fragment(),
         binding.listItemEnumArea.numberSurveyedTextView.text = "$surveyedCount"
 
         trimToolbarToFit( binding.toolbar )
+
+        binding.recordBreadcrumbsButton.setOnClickListener {
+            if (!isRecordingBreadcrumbs)
+            {
+                isShowingBreadcrumbs = true
+                isRecordingBreadcrumbs = true
+                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
+                binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else
+            {
+                isRecordingBreadcrumbs = false
+                binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
+                binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+            }
+        }
+
+        binding.showBreadcrumbsButton.setOnClickListener {
+            if (isRecordingBreadcrumbs)
+            {
+                return@setOnClickListener
+            }
+
+            if (!isShowingBreadcrumbs)
+            {
+                isShowingBreadcrumbs = true
+                binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else
+            {
+                isShowingBreadcrumbs = false
+                binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+            }
+
+            refreshMap()
+        }
     }
 
     override fun onResume()
@@ -593,10 +660,6 @@ class PerformEnumerationFragment : Fragment(),
 
             // Add stretchable space before the "More" button if needed
             if (overflowButtons.isNotEmpty()) {
-                // Calculate remaining space in dp
-                val remainingDp = screenWidthDp - usedWidthDp - moreButtonWidthDp
-                val spaceWidthDp = max(minSpaceWidthDp, remainingDp)
-
                 val space = Space(toolbar.context).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         0,
@@ -639,17 +702,33 @@ class PerformEnumerationFragment : Fragment(),
         val popupMenu = PopupMenu(context, anchorView)
 
         overflowButtons.forEachIndexed { index, view ->
-            val idName = context.resources.getResourceEntryName(view.id)
-            popupMenu.menu.add(0, view.id, index, idName.replace("_", " ").replaceFirstChar { it.uppercase() })
+            when (view.id)
+            {
+                R.id.help_button -> popupMenu.menu.add(0, view.id, index, "Help")
+                R.id.export_button -> popupMenu.menu.add(0, view.id, index, "Export")
+                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, "Delete")
+                R.id.show_breadcrumbs_button ->
+                {
+                    if (isShowingBreadcrumbs)
+                    {
+                        popupMenu.menu.add(0, view.id, index, "Hide Breadcrumbs")
+                    }
+                    else
+                    {
+                        popupMenu.menu.add(0, view.id, index, "Show Breadcrumbs")
+                    }
+                }
+            }
         }
 
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId)
             {
-                R.id.help_button ->
-                    binding.helpButton.performClick()
+                R.id.help_button -> binding.helpButton.performClick()
+                R.id.export_button -> binding.exportButton.performClick()
+                R.id.show_breadcrumbs_button -> binding.showBreadcrumbsButton.performClick()
+                R.id.delete_breadcrumbs_button -> binding.deleteBreadcrumbsButton.performClick()
             }
-            Toast.makeText(context, "${item.title} clicked", Toast.LENGTH_SHORT).show()
             true
         }
 
@@ -702,6 +781,16 @@ class PerformEnumerationFragment : Fragment(),
         if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
             MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+
+            if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+            {
+                for (breadcrumb in enumArea.breadcrumbs)
+                {
+                    MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
+                }
+
+                MapManager.instance().createPolyline( mapView, enumArea.breadcrumbs )
+            }
 
             for (location in enumArea.locations)
             {
@@ -1117,6 +1206,7 @@ class PerformEnumerationFragment : Fragment(),
     }
 
     private var lastLocationUpdateTime: Long = 0
+    private val MIN_BREADCRUMB_METERS: Double = 1.0
 
     private val locationCallback = object : LocationCallback()
     {
@@ -1148,6 +1238,33 @@ class PerformEnumerationFragment : Fragment(),
                 if (Date().time - lastLocationUpdateTime > 3000)
                 {
                     lastLocationUpdateTime = Date().time
+
+                    if (isRecordingBreadcrumbs)
+                    {
+                        val currentLatLng = LatLng( point.latitude(), point.longitude())
+
+                        var tooClose = false
+
+                        for (breadcrumb in enumArea.breadcrumbs)
+                        {
+                            val haversineCheck = GeoUtils.isCloseTo( currentLatLng, LatLng( breadcrumb.latitude, breadcrumb.longitude), 10 )
+                            if (haversineCheck.distance < MIN_BREADCRUMB_METERS)
+                            {
+                                tooClose = true
+                            }
+                        }
+
+                        if (!tooClose)
+                        {
+                            MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.breadcrumb, "")
+
+                            val breadcrumb = Breadcrumb( enumArea.uuid, point.latitude(), point.longitude())
+                            DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb )
+                            enumArea.breadcrumbs.add( breadcrumb )
+
+                            refreshMap()
+                        }
+                    }
 
                     for (loc in enumArea.locations)
                     {

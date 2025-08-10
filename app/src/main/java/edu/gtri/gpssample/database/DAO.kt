@@ -374,6 +374,16 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     "FOREIGN KEY($COLUMN_ENUM_AREA_UUID) REFERENCES $TABLE_ENUM_AREA($COLUMN_UUID)" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableMapTileRegion)
+
+            val createTableBreadcrumb = ("CREATE TABLE " +
+                    TABLE_BREADCRUMB + "(" +
+                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
+                    COLUMN_LATITUDE + " REAL" + "," +
+                    COLUMN_LONGITUDE + " REAL" +
+                    ") WITHOUT ROWID")
+            db.execSQL(createTableBreadcrumb)
         }
         catch(ex: Exception)
         {
@@ -405,6 +415,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_BREADCRUMB")
+
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD__FIELD_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION")
         db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION")
@@ -595,6 +607,10 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LAT = "lat"
         const val COLUMN_LON = "lon"
 
+        const val TABLE_BREADCRUMB = "breadcrumb"
+        const val COLUMN_LATITUDE = "latitude"
+        const val COLUMN_LONGITUDE = "longitude"
+
         // DAO's
         lateinit var userDAO: UserDAO
         lateinit var configDAO: ConfigDAO
@@ -612,6 +628,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         lateinit var locationDAO: LocationDAO
         lateinit var enumerationItemDAO: EnumerationItemDAO
         lateinit var mapTileRegionDAO: MapTileRegionDAO
+        lateinit var breadcrumbDAO: BreadcrumbDAO
 
         // creation/access methods
 
@@ -658,6 +675,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
                 db.execSQL("DELETE FROM $TABLE_MAP_TILE_REGION")
+                db.execSQL("DELETE FROM $TABLE_BREADCRUMB")
 
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_CONFIG'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_ENUM_AREA'")
@@ -685,6 +703,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON'")
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_MAP_TILE_REGION'")
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE where name='$TABLE_BREADCRUMB'")
 
                 db.close()
             }
@@ -712,11 +731,12 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 locationDAO = LocationDAO( _instance!! )
                 enumerationItemDAO = EnumerationItemDAO( _instance!! )
                 mapTileRegionDAO = MapTileRegionDAO( _instance!! )
+                breadcrumbDAO = BreadcrumbDAO( _instance!! )
             }
 
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 318
+        const val DATABASE_VERSION = 319
     }
 }

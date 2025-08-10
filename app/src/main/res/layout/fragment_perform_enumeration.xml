@@ -204,6 +204,15 @@
             android:background="@drawable/record" />
 
         <Button
+            android:id="@+id/delete_breadcrumbs_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:background="@drawable/delete_blue" />
+
+        <Button
             android:id="@+id/show_breadcrumbs_button"
             android:layout_width="50dp"
             android:layout_height="50dp"

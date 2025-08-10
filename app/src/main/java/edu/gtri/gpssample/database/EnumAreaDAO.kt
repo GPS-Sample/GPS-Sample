@@ -60,6 +60,11 @@ class EnumAreaDAO(private var dao: DAO)
             DAO.collectionTeamDAO.createOrUpdateCollectionTeam( collectionTeam )
         }
 
+        for (breacrumb in enumArea.breadcrumbs)
+        {
+            DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breacrumb )
+        }
+
         return enumArea
     }
 
@@ -123,6 +128,7 @@ class EnumAreaDAO(private var dao: DAO)
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
             enumArea.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( enumArea )
+            enumArea.breadcrumbs = DAO.breadcrumbDAO.getBreadcrumbs( enumArea.uuid )
         }
 
         cursor.close()
@@ -146,29 +152,7 @@ class EnumAreaDAO(private var dao: DAO)
             enumArea.locations = DAO.locationDAO.getLocations( enumArea )
             enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
             enumArea.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( enumArea )
-            enumAreas.add( enumArea )
-        }
-
-        cursor.close()
-
-        return enumAreas
-    }
-
-    fun getEnumAreas(): ArrayList<EnumArea>
-    {
-        val enumAreas = ArrayList<EnumArea>()
-
-        val query = "SELECT * FROM ${DAO.TABLE_ENUM_AREA}"
-        val cursor = dao.writableDatabase.rawQuery(query, null)
-
-        while (cursor.moveToNext())
-        {
-            val enumArea = buildEnumArea( cursor )
-            enumArea.mapTileRegion = DAO.mapTileRegionDAO.getMapTileRegion( enumArea )
-            enumArea.vertices = DAO.latLonDAO.getLatLonsWithEnumAreaUuid( enumArea.uuid )
-            enumArea.locations = DAO.locationDAO.getLocations( enumArea )
-            enumArea.enumerationTeams = DAO.enumerationTeamDAO.getEnumerationTeams( enumArea )
-            enumArea.collectionTeams = DAO.collectionTeamDAO.getCollectionTeams( enumArea )
+            enumArea.breadcrumbs = DAO.breadcrumbDAO.getBreadcrumbs( enumArea.uuid )
             enumAreas.add( enumArea )
         }
 
@@ -196,6 +180,11 @@ class EnumAreaDAO(private var dao: DAO)
         for (location in enumArea.locations)
         {
             DAO.locationDAO.delete( location )
+        }
+
+        for (breadcrumb in enumArea.breadcrumbs)
+        {
+            DAO.breadcrumbDAO.delete( breadcrumb )
         }
 
         val whereClause = "${DAO.COLUMN_UUID} = ?"

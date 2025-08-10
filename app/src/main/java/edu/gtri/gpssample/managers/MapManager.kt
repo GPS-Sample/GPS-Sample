@@ -52,6 +52,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.MapEngine
 import edu.gtri.gpssample.database.DAO
+import edu.gtri.gpssample.database.models.Breadcrumb
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
@@ -503,7 +504,19 @@ class MapManager
         }
     }
 
-    fun createPolyline( mapView: View, points: List<Point>, color: Int ) : Any?
+    fun createPolyline( mapView: View, breadcrumbs: List<Breadcrumb> )
+    {
+        val points = ArrayList<Point>()
+
+        for (breadcrumb in breadcrumbs)
+        {
+            points.add( Point.fromLngLat( breadcrumb.longitude, breadcrumb.latitude ))
+        }
+
+        createPolyline( mapView, points, Color.BLUE, 2f )
+    }
+
+    fun createPolyline( mapView: View, points: List<Point>, color: Int, lineWidth: Float = 10.0f ) : Any?
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -516,7 +529,7 @@ class MapManager
             val polyline = Polyline()
             polyline.setPoints(geoPoints)
             polyline.setColor(color)
-            polyline.setWidth(10f)
+            polyline.setWidth(lineWidth)
 
             mapView.getOverlayManager().add(polyline);
             mapView.invalidate();
