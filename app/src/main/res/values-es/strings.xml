@@ -404,6 +404,15 @@
     <string name="take_photo">"Tomar foto"</string>
     <string name="retake_photo">"Tomar foto de nuevo"</string>
     <string name="min_password_required">"La longitud mínima de la contraseña es de 6 caracteres"</string>
+    <string name="street_map">"Mapa de calles"</string>
+    <string name="satellite_map">"Mapa de satélite"</string>
+    <string name="map_engine">"Tipo de mapa"</string>
+    <string name="define_center">"Toca el mapa para definir el punto central"</string>
+    <string name="select_ea">"Toca un zona de enumeración para seleccionarla"</string>
+    <string name="select_configuration_file">"Seleccione un archivo de configuración"</string>
+    <string name="show_breadcrumbs">"Mostrar el camino recorrido"</string>
+    <string name="record_breadcrumbs">"Registrar el camino recorrido"</string>
+    <string name="delete_breadcrumbs">"Eliminar el camino recorrido"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

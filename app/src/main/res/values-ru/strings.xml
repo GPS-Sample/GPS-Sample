@@ -404,6 +404,15 @@
     <string name="take_photo">"Сделать фото"</string>
     <string name="retake_photo">"Сделать повторную фотографию"</string>
     <string name="min_password_required">"Минимальная длина пароля составляет 6 символов"</string>
+    <string name="street_map">"Карта улиц"</string>
+    <string name="satellite_map">"Спутниковая карта"</string>
+    <string name="map_engine">"Тип карты"</string>
+    <string name="define_center">""Нажмите на карту, чтобы определить центральную точку""</string>
+    <string name="select_ea">""Нажмите на область регистрации, чтобы выбрать ее""</string>
+    <string name="select_configuration_file">"Выберите файл конфигурации"</string>
+    <string name="show_breadcrumbs">"Показать пройденный путь"</string>
+    <string name="record_breadcrumbs">"Записать пройденный путь"</string>
+    <string name="delete_breadcrumbs">"Удалить пройденный путь"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

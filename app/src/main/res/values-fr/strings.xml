@@ -404,6 +404,15 @@
     <string name="take_photo">"Prenez une photo"</string>
     <string name="retake_photo">"Reprenez la photo"</string>
     <string name="min_password_required">"La longueur minimale du mot de passe est de 6 caractères"</string>
+    <string name="street_map">"Carte routière"</string>
+    <string name="satellite_map">"Carte satellite"</string>
+    <string name="map_engine">"Type de carte"</string>
+    <string name="define_center">"Appuyez sur la carte pour définir le point central"</string>
+    <string name="select_ea">"Appuyez sur une zone de recensement pour la sélectionner"</string>
+    <string name="select_configuration_file">"Sélectionnez un fichier de configuration"</string>
+    <string name="show_breadcrumbs">"Affichez le trajet parcouru"</string>
+    <string name="record_breadcrumbs">"Enregistrez le trajet parcouru"</string>
+    <string name="delete_breadcrumbs">"Supprimez le trajet parcouru"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

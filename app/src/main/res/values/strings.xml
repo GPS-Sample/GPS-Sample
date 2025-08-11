@@ -391,28 +391,28 @@
     <string name="collection_notes">"Collection Notes"</string>
     <string name="select_map_tiles">"Select a map tileset"</string>
     <string name="loading_mapbox_tiles">"Loading Mapbox Tiles..."</string>
+    <string name="mapbox_streets">"Mapbox Streets Map"</string>
+    <string name="satellite_streets">"Satellite Streets Map"</string>
     <string name="import_map_tiles">"Import Map Tiles"</string>
     <string name="re_import">"The selected file has already been imported.  Would you like to re-import it now?"</string>
     <string name="attach_mbtiles_question">"Would you like to attach MBTiles to this area?"</string>
     <string name="import_geojson">"Import a GeoJSON file"</string>
     <string name="import_mbtiles">"Import an MBTiles file"</string>
     <string name="select_file_type">"Select the import file type"</string>
+    <string name="attach_mbtiles">"Attach MapBox Tiles"</string>
+    <string name="detach_mbtiles">"Detach MapBox Tiles"</string>
     <string name="take_photo">"Take Photo"</string>
     <string name="retake_photo">"Retake Photo"</string>
     <string name="min_password_required">"The minimum password length is 6 characters"</string>
-    <string name="attach_mbtiles">"Attach Map Tiles"</string>
-    <string name="detach_mbtiles">"Detach Map Tiles"</string>
-
-    // all of these need to be updated!
     <string name="street_map">"Street Map"</string>
     <string name="satellite_map">"Satellite Map"</string>
-    <string name="map_engine">Map Engine</string>
+    <string name="map_engine">"Map Engine"</string>
     <string name="define_center">"Tap the map to define the center point"</string>
-    <string name="select_ea">"Select an Enumeration Area by tapping on it"</string>
+    <string name="select_ea">"Tap on an Enumeration Area to select it"</string>
     <string name="select_configuration_file">"Select a configuration file"</string>
-    <string name="show_breadcrumbs">"Show Breadcrumbs"</string>
-    <string name="record_breadcrumbs">"Record Breadcrumbs"</string>
-    <string name="delete_breadcrumbs">"Delete Breadcrumbs"</string>
+    <string name="show_breadcrumbs">"Show the walked path"</string>
+    <string name="record_breadcrumbs">"Record the walked path"</string>
+    <string name="delete_breadcrumbs">"Delete the walked path"</string>
 
     <string-array name="map_engines">
         <item>Open Street Map</item>

@@ -404,6 +404,15 @@
     <string name="take_photo">"Ambil Foto"</string>
     <string name="retake_photo">"Ambil Ulang Foto"</string>
     <string name="min_password_required">"Panjang kata sandi minimal 6 karakter"</string>
+    <string name="street_map">"Tampilan Jalan"</string>
+    <string name="satellite_map">"Tampilan Satelit"</string>
+    <string name="map_engine">"Mesin Peta"</string>
+    <string name="define_center">"Ketuk peta untuk menentukan titik pusat"</string>
+    <string name="select_ea">"Ketuk Area Enumerasi untuk memilihnya"</string>
+    <string name="select_configuration_file">"Pilih berkas konfigurasi"</string>
+    <string name="show_breadcrumbs">"Tampilkan jalur yang telah dilalui"</string>
+    <string name="record_breadcrumbs">"Rekam jalur yang telah dilalui"</string>
+    <string name="delete_breadcrumbs">"Hapus jalur yang telah dilalui"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

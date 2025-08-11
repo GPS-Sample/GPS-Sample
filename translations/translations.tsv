@@ -433,3 +433,12 @@ detach_mbtiles	Detach MapBox Tiles	Separar fichas de MapBox	Détachez les tuiles
 take_photo	Take Photo	Tomar foto	Prenez une photo	Tirar fotografia	Сделать фото	Ambil Foto	
 retake_photo	Retake Photo	Tomar foto de nuevo	Reprenez la photo	Voltar a tirar fotografia	Сделать повторную фотографию	Ambil Ulang Foto	
 min_password_required	The minimum password length is 6 characters	La longitud mínima de la contraseña es de 6 caracteres	La longueur minimale du mot de passe est de 6 caractères	O comprimento mínimo da palavra-passe é de 6 caracteres	Минимальная длина пароля составляет 6 символов	Panjang kata sandi minimal 6 karakter	
+street_map	Street Map	Mapa de calles	Carte routière	Mapa de ruas	Карта улиц	Tampilan Jalan	
+satellite_map	Satellite Map	Mapa de satélite	Carte satellite	Mapa de satélite	Спутниковая карта	Tampilan Satelit	
+map_engine	Map Engine	Tipo de mapa	Type de carte	Tipo de mapa	Тип карты	Mesin Peta	
+define_center	Tap the map to define the center point	Toca el mapa para definir el punto central	Appuyez sur la carte pour définir le point central	Clique no mapa para definir o ponto central	"Нажмите на карту, чтобы определить центральную точку"	Ketuk peta untuk menentukan titik pusat	
+select_ea	Tap on an Enumeration Area to select it	Toca un zona de enumeración para seleccionarla	Appuyez sur une zone de recensement pour la sélectionner	Clique numa área de enumeração para selecioná-la	"Нажмите на область регистрации, чтобы выбрать ее"	Ketuk Area Enumerasi untuk memilihnya	
+select_configuration_file	Select a configuration file	Seleccione un archivo de configuración	Sélectionnez un fichier de configuration	Selecione um ficheiro de configuração	Выберите файл конфигурации	Pilih berkas konfigurasi	
+show_breadcrumbs	Show the walked path	Mostrar el camino recorrido	Affichez le trajet parcouru	Mostrar o percurso percorrido	Показать пройденный путь	Tampilkan jalur yang telah dilalui	
+record_breadcrumbs	Record the walked path	Registrar el camino recorrido	Enregistrez le trajet parcouru	Registar o percurso percorrido	Записать пройденный путь	Rekam jalur yang telah dilalui	
+delete_breadcrumbs	Delete the walked path	Eliminar el camino recorrido	Supprimez le trajet parcouru	Apagar o percurso percorrido	Удалить пройденный путь	Hapus jalur yang telah dilalui	
