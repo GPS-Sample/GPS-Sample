@@ -252,28 +252,31 @@ class PerformEnumerationFragment : Fragment(),
         }
 
         binding.deleteBreadcrumbsButton.setOnClickListener {
-            ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently remove all breadcrumbs?", resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        for (breadcrumb in enumArea.breadcrumbs)
-                        {
-                            DAO.breadcrumbDAO.delete( breadcrumb )
+            if (enumArea.breadcrumbs.isNotEmpty())
+            {
+                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently remove all breadcrumbs?", resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
                         }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            for (breadcrumb in enumArea.breadcrumbs)
+                            {
+                                DAO.breadcrumbDAO.delete( breadcrumb )
+                            }
 
-                        enumArea.breadcrumbs.clear()
+                            enumArea.breadcrumbs.clear()
 
-                        isShowingBreadcrumbs = false
-                        isRecordingBreadcrumbs = false
-                        binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
-                        binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
-                        binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
+                            isShowingBreadcrumbs = false
+                            isRecordingBreadcrumbs = false
+                            binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                            binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+                            binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
 
-                        refreshMap()
-                    }
-                    ConfirmationDialog.ButtonPress.None -> {
+                            refreshMap()
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
                     }
                 }
             }
@@ -712,7 +715,7 @@ class PerformEnumerationFragment : Fragment(),
             {
                 R.id.help_button -> popupMenu.menu.add(0, view.id, index, "Help")
                 R.id.export_button -> popupMenu.menu.add(0, view.id, index, "Export Configuration")
-                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, "Delete Breadcrumbs")
+                R.id.delete_breadcrumbs_button -> popupMenu.menu.add(0, view.id, index, "Delete the walked path")
                 R.id.show_breadcrumbs_button ->
                 {
                     if (isShowingBreadcrumbs)
