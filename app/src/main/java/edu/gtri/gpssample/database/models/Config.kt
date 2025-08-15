@@ -84,7 +84,8 @@ data class Config(
             this.proximityWarningIsEnabled == other.proximityWarningIsEnabled &&
             this.proximityWarningValue == other.proximityWarningValue &&
             this.selectedStudyUuid == other.selectedStudyUuid &&
-            this.selectedEnumAreaUuid == other.selectedEnumAreaUuid)
+            this.selectedEnumAreaUuid == other.selectedEnumAreaUuid &&
+            this.validUsers == other.validUsers)
         {
             return true
         }

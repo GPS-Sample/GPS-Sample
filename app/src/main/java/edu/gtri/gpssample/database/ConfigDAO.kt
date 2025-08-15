@@ -15,6 +15,7 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.database.models.User
 import edu.gtri.gpssample.extensions.toBoolean
 import kotlin.math.min
 
@@ -22,17 +23,23 @@ class ConfigDAO(private var dao: DAO)
 {
     fun createOrUpdateConfig( config: Config ) : Config?
     {
-        MainApplication.instance.user?.let { user ->
+        lateinit var user: User
+
+        MainApplication.instance.user?.let {
+            user = it
+
             if (!config.validUsers.contains(user.uuid))
             {
                 config.validUsers += " ${user.uuid} "
             }
         }
 
-        val existingConfig = getConfig(config.uuid)
+        val existingConfig = getConfig( config.uuid )
 
         if (existingConfig != null)
         {
+            mergeValidUsers( config, existingConfig )
+
             if (config.doesNotEqual( existingConfig ))
             {
                 updateConfig( config )
@@ -54,6 +61,21 @@ class ConfigDAO(private var dao: DAO)
         createOrUpdateStudies(config)
 
         return config
+    }
+
+    fun mergeValidUsers( newConfig: Config, oldConfig: Config )
+    {
+        val oldUsers = oldConfig.validUsers.split( " " )
+
+        for (oldUser in oldUsers)
+        {
+            val trimmedOldUser = oldUser.trim()
+
+            if (trimmedOldUser.isNotEmpty() && !newConfig.validUsers.contains( trimmedOldUser ))
+            {
+                newConfig.validUsers += " ${trimmedOldUser}"
+            }
+        }
     }
 
     fun updateConfig( config: Config )
