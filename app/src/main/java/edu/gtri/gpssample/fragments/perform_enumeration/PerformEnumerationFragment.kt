@@ -100,9 +100,7 @@ class PerformEnumerationFragment : Fragment(),
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
 
     private var maxSubaddress = 0
-
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
-    private val REQUEST_CODE_PICK_IMAGE_DIR =  2001
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -1215,7 +1213,7 @@ class PerformEnumerationFragment : Fragment(),
     }
 
     private var lastLocationUpdateTime: Long = 0
-    private val MIN_BREADCRUMB_METERS: Double = 1.0
+    private var MIN_BREADCRUMB_METERS: Double = 10.0
 
     private val locationCallback = object : LocationCallback()
     {
@@ -1250,20 +1248,17 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (isRecordingBreadcrumbs)
                     {
+                        var distance: Double = 10.1;
                         val currentLatLng = LatLng( point.latitude(), point.longitude())
 
-                        var tooClose = false
-
-                        for (breadcrumb in enumArea.breadcrumbs)
+                        if (!enumArea.breadcrumbs.isEmpty())
                         {
-                            val haversineCheck = GeoUtils.isCloseTo( currentLatLng, LatLng( breadcrumb.latitude, breadcrumb.longitude), 10 )
-                            if (haversineCheck.distance < MIN_BREADCRUMB_METERS)
-                            {
-                                tooClose = true
-                            }
+                            val lastBreadcrumb = enumArea.breadcrumbs.last()
+                            val lastLatLng = LatLng( lastBreadcrumb.latitude, lastBreadcrumb.longitude )
+                            distance = GeoUtils.distanceBetween( currentLatLng, lastLatLng )
                         }
 
-                        if (!tooClose)
+                        if (distance > MIN_BREADCRUMB_METERS)
                         {
                             MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.breadcrumb, "")
 
