@@ -514,6 +514,9 @@ class ConfigurationFragment : Fragment(),
 
                                     binding.overlayView.visibility = View.GONE
                                     InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
+
+                                    updateOverview()
+                                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
                                 }
                             }
                         }
