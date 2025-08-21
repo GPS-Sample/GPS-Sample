@@ -556,7 +556,33 @@ class PerformCollectionFragment : Fragment(),
                     MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
                 }
 
-                MapManager.instance().createPolyline( mapView, enumArea.breadcrumbs )
+                val breadcrumbs = ArrayList<Breadcrumb>()
+                var groupId: String = ""
+
+                for (breadcrumb in enumArea.breadcrumbs)
+                {
+                    if (breadcrumbs.isEmpty)
+                    {
+                        groupId = breadcrumb.groupId
+                    }
+
+                    if (breadcrumb.groupId == groupId)
+                    {
+                        breadcrumbs.add( breadcrumb )
+                    }
+                    else
+                    {
+                        MapManager.instance().createPolyline( mapView, breadcrumbs )
+                        groupId = breadcrumb.groupId
+                        breadcrumbs.clear()
+                        breadcrumbs.add( breadcrumb )
+                    }
+                }
+
+                if (breadcrumbs.isNotEmpty())
+                {
+                    MapManager.instance().createPolyline( mapView, breadcrumbs )
+                }
             }
 
             for (location in enumArea.locations)

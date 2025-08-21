@@ -412,7 +412,7 @@
     <string name="select_configuration_file">"Select a configuration file"</string>
     <string name="show_breadcrumbs">"Show the walked path"</string>
     <string name="record_breadcrumbs">"Record the walked path"</string>
-    <string name="delete_breadcrumbs">"Delete the walked path"</string>
+    <string name="delete_breadcrumbs">"Delete the last walked path location"</string>
 
     <string-array name="map_engines">
         <item>Open Street Map</item>

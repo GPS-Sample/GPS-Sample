@@ -49,6 +49,7 @@ class BreadcrumbDAO(private var dao: DAO)
         values.put( DAO.COLUMN_ENUM_AREA_UUID, breadcrumb.enumAreaUuid )
         values.put( DAO.COLUMN_LATITUDE, breadcrumb.latitude )
         values.put( DAO.COLUMN_LONGITUDE, breadcrumb.longitude )
+        values.put( DAO.COLUMN_GROUP_ID, breadcrumb.groupId )
     }
 
     @SuppressLint("Range")
@@ -59,8 +60,9 @@ class BreadcrumbDAO(private var dao: DAO)
         val enumAreaUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_UUID))
         val latitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LATITUDE))
         val longitude = cursor.getDouble(cursor.getColumnIndex(DAO.COLUMN_LONGITUDE))
+        val groupId = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_GROUP_ID))
 
-        return Breadcrumb( uuid, creationDate, enumAreaUuid, latitude, longitude )
+        return Breadcrumb( uuid, creationDate, enumAreaUuid, latitude, longitude, groupId )
     }
 
     fun getBreadcrumb( uuid: String ): Breadcrumb?

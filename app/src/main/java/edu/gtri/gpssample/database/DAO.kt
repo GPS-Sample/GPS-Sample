@@ -381,7 +381,8 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
                     COLUMN_LATITUDE + " REAL" + "," +
-                    COLUMN_LONGITUDE + " REAL" +
+                    COLUMN_LONGITUDE + " REAL" + "," +
+                    COLUMN_GROUP_ID + " TEXT" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableBreadcrumb)
         }
@@ -610,6 +611,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val TABLE_BREADCRUMB = "breadcrumb"
         const val COLUMN_LATITUDE = "latitude"
         const val COLUMN_LONGITUDE = "longitude"
+        const val COLUMN_GROUP_ID = "group_id"
 
         // DAO's
         lateinit var userDAO: UserDAO
@@ -737,6 +739,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 319
+        const val DATABASE_VERSION = 320
     }
 }

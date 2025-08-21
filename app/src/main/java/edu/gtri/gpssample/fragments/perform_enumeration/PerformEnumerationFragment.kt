@@ -91,6 +91,8 @@ class PerformEnumerationFragment : Fragment(),
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
 
+    private var lastBreadcrumbGroupId = ""
+
     private var dropMode = false
     private var isShowingBreadcrumbs = false
     private var isRecordingBreadcrumbs = false
@@ -252,31 +254,10 @@ class PerformEnumerationFragment : Fragment(),
         binding.deleteBreadcrumbsButton.setOnClickListener {
             if (enumArea.breadcrumbs.isNotEmpty())
             {
-                ConfirmationDialog( activity, "Please Confirm", "Are you sure you want to permanently remove all breadcrumbs?", resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                    when( buttonPressed )
-                    {
-                        ConfirmationDialog.ButtonPress.Left -> {
-                        }
-                        ConfirmationDialog.ButtonPress.Right -> {
-                            for (breadcrumb in enumArea.breadcrumbs)
-                            {
-                                DAO.breadcrumbDAO.delete( breadcrumb )
-                            }
-
-                            enumArea.breadcrumbs.clear()
-
-                            isShowingBreadcrumbs = false
-                            isRecordingBreadcrumbs = false
-                            binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
-                            binding.recordBreadcrumbsButton.setBackgroundTintList(defaultColorList);
-                            binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.record )
-
-                            refreshMap()
-                        }
-                        ConfirmationDialog.ButtonPress.None -> {
-                        }
-                    }
-                }
+                val breadcrumb = enumArea.breadcrumbs.last()
+                DAO.breadcrumbDAO.delete( breadcrumb )
+                enumArea.breadcrumbs.remove( breadcrumb )
+                refreshMap()
             }
         }
 
@@ -490,11 +471,23 @@ class PerformEnumerationFragment : Fragment(),
 
         trimToolbarToFit( binding.toolbar )
 
+        if (isRecordingBreadcrumbs)
+        {
+            binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
+            binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        }
+
+        if (isShowingBreadcrumbs)
+        {
+            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        }
+
         binding.recordBreadcrumbsButton.setOnClickListener {
             if (!isRecordingBreadcrumbs)
             {
                 isShowingBreadcrumbs = true
                 isRecordingBreadcrumbs = true
+                lastBreadcrumbGroupId = UUID.randomUUID().toString()
                 binding.recordBreadcrumbsButton.setBackgroundResource( R.drawable.pause )
                 binding.recordBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
@@ -796,7 +789,33 @@ class PerformEnumerationFragment : Fragment(),
                     MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
                 }
 
-                MapManager.instance().createPolyline( mapView, enumArea.breadcrumbs )
+                val breadcrumbs = ArrayList<Breadcrumb>()
+                var groupId: String = ""
+
+                for (breadcrumb in enumArea.breadcrumbs)
+                {
+                    if (breadcrumbs.isEmpty)
+                    {
+                        groupId = breadcrumb.groupId
+                    }
+
+                    if (breadcrumb.groupId == groupId)
+                    {
+                        breadcrumbs.add( breadcrumb )
+                    }
+                    else
+                    {
+                        MapManager.instance().createPolyline( mapView, breadcrumbs )
+                        groupId = breadcrumb.groupId
+                        breadcrumbs.clear()
+                        breadcrumbs.add( breadcrumb )
+                    }
+                }
+
+                if (breadcrumbs.isNotEmpty())
+                {
+                    MapManager.instance().createPolyline( mapView, breadcrumbs )
+                }
             }
 
             for (location in enumArea.locations)
@@ -860,6 +879,11 @@ class PerformEnumerationFragment : Fragment(),
             {
                 if (gpsLocationIsGood( location ))
                 {
+                    if (isRecordingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
+                    {
+                        enumArea.breadcrumbs.add(Breadcrumb( UUID.randomUUID().toString(), Date().time, enumArea.uuid, location.latitude, location.longitude, enumArea.breadcrumbs.last().groupId))
+                    }
+
                     DAO.enumerationItemDAO.createOrUpdateEnumerationItem( EnumerationItem(), location )?.let { enumerationItem ->
                         location.enumerationItems.add( enumerationItem )
 
@@ -1248,7 +1272,7 @@ class PerformEnumerationFragment : Fragment(),
 
                     if (isRecordingBreadcrumbs)
                     {
-                        var distance: Double = 10.1;
+                        var distance = 10.1;
                         val currentLatLng = LatLng( point.latitude(), point.longitude())
 
                         if (!enumArea.breadcrumbs.isEmpty())
@@ -1262,7 +1286,7 @@ class PerformEnumerationFragment : Fragment(),
                         {
                             MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.breadcrumb, "")
 
-                            val breadcrumb = Breadcrumb( enumArea.uuid, point.latitude(), point.longitude())
+                            val breadcrumb = Breadcrumb( enumArea.uuid, point.latitude(), point.longitude(), lastBreadcrumbGroupId )
                             DAO.breadcrumbDAO.createOrUpdateBreadcrumb( breadcrumb )
                             enumArea.breadcrumbs.add( breadcrumb )
 
