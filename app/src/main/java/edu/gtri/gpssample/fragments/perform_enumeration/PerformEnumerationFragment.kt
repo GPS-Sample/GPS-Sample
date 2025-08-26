@@ -794,7 +794,7 @@ class PerformEnumerationFragment : Fragment(),
 
                 for (breadcrumb in enumArea.breadcrumbs)
                 {
-                    if (breadcrumbs.isEmpty)
+                    if (breadcrumbs.isEmpty())
                     {
                         groupId = breadcrumb.groupId
                     }
