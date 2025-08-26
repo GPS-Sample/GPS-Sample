@@ -153,10 +153,10 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
             }
         }
 
-        binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
-            checkPassword()
-            false
-        })
+//        binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
+//            checkPassword()
+//            false
+//        })
 
         binding.pinEditText.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_NEXT) {
@@ -222,7 +222,11 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
                     val editor = sharedPreferences.edit()
                     val expectedPin = sharedPreferences.getInt( user.role!!, 0 )
 
-                    if (pin == expectedPin)
+                    if (pin != expectedPin)
+                    {
+                        Toast.makeText( context, context?.getString(R.string.pin_incorrect), Toast.LENGTH_SHORT).show()
+                    }
+                    else
                     {
                         editor.putString(Keys.kUserName.value, userName)
                         editor.commit()
