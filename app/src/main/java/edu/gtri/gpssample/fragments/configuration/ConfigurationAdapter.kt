@@ -40,6 +40,7 @@ class ConfigurationAdapter(var enumAreas: List<EnumArea>?) : RecyclerView.Adapte
         this.enumAreas = areas
         notifyDataSetChanged()
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
     {
         this.context = parent.context

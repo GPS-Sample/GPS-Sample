@@ -75,11 +75,6 @@ class ConfigurationFragment : Fragment(),
 
         sharedNetworkViewModel.currentFragment = this
         sharedViewModel.currentFragment = this
-
-        if (BuildConfig.DEBUG)
-        {
-            setHasOptionsMenu(true)
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
@@ -510,13 +505,12 @@ class ConfigurationFragment : Fragment(),
 
                                     DAO.configDAO.getConfig( config.uuid )?.let {
                                         sharedViewModel.setCurrentConfig(it)
+                                        updateOverview()
+                                        enumerationAreasAdapter.updateEnumAreas(it.enumAreas)
                                     }
 
                                     binding.overlayView.visibility = View.GONE
                                     InfoDialog( activity!!, resources.getString(R.string.success), resources.getString(R.string.import_succeeded), resources.getString(R.string.ok), null, null)
-
-                                    updateOverview()
-                                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
                                 }
                             }
                         }
@@ -539,140 +533,6 @@ class ConfigurationFragment : Fragment(),
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_test, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean
-    {
-        when (item.itemId)
-        {
-            R.id.enumerate -> enumerateEverything()
-            R.id.survey -> surveyEverything()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    fun enumerateEverything()
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-
-            var count = 1
-            var total = 0
-            val busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Enumerating HH's...", this, false)
-
-            for (enumArea in config.enumAreas)
-            {
-                for (location in enumArea.locations)
-                {
-                    total += 1
-                }
-            }
-
-            Thread {
-                DAO.instance().writableDatabase.beginTransaction()
-
-                for (enumArea in config.enumAreas)
-                {
-                    val polygon = ArrayList<LatLon>()
-
-                    var creationDate = Date().time
-
-                    enumArea.vertices.map {
-                        polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
-                    }
-
-                    // TODO! FIX THIS
-//                    val enumerationTeam = DAO.enumerationTeamDAO.createOrUpdateEnumerationTeam( EnumerationTeam( enumArea.uuid, "E-Team-${enumArea.uuid}", polygon, enumArea.locations ))
-//                    enumArea.enumerationTeams.add(enumerationTeam!!)
-
-                    for (location in enumArea.locations)
-                    {
-                        val enumerationItem = EnumerationItem()
-                        enumerationItem.subAddress = count.toString()
-                        enumerationItem.enumerationDate = Date().time
-                        enumerationItem.enumerationEligibleForSampling = true
-                        enumerationItem.syncCode = enumerationItem.syncCode + 1
-                        enumerationItem.enumerationState = EnumerationState.Enumerated
-                        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-                        location.enumerationItems.add(enumerationItem)
-                        activity!!.runOnUiThread {
-                            busyIndicatorDialog.updateProgress("${count}/${total}")
-                        }
-                        count += 1
-                    }
-                }
-
-                DAO.instance().writableDatabase.setTransactionSuccessful()
-                DAO.instance().writableDatabase.endTransaction()
-
-                activity!!.runOnUiThread {
-                    busyIndicatorDialog.alertDialog.cancel()
-                    updateOverview()
-                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
-                }
-            }.start()
-        }
-    }
-
-    fun surveyEverything()
-    {
-        sharedViewModel.currentConfiguration?.value?.let { config ->
-
-            var count = 1
-            var total = 0
-            val busyIndicatorDialog = BusyIndicatorDialog(activity!!, "Enumerating HH's...", this, false)
-
-            for (enumArea in config.enumAreas)
-            {
-                for (location in enumArea.locations)
-                {
-                    total += 1
-                }
-            }
-
-            Thread {
-                DAO.instance().writableDatabase.beginTransaction()
-
-                for (enumArea in config.enumAreas)
-                {
-                    val polygon = ArrayList<LatLon>()
-
-                    var creationDate = Date().time
-
-                    enumArea.vertices.map {
-                        polygon.add( LatLon( creationDate++, it.latitude, it.longitude ))
-                    }
-
-//                    val collectionTeam = DAO.collectionTeamDAO.createOrUpdateCollectionTeam( CollectionTeam( enumArea.uuid,"S-Team-${enumArea.uuid}", polygon, enumArea.locations ))
-//                    enumArea.collectionTeams.add(collectionTeam!!)
-
-                    for (location in enumArea.locations)
-                    {
-                        for (enumerationItem in location.enumerationItems)
-                        {
-                            enumerationItem.collectionDate = Date().time
-                            enumerationItem.syncCode = enumerationItem.syncCode + 1
-                            enumerationItem.collectionState = CollectionState.Complete
-                            enumerationItem.samplingState = SamplingState.Sampled
-                            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-                            activity!!.runOnUiThread {
-                                busyIndicatorDialog.updateProgress("${count}/${total}")
-                            }
-                            count += 1
-                        }
-                    }
-                }
-
-                DAO.instance().writableDatabase.setTransactionSuccessful()
-                DAO.instance().writableDatabase.endTransaction()
-
-                activity!!.runOnUiThread {
-                    busyIndicatorDialog.alertDialog.cancel()
-                    updateOverview()
-                    enumerationAreasAdapter.updateEnumAreas(config.enumAreas)
-                }
-            }.start()
-        }
     }
 
     override fun didPressCancelButton()
