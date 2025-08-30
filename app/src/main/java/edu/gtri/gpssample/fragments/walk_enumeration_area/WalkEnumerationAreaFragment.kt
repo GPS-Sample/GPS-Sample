@@ -433,7 +433,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         pointList.add( points )
 
-        MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40, Color.BLACK )
+        MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0, Color.BLACK )
     }
 
     private val getResult =
