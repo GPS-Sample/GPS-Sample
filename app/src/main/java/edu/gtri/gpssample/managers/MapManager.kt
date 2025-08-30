@@ -8,6 +8,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -265,6 +267,12 @@ class MapManager
         }
 
         val myLocationNewOverlay = MyLocationNewOverlay(locationProvider, mapView)
+
+        ContextCompat.getDrawable(activity, R.drawable.osm_location)?.let { arrow ->
+            convertDrawableToBitmap( arrow )?.let { bitmap: Bitmap ->
+                myLocationNewOverlay.setDirectionArrow(bitmap,bitmap)
+            }
+        }
 
         myLocationNewOverlay.enableMyLocation()
         myLocationNewOverlay.enableFollowLocation()
