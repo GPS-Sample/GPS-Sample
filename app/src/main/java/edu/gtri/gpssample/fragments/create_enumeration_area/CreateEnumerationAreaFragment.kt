@@ -1417,32 +1417,21 @@ class CreateEnumerationAreaFragment : Fragment(),
                     allEnumAreas.addAll( unsavedEnumAreas )
                 }
 
-                for (enumArea in allEnumAreas)
+                var altitude = 0.0
+                point.point.coordinates.altitude?.let {
+                    altitude = it
+                }
+
+                val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
+                val location = Location( timeZone, LocationType.Enumeration, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
+
+                val enumArea = findEnumAreaOfLocation( allEnumAreas, LatLng( point.point.coordinates.latitude, point.point.coordinates.longitude ))?.let { enumArea ->
+                    enumArea.locations.add( location )
+                }
+
+                if (enumArea == null && allEnumAreas.size == 1)
                 {
-                    val enumAreaPoints = ArrayList<Coordinate>()
-
-                    enumArea.vertices.map {
-                        enumAreaPoints.add( Coordinate( it.toLatLng().longitude, it.toLatLng().latitude ))
-                    }
-
-                    val geometryFactory = GeometryFactory()
-                    val geometry: Geometry = geometryFactory.createPolygon(enumAreaPoints.toTypedArray())
-
-                    val coordinate = Coordinate( point.point.coordinates.longitude, point.point.coordinates.latitude )
-                    val geometry1 = geometryFactory.createPoint( coordinate )
-                    if (geometry.contains( geometry1 ))
-                    {
-                        var altitude: Double = 0.0
-                        point.point.coordinates.altitude?.let {
-                            altitude = it
-                        }
-
-                        val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                        val location = Location( timeZone, LocationType.Enumeration, -1, point.point.coordinates.latitude, point.point.coordinates.longitude, altitude, false, "", point.property )
-
-                        enumArea.locations.add( location )
-                        break // found! assuming that it can only exist in a single EA, for now!
-                    }
+                    allEnumAreas.first().locations.add( location )
                 }
             }
         }

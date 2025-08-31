@@ -286,6 +286,8 @@ class MapManager
         {
             if (overlay is MyLocationNewOverlay)
             {
+                overlay.disableMyLocation()
+                overlay.disableFollowLocation()
                 mapView.overlays.remove( overlay )
                 break
             }
@@ -591,82 +593,6 @@ class MapManager
         }
     }
 
-    fun setZoomLevel( mapView: View, zoomLevel: Double )
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-            mapView.controller.setZoom( zoomLevel )
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            val cameraPosition = CameraOptions.Builder()
-                .zoom(zoomLevel)
-                .build()
-
-            mapView.getMapboxMap().setCamera(cameraPosition)
-        }
-    }
-
-    fun centerMap( polygon: ArrayList<LatLon>, zoomLevel: Double, mapView: View )
-    {
-        val latLngBounds = GeoUtils.findGeobounds(polygon)
-
-        if (mapView is org.osmdroid.views.MapView)
-        {
-            mapView.controller.setZoom( zoomLevel )
-            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            val cameraPosition = CameraOptions.Builder()
-                .zoom( zoomLevel )
-                .center(point)
-                .build()
-
-            mapView.getMapboxMap().setCamera(cameraPosition)
-        }
-    }
-
-    fun centerMap( enumArea: EnumArea, zoomLevel: Double, mapView: View )
-    {
-        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
-
-        if (mapView is org.osmdroid.views.MapView)
-        {
-            mapView.controller.setZoom( zoomLevel )
-            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-            val cameraPosition = CameraOptions.Builder()
-                .zoom( zoomLevel )
-                .center(point)
-                .build()
-
-            mapView.getMapboxMap().setCamera(cameraPosition)
-        }
-    }
-
-    fun centerMap( point: Point, zoomLevel: Double, mapView: View )
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-            mapView.controller.setZoom( zoomLevel )
-            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( point.latitude(), point.longitude(), point.altitude() ))
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            val cameraPosition = CameraOptions.Builder()
-                .zoom( zoomLevel )
-                .center(point)
-                .build()
-
-            mapView.getMapboxMap().setCamera(cameraPosition)
-        }
-    }
-
     fun createMarker( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int, title: String = "" ) : Any?
     {
         val location = Location( point.latitude(), point.longitude(), point.altitude())
@@ -762,27 +688,6 @@ class MapManager
         return null
     }
 
-    fun getLocationFromPixelPoint( mapView: View, motionEvent: MotionEvent ) : Point
-    {
-        if (mapView is org.osmdroid.views.MapView)
-        {
-            val geoPoint = mapView.getProjection().fromPixels(motionEvent.x.toInt(), motionEvent.y.toInt()) as GeoPoint
-            return Point.fromLngLat( geoPoint.getLongitude(), geoPoint.getLatitude())
-        }
-        else if (mapView is com.mapbox.maps.MapView)
-        {
-            return mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(motionEvent.x.toDouble(),motionEvent.y.toDouble()))
-        }
-
-        return Point.fromLngLat( 0.0, 0.0 )
-    }
-
-    fun getIconDrawable(context: Context, iconName: String): Drawable?
-    {
-        val resId = context.resources.getIdentifier( iconName, "drawable", context.packageName)
-        return if (resId != 0) ContextCompat.getDrawable(context, resId) else null
-    }
-
     data class MarkerProperty( var location: Location, var resourceId: Int, var title: String )
     {
     }
@@ -806,6 +711,103 @@ class MapManager
 
         mapView.overlays.add(clusterer)
         mapView.invalidate()
+    }
+
+    fun setZoomLevel( mapView: View, zoomLevel: Double )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel )
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(zoomLevel)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+    }
+
+    fun centerMap( polygon: ArrayList<LatLon>, zoomLevel: Double, mapView: View )
+    {
+        val latLngBounds = GeoUtils.findGeobounds(polygon)
+
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel )
+            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom( zoomLevel )
+                .center(point)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+    }
+
+    fun centerMap( enumArea: EnumArea, zoomLevel: Double, mapView: View )
+    {
+        val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
+
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel )
+            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( latLngBounds.center.latitude, latLngBounds.center.longitude, 0.0 ))
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
+            val cameraPosition = CameraOptions.Builder()
+                .zoom( zoomLevel )
+                .center(point)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+    }
+
+    fun centerMap( point: Point, zoomLevel: Double, mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            mapView.controller.setZoom( zoomLevel )
+            mapView.controller.setCenter( org.osmdroid.util.GeoPoint( point.latitude(), point.longitude(), point.altitude() ))
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            val cameraPosition = CameraOptions.Builder()
+                .zoom( zoomLevel )
+                .center(point)
+                .build()
+
+            mapView.getMapboxMap().setCamera(cameraPosition)
+        }
+    }
+
+    fun getLocationFromPixelPoint( mapView: View, motionEvent: MotionEvent ) : Point
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val geoPoint = mapView.getProjection().fromPixels(motionEvent.x.toInt(), motionEvent.y.toInt()) as GeoPoint
+            return Point.fromLngLat( geoPoint.getLongitude(), geoPoint.getLatitude())
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            return mapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(motionEvent.x.toDouble(),motionEvent.y.toDouble()))
+        }
+
+        return Point.fromLngLat( 0.0, 0.0 )
+    }
+
+    fun getIconDrawable(context: Context, iconName: String): Drawable?
+    {
+        val resId = context.resources.getIdentifier( iconName, "drawable", context.packageName)
+        return if (resId != 0) ContextCompat.getDrawable(context, resId) else null
     }
 
     fun loadGeoJson( context: Context, mapView: org.osmdroid.views.MapView, geoJsonString: String )
