@@ -20,6 +20,8 @@ import android.os.Environment
 import android.os.Looper
 import android.util.Log
 import android.view.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Space
@@ -237,6 +239,101 @@ class PerformEnumerationFragment : Fragment(),
             }
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
+        }
+
+        val items = ArrayList<String>()
+        val sortFilters = resources.getTextArray( R.array.sort_filters )
+
+        for (sortFilter in sortFilters)
+        {
+            items.add( sortFilter.toString())
+        }
+
+        binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
+
+        binding.filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+            {
+                // Note! OnItemSelected fires automatically when the fragment is created
+                when( position )
+                {
+                    0-> { // nothing
+                        enumerationTeamLocations.sortBy{ it.creationDate }
+                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    }
+                    1-> { // undefined
+                        for (location in enumerationTeamLocations)
+                        {
+                            if (location.enumerationItems.isEmpty())
+                            {
+                                location.enumerationState = EnumerationState.Undefined
+                            }
+                            else
+                            {
+                                for (enumerationItem in location.enumerationItems)
+                                {
+                                    if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                    {
+                                        location.enumerationState = EnumerationState.Undefined
+                                        break
+                                    }
+                                    location.enumerationState = enumerationItem.enumerationState
+                                }
+                            }
+                        }
+                        enumerationTeamLocations.sortWith( compareByDescending { it.enumerationState == EnumerationState.Undefined } )
+                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    }
+                    2-> { // incomplete
+                        for (location in enumerationTeamLocations)
+                        {
+                            if (location.enumerationItems.isEmpty())
+                            {
+                                location.enumerationState = EnumerationState.Undefined
+                            }
+                            else
+                            {
+                                for (enumerationItem in location.enumerationItems)
+                                {
+                                    if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                                    {
+                                        location.enumerationState = EnumerationState.Incomplete
+                                        break
+                                    }
+                                    location.enumerationState = enumerationItem.enumerationState
+                                }
+                            }
+                        }
+                        enumerationTeamLocations.sortWith( compareByDescending { it.enumerationState == EnumerationState.Incomplete } )
+                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    }
+                    3-> { // complete
+                        for (location in enumerationTeamLocations)
+                        {
+                            if (location.enumerationItems.isEmpty())
+                            {
+                                location.enumerationState = EnumerationState.Undefined
+                            }
+                            else
+                            {
+                                for (enumerationItem in location.enumerationItems)
+                                {
+                                    if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                                    {
+                                        location.enumerationState = EnumerationState.Enumerated
+                                        break
+                                    }
+                                    location.enumerationState = enumerationItem.enumerationState
+                                }
+                            }
+                        }
+                        enumerationTeamLocations.sortWith( compareByDescending { it.enumerationState == EnumerationState.Enumerated } )
+                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    }
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
         binding.legendTextView.setOnClickListener {

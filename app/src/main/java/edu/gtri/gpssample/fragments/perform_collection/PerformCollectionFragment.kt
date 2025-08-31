@@ -22,6 +22,8 @@ import android.os.Environment
 import android.os.Looper
 import android.util.Log
 import android.view.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -104,6 +106,7 @@ class PerformCollectionFragment : Fragment(),
     private var busyIndicatorDialog: BusyIndicatorDialog? = null
     private var _binding: FragmentPerformCollectionBinding? = null
     private val fragmentResultListener = "PerformCollectionFragment"
+    private val enumerationItems = ArrayList<EnumerationItem>()
 
     private val REQUEST_CODE_PICK_CONFIG_DIR = 1001
 
@@ -206,8 +209,8 @@ class PerformCollectionFragment : Fragment(),
             this.user = user
         }
 
+        enumerationItems.clear()
         collectionTeamLocations.clear()
-        val enumerationItems = ArrayList<EnumerationItem>()
 
         for (teamLocationUuid in collectionTeam.locationUuids)
         {
@@ -297,6 +300,44 @@ class PerformCollectionFragment : Fragment(),
             }
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
+        }
+
+        val items = ArrayList<String>()
+        val sortFilters = resources.getTextArray( R.array.sort_filters )
+
+        for (sortFilter in sortFilters)
+        {
+            items.add( sortFilter.toString())
+        }
+
+        binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
+
+        binding.filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+            {
+                // Note! OnItemSelected fires automatically when the fragment is created
+                when( position )
+                {
+                    0-> { // nothing
+                        enumerationItems.sortBy{ it.creationDate }
+                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                    }
+                    1-> { // undefined
+                        enumerationItems.sortWith( compareByDescending { it.collectionState == CollectionState.Undefined } )
+                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                    }
+                    2-> { // incomplete
+                        enumerationItems.sortWith( compareByDescending { it.collectionState == CollectionState.Incomplete } )
+                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                    }
+                    3-> { // complete
+                        enumerationItems.sortWith( compareByDescending { it.collectionState == CollectionState.Complete } )
+                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                    }
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
         binding.mapTileCacheButton.setOnClickListener {

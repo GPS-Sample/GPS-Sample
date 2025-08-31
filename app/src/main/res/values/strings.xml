@@ -416,9 +416,18 @@
 
     // needs update
 
+    <string name="filter_by">Filter By:</string>
+
     <string-array name="map_engines">
         <item>Open Street Map</item>
         <item>MapBox</item>
+    </string-array>
+
+    <string-array name="sort_filters">
+        <item> </item>
+        <item>Undefined</item>
+        <item>Incomplete</item>
+        <item>Complete</item>
     </string-array>
 
     // end needs update
