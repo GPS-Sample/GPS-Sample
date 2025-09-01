@@ -99,6 +99,16 @@ class MapManager
 
     // public functions
 
+    fun selectOsmMap( activity: Activity, osmMapView: org.osmdroid.views.MapView, completion: ((mapView: View)->Unit) )
+    {
+        val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        initializeOsmMap( activity, osmMapView, mapStyle!! ) {
+            completion( osmMapView )
+        }
+    }
+
     fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
     {
         this.delegate = delegate

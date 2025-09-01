@@ -15,21 +15,30 @@
             android:layout_width="match_parent"
             android:layout_height="0dp">
 
-            <com.mapbox.maps.MapView
-                android:id="@+id/map_view"
+            <org.osmdroid.views.MapView
+                android:id="@+id/osm_map_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                mapbox:mapbox_cameraTargetLat="33.77577524978659"
-                mapbox:mapbox_cameraTargetLng="-84.39630379821243"
-                mapbox:mapbox_cameraZoom="9.0">
-            </com.mapbox.maps.MapView>
+                android:layout_height="match_parent">
+            </org.osmdroid.views.MapView>
 
             <View
+                android:id="@+id/map_overlay_view"
                 android:visibility="gone"
-                android:id="@+id/overlay_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
             </View>
+
+            <TextView
+                android:id="@+id/osm_label"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_gravity="bottom|start"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:text="OSM"
+                android:textStyle="normal" />
         </FrameLayout>
 
         <TextView
