@@ -14,6 +14,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import edu.gtri.gpssample.R
+import edu.gtri.gpssample.application.MainApplication
+import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.databinding.FragmentCodeBinding
 
@@ -59,6 +61,12 @@ class CodeFragment : Fragment()
                 findNavController().popBackStack()
             }
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.CodeFragment.value.toString() + ": " + this.javaClass.simpleName
     }
 
     override fun onDestroyView()
