@@ -45,6 +45,7 @@ import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
@@ -187,6 +188,8 @@ class MapManager
         createMapboxPointAnnotationManager( mapView )
         createMapboxPolygonAnnotationManager( mapView )
         createMapboxPolylineAnnotationManager( mapView )
+
+        mapView.compass.marginTop = 50.0f
 
         mapView.getMapboxMap().loadStyle(
             com.mapbox.maps.extension.style.style(styleUri = style) {
