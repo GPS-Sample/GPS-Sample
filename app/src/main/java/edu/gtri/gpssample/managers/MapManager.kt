@@ -17,6 +17,8 @@ import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -76,6 +78,9 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
+import org.osmdroid.views.overlay.compass.CompassOverlay
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 class MapManager
 {
@@ -99,17 +104,17 @@ class MapManager
 
     // public functions
 
-    fun selectOsmMap( activity: Activity, osmMapView: org.osmdroid.views.MapView, completion: ((mapView: View)->Unit) )
+    fun selectOsmMap( activity: Activity, osmMapView: org.osmdroid.views.MapView, northUpImageView: ImageView, completion: ((mapView: View)->Unit) )
     {
         val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
 
-        initializeOsmMap( activity, osmMapView, mapStyle!! ) {
+        initializeOsmMap( activity, osmMapView, northUpImageView, mapStyle!! ) {
             completion( osmMapView )
         }
     }
 
-    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
+    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
     {
         this.delegate = delegate
 
@@ -121,7 +126,7 @@ class MapManager
             mapBoxMapView.visibility = View.GONE
             osmMapView.visibility = View.VISIBLE
 
-            initializeOsmMap( activity, osmMapView, mapStyle!! ) {
+            initializeOsmMap( activity, osmMapView, northUpImageView, mapStyle!! ) {
                 completion( osmMapView )
             }
         }
@@ -136,7 +141,7 @@ class MapManager
         }
     }
 
-    fun initializeOsmMap( activity: Activity, mapView: org.osmdroid.views.MapView, mapStyle: String, completion: (()->Unit) )
+    fun initializeOsmMap(activity: Activity, mapView: org.osmdroid.views.MapView, northUpImageView: ImageView, mapStyle: String, completion: (()->Unit) )
     {
         org.osmdroid.config.Configuration.getInstance().load( activity, PreferenceManager.getDefaultSharedPreferences(activity))
 
@@ -189,6 +194,26 @@ class MapManager
                 }
             })
         }
+
+        // --- Rotation overlay ---
+        val rotationGestureOverlay = RotationGestureOverlay(mapView)
+        rotationGestureOverlay.isEnabled = true
+        mapView.overlays.add(rotationGestureOverlay)
+
+        northUpImageView.setOnClickListener {
+            mapView.mapOrientation = 0f   // reset to North-up
+            northUpImageView.visibility = View.GONE
+        }
+
+        mapView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                if (mapView.mapOrientation != 0f)
+                {
+                    northUpImageView.visibility = View.VISIBLE
+                }
+                return true
+            }
+        })
 
         completion()
     }

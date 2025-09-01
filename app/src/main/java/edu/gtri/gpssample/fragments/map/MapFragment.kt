@@ -16,6 +16,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -23,6 +24,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
@@ -62,6 +64,7 @@ import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.ArrayList
 import java.util.Date
+import kotlin.math.min
 
 class MapFragment : Fragment(),
     View.OnTouchListener,
@@ -105,7 +108,7 @@ class MapFragment : Fragment(),
             lifecycleOwner = viewLifecycleOwner
         }
 
-        MapManager.instance().selectOsmMap( activity!!, binding.osmMapView ) { mapView ->
+        MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 val point = com.mapbox.geojson.Point.fromLngLat( MapManager.GEORGIA_TECH.longitude, MapManager.GEORGIA_TECH.latitude )
@@ -331,7 +334,7 @@ class MapFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView ) { mapView ->
+                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
                     if (centerOnLocation)
                     {
                         MapManager.instance().enableLocationUpdates( activity!!, binding.osmMapView )
@@ -345,7 +348,7 @@ class MapFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView ) { mapView ->
+                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
                     if (centerOnLocation)
                     {
                         MapManager.instance().enableLocationUpdates( activity!!, binding.osmMapView )

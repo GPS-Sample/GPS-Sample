@@ -95,7 +95,7 @@ class CreateConfigurationFragment : Fragment(), View.OnTouchListener
                 // Note! OnItemSelected fires automatically when the fragment is created
                 sharedViewModel.currentConfiguration?.value?.let { config ->
                     config.mapEngineIndex = position
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView ) { mapView ->
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView ) { mapView ->
                         MapManager.instance().enableLocationUpdates( activity!!, mapView )
 
                         binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE

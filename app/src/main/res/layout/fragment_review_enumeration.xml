@@ -38,6 +38,16 @@
                 android:layout_height="match_parent">
             </org.osmdroid.views.MapView>
 
+            <ImageView
+                android:id="@+id/north_up_image_view"
+                android:visibility="gone"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="20dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="top|end"
+                app:srcCompat="@drawable/north_up"/>
+
             <TextView
                 android:id="@+id/osm_label"
                 android:layout_width="wrap_content"
