@@ -614,23 +614,41 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_GROUP_ID = "group_id"
 
         // DAO's
-        lateinit var userDAO: UserDAO
-        lateinit var configDAO: ConfigDAO
-        lateinit var studyDAO: StudyDAO
-        lateinit var fieldDAO: FieldDAO
-        lateinit var fieldOptionDAO: FieldOptionDAO
-        lateinit var ruleDAO: RuleDAO
-        lateinit var filterDAO: FilterDAO
-        lateinit var enumAreaDAO: EnumAreaDAO
-        lateinit var enumerationTeamDAO: EnumerationTeamDAO
-        lateinit var collectionTeamDAO: CollectionTeamDAO
-        lateinit var fieldDataDAO: FieldDataDAO
-        lateinit var fieldDataOptionDAO: FieldDataOptionDAO
-        lateinit var latLonDAO: LatLonDAO
-        lateinit var locationDAO: LocationDAO
-        lateinit var enumerationItemDAO: EnumerationItemDAO
-        lateinit var mapTileRegionDAO: MapTileRegionDAO
-        lateinit var breadcrumbDAO: BreadcrumbDAO
+        private lateinit var _userDAO: UserDAO
+        private lateinit var _configDAO: ConfigDAO
+        private lateinit var _studyDAO: StudyDAO
+        private lateinit var _fieldDAO: FieldDAO
+        private lateinit var _fieldOptionDAO: FieldOptionDAO
+        private lateinit var _ruleDAO: RuleDAO
+        private lateinit var _filterDAO: FilterDAO
+        private lateinit var _enumAreaDAO: EnumAreaDAO
+        private lateinit var _enumerationTeamDAO: EnumerationTeamDAO
+        private lateinit var _collectionTeamDAO: CollectionTeamDAO
+        private lateinit var _fieldDataDAO: FieldDataDAO
+        private lateinit var _fieldDataOptionDAO: FieldDataOptionDAO
+        private lateinit var _latLonDAO: LatLonDAO
+        private lateinit var _locationDAO: LocationDAO
+        private lateinit var _enumerationItemDAO: EnumerationItemDAO
+        private lateinit var _mapTileRegionDAO: MapTileRegionDAO
+        private lateinit var _breadcrumbDAO: BreadcrumbDAO
+
+        val userDAO get() = _userDAO
+        val configDAO get() = _configDAO
+        val studyDAO get() = _studyDAO
+        val fieldDAO get() = _fieldDAO
+        val fieldOptionDAO get() = _fieldOptionDAO
+        val ruleDAO get() = _ruleDAO
+        val filterDAO get() = _filterDAO
+        val enumAreaDAO get() = _enumAreaDAO
+        val enumerationTeamDAO get() = _enumerationTeamDAO
+        val collectionTeamDAO get() = _collectionTeamDAO
+        val fieldDataDAO get() = _fieldDataDAO
+        val fieldDataOptionDAO get() = _fieldDataOptionDAO
+        val latLonDAO get() = _latLonDAO
+        val locationDAO get() = _locationDAO
+        val enumerationItemDAO get() = _enumerationItemDAO
+        val mapTileRegionDAO get() = _mapTileRegionDAO
+        val breadcrumbDAO get() = _breadcrumbDAO
 
         // creation/access methods
 
@@ -717,23 +735,23 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             {
                 _instance = DAO( context, null, null, DATABASE_VERSION )
 
-                userDAO = UserDAO( _instance!! )
-                configDAO = ConfigDAO( _instance!! )
-                studyDAO = StudyDAO( _instance!! )
-                fieldDAO = FieldDAO( _instance!! )
-                fieldOptionDAO = FieldOptionDAO( _instance!! )
-                ruleDAO = RuleDAO( _instance!! )
-                filterDAO = FilterDAO( _instance!! )
-                enumAreaDAO = EnumAreaDAO( _instance!! )
-                enumerationTeamDAO = EnumerationTeamDAO( _instance!! )
-                collectionTeamDAO = CollectionTeamDAO( _instance!! )
-                fieldDataDAO = FieldDataDAO( _instance!! )
-                fieldDataOptionDAO = FieldDataOptionDAO( _instance!! )
-                latLonDAO = LatLonDAO( _instance!! )
-                locationDAO = LocationDAO( _instance!! )
-                enumerationItemDAO = EnumerationItemDAO( _instance!! )
-                mapTileRegionDAO = MapTileRegionDAO( _instance!! )
-                breadcrumbDAO = BreadcrumbDAO( _instance!! )
+                _userDAO = UserDAO( _instance!! )
+                _configDAO = ConfigDAO( _instance!! )
+                _studyDAO = StudyDAO( _instance!! )
+                _fieldDAO = FieldDAO( _instance!! )
+                _fieldOptionDAO = FieldOptionDAO( _instance!! )
+                _ruleDAO = RuleDAO( _instance!! )
+                _filterDAO = FilterDAO( _instance!! )
+                _enumAreaDAO = EnumAreaDAO( _instance!! )
+                _enumerationTeamDAO = EnumerationTeamDAO( _instance!! )
+                _collectionTeamDAO = CollectionTeamDAO( _instance!! )
+                _fieldDataDAO = FieldDataDAO( _instance!! )
+                _fieldDataOptionDAO = FieldDataOptionDAO( _instance!! )
+                _latLonDAO = LatLonDAO( _instance!! )
+                _locationDAO = LocationDAO( _instance!! )
+                _enumerationItemDAO = EnumerationItemDAO( _instance!! )
+                _mapTileRegionDAO = MapTileRegionDAO( _instance!! )
+                _breadcrumbDAO = BreadcrumbDAO( _instance!! )
             }
 
             return _instance!!
