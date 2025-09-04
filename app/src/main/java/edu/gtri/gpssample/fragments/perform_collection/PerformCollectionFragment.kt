@@ -96,7 +96,6 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var fusedLocationClient : FusedLocationProviderClient
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
-    private var dateTime = ""
     private val binding get() = _binding!!
     private var isShowingBreadcrumbs = false
     private var currentGPSAccuracy: Int? = null
@@ -253,6 +252,9 @@ class PerformCollectionFragment : Fragment(),
         binding.mapTileCacheButton.backgroundTintList?.let {
             defaultColorList = it
         }
+
+        isShowingBreadcrumbs = true
+        binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
 
         val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
         if (centerOnCurrentLocation == null)
