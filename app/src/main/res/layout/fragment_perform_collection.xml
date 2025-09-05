@@ -15,7 +15,38 @@
 
     <include layout="@layout/list_item_enum_area" android:id="@+id/list_item_enum_area" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/black"
+            android:text="@string/view"
+            android:textSize="17sp"
+            android:textStyle="normal" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/spinner_frame">
+
+            <Spinner
+                android:id="@+id/showSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </FrameLayout>
+    </LinearLayout>
+
     <FrameLayout
+        android:id="@+id/map_layout"
         android:layout_weight="2"
         android:layout_width="match_parent"
         android:layout_height="0dp">

@@ -241,15 +241,49 @@ class PerformEnumerationFragment : Fragment(),
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
         }
 
-        val items = ArrayList<String>()
+        val views = ArrayList<String>()
+        val showViews = resources.getTextArray( R.array.show_views )
+
+        for (showView in showViews)
+        {
+            views.add( showView.toString())
+        }
+
+        binding.showSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, views )
+
+        binding.showSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+            {
+                // Note! OnItemSelected fires automatically when the fragment is created
+                when( position )
+                {
+                    0-> { // nothing
+                        binding.mapLayout.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.VISIBLE
+                    }
+                    1-> { // Map Only
+                        binding.mapLayout.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.GONE
+                    }
+                    2-> { // List Only
+                        binding.mapLayout.visibility = View.GONE
+                        binding.recyclerView.visibility = View.VISIBLE
+                    }
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        val filters = ArrayList<String>()
         val sortFilters = resources.getTextArray( R.array.sort_filters )
 
         for (sortFilter in sortFilters)
         {
-            items.add( sortFilter.toString())
+            filters.add( sortFilter.toString())
         }
 
-        binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, items )
+        binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, filters )
 
         binding.filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
