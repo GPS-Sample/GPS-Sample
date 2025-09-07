@@ -308,7 +308,9 @@ class MapManager
 
         ContextCompat.getDrawable(activity, R.drawable.osm_location)?.let { arrow ->
             convertDrawableToBitmap( arrow )?.let { bitmap: Bitmap ->
-                myLocationNewOverlay.setDirectionArrow(bitmap,bitmap)
+                myLocationNewOverlay.setDirectionIcon(bitmap)
+                myLocationNewOverlay.setPersonAnchor(0.5f, 0.5f)
+                myLocationNewOverlay.setDirectionAnchor(0.5f, 0.5f)
             }
         }
 
@@ -324,9 +326,9 @@ class MapManager
         {
             if (overlay is MyLocationNewOverlay)
             {
-                overlay.disableMyLocation()
+//                overlay.disableMyLocation()
                 overlay.disableFollowLocation()
-                mapView.overlays.remove( overlay )
+//                mapView.overlays.remove( overlay )
                 break
             }
         }

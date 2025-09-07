@@ -1106,6 +1106,11 @@ class PerformCollectionFragment : Fragment(),
             currentGPSLocation = point
             currentGPSAccuracy = accuracy
 
+            if (_binding == null)
+            {
+                return
+            }
+
             lateinit var config: Config
 
             sharedViewModel.currentConfiguration?.value?.let {
@@ -1124,8 +1129,7 @@ class PerformCollectionFragment : Fragment(),
             }
 
             binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
-
-            binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
+            binding.locationTextView.text = String.format( "%.7f, %.7f, %.0f", point.latitude(), point.longitude(), location.bearing)
 
             if (Date().time - lastLocationUpdateTime > 3000)
             {

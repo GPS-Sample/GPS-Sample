@@ -11,6 +11,12 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
 <!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
 <!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
@@ -42,6 +48,11 @@
 
         <service android:name=".services.UDPBroadcastReceiverService"/>
         <service android:name=".services.NetworkMonitorService"/>
+        <service
+            android:name=".fragments.perform_enumeration.LocationService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
         <activity
             android:name=".activities.MainActivity"
             android:exported="true"

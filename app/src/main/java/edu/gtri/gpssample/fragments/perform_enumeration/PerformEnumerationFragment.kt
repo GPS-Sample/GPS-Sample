@@ -14,10 +14,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Looper
+import android.os.PowerManager
+import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
@@ -32,6 +35,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -88,7 +93,6 @@ class PerformEnumerationFragment : Fragment(),
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var sharedNetworkViewModel : NetworkViewModel
     private lateinit var performEnumerationAdapter: PerformEnumerationAdapter
-    private lateinit var fusedLocationClient : FusedLocationProviderClient
 
     private var _binding: FragmentPerformEnumerationBinding? = null
     private val binding get() = _binding!!
@@ -232,13 +236,12 @@ class PerformEnumerationFragment : Fragment(),
         if (ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ActivityCompat.checkSelfPermission( activity!!, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
-            val locationRequest = LocationRequest.create().apply {
-                interval = 5000
-                fastestInterval = 2000
-                priority = Priority.PRIORITY_HIGH_ACCURACY
+            if (!LocationService.started)
+            {
+                LocationService.locationCallback = locationCallback
+                val intent = Intent(activity!!, LocationService::class.java)
+                ContextCompat.startForegroundService(activity!!, intent)
             }
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
-            fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, Looper.getMainLooper())
         }
 
         val views = ArrayList<String>()
@@ -1381,6 +1384,11 @@ class PerformEnumerationFragment : Fragment(),
             currentGPSLocation = point
             currentGPSAccuracy = accuracy
 
+            if (_binding == null)
+            {
+                return
+            }
+
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 if (accuracy <= config.minGpsPrecision)
                 {
@@ -1394,8 +1402,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
-
-                binding.locationTextView.text = String.format( "%.7f, %.7f", point.latitude(), point.longitude())
+                binding.locationTextView.text = String.format( "%.7f, %.7f, %.0f", point.latitude(), point.longitude(), location.bearing)
 
                 if (Date().time - lastLocationUpdateTime > 3000)
                 {
@@ -1551,7 +1558,11 @@ class PerformEnumerationFragment : Fragment(),
     {
         super.onDestroyView()
 
-        fusedLocationClient.removeLocationUpdates( locationCallback )
+        if (LocationService.started)
+        {
+            val intent = Intent(activity!!, LocationService::class.java)
+            activity!!.stopService( intent )
+        }
 
         _binding = null
     }

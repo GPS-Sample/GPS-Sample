@@ -11,8 +11,11 @@ import android.Manifest
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -286,11 +289,32 @@ class MainFragment : Fragment()
         }
 
         if (permissionsToRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                activity as AppCompatActivity,
-                permissionsToRequest.toTypedArray(),
-                PERMISSION_REQUESTS
-            )
+            requestPermissions( permissionsToRequest.toTypedArray(), REQUEST_CODE)
+//            requestPermissions(
+//                activity as AppCompatActivity,
+//                permissionsToRequest.toTypedArray(),
+//                REQUEST_CODE
+//            )
+        }
+
+        if (isPermissionGranted( activity as AppCompatActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+            && !isPermissionGranted( activity as AppCompatActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            {
+                requestPermissions( arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), 1001 )
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val intent = Intent()
+            val packageName = requireContext().packageName
+            val pm = requireContext().getSystemService(PowerManager::class.java)
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            }
         }
     }
 
@@ -304,6 +328,22 @@ class MainFragment : Fragment()
         return false
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 1001) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("xxx", "✅ Background permission granted")
+            } else {
+                Log.d("xxx", "❌ Background permission denied")
+            }
+        }
+    }
+
     override fun onDestroyView()
     {
         super.onDestroyView()
@@ -313,7 +353,7 @@ class MainFragment : Fragment()
 
     companion object
     {
-        private const val PERMISSION_REQUESTS = 1
+        private const val REQUEST_CODE = 1
 
         private val REQUIRED_RUNTIME_PERMISSIONS =
             arrayOf(
@@ -329,7 +369,8 @@ class MainFragment : Fragment()
                 Manifest.permission.CHANGE_WIFI_STATE,
                 Manifest.permission.CHANGE_WIFI_MULTICAST_STATE,
                 Manifest.permission.UPDATE_DEVICE_STATS,
-                Manifest.permission.NEARBY_WIFI_DEVICES
+                Manifest.permission.NEARBY_WIFI_DEVICES,
+                Manifest.permission.FOREGROUND_SERVICE
             )
     }
 }
