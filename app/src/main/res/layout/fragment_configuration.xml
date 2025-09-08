@@ -365,7 +365,7 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_gravity="top|end"
-                            app:srcCompat="@drawable/north_up"/>
+                            app:srcCompat="@drawable/compass_icon"/>
 
                         <TextView
                             android:id="@+id/osm_label"
