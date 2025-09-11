@@ -420,6 +420,10 @@ class MapManager
                 {
                     overlays.add( overlay )
                 }
+                else if (overlay is TextOverlay)
+                {
+                    overlays.add(overlay)
+                }
             }
 
             for (overlay in overlays)
@@ -639,6 +643,10 @@ class MapManager
         return createMarker( context, mapView, location, resourceId, title )
     }
 
+    open class TextOverlay : Overlay()
+    {
+    }
+
     fun createMarker( context: Context, mapView: View, location: Location, @DrawableRes resourceId: Int, title: String = "" ) : Any?
     {
         if (mapView is org.osmdroid.views.MapView)
@@ -653,38 +661,41 @@ class MapManager
             marker.title = title
             mapView.overlays.add(marker)
 
-            val textOverlay = object : Overlay() {
-                override fun draw(
-                    canvas: Canvas,
-                    mapView: org.osmdroid.views.MapView,
-                    shadow: Boolean
-                ) {
-                    if (!shadow) {
-                        val point = GeoPoint(location.latitude, location.longitude)
-                        val screenPoint = android.graphics.Point()
-                        mapView.projection.toPixels(point, screenPoint)
+            if (title.isNotEmpty())
+            {
+                val textOverlay = object : TextOverlay()
+                {
+                    override fun draw( canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean)
+                    {
+                        if (!shadow)
+                        {
+                            val point = GeoPoint(location.latitude, location.longitude)
+                            val screenPoint = android.graphics.Point()
+                            mapView.projection.toPixels(point, screenPoint)
 
-                        val paint = Paint().apply {
-                            color = android.graphics.Color.BLACK
-                            textSize = 30f
-                            isAntiAlias = true
-                            textAlign = Paint.Align.LEFT
+                            val paint = Paint().apply {
+                                color = android.graphics.Color.BLACK
+                                textSize = 30f
+                                isAntiAlias = true
+                                textAlign = Paint.Align.LEFT
+                            }
+
+                            val textBounds = Rect()
+                            paint.getTextBounds(title, 0, title.length, textBounds)
+                            val textWidth = textBounds.width()
+                            val textHeight = textBounds.height()
+
+                            val x = screenPoint.x.toFloat() - textWidth / 2
+                            val y = screenPoint.y.toFloat() + textHeight / 2
+
+                            canvas.drawText(title, x, y, paint)
                         }
-
-                        val textBounds = Rect()
-                        paint.getTextBounds(title, 0, title.length, textBounds)
-                        val textWidth = textBounds.width()
-                        val textHeight = textBounds.height()
-
-                        val x = screenPoint.x.toFloat() - textWidth / 2
-                        val y = screenPoint.y.toFloat() + textHeight / 2
-
-                        canvas.drawText(title, x, y, paint)
                     }
                 }
+
+                mapView.overlays.add(textOverlay)
             }
 
-            mapView.overlays.add(textOverlay)
             mapView.invalidate()
 
             marker.setOnMarkerClickListener { clickedMarker, mapView ->

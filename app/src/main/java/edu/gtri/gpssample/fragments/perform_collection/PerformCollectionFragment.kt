@@ -356,23 +356,112 @@ class PerformCollectionFragment : Fragment(),
                 when( position )
                 {
                     0-> { // nothing
-                        enumerationItems.sortBy{ it.creationDate }
-                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = true
+                        }
+                        for (location in collectionTeamLocations) // includes landmarks!
+                        {
+                            location.isVisible = true
+                        }
                     }
                     1-> { // undefined
-                        enumerationItems.sortWith( compareByDescending { it.collectionState == CollectionState.Undefined } )
-                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                        for (location in collectionTeamLocations)
+                        {
+                            location.isVisible = false
+                        }
+
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = false
+
+                            if (enumerationItem.collectionState == CollectionState.Undefined)
+                            {
+                                enumerationItem.isVisible = true
+                                for (location in collectionTeamLocations)
+                                {
+                                    for (enumItem in location.enumerationItems)
+                                    {
+                                        if (enumItem.uuid == enumerationItem.uuid)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     2-> { // incomplete
-                        enumerationItems.sortWith( compareByDescending { it.collectionState == CollectionState.Incomplete } )
-                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                        for (location in collectionTeamLocations)
+                        {
+                            location.isVisible = false
+                        }
+
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = false
+
+                            if (enumerationItem.collectionState == CollectionState.Incomplete)
+                            {
+                                enumerationItem.isVisible = true
+                                for (location in collectionTeamLocations)
+                                {
+                                    for (enumItem in location.enumerationItems)
+                                    {
+                                        if (enumItem.uuid == enumerationItem.uuid)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     3-> { // complete
-                        enumerationItems.sortWith( compareByDescending { it.collectionState == CollectionState.Complete } )
-                        performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
+                        for (location in collectionTeamLocations)
+                        {
+                            location.isVisible = false
+                        }
+
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = false
+
+                            if (enumerationItem.collectionState == CollectionState.Complete)
+                            {
+                                enumerationItem.isVisible = true
+                                for (location in collectionTeamLocations)
+                                {
+                                    for (enumItem in location.enumerationItems)
+                                    {
+                                        if (enumItem.uuid == enumerationItem.uuid)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    4-> { // points of interest
+                        for (location in collectionTeamLocations)
+                        {
+                            location.isVisible = if (location.isLandmark) true else false
+                        }
+                        for (enumerationItem in enumerationItems)
+                        {
+                            enumerationItem.isVisible = false
+                        }
                     }
                 }
+
+                refreshMap()
+                performCollectionAdapter.updateItems( enumerationItems, landmarkLocations )
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
@@ -662,9 +751,9 @@ class PerformCollectionFragment : Fragment(),
                 }
             }
 
-            for (location in enumArea.locations)
+            for (location in landmarkLocations)
             {
-                if (location.isLandmark)
+                if (location.isVisible)
                 {
                     MapManager.instance().createMarker( activity!!, mapView, location, R.drawable.location_blue, "" )
                 }
@@ -672,7 +761,7 @@ class PerformCollectionFragment : Fragment(),
 
             for (location in collectionTeamLocations)
             {
-                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                if (!location.isLandmark && location.isVisible && location.enumerationItems.isNotEmpty())
                 {
                     var resourceId = 0
 

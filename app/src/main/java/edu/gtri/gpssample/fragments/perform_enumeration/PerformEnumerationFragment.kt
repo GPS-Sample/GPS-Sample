@@ -180,7 +180,7 @@ class PerformEnumerationFragment : Fragment(),
             user = it
         }
 
-        performEnumerationAdapter = PerformEnumerationAdapter( ArrayList<Location>(), enumArea.name )
+        performEnumerationAdapter = PerformEnumerationAdapter( enumerationTeamLocations, enumArea.name )
         performEnumerationAdapter.didSelectLocation = this::didSelectLocation
 
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
@@ -296,80 +296,73 @@ class PerformEnumerationFragment : Fragment(),
                 when( position )
                 {
                     0-> { // nothing
-                        enumerationTeamLocations.sortBy{ it.creationDate }
-                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                        for (location in enumerationTeamLocations) {
+                            location.isVisible = true
+                        }
                     }
                     1-> { // undefined
                         for (location in enumerationTeamLocations)
                         {
-                            if (location.enumerationItems.isEmpty())
-                            {
-                                location.enumerationState = EnumerationState.Undefined
-                            }
-                            else
+                            location.isVisible = false
+                            if (!location.isLandmark)
                             {
                                 for (enumerationItem in location.enumerationItems)
                                 {
                                     if (enumerationItem.enumerationState == EnumerationState.Undefined)
                                     {
-                                        location.enumerationState = EnumerationState.Undefined
+                                        location.isVisible = true
                                         break
                                     }
-                                    location.enumerationState = enumerationItem.enumerationState
                                 }
                             }
                         }
-                        enumerationTeamLocations.sortWith( compareByDescending { it.enumerationState == EnumerationState.Undefined } )
-                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
                     }
                     2-> { // incomplete
                         for (location in enumerationTeamLocations)
                         {
-                            if (location.enumerationItems.isEmpty())
-                            {
-                                location.enumerationState = EnumerationState.Undefined
-                            }
-                            else
+                            location.isVisible = false
+                            if (!location.isLandmark)
                             {
                                 for (enumerationItem in location.enumerationItems)
                                 {
                                     if (enumerationItem.enumerationState == EnumerationState.Incomplete)
                                     {
-                                        location.enumerationState = EnumerationState.Incomplete
+                                        location.isVisible = true
                                         break
                                     }
-                                    location.enumerationState = enumerationItem.enumerationState
                                 }
                             }
                         }
-                        enumerationTeamLocations.sortWith( compareByDescending { it.enumerationState == EnumerationState.Incomplete } )
-                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
                     }
                     3-> { // complete
                         for (location in enumerationTeamLocations)
                         {
-                            if (location.enumerationItems.isEmpty())
-                            {
-                                location.enumerationState = EnumerationState.Undefined
-                            }
-                            else
+                            location.isVisible = false
+                            if (!location.isLandmark)
                             {
                                 for (enumerationItem in location.enumerationItems)
                                 {
                                     if (enumerationItem.enumerationState == EnumerationState.Enumerated)
                                     {
-                                        location.enumerationState = EnumerationState.Enumerated
+                                        location.isVisible = true
                                         break
                                     }
-                                    location.enumerationState = enumerationItem.enumerationState
                                 }
                             }
                         }
-                        enumerationTeamLocations.sortWith( compareByDescending { it.enumerationState == EnumerationState.Enumerated } )
-                        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+                    }
+                    4-> { // points of interest
+                        for (location in enumerationTeamLocations)
+                        {
+                            location.isVisible = if (location.isLandmark) true else false
+                        }
                     }
                 }
+
+                refreshMap()
+                performEnumerationAdapter.updateLocations( enumerationTeamLocations )
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
@@ -901,7 +894,7 @@ class PerformEnumerationFragment : Fragment(),
     {
         MapManager.instance().clearMap( mapView )
 
-        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
+//        performEnumerationAdapter.updateLocations( enumerationTeamLocations )
 
         val points = java.util.ArrayList<Point>()
         val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
@@ -954,7 +947,7 @@ class PerformEnumerationFragment : Fragment(),
 
             for (location in enumArea.locations)
             {
-                if (location.isLandmark)
+                if (location.isLandmark && location.isVisible)
                 {
                     MapManager.instance().createMarker( activity!!, mapView, location, R.drawable.location_blue, "" )
                 }
@@ -962,7 +955,7 @@ class PerformEnumerationFragment : Fragment(),
 
             for (location in enumerationTeamLocations)
             {
-                if (!location.isLandmark)
+                if (!location.isLandmark && location.isVisible)
                 {
                     var resourceId = if (location.enumerationItems.size > 1) R.drawable.multi_home_black else R.drawable.home_black
 

@@ -46,7 +46,18 @@ class PerformEnumerationAdapter(var locations: List<Location>, val enumAreaName:
 
     fun updateLocations( locations: List<Location> )
     {
-        this.locations = locations
+        val filteredLocations = ArrayList<Location>()
+
+        for (location in locations)
+        {
+            if (location.isVisible)
+            {
+                filteredLocations.add( location )
+            }
+        }
+
+        this.locations = filteredLocations
+
         notifyDataSetChanged()
     }
 

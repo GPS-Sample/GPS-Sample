@@ -27,6 +27,7 @@ data class EnumerationItem(
     var syncCode : Int,
     var distance : Double,      // not stored in DB!
     var distanceUnits: String,  // not stored in DB!
+    var isVisible : Boolean,
     var subAddress : String,
     var enumeratorName : String,
     var enumerationState : EnumerationState,
@@ -50,6 +51,7 @@ data class EnumerationItem(
         0,
         0.0,
         "",
+        true,
         "",
         "",
         EnumerationState.Undefined,

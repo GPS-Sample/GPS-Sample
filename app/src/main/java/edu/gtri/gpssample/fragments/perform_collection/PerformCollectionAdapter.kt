@@ -50,8 +50,28 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
 
     fun updateItems( enumerationItems: List<EnumerationItem>, locations: List<Location> )
     {
-        this.locations = locations
-        this.enumerationItems = enumerationItems
+        val filteredLocations = ArrayList<Location>()
+
+        for (location in locations)
+        {
+            if (location.isVisible)
+            {
+                filteredLocations.add( location )
+            }
+        }
+
+        val filteredEnumerationItems = ArrayList<EnumerationItem>()
+
+        for (enumerationItem in enumerationItems)
+        {
+            if (enumerationItem.isVisible)
+            {
+                filteredEnumerationItems.add( enumerationItem )
+            }
+        }
+
+        this.locations = filteredLocations
+        this.enumerationItems = filteredEnumerationItems
 
         items.clear()
         items.addAll( enumerationItems )

@@ -125,6 +125,7 @@ class EnumerationItemDAO(private var dao: DAO)
             syncCode,
             0.0,
             "",
+            true,
             subAddress,
             enumeratorName,
             enumerationState,

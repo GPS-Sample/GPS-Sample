@@ -429,6 +429,7 @@
         <item>Undefined</item>
         <item>Incomplete</item>
         <item>Complete</item>
+        <item>Points of Interest</item>
     </string-array>
 
     <string-array name="show_views">

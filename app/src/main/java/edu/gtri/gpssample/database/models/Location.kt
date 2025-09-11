@@ -25,7 +25,7 @@ data class Location(
     var timeZone: Int,
     var distance : Double,      // not stored in DB!
     var distanceUnits: String,  // not stored in DB!
-    var enumerationState : EnumerationState, // not stored in DB!
+    var isVisible : Boolean, // not stored in DB!
     var type : LocationType,
     var gpsAccuracy : Int,
     var latitude : Double,
@@ -39,10 +39,10 @@ data class Location(
     var enumerationItems: ArrayList<EnumerationItem>)
 {
     constructor( latitude: Double, longitude: Double, altitude: Double ) :
-            this( UUID.randomUUID().toString(), Date().time, 0, 0.0, "", EnumerationState.Undefined, LocationType.None, 0, latitude, longitude, altitude, false, "","", false, "", ArrayList<EnumerationItem>())
+            this( UUID.randomUUID().toString(), Date().time, 0, 0.0, "", true, LocationType.None, 0, latitude, longitude, altitude, false, "","", false, "", ArrayList<EnumerationItem>())
 
     constructor( timeZone: Int, type: LocationType, gpsAccuracy: Int, latitude: Double, longitude: Double, altitude: Double, isLandmark: Boolean, description: String, properties: String ) :
-            this( UUID.randomUUID().toString(), Date().time, timeZone, 0.0, "", EnumerationState.Undefined, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, properties, ArrayList<EnumerationItem>())
+            this( UUID.randomUUID().toString(), Date().time, timeZone, 0.0, "", true, type, gpsAccuracy, latitude, longitude, altitude, isLandmark, description,"", false, properties, ArrayList<EnumerationItem>())
 
     fun equals( other: Location ) : Boolean
     {
