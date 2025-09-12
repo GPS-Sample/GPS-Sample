@@ -189,6 +189,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, this ) { mapView ->
             this.mapView = mapView
 
+            MapManager.instance().enableLocationUpdates( activity!!, mapView )
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
             if (config.enumAreas.isNotEmpty())
@@ -200,12 +201,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             }
             else
             {
-                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                MapManager.instance().startCenteringOnLocation( mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
-
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                    val point = com.mapbox.geojson.Point.fromLngLat( MapManager.GEORGIA_TECH.longitude, MapManager.GEORGIA_TECH.latitude )
-                    MapManager.instance().centerMap( point, currentZoomLevel, mapView )
+                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
                 }
             }
 
@@ -215,12 +214,12 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         binding.centerOnLocationButton.setOnClickListener {
             if (binding.centerOnLocationButton.backgroundTintList == defaultColorList)
             {
-                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                MapManager.instance().startCenteringOnLocation( mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
-                MapManager.instance().disableLocationUpdates( activity!!, mapView )
+                MapManager.instance().stopCenteringOnLocation( mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -1095,7 +1094,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                         activity!!.runOnUiThread {
                             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                                MapManager.instance().disableLocationUpdates( activity!!, mapView )
+                                MapManager.instance().stopCenteringOnLocation( mapView )
                                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                                 MapManager.instance().centerMap( enumArea, currentZoomLevel, mapView )
                             }

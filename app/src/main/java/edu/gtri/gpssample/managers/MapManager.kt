@@ -135,13 +135,13 @@ class MapManager
             mapBoxMapView.visibility = View.VISIBLE
             osmMapView.visibility = View.GONE
 
-            initializeMapboxMap( activity, mapBoxMapView, mapStyle!! ) {
+            initializeMapboxMap( mapBoxMapView, mapStyle!! ) {
                 completion( mapBoxMapView )
             }
         }
     }
 
-    fun initializeOsmMap(activity: Activity, mapView: org.osmdroid.views.MapView, northUpImageView: ImageView, mapStyle: String, completion: (()->Unit) )
+    private fun initializeOsmMap( activity: Activity, mapView: org.osmdroid.views.MapView, northUpImageView: ImageView, mapStyle: String, completion: (()->Unit) )
     {
         org.osmdroid.config.Configuration.getInstance().load( activity, PreferenceManager.getDefaultSharedPreferences(activity))
 
@@ -218,7 +218,7 @@ class MapManager
         completion()
     }
 
-    fun initializeMapboxMap( activity: Activity, mapView: com.mapbox.maps.MapView, style: String, completion: (()->Unit))
+    private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, completion: (()->Unit))
     {
         createMapboxPointAnnotationManager( mapView )
         createMapboxPolygonAnnotationManager( mapView )
@@ -277,19 +277,19 @@ class MapManager
         }
     }
 
-    fun disableLocationUpdates( activity: Activity, mapView: View )
+    fun disableLocationUpdates( mapView: View )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
-            disableOsmMapLocationUpdates( activity, mapView )
+            disableOsmMapLocationUpdates( mapView )
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
-            disableMapboxLocationUpdates( activity, mapView )
+            disableMapboxLocationUpdates( mapView )
         }
     }
 
-    fun enableOsmMapLocationUpdates( activity: Activity, mapView: org.osmdroid.views.MapView )
+    private fun enableOsmMapLocationUpdates( activity: Activity, mapView: org.osmdroid.views.MapView )
     {
         val locationProvider = GpsMyLocationProvider( activity )
         locationProvider.locationUpdateMinTime = 1000 // 1 second
@@ -315,21 +315,50 @@ class MapManager
         }
 
         myLocationNewOverlay.enableMyLocation()
-        myLocationNewOverlay.enableFollowLocation()
 
         mapView.getOverlays().add( myLocationNewOverlay )
     }
 
-    fun disableOsmMapLocationUpdates( activity: Activity, mapView: org.osmdroid.views.MapView )
+    private fun disableOsmMapLocationUpdates( mapView: org.osmdroid.views.MapView )
     {
         for (overlay in mapView.overlays)
         {
             if (overlay is MyLocationNewOverlay)
             {
-//                overlay.disableMyLocation()
+                overlay.disableMyLocation()
                 overlay.disableFollowLocation()
-//                mapView.overlays.remove( overlay )
+                mapView.overlays.remove( overlay )
                 break
+            }
+        }
+    }
+
+    fun startCenteringOnLocation( mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            for (overlay in mapView.getOverlays())
+            {
+                if (overlay is MyLocationNewOverlay)
+                {
+                    overlay.enableFollowLocation()
+                    break
+                }
+            }
+        }
+    }
+
+    fun stopCenteringOnLocation( mapView: View )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            for (overlay in mapView.getOverlays())
+            {
+                if (overlay is MyLocationNewOverlay)
+                {
+                    overlay.disableFollowLocation()
+                    break
+                }
             }
         }
     }
@@ -376,7 +405,7 @@ class MapManager
         mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener!!)
     }
 
-    fun disableMapboxLocationUpdates( activity: Activity, mapView: com.mapbox.maps.MapView )
+    private fun disableMapboxLocationUpdates( mapView: com.mapbox.maps.MapView )
     {
         if (onIndicatorPositionChangedListener != null)
         {
@@ -441,7 +470,8 @@ class MapManager
         }
     }
 
-    fun createTextLabel(context: Context, text: String): Bitmap {
+    fun createTextLabel(context: Context, text: String): Bitmap
+    {
         val textView = TextView(context)
         textView.text = text
         textView.setTextColor(Color.BLACK)
@@ -860,40 +890,6 @@ class MapManager
         val resId = context.resources.getIdentifier( iconName, "drawable", context.packageName)
         return if (resId != 0) ContextCompat.getDrawable(context, resId) else null
     }
-
-    fun loadGeoJson( context: Context, mapView: org.osmdroid.views.MapView, geoJsonString: String )
-    {
-        val clusterer = RadiusMarkerClusterer(context)
-        clusterer.textPaint.color = Color.WHITE
-
-        val geoJson = JSONObject(geoJsonString)
-        val features = geoJson.getJSONArray("features")
-
-        for (i in 0 until features.length())
-        {
-            val feature = features.getJSONObject(i)
-            val geometry = feature.getJSONObject("geometry")
-            val coords = geometry.getJSONArray("coordinates")
-            val properties = feature.getJSONObject("properties")
-
-            val lat = coords.getDouble(1)
-            val lon = coords.getDouble(0)
-            val iconType = properties.getString("home_black")
-
-            val marker = Marker(mapView)
-            marker.position = GeoPoint(lat, lon)
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            marker.icon = getIconDrawable(context, iconType) // Load the correct PNG
-            marker.title = properties.optString("name")
-
-            clusterer.add(marker)
-        }
-
-        mapView.overlays.add(clusterer)
-        mapView.invalidate()
-    }
-
-    // private functions
 
     private fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap?
     {

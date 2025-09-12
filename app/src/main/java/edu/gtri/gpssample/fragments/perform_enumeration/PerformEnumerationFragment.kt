@@ -209,6 +209,8 @@ class PerformEnumerationFragment : Fragment(),
         MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
             this.mapView = mapView
 
+            MapManager.instance().enableLocationUpdates( activity!!, mapView )
+
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
 
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
@@ -218,12 +220,11 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
                 if (centerOnCurrentLocation)
                 {
-                    MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                    MapManager.instance().startCenteringOnLocation( mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
                 else
                 {
-                    MapManager.instance().disableLocationUpdates( activity!!, mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                 }
             }
@@ -399,13 +400,13 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
                 if (centerOnCurrentLocation)
                 {
-                    MapManager.instance().disableLocationUpdates( activity!!, mapView )
+                    MapManager.instance().stopCenteringOnLocation( mapView )
                     sharedViewModel.setCenterOnCurrentLocation( false )
                     binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                 }
                 else
                 {
-                    MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                    MapManager.instance().startCenteringOnLocation( mapView )
                     sharedViewModel.setCenterOnCurrentLocation( true )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }

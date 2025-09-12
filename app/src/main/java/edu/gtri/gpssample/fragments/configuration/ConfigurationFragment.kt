@@ -225,23 +225,25 @@ class ConfigurationFragment : Fragment(),
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
             MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView ) { mapView ->
-
-                binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
-
                 MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                MapManager.instance().startCenteringOnLocation( mapView )
+                binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
+                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                }
 
-                if (config.enumAreas.isNotEmpty())
-                {
-                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                        MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
-                    }
-                }
-                else
-                {
-                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
-                        MapManager.instance().centerMap( Point.fromLngLat( MapManager.GEORGIA_TECH.longitude, MapManager.GEORGIA_TECH.latitude), currentZoomLevel, mapView )
-                    }
-                }
+//                if (config.enumAreas.isNotEmpty())
+//                {
+//                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+//                        MapManager.instance().centerMap( config.enumAreas[0], currentZoomLevel, mapView )
+//                    }
+//                }
+//                else
+//                {
+//                    sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+//                        MapManager.instance().centerMap( Point.fromLngLat( MapManager.GEORGIA_TECH.longitude, MapManager.GEORGIA_TECH.latitude), currentZoomLevel, mapView )
+//                    }
+//                }
             }
 
             val items = ArrayList<String>()
