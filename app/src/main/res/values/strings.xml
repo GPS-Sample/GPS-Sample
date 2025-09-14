@@ -341,7 +341,6 @@
     <string name="import_request_failed">"Received an Export Request while waiting for an Import Request"</string>
     <string name="export_request_failed">"Received an Import Request while waiting for an Export Request"</string>
     <string name="network_connection">"Network Connection"</string>
-    <string name="add_landmark">"Add Landmark"</string>
     <string name="enumerated">"Enumerated"</string>
     <string name="surveyed">"Surveyed"</string>
     <string name="meters">"Meters"</string>
@@ -418,6 +417,7 @@
 
     <string name="view">View:</string>
     <string name="filter_by">Filter By:</string>
+    <string name="add_landmark">Add Point of Interest</string>
 
     <string-array name="map_engines">
         <item>Open Street Map</item>
