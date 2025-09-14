@@ -74,8 +74,9 @@ class PerformCollectionAdapter(var enumerationItems: List<EnumerationItem>, var 
         this.enumerationItems = filteredEnumerationItems
 
         items.clear()
-        items.addAll( enumerationItems )
-        items.addAll( locations )
+        items.addAll( filteredEnumerationItems )
+        items.addAll( filteredLocations )
+
         notifyDataSetChanged()
     }
 

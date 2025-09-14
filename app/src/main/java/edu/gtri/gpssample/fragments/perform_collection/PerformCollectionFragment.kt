@@ -1225,35 +1225,38 @@ class PerformCollectionFragment : Fragment(),
             {
                 lastLocationUpdateTime = Date().time
 
-                for (loc in enumArea.locations)
+                for (enumerationItem in performCollectionAdapter.enumerationItems)
                 {
-                    val currentLatLng = LatLng( point.latitude(), point.longitude())
-                    val itemLatLng = LatLng( loc.latitude, loc.longitude )
-                    val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
-                    if (distance < 400) // display in meters or feet
-                    {
-                        if (config.distanceFormat == DistanceFormat.Meters)
+                    DAO.locationDAO.getLocation( enumerationItem.locationUuid )?.let {
+                        val currentLatLng = LatLng( point.latitude(), point.longitude())
+                        val itemLatLng = LatLng( it.latitude, it.longitude )
+                        val distance = GeoUtils.distanceBetween( currentLatLng, itemLatLng )
+
+                        if (distance < 400) // display in meters or feet
                         {
-                            loc.distance = distance
-                            loc.distanceUnits = resources.getString( R.string.meters )
+                            if (config.distanceFormat == DistanceFormat.Meters)
+                            {
+                                enumerationItem.distance = distance
+                                enumerationItem.distanceUnits = resources.getString( R.string.meters )
+                            }
+                            else
+                            {
+                                enumerationItem.distance = distance * 3.28084
+                                enumerationItem.distanceUnits = resources.getString( R.string.feet )
+                            }
                         }
-                        else
+                        else // display in kilometers or miles
                         {
-                            loc.distance = distance * 3.28084
-                            loc.distanceUnits = resources.getString( R.string.feet )
-                        }
-                    }
-                    else // display in kilometers or miles
-                    {
-                        if (config.distanceFormat == DistanceFormat.Meters)
-                        {
-                            loc.distance = distance / 1000.0
-                            loc.distanceUnits = resources.getString( R.string.kilometers )
-                        }
-                        else
-                        {
-                            loc.distance = distance / 1609.34
-                            loc.distanceUnits = resources.getString( R.string.miles )
+                            if (config.distanceFormat == DistanceFormat.Meters)
+                            {
+                                enumerationItem.distance = distance / 1000.0
+                                enumerationItem.distanceUnits = resources.getString( R.string.kilometers )
+                            }
+                            else
+                            {
+                                enumerationItem.distance = distance / 1609.34
+                                enumerationItem.distanceUnits = resources.getString( R.string.miles )
+                            }
                         }
                     }
                 }
