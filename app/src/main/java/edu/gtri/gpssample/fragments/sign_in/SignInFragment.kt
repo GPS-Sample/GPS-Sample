@@ -153,20 +153,20 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
             }
         }
 
-//        binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
-//            checkPassword()
-//            false
-//        })
+        binding.pinEditText.setOnKeyListener(View.OnKeyListener { view, i, keyEvent ->
+            checkPassword( false )
+            false
+        })
 
         binding.pinEditText.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                checkPassword()
+                checkPassword( true )
             }
             false
         })
     }
 
-    fun checkPassword()
+    fun checkPassword( showFailMessage: Boolean )
     {
         val pinText = binding.pinEditText.text.toString()
         val userName = binding.nameEditText.text.toString()
@@ -224,7 +224,10 @@ class SignInFragment : Fragment(), ResetPinDialog.ResetPinDialogDelegate
 
                     if (pin != expectedPin)
                     {
-                        Toast.makeText( context, context?.getString(R.string.pin_incorrect), Toast.LENGTH_SHORT).show()
+                        if (showFailMessage)
+                        {
+                            Toast.makeText( context, context?.getString(R.string.pin_incorrect), Toast.LENGTH_SHORT).show()
+                        }
                     }
                     else
                     {
