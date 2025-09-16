@@ -97,7 +97,7 @@ class PerformCollectionFragment : Fragment(),
     private lateinit var performCollectionAdapter: PerformCollectionAdapter
 
     private val binding get() = _binding!!
-    private var isShowingBreadcrumbs = false
+    private var isShowingBreadcrumbs = true
     private var currentGPSAccuracy: Int? = null
     private var currentGPSLocation: Point? = null
     private var landmarkLocations = ArrayList<Location>()
@@ -253,8 +253,14 @@ class PerformCollectionFragment : Fragment(),
             defaultColorList = it
         }
 
-        isShowingBreadcrumbs = true
-        binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        if (isShowingBreadcrumbs)
+        {
+            binding.showBreadcrumbsButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+        }
+        else
+        {
+            binding.showBreadcrumbsButton.setBackgroundTintList(defaultColorList);
+        }
 
         val centerOnCurrentLocation = sharedViewModel.centerOnCurrentLocation?.value
         if (centerOnCurrentLocation == null)
