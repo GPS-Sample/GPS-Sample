@@ -13,6 +13,7 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.InsetDrawable
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MotionEvent
@@ -149,6 +150,7 @@ class MapManager
         mapView.minZoomLevel = 0.0
         mapView.maxZoomLevel = 24.0
         mapView.setMultiTouchControls( true )
+        mapView.setBuiltInZoomControls(false)
 
         var tileSource = TileSourceFactory.MAPNIK
 
@@ -686,9 +688,11 @@ class MapManager
             marker.setAnchor( org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_CENTER)
 
             val icon: Drawable? = ContextCompat.getDrawable(context, resourceId)
+            val paddedIcon = InsetDrawable(icon, 36, 36, 36, 36)
 
-            marker.icon = icon
             marker.title = title
+            marker.icon = paddedIcon
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
             mapView.overlays.add(marker)
 
             if (title.isNotEmpty())
@@ -729,6 +733,7 @@ class MapManager
             mapView.invalidate()
 
             marker.setOnMarkerClickListener { clickedMarker, mapView ->
+                Log.d( "xxx", "marker.tapped" )
                 delegate?.onMarkerTapped( location )
                 true
             }

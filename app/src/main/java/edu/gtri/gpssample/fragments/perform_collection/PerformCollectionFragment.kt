@@ -1268,6 +1268,7 @@ class PerformCollectionFragment : Fragment(),
 
     override fun onMarkerTapped( location: Location )
     {
+        Log.d( "xxx", "onMarkerTapped" )
         sharedViewModel.currentLocationUuid = location.uuid
 
         if (location.isLandmark)
@@ -1294,9 +1295,6 @@ class PerformCollectionFragment : Fragment(),
                         {
                             count += 1
                             index = i
-                            // This is really only necessary here for the enumerationItems.size == 1 case
-                            // For size > 1, this will get set in the multiCollectionFragment
-                            sharedViewModel.currentEnumerationItemUuid = enumerationItem.uuid
                         }
                     }
 

@@ -49,7 +49,6 @@ class PerformMultiCollectionFragment : Fragment(),
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
 {
     private lateinit var location: Location
-    private lateinit var enumerationItem: EnumerationItem
     private lateinit var sharedViewModel : ConfigurationViewModel
     private lateinit var performMultiCollectionAdapter: PerformMultiCollectionAdapter
 
@@ -74,17 +73,19 @@ class PerformMultiCollectionFragment : Fragment(),
                         Keys.kAdditionalInfoRequest.value -> AdditionalInfoDialog(activity, "", "", this)
                         Keys.kLaunchSurveyRequest.value ->
                         {
-                            if (enumerationItem.odkRecordUri.isNotEmpty())
-                            {
-                                val uri = Uri.parse( enumerationItem.odkRecordUri )
-                                val intent = Intent(Intent.ACTION_EDIT)
-                                intent.setData(uri)
-                                odk_result.launch(intent)
-                            }
-                            else
-                            {
-                                // This will create a new ODK instance record
-                                SurveyLaunchNotificationDialog(activity!!, this)
+                            this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                                if (enumerationItem.odkRecordUri.isNotEmpty())
+                                {
+                                    val uri = Uri.parse( enumerationItem.odkRecordUri )
+                                    val intent = Intent(Intent.ACTION_EDIT)
+                                    intent.setData(uri)
+                                    odk_result.launch(intent)
+                                }
+                                else
+                                {
+                                    // This will create a new ODK instance record
+                                    SurveyLaunchNotificationDialog(activity!!, this)
+                                }
                             }
                         }
                     }
@@ -106,9 +107,9 @@ class PerformMultiCollectionFragment : Fragment(),
         sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
             enumArea.locations.find { it.uuid == sharedViewModel.currentLocationUuid }?.let { location: Location ->
                 this.location = location
-                this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
-                    this.enumerationItem = enumerationItem
-                }
+//                this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+//                    this.enumerationItem = enumerationItem
+//                }
             }
         }
     }
@@ -186,52 +187,26 @@ class PerformMultiCollectionFragment : Fragment(),
 
     override fun didSelectSaveButton( incompleteReason: String, notes: String )
     {
-        enumerationItem.collectionNotes = notes
-        enumerationItem.collectionDate = Date().time
-        enumerationItem.syncCode = enumerationItem.syncCode + 1
-        enumerationItem.collectionState = CollectionState.Complete
+        this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+            enumerationItem.collectionNotes = notes
+            enumerationItem.collectionDate = Date().time
+            enumerationItem.syncCode = enumerationItem.syncCode + 1
+            enumerationItem.collectionState = CollectionState.Complete
 
-        (activity!!.application as MainApplication).user?.let { user ->
-            enumerationItem.collectorName = user.name
-        }
-
-        if (incompleteReason.isNotEmpty())
-        {
-            enumerationItem.collectionState = CollectionState.Incomplete
-            enumerationItem.collectionIncompleteReason = incompleteReason
-        }
-
-        DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
-
-//        sharedViewModel.currentConfiguration?.value?.let { config ->
-//            DAO.configDAO.getConfig( config.uuid )?.let {
-//                sharedViewModel.setCurrentConfig( it )
-//            }
-//        }
-//
-//        sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
-//            DAO.enumAreaDAO.getEnumArea( enumArea.uuid )?.let {
-//                sharedViewModel.enumAreaViewModel.setCurrentEnumArea( it )
-//            }
-//        }
-//
-//        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-//            DAO.studyDAO.getStudy( study.uuid )?.let {
-//                sharedViewModel.createStudyModel.setStudy( it )
-//            }
-//        }
-
-        val enumerationItems = ArrayList<EnumerationItem>()
-
-        for (enumurationItem in location.enumerationItems)
-        {
-            if (enumurationItem.samplingState == SamplingState.Sampled)
-            {
-                enumerationItems.add( enumurationItem )
+            (activity!!.application as MainApplication).user?.let { user ->
+                enumerationItem.collectorName = user.name
             }
-        }
 
-        performMultiCollectionAdapter.updateEnumerationItems( enumerationItems )
+            if (incompleteReason.isNotEmpty())
+            {
+                enumerationItem.collectionState = CollectionState.Incomplete
+                enumerationItem.collectionIncompleteReason = incompleteReason
+            }
+
+            DAO.enumerationItemDAO.createOrUpdateEnumerationItem( enumerationItem, location )
+
+            performMultiCollectionAdapter.updateEnumerationItems()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -247,10 +222,12 @@ class PerformMultiCollectionFragment : Fragment(),
         if (result.resultCode == Activity.RESULT_OK)
         {
             result.data?.data?.let { uri ->
-                if (enumerationItem.odkRecordUri.isEmpty())
-                {
-                    enumerationItem.odkRecordUri = uri.toString()
-                    didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
+                this.location.enumerationItems.find { it.uuid == sharedViewModel.currentEnumerationItemUuid }?.let { enumerationItem ->
+                    if (enumerationItem.odkRecordUri.isEmpty())
+                    {
+                        enumerationItem.odkRecordUri = uri.toString()
+                        didSelectSaveButton( "Other", "User canceled action, ODK record saved.")
+                    }
                 }
             }
 

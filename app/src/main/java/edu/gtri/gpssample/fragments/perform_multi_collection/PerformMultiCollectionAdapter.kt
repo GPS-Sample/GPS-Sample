@@ -40,6 +40,11 @@ class PerformMultiCollectionAdapter( var enumerationItems: List<EnumerationItem>
         return viewHolder
     }
 
+    fun updateEnumerationItems()
+    {
+        notifyDataSetChanged()
+    }
+
     fun updateEnumerationItems( enumerationItems: List<EnumerationItem> )
     {
         this.enumerationItems = enumerationItems
