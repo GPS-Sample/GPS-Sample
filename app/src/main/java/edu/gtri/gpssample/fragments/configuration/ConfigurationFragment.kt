@@ -41,6 +41,7 @@ import edu.gtri.gpssample.databinding.FragmentConfigurationBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InfoDialog
+import edu.gtri.gpssample.dialogs.NotificationDialog
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -204,7 +205,16 @@ class ConfigurationFragment : Fragment(),
                             {
                                 ConfirmationDialog.ButtonPress.Left -> {
                                     sharedViewModel.currentConfiguration?.value?.let { config ->
-                                        ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), false )
+                                        ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), false, { success ->
+                                            if (success)
+                                            {
+                                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                            }
+                                            else
+                                            {
+                                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                            }
+                                        } )
                                     }
                                 }
                                 ConfirmationDialog.ButtonPress.Right -> {
@@ -455,10 +465,12 @@ class ConfigurationFragment : Fragment(),
                                         if (error.isEmpty())
                                         {
                                             imageFile.delete()
+                                            configFile.delete()
+                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
                                         }
                                         else
                                         {
-                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                                         }
                                     }
                                 }
@@ -468,10 +480,11 @@ class ConfigurationFragment : Fragment(),
                                         if (error.isEmpty())
                                         {
                                             configFile.delete()
+                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
                                         }
                                         else
                                         {
-                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                                         }
                                     }
                                 }

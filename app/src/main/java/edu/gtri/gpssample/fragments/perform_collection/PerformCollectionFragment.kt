@@ -551,7 +551,16 @@ class PerformCollectionFragment : Fragment(),
                                 when( buttonPressed )
                                 {
                                     ConfirmationDialog.ButtonPress.Left -> {
-                                        ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal())
+                                        ZipUtils.exportToDefaultLocation( activity!!, config, getPathName(), shouldPackMinimal(), { success ->
+                                            if (success)
+                                            {
+                                                Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
+                                            }
+                                            else
+                                            {
+                                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
+                                            }
+                                        })
                                     }
                                     ConfirmationDialog.ButtonPress.Right -> {
                                         exportToDevice()
@@ -887,10 +896,11 @@ class PerformCollectionFragment : Fragment(),
                                         {
                                             imageFile.delete()
                                             configFile.delete()
+                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
                                         }
                                         else
                                         {
-                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                                         }
                                     }
                                 }
@@ -900,13 +910,18 @@ class PerformCollectionFragment : Fragment(),
                                         if (error.isEmpty())
                                         {
                                             configFile.delete()
+                                            Toast.makeText( activity!!.applicationContext, resources.getString(R.string.export_succeeded), Toast.LENGTH_LONG).show()
                                         }
                                         else
                                         {
-                                            Toast.makeText( activity!!.applicationContext, error, Toast.LENGTH_LONG).show()
+                                            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                                         }
                                     }
                                 }
+                            }
+                            else
+                            {
+                                NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
                             }
                         }
                     }
@@ -916,7 +931,7 @@ class PerformCollectionFragment : Fragment(),
         catch (ex: java.lang.Exception)
         {
             Log.d( "xxx", ex.stackTraceToString())
-            Toast.makeText( activity!!.applicationContext, ex.stackTraceToString(), Toast.LENGTH_LONG).show()
+            NotificationDialog( activity!!, resources.getString(R.string.oops), resources.getString(R.string.export_failed))
         }
     }
 

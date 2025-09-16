@@ -128,7 +128,7 @@ object ZipUtils
         }.start()
     }
 
-    fun exportToDefaultLocation( activity: Activity, config: Config, fileName: String, shouldPackMinimal: Boolean )
+    fun exportToDefaultLocation( activity: Activity, config: Config, fileName: String, shouldPackMinimal: Boolean, completion: (success: Boolean )->Unit )
     {
         Thread {
             try
@@ -143,6 +143,9 @@ object ZipUtils
                         {
                             zipToFile( listOf( configFile, imageFile ), zipFile )
                             imageFile.delete()
+                            activity.runOnUiThread {
+                                completion( true )
+                            }
                         }
                         else
                         {
@@ -150,12 +153,19 @@ object ZipUtils
                         }
 
                         configFile.delete()
+
+                        activity.runOnUiThread {
+                            completion( true )
+                        }
                     }
                 }
             }
             catch( ex: Exception )
             {
                 Log.d( "xxx", ex.stackTraceToString())
+                activity.runOnUiThread {
+                    completion( false )
+                }
             }
         }.start()
     }
