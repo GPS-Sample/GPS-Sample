@@ -23,11 +23,7 @@ class ConfigDAO(private var dao: DAO)
 {
     fun createOrUpdateConfig( config: Config ) : Config?
     {
-        lateinit var user: User
-
-        MainApplication.instance.user?.let {
-            user = it
-
+        MainApplication.instance.user?.let { user ->
             if (!config.validUsers.contains(user.uuid))
             {
                 config.validUsers += " ${user.uuid} "
@@ -150,7 +146,14 @@ class ConfigDAO(private var dao: DAO)
         val autoIncrementSubaddress = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_AUTO_INCREMENT_SUBADDRESS)).toBoolean()
         val proximityWarningIsEnabled = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_IS_ENABLED)).toBoolean()
         val proximityWarningValue = cursor.getInt(cursor.getColumnIndex(DAO.COLUMN_CONFIG_PROXIMITY_WARNING_VALUE))
-        val validUsers = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_VALID_USERS))
+        var validUsers = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_VALID_USERS))
+
+        if (validUsers.isEmpty())
+        {
+            MainApplication.instance.user?.let { user->
+                validUsers = " ${user.uuid} "
+            }
+        }
 
         // TODO: these should be lookup tables
         val distanceFormat = DistanceFormatConverter.fromIndex(distanceFormatIndex)

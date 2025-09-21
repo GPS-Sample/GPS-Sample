@@ -11,6 +11,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
@@ -392,40 +393,132 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         }
     }
 
-    override fun onUpgrade( db: SQLiteDatabase, oldVersion: Int, newVersion: Int )
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
     {
-        // clear all tables
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_CONFIG__STUDY")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTEROPERATOR")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUM_AREA__LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_BREADCRUMB")
+        if (oldVersion == 314 && newVersion == 321)
+        {
+            migrateFrom314To321( db )
+        }
+        else
+        {
+            dropAllTables( db )
+        }
+    }
 
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD__FIELD_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUM_AREA")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM")
-        db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM")
+    fun migrateFrom314To321( db: SQLiteDatabase )
+    {
+        try
+        {
+            // Add new columns to Config table
+            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_MAP_ENGINE_INDEX INTEGER DEFAULT 0")
+            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_VALID_USERS TEXT")
 
-        onCreate(db)
+            // Assign a default value for VALID_USERS to existing rows
+            db.execSQL("UPDATE $TABLE_CONFIG SET $COLUMN_CONFIG_VALID_USERS = '' WHERE $COLUMN_CONFIG_VALID_USERS IS NULL")
+
+            // Rename old Location table
+            db.execSQL("ALTER TABLE $TABLE_LOCATION RENAME TO ${TABLE_LOCATION}_old")
+
+            // Create new Location table with updated schema
+            val createTableLocation = ("CREATE TABLE " +
+                    TABLE_LOCATION + "(" +
+                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_TIME_ZONE + " INTEGER" + "," +
+                    COLUMN_LOCATION_TYPE_ID + " INTEGER" + "," +
+                    COLUMN_LOCATION_GPS_ACCURACY + " INTEGER" + "," +
+                    COLUMN_LOCATION_LATITUDE + " REAL" + "," +
+                    COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
+                    COLUMN_LOCATION_ALTITUDE + " REAL" + "," +
+                    COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
+                    COLUMN_LOCATION_DESCRIPTION + " TEXT" + "," +
+                    COLUMN_LOCATION_IMAGE_UUID + " TEXT" + "," +
+                    COLUMN_LOCATION_IS_MULTI_FAMILY + " INTEGER" + "," +
+                    COLUMN_LOCATION_PROPERTIES + " STRING" +
+                    ") WITHOUT ROWID")
+            db.execSQL(createTableLocation)
+
+            // Migrate data from old Location table to new one
+            db.execSQL("""
+                INSERT INTO $TABLE_LOCATION (
+                    $COLUMN_UUID, $COLUMN_CREATION_DATE, $COLUMN_TIME_ZONE,
+                    $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
+                    $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
+                    $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
+                    $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_UUID,
+                    $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
+                )
+                SELECT
+                    $COLUMN_UUID, $COLUMN_CREATION_DATE, $COLUMN_TIME_ZONE,
+                    $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
+                    $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
+                    $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
+                    $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_DATA,
+                    $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
+                FROM ${TABLE_LOCATION}_old
+            """)
+
+            // Drop old Location table
+            db.execSQL("DROP TABLE ${TABLE_LOCATION}_old")
+
+            // Create Breadcrumb table
+            val createTableBreadcrumb = ("CREATE TABLE " +
+                    TABLE_BREADCRUMB + "(" +
+                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
+                    COLUMN_LATITUDE + " REAL" + "," +
+                    COLUMN_LONGITUDE + " REAL" + "," +
+                    COLUMN_GROUP_ID + " TEXT" +
+                    ") WITHOUT ROWID")
+            db.execSQL(createTableBreadcrumb)
+        }
+        catch (ex: Exception)
+        {
+            Log.d( "xxx", "Migration from DB 314 to 321 FAILED")
+        }
+    }
+
+    fun dropAllTables( db: SQLiteDatabase )
+    {
+        try
+        {
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_CONFIG")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_STUDY")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_CONFIG__STUDY")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTEROPERATOR")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_COLLECTION_TEAM")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_DATA_OPTION")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_LAT_LON")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_LOCATION")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_ITEM")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUM_AREA__LAT_LON")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_ENUMERATION_TEAM__LAT_LON")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_COLLECTION_TEAM__LAT_LON")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD_OPTION")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_MAP_TILE_REGION")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_BREADCRUMB")
+
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD__FIELD_OPTION")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_FIELD_DATA__FIELD_DATA_OPTION")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_RULE__FIELD_DATA_OPTION")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUM_AREA")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__ENUMERATION_TEAM")
+            db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_LOCATION__COLLECTION_TEAM")
+
+            onCreate(db)
+        }
+        catch (ex:Exception)
+        {
+            Log.d( "xxx", "Drop All tables FAILED" )
+        }
     }
 
     companion object
@@ -566,6 +659,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_LOCATION_ALTITUDE = "location_altitude"
         const val COLUMN_LOCATION_IS_LANDMARK = "location_is_landmark"
         const val COLUMN_LOCATION_DESCRIPTION = "location_description"
+        const val COLUMN_LOCATION_IMAGE_DATA = "location_image_data"
         const val COLUMN_LOCATION_IMAGE_UUID = "location_image_uuid"
         const val COLUMN_LOCATION_IS_MULTI_FAMILY = "location_is_multi_family"
         const val  COLUMN_LOCATION_PROPERTIES = "location_properties"
