@@ -15,7 +15,6 @@ import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import edu.gtri.gpssample.R
@@ -62,11 +61,10 @@ class LocationService : Service()
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        fusedLocationClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
+
+        locationCallback?.let {
+            fusedLocationClient.requestLocationUpdates( locationRequest, it, Looper.getMainLooper())
+        }
     }
 
     private fun buildNotification(): Notification {
@@ -92,14 +90,16 @@ class LocationService : Service()
     override fun onDestroy() {
         super.onDestroy()
         started = false
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+        locationCallback?.let {
+            fusedLocationClient.removeLocationUpdates(it)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     companion object
     {
-        lateinit var locationCallback: LocationCallback
+        var locationCallback: LocationCallback? = null
 
         var started = false
     }

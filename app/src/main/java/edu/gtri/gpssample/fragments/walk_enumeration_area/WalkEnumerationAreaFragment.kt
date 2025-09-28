@@ -501,7 +501,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                 binding.mapOverlayView.visibility = View.GONE
                 binding.addPointButton.setBackgroundTintList(defaultColorList)
 
-                startPoint = binding.mapboxMapView.getMapboxMap().coordinateForPixel(ScreenCoordinate(p1.x.toDouble(),p1.y.toDouble()))
+                startPoint = MapManager.instance().getLocationFromPixelPoint( mapView, p1 )
 
                 val inputDialog = InputDialog( activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), null )  { action, text, tag ->
                     when (action) {

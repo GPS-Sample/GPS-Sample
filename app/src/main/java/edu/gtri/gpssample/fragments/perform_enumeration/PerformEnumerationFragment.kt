@@ -14,13 +14,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Looper
-import android.os.PowerManager
-import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
@@ -30,24 +26,18 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
 import com.mapbox.maps.Style
@@ -57,26 +47,21 @@ import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
-import edu.gtri.gpssample.utils.CameraUtils
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
-import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.math.max
 
 class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
@@ -240,6 +225,7 @@ class PerformEnumerationFragment : Fragment(),
             if (!LocationService.started)
             {
                 LocationService.locationCallback = locationCallback
+                Log.d( "xxx", "locationServer.locationCallback NOT null" )
                 val intent = Intent(activity!!, LocationService::class.java)
                 ContextCompat.startForegroundService(activity!!, intent)
             }
@@ -289,82 +275,83 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.filterSpinner.adapter = ArrayAdapter<String>(this.context!!, android.R.layout.simple_spinner_dropdown_item, filters )
 
-        binding.filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-        {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-            {
-                // Note! OnItemSelected fires automatically when the fragment is created
-                when( position )
+        // Note! OnItemSelected fires automatically when the fragment is created
+        // using post will ensure that this will not happen
+        binding.filterSpinner.post {
+            binding.filterSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long)
                 {
-                    0-> { // nothing
-                        for (location in enumerationTeamLocations) {
-                            location.isVisible = true
+                    when( position )
+                    {
+                        0-> { // nothing
+                            for (location in enumerationTeamLocations) {
+                                location.isVisible = true
+                            }
                         }
-                    }
-                    1-> { // undefined
-                        for (location in enumerationTeamLocations)
-                        {
-                            location.isVisible = false
-                            if (!location.isLandmark)
+                        1-> { // undefined
+                            for (location in enumerationTeamLocations)
                             {
-                                for (enumerationItem in location.enumerationItems)
+                                location.isVisible = false
+                                if (!location.isLandmark)
                                 {
-                                    if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                    for (enumerationItem in location.enumerationItems)
                                     {
-                                        location.isVisible = true
-                                        break
+                                        if (enumerationItem.enumerationState == EnumerationState.Undefined)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    2-> { // incomplete
-                        for (location in enumerationTeamLocations)
-                        {
-                            location.isVisible = false
-                            if (!location.isLandmark)
+                        2-> { // incomplete
+                            for (location in enumerationTeamLocations)
                             {
-                                for (enumerationItem in location.enumerationItems)
+                                location.isVisible = false
+                                if (!location.isLandmark)
                                 {
-                                    if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                                    for (enumerationItem in location.enumerationItems)
                                     {
-                                        location.isVisible = true
-                                        break
+                                        if (enumerationItem.enumerationState == EnumerationState.Incomplete)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    3-> { // complete
-                        for (location in enumerationTeamLocations)
-                        {
-                            location.isVisible = false
-                            if (!location.isLandmark)
+                        3-> { // complete
+                            for (location in enumerationTeamLocations)
                             {
-                                for (enumerationItem in location.enumerationItems)
+                                location.isVisible = false
+                                if (!location.isLandmark)
                                 {
-                                    if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                                    for (enumerationItem in location.enumerationItems)
                                     {
-                                        location.isVisible = true
-                                        break
+                                        if (enumerationItem.enumerationState == EnumerationState.Enumerated)
+                                        {
+                                            location.isVisible = true
+                                            break
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    4-> { // points of interest
-                        for (location in enumerationTeamLocations)
-                        {
-                            location.isVisible = if (location.isLandmark) true else false
+                        4-> { // points of interest
+                            for (location in enumerationTeamLocations)
+                            {
+                                location.isVisible = if (location.isLandmark) true else false
+                            }
                         }
                     }
+
+                    performEnumerationAdapter.updateLocations( enumerationTeamLocations )
                 }
 
-                refreshMap()
-                performEnumerationAdapter.updateLocations( enumerationTeamLocations )
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            })
         }
 
         binding.legendTextView.setOnClickListener {
