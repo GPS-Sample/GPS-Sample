@@ -287,11 +287,12 @@ class PerformCollectionFragment : Fragment(),
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
                 if (centerOnCurrentLocation)
                 {
-                    MapManager.instance().startCenteringOnLocation( mapView )
+                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                     binding.centerOnLocationButton.setBackgroundTintList( ColorStateList.valueOf( resources.getColor(android.R.color.holo_red_light)));
                 }
                 else
                 {
+                    MapManager.instance().stopCenteringOnLocation( mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                 }
             }
@@ -502,7 +503,7 @@ class PerformCollectionFragment : Fragment(),
                 else
                 {
                     sharedViewModel.setCenterOnCurrentLocation( true )
-                    MapManager.instance().startCenteringOnLocation( mapView )
+                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
                 refreshMap()
@@ -716,6 +717,11 @@ class PerformCollectionFragment : Fragment(),
 
     fun refreshMap()
     {
+        if (!this::mapView.isInitialized)
+        {
+            return
+        }
+
         MapManager.instance().clearMap( mapView )
 
         val points = java.util.ArrayList<Point>()

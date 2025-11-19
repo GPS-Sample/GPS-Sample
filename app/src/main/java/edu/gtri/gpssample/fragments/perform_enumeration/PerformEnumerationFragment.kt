@@ -205,11 +205,12 @@ class PerformEnumerationFragment : Fragment(),
             sharedViewModel.centerOnCurrentLocation?.value?.let { centerOnCurrentLocation ->
                 if (centerOnCurrentLocation)
                 {
-                    MapManager.instance().startCenteringOnLocation( mapView )
+                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
                 else
                 {
+                    MapManager.instance().stopCenteringOnLocation( mapView )
                     binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
                 }
             }
@@ -393,7 +394,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
                 else
                 {
-                    MapManager.instance().startCenteringOnLocation( mapView )
+                    MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                     sharedViewModel.setCenterOnCurrentLocation( true )
                     binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 }
@@ -889,6 +890,11 @@ class PerformEnumerationFragment : Fragment(),
 
     private fun refreshMap()
     {
+        if (!this::mapView.isInitialized)
+        {
+            return
+        }
+
         MapManager.instance().clearMap( mapView )
 
 //        performEnumerationAdapter.updateLocations( enumerationTeamLocations )

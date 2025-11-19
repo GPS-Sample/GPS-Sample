@@ -159,7 +159,7 @@ class WalkEnumerationAreaFragment : Fragment(),
             }
             else
             {
-                MapManager.instance().startCenteringOnLocation( mapView )
+                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                     MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
@@ -307,7 +307,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             if (showCurrentLocation)
             {
-                MapManager.instance().startCenteringOnLocation( mapView )
+                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else

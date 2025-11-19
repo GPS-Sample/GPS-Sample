@@ -335,7 +335,7 @@ class MapManager
         }
     }
 
-    fun startCenteringOnLocation( mapView: View )
+    fun startCenteringOnLocation( activity: Activity, mapView: View )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -347,6 +347,10 @@ class MapManager
                     break
                 }
             }
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            enableMapboxLocationUpdates( activity, mapView )
         }
     }
 
@@ -362,6 +366,10 @@ class MapManager
                     break
                 }
             }
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            disableMapboxLocationUpdates( mapView )
         }
     }
 

@@ -110,7 +110,7 @@ class MapFragment : Fragment(),
 
         MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
-            MapManager.instance().startCenteringOnLocation( binding.osmMapView )
+            MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
             binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
@@ -171,7 +171,7 @@ class MapFragment : Fragment(),
 
             if (centerOnLocation)
             {
-                MapManager.instance().startCenteringOnLocation( binding.osmMapView )
+                MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
@@ -337,7 +337,7 @@ class MapFragment : Fragment(),
                 MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
                     if (centerOnLocation)
                     {
-                        MapManager.instance().startCenteringOnLocation( binding.osmMapView )
+                        MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
                     }
                 }
             }
@@ -351,7 +351,7 @@ class MapFragment : Fragment(),
                 MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
                     if (centerOnLocation)
                     {
-                        MapManager.instance().startCenteringOnLocation( binding.osmMapView )
+                        MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
                     }
                 }
             }
