@@ -524,7 +524,19 @@ class AddHouseholdFragment : Fragment(),
                             }
                         }
                         FieldType.Checkbox -> {
-                            if (fieldData.fieldDataOptions.isEmpty()) {
+                            var somethingChecked = false
+
+                            for (fieldDataOption in fieldData.fieldDataOptions)
+                            {
+                                if (fieldDataOption.value == true)
+                                {
+                                    somethingChecked = true
+                                    break
+                                }
+                            }
+
+                            if (!somethingChecked)
+                            {
                                 Toast.makeText(activity!!.applicationContext, "${context?.getString(R.string.oops)} ${field.name} ${context?.getString(R.string.field_is_required)}", Toast.LENGTH_SHORT).show()
                                 return
                             }
