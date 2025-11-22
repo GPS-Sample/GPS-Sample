@@ -883,7 +883,7 @@ class PerformCollectionFragment : Fragment(),
 
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
+            type = "application/zip"
             putExtra(Intent.EXTRA_TITLE, zipFileName)
         }
 
