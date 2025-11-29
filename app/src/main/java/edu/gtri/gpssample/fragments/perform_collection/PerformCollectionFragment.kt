@@ -8,7 +8,6 @@
 package edu.gtri.gpssample.fragments.perform_collection
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
@@ -27,7 +26,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -43,27 +41,17 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
@@ -72,15 +60,13 @@ import edu.gtri.gpssample.viewmodels.NetworkViewModel
 import edu.gtri.gpssample.viewmodels.SamplingViewModel
 import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
-import java.io.FileWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PerformCollectionFragment : Fragment(),
     MapManager.MapManagerDelegate,
-    MapboxManager.MapTileCacheDelegate,
+    MapManager.MapTileCacheDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate,
     AdditionalInfoDialog.AdditionalInfoDialogDelegate,
     SurveyLaunchNotificationDialog.SurveyLaunchNotificationDialogDelegate
@@ -475,8 +461,10 @@ class PerformCollectionFragment : Fragment(),
 
         binding.mapTileCacheButton.setOnClickListener {
             enumArea.mapTileRegion?.let {
+                val mapTileRegions = ArrayList<MapTileRegion>()
+                mapTileRegions.add( it )
                 busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapboxManager.loadStylePack( activity!!, this )
+                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
             }
         }
 
@@ -1110,27 +1098,6 @@ class PerformCollectionFragment : Fragment(),
         return editMode
     }
 
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                enumArea.mapTileRegion?.let {
-                    val mapTileRegions = ArrayList<MapTileRegion>()
-                    mapTileRegions.add( it )
-                    MapboxManager.loadTilePacks( activity!!, mapTileRegions, this )
-                }
-            }
-        }
-    }
-
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
         busyIndicatorDialog?.let {
@@ -1161,8 +1128,7 @@ class PerformCollectionFragment : Fragment(),
 
     override fun didPressCancelButton()
     {
-        MapboxManager.cancelStylePackDownload()
-        MapboxManager.cancelTilePackDownload()
+        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)

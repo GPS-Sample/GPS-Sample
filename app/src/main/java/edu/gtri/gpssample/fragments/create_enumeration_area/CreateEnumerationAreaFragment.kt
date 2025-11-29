@@ -60,6 +60,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
+import edu.gtri.gpssample.managers.MapManager
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -80,7 +81,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     OnMapClickListener,
     View.OnTouchListener,
     OnCameraChangeListener,
-    MapboxManager.MapTileCacheDelegate,
+    MapManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     DropdownDialog.DropdownDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
@@ -367,10 +368,11 @@ class CreateEnumerationAreaFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            if (getAllMapTileRegions().isNotEmpty())
+            val mapTileRegions = getAllMapTileRegions()
+            if (mapTileRegions.isNotEmpty())
             {
                 busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapboxManager.loadStylePack( activity!!, this )
+                MapManager.instance().cacheMapTiles(activity!!, binding.mapboxMapView, mapTileRegions, this )
             }
         }
 
@@ -1164,23 +1166,6 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
     }
 
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                MapboxManager.loadTilePacks( activity!!, getAllMapTileRegions(), this )
-            }
-        }
-    }
-
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
         busyIndicatorDialog?.let {
@@ -1211,8 +1196,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
     override fun didPressCancelButton()
     {
-        MapboxManager.cancelStylePackDownload()
-        MapboxManager.cancelTilePackDownload()
+        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)

@@ -7,16 +7,11 @@
 
 package edu.gtri.gpssample.fragments.map
 
-import android.Manifest
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Looper
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -24,29 +19,11 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.geojson.Point
 import com.mapbox.maps.*
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.gestures.OnMoveListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -59,16 +36,14 @@ import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.MapHelpDialog
 import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.ArrayList
 import java.util.Date
-import kotlin.math.min
 
 class MapFragment : Fragment(),
     View.OnTouchListener,
-    MapboxManager.MapTileCacheDelegate,
+    MapManager.MapTileCacheDelegate,
     SelectionDialog.SelectionDialogDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
@@ -147,7 +122,9 @@ class MapFragment : Fragment(),
                 binding.mapOverlayView.visibility = View.GONE
                 binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
                 busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapboxManager.loadStylePack( activity!!, this )
+                val mapTileRegions = ArrayList<MapTileRegion>()
+                mapTileRegions.add(it)
+                MapManager.instance().cacheMapTiles(activity!!, binding.osmMapView, mapTileRegions, this )
             }
         }
 
@@ -266,29 +243,7 @@ class MapFragment : Fragment(),
 
     override fun didPressCancelButton()
     {
-        MapboxManager.cancelStylePackDownload()
-        MapboxManager.cancelTilePackDownload()
-    }
-
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(edu.gtri.gpssample.R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                mapTileRegion?.let { mapTileRegion ->
-                    val mapTileRegions = ArrayList<MapTileRegion>()
-                    mapTileRegions.add(mapTileRegion)
-                    MapboxManager.loadTilePacks( activity!!, mapTileRegions, this )
-                }
-            }
-        }
+        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )

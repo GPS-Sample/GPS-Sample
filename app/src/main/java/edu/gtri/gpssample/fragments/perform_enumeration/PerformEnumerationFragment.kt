@@ -51,7 +51,6 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentPerformEnumerationBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.utils.ZipUtils
@@ -67,7 +66,7 @@ class PerformEnumerationFragment : Fragment(),
     View.OnTouchListener,
     MapManager.MapManagerDelegate,
     InfoDialog.InfoDialogDelegate,
-    MapboxManager.MapTileCacheDelegate,
+    MapManager.MapTileCacheDelegate,
     BusyIndicatorDialog.BusyIndicatorDialogDelegate
 {
     private lateinit var user: User
@@ -379,8 +378,10 @@ class PerformEnumerationFragment : Fragment(),
 
         binding.mapTileCacheButton.setOnClickListener {
             enumArea.mapTileRegion?.let {
-                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapboxManager.loadStylePack( activity!!, this )
+                val mapTileRegions = ArrayList<MapTileRegion>()
+                mapTileRegions.add( it )
+                busyIndicatorDialog = BusyIndicatorDialog(activity!!, resources.getString(R.string.downloading_map_tiles), this )
+                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
             }
         }
 
@@ -1263,29 +1264,7 @@ class PerformEnumerationFragment : Fragment(),
 
     override fun didPressCancelButton()
     {
-        MapboxManager.cancelStylePackDownload()
-        MapboxManager.cancelTilePackDownload()
-    }
-
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                enumArea.mapTileRegion?.let {
-                    val mapTileRegions = ArrayList<MapTileRegion>()
-                    mapTileRegions.add( it )
-                    MapboxManager.loadTilePacks( activity!!, mapTileRegions, this )
-                }
-            }
-        }
+        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )

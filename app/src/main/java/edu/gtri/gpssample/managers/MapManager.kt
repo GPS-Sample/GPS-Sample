@@ -3,13 +3,10 @@ package edu.gtri.gpssample.managers
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -26,17 +23,28 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.JsonObject
+import com.mapbox.bindgen.Value
+import com.mapbox.common.Cancelable
+import com.mapbox.common.NetworkRestriction
+import com.mapbox.common.TileDataDomain
+import com.mapbox.common.TileRegionLoadOptions
+import com.mapbox.common.TileStore
+import com.mapbox.common.TileStoreOptions
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.GlyphsRasterizationMode
+import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
+import com.mapbox.maps.OfflineManager
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
+import com.mapbox.maps.StylePackLoadOptions
+import com.mapbox.maps.TilesetDescriptorOptions
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotation
@@ -51,8 +59,6 @@ import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManag
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.viewannotation.ViewAnnotationManager
-import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.Keys
@@ -63,10 +69,10 @@ import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.EnumArea
 import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.Location
+import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterLayer
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterSource
 import edu.gtri.gpssample.utils.GeoUtils
-import org.json.JSONObject
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -79,9 +85,8 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
-import org.osmdroid.views.overlay.compass.CompassOverlay
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import java.util.concurrent.atomic.AtomicInteger
 
 class MapManager
 {
@@ -928,6 +933,158 @@ class MapManager
             drawable.draw(canvas)
             bitmap
         }
+    }
+
+    fun cacheMapTiles( activity: Activity, mapView: View, mapTileRegions: ArrayList<MapTileRegion>, delegate: MapManager.MapTileCacheDelegate )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            cacheMapboxTiles(activity, mapView, mapTileRegions, delegate )
+        }
+    }
+
+    fun cacheMapboxTiles( context: Context, mapView: com.mapbox.maps.MapView, mapTileRegions: ArrayList<MapTileRegion>, delegate: MapManager.MapTileCacheDelegate )
+    {
+        val STYLE_PACK_METADATA = "STYLE_PACK_METADATA"
+
+        val stylePackLoadOptions = StylePackLoadOptions.Builder()
+            .glyphsRasterizationMode(GlyphsRasterizationMode.IDEOGRAPHS_RASTERIZED_LOCALLY)
+            .metadata(Value(STYLE_PACK_METADATA))
+            .build()
+
+        val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        stylePackCancelable = offlineManager.loadStylePack(
+            mapStyle!!,
+            stylePackLoadOptions,
+            { progress ->
+            },
+            { expected ->
+                if (expected.isValue) {
+                    expected.value?.let { stylePack ->
+                        // Style pack download finished successfully
+                        Log.d( "xxx", "Style Pack download finished")
+                        loadMapboxTilePacks( context, mapTileRegions, delegate )
+                    }
+                }
+                expected.error?.let {
+                    // Handle errors that occurred during the style pack download.
+                    Log.d( "xxx", it.message )
+                    delegate.tilePacksLoaded( it.message )
+                }
+            }
+        )
+    }
+
+    fun loadMapboxTilePacks( context: Context, mapTileRegions: ArrayList<MapTileRegion>, delegate: MapTileCacheDelegate )
+    {
+        val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        val tilesetDescriptor = offlineManager.createTilesetDescriptor(
+            TilesetDescriptorOptions.Builder()
+                .styleURI(mapStyle!!)
+                .minZoom(9)
+                .maxZoom(16)
+                .build()
+        )
+
+        // You need to keep a reference of the created tileStore and keep it during the download process.
+        // You are also responsible for initializing the TileStore properly, including setting the proper access token.
+        val tileStore = TileStore.create().also {
+            // Set default access token for the created tile store instance
+            it.setOption(
+                TileStoreOptions.MAPBOX_ACCESS_TOKEN,
+                TileDataDomain.MAPS,
+                Value(context.resources.getString(R.string.mapbox_access_token))
+            )
+        }
+
+        var id = 0
+        tileRegionsCancelable.clear()
+        val numRegionsLeft = AtomicInteger(mapTileRegions.size)
+
+        for (mapTileRegion in mapTileRegions)
+        {
+            id += 1
+
+            Log.d( "xxx", "downloading region ${id}")
+
+            val points = java.util.ArrayList<Point>()
+            points.add( Point.fromLngLat( mapTileRegion.southWest.longitude, mapTileRegion.southWest.latitude ))
+            points.add( Point.fromLngLat( mapTileRegion.northEast.longitude, mapTileRegion.southWest.latitude ))
+            points.add( Point.fromLngLat( mapTileRegion.northEast.longitude, mapTileRegion.northEast.latitude ))
+            points.add( Point.fromLngLat( mapTileRegion.southWest.longitude, mapTileRegion.northEast.latitude ))
+            points.add( Point.fromLngLat( mapTileRegion.southWest.longitude, mapTileRegion.southWest.latitude ))
+
+            val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
+            pointList.add( points )
+            val geometry = com.mapbox.geojson.Polygon.fromLngLats(pointList as List<MutableList<Point>>)
+
+            val TILE_REGION_METADATA = "TILE_REGION_METADATA"
+
+            val tileRegionCancelable = tileStore.loadTileRegion(
+                id.toString(),
+                TileRegionLoadOptions.Builder()
+                    .geometry(geometry)
+                    .descriptors(listOf(tilesetDescriptor))
+                    .metadata(Value(TILE_REGION_METADATA))
+                    .acceptExpired(true)
+                    .networkRestriction(NetworkRestriction.NONE)
+                    .build(),
+                { progress ->
+                    Log.d( "xxx", " ${progress.completedResourceCount} / ${progress.requiredResourceCount}" )
+                    delegate.mapLoadProgress( progress.completedResourceCount, progress.requiredResourceCount )
+                }
+            ) { expected ->
+                if (expected.isValue) {
+                    if (numRegionsLeft.decrementAndGet() <= 0)
+                    {
+                        delegate.tilePacksLoaded("")
+                        Log.d( "xxx", "Tile Regions download finished")
+                    }
+                }
+                expected.error?.let {
+                    // Handle errors that occurred during the tile region download.
+                    Log.d( "xxx", it.message )
+                    cancelTilePackDownload()
+                    delegate.tilePacksLoaded( it.message )
+                    return@let
+                }
+            }
+
+            tileRegionsCancelable.add( tileRegionCancelable )
+        }
+    }
+
+    fun cancelTilePackDownload()
+    {
+        stylePackCancelable?.let {
+            it.cancel()
+            stylePackCancelable = null
+        }
+
+        for (tileRegionCancelable in tileRegionsCancelable)
+        {
+            tileRegionCancelable.cancel()
+        }
+
+        tileRegionsCancelable.clear()
+    }
+
+    private var stylePackCancelable: Cancelable? = null
+    private var tileRegionsCancelable = ArrayList<Cancelable>()
+
+    interface MapTileCacheDelegate
+    {
+        fun tilePacksLoaded( error: String )
+        fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     }
 
     companion object

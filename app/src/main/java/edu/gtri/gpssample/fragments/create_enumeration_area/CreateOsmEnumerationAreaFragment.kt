@@ -11,7 +11,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -26,33 +25,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.model.*
-import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.maps.*
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
-import com.mapbox.maps.extension.style.image.image
-import com.mapbox.maps.extension.style.layers.addLayer
-import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
-import com.mapbox.maps.extension.style.layers.generated.symbolLayer
-import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
-import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
-import com.mapbox.maps.extension.style.style
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
-import com.mapbox.maps.plugin.gestures.OnMapClickListener
-import com.mapbox.maps.plugin.gestures.OnMoveListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -61,9 +39,7 @@ import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
-import edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment.PointWithProperty
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -71,7 +47,6 @@ import io.github.dellisd.spatialk.geojson.FeatureCollection
 import io.github.dellisd.spatialk.geojson.MultiPolygon
 import io.github.dellisd.spatialk.geojson.Point
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import org.json.JSONObject
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.Geometry
@@ -82,7 +57,7 @@ import java.util.*
 class CreateOsmEnumerationAreaFragment : Fragment(),
     View.OnTouchListener,
     MapManager.MapManagerDelegate,
-    MapboxManager.MapTileCacheDelegate,
+    MapManager.MapTileCacheDelegate,
     CheckboxDialog.CheckboxDialogDelegate,
     DropdownDialog.DropdownDialogDelegate,
     SelectionDialog.SelectionDialogDelegate,
@@ -331,10 +306,12 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 return@setOnClickListener
             }
 
-            if (getAllMapTileRegions().isNotEmpty())
+            val mapTileRegions = getAllMapTileRegions()
+
+            if (mapTileRegions.isNotEmpty())
             {
                 busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.downloading_map_tiles), this )
-                MapboxManager.loadStylePack( activity!!, this )
+                MapManager.instance().cacheMapTiles(activity!!, mapView, mapTileRegions, this )
             }
         }
 
@@ -913,23 +890,6 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 //        binding.createEnumAreaButton.backgroundTintList = defaultColorList
 //    }
 
-    override fun stylePackLoaded( error: String )
-    {
-        activity!!.runOnUiThread {
-            if (error.isNotEmpty())
-            {
-                busyIndicatorDialog?.let{
-                    it.alertDialog.cancel()
-                    Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.style_pack_download_failed), Toast.LENGTH_SHORT).show()
-                }
-            }
-            else
-            {
-                MapboxManager.loadTilePacks( activity!!, getAllMapTileRegions(), this )
-            }
-        }
-    }
-
     override fun mapLoadProgress( numLoaded: Long, numNeeded: Long )
     {
         busyIndicatorDialog?.let {
@@ -960,8 +920,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     override fun didPressCancelButton()
     {
-        MapboxManager.cancelStylePackDownload()
-        MapboxManager.cancelTilePackDownload()
+        MapManager.instance().cancelTilePackDownload()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
