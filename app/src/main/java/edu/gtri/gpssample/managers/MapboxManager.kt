@@ -19,6 +19,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
+import com.mapbox.maps.plugin.annotation.AnnotationConfig
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
@@ -91,27 +92,46 @@ class MapboxManager( var context: Context )
         }
     }
 
-    fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
+    fun addLabelAtPoint( mapView: MapView, point: Point, label: String, color: String )
     {
-        if (label.isNotEmpty())
-        {
-            removeViewAnnotation(viewAnnotationManager, label)
+        // Create an AnnotationConfig (empty for default)
+        val annotationConfig = AnnotationConfig()
 
-            val view = viewAnnotationManager.addViewAnnotation(
-                resId = R.layout.view_text_view,
-                options = viewAnnotationOptions
-                {
-                    allowOverlap(true)
-                    geometry(point)
-                }
-            )
+        // Create the PointAnnotationManager
+        val pointAnnotationManager = mapView.annotations.createPointAnnotationManager(annotationConfig)
 
-            view.rootView.findViewById<TextView>( R.id.text_view )?.let {
-                it.text = label
-                it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
-            }
-        }
+        // Create a PointAnnotation with text label
+        val pointAnnotationOptions = PointAnnotationOptions()
+            .withPoint(point)
+            .withTextField(label)
+            .withTextSize(12.0)
+            .withTextColor(Color.parseColor(color))
+
+        // Add it to the map
+        pointAnnotationManager.create(pointAnnotationOptions)
     }
+
+//    fun addViewAnnotationToPoint(viewAnnotationManager: ViewAnnotationManager, point: com.mapbox.geojson.Point, label: String, backgroundColor: String )
+//    {
+//        if (label.isNotEmpty())
+//        {
+//            removeViewAnnotation(viewAnnotationManager, label)
+//
+//            val view = viewAnnotationManager.addViewAnnotation(
+//                resId = R.layout.view_text_view,
+//                options = viewAnnotationOptions
+//                {
+//                    allowOverlap(true)
+//                    geometry(point)
+//                }
+//            )
+//
+//            view.rootView.findViewById<TextView>( R.id.text_view )?.let {
+//                it.text = label
+//                it.backgroundTintList = ColorStateList.valueOf(Color.parseColor(backgroundColor))
+//            }
+//        }
+//    }
 
     fun createPointAnnotationManager( pointAnnotationManager: PointAnnotationManager?, mapView: MapView ) : PointAnnotationManager
     {

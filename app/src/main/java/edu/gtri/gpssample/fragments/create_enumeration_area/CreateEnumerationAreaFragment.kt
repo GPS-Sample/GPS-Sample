@@ -51,6 +51,7 @@ import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -103,7 +104,7 @@ class CreateEnumerationAreaFragment : Fragment(),
     private var createEnumAreaBoundary = false
     private var inputDialog: InputDialog? = null
     private var selectedEnumArea: EnumArea? = null
-    private val polygonHashMap = HashMap<Long,Any>()
+    private val polygonHashMap = HashMap<String,Any>()
     private var checkboxDialog: CheckboxDialog? = null
     private var point: com.mapbox.geojson.Point? = null
     private val pointHashMap = HashMap<Long,Location>()
@@ -1014,7 +1015,7 @@ class CreateEnumerationAreaFragment : Fragment(),
         // add the label
         val latLngBounds = GeoUtils.findGeobounds(enumArea.vertices)
         val point = com.mapbox.geojson.Point.fromLngLat( latLngBounds.center.longitude, latLngBounds.center.latitude )
-        mapboxManager.addViewAnnotationToPoint( binding.mapboxMapView.viewAnnotationManager, point, enumArea.name, "#80FFFFFF" )
+        mapboxManager.addLabelAtPoint( binding.mapboxMapView, point, enumArea.name, "#80FFFFFF" )
     }
 
     override fun onTouch(p0: View?, p1: MotionEvent?): Boolean
@@ -1446,31 +1447,10 @@ class CreateEnumerationAreaFragment : Fragment(),
     }
 
     private fun initLocationComponent() {
-        val locationComponentPlugin = binding.mapboxMapView.location
-        locationComponentPlugin.updateSettings {
-            this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                bearingImage = AppCompatResources.getDrawable(
-                    activity!!,
-                    R.drawable.mapbox_user_puck_icon,
-                ),
-                shadowImage = AppCompatResources.getDrawable(
-                    activity!!,
-                    R.drawable.mapbox_user_icon_shadow,
-                ),
-                scaleExpression = interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
+        binding.mapboxMapView.location.apply {
+            locationPuck = createDefault2DPuck(withBearing = true)
+            puckBearingEnabled = true
+            enabled = true
         }
     }
 

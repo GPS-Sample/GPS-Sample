@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.gson.JsonObject
 import com.mapbox.bindgen.Value
 import com.mapbox.common.Cancelable
+import com.mapbox.common.MapboxOptions
 import com.mapbox.common.NetworkRestriction
 import com.mapbox.common.TileDataDomain
 import com.mapbox.common.TileRegionLoadOptions
@@ -33,6 +34,7 @@ import com.mapbox.common.TileStoreOptions
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.GlyphsRasterizationMode
+import com.mapbox.maps.ImageHolder
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.OfflineManager
@@ -58,6 +60,7 @@ import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManage
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
+import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -234,7 +237,7 @@ class MapManager
         mapView.compass.marginTop = 50.0f
 
         mapView.getMapboxMap().loadStyle(
-            com.mapbox.maps.extension.style.style(styleUri = style) {
+            com.mapbox.maps.extension.style.style(style) {
                 rasterSource?.let {
                     +it
                 }
@@ -391,30 +394,10 @@ class MapManager
             mapView.getMapboxMap().setCamera(CameraOptions.Builder().center(it).build())
         }
 
-        mapView.location.updateSettings {
-            this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                bearingImage = AppCompatResources.getDrawable(
-                    activity,
-                    edu.gtri.gpssample.R.drawable.mapbox_user_puck_icon,
-                ),
-                shadowImage = AppCompatResources.getDrawable(
-                    activity,
-                    edu.gtri.gpssample.R.drawable.mapbox_user_icon_shadow,
-                ),
-                scaleExpression = Expression.interpolate {
-                    linear()
-                    zoom()
-                    stop {
-                        literal(0.0)
-                        literal(0.6)
-                    }
-                    stop {
-                        literal(20.0)
-                        literal(1.0)
-                    }
-                }.toJson()
-            )
+        mapView.location.apply {
+            locationPuck = createDefault2DPuck(withBearing = true)
+            puckBearingEnabled = true
+            enabled = true
         }
 
         mapView.location.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener!!)
@@ -955,7 +938,7 @@ class MapManager
             .metadata(Value(STYLE_PACK_METADATA))
             .build()
 
-        val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+        val offlineManager = OfflineManager()
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
 
@@ -983,9 +966,10 @@ class MapManager
 
     fun loadMapboxTilePacks( context: Context, mapTileRegions: ArrayList<MapTileRegion>, delegate: MapTileCacheDelegate )
     {
-        val offlineManager = OfflineManager(MapInitOptions.getDefaultResourceOptions(context))
+        val offlineManager = OfflineManager()
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+        MapboxOptions.accessToken = context.resources.getString(R.string.mapbox_access_token)
 
         val tilesetDescriptor = offlineManager.createTilesetDescriptor(
             TilesetDescriptorOptions.Builder()
@@ -995,16 +979,7 @@ class MapManager
                 .build()
         )
 
-        // You need to keep a reference of the created tileStore and keep it during the download process.
-        // You are also responsible for initializing the TileStore properly, including setting the proper access token.
-        val tileStore = TileStore.create().also {
-            // Set default access token for the created tile store instance
-            it.setOption(
-                TileStoreOptions.MAPBOX_ACCESS_TOKEN,
-                TileDataDomain.MAPS,
-                Value(context.resources.getString(R.string.mapbox_access_token))
-            )
-        }
+        val tileStore = TileStore.create()
 
         var id = 0
         tileRegionsCancelable.clear()

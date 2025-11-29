@@ -8,12 +8,13 @@ plugins {
 
 android {
     namespace 'edu.gtri.gpssample'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "edu.gtri.gpssample"
         minSdk 26
-        targetSdk 34
+        //noinspection EditedTargetSdkVersion
+        targetSdk 35
         versionCode 17
         versionName "1.0.0 #109 beta-11"
 
@@ -75,7 +76,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
     // MapBox
-    implementation 'com.mapbox.maps:android:10.15.0'
+    implementation 'com.mapbox.maps:android:11.16.6'
 
     // GeoJson
     implementation("io.github.dellisd.spatialk:geojson:0.2.1")

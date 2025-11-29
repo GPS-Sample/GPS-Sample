@@ -215,23 +215,13 @@ class TileServer( mbtilesPath: String ) : NanoHTTPD(8080), BusyIndicatorDialog.B
                 style = it
             }
 
-            mapboxMap.loadStyle(
-                style(styleUri = style) {
-                    rasterSource?.let {
-                        +it
-                    }
-                    rasterLayer?.let {
-                        +it
-                    }
-                },
-                object : Style.OnStyleLoaded {
-                    override fun onStyleLoaded(style: Style) {
-                        completion?.let {
-                            it()
-                        }
-                    }
-                }
-            )
+            mapboxMap.loadStyle(style(style) {
+                rasterSource?.let { +it }
+                rasterLayer?.let { +it }
+            }) { style ->
+                // style is now the loaded Style object
+                completion?.invoke()
+            }
         }
 
         fun getCachedFiles( context: Context ): List<String>
