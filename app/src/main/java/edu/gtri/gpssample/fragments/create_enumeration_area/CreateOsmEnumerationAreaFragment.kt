@@ -269,7 +269,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                 if (droppedPoints.size > 2)
                 {
-                    if (MapboxManager.isSelfIntersectingPolygon1( droppedPoints ))
+                    if (GeoUtils.isSelfIntersectingPolygon1( droppedPoints ))
                     {
                         createEnumAreaBoundary = false
                         Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()

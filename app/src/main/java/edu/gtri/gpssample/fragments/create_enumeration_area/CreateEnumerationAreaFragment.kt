@@ -283,7 +283,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                 if (droppedPointAnnotations.size > 2)
                 {
-                    if (MapboxManager.isSelfIntersectingPolygon2( droppedPointAnnotations ))
+                    if (GeoUtils.isSelfIntersectingPolygon2( droppedPointAnnotations ))
                     {
                         droppedPointAnnotations.map { pointAnnotation ->
                             pointAnnotation?.let{ pointAnnotation ->

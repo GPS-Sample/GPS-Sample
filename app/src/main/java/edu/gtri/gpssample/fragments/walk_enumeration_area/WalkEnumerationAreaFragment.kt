@@ -8,17 +8,14 @@
 package edu.gtri.gpssample.fragments.walk_enumeration_area
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -28,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -39,20 +35,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.google.android.gms.maps.model.LatLng
-import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
-import com.mapbox.maps.plugin.gestures.OnMoveListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.barcode_scanner.CameraXLivePreviewActivity
@@ -62,11 +46,9 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentWalkEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
-import java.io.File
 import java.util.*
 
 class WalkEnumerationAreaFragment : Fragment(),
@@ -237,7 +219,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                             val testPoints = ArrayList<com.mapbox.geojson.Point>()
                             testPoints.addAll( polyLinePoints )
                             testPoints.add( polyLinePoints[0])
-                            if (MapboxManager.isSelfIntersectingPolygon1( testPoints ))
+                            if (GeoUtils.isSelfIntersectingPolygon1( testPoints ))
                             {
                                 Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_LONG).show()
                             } else {}

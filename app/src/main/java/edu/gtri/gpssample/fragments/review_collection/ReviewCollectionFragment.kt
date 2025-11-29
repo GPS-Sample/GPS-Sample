@@ -8,16 +8,12 @@
 package edu.gtri.gpssample.fragments.review_collection
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.view.*
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -32,15 +28,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.*
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
-import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.*
@@ -50,7 +38,6 @@ import edu.gtri.gpssample.databinding.FragmentReviewCollectionBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.fragments.perform_collection.PerformCollectionAdapter
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel

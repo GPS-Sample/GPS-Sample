@@ -9,7 +9,6 @@ package edu.gtri.gpssample.fragments.create_collection_team
 
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,19 +19,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
-import com.mapbox.maps.plugin.gestures.OnMapClickListener
-import com.mapbox.maps.plugin.gestures.gestures
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FragmentNumber
@@ -41,9 +32,7 @@ import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationTeamBinding
-import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -62,7 +51,6 @@ class CreateCollectionTeamFragment : Fragment(),
     private lateinit var config: Config
     private lateinit var enumArea: EnumArea
     private var fingerPolyline: Any? = null
-    private lateinit var mapboxManager: MapboxManager
     private lateinit var samplingViewModel: SamplingViewModel
     private lateinit var sharedViewModel : ConfigurationViewModel
 
@@ -302,7 +290,7 @@ class CreateCollectionTeamFragment : Fragment(),
                     fingerPolyline = null
                 }
 
-                val points1 = MapboxManager.ArrayListOfLatLonToArrayListOfCoordinate( enumArea.vertices )
+                val points1 = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate( enumArea.vertices )
 
                 // close the polygon, if necessary
                 if (!points1.first().equals(points1.last()))
@@ -316,7 +304,7 @@ class CreateCollectionTeamFragment : Fragment(),
                 // close the polygon
                 polyList.add( polyLinePoints[0])
 
-                val points2 = MapboxManager.ArrayListOfPointToArrayListOfCoordinate( polyList )
+                val points2 = GeoUtils.ArrayListOfPointToArrayListOfCoordinate( polyList )
 
                 // compute the intersection of points1 & points2
                 val geometryFactory = GeometryFactory()
@@ -333,7 +321,7 @@ class CreateCollectionTeamFragment : Fragment(),
                             // subtract any existing teams from the selection
                             for (collectionTeam in enumArea.collectionTeams)
                             {
-                                val points = MapboxManager.ArrayListOfLatLonToArrayListOfCoordinate(collectionTeam.polygon)
+                                val points = GeoUtils.ArrayListOfLatLonToArrayListOfCoordinate(collectionTeam.polygon)
 
                                 val teamPolygon = geometryFactory.createPolygon(points.toTypedArray())
 
@@ -385,7 +373,7 @@ class CreateCollectionTeamFragment : Fragment(),
 
                                 if (locationUuids.size == count)
                                 {
-                                    val vertices = MapboxManager.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
+                                    val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( coordinates )
 
                                     val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                     pointList.add( vertices )
@@ -394,7 +382,7 @@ class CreateCollectionTeamFragment : Fragment(),
                                 }
                                 else
                                 {
-                                    val vertices = MapboxManager.ArrayListOfCoordinateToArrayListOfPoint( selectionPolygon.coordinates )
+                                    val vertices = GeoUtils.ArrayListOfCoordinateToArrayListOfPoint( selectionPolygon.coordinates )
 
                                     val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                     pointList.add( vertices )

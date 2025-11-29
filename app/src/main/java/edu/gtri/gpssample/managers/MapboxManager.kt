@@ -209,64 +209,6 @@ class MapboxManager( var context: Context )
             return _instance!!
         }
 
-        fun isSelfIntersectingPolygon1( polylinePoints: java.util.ArrayList<Point> ) : Boolean
-        {
-            val coordinates = java.util.ArrayList<Coordinate>()
-
-            polylinePoints.map { point ->
-                coordinates.add( Coordinate( point.longitude(), point.latitude()))
-            }
-
-            return isSelfIntersectingPolygon( coordinates )
-        }
-
-        fun isSelfIntersectingPolygon2( pointAnnotations: java.util.ArrayList<PointAnnotation?>) : Boolean
-        {
-            val coordinates = java.util.ArrayList<Coordinate>()
-
-            pointAnnotations.map { pointAnnotation ->
-                pointAnnotation?.let{ pointAnnotation ->
-                    coordinates.add( Coordinate( pointAnnotation.point.longitude(), pointAnnotation.point.latitude()))
-                }
-            }
-
-            coordinates.add( coordinates[0] )
-
-            return isSelfIntersectingPolygon( coordinates )
-        }
-
-        fun isSelfIntersectingPolygon3( latLons: java.util.ArrayList<LatLon> ) : Boolean
-        {
-            val coordinates = ArrayList<Coordinate>()
-            for (latLon in latLons)
-            {
-                coordinates.add( Coordinate( latLon.longitude, latLon.latitude ))
-            }
-
-            return isSelfIntersectingPolygon( coordinates )
-        }
-
-        fun isSelfIntersectingPolygon( coordinates: java.util.ArrayList<Coordinate> ) : Boolean
-        {
-            try
-            {
-                val last = coordinates.size - 1
-
-                // close the polygon, if necc...
-                if (coordinates[0].x != coordinates[last].x || coordinates[0].y != coordinates[last].y)
-                {
-                    coordinates.add( coordinates[0] )
-                }
-
-                return !GeometryFactory().createPolygon(coordinates.toTypedArray()).isSimple
-            }
-            catch( ex: Exception )
-            {
-                Log.d( "xxx", ex.stackTraceToString())
-                return true
-            }
-        }
-
         fun loadStylePack( context: Context, delegate: MapTileCacheDelegate )
         {
             val stylePackLoadOptions = StylePackLoadOptions.Builder()
@@ -395,39 +337,6 @@ class MapboxManager( var context: Context )
             }
 
             tileRegionsCancelable.clear()
-        }
-
-        fun ArrayListOfLatLonToArrayListOfCoordinate( latLons: ArrayList<LatLon> ) : ArrayList<Coordinate>
-        {
-            val coordinates = ArrayList<Coordinate>()
-
-            latLons.map { latLon ->
-                coordinates.add( Coordinate( latLon.longitude, latLon.latitude ))
-            }
-
-            return coordinates
-        }
-
-        fun ArrayListOfPointToArrayListOfCoordinate( points: ArrayList<Point> ) : ArrayList<Coordinate>
-        {
-            val coordinates = ArrayList<Coordinate>()
-
-            points.map { point ->
-                coordinates.add( Coordinate( point.longitude(), point.latitude()))
-            }
-
-            return coordinates
-        }
-
-        fun ArrayListOfCoordinateToArrayListOfPoint( coordinates: Array<Coordinate> ) : ArrayList<Point>
-        {
-            val points = ArrayList<Point>()
-
-            coordinates.map {
-                points.add( Point.fromLngLat(it.x, it.y))
-            }
-
-            return points
         }
 
         fun centerMap(enumArea: EnumArea, zoomLevel: Double?, mapboxMap: MapboxMap)

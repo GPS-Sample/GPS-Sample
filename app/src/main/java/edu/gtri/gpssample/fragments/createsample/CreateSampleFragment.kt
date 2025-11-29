@@ -8,21 +8,14 @@
 package edu.gtri.gpssample.fragments.createsample
 
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
-import com.mapbox.maps.plugin.annotation.generated.*
-import com.mapbox.maps.plugin.delegates.listeners.OnCameraChangeListener
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.EnumerationState
@@ -35,9 +28,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateSampleBinding
 import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.MapLegendDialog
-import edu.gtri.gpssample.dialogs.SelectionDialog
 import edu.gtri.gpssample.managers.MapManager
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
@@ -252,7 +243,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
             }
         }
 
-        if (MapboxManager.isSelfIntersectingPolygon3( enumArea.vertices))
+        if (GeoUtils.isSelfIntersectingPolygon3( enumArea.vertices))
         {
             ConfirmationDialog( activity, resources.getString(R.string.oops), resources.getString(R.string.boundary_is_self_intersecting), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
                 when( buttonPressed )

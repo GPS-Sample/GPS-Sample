@@ -14,14 +14,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.constants.*
 import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.fragments.createsample.CreateSampleFragment
-import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.utils.DateUtils
 import java.lang.Integer.min
 import java.util.*

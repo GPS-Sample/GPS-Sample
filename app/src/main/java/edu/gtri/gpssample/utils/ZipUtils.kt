@@ -1,23 +1,13 @@
 package edu.gtri.gpssample.utils
 
 import android.app.Activity
-import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import android.util.Log
-import android.widget.Toast
-import edu.gtri.gpssample.BuildConfig
-import edu.gtri.gpssample.R
-import edu.gtri.gpssample.application.MainApplication
-import edu.gtri.gpssample.database.ConfigDAO
-import edu.gtri.gpssample.database.DAO
 import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.database.models.Config
 import edu.gtri.gpssample.database.models.Image
 import edu.gtri.gpssample.database.models.ImageList
 import java.io.*
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.ArrayList
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
