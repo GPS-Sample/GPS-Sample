@@ -11,6 +11,8 @@ import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
+import android.os.Handler
+import android.os.Looper
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MotionEvent
@@ -76,6 +78,10 @@ import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterLayer
 import edu.gtri.gpssample.managers.TileServer.Companion.rasterSource
 import edu.gtri.gpssample.utils.GeoUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -88,6 +94,7 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -106,6 +113,9 @@ class MapManager
     }
 
     private var delegate: MapManagerDelegate? = null
+
+    private val MIN_ZOOM = 8
+    private val MAX_ZOOM = 18
 
     var mapboxPointAnnotationManager: PointAnnotationManager? = null
     var mapboxPolygonAnnotationManager: PolygonAnnotationManager? = null
@@ -150,6 +160,8 @@ class MapManager
         }
     }
 
+    private lateinit var osmTilesOverlay: TilesOverlay
+
     private fun initializeOsmMap( activity: Activity, mapView: org.osmdroid.views.MapView, northUpImageView: ImageView, mapStyle: String, completion: (()->Unit) )
     {
         org.osmdroid.config.Configuration.getInstance().load( activity, PreferenceManager.getDefaultSharedPreferences(activity))
@@ -170,8 +182,8 @@ class MapManager
         // Mapnik (OSM standard tiles)
         val osmProvider = MapTileProviderBasic(activity)
         osmProvider.tileSource = tileSource
-        val osmOverlay = TilesOverlay(osmProvider, activity)
-        mapView.overlays.add(osmOverlay)
+        osmTilesOverlay = TilesOverlay(osmProvider, activity)
+        mapView.overlays.add(osmTilesOverlay)
 
         // Custom tiles
         if (TileServer.started)
@@ -922,6 +934,29 @@ class MapManager
     {
         if (mapView is org.osmdroid.views.MapView)
         {
+            CoroutineScope(Dispatchers.Main).launch {
+                for (mapTileRegion in mapTileRegions)
+                {
+                    val boundingBox = BoundingBox(
+                        mapTileRegion.northEast.latitude,
+                        mapTileRegion.northEast.longitude,
+                        mapTileRegion.southWest.latitude,
+                        mapTileRegion.southWest.longitude
+                    )
+
+                    val center = GeoPoint(boundingBox.centerLatitude, boundingBox.centerLongitude )
+
+                    for (zoom in MIN_ZOOM..MAX_ZOOM)
+                    {
+                        mapView.controller.setCenter(center)
+                        mapView.controller.setZoom(zoom)
+                        mapView.invalidate()
+                        delay(2000)
+                    }
+                }
+
+                delegate.tilePacksLoaded("")
+            }
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
@@ -974,8 +1009,8 @@ class MapManager
         val tilesetDescriptor = offlineManager.createTilesetDescriptor(
             TilesetDescriptorOptions.Builder()
                 .styleURI(mapStyle!!)
-                .minZoom(9)
-                .maxZoom(16)
+                .minZoom(MIN_ZOOM.toByte())
+                .maxZoom(MAX_ZOOM.toByte())
                 .build()
         )
 
@@ -1065,8 +1100,6 @@ class MapManager
     companion object
     {
         private var _instance: MapManager? = null
-
-        val GEORGIA_TECH = LatLng( 33.77577524978659, -84.39630379821243 )
 
         fun instance() : MapManager
         {
