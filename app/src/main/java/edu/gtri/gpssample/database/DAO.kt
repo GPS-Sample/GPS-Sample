@@ -446,7 +446,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
                     $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
                     $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
-                    $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_UUID,
+                    $COLUMN_LOCATION_DESCRIPTION,
                     $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
                 )
                 SELECT
@@ -454,30 +454,36 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
                     $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
                     $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
-                    $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_DATA,
+                    $COLUMN_LOCATION_DESCRIPTION,
                     $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
                 FROM ${TABLE_LOCATION}_old
             """)
 
-            // Drop old Location table
-            db.execSQL("DROP TABLE ${TABLE_LOCATION}_old")
+            // Extract imageData from the old Location table, create new Image in the Image db,
+            // Update the new Location table with the new Image Id
 
-            // Location.imageUuid now contains the imageData.
-            // We need to create an image in the new Image database
-            // and set the Location.imageUuid to the correct value
+            val cursor = db.rawQuery("SELECT $COLUMN_UUID, $COLUMN_LOCATION_IMAGE_DATA FROM ${TABLE_LOCATION}_old", null)
 
-            val locations = locationDAO.getLocations()
-
-            for (location in locations)
+            while (cursor.moveToNext())
             {
-                if (location.imageUuid.isNotEmpty())
+                val locationUuid = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UUID))
+                val imageData = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION_IMAGE_DATA))
+
+                if (imageData != null && imageData.isNotEmpty())
                 {
-                    ImageDAO.instance().createImage( Image( location.uuid, location.imageUuid ))?.let { image ->
-                        location.imageUuid = image.uuid
-                        locationDAO.updateLocation( location )
+                    ImageDAO.instance().createImage(Image(locationUuid, imageData))?.let { image ->
+                        db.execSQL(
+                            "UPDATE $TABLE_LOCATION SET $COLUMN_LOCATION_IMAGE_UUID = ? WHERE $COLUMN_UUID = ?",
+                            arrayOf(image.uuid, locationUuid)
+                        )
                     }
                 }
             }
+
+            cursor.close()
+
+            // Drop old Location table
+            db.execSQL("DROP TABLE ${TABLE_LOCATION}_old")
 
             // Create Breadcrumb table
             val createTableBreadcrumb = ("CREATE TABLE " +
