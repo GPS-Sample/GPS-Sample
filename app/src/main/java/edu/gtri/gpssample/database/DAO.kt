@@ -466,7 +466,9 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             // We need to create an image in the new Image database
             // and set the Location.imageUuid to the correct value
 
-            for (location in locationDAO.getLocations())
+            val locations = locationDAO.getLocations()
+
+            for (location in locations)
             {
                 if (location.imageUuid.isNotEmpty())
                 {
