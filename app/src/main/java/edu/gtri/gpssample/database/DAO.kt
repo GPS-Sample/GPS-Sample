@@ -16,6 +16,7 @@ import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.database.models.Image
 import java.util.*
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
@@ -460,6 +461,21 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
 
             // Drop old Location table
             db.execSQL("DROP TABLE ${TABLE_LOCATION}_old")
+
+            // Location.imageUuid now contains the imageData.
+            // We need to create an image in the new Image database
+            // and set the Location.imageUuid to the correct value
+
+            for (location in locationDAO.getLocations())
+            {
+                if (location.imageUuid.isNotEmpty())
+                {
+                    ImageDAO.instance().createImage( Image( location.uuid, location.imageUuid ))?.let { image ->
+                        location.imageUuid = image.uuid
+                        locationDAO.updateLocation( location )
+                    }
+                }
+            }
 
             // Create Breadcrumb table
             val createTableBreadcrumb = ("CREATE TABLE " +
