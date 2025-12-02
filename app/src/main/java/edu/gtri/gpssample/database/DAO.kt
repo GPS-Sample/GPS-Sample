@@ -446,7 +446,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
                     $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
                     $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
-                    $COLUMN_LOCATION_DESCRIPTION,
+                    $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_UUID,
                     $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
                 )
                 SELECT
@@ -454,7 +454,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
                     $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
                     $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
-                    $COLUMN_LOCATION_DESCRIPTION,
+                    $COLUMN_LOCATION_DESCRIPTION, '' AS $COLUMN_LOCATION_IMAGE_UUID,
                     $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
                 FROM ${TABLE_LOCATION}_old
             """)
