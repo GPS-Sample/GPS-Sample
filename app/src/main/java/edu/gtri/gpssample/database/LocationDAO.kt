@@ -35,14 +35,14 @@ class LocationDAO(private var dao: DAO)
         {
             if (location.doesNotEqual( existingLocation ))
             {
-                updateLocation( location, enumArea )
+                updateLocation( location )
                 Log.d( "xxx", "Updated Location with ID ${location.uuid}" )
             }
         }
         else
         {
             val values = ContentValues()
-            putLocation( location, enumArea, values )
+            putLocation( location, values )
             if (dao.writableDatabase.insert(DAO.TABLE_LOCATION, null, values) < 0)
             {
                 return null
@@ -82,23 +82,19 @@ class LocationDAO(private var dao: DAO)
         } ?: return false
     }
 
-    fun updateLocation( location: Location, enumArea: EnumArea )
+    fun updateLocation( location: Location )
     {
         val whereClause = "${DAO.COLUMN_UUID} = ?"
         val args: Array<String> = arrayOf(location.uuid)
         val values = ContentValues()
 
-        putLocation( location, enumArea, values )
+        putLocation( location, values )
 
         dao.writableDatabase.update(DAO.TABLE_LOCATION, values, whereClause, args )
     }
 
-    fun putLocation( location: Location, enumArea : EnumArea, values: ContentValues)
+    fun putLocation( location: Location, values: ContentValues)
     {
-        location.isMultiFamily?.let {
-            values.put( DAO.COLUMN_LOCATION_IS_MULTI_FAMILY, it.toInt())
-        }
-
         values.put( DAO.COLUMN_UUID, location.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, location.creationDate )
         values.put( DAO.COLUMN_TIME_ZONE, location.timeZone )
@@ -111,6 +107,7 @@ class LocationDAO(private var dao: DAO)
         values.put( DAO.COLUMN_LOCATION_DESCRIPTION, location.description)
         values.put( DAO.COLUMN_LOCATION_IMAGE_UUID, location.imageUuid)
         values.put( DAO.COLUMN_LOCATION_PROPERTIES, location.properties)
+        values.put( DAO.COLUMN_LOCATION_IS_MULTI_FAMILY, location.isMultiFamily.toInt())
     }
 
     @SuppressLint("Range")

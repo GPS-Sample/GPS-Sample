@@ -7,6 +7,7 @@
 
 package edu.gtri.gpssample.database
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -16,6 +17,7 @@ import edu.gtri.gpssample.constants.CollectionState
 import edu.gtri.gpssample.constants.EnumerationState
 import edu.gtri.gpssample.constants.SamplingState
 import edu.gtri.gpssample.database.models.FieldData
+import edu.gtri.gpssample.database.models.Image
 import java.util.*
 
 class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.CursorFactory?, version: Int )
@@ -405,7 +407,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         }
     }
 
-    fun migrateFrom314To321( db: SQLiteDatabase )
+    fun migrateFrom314To321XXX( db: SQLiteDatabase )
     {
         try
         {
@@ -453,10 +455,33 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
                     $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
                     $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
-                    $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_DATA,
+                    $COLUMN_LOCATION_DESCRIPTION, '' AS $COLUMN_LOCATION_IMAGE_UUID,
                     $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
                 FROM ${TABLE_LOCATION}_old
             """)
+
+            // Extract imageData from the old Location table, create new Image in the Image db,
+            // Update the new Location table with the new Image Id
+
+            val cursor = db.rawQuery("SELECT $COLUMN_UUID, $COLUMN_LOCATION_IMAGE_DATA FROM ${TABLE_LOCATION}_old", null)
+
+            while (cursor.moveToNext())
+            {
+                val locationUuid = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UUID))
+                val imageData = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION_IMAGE_DATA))
+
+                if (imageData != null && imageData.isNotEmpty())
+                {
+                    ImageDAO.instance().createImage(Image(locationUuid, imageData))?.let { image ->
+                        db.execSQL(
+                            "UPDATE $TABLE_LOCATION SET $COLUMN_LOCATION_IMAGE_UUID = ? WHERE $COLUMN_UUID = ?",
+                            arrayOf(image.uuid, locationUuid)
+                        )
+                    }
+                }
+            }
+
+            cursor.close()
 
             // Drop old Location table
             db.execSQL("DROP TABLE ${TABLE_LOCATION}_old")
@@ -476,6 +501,115 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         catch (ex: Exception)
         {
             Log.d( "xxx", "Migration from DB 314 to 321 FAILED")
+        }
+    }
+
+    fun migrateFrom314To321(db: SQLiteDatabase) {
+        db.beginTransaction()
+        try {
+            // ----------------------------
+            // 1. Update Config table
+            // ----------------------------
+            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_MAP_ENGINE_INDEX INTEGER DEFAULT 0")
+            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_VALID_USERS TEXT")
+            db.execSQL("UPDATE $TABLE_CONFIG SET $COLUMN_CONFIG_VALID_USERS = '' WHERE $COLUMN_CONFIG_VALID_USERS IS NULL")
+
+            // ----------------------------
+            // 2. Migrate Location table
+            // ----------------------------
+            db.execSQL("ALTER TABLE $TABLE_LOCATION RENAME TO ${TABLE_LOCATION}_old")
+
+            val createTableLocation = """
+            CREATE TABLE $TABLE_LOCATION (
+                $COLUMN_UUID $COLUMN_UUID_TYPE,
+                $COLUMN_CREATION_DATE INTEGER,
+                $COLUMN_TIME_ZONE INTEGER,
+                $COLUMN_LOCATION_TYPE_ID INTEGER,
+                $COLUMN_LOCATION_GPS_ACCURACY INTEGER,
+                $COLUMN_LOCATION_LATITUDE REAL,
+                $COLUMN_LOCATION_LONGITUDE REAL,
+                $COLUMN_LOCATION_ALTITUDE REAL,
+                $COLUMN_LOCATION_IS_LANDMARK INTEGER,
+                $COLUMN_LOCATION_DESCRIPTION TEXT,
+                $COLUMN_LOCATION_IMAGE_UUID TEXT,
+                $COLUMN_LOCATION_IS_MULTI_FAMILY INTEGER,
+                $COLUMN_LOCATION_PROPERTIES STRING
+            ) WITHOUT ROWID
+            """.trimIndent()
+            db.execSQL(createTableLocation)
+
+            // Copy data from old table
+            db.execSQL("""
+            INSERT INTO $TABLE_LOCATION (
+                $COLUMN_UUID, $COLUMN_CREATION_DATE, $COLUMN_TIME_ZONE,
+                $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
+                $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
+                $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
+                $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_UUID,
+                $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
+            )
+            SELECT
+                $COLUMN_UUID, $COLUMN_CREATION_DATE, $COLUMN_TIME_ZONE,
+                $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
+                $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
+                $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
+                $COLUMN_LOCATION_DESCRIPTION, '' AS $COLUMN_LOCATION_IMAGE_UUID,
+                $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
+            FROM ${TABLE_LOCATION}_old
+            """)
+
+            // Migrate images
+            val cursor = db.rawQuery("SELECT $COLUMN_UUID, $COLUMN_LOCATION_IMAGE_DATA FROM ${TABLE_LOCATION}_old", null)
+            while (cursor.moveToNext()) {
+                val locationUuid = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UUID))
+                val imageData = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION_IMAGE_DATA))
+
+                if (!imageData.isNullOrEmpty()) {
+                    ImageDAO.instance().createImage(Image(locationUuid, imageData))?.let { image ->
+                        db.execSQL(
+                            "UPDATE $TABLE_LOCATION SET $COLUMN_LOCATION_IMAGE_UUID = ? WHERE $COLUMN_UUID = ?",
+                            arrayOf(image.uuid, locationUuid)
+                        )
+                    }
+                }
+            }
+            cursor.close()
+
+            db.execSQL("DROP TABLE ${TABLE_LOCATION}_old")
+
+            // ----------------------------
+            // 3. Create Breadcrumb table
+            // ----------------------------
+            val createTableBreadcrumb = """
+            CREATE TABLE $TABLE_BREADCRUMB (
+                $COLUMN_UUID $COLUMN_UUID_TYPE,
+                $COLUMN_CREATION_DATE INTEGER,
+                $COLUMN_ENUM_AREA_UUID TEXT,
+                $COLUMN_LATITUDE REAL,
+                $COLUMN_LONGITUDE REAL,
+                $COLUMN_GROUP_ID TEXT
+            ) WITHOUT ROWID
+            """.trimIndent()
+            db.execSQL(createTableBreadcrumb)
+
+            // ----------------------------
+            // 4. Update dbVersion in Config
+            // ----------------------------
+            val newDbVersion = 321
+            val contentValues = ContentValues().apply {
+                put(COLUMN_CONFIG_DB_VERSION, newDbVersion)
+            }
+            db.update(TABLE_CONFIG, contentValues, null, null)
+
+            // ----------------------------
+            // 5. Commit transaction
+            // ----------------------------
+            db.setTransactionSuccessful()
+        } catch (ex: Exception) {
+            Log.d("xxx", "Migration from DB 314 to 321 FAILED: ${ex.message}")
+            throw ex // optional: rethrow so Android knows migration failed
+        } finally {
+            db.endTransaction()
         }
     }
 

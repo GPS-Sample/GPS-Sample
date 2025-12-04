@@ -16,7 +16,7 @@ android {
         //noinspection EditedTargetSdkVersion
         targetSdk 35
         versionCode 17
-        versionName "1.0.0 #109 beta-11"
+        versionName "1.0.0 #109 beta-13"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
