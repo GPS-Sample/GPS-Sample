@@ -240,6 +240,16 @@ class MapManager
         completion()
     }
 
+    fun selectMapboxMap( activity: Activity, mapboxMapView: com.mapbox.maps.MapView, completion: ((mapView: View)->Unit) )
+    {
+        val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        initializeMapboxMap( mapboxMapView, mapStyle!! ) {
+            completion( mapboxMapView )
+        }
+    }
+
     private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, completion: (()->Unit))
     {
         createMapboxPointAnnotationManager( mapView )

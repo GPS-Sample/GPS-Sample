@@ -420,6 +420,7 @@
     <string name="add_landmark">Add Point of Interest</string>
     <string name="export_succeeded">"The export was successful."</string>
     <string name="export_failed">"The export failed."</string>
+    <string name="select_map_engine">"Select Map Engine"</string>
 
     <string-array name="map_engines">
         <item>Open Street Map</item>

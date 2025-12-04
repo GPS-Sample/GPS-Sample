@@ -15,6 +15,13 @@
             android:layout_width="match_parent"
             android:layout_height="0dp">
 
+            <com.mapbox.maps.MapView
+                android:id="@+id/mapbox_map_view"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </com.mapbox.maps.MapView>
+
             <org.osmdroid.views.MapView
                 android:id="@+id/osm_map_view"
                 android:layout_width="match_parent"

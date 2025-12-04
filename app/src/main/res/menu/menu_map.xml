@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="edu.gtri.gpssample.MainActivity">
+
+    <item
+        android:id="@+id/select_map_engine"
+        android:title="@string/select_map_engine"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/mapbox_streets"
+        android:title="@string/street_map"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/satellite_streets"
+        android:title="@string/satellite_map"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/import_map_tiles"
+        android:title="@string/import_map_tiles"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/select_map_tiles"
+        android:title="@string/select_map_tiles"
+        app:showAsAction="never"/>
+</menu>

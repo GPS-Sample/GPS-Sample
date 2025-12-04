@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.mapbox.maps.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
@@ -32,6 +33,7 @@ import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.databinding.FragmentMapBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.MapHelpDialog
 import edu.gtri.gpssample.dialogs.SelectionDialog
@@ -276,13 +278,51 @@ class MapFragment : Fragment(),
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_map_style, menu)
+        inflater.inflate(R.menu.menu_map, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId)
         {
+            R.id.select_map_engine ->
+            {
+                val mapEngines = resources.getTextArray( R.array.map_engines )
+
+                ConfirmationDialog( activity, resources.getString(R.string.select_map_engine), "", mapEngines[0].toString(), mapEngines[1].toString(), null, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            binding.mapboxMapView.visibility = View.GONE
+                            MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                                }
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            binding.osmLabel.visibility = View.GONE
+                            binding.osmMapView.visibility = View.GONE
+                            binding.northUpImageView.visibility = View.GONE
+                            binding.mapboxMapView.visibility = View.VISIBLE
+                            MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                                }
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+            }
+
             R.id.mapbox_streets ->
             {
                 val editor = activity!!.getSharedPreferences("default", 0).edit()
