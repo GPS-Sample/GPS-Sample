@@ -335,7 +335,6 @@
     <string name="map_tile_boundary">"Enter the length/width (Kilometers) of the desired map tile region"</string>
     <string name="success">"SUCCESS!"</string>
     <string name="error">"ERROR!"</string>
-    <string name="import_failed">"The import failed."</string>
     <string name="import_succeeded">"The import was successful."</string>
     <string name="clear_map_tile_region">"Clear map tile cache region"</string>
     <string name="import_request_failed">"Received an Export Request while waiting for an Import Request"</string>
@@ -412,36 +411,13 @@
     <string name="show_breadcrumbs">"Show the walked path"</string>
     <string name="record_breadcrumbs">"Record the walked path"</string>
     <string name="delete_breadcrumbs">"Delete the walked path"</string>
-
-    // needs update
-
-    <string name="view">View:</string>
-    <string name="filter_by">Filter By:</string>
-    <string name="add_landmark">Add Point of Interest</string>
-    <string name="export_succeeded">"The export was successful."</string>
-    <string name="export_failed">"The export failed."</string>
-
-    <string-array name="map_engines">
-        <item>Open Street Map</item>
-        <item>MapBox</item>
-    </string-array>
-
-    <string-array name="sort_filters">
-        <item>Default</item>
-        <item>Undefined</item>
-        <item>Incomplete</item>
-        <item>Complete</item>
-        <item>Points of Interest</item>
-    </string-array>
-
-    <string-array name="show_views">
-        <item>Default</item>
-        <item>Map Only</item>
-        <item>List Only</item>
-    </string-array>
-
-    // end needs update
-
+    <string name="view">"View"</string>
+    <string name="filter_by">"Filter By:"</string>
+    <string name="add_landmark">"Add Point of Interest"</string>
+    <string name="export_succeeded">"The export was successful"</string>
+    <string name="export_failed">"The export failed"</string>
+    <string name="select_map_engine">"Select Map Engine"</string>
+    <string name="import_failed">"Error. The import failed. Ensure GPSSample versions are the same."</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>
@@ -488,5 +464,21 @@
         <item>"dd/mm/yyyy"</item>
         <item>"mm/dd/yyyy"</item>
         <item>"yyyy/mm/dd"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"Open Street Map"</item>
+        <item>"Mapbox"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"Default"</item>
+        <item>"Undefined"</item>
+        <item>"Incomplete"</item>
+        <item>"Complete"</item>
+        <item>"Points of Interest"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"Default view"</item>
+        <item>"Map Only"</item>
+        <item>"List Only"</item>
     </string-array>
 </resources>

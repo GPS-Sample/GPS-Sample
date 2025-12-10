@@ -361,13 +361,11 @@ rename	Rename	Renombrar	Renommer	Mudar o nome	Переименовать	Ganti n
 map_tile_boundary	Enter the length/width (Kilometers) of the desired map tile region	Ingrese la longitud/anchura (Kilómetros) de la región de mosaico de mapa deseada	Saisir la longueur/largeur (en kilomètres) de la région souhaitée.	Introduza o comprimento/largura (quilómetros) da região de mosaico pretendida	Введите длину/ширину (в километрах) желаемого региона плитки карты	Masukkan panjang/lebar (Kilometer) wilayah petak peta yang diinginkan	Ilagay ang haba/lapad (Kilometro) ng gustong rehiyon ng tile ng mapa	
 success	SUCCESS!	¡ÉXITO!	SUCCES !	SUCESSO!	УСПЕХ!	SUKSES!	TAGUMPAY!	
 error	ERROR!	¡ERROR!	ERREUR !	ERRO!	ОШИБКА!	KESALAHAN!	ERROR!	
-import_failed	The import failed.	La importación ha fallado.	L'importation a échoué.	A importação falhou.	Импорт не удался.	Impor gagal.	Nabigo ang pag-import.	
 import_succeeded	The import was successful.	La importación se ha realizado correctamente.	Importation réussie	A importação foi bem sucedida.	Импорт прошел успешно.	Impor berhasil.	Ang pag-import ay matagumpay.	
 clear_map_tile_region	Clear map tile cache region	Borrar región de caché de mosaico de mapa	Effacez la région du cache des tuiles de la carte	Limpar a região da cache de mosaicos do mapa	Очистить кэш региона плитки карты	Hapus wilayah cache ubin peta	I-clear ang rehiyon ng cache ng tile ng mapa	
 import_request_failed	Received an Export Request while waiting for an Import Request	Recibida una solicitud de exportación a la espera de una solicitud de importación	Réception d'une demande d'exportation en attente d'une demande d'importation	Recebeu um pedido de exportação enquanto aguardava um pedido de importação	Получен запрос на экспорт в ожидании запроса на импорт	Menerima Permintaan Ekspor sambil menunggu Permintaan Impor	Nakatanggap ng Kahilingan sa Pag-export habang naghihintay ng Kahilingan sa Pag-import	
 export_request_failed	Received an Import Request while waiting for an Export Request	Recibida una Solicitud de Importación mientras se espera una Solicitud de Exportación	Réception d'une demande d'importation en attente d'une demande d'exportation	Recebeu um pedido de importação enquanto aguardava um pedido de exportação	Получен запрос на импорт в ожидании запроса на экспорт	Menerima Permintaan Impor sambil menunggu Permintaan Ekspor	Nakatanggap ng Kahilingan sa Pag-import habang naghihintay ng Kahilingan sa Pag-export	
 network_connection	Network Connection	Conexión a la red	Connexion au réseau	Ligação de rede	Сетевое подключение	Koneksi jaringan	Koneksyon sa Network	
-add_landmark	Add Landmark	Añadir punto de referencia	Ajoutez un point de repère	Adicionar ponto de referência	Добавить ориентир	Tambahkan Penanda	Magdagdag ng Landmark	
 enumerated	Enumerated	Censados	Recensés	Enumerados	Зарегистрированные	Dihitung	Enumerated	
 surveyed	Surveyed	Encuestados	Enquêtés	Inquiridos	Обследованные	Disurvei	Sinuri	
 meters	Meters	Metros	Mètres	Metros	Метры	Meter	Mga metro	
@@ -442,3 +440,20 @@ select_configuration_file	Select a configuration file	Seleccione un archivo de c
 show_breadcrumbs	Show the walked path	Mostrar el camino recorrido	Affichez le trajet parcouru	Mostrar o percurso percorrido	Показать пройденный путь	Tampilkan jalur yang telah dilalui	Ipakita ang tinahak na landas	
 record_breadcrumbs	Record the walked path	Registrar el camino recorrido	Enregistrez le trajet parcouru	Registar o percurso percorrido	Записать пройденный путь	Rekam jalur yang telah dilalui	Itala ang tinahak na landas	
 delete_breadcrumbs	Delete the walked path	Eliminar el camino recorrido	Supprimez le trajet parcouru	Apagar o percurso percorrido	Удалить пройденный путь	Hapus jalur yang telah dilalui	Tanggalin ang tinahak na landas	
+view	View	Ver	Affichez	Ver	Просмотр	Tampilan	Tingnan	
+filter_by	Filter By:	Filtrar por:	Filtrez par:	Filtrar por:	Фильтр по:	Filter Berdasarkan:	I-filter Ayon sa:	
+add_landmark	Add Point of Interest	Añadir punto de interés	Ajoutez un point d'intérêt	Adicionar ponto de interesse	Добавить точку интереса	Tambahkan Titik Minat	Magdagdag ng Punto ng Interes	
+export_succeeded	The export was successful	La exportación se ha realizado correctamente	L'exportation a réussi	A exportação foi bem-sucedida	Экспорт прошел успешно	Ekspor berhasil	Matagumpay ang pag-export	
+export_failed	The export failed	La exportación ha fallado	L'exportation a échoué	A exportação falhou	Экспорт не удался	Ekspor gagal	Nabigo ang pag-export	
+select_map_engine	Select Map Engine	Seleccionar motor de mapas	Sélectionnez le moteur de carte	Selecionar motor de mapa	Выбрать движок карты	Pilih Mensin Peta	Piliin ang Map Engine	
+import_failed	Error. The import failed. Ensure GPSSample versions are the same.	Error. La importación ha fallado. Asegúrese de que las versiones de GPSSample sean las mismas.	Erreur. L'importation a échoué. Assurez-vous que les versions GPSSample sont identiques.	Erro. A importação falhou. Certifique-se de que as versões do GPSSample são as mesmas.	"Ошибка. Импорт не удался. Убедитесь, что версии GPSSample совпадают."	Kesalahan. Impor gagal. Pastikan versi GPSSample sama.	Error. Nabigo ang pag-import. Tiyaking pareho ang mga bersyon ng GPSSample.	
+map_engines	Open Street Map	Open Street Map	Open Street Map	Open Street Map	Open Street Map	Open Street Map	Buksan ang Mapa ng Kalye	
+map_engines	Mapbox	Mapbox	Mapbox	Mapbox	Mapbox	Mapbox	Mapbox	
+sort_filters	Default	Predeterminado	Par défaut	Padrão	По умолчанию	Default	Default na lokasyon	
+sort_filters	Undefined	Sin definir	Non défini	Indefinido	Не определено	Tidak Terdefinisi	Hindi Natukoy	
+sort_filters	Incomplete	Incompleto	Incomplet	Incompleto	Неполный	Tidak Lengkap	Hindi Kumpleto	
+sort_filters	Complete	Completo	Complète	Completo	Полный	Lengkap	Kumpleto	
+sort_filters	Points of Interest	Puntos de interés	Points d'intérêt	Pontos de interesse	Точки интереса	Titik Minat	Mga Punto ng Interes	
+show_views	Default view	Vista Predeterminado	Vue par défaut	Visualização padrão	вид по умолчанию	Tampilan Default	Default na pagtingin	
+show_views	Map Only	Solo mapa	Carte uniquement	Apenas mapa	Только карта	Hanya Peta	Mapa Lamang	
+show_views	List Only	Solo lista	Liste uniquement	Apenas lista	Только список	Hanya Daftar	Listahan Lamang	

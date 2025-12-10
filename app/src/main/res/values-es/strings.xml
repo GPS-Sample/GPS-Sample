@@ -335,13 +335,11 @@
     <string name="map_tile_boundary">"Ingrese la longitud/anchura (Kilómetros) de la región de mosaico de mapa deseada"</string>
     <string name="success">"¡ÉXITO!"</string>
     <string name="error">"¡ERROR!"</string>
-    <string name="import_failed">"La importación ha fallado."</string>
     <string name="import_succeeded">"La importación se ha realizado correctamente."</string>
     <string name="clear_map_tile_region">"Borrar región de caché de mosaico de mapa"</string>
     <string name="import_request_failed">"Recibida una solicitud de exportación a la espera de una solicitud de importación"</string>
     <string name="export_request_failed">"Recibida una Solicitud de Importación mientras se espera una Solicitud de Exportación"</string>
     <string name="network_connection">"Conexión a la red"</string>
-    <string name="add_landmark">"Añadir punto de referencia"</string>
     <string name="enumerated">"Censados"</string>
     <string name="surveyed">"Encuestados"</string>
     <string name="meters">"Metros"</string>
@@ -413,6 +411,13 @@
     <string name="show_breadcrumbs">"Mostrar el camino recorrido"</string>
     <string name="record_breadcrumbs">"Registrar el camino recorrido"</string>
     <string name="delete_breadcrumbs">"Eliminar el camino recorrido"</string>
+    <string name="view">"Ver"</string>
+    <string name="filter_by">"Filtrar por:"</string>
+    <string name="add_landmark">"Añadir punto de interés"</string>
+    <string name="export_succeeded">"La exportación se ha realizado correctamente"</string>
+    <string name="export_failed">"La exportación ha fallado"</string>
+    <string name="select_map_engine">"Seleccionar motor de mapas"</string>
+    <string name="import_failed">"Error. La importación ha fallado. Asegúrese de que las versiones de GPSSample sean las mismas."</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>
@@ -459,5 +464,21 @@
         <item>"dd/mm/aaaa"</item>
         <item>"mm/dd/aaaa"</item>
         <item>"aaaa/mm/dd"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"Open Street Map"</item>
+        <item>"Mapbox"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"Predeterminado"</item>
+        <item>"Sin definir"</item>
+        <item>"Incompleto"</item>
+        <item>"Completo"</item>
+        <item>"Puntos de interés"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"Vista Predeterminado"</item>
+        <item>"Solo mapa"</item>
+        <item>"Solo lista"</item>
     </string-array>
 </resources>

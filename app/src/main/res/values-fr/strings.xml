@@ -335,13 +335,11 @@
     <string name="map_tile_boundary">"Saisir la longueur/largeur (en kilomètres) de la région souhaitée."</string>
     <string name="success">"SUCCES !"</string>
     <string name="error">"ERREUR !"</string>
-    <string name="import_failed">"L'importation a échoué."</string>
     <string name="import_succeeded">"Importation réussie"</string>
     <string name="clear_map_tile_region">"Effacez la région du cache des tuiles de la carte"</string>
     <string name="import_request_failed">"Réception d'une demande d'exportation en attente d'une demande d'importation"</string>
     <string name="export_request_failed">"Réception d'une demande d'importation en attente d'une demande d'exportation"</string>
     <string name="network_connection">"Connexion au réseau"</string>
-    <string name="add_landmark">"Ajoutez un point de repère"</string>
     <string name="enumerated">"Recensés"</string>
     <string name="surveyed">"Enquêtés"</string>
     <string name="meters">"Mètres"</string>
@@ -413,6 +411,13 @@
     <string name="show_breadcrumbs">"Affichez le trajet parcouru"</string>
     <string name="record_breadcrumbs">"Enregistrez le trajet parcouru"</string>
     <string name="delete_breadcrumbs">"Supprimez le trajet parcouru"</string>
+    <string name="view">"Affichez"</string>
+    <string name="filter_by">"Filtrez par:"</string>
+    <string name="add_landmark">"Ajoutez un point d'intérêt"</string>
+    <string name="export_succeeded">"L'exportation a réussi"</string>
+    <string name="export_failed">"L'exportation a échoué"</string>
+    <string name="select_map_engine">"Sélectionnez le moteur de carte"</string>
+    <string name="import_failed">"Erreur. L'importation a échoué. Assurez-vous que les versions GPSSample sont identiques."</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
@@ -459,5 +464,21 @@
         <item>"jj/mm/aaaa"</item>
         <item>"mm/jj/aaaa"</item>
         <item>"aaaa/mm/jj"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"Open Street Map"</item>
+        <item>"Mapbox"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"Par défaut"</item>
+        <item>"Non défini"</item>
+        <item>"Incomplet"</item>
+        <item>"Complète"</item>
+        <item>"Points d'intérêt"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"Vue par défaut"</item>
+        <item>"Carte uniquement"</item>
+        <item>"Liste uniquement"</item>
     </string-array>
 </resources>
