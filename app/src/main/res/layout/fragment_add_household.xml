@@ -51,463 +51,457 @@
                 app:srcCompat="@drawable/delete_white"/>
         </LinearLayout>
 
-        <ScrollView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <androidx.cardview.widget.CardView
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                card_view:cardCornerRadius="4dp">
 
-                <androidx.cardview.widget.CardView
-                    android:layout_margin="10dp"
-                    android:layout_gravity="center"
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    card_view:cardCornerRadius="4dp">
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="50dp">
 
-                        <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="50dp">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="50dp"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:padding="10dp"
-                                android:text="@string/additional_info"
-                                android:textColor="@color/primary"
-                                android:textSize="17sp"
-                                android:textStyle="bold" />
-
-                            <FrameLayout
-                                android:layout_width="40dp"
-                                android:layout_height="40dp">
-
-                                <ImageView
-                                    android:id="@+id/hide_additional_info_image_view"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginEnd="10dp"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    app:srcCompat="@drawable/arrow_up_blue"/>
-
-                                <ImageView
-                                    android:id="@+id/show_additional_info_image_view"
-                                    android:visibility="gone"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginEnd="10dp"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    app:srcCompat="@drawable/arrow_down_blue"/>
-                            </FrameLayout>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/default_info_layout"
-                            android:orientation="vertical"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <LinearLayout
-                                android:id="@+id/uuid_layout"
-                                android:orientation="horizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="50dp">
-
-                                <TextView
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"
-                                    android:gravity="center_vertical"
-                                    android:padding="10dp"
-                                    android:text="@string/UUID"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold" />
-
-                                <EditText
-                                    android:id="@+id/UUID_edit_text"
-                                    android:focusable="false"
-                                    android:layout_marginEnd="20dp"
-                                    android:textSize="17sp"
-                                    android:textColor="@color/black"
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"/>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="50dp">
-
-                                <TextView
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"
-                                    android:gravity="center_vertical"
-                                    android:padding="10dp"
-                                    android:text="@string/latitude"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold" />
-
-                                <EditText
-                                    android:id="@+id/latitude_edit_text"
-                                    android:focusable="false"
-                                    android:layout_marginEnd="20dp"
-                                    android:textSize="17sp"
-                                    android:textColor="@color/black"
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"/>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="50dp">
-
-                                <TextView
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"
-                                    android:gravity="center_vertical"
-                                    android:padding="10dp"
-                                    android:text="@string/longitude"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold" />
-
-                                <EditText
-                                    android:id="@+id/longitude_edit_text"
-                                    android:focusable="false"
-                                    android:layout_marginEnd="20dp"
-                                    android:textSize="17sp"
-                                    android:textColor="@color/black"
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"/>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="50dp">
-
-                                <TextView
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"
-                                    android:gravity="center_vertical"
-                                    android:padding="10dp"
-                                    android:text="@string/subaddress"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold" />
-
-                                <EditText
-                                    android:id="@+id/subaddress_edit_text"
-                                    android:focusable="true"
-                                    android:layout_marginEnd="20dp"
-                                    android:textSize="17sp"
-                                    android:imeOptions="actionDone"
-                                    android:inputType="text"
-                                    android:layout_weight="1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="50dp"/>
-                            </LinearLayout>
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:visibility="gone"
-                                android:id="@+id/property_recycler_view"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/additional_info_layout"
-                            android:orientation="vertical"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <LinearLayout
-                                android:id="@+id/enumeration_info_layout"
-                                android:orientation="vertical"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <TextView
-                                    android:id="@+id/enumeration_status_text_view"
-                                    android:text="@string/enumeration_status"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold"
-                                    android:padding="10dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"/>
-
-                                <CheckBox
-                                    android:id="@+id/enumeration_incomplete_check_box"
-                                    android:clickable="false"
-                                    android:layout_marginStart="20dp"
-                                    android:layout_marginEnd="20dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/incomplete" />
-
-                                <LinearLayout
-                                    android:id="@+id/enumeration_reason_incomplete_layout"
-                                    android:orientation="vertical"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
-
-                                    <TextView
-                                        android:id="@+id/enumeration_reason_incomplete_text_view"
-                                        android:text="@string/enumeration_reason_incomplete_label"
-                                        android:textColor="@color/primary"
-                                        android:textSize="17sp"
-                                        android:textStyle="bold"
-                                        android:padding="10dp"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"/>
-
-                                    <RadioGroup
-                                        android:id="@+id/enumeration_reason_incomplete_radio_group"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content">
-                                        <RadioButton
-                                            android:id="@+id/enumeration_nobody_home_button"
-                                            android:clickable="false"
-                                            android:layout_marginStart="20dp"
-                                            android:layout_marginEnd="20dp"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/nobody_home" />
-
-                                        <RadioButton
-                                            android:id="@+id/enumeration_does_not_exist_button"
-                                            android:clickable="false"
-                                            android:layout_marginStart="20dp"
-                                            android:layout_marginEnd="20dp"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/does_not_exist" />
-
-                                        <RadioButton
-                                            android:id="@+id/enumeration_other_button"
-                                            android:clickable="false"
-                                            android:layout_marginStart="20dp"
-                                            android:layout_marginEnd="20dp"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/other" />
-                                    </RadioGroup>
-                                </LinearLayout>
-
-                                <TextView
-                                    android:id="@+id/enumeration_notes_text_view"
-                                    android:text="@string/enumeration_notes"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold"
-                                    android:padding="10dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"/>
-
-                                <EditText
-                                    android:id="@+id/enumeration_notes_edit_text"
-                                    android:focusable="false"
-                                    android:textSize="17sp"
-                                    android:layout_marginStart="20dp"
-                                    android:layout_marginEnd="20dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="40dp"/>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/collection_info_layout"
-                                android:orientation="vertical"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <TextView
-                                    android:id="@+id/collection_status_text_view"
-                                    android:text="@string/collection_status"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold"
-                                    android:padding="10dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"/>
-
-                                <CheckBox
-                                    android:id="@+id/collection_incomplete_check_box"
-                                    android:clickable="false"
-                                    android:layout_marginStart="20dp"
-                                    android:layout_marginEnd="20dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/incomplete" />
-
-                                <LinearLayout
-                                    android:id="@+id/collection_reason_incomplete_layout"
-                                    android:orientation="vertical"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
-
-                                    <TextView
-                                        android:id="@+id/collection_reason_incomplete_text_view"
-                                        android:text="@string/collection_reason_incomplete_label"
-                                        android:textColor="@color/primary"
-                                        android:textSize="17sp"
-                                        android:textStyle="bold"
-                                        android:padding="10dp"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"/>
-
-                                    <RadioGroup
-                                        android:id="@+id/collection_reason_incomplete_radio_group"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content">
-                                        <RadioButton
-                                            android:id="@+id/collection_nobody_home_button"
-                                            android:clickable="false"
-                                            android:layout_marginStart="20dp"
-                                            android:layout_marginEnd="20dp"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/nobody_home" />
-
-                                        <RadioButton
-                                            android:id="@+id/collection_does_not_exist_button"
-                                            android:clickable="false"
-                                            android:layout_marginStart="20dp"
-                                            android:layout_marginEnd="20dp"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/does_not_exist" />
-
-                                        <RadioButton
-                                            android:id="@+id/collection_other_button"
-                                            android:clickable="false"
-                                            android:layout_marginStart="20dp"
-                                            android:layout_marginEnd="20dp"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/other" />
-                                    </RadioGroup>
-                                </LinearLayout>
-
-                                <TextView
-                                    android:id="@+id/collection_notes_text_view"
-                                    android:text="@string/collection_notes"
-                                    android:textColor="@color/primary"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold"
-                                    android:padding="10dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"/>
-
-                                <EditText
-                                    android:id="@+id/collection_notes_edit_text"
-                                    android:focusable="false"
-                                    android:textSize="17sp"
-                                    android:layout_marginStart="20dp"
-                                    android:layout_marginEnd="20dp"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="40dp"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/image_card_view"
-                    android:visibility="gone"
-                    android:layout_margin="10dp"
-                    android:layout_gravity="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    card_view:cardCornerRadius="4dp">
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="50dp">
-
-                            <TextView
-                                android:id="@+id/image_text_view"
-                                android:layout_width="0dp"
-                                android:layout_height="50dp"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:padding="10dp"
-                                android:text="@string/location_image"
-                                android:textColor="@color/primary"
-                                android:textSize="17sp"
-                                android:textStyle="bold" />
-
-                            <FrameLayout
-                                android:layout_width="40dp"
-                                android:layout_height="40dp">
-
-                                <ImageView
-                                    android:id="@+id/hide_image_view"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginEnd="10dp"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    app:srcCompat="@drawable/arrow_up_blue"/>
-
-                                <ImageView
-                                    android:id="@+id/show_image_view"
-                                    android:visibility="gone"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginEnd="10dp"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    app:srcCompat="@drawable/arrow_down_blue"/>
-                            </FrameLayout>
-                        </LinearLayout>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:padding="10dp"
+                            android:text="@string/additional_info"
+                            android:textColor="@color/primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
 
                         <FrameLayout
-                            android:id="@+id/image_frame_layout"
-                            android:layout_gravity="center"
-                            android:layout_marginBottom="20dp"
-                            android:layout_width="300dp"
-                            android:layout_height="300dp">
+                            android:layout_width="40dp"
+                            android:layout_height="40dp">
 
                             <ImageView
-                                android:id="@+id/image_view"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"/>
+                                android:id="@+id/hide_additional_info_image_view"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_up_blue"/>
+
+                            <ImageView
+                                android:id="@+id/show_additional_info_image_view"
+                                android:visibility="gone"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_down_blue"/>
                         </FrameLayout>
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_weight="1"
+                    <LinearLayout
+                        android:id="@+id/default_info_layout"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:id="@+id/uuid_layout"
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/UUID"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/UUID_edit_text"
+                                android:focusable="false"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:textColor="@color/black"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/latitude"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/latitude_edit_text"
+                                android:focusable="false"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:textColor="@color/black"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/longitude"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/longitude_edit_text"
+                                android:focusable="false"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:textColor="@color/black"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp">
+
+                            <TextView
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:gravity="center_vertical"
+                                android:padding="10dp"
+                                android:text="@string/subaddress"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/subaddress_edit_text"
+                                android:focusable="true"
+                                android:layout_marginEnd="20dp"
+                                android:textSize="17sp"
+                                android:imeOptions="actionDone"
+                                android:inputType="text"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"/>
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:visibility="gone"
+                            android:id="@+id/property_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/additional_info_layout"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:id="@+id/enumeration_info_layout"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/enumeration_status_text_view"
+                                android:text="@string/enumeration_status"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold"
+                                android:padding="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                            <CheckBox
+                                android:id="@+id/enumeration_incomplete_check_box"
+                                android:clickable="false"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginEnd="20dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/incomplete" />
+
+                            <LinearLayout
+                                android:id="@+id/enumeration_reason_incomplete_layout"
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/enumeration_reason_incomplete_text_view"
+                                    android:text="@string/enumeration_reason_incomplete_label"
+                                    android:textColor="@color/primary"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold"
+                                    android:padding="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"/>
+
+                                <RadioGroup
+                                    android:id="@+id/enumeration_reason_incomplete_radio_group"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                    <RadioButton
+                                        android:id="@+id/enumeration_nobody_home_button"
+                                        android:clickable="false"
+                                        android:layout_marginStart="20dp"
+                                        android:layout_marginEnd="20dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/nobody_home" />
+
+                                    <RadioButton
+                                        android:id="@+id/enumeration_does_not_exist_button"
+                                        android:clickable="false"
+                                        android:layout_marginStart="20dp"
+                                        android:layout_marginEnd="20dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/does_not_exist" />
+
+                                    <RadioButton
+                                        android:id="@+id/enumeration_other_button"
+                                        android:clickable="false"
+                                        android:layout_marginStart="20dp"
+                                        android:layout_marginEnd="20dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/other" />
+                                </RadioGroup>
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/enumeration_notes_text_view"
+                                android:text="@string/enumeration_notes"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold"
+                                android:padding="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                            <EditText
+                                android:id="@+id/enumeration_notes_edit_text"
+                                android:focusable="false"
+                                android:textSize="17sp"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginEnd="20dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/collection_info_layout"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/collection_status_text_view"
+                                android:text="@string/collection_status"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold"
+                                android:padding="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                            <CheckBox
+                                android:id="@+id/collection_incomplete_check_box"
+                                android:clickable="false"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginEnd="20dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/incomplete" />
+
+                            <LinearLayout
+                                android:id="@+id/collection_reason_incomplete_layout"
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/collection_reason_incomplete_text_view"
+                                    android:text="@string/collection_reason_incomplete_label"
+                                    android:textColor="@color/primary"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold"
+                                    android:padding="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"/>
+
+                                <RadioGroup
+                                    android:id="@+id/collection_reason_incomplete_radio_group"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                    <RadioButton
+                                        android:id="@+id/collection_nobody_home_button"
+                                        android:clickable="false"
+                                        android:layout_marginStart="20dp"
+                                        android:layout_marginEnd="20dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/nobody_home" />
+
+                                    <RadioButton
+                                        android:id="@+id/collection_does_not_exist_button"
+                                        android:clickable="false"
+                                        android:layout_marginStart="20dp"
+                                        android:layout_marginEnd="20dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/does_not_exist" />
+
+                                    <RadioButton
+                                        android:id="@+id/collection_other_button"
+                                        android:clickable="false"
+                                        android:layout_marginStart="20dp"
+                                        android:layout_marginEnd="20dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/other" />
+                                </RadioGroup>
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/collection_notes_text_view"
+                                android:text="@string/collection_notes"
+                                android:textColor="@color/primary"
+                                android:textSize="17sp"
+                                android:textStyle="bold"
+                                android:padding="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                            <EditText
+                                android:id="@+id/collection_notes_edit_text"
+                                android:focusable="false"
+                                android:textSize="17sp"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginEnd="20dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/image_card_view"
+                android:visibility="gone"
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                card_view:cardCornerRadius="4dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"/>
-            </LinearLayout>
-        </ScrollView>
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+
+                        <TextView
+                            android:id="@+id/image_text_view"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:padding="10dp"
+                            android:text="@string/location_image"
+                            android:textColor="@color/primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp">
+
+                            <ImageView
+                                android:id="@+id/hide_image_view"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_up_blue"/>
+
+                            <ImageView
+                                android:id="@+id/show_image_view"
+                                android:visibility="gone"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:srcCompat="@drawable/arrow_down_blue"/>
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:id="@+id/image_frame_layout"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="20dp"
+                        android:layout_width="300dp"
+                        android:layout_height="300dp">
+
+                        <ImageView
+                            android:id="@+id/image_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                    </FrameLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"/>
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
