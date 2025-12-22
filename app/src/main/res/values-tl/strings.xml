@@ -335,13 +335,11 @@
     <string name="map_tile_boundary">"Ilagay ang haba/lapad (Kilometro) ng gustong rehiyon ng tile ng mapa"</string>
     <string name="success">"TAGUMPAY!"</string>
     <string name="error">"ERROR!"</string>
-    <string name="import_failed">"Nabigo ang pag-import."</string>
     <string name="import_succeeded">"Ang pag-import ay matagumpay."</string>
     <string name="clear_map_tile_region">"I-clear ang rehiyon ng cache ng tile ng mapa"</string>
     <string name="import_request_failed">"Nakatanggap ng Kahilingan sa Pag-export habang naghihintay ng Kahilingan sa Pag-import"</string>
     <string name="export_request_failed">"Nakatanggap ng Kahilingan sa Pag-import habang naghihintay ng Kahilingan sa Pag-export"</string>
     <string name="network_connection">"Koneksyon sa Network"</string>
-    <string name="add_landmark">"Magdagdag ng Landmark"</string>
     <string name="enumerated">"Enumerated"</string>
     <string name="surveyed">"Sinuri"</string>
     <string name="meters">"Mga metro"</string>
@@ -413,6 +411,13 @@
     <string name="show_breadcrumbs">"Ipakita ang tinahak na landas"</string>
     <string name="record_breadcrumbs">"Itala ang tinahak na landas"</string>
     <string name="delete_breadcrumbs">"Tanggalin ang tinahak na landas"</string>
+    <string name="view">"Tingnan"</string>
+    <string name="filter_by">"I-filter Ayon sa:"</string>
+    <string name="add_landmark">"Magdagdag ng Punto ng Interes"</string>
+    <string name="export_succeeded">"Matagumpay ang pag-export"</string>
+    <string name="export_failed">"Nabigo ang pag-export"</string>
+    <string name="select_map_engine">"Piliin ang Map Engine"</string>
+    <string name="import_failed">"Error. Nabigo ang pag-import. Tiyaking pareho ang mga bersyon ng GPSSample."</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>
@@ -459,5 +464,21 @@
         <item>"araw/buwan/taon"</item>
         <item>"buwan / araw / taon"</item>
         <item>"taon/buwan/araw"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"Buksan ang Mapa ng Kalye"</item>
+        <item>"Mapbox"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"Default na lokasyon"</item>
+        <item>"Hindi Natukoy"</item>
+        <item>"Hindi Kumpleto"</item>
+        <item>"Kumpleto"</item>
+        <item>"Mga Punto ng Interes"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"Default na pagtingin"</item>
+        <item>"Mapa Lamang"</item>
+        <item>"Listahan Lamang"</item>
     </string-array>
 </resources>

@@ -287,10 +287,13 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
 
         for (enumArea in config.enumAreas)
         {
-//            if (enumArea.uuid != config.selectedEnumAreaUuid)
-//            {
-//                continue
-//            }
+            if (study.samplingMethod == SamplingMethod.Cluster)
+            {
+                if (enumArea.uuid != config.selectedEnumAreaUuid)
+                {
+                    continue
+                }
+            }
 
             for (location in enumArea.locations)
             {

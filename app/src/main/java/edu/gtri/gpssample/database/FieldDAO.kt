@@ -164,12 +164,25 @@ class FieldDAO(private var dao: DAO)
         val query = "SELECT * FROM ${DAO.TABLE_FIELD} where ${DAO.COLUMN_STUDY_UUID} = '${study.uuid}' ORDER BY ${DAO.COLUMN_FIELD_INDEX} ASC"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
+        study.rules.clear()
+
         while (cursor.moveToNext())
         {
             val field = buildField( cursor )
             if (field.parentUUID == null)
             {
-                field.fields = getBlockFields( field.uuid )
+                // search blockFields for rules so that the study
+                // will have a complete set of rules
+                getBlockFields( field.uuid )?.let { blockFields ->
+                    field.fields = blockFields
+
+                    for (blockField in blockFields)
+                    {
+                        val rules = DAO.ruleDAO.getRules(blockField)
+                        study.rules.addAll( rules )
+                    }
+                }
+
                 field.fieldOptions = DAO.fieldOptionDAO.getFieldOptions( field )
                 val rules = DAO.ruleDAO.getRules(field)
                 study.rules.addAll(rules)

@@ -510,7 +510,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             // ----------------------------
             // 1. Update Config table
             // ----------------------------
-            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_MAP_ENGINE_INDEX INTEGER DEFAULT 0")
+            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_MAP_ENGINE_INDEX INTEGER DEFAULT 1")
             db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_VALID_USERS TEXT")
             db.execSQL("UPDATE $TABLE_CONFIG SET $COLUMN_CONFIG_VALID_USERS = '' WHERE $COLUMN_CONFIG_VALID_USERS IS NULL")
 

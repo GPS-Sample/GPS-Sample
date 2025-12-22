@@ -45,9 +45,6 @@ class CreateRuleFragment : Fragment(),
     private var _binding: FragmentCreateRuleBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var rule: Rule
-    private lateinit var study: Study
-    private lateinit var config: Config
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     private var fieldList = ArrayList<Field>()
@@ -84,297 +81,291 @@ class CreateRuleFragment : Fragment(),
         }
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            this.config = config
-        }
+            sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+                sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+                    fieldList = sharedViewModel.createStudyModel.fieldList
 
-        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
-            this.study = study
-        }
+                    // for an existing rule, figure out which field was selected
 
-        sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
-            this.rule = rule
-        }
-
-        fieldList = sharedViewModel.createStudyModel.fieldList
-
-        // for an existing rule, figure out which field was selected
-
-        getField( rule.fieldUuid )?.let { field->
-            for (i in 0..fieldList.size-1)
-            {
-                if (fieldList[i].uuid == field.uuid)
-                {
-                    sharedViewModel.createRuleModel.ruleFieldPosition.value = i
-
-                    if (field.type == FieldType.Text || field.type == FieldType.Number)
-                    {
-                        binding.textValueEditText.visibility = View.VISIBLE
-                        binding.dropdownValueSpinner.visibility = View.GONE
-                        binding.dateValueTextView.visibility = View.GONE
-                        binding.checkboxValueRecyclerView.visibility = View.GONE
-                    }
-                    else if (field.type == FieldType.Dropdown)
-                    {
-                        binding.textValueEditText.visibility = View.GONE
-                        binding.dropdownValueSpinner.visibility = View.VISIBLE
-                        binding.dateValueTextView.visibility = View.GONE
-                        binding.checkboxValueRecyclerView.visibility = View.GONE
-
-                        val items = ArrayList<String>()
-
-                        for (j in 0..field.fieldOptions.size-1)
+                    getField( rule.fieldUuid )?.let { field->
+                        for (i in 0..fieldList.size-1)
                         {
-                            val fieldOption = field.fieldOptions[j]
-                            items.add( fieldOption.name )
-
-                            if (rule.value == fieldOption.name)
+                            if (fieldList[i].uuid == field.uuid)
                             {
-                                sharedViewModel.createRuleModel.dropdownPosition.value = j
+                                sharedViewModel.createRuleModel.ruleFieldPosition.value = i
+
+                                if (field.type == FieldType.Text || field.type == FieldType.Number)
+                                {
+                                    binding.textValueEditText.visibility = View.VISIBLE
+                                    binding.dropdownValueSpinner.visibility = View.GONE
+                                    binding.dateValueTextView.visibility = View.GONE
+                                    binding.checkboxValueRecyclerView.visibility = View.GONE
+                                }
+                                else if (field.type == FieldType.Dropdown)
+                                {
+                                    binding.textValueEditText.visibility = View.GONE
+                                    binding.dropdownValueSpinner.visibility = View.VISIBLE
+                                    binding.dateValueTextView.visibility = View.GONE
+                                    binding.checkboxValueRecyclerView.visibility = View.GONE
+
+                                    val items = ArrayList<String>()
+
+                                    for (j in 0..field.fieldOptions.size-1)
+                                    {
+                                        val fieldOption = field.fieldOptions[j]
+                                        items.add( fieldOption.name )
+
+                                        if (rule.value == fieldOption.name)
+                                        {
+                                            sharedViewModel.createRuleModel.dropdownPosition.value = j
+                                        }
+                                    }
+
+                                    binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                                }
+                                else if (field.type == FieldType.Date)
+                                {
+                                    binding.textValueEditText.visibility = View.GONE
+                                    binding.dropdownValueSpinner.visibility = View.GONE
+                                    binding.dateValueTextView.visibility = View.VISIBLE
+                                    binding.checkboxValueRecyclerView.visibility = View.GONE
+
+                                    rule.value.toLongOrNull()?.let { unixTime ->
+                                        if (field.date && !field.time)
+                                        {
+                                            binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
+                                        }
+                                        else if (field.time && !field.date)
+                                        {
+                                            binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat ))
+                                        }
+                                        else
+                                        {
+                                            binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
+                                        }
+                                    }
+                                }
+                                else if (field.type == FieldType.Checkbox)
+                                {
+                                    binding.textValueEditText.visibility = View.GONE
+                                    binding.dropdownValueSpinner.visibility = View.GONE
+                                    binding.dateValueTextView.visibility = View.GONE
+                                    binding.checkboxValueRecyclerView.visibility = View.VISIBLE
+
+                                    binding.checkboxValueRecyclerView.adapter = CheckboxOptionAdapter( true, rule.fieldDataOptions )
+                                }
+
+                                break
+                            }
+                        }
+                    }
+
+                    if (rule.uuid.isEmpty())
+                    {
+                        val field = study.fields[0]
+                        if (field.type == FieldType.Checkbox)
+                        {
+                            rule.operator = Operator.Contains
+                        }
+                    }
+
+                    rule.operator?.let { operator ->
+                        sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( operator )
+                    }
+
+                    binding.checkboxValueRecyclerView.itemAnimator = DefaultItemAnimator()
+                    binding.checkboxValueRecyclerView.layoutManager = LinearLayoutManager(context)
+                    binding.checkboxValueRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 )
+
+                    binding.fieldSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+                    {
+                        override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
+                        {
+                            val field = fieldList[position]
+                            rule.fieldUuid = field.uuid
+                            setKeyboardInputType( field )
+                            rule.operator = Operator.Equal
+                            sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( Operator.Equal )
+
+                            if (field.type == FieldType.Text || field.type == FieldType.Number)
+                            {
+                                binding.textValueEditText.visibility = View.VISIBLE
+                                binding.dropdownValueSpinner.visibility = View.GONE
+                                binding.dateValueTextView.visibility = View.GONE
+                                binding.checkboxValueRecyclerView.visibility = View.GONE
+                            }
+                            else if (field.type == FieldType.Dropdown)
+                            {
+                                binding.textValueEditText.visibility = View.GONE
+                                binding.dropdownValueSpinner.visibility = View.VISIBLE
+                                binding.dateValueTextView.visibility = View.GONE
+                                binding.checkboxValueRecyclerView.visibility = View.GONE
+
+                                val items = ArrayList<String>()
+
+                                for (j in 0..field.fieldOptions.size-1)
+                                {
+                                    val fieldOption = field.fieldOptions[j]
+                                    items.add( fieldOption.name )
+
+                                    if (rule.value == fieldOption.name)
+                                    {
+                                        sharedViewModel.createRuleModel.dropdownPosition.value = j
+                                    }
+                                }
+
+                                binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                            }
+                            else if (field.type == FieldType.Date)
+                            {
+                                binding.textValueEditText.visibility = View.GONE
+                                binding.dropdownValueSpinner.visibility = View.GONE
+                                binding.dateValueTextView.visibility = View.VISIBLE
+                                binding.checkboxValueRecyclerView.visibility = View.GONE
+                            }
+                            else if (field.type == FieldType.Checkbox)
+                            {
+                                binding.textValueEditText.visibility = View.GONE
+                                binding.dropdownValueSpinner.visibility = View.GONE
+                                binding.dateValueTextView.visibility = View.GONE
+                                binding.checkboxValueRecyclerView.visibility = View.VISIBLE
+
+                                if (rule.fieldDataOptions.isEmpty())
+                                {
+                                    for (fieldOption in field.fieldOptions)
+                                    {
+                                        val fieldDataOption = FieldDataOption( fieldOption.name, false )
+                                        rule.fieldDataOptions.add( fieldDataOption )
+                                    }
+                                }
+
+                                rule.operator = Operator.Contains
+                                sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( Operator.Contains )
+
+                                binding.checkboxValueRecyclerView.adapter = CheckboxOptionAdapter( true, rule.fieldDataOptions )
                             }
                         }
 
-                        binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
+                        override fun onNothingSelected(parent: AdapterView<*>)
+                        {
+                        }
                     }
-                    else if (field.type == FieldType.Date)
-                    {
-                        binding.textValueEditText.visibility = View.GONE
-                        binding.dropdownValueSpinner.visibility = View.GONE
-                        binding.dateValueTextView.visibility = View.VISIBLE
-                        binding.checkboxValueRecyclerView.visibility = View.GONE
 
-                        rule.value.toLongOrNull()?.let { unixTime ->
-                            if (field.date && !field.time)
+                    binding.dateValueTextView.setOnClickListener {
+                        getField( rule.fieldUuid )?.let { field ->
+                            val date = Date()
+                            if (field.time && !field.date)
                             {
-                                binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
-                            }
-                            else if (field.time && !field.date)
-                            {
-                                binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat ))
+                                TimePickerDialog(context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, null, null, this)
                             }
                             else
                             {
-                                binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
+                                DatePickerDialog(context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, null, null, this)
                             }
                         }
                     }
-                    else if (field.type == FieldType.Checkbox)
+
+                    binding.dropdownValueSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
                     {
-                        binding.textValueEditText.visibility = View.GONE
-                        binding.dropdownValueSpinner.visibility = View.GONE
-                        binding.dateValueTextView.visibility = View.GONE
-                        binding.checkboxValueRecyclerView.visibility = View.VISIBLE
-
-                        binding.checkboxValueRecyclerView.adapter = CheckboxOptionAdapter( true, rule.fieldDataOptions )
-                    }
-
-                    break
-                }
-            }
-        }
-
-        if (rule.uuid.isEmpty())
-        {
-            val field = study.fields[0]
-            if (field.type == FieldType.Checkbox)
-            {
-                rule.operator = Operator.Contains
-            }
-        }
-
-        rule.operator?.let { operator ->
-            sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( operator )
-        }
-
-        binding.checkboxValueRecyclerView.itemAnimator = DefaultItemAnimator()
-        binding.checkboxValueRecyclerView.layoutManager = LinearLayoutManager(context)
-        binding.checkboxValueRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 )
-
-        binding.fieldSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-        {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-            {
-                val field = fieldList[position]
-                rule.fieldUuid = field.uuid
-                setKeyboardInputType( field )
-                rule.operator = Operator.Equal
-                sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( Operator.Equal )
-
-                if (field.type == FieldType.Text || field.type == FieldType.Number)
-                {
-                    binding.textValueEditText.visibility = View.VISIBLE
-                    binding.dropdownValueSpinner.visibility = View.GONE
-                    binding.dateValueTextView.visibility = View.GONE
-                    binding.checkboxValueRecyclerView.visibility = View.GONE
-                }
-                else if (field.type == FieldType.Dropdown)
-                {
-                    binding.textValueEditText.visibility = View.GONE
-                    binding.dropdownValueSpinner.visibility = View.VISIBLE
-                    binding.dateValueTextView.visibility = View.GONE
-                    binding.checkboxValueRecyclerView.visibility = View.GONE
-
-                    val items = ArrayList<String>()
-
-                    for (j in 0..field.fieldOptions.size-1)
-                    {
-                        val fieldOption = field.fieldOptions[j]
-                        items.add( fieldOption.name )
-
-                        if (rule.value == fieldOption.name)
+                        override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
                         {
-                            sharedViewModel.createRuleModel.dropdownPosition.value = j
+                            getField( rule.fieldUuid )?.let { field ->
+                                val fieldOption = field.fieldOptions[position]
+                                rule.value = fieldOption.name
+                            }
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>)
+                        {
                         }
                     }
 
-                    binding.dropdownValueSpinner.adapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item, items )
-                }
-                else if (field.type == FieldType.Date)
-                {
-                    binding.textValueEditText.visibility = View.GONE
-                    binding.dropdownValueSpinner.visibility = View.GONE
-                    binding.dateValueTextView.visibility = View.VISIBLE
-                    binding.checkboxValueRecyclerView.visibility = View.GONE
-                }
-                else if (field.type == FieldType.Checkbox)
-                {
-                    binding.textValueEditText.visibility = View.GONE
-                    binding.dropdownValueSpinner.visibility = View.GONE
-                    binding.dateValueTextView.visibility = View.GONE
-                    binding.checkboxValueRecyclerView.visibility = View.VISIBLE
-
-                    if (rule.fieldDataOptions.isEmpty())
-                    {
-                        for (fieldOption in field.fieldOptions)
-                        {
-                            val fieldDataOption = FieldDataOption( fieldOption.name, false )
-                            rule.fieldDataOptions.add( fieldDataOption )
+                    binding.deleteImageView.setOnClickListener {
+                        ConfirmationDialog( activity,  resources.getString(R.string.please_confirm), resources.getString(R.string.delete_rule_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                    sharedViewModel.createRuleModel.deleteSelectedRule( study )
+                                    findNavController().popBackStack()
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
+                            }
                         }
+
                     }
 
-                    rule.operator = Operator.Contains
-                    sharedViewModel.createRuleModel.ruleOperationPosition.value = OperatorConverter.toIndex( Operator.Contains )
-
-                    binding.checkboxValueRecyclerView.adapter = CheckboxOptionAdapter( true, rule.fieldDataOptions )
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>)
-            {
-            }
-        }
-
-        binding.dateValueTextView.setOnClickListener {
-            getField( rule.fieldUuid )?.let { field ->
-                val date = Date()
-                if (field.time && !field.date)
-                {
-                    TimePickerDialog(context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, null, null, this)
-                }
-                else
-                {
-                    DatePickerDialog(context!!, context?.getString(R.string.select_date) ?: "Select Date", date, field, null, null, this)
-                }
-            }
-        }
-
-        binding.dropdownValueSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
-        {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long)
-            {
-                getField( rule.fieldUuid )?.let { field ->
-                    val fieldOption = field.fieldOptions[position]
-                    rule.value = fieldOption.name
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>)
-            {
-            }
-        }
-
-        binding.deleteImageView.setOnClickListener {
-            ConfirmationDialog( activity,  resources.getString(R.string.please_confirm), resources.getString(R.string.delete_rule_message), resources.getString(R.string.no), resources.getString(R.string.yes), null, false ) { buttonPressed, tag ->
-                when( buttonPressed )
-                {
-                    ConfirmationDialog.ButtonPress.Left -> {
-                    }
-                    ConfirmationDialog.ButtonPress.Right -> {
-                        sharedViewModel.createRuleModel.deleteSelectedRule( study )
+                    binding.cancelButton.setOnClickListener {
                         findNavController().popBackStack()
                     }
-                    ConfirmationDialog.ButtonPress.None -> {
+
+                    binding.saveButton.setOnClickListener {
+                        if (rule.name.isEmpty())
+                        {
+                            Toast.makeText(activity!!.applicationContext, context?.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+
+                        rule.operator?.let { operator ->
+                            getField( rule.fieldUuid )?.let { field ->
+                                when (field.type)
+                                {
+                                    FieldType.Text,
+                                    FieldType.Checkbox ->
+                                    {
+                                        when (operator)
+                                        {
+                                            Operator.LessThan,
+                                            Operator.GreaterThan,
+                                            Operator.LessThanOrEqual,
+                                            Operator.GreaterThanOrEqual ->
+                                            {
+                                                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                                return@setOnClickListener
+                                            }
+                                            else -> {}
+                                        }
+                                    }
+
+                                    FieldType.Number,
+                                    FieldType.Date ->
+                                    {
+                                        if (operator == Operator.Contains)
+                                        {
+                                            Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                            return@setOnClickListener
+                                        }
+                                    }
+
+                                    FieldType.Dropdown ->
+                                    {
+                                        when (operator)
+                                        {
+                                            Operator.Contains,
+                                            Operator.LessThan,
+                                            Operator.GreaterThan,
+                                            Operator.LessThanOrEqual,
+                                            Operator.GreaterThanOrEqual ->
+                                            {
+                                                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
+                                                return@setOnClickListener
+                                            }
+                                            else -> {}
+                                        }
+                                    }
+
+                                    else -> {}
+                                }
+                            }
+                        }
+
+                        sharedViewModel.addRule()
+                        findNavController().popBackStack()
                     }
                 }
             }
-
-        }
-
-        binding.cancelButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        binding.saveButton.setOnClickListener {
-            if (rule.name.isEmpty())
-            {
-                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.enter_name), Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            rule.operator?.let { operator ->
-                getField( rule.fieldUuid )?.let { field ->
-                    when (field.type)
-                    {
-                        FieldType.Text,
-                        FieldType.Checkbox ->
-                        {
-                            when (operator)
-                            {
-                                Operator.LessThan,
-                                Operator.GreaterThan,
-                                Operator.LessThanOrEqual,
-                                Operator.GreaterThanOrEqual ->
-                                {
-                                    Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
-                                }
-                                else -> {}
-                            }
-                        }
-
-                        FieldType.Number,
-                        FieldType.Date ->
-                        {
-                            if (operator == Operator.Contains)
-                            {
-                                Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
-                                return@setOnClickListener
-                            }
-                        }
-
-                        FieldType.Dropdown ->
-                        {
-                            when (operator)
-                            {
-                                Operator.Contains,
-                                Operator.LessThan,
-                                Operator.GreaterThan,
-                                Operator.LessThanOrEqual,
-                                Operator.GreaterThanOrEqual ->
-                                {
-                                    Toast.makeText(activity!!.applicationContext, context?.getString(R.string.invalid_operator), Toast.LENGTH_SHORT).show()
-                                    return@setOnClickListener
-                                }
-                                else -> {}
-                            }
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
-
-            sharedViewModel.addRule()
-            findNavController().popBackStack()
         }
     }
 
@@ -386,11 +377,25 @@ class CreateRuleFragment : Fragment(),
 
     fun getField( uuid: String ) : Field?
     {
-        for (field in study.fields)
-        {
-            if (field.uuid == uuid)
+        sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
+            for (field in study.fields)
             {
-                return field
+                if (field.uuid == uuid)
+                {
+                    return field
+                }
+                else
+                {
+                    field.fields?.let { blockFields ->
+                        for (blockField in blockFields)
+                        {
+                            if (blockField.uuid == uuid)
+                            {
+                                return blockField
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -418,29 +423,37 @@ class CreateRuleFragment : Fragment(),
 
     override fun didSelectDate(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
     {
-        val unixTime = date.time
-        rule.value = unixTime.toString()
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+                val unixTime = date.time
+                rule.value = unixTime.toString()
 
-        binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
+                binding.dateValueTextView.setText( DateUtils.dateString( Date( unixTime ), config.dateFormat ))
 
-        if (field.time)
-        {
-            TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
+                if (field.time)
+                {
+                    TimePickerDialog( context!!, context?.getString(R.string.select_time) ?: "Select Time", date, field, fieldData, editText,this )
+                }
+            }
         }
     }
 
     override fun didSelectTime(date: Date, field: Field, fieldData: FieldData?, editText: EditText?)
     {
-        val unixTime = date.time
-        rule.value = unixTime.toString()
+        sharedViewModel.currentConfiguration?.value?.let { config ->
+            sharedViewModel.createRuleModel.currentRule?.value?.let { rule ->
+                val unixTime = date.time
+                rule.value = unixTime.toString()
 
-        if (field.date && field.time)
-        {
-            binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
-        }
-        else if (field.time)
-        {
-            binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat))
+                if (field.date && field.time)
+                {
+                    binding.dateValueTextView.setText( DateUtils.dateTimeString( Date( unixTime ), config.dateFormat, config.timeFormat))
+                }
+                else if (field.time)
+                {
+                    binding.dateValueTextView.setText( DateUtils.timeString( Date( unixTime ), config.timeFormat))
+                }
+            }
         }
     }
 

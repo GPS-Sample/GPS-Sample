@@ -335,13 +335,11 @@
     <string name="map_tile_boundary">"Введите длину/ширину (в километрах) желаемого региона плитки карты"</string>
     <string name="success">"УСПЕХ!"</string>
     <string name="error">"ОШИБКА!"</string>
-    <string name="import_failed">"Импорт не удался."</string>
     <string name="import_succeeded">"Импорт прошел успешно."</string>
     <string name="clear_map_tile_region">"Очистить кэш региона плитки карты"</string>
     <string name="import_request_failed">"Получен запрос на экспорт в ожидании запроса на импорт"</string>
     <string name="export_request_failed">"Получен запрос на импорт в ожидании запроса на экспорт"</string>
     <string name="network_connection">"Сетевое подключение"</string>
-    <string name="add_landmark">"Добавить ориентир"</string>
     <string name="enumerated">"Зарегистрированные"</string>
     <string name="surveyed">"Обследованные"</string>
     <string name="meters">"Метры"</string>
@@ -413,6 +411,13 @@
     <string name="show_breadcrumbs">"Показать пройденный путь"</string>
     <string name="record_breadcrumbs">"Записать пройденный путь"</string>
     <string name="delete_breadcrumbs">"Удалить пройденный путь"</string>
+    <string name="view">"Просмотр"</string>
+    <string name="filter_by">"Фильтр по:"</string>
+    <string name="add_landmark">"Добавить точку интереса"</string>
+    <string name="export_succeeded">"Экспорт прошел успешно"</string>
+    <string name="export_failed">"Экспорт не удался"</string>
+    <string name="select_map_engine">"Выбрать движок карты"</string>
+    <string name="import_failed">""Ошибка. Импорт не удался. Убедитесь, что версии GPSSample совпадают.""</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>
@@ -459,5 +464,21 @@
         <item>"дд/мм/гггг"</item>
         <item>"мм/дд/гггг"</item>
         <item>"гггг/мм/дд"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"Open Street Map"</item>
+        <item>"Mapbox"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"По умолчанию"</item>
+        <item>"Не определено"</item>
+        <item>"Неполный"</item>
+        <item>"Полный"</item>
+        <item>"Точки интереса"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"вид по умолчанию"</item>
+        <item>"Только карта"</item>
+        <item>"Только список"</item>
     </string-array>
 </resources>

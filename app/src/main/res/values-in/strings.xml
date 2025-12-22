@@ -335,13 +335,11 @@
     <string name="map_tile_boundary">"Masukkan panjang/lebar (Kilometer) wilayah petak peta yang diinginkan"</string>
     <string name="success">"SUKSES!"</string>
     <string name="error">"KESALAHAN!"</string>
-    <string name="import_failed">"Impor gagal."</string>
     <string name="import_succeeded">"Impor berhasil."</string>
     <string name="clear_map_tile_region">"Hapus wilayah cache ubin peta"</string>
     <string name="import_request_failed">"Menerima Permintaan Ekspor sambil menunggu Permintaan Impor"</string>
     <string name="export_request_failed">"Menerima Permintaan Impor sambil menunggu Permintaan Ekspor"</string>
     <string name="network_connection">"Koneksi jaringan"</string>
-    <string name="add_landmark">"Tambahkan Penanda"</string>
     <string name="enumerated">"Dihitung"</string>
     <string name="surveyed">"Disurvei"</string>
     <string name="meters">"Meter"</string>
@@ -413,6 +411,13 @@
     <string name="show_breadcrumbs">"Tampilkan jalur yang telah dilalui"</string>
     <string name="record_breadcrumbs">"Rekam jalur yang telah dilalui"</string>
     <string name="delete_breadcrumbs">"Hapus jalur yang telah dilalui"</string>
+    <string name="view">"Tampilan"</string>
+    <string name="filter_by">"Filter Berdasarkan:"</string>
+    <string name="add_landmark">"Tambahkan Titik Minat"</string>
+    <string name="export_succeeded">"Ekspor berhasil"</string>
+    <string name="export_failed">"Ekspor gagal"</string>
+    <string name="select_map_engine">"Pilih Mensin Peta"</string>
+    <string name="import_failed">"Kesalahan. Impor gagal. Pastikan versi GPSSample sama."</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>
@@ -459,5 +464,21 @@
         <item>"dd/mm/yyyy"</item>
         <item>"mm/dd/yyyy"</item>
         <item>"yyyy/mm/dd"</item>
+    </string-array>
+    <string-array name="map_engines">
+        <item>"Open Street Map"</item>
+        <item>"Mapbox"</item>
+    </string-array>
+    <string-array name="sort_filters">
+        <item>"Default"</item>
+        <item>"Tidak Terdefinisi"</item>
+        <item>"Tidak Lengkap"</item>
+        <item>"Lengkap"</item>
+        <item>"Titik Minat"</item>
+    </string-array>
+    <string-array name="show_views">
+        <item>"Tampilan Default"</item>
+        <item>"Hanya Peta"</item>
+        <item>"Hanya Daftar"</item>
     </string-array>
 </resources>
