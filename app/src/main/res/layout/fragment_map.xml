@@ -15,14 +15,23 @@
             android:layout_width="match_parent"
             android:layout_height="0dp">
 
+            <com.mapbox.maps.MapView
+                android:id="@+id/mapbox_map_view"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </com.mapbox.maps.MapView>
+
             <org.osmdroid.views.MapView
                 android:id="@+id/osm_map_view"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
             </org.osmdroid.views.MapView>
 
             <TextView
                 android:id="@+id/osm_label"
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="10dp"

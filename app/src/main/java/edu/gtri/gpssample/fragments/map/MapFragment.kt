@@ -55,6 +55,7 @@ import edu.gtri.gpssample.database.models.LatLon
 import edu.gtri.gpssample.database.models.MapTileRegion
 import edu.gtri.gpssample.databinding.FragmentMapBinding
 import edu.gtri.gpssample.dialogs.BusyIndicatorDialog
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.dialogs.InputDialog
 import edu.gtri.gpssample.dialogs.MapHelpDialog
 import edu.gtri.gpssample.dialogs.SelectionDialog
@@ -75,6 +76,7 @@ class MapFragment : Fragment(),
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var mapView: View
     private var centerOnLocation = true
     private var defineMapRegion = false
     private var mapTileRegion: MapTileRegion? = null
@@ -108,9 +110,15 @@ class MapFragment : Fragment(),
             lifecycleOwner = viewLifecycleOwner
         }
 
-        MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+        binding.osmLabel.visibility = View.GONE
+        binding.osmMapView.visibility = View.GONE
+        binding.northUpImageView.visibility = View.GONE
+        binding.mapboxMapView.visibility = View.VISIBLE
+
+        MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+            this.mapView = mapView
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
-            MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
+            MapManager.instance().startCenteringOnLocation( activity!!, mapView )
             binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
                 MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
@@ -159,7 +167,7 @@ class MapFragment : Fragment(),
             defineMapRegion = false
             binding.mapOverlayView.visibility = View.GONE
             binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
-            MapManager.instance().clearMap( binding.osmMapView )
+            MapManager.instance().clearMap( mapView )
         }
 
         binding.centerOnLocationButton.setOnClickListener {
@@ -171,12 +179,12 @@ class MapFragment : Fragment(),
 
             if (centerOnLocation)
             {
-                MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
+                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
             }
             else
             {
-                MapManager.instance().stopCenteringOnLocation( binding.osmMapView )
+                MapManager.instance().stopCenteringOnLocation( mapView )
                 binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
             }
         }
@@ -196,7 +204,9 @@ class MapFragment : Fragment(),
             p1?.let { p1 ->
                 if (p1.action == MotionEvent.ACTION_DOWN)
                 {
-                    val point = MapManager.instance().getLocationFromPixelPoint(binding.osmMapView, p1 )
+                    val point = MapManager.instance().getLocationFromPixelPoint(mapView, p1 )
+                    MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(point.longitude(), point.latitude()), R.drawable.breadcrumb, "X")
+
                     defineMapRegion = false
                     binding.mapOverlayView.visibility = View.GONE
                     binding.defineMapTileRegionButton.setBackgroundTintList(defaultColorList);
@@ -261,7 +271,7 @@ class MapFragment : Fragment(),
 
         pointList.add( points )
 
-        MapManager.instance().createPolygon( binding.osmMapView, pointList, Color.BLACK, 0, Color.BLACK )
+        MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0, Color.BLACK )
     }
 
     override fun didPressCancelButton()
@@ -321,23 +331,83 @@ class MapFragment : Fragment(),
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_map_style, menu)
+        inflater.inflate(R.menu.menu_map, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean
     {
         when (item.itemId)
         {
+            R.id.select_map_engine ->
+            {
+                val mapEngines = resources.getTextArray( R.array.map_engines )
+
+                ConfirmationDialog( activity, resources.getString(R.string.select_map_engine), "", mapEngines[0].toString(), mapEngines[1].toString(), null, false ) { buttonPressed, tag ->
+                    when( buttonPressed )
+                    {
+                        ConfirmationDialog.ButtonPress.Left -> {
+                            binding.osmLabel.visibility = View.VISIBLE
+                            binding.osmMapView.visibility = View.VISIBLE
+                            binding.mapboxMapView.visibility = View.GONE
+                            MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                                this.mapView = mapView
+                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                                }
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.Right -> {
+                            binding.osmLabel.visibility = View.GONE
+                            binding.osmMapView.visibility = View.GONE
+                            binding.northUpImageView.visibility = View.GONE
+                            binding.mapboxMapView.visibility = View.VISIBLE
+                            MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+                                this.mapView = mapView
+                                MapManager.instance().enableLocationUpdates( activity!!, mapView )
+                                MapManager.instance().startCenteringOnLocation( activity!!, mapView )
+                                binding.centerOnLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                                sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->
+                                    MapManager.instance().setZoomLevel( mapView, currentZoomLevel )
+                                }
+                            }
+                        }
+                        ConfirmationDialog.ButtonPress.None -> {
+                        }
+                    }
+                }
+            }
+
             R.id.mapbox_streets ->
             {
                 val editor = activity!!.getSharedPreferences("default", 0).edit()
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
-                    if (centerOnLocation)
-                    {
-                        MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
+                if (binding.mapboxMapView.visibility == View.VISIBLE)
+                {
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+                        this.mapView = mapView
+                        if (centerOnLocation)
+                        {
+                            MapManager.instance().startCenteringOnLocation( activity!!, binding.mapboxMapView )
+                        }
+                    }
+                }
+                else
+                {
+                    MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                        this.mapView = mapView
+                        mapView.post {
+                            binding.osmMapView.tileProvider.clearTileCache()
+                            binding.osmMapView.invalidate()
+                        }
+                        if (centerOnLocation)
+                        {
+                            MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
+                        }
                     }
                 }
             }
@@ -348,10 +418,28 @@ class MapFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
-                    if (centerOnLocation)
-                    {
-                        MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
+                if (binding.mapboxMapView.visibility == View.VISIBLE)
+                {
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+                        this.mapView = mapView
+                        if (centerOnLocation)
+                        {
+                            MapManager.instance().startCenteringOnLocation( activity!!, binding.mapboxMapView )
+                        }
+                    }
+                }
+                else
+                {
+                    MapManager.instance().selectOsmMap( activity!!, binding.osmMapView, binding.northUpImageView ) { mapView ->
+                        this.mapView = mapView
+                        mapView.post {
+                            binding.osmMapView.tileProvider.clearTileCache()
+                            binding.osmMapView.invalidate()
+                        }
+                        if (centerOnLocation)
+                        {
+                            MapManager.instance().startCenteringOnLocation( activity!!, binding.osmMapView )
+                        }
                     }
                 }
             }

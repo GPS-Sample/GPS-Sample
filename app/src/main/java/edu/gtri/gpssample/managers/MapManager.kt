@@ -115,6 +115,16 @@ class MapManager
         }
     }
 
+    fun selectMapboxMap( activity: Activity, mapboxMapView: com.mapbox.maps.MapView, completion: ((mapView: View)->Unit) )
+    {
+        val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
+        val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
+
+        initializeMapboxMap( mapboxMapView, mapStyle!! ) {
+            completion( mapboxMapView )
+        }
+    }
+
     fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
     {
         this.delegate = delegate
