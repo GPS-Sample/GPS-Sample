@@ -24,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.mapbox.geojson.Point
 import com.mapbox.maps.*
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
