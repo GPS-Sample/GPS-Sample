@@ -451,9 +451,8 @@ class PerformEnumerationFragment : Fragment(),
             {
                 currentGPSAccuracy?.let { accuracy ->
                     currentGPSLocation?.let { point ->
-                        val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
                         val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                        val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, true, "", "")
+                        val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), true, "", "")
 
                         DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                         enumArea.locations.add(location)
@@ -656,7 +655,6 @@ class PerformEnumerationFragment : Fragment(),
     private fun addHouseholdButtonPress()
     {
         currentGPSLocation?.let { point ->
-
             sharedViewModel.currentConfiguration?.value?.let { config ->
                 if (config.proximityWarningIsEnabled)
                 {
@@ -682,9 +680,8 @@ class PerformEnumerationFragment : Fragment(),
                 accuracy = it
             }
 
-            val altitude = if (point.altitude().isNaN()) 0.0 else point.altitude()
             val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-            val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), altitude, false, "", "")
+            val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), point.altitude(), false, "", "")
 
             DAO.locationDAO.createOrUpdateLocation( location, enumArea )
             enumArea.locations.add(location)
@@ -713,9 +710,8 @@ class PerformEnumerationFragment : Fragment(),
                     }
 
                     val pt = tag as Point
-                    val altitude = if (pt.altitude().isNaN()) 0.0 else pt.altitude()
                     val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                    val location = Location( timeZone, LocationType.Enumeration, accuracy, tag.latitude(), tag.longitude(), altitude, false, "", "")
+                    val location = Location( timeZone, LocationType.Enumeration, accuracy, pt.latitude(), pt.longitude(), pt.altitude(), false, "", "")
 
                     DAO.locationDAO.createOrUpdateLocation( location, enumArea )
                     enumArea.locations.add(location)
@@ -1381,7 +1377,8 @@ class PerformEnumerationFragment : Fragment(),
         {
             val location = locationResult.locations.last()
             val accuracy = location.accuracy.toInt() // in meters
-            val point = Point.fromLngLat( location.longitude, location.latitude )
+            val altitude = if (location.altitude.isNaN()) 0.0 else location.altitude
+            val point = Point.fromLngLat( location.longitude, location.latitude, altitude )
 
             currentGPSLocation = point
             currentGPSAccuracy = accuracy
@@ -1404,7 +1401,7 @@ class PerformEnumerationFragment : Fragment(),
                 }
 
                 binding.accuracyValueTextView.text = " : ${accuracy.toString()}m"
-                binding.locationTextView.text = String.format( "%.7f, %.7f, %.0f", point.latitude(), point.longitude(), location.bearing)
+                binding.locationTextView.text = String.format( "%.7f, %.7f, %.0f", point.latitude(), point.longitude(), location.altitude)
 
                 if (Date().time - lastLocationUpdateTime > 3000)
                 {
@@ -1481,8 +1478,12 @@ class PerformEnumerationFragment : Fragment(),
                 if (dropMode)
                 {
                     dropMode = false
-                    val point = MapManager.instance().getLocationFromPixelPoint(mapView, motionEvent )
+                    var point = MapManager.instance().getLocationFromPixelPoint(mapView, motionEvent )
                     binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+
+                    currentGPSLocation?.let { current ->
+                        point = Point.fromLngLat(point.longitude(), point.latitude(),current.altitude())
+                    }
 
                     sharedViewModel.currentConfiguration?.value?.let { config ->
                         if (config.proximityWarningIsEnabled)
@@ -1510,7 +1511,7 @@ class PerformEnumerationFragment : Fragment(),
                     }
 
                     val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-                    val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(), 0.0, false, "", "")
+                    val location = Location( timeZone, LocationType.Enumeration, accuracy, point.latitude(), point.longitude(),point.altitude(), false, "", "")
 
                     if (gpsLocationIsGood( location ))
                     {
