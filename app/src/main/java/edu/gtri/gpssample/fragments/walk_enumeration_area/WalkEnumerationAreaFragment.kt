@@ -254,7 +254,7 @@ class WalkEnumerationAreaFragment : Fragment(),
                         ConfirmationDialog.ButtonPress.Left -> {
                         }
                         ConfirmationDialog.ButtonPress.Right -> {
-                            polyLinePoints.removeLast()
+                            polyLinePoints.removeAt(polyLinePoints.lastIndex)
 
                             MapManager.instance().clearMap( mapView )
 
