@@ -437,6 +437,19 @@ class MapManager
     fun createMapboxPointAnnotationManager( mapView: MapView )
     {
         mapboxPointAnnotationManager = mapView.annotations.createPointAnnotationManager()
+
+        mapboxPointAnnotationManager!!.apply {
+            addClickListener(
+                OnPointAnnotationClickListener { pointAnnotation ->
+                    pointAnnotation.getData()?.asJsonObject?.get("uuid")?.asString?.let { uuid ->
+                        DAO.locationDAO.getLocation( uuid )?.let {
+                            delegate?.onMarkerTapped( it )
+                        }
+                    }
+                    true
+                }
+            )
+        }
     }
 
     fun createMapboxPolylineAnnotationManager( mapView: MapView )
@@ -697,7 +710,7 @@ class MapManager
     {
     }
 
-    fun createMarker( context: Context, mapView: View, location: Location, @DrawableRes resourceId: Int, title: String = "" ) : Any?
+    fun createMarker( context: Context, mapView: View, location: Location, @DrawableRes resourceId: Int, title: String = "" )
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -758,38 +771,28 @@ class MapManager
         }
         else if (mapView is com.mapbox.maps.MapView)
         {
-            mapboxPointAnnotationManager?.let { pointAnnotationManager ->
-                val point = Point.fromLngLat( location.longitude, location.latitude )
-                val jsonElement = JsonObject().apply { addProperty( "uuid", location.uuid ) }
-                val pointAnnotationOptions = PointAnnotationOptions()
-                    .withPoint( point )
-                    .withData( jsonElement )
-                    .withTextField( title )
+            mapView.getMapboxMap().getStyle { style ->
+                val iconId = "custom-marker-${resourceId}"
 
-                convertDrawableToBitmap( AppCompatResources.getDrawable(context, resourceId))?.let { bitmap ->
-                    pointAnnotationOptions.withIconImage( bitmap )
+                if (style.getStyleImage(iconId) == null)
+                {
+                    val bitmap = convertDrawableToBitmap(AppCompatResources.getDrawable(context,resourceId))!!
+                    style.addImage(iconId, bitmap)
                 }
 
-                val pointAnnotation = pointAnnotationManager.create(pointAnnotationOptions)
+                mapboxPointAnnotationManager?.let { pointAnnotationManager ->
+                    val point = Point.fromLngLat( location.longitude, location.latitude )
+                    val jsonElement = JsonObject().apply { addProperty( "uuid", location.uuid ) }
+                    val pointAnnotationOptions = PointAnnotationOptions()
+                        .withPoint( point )
+                        .withData( jsonElement )
+                        .withIconImage( iconId )
+                        .withTextField( title )
 
-                pointAnnotationManager.apply {
-                    addClickListener(
-                        OnPointAnnotationClickListener { pointAnnotation ->
-                            pointAnnotation.getData()?.asJsonObject?.get("uuid")?.asString?.let { uuid ->
-                                DAO.locationDAO.getLocation( uuid )?.let {
-                                    delegate?.onMarkerTapped( it )
-                                }
-                            }
-                            true
-                        }
-                    )
+                    pointAnnotationManager.create(pointAnnotationOptions)
                 }
-
-                return pointAnnotation
             }
         }
-
-        return null
     }
 
     data class MarkerProperty( var location: Location, var resourceId: Int, var title: String )

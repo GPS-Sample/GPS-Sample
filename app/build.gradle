@@ -13,10 +13,9 @@ android {
     defaultConfig {
         applicationId "edu.gtri.gpssample"
         minSdk 26
-        //noinspection EditedTargetSdkVersion
         targetSdk 35
-        versionCode 17
-        versionName "1.0.0 #109 beta-17"
+        versionCode 20
+        versionName "2.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
