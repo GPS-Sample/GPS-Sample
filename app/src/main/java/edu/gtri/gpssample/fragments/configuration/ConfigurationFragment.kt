@@ -315,18 +315,13 @@ class ConfigurationFragment : Fragment(),
             val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
             val dateTime = LocalDateTime.now().format(formatter)
 
-            var version = ""
-            val versionName = BuildConfig.VERSION_NAME.split( "#" )
-            if (versionName.size == 2)
-            {
-                version = versionName[1]
-            }
+            val versionName = BuildConfig.VERSION_NAME
 
             val path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOCUMENTS + "/GPSSample/Configurations"
             val root = File( path )
             root.mkdirs()
 
-            return "${role}-${userName}-${config.name}-${dateTime!!}-${version}"
+            return "${role}-${userName}-${config.name}-${dateTime!!}-${versionName}"
         }
 
         return ""
