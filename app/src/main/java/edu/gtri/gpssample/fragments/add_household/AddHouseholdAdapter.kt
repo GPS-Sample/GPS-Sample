@@ -89,7 +89,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
 
         editText.inputType = InputType.TYPE_CLASS_NUMBER
         fieldData.numberValue?.let {
-            editText.setText( it.toInt().toString())
+            editText.setText( it.toLong().toString())
         }
 
         val requiredTextView = numberLayout.findViewById<TextView>(R.id.required_text_view)
@@ -212,7 +212,7 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
                 {
                     editText.inputType = InputType.TYPE_CLASS_NUMBER
                     fieldData.numberValue?.let {
-                        editText.setText( it.toInt().toString())
+                        editText.setText( it.toLong().toString())
                     }
                 }
                 else
