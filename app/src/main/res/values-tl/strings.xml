@@ -418,6 +418,9 @@
     <string name="export_failed">"Nabigo ang pag-export"</string>
     <string name="select_map_engine">"Piliin ang Map Engine"</string>
     <string name="import_failed">"Error. Nabigo ang pag-import. Tiyaking pareho ang mga bersyon ng GPSSample."</string>
+    <string name="privacy_policy_statement">""Itinatala ng GPSSample ang iyong lokasyon sa background habang lumilipat ka sa pagitan ng mga kabahayan. Nagbibigay-daan ito sa app na subaybayan ang iyong ruta (breadcrumb trail), imapa ang mga lokasyon ng kabahayan, at mag-navigate pabalik sa mga piling lugar ng survey. Ang iyong lokasyon ay ligtas na nakaimbak sa iyong device at maaari lamang i-export kung pipiliin mong gawin ito. Maaari mong bawiin ang access sa lokasyon sa background anumang oras sa Mga Setting ng Android.""</string>
+    <string name="accept_privacy_policy">"Paganahin ang Lokasyon sa Background → tini-trigger ang pahintulot ng Android system para sa “Payagan sa lahat ng oras”"</string>
+    <string name="decline_privacy_policy">"Hindi Ngayon → nilalaktawan ang pahintulot (hindi gagana ang feature)"</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>

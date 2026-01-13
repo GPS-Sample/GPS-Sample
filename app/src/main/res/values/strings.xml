@@ -418,6 +418,9 @@
     <string name="export_failed">"The export failed"</string>
     <string name="select_map_engine">"Select Map Engine"</string>
     <string name="import_failed">"Error. The import failed. Ensure GPSSample versions are the same."</string>
+    <string name="privacy_policy_statement">""GPSSample records your location in the background while you move between households. This allows the app to track your route (breadcrumb trail), map household locations, and navigate back to selected survey sites. Your location is stored securely on your device and may be exported only if you choose to do so. You can revoke background location access at any time in Android Settings.""</string>
+    <string name="accept_privacy_policy">"Enable Background Location → triggers Android system permission for “Allow all the time”"</string>
+    <string name="decline_privacy_policy">"Not Now → skips permission (feature won’t work)"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

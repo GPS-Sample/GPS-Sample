@@ -418,6 +418,9 @@
     <string name="export_failed">"La exportación ha fallado"</string>
     <string name="select_map_engine">"Seleccionar motor de mapas"</string>
     <string name="import_failed">"Error. La importación ha fallado. Asegúrese de que las versiones de GPSSample sean las mismas."</string>
+    <string name="privacy_policy_statement">""GPSSample registra su ubicación en segundo plano mientras se desplaza entre hogares. Esto permite a la aplicación realizar un seguimiento de su ruta (rastro de migas de pan), trazar un mapa con la ubicación de los hogares y navegar de vuelta a los lugares seleccionados para la encuesta. Su ubicación se almacena de forma segura en su dispositivo y solo se puede exportar si usted decide hacerlo. Puede revocar el acceso a la ubicación en segundo plano en cualquier momento en los ajustes de Android.""</string>
+    <string name="accept_privacy_policy">"Habilitar ubicación en segundo plano → activa el permiso del sistema Android para «Permitir siempre»"</string>
+    <string name="decline_privacy_policy">"Ahora no → omite el permiso (la función no funcionará)"</string>
     <string-array name="forgot_pin_questions">
         <item>"Segundo nombre del padre"</item>
         <item>"Apellido de soltera de la madre"</item>

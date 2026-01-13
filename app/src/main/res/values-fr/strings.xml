@@ -418,6 +418,9 @@
     <string name="export_failed">"L'exportation a échoué"</string>
     <string name="select_map_engine">"Sélectionnez le moteur de carte"</string>
     <string name="import_failed">"Erreur. L'importation a échoué. Assurez-vous que les versions GPSSample sont identiques."</string>
+    <string name="privacy_policy_statement">"GPSSample enregistre votre position en arrière-plan lorsque vous vous déplacez d'un foyer à l'autre. Cela permet à l'application de suivre votre itinéraire (fil d'Ariane), de cartographier l'emplacement des foyers et de vous guider vers les sites d'enquête sélectionnés. Votre position est stockée en toute sécurité sur votre appareil et ne peut être exportée que si vous le souhaitez. Vous pouvez révoquer l'accès à votre position en arrière-plan à tout moment dans les paramètres Android."</string>
+    <string name="accept_privacy_policy">"Activer la localisation en arrière-plan → déclenche l'autorisation du système Android pour « Autoriser tout le temps »"</string>
+    <string name="decline_privacy_policy">"Pas maintenant → ignore l'autorisation (la fonctionnalité ne fonctionnera pas)"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>
