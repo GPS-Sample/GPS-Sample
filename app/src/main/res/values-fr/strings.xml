@@ -418,9 +418,13 @@
     <string name="export_failed">"L'exportation a échoué"</string>
     <string name="select_map_engine">"Sélectionnez le moteur de carte"</string>
     <string name="import_failed">"Erreur. L'importation a échoué. Assurez-vous que les versions GPSSample sont identiques."</string>
-    <string name="privacy_policy_statement">"GPSSample enregistre votre position en arrière-plan lorsque vous vous déplacez d'un foyer à l'autre. Cela permet à l'application de suivre votre itinéraire (fil d'Ariane), de cartographier l'emplacement des foyers et de vous guider vers les sites d'enquête sélectionnés. Votre position est stockée en toute sécurité sur votre appareil et ne peut être exportée que si vous le souhaitez. Vous pouvez révoquer l'accès à votre position en arrière-plan à tout moment dans les paramètres Android."</string>
-    <string name="accept_privacy_policy">"Activer la localisation en arrière-plan → déclenche l'autorisation du système Android pour « Autoriser tout le temps »"</string>
-    <string name="decline_privacy_policy">"Pas maintenant → ignore l'autorisation (la fonctionnalité ne fonctionnera pas)"</string>
+    <string name="privacy_policy_statement">""GPSSample enregistre votre itinéraire (fil d\'Ariane) lorsque vous vous déplacez entre les foyers et cartographiez les foyers.\n\nL\'enregistrement ne commence que lorsque vous appuyez sur le bouton ENREGISTRER dans l\'application et s\'arrête lorsque vous appuyez sur le bouton ARRÊTER.\n\nLa localisation est collectée en continu pendant l\'enregistrement, même si l\'application est en arrière-plan ou si votre appareil est verrouillé.\n\nVos données de localisation sont stockées en toute sécurité sur votre appareil et ne sont exportées que si vous le souhaitez.\n\nVous pouvez révoquer l\'accès à la localisation en arrière-plan à tout moment dans les paramètres Android.""</string>
+    <string name="accept_privacy_policy">"Activer la localisation en arrière-plan : \nTOUJOURS AUTORISER"</string>
+    <string name="decline_privacy_policy">"Pas maintenant : \nla fonction de suivi ne fonctionnera pas"</string>
+    <string name="background_location_permission">"Autorisation de localisation en arrière-plan"</string>
+    <string name="enable_background_activity_title">"Activer l'activité en arrière-plan"</string>
+    <string name="enable_background_activity_body">"1. Appuyez sur le bouton OUVRIR LES PARAMÈTRES\n2. Recherchez GPSSample dans la liste.\n3. Activez AUTORISER L'ACTIVITÉ EN ARRIÈRE-PLAN.\n4. Revenez à cette application."</string>
+    <string name="open_settings">"Ouvrir les paramètres"</string>
     <string-array name="forgot_pin_questions">
         <item>"Deuxième prénom de votre père"</item>
         <item>"Nom de jeune fille de votre mère"</item>

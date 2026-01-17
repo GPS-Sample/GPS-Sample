@@ -418,9 +418,13 @@
     <string name="export_failed">"The export failed"</string>
     <string name="select_map_engine">"Select Map Engine"</string>
     <string name="import_failed">"Error. The import failed. Ensure GPSSample versions are the same."</string>
-    <string name="privacy_policy_statement">""GPSSample records your location in the background while you move between households. This allows the app to track your route (breadcrumb trail), map household locations, and navigate back to selected survey sites. Your location is stored securely on your device and may be exported only if you choose to do so. You can revoke background location access at any time in Android Settings.""</string>
-    <string name="accept_privacy_policy">"Enable Background Location → triggers Android system permission for “Allow all the time”"</string>
-    <string name="decline_privacy_policy">"Not Now → skips permission (feature won’t work)"</string>
+    <string name="privacy_policy_statement">""GPSSample records your route (breadcrumb trail) while you travel between households and map households.\n\nRecording starts only when you tap the RECORD button in the app and stops recording when you tap the STOP button.\n\nLocation is collected continuously while recording, even if the app is in the background or your device is locked.\n\nYour location data is stored securely on your device and is only exported if you choose to do so.\n\nYou can revoke background location access at any time in Android Settings.""</string>
+    <string name="accept_privacy_policy">"Enable Background Location:\nALLOW ALL THE TIME"</string>
+    <string name="decline_privacy_policy">"Not Now:\ntracking feature won't work"</string>
+    <string name="background_location_permission">"Background Location Permission"</string>
+    <string name="enable_background_activity_title">"Enable Background Activity"</string>
+    <string name="enable_background_activity_body">"1. Tap the OPEN SETTINGS button\n2. Find GPSSample in the list.\n3. Enable ALLOW BACKGROUND ACTIVITY.\n4. Return to this app."</string>
+    <string name="open_settings">"Open Settings"</string>
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

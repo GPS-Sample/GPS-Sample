@@ -418,9 +418,13 @@
     <string name="export_failed">"Ekspor gagal"</string>
     <string name="select_map_engine">"Pilih Mensin Peta"</string>
     <string name="import_failed">"Kesalahan. Impor gagal. Pastikan versi GPSSample sama."</string>
-    <string name="privacy_policy_statement">""GPSSample merekam lokasi Anda di latar belakang saat Anda berpindah antar rumah tangga. Hal ini memungkinkan aplikasi untuk melacak rute Anda (jejak perjalanan), memetakan lokasi rumah tangga, dan menavigasi kembali ke lokasi survei yang dipilih. Lokasi Anda disimpan dengan aman di perangkat Anda dan hanya dapat diekspor jika Anda memilih untuk melakukannya. Anda dapat mencabut akses lokasi latar belakang kapan saja di Pengaturan Android.""</string>
-    <string name="accept_privacy_policy">""Aktifkan Lokasi Latar Belakang → memicu izin sistem Android untuk ""Izinkan setiap saat""""</string>
-    <string name="decline_privacy_policy">"Nanti Saja → melewati izin (fitur tidak akan berfungsi)"</string>
+    <string name="privacy_policy_statement">""GPSSample merekam rute Anda (jejak perjalanan) saat Anda bepergian antar rumah tangga dan memetakan rumah tangga.\n\nPerekaman hanya dimulai saat Anda mengetuk tombol REKAM di aplikasi dan berhenti merekam saat Anda mengetuk tombol BERHENTI.\n\nLokasi dikumpulkan terus menerus selama perekaman, bahkan jika aplikasi berada di latar belakang atau perangkat Anda terkunci.\n\nData lokasi Anda disimpan dengan aman di perangkat Anda dan hanya diekspor jika Anda memilih untuk melakukannya.\n\nAnda dapat mencabut akses lokasi latar belakang kapan saja di Pengaturan Android.""</string>
+    <string name="accept_privacy_policy">"Aktifkan Lokasi Latar Belakang:\nIZINKAN SEPANJANG WAKTU"</string>
+    <string name="decline_privacy_policy">"Nanti: fitur pelacakan tidak akan berfungsi"</string>
+    <string name="background_location_permission">"Izin Lokasi Latar Belakang"</string>
+    <string name="enable_background_activity_title">"Aktifkan Aktivitas Latar Belakang"</string>
+    <string name="enable_background_activity_body">"1. Ketuk tombol BUKA PENGATURAN\n2. Temukan GPSSample dalam daftar.\n3. Aktifkan IZINKAN AKTIVITAS LATAR BELAKANG.\n4. Kembali ke aplikasi ini."</string>
+    <string name="open_settings">"Buka Pengaturan"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nama ayah"</item>
         <item>"Nama Ibu"</item>

@@ -39,7 +39,7 @@ class ConfirmationDialog
 
         val alertDialog = builder.create()
 
-        alertDialog.setCancelable(true)
+        alertDialog.setCancelable(false)
         alertDialog.show()
 
         val textView = view.findViewById<TextView>(R.id.text_view)

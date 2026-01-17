@@ -418,9 +418,13 @@
     <string name="export_failed">"A exportação falhou"</string>
     <string name="select_map_engine">"Selecionar motor de mapa"</string>
     <string name="import_failed">"Erro. A importação falhou. Certifique-se de que as versões do GPSSample são as mesmas."</string>
-    <string name="privacy_policy_statement">""O GPSSample grava a sua localização em segundo plano enquanto se desloca entre residências. Isso permite que a aplicação acompanhe o seu percurso (trilha de navegação), mapeie as localizações das residências e navegue de volta aos locais selecionados para pesquisa. A sua localização é armazenada com segurança no seu dispositivo e só pode ser exportada se assim o desejar. Pode revogar o acesso à localização em segundo plano a qualquer momento nas Definições do Android.""</string>
-    <string name="accept_privacy_policy">"Ativar localização em segundo plano → aciona a permissão do sistema Android para «Permitir sempre»"</string>
-    <string name="decline_privacy_policy">"Agora não → ignora a permissão (o recurso não funcionará)"</string>
+    <string name="privacy_policy_statement">""O GPSSample grava a sua rota (trilha de navegação) enquanto você se desloca entre residências e mapeia residências.\n\nA gravação só começa quando você toca no botão GRAVAR no aplicativo e para quando você toca no botão PARAR.\n\nA localização é coletada continuamente durante a gravação, mesmo que o aplicativo esteja em segundo plano ou o seu dispositivo esteja bloqueado.\n\nOs seus dados de localização são armazenados com segurança no seu dispositivo e só são exportados se você optar por fazê-lo.\n\nVocê pode revogar o acesso à localização em segundo plano a qualquer momento nas Definições do Android.""</string>
+    <string name="accept_privacy_policy">"Ativar localização em segundo plano:\nPERMITIR SEMPRE"</string>
+    <string name="decline_privacy_policy">"Agora não:\nA funcionalidade de rastreamento não funcionará"</string>
+    <string name="background_location_permission">"Permissão de localização em segundo plano"</string>
+    <string name="enable_background_activity_title">"Ativar atividade em segundo plano"</string>
+    <string name="enable_background_activity_body">"1. Toque no botão ABRIR CONFIGURAÇÕES \n2. Encontre GPSSample na lista.\n3. Ative PERMITIR ATIVIDADE EM SEGUNDO PLANO.\n4. Volte para este aplicativo."</string>
+    <string name="open_settings">"Abrir configurações"</string>
     <string-array name="forgot_pin_questions">
         <item>"Nome do meio do pai"</item>
         <item>"Nome de solteira da mãe"</item>
