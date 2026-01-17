@@ -255,36 +255,38 @@ class MainFragment : Fragment()
 
         val key = "IsFirstRun"
 
-        if (sharedPreferences.getBoolean(key, true ))
-        {
-            val editor = sharedPreferences.edit()
-            editor.putBoolean( key, false )
-            editor.commit()
-            view.post {
-                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                {
-                    ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
-                        resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true ) { buttonPressed, tag ->
-                        when( buttonPressed )
-                        {
-                            ConfirmationDialog.ButtonPress.Left -> {
-                                ConfirmationDialog( activity, resources.getString(R.string.enable_background_activity_title), resources.getString(R.string.enable_background_activity_body),
-                                    resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true ) { buttonPressed, tag ->
-                                    when( buttonPressed )
-                                    {
-                                        ConfirmationDialog.ButtonPress.Left -> {
-                                            requestIgnoreBatteryOptimizationsIfNeeded()
-                                        }
-                                        ConfirmationDialog.ButtonPress.Right -> {
-                                        }
-                                        ConfirmationDialog.ButtonPress.None -> {
+        view.post {
+            if (sharedPreferences.getBoolean(key, true ))
+            {
+                val editor = sharedPreferences.edit()
+                editor.putBoolean( key, false )
+                editor.commit()
+                view.post {
+                    if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                    {
+                        ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
+                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    ConfirmationDialog( activity, resources.getString(R.string.enable_background_activity_title), resources.getString(R.string.enable_background_activity_body),
+                                        resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true ) { buttonPressed, tag ->
+                                        when( buttonPressed )
+                                        {
+                                            ConfirmationDialog.ButtonPress.Left -> {
+                                                requestIgnoreBatteryOptimizationsIfNeeded()
+                                            }
+                                            ConfirmationDialog.ButtonPress.Right -> {
+                                            }
+                                            ConfirmationDialog.ButtonPress.None -> {
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            ConfirmationDialog.ButtonPress.Right -> {
-                            }
-                            ConfirmationDialog.ButtonPress.None -> {
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
                             }
                         }
                     }
@@ -360,16 +362,16 @@ class MainFragment : Fragment()
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val intent = Intent()
-            val packageName = requireContext().packageName
-            val pm = requireContext().getSystemService(PowerManager::class.java)
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                intent.data = Uri.parse("package:$packageName")
-                startActivity(intent)
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            val intent = Intent()
+//            val packageName = requireContext().packageName
+//            val pm = requireContext().getSystemService(PowerManager::class.java)
+//            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+//                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+//                intent.data = Uri.parse("package:$packageName")
+//                startActivity(intent)
+//            }
+//        }
     }
 
     private fun isPermissionGranted(context: Context, permission: String): Boolean
@@ -415,13 +417,17 @@ class MainFragment : Fragment()
                     Manifest.permission.CAMERA,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.CHANGE_NETWORK_STATE,
                     Manifest.permission.NEARBY_WIFI_DEVICES
                 )
             } else {
                 arrayOf(
                     Manifest.permission.CAMERA,
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.CHANGE_NETWORK_STATE,
                 )
             }
     }
