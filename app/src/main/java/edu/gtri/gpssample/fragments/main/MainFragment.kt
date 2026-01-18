@@ -419,6 +419,8 @@ class MainFragment : Fragment()
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_NETWORK_STATE,
                     Manifest.permission.CHANGE_NETWORK_STATE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.NEARBY_WIFI_DEVICES
                 )
             } else {
@@ -428,6 +430,8 @@ class MainFragment : Fragment()
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_NETWORK_STATE,
                     Manifest.permission.CHANGE_NETWORK_STATE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
                 )
             }
     }
