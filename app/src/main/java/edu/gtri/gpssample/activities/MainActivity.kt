@@ -140,14 +140,21 @@ class MainActivity : AppCompatActivity(), InfoDialog.InfoDialogDelegate, Provide
         if(networkConnectionStatus != status)
         {
             networkConnectionStatus = status
-            runOnUiThread {
-                // pop up a dialog if the wifi is off
-                if(status == NetworkConnectionStatus.WIFI_NOT_AVAILABLE)
-                {
-                    InfoDialog( this, resources.getString(R.string.wifi_disabled),
-                        resources.getString(R.string.wifi_disabled_message), resources.getString(R.string.ok), null, this)
-                }
-            }
+
+//            val sharedPreferences: SharedPreferences = getSharedPreferences("default", 0)
+//            val isFirstRun = sharedPreferences.getBoolean("IsFirstRun", true )
+//
+//            if (!isFirstRun)
+//            {
+//                runOnUiThread {
+//                    // pop up a dialog if the wifi is off
+//                    if(status == NetworkConnectionStatus.WIFI_NOT_AVAILABLE)
+//                    {
+//                        InfoDialog( this, resources.getString(R.string.wifi_disabled),
+//                            resources.getString(R.string.wifi_disabled_message), resources.getString(R.string.ok), null, this)
+//                    }
+//                }
+//            }
         }
     }
 

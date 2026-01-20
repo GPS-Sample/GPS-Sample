@@ -418,6 +418,13 @@
     <string name="export_failed">"Nabigo ang pag-export"</string>
     <string name="select_map_engine">"Piliin ang Map Engine"</string>
     <string name="import_failed">"Error. Nabigo ang pag-import. Tiyaking pareho ang mga bersyon ng GPSSample."</string>
+    <string name="privacy_policy_statement">""Itinatala ng GPSSample ang iyong ruta (breadcrumb trail) habang naglalakbay ka sa pagitan ng mga sambahayan at mga sambahayan sa mapa.\n\nNagsisimula lamang ang pagre-record kapag pinindot mo ang RECORD button sa app at humihinto sa pagre-record kapag pinindot mo ang STOP button.\n\nPatuloy na kinokolekta ang lokasyon habang nagre-record, kahit na nasa background ang app o naka-lock ang iyong device.\n\nLigtas na nakaimbak ang data ng iyong lokasyon sa iyong device at ine-export lamang kung pipiliin mong gawin ito.\n\nMaaari mong bawiin ang access sa lokasyon sa background anumang oras sa Mga Setting ng Android.""</string>
+    <string name="accept_privacy_policy">"Paganahin ang Lokasyon sa Background:\nPAHINTUlutan SA LAHAT NG ORAS"</string>
+    <string name="decline_privacy_policy">"Hindi Ngayon:\nhindi gagana ang feature na pagsubaybay"</string>
+    <string name="background_location_permission">"Pahintulot sa Lokasyon sa Background"</string>
+    <string name="enable_background_activity_title">"Paganahin ang Aktibidad sa Background"</string>
+    <string name="enable_background_activity_body">"1. Pindutin ang buton na BUKASIN ANG MGA SETTING\n2. Hanapin ang GPSSample sa listahan.\n3. Paganahin ang PAHINTULOT SA AKTIBIDAD SA BACKGROUND.\n4. Bumalik sa app na ito."</string>
+    <string name="open_settings">"Buksan ang Mga Setting"</string>
     <string-array name="forgot_pin_questions">
         <item>"Panggitnang pangalan ng ama"</item>
         <item>"Pangalan ng dalaga ng ina"</item>

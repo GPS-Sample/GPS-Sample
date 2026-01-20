@@ -418,6 +418,13 @@
     <string name="export_failed">"Экспорт не удался"</string>
     <string name="select_map_engine">"Выбрать движок карты"</string>
     <string name="import_failed">""Ошибка. Импорт не удался. Убедитесь, что версии GPSSample совпадают.""</string>
+    <string name="privacy_policy_statement">""GPSSample записывает ваш маршрут (хлебные крошки) во время поездок между домохозяйствами и нанесения их на карту.\n\nЗапись начинается только после нажатия кнопки RECORD в приложении и останавливается после нажатия кнопки STOP.\n\nМестоположение собирается непрерывно во время записи, даже если приложение находится в фоновом режиме или ваше устройство заблокировано.\n\nДанные о вашем местоположении надежно хранятся на вашем устройстве и экспортируются только по вашему желанию.\n\nВы можете в любой момент отменить доступ к фоновому местоположению в настройках Android.""</string>
+    <string name="accept_privacy_policy">"Включить фоновое местоположение:\nВСЕГДА РАЗРЕШАТЬ"</string>
+    <string name="decline_privacy_policy">"Не сейчас:\nфункция отслеживания не будет работать"</string>
+    <string name="background_location_permission">"Разрешение на фоновое местоположение"</string>
+    <string name="enable_background_activity_title">"Включение фоновой активности"</string>
+    <string name="enable_background_activity_body">"1. Нажмите кнопку ОТКРЫТЬ НАСТРОЙКИ \n2. Найдите GPSSample в списке.\n3.Включите РАЗРЕШИТЬ ФОНОВУЮ АКТИВНОСТЬ.\n4. Вернитесь в это приложение."</string>
+    <string name="open_settings">"Откройте настройки"</string>
     <string-array name="forgot_pin_questions">
         <item>"Отчество отца"</item>
         <item>"Девичья фамилия матери"</item>

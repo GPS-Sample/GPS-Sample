@@ -628,13 +628,7 @@ class PerformCollectionFragment : Fragment(),
             val formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm")
             val dateTime = LocalDateTime.now().format(formatter)
 
-            var version = ""
-            val versionName = BuildConfig.VERSION_NAME.split( "#" )
-            if (versionName.size == 2)
-            {
-                version = versionName[1]
-            }
-
+            val versionName = BuildConfig.VERSION_NAME
             val clusterName = enumArea.name.replace(" ", "" ).uppercase()
 
             when(user.role)
@@ -642,13 +636,13 @@ class PerformCollectionFragment : Fragment(),
                 Role.Admin.value,
                 Role.Supervisor.value ->
                 {
-                    return "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${version}"
+                    return "${role}-${userName}-${clusterName}-DC-${dateTime!!}-${versionName}"
                 }
 
                 Role.Enumerator.value,
                 Role.DataCollector.value ->
                 {
-                    return "${role}-${userName}-${clusterName}-${dateTime!!}-${version}"
+                    return "${role}-${userName}-${clusterName}-${dateTime!!}-${versionName}"
                 }
                 Role.Undefined.value -> {}
             }

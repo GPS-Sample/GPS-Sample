@@ -8,7 +8,6 @@
 package edu.gtri.gpssample.fragments.main
 
 import android.Manifest
-import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -23,13 +22,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.google.common.io.Resources
 import com.mapbox.maps.Style
 import edu.gtri.gpssample.BuildConfig
 import edu.gtri.gpssample.R
@@ -38,11 +34,9 @@ import edu.gtri.gpssample.constants.FragmentNumber
 import edu.gtri.gpssample.constants.Keys
 import edu.gtri.gpssample.constants.Role
 import edu.gtri.gpssample.database.DAO
-import edu.gtri.gpssample.database.models.User
+import edu.gtri.gpssample.database.ImageDAO
 import edu.gtri.gpssample.databinding.FragmentMainBinding
-import edu.gtri.gpssample.receivers.NetworkStatusBroadcastReceiver
-import edu.gtri.gpssample.services.NetworkMonitorService.Companion.NETWORK_SERVICE_STATUS_KEY
-import edu.gtri.gpssample.utils.NetworkConnectionStatus
+import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 
 class MainFragment : Fragment()
@@ -259,6 +253,47 @@ class MainFragment : Fragment()
             }
         }
 
+        val key = "IsFirstRun"
+
+        view.post {
+            if (sharedPreferences.getBoolean(key, true ))
+            {
+                val editor = sharedPreferences.edit()
+                editor.putBoolean( key, false )
+                editor.commit()
+                view.post {
+                    if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                    {
+                        ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
+                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true ) { buttonPressed, tag ->
+                            when( buttonPressed )
+                            {
+                                ConfirmationDialog.ButtonPress.Left -> {
+                                    ConfirmationDialog( activity, resources.getString(R.string.enable_background_activity_title), resources.getString(R.string.enable_background_activity_body),
+                                        resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true ) { buttonPressed, tag ->
+                                        when( buttonPressed )
+                                        {
+                                            ConfirmationDialog.ButtonPress.Left -> {
+                                                requestIgnoreBatteryOptimizationsIfNeeded()
+                                            }
+                                            ConfirmationDialog.ButtonPress.Right -> {
+                                            }
+                                            ConfirmationDialog.ButtonPress.None -> {
+                                            }
+                                        }
+                                    }
+                                }
+                                ConfirmationDialog.ButtonPress.Right -> {
+                                }
+                                ConfirmationDialog.ButtonPress.None -> {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if (!allRuntimePermissionsGranted())
         {
             getRuntimePermissions()
@@ -268,7 +303,28 @@ class MainFragment : Fragment()
     override fun onResume()
     {
         super.onResume()
+
         (activity!!.application as? MainApplication)?.currentFragment = FragmentNumber.MainFragment.value.toString() + ": " + this.javaClass.simpleName
+    }
+
+    private fun requestIgnoreBatteryOptimizationsIfNeeded()
+    {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+
+        val context = requireContext()
+        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        if (pm.isIgnoringBatteryOptimizations(context.packageName)) return
+
+        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+
+        try {
+            requireActivity().startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            startActivity(
+                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            )
+        }
     }
 
     private fun allRuntimePermissionsGranted(): Boolean {
@@ -306,16 +362,16 @@ class MainFragment : Fragment()
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val intent = Intent()
-            val packageName = requireContext().packageName
-            val pm = requireContext().getSystemService(PowerManager::class.java)
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                intent.data = Uri.parse("package:$packageName")
-                startActivity(intent)
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            val intent = Intent()
+//            val packageName = requireContext().packageName
+//            val pm = requireContext().getSystemService(PowerManager::class.java)
+//            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+//                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+//                intent.data = Uri.parse("package:$packageName")
+//                startActivity(intent)
+//            }
+//        }
     }
 
     private fun isPermissionGranted(context: Context, permission: String): Boolean
@@ -355,22 +411,28 @@ class MainFragment : Fragment()
     {
         private const val REQUEST_CODE = 1
 
-        private val REQUIRED_RUNTIME_PERMISSIONS =
-            arrayOf(
-                Manifest.permission.INTERNET,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.CHANGE_NETWORK_STATE,
-                Manifest.permission.ACCESS_NETWORK_STATE,
-                Manifest.permission.ACCESS_WIFI_STATE,
-                Manifest.permission.CHANGE_WIFI_STATE,
-                Manifest.permission.CHANGE_WIFI_MULTICAST_STATE,
-                Manifest.permission.UPDATE_DEVICE_STATS,
-                Manifest.permission.NEARBY_WIFI_DEVICES,
-                Manifest.permission.FOREGROUND_SERVICE
-            )
+        private val REQUIRED_RUNTIME_PERMISSIONS: Array<String> =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.CHANGE_NETWORK_STATE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.NEARBY_WIFI_DEVICES
+                )
+            } else {
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.CHANGE_NETWORK_STATE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            }
     }
 }

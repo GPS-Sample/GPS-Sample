@@ -99,7 +99,7 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
                 {
                     editText.inputType = InputType.TYPE_CLASS_NUMBER
                     fieldData.numberValue?.let {
-                        editText.setText( it.toInt().toString())
+                        editText.setText( it.toLong().toString())
                     }
                 }
                 else
