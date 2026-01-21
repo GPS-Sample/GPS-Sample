@@ -265,12 +265,12 @@ class MainFragment : Fragment()
                     if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     {
                         ConfirmationDialog( activity, resources.getString(R.string.background_location_permission), resources.getString(R.string.privacy_policy_statement),
-                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true ) { buttonPressed, tag ->
+                            resources.getString(R.string.accept_privacy_policy), resources.getString(R.string.decline_privacy_policy), null, true, false ) { buttonPressed, tag ->
                             when( buttonPressed )
                             {
                                 ConfirmationDialog.ButtonPress.Left -> {
                                     ConfirmationDialog( activity, resources.getString(R.string.enable_background_activity_title), resources.getString(R.string.enable_background_activity_body),
-                                        resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true ) { buttonPressed, tag ->
+                                        resources.getString(R.string.open_settings), resources.getString(R.string.cancel), null, true, false ) { buttonPressed, tag ->
                                         when( buttonPressed )
                                         {
                                             ConfirmationDialog.ButtonPress.Left -> {

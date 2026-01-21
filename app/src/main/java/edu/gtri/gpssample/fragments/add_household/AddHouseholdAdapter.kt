@@ -98,7 +98,38 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         editText.doAfterTextChanged {
             if (it.toString().isNotEmpty())
             {
-                fieldData.numberValue = it.toString().toDouble()
+                val newNumberValue = it.toString().toDouble()
+
+                fieldData.numberValue?.let { oldNumberValue ->
+                    if (newNumberValue < oldNumberValue)
+                    {
+                        val removeList = ArrayList<FieldData>()
+
+                        for (blockFieldData in enumerationItem.fieldDataList)
+                        {
+                            DAO.fieldDAO.getField( blockFieldData.fieldUuid )?.let { blockField ->
+                                blockField.parentUUID?.let { uuid ->
+                                    if (uuid == field.uuid)
+                                    {
+                                        blockFieldData.blockNumber?.let { blockNumber ->
+                                            if (blockNumber > newNumberValue)
+                                            {
+                                                removeList.add( blockFieldData )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        for (removeField in removeList)
+                        {
+                            enumerationItem.fieldDataList.remove( removeField )
+                        }
+                    }
+                }
+
+                fieldData.numberValue = newNumberValue
                 layoutBlockAdapter( fieldData, field, blockLayout )
             }
         }

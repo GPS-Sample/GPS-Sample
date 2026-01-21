@@ -29,6 +29,9 @@ class ConfirmationDialog
     }
 
     constructor( context: Context?, title: String?, message: String?, leftButtonText: String, rightButtonText: String, tag: Any?, layoutVertically: Boolean, completion: (( buttonPressed: ButtonPress, tag: Any? )->Unit))
+    : this( context, title, message, leftButtonText, rightButtonText, tag, layoutVertically, true, completion )
+
+    constructor( context: Context?, title: String?, message: String?, leftButtonText: String, rightButtonText: String, tag: Any?, layoutVertically: Boolean, cancelable: Boolean, completion: (( buttonPressed: ButtonPress, tag: Any? )->Unit))
     {
         val inflater = LayoutInflater.from(context)
 
@@ -39,7 +42,7 @@ class ConfirmationDialog
 
         val alertDialog = builder.create()
 
-        alertDialog.setCancelable(false)
+        alertDialog.setCancelable( cancelable )
         alertDialog.show()
 
         val textView = view.findViewById<TextView>(R.id.text_view)
