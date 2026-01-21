@@ -717,7 +717,7 @@ class PerformCollectionFragment : Fragment(),
 
         if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
-            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20 )
 
             if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
             {

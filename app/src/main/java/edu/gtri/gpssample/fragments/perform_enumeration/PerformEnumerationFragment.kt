@@ -907,7 +907,7 @@ class PerformEnumerationFragment : Fragment(),
 
         if (pointList.isNotEmpty() && pointList[0].isNotEmpty())
         {
-            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20 )
 
             if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
             {
@@ -1318,6 +1318,8 @@ class PerformEnumerationFragment : Fragment(),
                     editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                     editor.commit()
 
+                    MapManager.instance().clearMap( mapView )
+
                     MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
                         refreshMap()
                     }
@@ -1328,6 +1330,8 @@ class PerformEnumerationFragment : Fragment(),
                     val editor = activity!!.getSharedPreferences("default", 0).edit()
                     editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                     editor.commit()
+
+                    MapManager.instance().clearMap( mapView )
 
                     MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
                         refreshMap()
