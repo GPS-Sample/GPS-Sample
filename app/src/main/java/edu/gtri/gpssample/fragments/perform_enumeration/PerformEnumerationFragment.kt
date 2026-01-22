@@ -911,13 +911,64 @@ class PerformEnumerationFragment : Fragment(),
 
             if (isShowingBreadcrumbs && enumArea.breadcrumbs.isNotEmpty())
             {
+                var numPaths = 1
+                var groupId: String = ""
+                var path = ArrayList<Breadcrumb>()
+                val paths = ArrayList<ArrayList<Breadcrumb>>()
+
                 for (breadcrumb in enumArea.breadcrumbs)
                 {
-                    MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
+                    if (groupId.isEmpty())
+                    {
+                        groupId = breadcrumb.groupId
+                        path.add( breadcrumb )
+                    }
+                    else if (breadcrumb.groupId == groupId)
+                    {
+                        path.add( breadcrumb )
+                    }
+                    else
+                    {
+                        numPaths += 1
+                        paths.add( path )
+                        groupId = breadcrumb.groupId
+                        path = ArrayList<Breadcrumb>()
+                        path.add( breadcrumb )
+                    }
                 }
 
+                // add the last path to the list
+                if (paths.size < numPaths)
+                {
+                    paths.add( path )
+                }
+
+                for (path in paths)
+                {
+                    if (path.size == 1)
+                    {
+                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
+                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
+                    }
+                    else if (path.size > 1)
+                    {
+                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
+                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
+                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
+                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
+                    }
+                    for (breadcrumb in path)
+                    {
+                        if (breadcrumb != path.first() && breadcrumb != path.last())
+                        {
+                            MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
+                        }
+                    }
+                }
+
+                groupId = ""
+
                 val breadcrumbs = ArrayList<Breadcrumb>()
-                var groupId: String = ""
 
                 for (breadcrumb in enumArea.breadcrumbs)
                 {
