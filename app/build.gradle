@@ -75,7 +75,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
     // MapBox
-    implementation 'com.mapbox.maps:android:11.16.6'
+    implementation 'com.mapbox.maps:android-ndk27:11.18.0'
 
     // GeoJson
     implementation("io.github.dellisd.spatialk:geojson:0.2.1")
@@ -87,7 +87,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation 'org.locationtech.jts:jts-core:1.19.0'
 
-    def camerax_version = '1.2.3'
+    def camerax_version = '1.4.0'
     implementation "androidx.camera:camera-camera2:$camerax_version"
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     implementation "androidx.camera:camera-view:$camerax_version"
