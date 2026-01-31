@@ -96,7 +96,9 @@ class CreateEnumerationTeamFragment : Fragment(),
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, this ) { mapView ->
+        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
@@ -207,7 +209,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
         if (pointList.isNotEmpty())
         {
-            MapManager.instance().createPolygon( mapView, pointList,Color.BLACK, 0x40)
+            MapManager.instance().createPolygon( mapView, pointList,Color.BLACK, 0x30)
 
             for (enumerationTeam in enumArea.enumerationTeams)
             {
@@ -222,7 +224,7 @@ class CreateEnumerationTeamFragment : Fragment(),
 
                 if (ptList.isNotEmpty() && ptList[0].isNotEmpty())
                 {
-                    MapManager.instance().createPolygon( mapView, ptList, Color.BLACK, 0x40, Color.RED, enumerationTeam.name )
+                    MapManager.instance().createPolygon( mapView, ptList, Color.BLACK, 0x30, Color.RED, enumerationTeam.name )
                 }
             }
 
@@ -320,7 +322,7 @@ class CreateEnumerationTeamFragment : Fragment(),
                                 val pointList = java.util.ArrayList<java.util.ArrayList<Point>>()
                                 pointList.add( vertices )
 
-                                intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList,Color.BLACK, 0x40 )
+                                intersectionPolygon = MapManager.instance().createPolygon( mapView, pointList,Color.BLACK, 0x30 )
 
                                 locationUuids.clear()
 
@@ -383,7 +385,9 @@ class CreateEnumerationTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -395,7 +399,9 @@ class CreateEnumerationTeamFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, this ) { mapView ->
+                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
                     refreshMap()
                 }
             }

@@ -127,7 +127,9 @@ class WalkEnumerationAreaFragment : Fragment(),
 
         binding.mapOverlayView.visibility = View.GONE
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom,this ) { mapView ->
             this.mapView = mapView
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
 //            binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
@@ -554,7 +556,9 @@ class WalkEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom,this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -566,7 +570,9 @@ class WalkEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom,this ) { mapView ->
                     refreshMap()
                 }
             }

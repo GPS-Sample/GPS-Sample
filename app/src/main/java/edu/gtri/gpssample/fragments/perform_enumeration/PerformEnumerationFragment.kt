@@ -190,7 +190,9 @@ class PerformEnumerationFragment : Fragment(),
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
             this.mapView = mapView
 
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
@@ -1371,7 +1373,9 @@ class PerformEnumerationFragment : Fragment(),
 
                     MapManager.instance().clearMap( mapView )
 
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom, this ) { mapView ->
                         refreshMap()
                     }
                 }
@@ -1384,7 +1388,9 @@ class PerformEnumerationFragment : Fragment(),
 
                     MapManager.instance().clearMap( mapView )
 
-                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                    MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom, this ) { mapView ->
                         refreshMap()
                     }
                 }

@@ -133,17 +133,17 @@ class MapManager
         }
     }
 
-    fun selectMapboxMap( activity: Activity, mapboxMapView: com.mapbox.maps.MapView, completion: ((mapView: View)->Unit) )
+    fun selectMapboxMap( activity: Activity, mapboxMapView: com.mapbox.maps.MapView, enumArea: EnumArea?, zoom: Double, completion: ((mapView: View)->Unit) )
     {
         val sharedPreferences: SharedPreferences = activity.getSharedPreferences("default", 0)
         val mapStyle = sharedPreferences.getString( Keys.kMapStyle.value, Style.MAPBOX_STREETS)
 
-        initializeMapboxMap( mapboxMapView, mapStyle!! ) {
+        initializeMapboxMap( mapboxMapView, mapStyle!!, enumArea, zoom ) {
             completion( mapboxMapView )
         }
     }
 
-    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
+    fun selectMap( activity: Activity, config: Config, osmMapView: org.osmdroid.views.MapView, mapBoxMapView: com.mapbox.maps.MapView, northUpImageView: ImageView, enumArea: EnumArea?, zoom: Double, delegate: MapManagerDelegate? = null, completion: ((mapView: View)->Unit) )
     {
         this.delegate = delegate
 
@@ -164,7 +164,7 @@ class MapManager
             mapBoxMapView.visibility = View.VISIBLE
             osmMapView.visibility = View.GONE
 
-            initializeMapboxMap( mapBoxMapView, mapStyle!! ) {
+            initializeMapboxMap( mapBoxMapView, mapStyle!!, enumArea, zoom ) {
                 completion( mapBoxMapView )
             }
         }
@@ -250,13 +250,22 @@ class MapManager
         completion()
     }
 
-    private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, completion: (()->Unit))
+    private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, enumArea: EnumArea?, zoom: Double, completion: (()->Unit))
     {
         createMapboxPointAnnotationManager( mapView )
         createMapboxPolygonAnnotationManager( mapView )
         createMapboxPolylineAnnotationManager( mapView )
 
         mapView.compass.marginTop = 50.0f
+
+        if (enumArea == null)
+        {
+            centerMap( GEORGIA_TECH, zoom, mapView )
+        }
+        else
+        {
+            centerMap( enumArea,zoom, mapView )
+        }
 
         mapView.getMapboxMap().loadStyle(
             com.mapbox.maps.extension.style.style(style) {
@@ -1112,6 +1121,8 @@ class MapManager
 
     companion object
     {
+        val GEORGIA_TECH = Point.fromLngLat(-84.39801338134015, 33.778349807286304 )
+
         private var _instance: MapManager? = null
 
         fun instance() : MapManager

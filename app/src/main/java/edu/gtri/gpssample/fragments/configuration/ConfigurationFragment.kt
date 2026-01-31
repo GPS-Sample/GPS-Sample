@@ -234,7 +234,10 @@ class ConfigurationFragment : Fragment(),
         binding.mapOverlayView.setOnTouchListener(this)
 
         sharedViewModel.currentConfiguration?.value?.let { config ->
-            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView ) { mapView ->
+
+            val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+            MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, zoom ) { mapView ->
                 MapManager.instance().enableLocationUpdates( activity!!, mapView )
                 MapManager.instance().startCenteringOnLocation( activity!!, mapView )
                 binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE

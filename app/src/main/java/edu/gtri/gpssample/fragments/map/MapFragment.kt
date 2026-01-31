@@ -92,7 +92,9 @@ class MapFragment : Fragment(),
         binding.northUpImageView.visibility = View.GONE
         binding.mapboxMapView.visibility = View.VISIBLE
 
-        MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+        MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
             this.mapView = mapView
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
             MapManager.instance().startCenteringOnLocation( activity!!, mapView )
@@ -321,7 +323,8 @@ class MapFragment : Fragment(),
                             binding.osmMapView.visibility = View.GONE
                             binding.northUpImageView.visibility = View.GONE
                             binding.mapboxMapView.visibility = View.VISIBLE
-                            MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+                            val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+                            MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
                                 this.mapView = mapView
                                 MapManager.instance().enableLocationUpdates( activity!!, mapView )
                                 MapManager.instance().startCenteringOnLocation( activity!!, mapView )
@@ -345,7 +348,9 @@ class MapFragment : Fragment(),
 
                 if (binding.mapboxMapView.visibility == View.VISIBLE)
                 {
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
                         this.mapView = mapView
                         if (centerOnLocation)
                         {
@@ -377,7 +382,9 @@ class MapFragment : Fragment(),
 
                 if (binding.mapboxMapView.visibility == View.VISIBLE)
                 {
-                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView ) { mapView ->
+                    val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                    MapManager.instance().selectMapboxMap( activity!!, binding.mapboxMapView, null, zoom ) { mapView ->
                         this.mapView = mapView
                         if (centerOnLocation)
                         {

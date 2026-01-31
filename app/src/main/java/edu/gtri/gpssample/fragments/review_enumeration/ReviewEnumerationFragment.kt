@@ -120,7 +120,9 @@ class ReviewEnumerationFragment : Fragment(),
             TileServer.startServer( enumArea.mbTilesPath )
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
             this.mapView = mapView
 
             binding.osmLabel.visibility = if (mapView is org.osmdroid.views.MapView) View.VISIBLE else View.GONE
@@ -216,7 +218,7 @@ class ReviewEnumerationFragment : Fragment(),
 
         pointList.add( points )
 
-        MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40 )
+        MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20 )
 
         for (enumerationTeam in enumArea.enumerationTeams)
         {
@@ -228,7 +230,7 @@ class ReviewEnumerationFragment : Fragment(),
             }
 
             pointList.add( points )
-            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x40, Color.RED, enumerationTeam.name )
+            MapManager.instance().createPolygon( mapView, pointList, Color.BLACK, 0x20, Color.RED, enumerationTeam.name )
         }
 
         for (location in enumArea.locations)
@@ -395,7 +397,9 @@ class ReviewEnumerationFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.MAPBOX_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -407,7 +411,9 @@ class ReviewEnumerationFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, Style.SATELLITE_STREETS )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, enumArea, zoom,this ) { mapView ->
                     refreshMap()
                 }
             }

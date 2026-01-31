@@ -161,7 +161,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             defaultColorList = it
         }
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, this ) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0,this ) { mapView ->
             this.mapView = mapView
 
             MapManager.instance().enableLocationUpdates( activity!!, mapView )
@@ -1179,7 +1179,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0,this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -1192,7 +1192,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                 editor.putString( Keys.kMapStyle.value, mapStyle )
                 editor.commit()
 
-                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+                MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0,this ) { mapView ->
                     refreshMap()
                 }
             }
@@ -1251,7 +1251,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
         TileServer.startServer( mbTilesPath )
 
-        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView,this ) { mapView ->
+        MapManager.instance().selectMap( activity!!, config, binding.osmMapView, binding.mapboxMapView, binding.northUpImageView, null, 0.0,this ) { mapView ->
             refreshMap()
         }
     }

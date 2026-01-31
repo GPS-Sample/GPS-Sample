@@ -62,6 +62,7 @@ import edu.gtri.gpssample.database.models.*
 import edu.gtri.gpssample.databinding.FragmentCreateEnumerationAreaBinding
 import edu.gtri.gpssample.dialogs.*
 import edu.gtri.gpssample.managers.MapManager
+import edu.gtri.gpssample.managers.MapManager.Companion.GEORGIA_TECH
 import edu.gtri.gpssample.managers.MapboxManager
 import edu.gtri.gpssample.managers.TileServer
 import edu.gtri.gpssample.utils.GeoUtils
@@ -179,6 +180,10 @@ class CreateEnumerationAreaFragment : Fragment(),
         }
 
         binding.mapboxMapView.gestures.addOnMapClickListener(this )
+
+        val zoom = sharedViewModel.currentZoomLevel?.value ?: 0.0
+
+        MapManager.instance().centerMap( GEORGIA_TECH, zoom, binding.mapboxMapView )
 
         if (config.enumAreas.isNotEmpty())
         {
