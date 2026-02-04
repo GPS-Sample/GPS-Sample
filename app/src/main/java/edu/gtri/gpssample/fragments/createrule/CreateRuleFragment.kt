@@ -327,6 +327,26 @@ class CreateRuleFragment : Fragment(),
                                             }
                                             else -> {}
                                         }
+
+                                        if (field.type == FieldType.Checkbox)
+                                        {
+                                            rule.value = ""
+
+                                            for (fieldDataOption in rule.fieldDataOptions)
+                                            {
+                                                if (fieldDataOption.value)
+                                                {
+                                                    if (rule.value.isEmpty())
+                                                    {
+                                                        rule.value = fieldDataOption.name
+                                                    }
+                                                    else
+                                                    {
+                                                        rule.value += ",${fieldDataOption.name}"
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
 
                                     FieldType.Number,
@@ -360,6 +380,9 @@ class CreateRuleFragment : Fragment(),
                                 }
                             }
                         }
+
+
+
 
                         sharedViewModel.addRule()
                         findNavController().popBackStack()
