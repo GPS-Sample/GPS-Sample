@@ -74,6 +74,10 @@ class BlockFieldAdapter( val parentFieldIndex: Int, val editMode: Boolean, val c
         var frameLayout: FrameLayout? = null
 
         when (field.type) {
+            FieldType.Note -> {
+                frameLayout = holder.frameLayout.findViewById(R.id.note_layout)
+            }
+
             FieldType.Text -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)

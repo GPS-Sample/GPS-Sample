@@ -61,7 +61,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
     val fieldTypes : Array<String>
         get() {
-            val array: Array<String> = Array(5)
+            val array: Array<String> = Array(6)
             { i ->
                 when (i) {
                     0 -> getString(R.string.text)
@@ -69,6 +69,7 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
                     2 -> getString(R.string.date)
                     3 -> getString(R.string.checkbox)
                     4 -> getString(R.string.dropdown)
+                    5 -> getString(R.string.note)
                     else -> String()
                 }
             }
@@ -304,6 +305,13 @@ class CreateFieldFragment : Fragment(), DatePickerDialog.DatePickerDialogDelegat
 
             when (fieldType)
             {
+                FieldType.Note -> {
+                    textLayout.visibility = View.GONE
+                    numberLayout.visibility = View.GONE
+                    dateLayout.visibility = View.GONE
+                    checkboxLayout.visibility = View.GONE
+                    dropdownLayout.visibility = View.GONE
+                }
                 FieldType.Text -> {
                     textLayout.visibility = View.VISIBLE
                     numberLayout.visibility = View.GONE

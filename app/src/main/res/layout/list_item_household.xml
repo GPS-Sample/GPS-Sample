@@ -11,5 +11,6 @@
     <include android:id="@+id/date_layout" android:visibility="gone" layout="@layout/list_item_date_field" />
     <include android:id="@+id/checkbox_layout" android:visibility="gone" layout="@layout/list_item_checkbox_field" />
     <include android:id="@+id/dropdown_layout" android:visibility="gone" layout="@layout/list_item_dropdown_field" />
+    <include android:id="@+id/note_layout" android:visibility="gone" layout="@layout/list_item_note_field" />
 
 </FrameLayout>

@@ -425,6 +425,9 @@
     <string name="enable_background_activity_title">"Enable Background Activity"</string>
     <string name="enable_background_activity_body">"1. Tap the OPEN SETTINGS button\n2. Find GPSSample in the list.\n3. Enable ALLOW BACKGROUND ACTIVITY.\n4. Return to this app."</string>
     <string name="open_settings">"Open Settings"</string>
+
+    <string name="note">"Note"</string>
+
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
         <item>"Mother's maiden name"</item>

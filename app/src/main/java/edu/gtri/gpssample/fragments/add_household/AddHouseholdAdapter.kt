@@ -9,12 +9,14 @@ package edu.gtri.gpssample.fragments.add_household
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -218,6 +220,10 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
         var frameLayout: FrameLayout? = null
 
         when (field.type) {
+            FieldType.Note -> {
+                frameLayout = holder.frameLayout.findViewById(R.id.note_layout)
+            }
+
             FieldType.Text -> {
                 frameLayout = holder.frameLayout.findViewById(R.id.text_layout)
                 val editText = frameLayout.findViewById<EditText>(R.id.edit_text)
@@ -384,6 +390,8 @@ class AddHouseholdAdapter( val editMode: Boolean, val config: Config, val enumer
             layout.visibility = View.VISIBLE
             val titleView = layout.findViewById<TextView>(R.id.title_text_view)
             titleView.text = "${field.index}. ${field.name}"
+//            val textColor = if (field.type == FieldType.Note) ContextCompat.getColor(titleView.context, R.color.primary) else Color.BLACK
+//            titleView.setTextColor( textColor )
         }
     }
 
