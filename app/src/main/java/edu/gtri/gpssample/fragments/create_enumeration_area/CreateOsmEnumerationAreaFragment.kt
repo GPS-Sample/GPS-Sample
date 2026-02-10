@@ -83,15 +83,18 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
     private var droppedPoints = ArrayList<com.mapbox.geojson.Point>()
     private var _binding: FragmentCreateEnumerationAreaBinding? = null
 
-    private var addHousehold = false
-    private var deleteEnumArea = false
-    private var createMapTileCache = false
-    private var createEnumAreaLocation = false
-    private var createEnumAreaBoundary = false
-
     private val kEnumAreaNameTag: Int = 0
     private val kEnumAreaLengthTag: Int = 1
-    private val kImportTag: Int = 3
+
+    enum class TapType {
+        None,
+        DeleteEnumArea,
+        CreateEnumAreaLocation,
+        AddHousehold,
+        CreateEnumAreaBoundary
+    }
+
+    private var currentTapType = TapType.None
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -200,7 +203,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         }
 
         binding.importButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache || deleteEnumArea)
+            if (currentTapType != TapType.None)
             {
                 return@setOnClickListener
             }
@@ -230,62 +233,21 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
         }
 
         binding.createEnumAreaButton.setOnClickListener {
-            if (addHousehold || createMapTileCache || deleteEnumArea)
-            {
-                return@setOnClickListener
-            }
-
-            if (createEnumAreaBoundary)
-            {
-                MapManager.instance().clearMap( mapView )
-                binding.mapOverlayView.visibility = View.GONE
-                binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
-                binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
-
-                if (droppedPoints.size > 2)
-                {
-                    if (GeoUtils.isSelfIntersectingPolygon1( droppedPoints ))
-                    {
-                        createEnumAreaBoundary = false
-                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag ) { action, text, tag ->
-                            when (action) {
-                                InputDialog.Action.DidCancel -> {
-                                    createEnumAreaBoundary = false
-                                    binding.createEnumAreaButton.backgroundTintList = defaultColorList
-                                }
-                                InputDialog.Action.DidEnterText -> {createEnumArea( text )}
-                                InputDialog.Action.DidPressQRButton -> {
-                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                    getResult.launch(intent)
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    createEnumAreaBoundary = false
-                }
-            }
-            else
+            if (currentTapType == TapType.None)
             {
                 droppedPoints.clear()
                 ConfirmationDialog( activity, resources.getString(R.string.creation_options), "", resources.getString(R.string.set_boundary), resources.getString(R.string.set_location), null, true ) { buttonPressed, tag ->
                     when( buttonPressed )
                     {
                         ConfirmationDialog.ButtonPress.Left -> {
-                            createEnumAreaBoundary = true
+                            currentTapType = TapType.CreateEnumAreaBoundary
                             binding.mapOverlayView.visibility = View.VISIBLE
                             binding.createEnumAreaButton.setBackgroundResource( R.drawable.save_blue )
                             binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                         }
                         ConfirmationDialog.ButtonPress.Right -> {
+                            currentTapType = TapType.CreateEnumAreaLocation
                             droppedPoints.clear()
-                            createEnumAreaLocation = true
                             binding.mapOverlayView.visibility = View.VISIBLE
                             binding.createEnumAreaButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                             Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.define_center), Toast.LENGTH_SHORT).show()
@@ -294,14 +256,54 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
                         }
                     }
                 }
+            }
+            else if (currentTapType == TapType.CreateEnumAreaLocation)
+            {
+                currentTapType = TapType.None
 
+                binding.mapOverlayView.visibility = View.GONE
+                binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+            }
+            else if (currentTapType == TapType.CreateEnumAreaBoundary)
+            {
+                currentTapType = TapType.None
+
+                binding.mapOverlayView.visibility = View.GONE
+                binding.createEnumAreaButton.setBackgroundResource( R.drawable.add_location_blue )
+                binding.createEnumAreaButton.setBackgroundTintList(defaultColorList);
+
+                MapManager.instance().clearMap( mapView )
+
+                if (droppedPoints.size > 2)
+                {
+                    if (GeoUtils.isSelfIntersectingPolygon1( droppedPoints ))
+                    {
+                        Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.polygon_is_self_intersecting), Toast.LENGTH_SHORT).show()
+                    }
+                    else
+                    {
+                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag ) { action, text, tag ->
+                            when (action) {
+                                InputDialog.Action.DidCancel -> {
+                                    binding.createEnumAreaButton.backgroundTintList = defaultColorList
+                                }
+                                InputDialog.Action.DidEnterText -> {createEnumArea( TapType.CreateEnumAreaBoundary, text )}
+                                InputDialog.Action.DidPressQRButton -> {
+                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                    getResult.launch(intent)
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
         binding.mapOverlayView.setOnTouchListener(this)
 
         binding.mapTileCacheButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || deleteEnumArea)
+            if (currentTapType != TapType.None)
             {
                 return@setOnClickListener
             }
@@ -315,43 +317,34 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             }
         }
 
-        binding.deleteButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation || addHousehold || createMapTileCache)
+        binding.editLocationButton.setOnClickListener {
+            if (currentTapType == TapType.None)
             {
-                return@setOnClickListener
-            }
-
-            if (deleteEnumArea)
-            {
-                deleteEnumArea = false
-                binding.mapOverlayView.visibility = View.GONE
-                binding.deleteButton.setBackgroundTintList( defaultColorList );
-            }
-            else
-            {
-                deleteEnumArea = true
+                currentTapType = TapType.DeleteEnumArea
                 binding.mapOverlayView.visibility = View.VISIBLE
-                binding.deleteButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+                binding.editLocationButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
                 Toast.makeText(activity!!.applicationContext,  resources.getString(R.string.select_ea), Toast.LENGTH_SHORT).show()
+            }
+            else if (currentTapType == TapType.DeleteEnumArea)
+            {
+                currentTapType = TapType.None
+                binding.mapOverlayView.visibility = View.GONE
+                binding.editLocationButton.setBackgroundTintList( defaultColorList );
             }
         }
 
         binding.addHouseholdButton.setOnClickListener {
-            if (createEnumAreaBoundary || createEnumAreaLocation || createMapTileCache || deleteEnumArea)
+            if (currentTapType == TapType.None)
             {
-                return@setOnClickListener
-            }
-
-            if (addHousehold)
-            {
-                addHousehold = false
-                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-            }
-            else
-            {
-                addHousehold = true
+                currentTapType = TapType.AddHousehold
                 binding.mapOverlayView.visibility = View.VISIBLE
                 binding.addHouseholdButton.setBackgroundTintList(ColorStateList.valueOf(resources.getColor(android.R.color.holo_red_light)));
+            }
+            else if (currentTapType == TapType.AddHousehold)
+            {
+                currentTapType = TapType.None
+                binding.mapOverlayView.visibility = View.VISIBLE
+                binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
             }
         }
 
@@ -640,79 +633,81 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             if (p1.action == MotionEvent.ACTION_UP) {
                 val point = MapManager.instance().getLocationFromPixelPoint(mapView, p1)
 
-                if (deleteEnumArea)
+                when( currentTapType )
                 {
-                    findEnumAreaOfLocation(
-                        getAllEnumAreas(),
-                        LatLng(point.latitude(), point.longitude())
-                    )?.let { enumArea ->
-                        deleteEnumArea = false
-                        binding.mapOverlayView.visibility = View.GONE
-                        binding.deleteButton.backgroundTintList = defaultColorList
+                    TapType.DeleteEnumArea -> {
+                        findEnumAreaOfLocation(
+                            getAllEnumAreas(),
+                            LatLng(point.latitude(), point.longitude())
+                        )?.let { enumArea ->
+                            currentTapType = TapType.None
+                            binding.mapOverlayView.visibility = View.GONE
+                            binding.editLocationButton.backgroundTintList = defaultColorList
 
-                        val items = ArrayList<String>()
-                        items.add(resources.getString(R.string.rename))
-                        items.add(resources.getString(R.string.delete))
-                        items.add(resources.getString(R.string.attach_mbtiles))
-                        items.add(resources.getString(R.string.detach_mbtiles))
+                            val items = ArrayList<String>()
+                            items.add(resources.getString(R.string.rename))
+                            items.add(resources.getString(R.string.delete))
+                            items.add(resources.getString(R.string.attach_mbtiles))
+                            items.add(resources.getString(R.string.detach_mbtiles))
 
-                        MultiConfirmationDialog(
-                            activity, resources.getString(R.string.select_task),
-                            "", items, enumArea, this
-                        )
-                    }
-                }
-                else if (createEnumAreaLocation)
-                {
-                    centerPoint = MapManager.instance().getLocationFromPixelPoint(mapView, p1)
-                    binding.mapOverlayView.visibility = View.GONE
-
-                    val inputDialog = InputDialog(activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag ) { action, text, tag ->
-                        when (action) {
-                            InputDialog.Action.DidCancel -> {}
-                            InputDialog.Action.DidEnterText -> {
-                                text.toDoubleOrNull()?.let {
-                                    binding.mapOverlayView.visibility = View.GONE
-                                    binding.createEnumAreaButton.backgroundTintList = defaultColorList
-
-                                    radius = it * 1000
-                                    inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, false ) { action, text, tag ->
-                                        when (action) {
-                                            InputDialog.Action.DidCancel -> {
-                                                createEnumAreaLocation = false
-                                                binding.createEnumAreaButton.backgroundTintList = defaultColorList
-                                            }
-                                            InputDialog.Action.DidEnterText -> {
-                                                createEnumArea( text )
-                                            }
-                                            InputDialog.Action.DidPressQRButton -> {
-                                                val intent = Intent(context, CameraXLivePreviewActivity::class.java)
-                                                getResult.launch(intent)
-                                            }
-                                        }
-                                    }
-
-                                }
+                            if (config.studies.isNotEmpty() && config.studies.first().samplingMethod == SamplingMethod.Strata)
+                            {
+                                items.add(resources.getString(R.string.select_strata))
                             }
-                            InputDialog.Action.DidPressQRButton -> {}
+
+                            MultiConfirmationDialog(
+                                activity, resources.getString(R.string.select_task),
+                                "", items, enumArea, this
+                            )
                         }
                     }
+                    TapType.AddHousehold -> {
+                        currentTapType = TapType.None
+                        binding.mapOverlayView.visibility = View.GONE
+                        binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
+                        createLocation(point.latitude(), point.longitude(), point.altitude())
+                        refreshMap()
+                    }
+                    TapType.CreateEnumAreaBoundary -> {
+                        droppedPoints.add( point )
+                        MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.location_blue, "" )
+                    }
+                    TapType.CreateEnumAreaLocation -> {
+                        centerPoint = MapManager.instance().getLocationFromPixelPoint(mapView, p1)
+                        binding.mapOverlayView.visibility = View.GONE
+                        binding.createEnumAreaButton.backgroundTintList = defaultColorList
+                        currentTapType = TapType.None
 
+                        val inputDialog = InputDialog(activity!!, false, resources.getString(R.string.map_tile_boundary), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaLengthTag ) { action, text, tag ->
+                            when (action) {
+                                InputDialog.Action.DidCancel -> {}
+                                InputDialog.Action.DidEnterText -> {
+                                    text.toDoubleOrNull()?.let {
+                                        radius = it * 1000
+                                        inputDialog = InputDialog( activity!!, true, resources.getString(R.string.enter_enum_area_name), "", resources.getString(R.string.cancel), resources.getString(R.string.save), kEnumAreaNameTag, false ) { action, text, tag ->
+                                            when (action) {
+                                                InputDialog.Action.DidCancel -> {
+                                                    binding.createEnumAreaButton.backgroundTintList = defaultColorList
+                                                }
+                                                InputDialog.Action.DidEnterText -> {
+                                                    createEnumArea( TapType.CreateEnumAreaLocation, text )
+                                                }
+                                                InputDialog.Action.DidPressQRButton -> {
+                                                    val intent = Intent(context, CameraXLivePreviewActivity::class.java)
+                                                    getResult.launch(intent)
+                                                }
+                                            }
+                                        }
 
-                    inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-                }
-                else if (addHousehold)
-                {
-                    addHousehold = false
-                    binding.mapOverlayView.visibility = View.GONE
-                    binding.addHouseholdButton.setBackgroundTintList(defaultColorList);
-                    createLocation(point.latitude(), point.longitude(), point.altitude())
-                    refreshMap()
-                }
-                else if (createEnumAreaBoundary)
-                {
-                    droppedPoints.add( point )
-                    MapManager.instance().createMarker( activity!!, mapView, point, R.drawable.location_blue, "" )
+                                    }
+                                }
+                                InputDialog.Action.DidPressQRButton -> {}
+                            }
+                        }
+
+                        inputDialog.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    }
+                    else -> {}
                 }
             }
         }
@@ -731,12 +726,10 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             }
         }
 
-    fun createEnumArea( name: String )
+    fun createEnumArea( tapType: TapType, name: String )
     {
-        if (createEnumAreaBoundary)
+        if (tapType == TapType.CreateEnumAreaBoundary)
         {
-            createEnumAreaBoundary = false
-
             val vertices = ArrayList<LatLon>()
 
             var creationDate = Date().time
@@ -757,21 +750,19 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
             if (name.isEmpty())
             {
-                selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+                selectedEnumArea = EnumArea( config.uuid, "", "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
                 unsavedEnumAreas.add( selectedEnumArea!! )
             }
             else
             {
-                selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
+                selectedEnumArea = EnumArea( config.uuid, "", name, "", 0, vertices, mapTileRegion )
                 unsavedEnumAreas.add( selectedEnumArea!! )
             }
 
             refreshMap()
         }
-        else if (createEnumAreaLocation)
+        else if (tapType == TapType.CreateEnumAreaLocation)
         {
-            createEnumAreaLocation = false
-
             centerPoint?.let { centerPoint ->
                 val r_earth = 6378000.0
                 var creationDate = Date().time
@@ -808,12 +799,12 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                 if (name.isEmpty())
                 {
-                    selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+                    selectedEnumArea = EnumArea( config.uuid, "", "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
                     unsavedEnumAreas.add( selectedEnumArea!! )
                 }
                 else
                 {
-                    selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
+                    selectedEnumArea = EnumArea( config.uuid, "", name, "", 0, vertices, mapTileRegion )
                     unsavedEnumAreas.add( selectedEnumArea!! )
                 }
 
@@ -876,6 +867,24 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
             resources.getString(R.string.detach_mbtiles) -> {
                 enumArea.mbTilesSize = 0
                 enumArea.mbTilesPath = ""
+            }
+            resources.getString(R.string.select_strata) -> {
+                val study = config.studies.first()
+
+                DropdownDialog(requireActivity(), resources.getString(R.string.select_strata), study.stratas ) { strata ->
+                    strata?.let { strata ->
+                        enumArea.strataUuid = strata.uuid
+                        if (enumArea.name.contains("[") && enumArea.name.contains("]"))
+                        {
+                            enumArea.name = enumArea.name.replace(Regex("\\[.*?]"), "[" + strata.name + "]")
+                        }
+                        else
+                        {
+                            enumArea.name = enumArea.name + "-[" + strata.name + "]"
+                        }
+                        refreshMap()
+                    }
+                }
             }
             else -> {}
         }
@@ -973,14 +982,19 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
     override fun dropdownDidSelectSaveButton( json: String, response: String )
     {
-        activity!!.runOnUiThread {
-            busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+        if (json.isEmpty())
+        {
         }
+        else
+        {
+            activity!!.runOnUiThread {
+                busyIndicatorDialog = BusyIndicatorDialog( activity!!, resources.getString(R.string.importing_locations), this, false )
+            }
 
-        Thread {
-            try
-            {
-                parseGeoJson( json, response )
+            Thread {
+                try
+                {
+                    parseGeoJson( json, response )
 
 //                if (showCurrentLocation && unsavedEnumAreas.isNotEmpty())
 //                {
@@ -992,20 +1006,21 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 //                        binding.centerOnLocationButton.setBackgroundTintList(defaultColorList);
 //                    }
 //                }
-            }
-            catch( ex: Exception)
-            {
-                activity!!.runOnUiThread {
-                    Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
                 }
-            }
+                catch( ex: Exception)
+                {
+                    activity!!.runOnUiThread {
+                        Toast.makeText(activity!!.applicationContext, resources.getString(R.string.import_failed), Toast.LENGTH_SHORT).show()
+                    }
+                }
 
-            busyIndicatorDialog?.let {
-                activity!!.runOnUiThread {
-                    it.alertDialog.cancel()
+                busyIndicatorDialog?.let {
+                    activity!!.runOnUiThread {
+                        it.alertDialog.cancel()
+                    }
                 }
-            }
-        }.start()
+            }.start()
+        }
     }
 
     override fun dropdownDidSelectCancelButton( json: String )
@@ -1049,7 +1064,7 @@ class CreateOsmEnumerationAreaFragment : Fragment(),
 
                         val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                        val enumArea = EnumArea(config.uuid, name, "", 0, vertices, mapTileRegion )
+                        val enumArea = EnumArea(config.uuid, "", name, "", 0, vertices, mapTileRegion )
 
                         activity!!.runOnUiThread {
                             sharedViewModel.currentZoomLevel?.value?.let { currentZoomLevel ->

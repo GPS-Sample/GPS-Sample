@@ -1097,12 +1097,12 @@ class CreateEnumerationAreaFragment : Fragment(),
 
         if (name.isEmpty())
         {
-            selectedEnumArea = EnumArea( config.uuid, "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
+            selectedEnumArea = EnumArea( config.uuid, "", "${resources.getString(R.string.enumeration_area)} ${unsavedEnumAreas.size + 1}", "", 0, vertices, mapTileRegion )
             unsavedEnumAreas.add( selectedEnumArea!! )
         }
         else
         {
-            selectedEnumArea = EnumArea( config.uuid, name, "", 0, vertices, mapTileRegion )
+            selectedEnumArea = EnumArea( config.uuid, "", name, "", 0, vertices, mapTileRegion )
             unsavedEnumAreas.add( selectedEnumArea!! )
         }
 
@@ -1335,7 +1335,7 @@ class CreateEnumerationAreaFragment : Fragment(),
 
                         val mapTileRegion = MapTileRegion( northEast, southWest )
 
-                        val enumArea = EnumArea(config.uuid, name, "", 0, vertices, mapTileRegion )
+                        val enumArea = EnumArea(config.uuid, "", name, "", 0, vertices, mapTileRegion )
 
                         unsavedEnumAreas.add(enumArea)
                     }

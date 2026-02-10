@@ -73,6 +73,7 @@ class EnumAreaDAO(private var dao: DAO)
         values.put( DAO.COLUMN_UUID, enumArea.uuid )
         values.put( DAO.COLUMN_CREATION_DATE, enumArea.creationDate )
         values.put( DAO.COLUMN_CONFIG_UUID, enumArea.configUuid )
+        values.put( DAO.COLUMN_STRATA_UUID, enumArea.strataUuid )
         values.put( DAO.COLUMN_ENUM_AREA_NAME, enumArea.name )
         values.put( DAO.COLUMN_ENUM_AREA_MBTILESPATH, enumArea.mbTilesPath )
         values.put( DAO.COLUMN_ENUM_AREA_MBTILESSIZE, enumArea.mbTilesSize )
@@ -86,13 +87,14 @@ class EnumAreaDAO(private var dao: DAO)
         val uuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_UUID))
         val creationDate = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_CREATION_DATE))
         val configUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_CONFIG_UUID))
+        val strataUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_STRATA_UUID))
         val name = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_NAME))
         val mbTilesPath = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_MBTILESPATH))
         val mbTilesSize = cursor.getLong(cursor.getColumnIndex(DAO.COLUMN_ENUM_AREA_MBTILESSIZE))
         val selectedEnumerationTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_ENUMERATION_TEAM_UUID))
         val selectedCollectionTeamUuid = cursor.getString(cursor.getColumnIndex(DAO.COLUMN_COLLECTION_TEAM_UUID))
 
-        return EnumArea( uuid, creationDate, configUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid )
+        return EnumArea( uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, selectedEnumerationTeamUuid, selectedCollectionTeamUuid )
     }
 
     fun exists( enumArea: EnumArea ): Boolean

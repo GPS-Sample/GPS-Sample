@@ -314,13 +314,16 @@ class SamplingViewModel : ViewModel()
                         }
                     }
 
-                    performSimpleRandomSampling()
+                    performSimpleRandomSampling( study.sampleSize, study.sampleType )
                 }
 
                 SamplingMethod.Cluster ->
                 {
-                    // TODO: init currentSampledItemsForSampling
-                    performClusterSampling()
+                    performClusterSampling( study.sampleSize, study.sampleType )
+                }
+                SamplingMethod.Strata ->
+                {
+                    performStrataSampling()
                 }
                 else -> {}
             }
@@ -329,7 +332,7 @@ class SamplingViewModel : ViewModel()
         }
     }
 
-    fun performSimpleRandomSampling()
+    fun performSimpleRandomSampling( studySampleSize: Int, studySampleType: SampleType )
     {
         val validSamples : ArrayList<EnumerationItem> = ArrayList()
 
@@ -424,54 +427,102 @@ class SamplingViewModel : ViewModel()
                 }
             }
 
-            currentStudy?.value?.let { study ->
-                var sampleSize = 0
+            var sampleSize = 0
 
-                when (study.sampleType)
+            when (studySampleType)
+            {
+                SampleType.NumberHouseholds ->
                 {
-                    SampleType.NumberHouseholds ->
+                    sampleSize =  min(studySampleSize,validSamples.size)
+                }
+                SampleType.PercentHouseholds ->
+                {
+                    sampleSize = (studySampleSize.toDouble() / 100.0 * validSamples.size.toDouble()).roundToInt()
+                }
+                SampleType.PercentTotal ->
+                {
+                    sampleSize = (studySampleSize.toDouble() / 100.0 * totalPopulation().toDouble()).roundToInt()
+                }
+                else -> {}
+            }
+
+            if (sampleSize == 0)
+            {
+                val fragment = currentFragment as? CreateSampleFragment
+                fragment?.let { fragment ->
+                    Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            else
+            {
+                val sampledIndices = ArrayList<Int>()
+
+                for (i in 0 until sampleSize)
+                {
+                    var rnds = (0 until validSamples.size).random()
+
+                    while(sampledIndices.contains(rnds))
                     {
-                        sampleSize =  min(study.sampleSize,validSamples.size)
+                        rnds = (0 until validSamples.size).random()
                     }
-                    SampleType.PercentHouseholds ->
-                    {
-                        sampleSize = (study.sampleSize.toDouble() / 100.0 * validSamples.size.toDouble()).roundToInt()
-                    }
-                    SampleType.PercentTotal ->
-                    {
-                        sampleSize = (study.sampleSize.toDouble() / 100.0 * totalPopulation().toDouble()).roundToInt()
-                    }
-                    else -> {}
+
+                    sampledIndices.add(rnds)
+                    validSamples[rnds].syncCode = validSamples[rnds].syncCode + 1
+                    validSamples[rnds].samplingState = SamplingState.Sampled
                 }
 
-                if (sampleSize == 0)
-                {
-                    val fragment = currentFragment as? CreateSampleFragment
-                    fragment?.let { fragment ->
-                        Toast.makeText( fragment.activity!!.applicationContext, "${fragment.activity!!.getString(R.string.no_eligible_households)}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                else
-                {
-                    val sampledIndices = ArrayList<Int>()
+                val fragment = currentFragment as? CreateSampleFragment
+                fragment?.sampleGenerated()
+            }
+        }
+    }
 
-                    for (i in 0 until sampleSize)
+    fun performClusterSampling( studySampleSize: Int, studySampleType: SampleType )
+    {
+        currentEnumArea?.value?.let { enumArea ->
+
+            _currentSampledItemsForSampling.clear()
+
+            for (location in enumArea.locations)
+            {
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                {
+                    for (sampledItem in location.enumerationItems)
                     {
-                        var rnds = (0 until validSamples.size).random()
-
-                        while(sampledIndices.contains(rnds))
+                        if(!_currentSampledItemsForSampling.contains(sampledItem))
                         {
-                            rnds = (0 until validSamples.size).random()
+                            _currentSampledItemsForSampling.add(sampledItem)
                         }
-
-                        sampledIndices.add(rnds)
-                        validSamples[rnds].syncCode = validSamples[rnds].syncCode + 1
-                        validSamples[rnds].samplingState = SamplingState.Sampled
                     }
-
-                    val fragment = currentFragment as? CreateSampleFragment
-                    fragment?.sampleGenerated()
                 }
+            }
+
+            performSimpleRandomSampling( studySampleSize, studySampleType )
+        }
+    }
+
+    fun performStrataSampling()
+    {
+        currentEnumArea?.value?.let { enumArea ->
+
+            _currentSampledItemsForSampling.clear()
+
+            for (location in enumArea.locations)
+            {
+                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
+                {
+                    for (sampledItem in location.enumerationItems)
+                    {
+                        if(!_currentSampledItemsForSampling.contains(sampledItem))
+                        {
+                            _currentSampledItemsForSampling.add(sampledItem)
+                        }
+                    }
+                }
+            }
+
+            DAO.strataDAO.getStrata( enumArea.strataUuid )?.let { strata ->
+                performSimpleRandomSampling(strata.sampleSize, strata.sampleType )
             }
         }
     }
@@ -508,31 +559,5 @@ class SamplingViewModel : ViewModel()
         }
 
         return total
-    }
-
-    fun performClusterSampling()
-    {
-        currentEnumArea?.value?.let { enumArea ->
-
-            _currentSampledItemsForSampling.clear()
-
-            for (location in enumArea.locations)
-            {
-                if (!location.isLandmark && location.enumerationItems.isNotEmpty())
-                {
-                    for (sampledItem in location.enumerationItems)
-                    {
-                        if(!_currentSampledItemsForSampling.contains(sampledItem))
-                        {
-                            _currentSampledItemsForSampling.add(sampledItem)
-                        }
-                    }
-                }
-            }
-
-            // generate sample this cluster
-
-            performSimpleRandomSampling()
-        }
     }
 }

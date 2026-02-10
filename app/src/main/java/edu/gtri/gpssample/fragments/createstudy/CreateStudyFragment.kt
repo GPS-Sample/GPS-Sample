@@ -9,13 +9,19 @@ package edu.gtri.gpssample.fragments.createstudy
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.ExpandableListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import edu.gtri.gpssample.R
 import edu.gtri.gpssample.application.MainApplication
 import edu.gtri.gpssample.constants.FieldType
@@ -29,7 +35,11 @@ import edu.gtri.gpssample.dialogs.ConfirmationDialog
 import edu.gtri.gpssample.database.models.Field
 import edu.gtri.gpssample.database.models.Filter
 import edu.gtri.gpssample.database.models.Rule
+import edu.gtri.gpssample.database.models.Strata
 import edu.gtri.gpssample.database.models.Study
+import edu.gtri.gpssample.dialogs.AddStrataDialog
+import edu.gtri.gpssample.dialogs.DropdownDialog
+import edu.gtri.gpssample.fragments.configuration.CreateStrataAdapter
 import edu.gtri.gpssample.viewmodels.ConfigurationViewModel
 import java.util.*
 
@@ -43,12 +53,13 @@ enum class DeleteMode(val value : Int)
 
 }
 
-class CreateStudyFragment : Fragment()
+class CreateStudyFragment : Fragment(), CreateStrataAdapter.CreateStrataAdapterDelegate
 {
     private lateinit var study: Study
     private var _binding: FragmentCreateStudyBinding? = null
     private val binding get() = _binding!!
     private lateinit var createStudyAdapter: CreateStudyAdapter
+    private lateinit var createStrataAdapter: CreateStrataAdapter
     private lateinit var sharedViewModel : ConfigurationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -76,6 +87,8 @@ class CreateStudyFragment : Fragment()
         createStudyAdapter.shouldAddField = this::shouldAddField
         createStudyAdapter.shouldAddRule = this::shouldAddRule
         createStudyAdapter.shouldAddFilter = this::shouldAddFilter
+        createStudyAdapter.setExpandableListViewHeight = this::setExpandableListViewHeight
+
 //        createStudyAdapter.didDeleteField = this::didDeleteField
 //        createStudyAdapter.didDeleteRule = this::didDeleteRule
 //        createStudyAdapter.didDeleteFilter = this::didDeleteFilter
@@ -110,6 +123,8 @@ class CreateStudyFragment : Fragment()
         binding.expandableListView.setAdapter(createStudyAdapter)
         binding.expandableListView.setChildDivider(getResources().getDrawable(R.color.clear))
 
+        setExpandableListViewHeight()
+
         binding.deleteImageView.setOnClickListener {
             ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_study_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
                 when( buttonPressed )
@@ -130,6 +145,31 @@ class CreateStudyFragment : Fragment()
             updateStudy()
         }
 
+        createStrataAdapter = CreateStrataAdapter(study.stratas, this )
+
+        val strataRecyclerView= view.findViewById<RecyclerView>(R.id.strata_recycler_view )
+        strataRecyclerView.itemAnimator = DefaultItemAnimator()
+        strataRecyclerView.adapter = createStrataAdapter
+        strataRecyclerView.layoutManager = LinearLayoutManager(activity )
+        strataRecyclerView.recycledViewPool.setMaxRecycledViews(0, 0 );
+
+        val addStrataButton= view.findViewById<Button>( R.id.add_strata_button )
+
+        addStrataButton.setOnClickListener {
+            val strata = Strata(study.uuid,"", 0, SampleType.NumberHouseholds )
+
+            AddStrataDialog(requireActivity(), strata ) { buttonPressed ->
+                if (buttonPressed == AddStrataDialog.ButtonPress.Save)
+                {
+                    if (!study.stratas.contains( strata ))
+                    {
+                        study.stratas.add( strata )
+                        createStrataAdapter.updateStratas(study.stratas )
+                    }
+                }
+            }
+        }
+
         sharedViewModel.createStudyModel.samplingMethod.observe( this, androidx.lifecycle.Observer { samplingMethod ->
             when(study.samplingMethod)
             {
@@ -148,6 +188,34 @@ class CreateStudyFragment : Fragment()
         sharedViewModel.createStudyModel.currentStudy?.value?.let{ study->
             createStudyAdapter.updateStudy( study )
         }
+    }
+
+    fun setExpandableListViewHeight() {
+
+        val adapter = binding.expandableListView.expandableListAdapter ?: return
+
+        var totalHeight = 0
+
+        for (i in 0 until adapter.groupCount)
+        {
+            val groupView = adapter.getGroupView(i, false, null, binding.expandableListView)
+            groupView.measure(0, 0)
+            totalHeight += groupView.measuredHeight
+
+            if (binding.expandableListView.isGroupExpanded(i))
+            {
+                for (j in 0 until adapter.getChildrenCount(i))
+                {
+                    val childView = adapter.getChildView(i, j, false, null, binding.expandableListView)
+                    childView.measure(0, 0)
+                    totalHeight += childView.measuredHeight
+                }
+            }
+        }
+
+        binding.expandableListView.layoutParams.height = totalHeight
+
+        binding.fragmentRootLayout.requestLayout()
     }
 
     private fun shouldAddField()
@@ -248,6 +316,38 @@ class CreateStudyFragment : Fragment()
         sharedViewModel.addStudy()
 
         findNavController().popBackStack()
+    }
+
+    override fun strataEditButtonPressed( strata: Strata )
+    {
+        AddStrataDialog(requireActivity(), strata ) { buttonPressed ->
+            if (buttonPressed == AddStrataDialog.ButtonPress.Save)
+            {
+                if (!study.stratas.contains( strata ))
+                {
+                    study.stratas.add( strata )
+                }
+
+                createStrataAdapter.updateStratas(study.stratas )
+            }
+        }
+    }
+
+    override fun strataDeleteButtonPressed( strata: Strata )
+    {
+        ConfirmationDialog(activity, resources.getString(R.string.please_confirm), resources.getString(R.string.delete_strata_message), resources.getString(R.string.no), resources.getString(R.string.yes), DeleteMode.deleteStudyTag.value, false) { buttonPressed, tag ->
+            when( buttonPressed )
+            {
+                ConfirmationDialog.ButtonPress.Left -> {
+                }
+                ConfirmationDialog.ButtonPress.Right -> {
+                    study.stratas.remove(strata )
+                    createStrataAdapter.updateStratas(study.stratas )
+                }
+                ConfirmationDialog.ButtonPress.None -> {
+                }
+            }
+        }
     }
 
     override fun onDestroyView()

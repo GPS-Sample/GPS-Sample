@@ -67,6 +67,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     TABLE_ENUM_AREA + "(" +
                     COLUMN_UUID + COLUMN_UUID_TYPE + "," +
                     COLUMN_CONFIG_UUID + " TEXT" + "," +
+                    COLUMN_STRATA_UUID + " TEXT" + "," +
                     COLUMN_CREATION_DATE + " INTEGER" + "," +
                     COLUMN_ENUM_AREA_NAME + " TEXT" + "," +
                     COLUMN_ENUM_AREA_MBTILESPATH + " TEXT" + "," +
@@ -89,6 +90,17 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                     COLUMN_STUDY_SAMPLE_SIZE_INDEX + " INTEGER" +
                     ") WITHOUT ROWID")
             db.execSQL(createTableStudy)
+
+            val createTableStrata = ("CREATE TABLE " +
+                    TABLE_STRATA + "(" +
+                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
+                    COLUMN_CREATION_DATE + " INTEGER" + "," +
+                    COLUMN_STUDY_UUID + " TEXT" + "," +
+                    COLUMN_STRATA_NAME + " TEXT" + "," +
+                    COLUMN_STRATA_SAMPLE_SIZE + " INTEGER" + "," +
+                    COLUMN_STRATA_SAMPLE_TYPE_INDEX + " INTEGER" +
+                    ") WITHOUT ROWID")
+            db.execSQL(createTableStrata)
 
             val createConnectorTableConfigStudy = ("CREATE TABLE " +
                     CONNECTOR_TABLE_CONFIG__STUDY + "(" +
@@ -400,6 +412,11 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         if (oldVersion == 314 && newVersion == 321)
         {
             migrateFrom314To321( db )
+            migrateFrom321To322( db )
+        }
+        if (oldVersion == 321 && newVersion == 322)
+        {
+            migrateFrom321To322( db )
         }
         else
         {
@@ -407,104 +424,53 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         }
     }
 
-    fun migrateFrom314To321XXX( db: SQLiteDatabase )
+    fun migrateFrom321To322(db: SQLiteDatabase)
     {
-        try
-        {
-            // Add new columns to Config table
-            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_MAP_ENGINE_INDEX INTEGER DEFAULT 0")
-            db.execSQL("ALTER TABLE $TABLE_CONFIG ADD COLUMN $COLUMN_CONFIG_VALID_USERS TEXT")
+        db.beginTransaction()
+        try {
+            // ----------------------------
+            // 1. Update EnumArea table
+            // ----------------------------
+            db.execSQL("ALTER TABLE $TABLE_ENUM_AREA ADD COLUMN $COLUMN_STRATA_UUID TEXT DEFAULT ''")
 
-            // Assign a default value for VALID_USERS to existing rows
-            db.execSQL("UPDATE $TABLE_CONFIG SET $COLUMN_CONFIG_VALID_USERS = '' WHERE $COLUMN_CONFIG_VALID_USERS IS NULL")
+            // ----------------------------
+            // 3. Create Strata table
+            // ----------------------------
+            val createTableStrata = """
+            CREATE TABLE $TABLE_STRATA (
+                $COLUMN_UUID $COLUMN_UUID_TYPE,
+                $COLUMN_CREATION_DATE INTEGER,
+                $COLUMN_STUDY_UUID TEXT,
+                $COLUMN_STRATA_NAME TEXT,
+                $COLUMN_STRATA_SAMPLE_SIZE INTEGER,
+                $COLUMN_STRATA_SAMPLE_TYPE_INDEX INTEGER
+            ) WITHOUT ROWID
+            """.trimIndent()
+            db.execSQL(createTableStrata)
 
-            // Rename old Location table
-            db.execSQL("ALTER TABLE $TABLE_LOCATION RENAME TO ${TABLE_LOCATION}_old")
-
-            // Create new Location table with updated schema
-            val createTableLocation = ("CREATE TABLE " +
-                    TABLE_LOCATION + "(" +
-                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
-                    COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_TIME_ZONE + " INTEGER" + "," +
-                    COLUMN_LOCATION_TYPE_ID + " INTEGER" + "," +
-                    COLUMN_LOCATION_GPS_ACCURACY + " INTEGER" + "," +
-                    COLUMN_LOCATION_LATITUDE + " REAL" + "," +
-                    COLUMN_LOCATION_LONGITUDE + " REAL" + "," +
-                    COLUMN_LOCATION_ALTITUDE + " REAL" + "," +
-                    COLUMN_LOCATION_IS_LANDMARK + " INTEGER" + "," +
-                    COLUMN_LOCATION_DESCRIPTION + " TEXT" + "," +
-                    COLUMN_LOCATION_IMAGE_UUID + " TEXT" + "," +
-                    COLUMN_LOCATION_IS_MULTI_FAMILY + " INTEGER" + "," +
-                    COLUMN_LOCATION_PROPERTIES + " STRING" +
-                    ") WITHOUT ROWID")
-            db.execSQL(createTableLocation)
-
-            // Migrate data from old Location table to new one
-            db.execSQL("""
-                INSERT INTO $TABLE_LOCATION (
-                    $COLUMN_UUID, $COLUMN_CREATION_DATE, $COLUMN_TIME_ZONE,
-                    $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
-                    $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
-                    $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
-                    $COLUMN_LOCATION_DESCRIPTION, $COLUMN_LOCATION_IMAGE_UUID,
-                    $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
-                )
-                SELECT
-                    $COLUMN_UUID, $COLUMN_CREATION_DATE, $COLUMN_TIME_ZONE,
-                    $COLUMN_LOCATION_TYPE_ID, $COLUMN_LOCATION_GPS_ACCURACY,
-                    $COLUMN_LOCATION_LATITUDE, $COLUMN_LOCATION_LONGITUDE,
-                    $COLUMN_LOCATION_ALTITUDE, $COLUMN_LOCATION_IS_LANDMARK,
-                    $COLUMN_LOCATION_DESCRIPTION, '' AS $COLUMN_LOCATION_IMAGE_UUID,
-                    $COLUMN_LOCATION_IS_MULTI_FAMILY, $COLUMN_LOCATION_PROPERTIES
-                FROM ${TABLE_LOCATION}_old
-            """)
-
-            // Extract imageData from the old Location table, create new Image in the Image db,
-            // Update the new Location table with the new Image Id
-
-            val cursor = db.rawQuery("SELECT $COLUMN_UUID, $COLUMN_LOCATION_IMAGE_DATA FROM ${TABLE_LOCATION}_old", null)
-
-            while (cursor.moveToNext())
-            {
-                val locationUuid = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_UUID))
-                val imageData = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION_IMAGE_DATA))
-
-                if (imageData != null && imageData.isNotEmpty())
-                {
-                    ImageDAO.instance().createImage(Image(locationUuid, imageData))?.let { image ->
-                        db.execSQL(
-                            "UPDATE $TABLE_LOCATION SET $COLUMN_LOCATION_IMAGE_UUID = ? WHERE $COLUMN_UUID = ?",
-                            arrayOf(image.uuid, locationUuid)
-                        )
-                    }
-                }
+            // ----------------------------
+            // 4. Update dbVersion in Config
+            // ----------------------------
+            val newDbVersion = 322
+            val contentValues = ContentValues().apply {
+                put(COLUMN_CONFIG_DB_VERSION, newDbVersion)
             }
+            db.update(TABLE_CONFIG, contentValues, null, null)
 
-            cursor.close()
-
-            // Drop old Location table
-            db.execSQL("DROP TABLE ${TABLE_LOCATION}_old")
-
-            // Create Breadcrumb table
-            val createTableBreadcrumb = ("CREATE TABLE " +
-                    TABLE_BREADCRUMB + "(" +
-                    COLUMN_UUID + COLUMN_UUID_TYPE + "," +
-                    COLUMN_CREATION_DATE + " INTEGER" + "," +
-                    COLUMN_ENUM_AREA_UUID + " TEXT" + "," +
-                    COLUMN_LATITUDE + " REAL" + "," +
-                    COLUMN_LONGITUDE + " REAL" + "," +
-                    COLUMN_GROUP_ID + " TEXT" +
-                    ") WITHOUT ROWID")
-            db.execSQL(createTableBreadcrumb)
-        }
-        catch (ex: Exception)
-        {
-            Log.d( "xxx", "Migration from DB 314 to 321 FAILED")
+            // ----------------------------
+            // 5. Commit transaction
+            // ----------------------------
+            db.setTransactionSuccessful()
+        } catch (ex: Exception) {
+            Log.d("xxx", "Migration from DB 321 to 322 FAILED: ${ex.message}")
+            throw ex // optional: rethrow so Android knows migration failed
+        } finally {
+            db.endTransaction()
         }
     }
 
-    fun migrateFrom314To321(db: SQLiteDatabase) {
+    fun migrateFrom314To321(db: SQLiteDatabase)
+    {
         db.beginTransaction()
         try {
             // ----------------------------
@@ -623,7 +589,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             db.execSQL("DROP TABLE IF EXISTS $CONNECTOR_TABLE_CONFIG__STUDY")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_FIELD")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_RULE")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTER")
+            db.execSQL("DROP TABLE IF EXISTS `$TABLE_FILTER`")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_FILTEROPERATOR")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUM_AREA")
             db.execSQL("DROP TABLE IF EXISTS $TABLE_ENUMERATION_TEAM")
@@ -730,6 +696,13 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_STUDY_SAMPLE_SIZE = "study_sample_size"
         const val COLUMN_STUDY_SAMPLE_SIZE_INDEX = "study_sample_size_index"
 
+        // Strata table
+        const val TABLE_STRATA = "strata"
+        const val COLUMN_STRATA_NAME = "strata_name"
+        const val COLUMN_STRATA_SAMPLE_SIZE = "strata_sample_size"
+        const val COLUMN_STRATA_SAMPLE_TYPE_INDEX = "strata_sample_type_index"
+        const val COLUMN_STRATA_UUID = "strata_uuid"
+
         // Field Table
         const val TABLE_FIELD = "field"
         const val COLUMN_FIELD_NAME = "field_name"
@@ -757,6 +730,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         const val COLUMN_RULE_NAME = "rule_name"
         const val COLUMN_RULE_VALUE = "rule_value"
         const val COLUMN_FILTEROPERATOR_UUID = "filter_operator_uuid"
+
         // Filter Table
         const val TABLE_FILTER = "filter"
         const val COLUMN_FILTER_NAME = "filter_name"
@@ -845,6 +819,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         private lateinit var _userDAO: UserDAO
         private lateinit var _configDAO: ConfigDAO
         private lateinit var _studyDAO: StudyDAO
+        private lateinit var _strataDAO: StrataDAO
         private lateinit var _fieldDAO: FieldDAO
         private lateinit var _fieldOptionDAO: FieldOptionDAO
         private lateinit var _ruleDAO: RuleDAO
@@ -863,6 +838,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
         val userDAO get() = _userDAO
         val configDAO get() = _configDAO
         val studyDAO get() = _studyDAO
+        val strataDAO get() = _strataDAO
         val fieldDAO get() = _fieldDAO
         val fieldOptionDAO get() = _fieldOptionDAO
         val ruleDAO get() = _ruleDAO
@@ -905,7 +881,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 db.execSQL("DELETE FROM $TABLE_FIELD_OPTION")
                 db.execSQL("DELETE FROM $CONNECTOR_TABLE_FIELD__FIELD_OPTION")
                 db.execSQL("DELETE FROM $TABLE_RULE")
-                db.execSQL("DELETE FROM $TABLE_FILTER")
+                db.execSQL("DELETE FROM `$TABLE_FILTER`")
                 db.execSQL("DELETE FROM $TABLE_FILTEROPERATOR")
                 db.execSQL("DELETE FROM $TABLE_ENUMERATION_TEAM")
                 db.execSQL("DELETE FROM $TABLE_COLLECTION_TEAM")
@@ -966,6 +942,7 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
                 _userDAO = UserDAO( _instance!! )
                 _configDAO = ConfigDAO( _instance!! )
                 _studyDAO = StudyDAO( _instance!! )
+                _strataDAO = StrataDAO( _instance!! )
                 _fieldDAO = FieldDAO( _instance!! )
                 _fieldOptionDAO = FieldOptionDAO( _instance!! )
                 _ruleDAO = RuleDAO( _instance!! )
@@ -985,6 +962,6 @@ class DAO(private var context: Context, name: String?, factory: SQLiteDatabase.C
             return _instance!!
         }
 
-        const val DATABASE_VERSION = 321
+        const val DATABASE_VERSION = 322
     }
 }

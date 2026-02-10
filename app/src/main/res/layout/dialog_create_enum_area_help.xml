@@ -84,30 +84,6 @@
             android:textStyle="normal" />
     </LinearLayout>
 
-<!--    <LinearLayout-->
-<!--        android:orientation="horizontal"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="40dp">-->
-
-<!--        <ImageView-->
-<!--            android:layout_marginStart="10dp"-->
-<!--            android:layout_width="40dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_gravity="start"-->
-<!--            app:srcCompat="@drawable/crop"/>-->
-
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:gravity="center_vertical"-->
-<!--            android:text="@string/define_map_tile_cache_region"-->
-<!--            android:textColor="@color/black"-->
-<!--            android:textSize="17sp"-->
-<!--            android:textStyle="normal" />-->
-<!--    </LinearLayout>-->
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_marginTop="20dp"
@@ -127,6 +103,30 @@
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:text="@string/download_map_tiles"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <ImageView
+            android:layout_marginStart="10dp"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:srcCompat="@drawable/edit_location"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/edit_location"
             android:textColor="@color/black"
             android:textSize="17sp"
             android:textStyle="normal" />

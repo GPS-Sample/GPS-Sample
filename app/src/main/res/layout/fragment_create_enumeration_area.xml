@@ -4,14 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
     <data>
         <variable
             name="viewModel"
             type="edu.gtri.gpssample.viewmodels.ConfigurationViewModel" />
-
-<!--        <variable-->
-<!--            name="createEnumerationAreaFragment"-->
-<!--            type="edu.gtri.gpssample.fragments.create_enumeration_area.CreateEnumerationAreaFragment" />-->
     </data>
 
     <LinearLayout
@@ -150,15 +147,6 @@
                     android:insetBottom="0dp"
                     android:background="@drawable/add_house_blue" />
 
-                <!--                <Button-->
-                <!--                    android:id="@+id/map_tile_region_button"-->
-                <!--                    android:layout_width="50dp"-->
-                <!--                    android:layout_height="50dp"-->
-                <!--                    android:layout_margin="5dp"-->
-                <!--                    android:insetTop="0dp"-->
-                <!--                    android:insetBottom="0dp"-->
-                <!--                    android:background="@drawable/crop" />-->
-
                 <Button
                     android:id="@+id/map_tile_cache_button"
                     android:layout_width="50dp"
@@ -169,13 +157,13 @@
                     android:background="@drawable/cache2" />
 
                 <Button
-                    android:id="@+id/delete_button"
+                    android:id="@+id/edit_location_button"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:background="@drawable/delete_blue" />
+                    android:background="@drawable/edit_location" />
 
                 <Button
                     android:id="@+id/center_on_location_button"

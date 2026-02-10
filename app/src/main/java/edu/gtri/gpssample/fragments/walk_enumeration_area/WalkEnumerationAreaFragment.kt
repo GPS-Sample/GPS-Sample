@@ -457,7 +457,7 @@ class WalkEnumerationAreaFragment : Fragment(),
 
             val mapTileRegion = MapTileRegion( northEast, southWest )
 
-            selectedEnumArea = EnumArea( config.uuid, name2, "", 0, vertices, mapTileRegion )
+            selectedEnumArea = EnumArea( config.uuid,"", name2, "", 0, vertices, mapTileRegion )
             config.enumAreas.add( selectedEnumArea!! )
 
             DAO.configDAO.createOrUpdateConfig( config )?.let { config ->

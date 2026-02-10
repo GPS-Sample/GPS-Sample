@@ -57,6 +57,16 @@ class MultiConfirmationDialog
         val thirdButton: Button
         val fourthButton: Button
 
+        if (items.size > 4)
+        {
+            val fifthButton = view.findViewById<Button>(R.id.fifth_button)
+            fifthButton.visibility = View.VISIBLE
+            fifthButton.setOnClickListener {
+                delegate.didSelectMultiButton(items[4], tag)
+                alertDialog.dismiss()
+            }
+        }
+
         firstButton = view.findViewById<Button>(R.id.first_button)
         secondButton = view.findViewById<Button>(R.id.second_button)
         thirdButton = view.findViewById<Button>(R.id.third_button)

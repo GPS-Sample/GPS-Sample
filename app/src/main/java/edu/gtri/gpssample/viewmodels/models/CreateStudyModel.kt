@@ -37,7 +37,8 @@ class CreateStudyModel {
     var samplingMethod : LiveData<SamplingMethod> = _samplingMethod
 
     var fragment : Fragment? = null
-    var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)//MutableLiveData<Int> = MutableLiveData(View.GONE)
+    var sampleTypesVisibility : ObservableBoolean = ObservableBoolean(true)
+    var strataVisibility : ObservableBoolean = ObservableBoolean(false)
 
     val samplingMethodPosition : MutableLiveData<Int>
         get() = _samplingMethodPosition
@@ -202,15 +203,22 @@ class CreateStudyModel {
 
                 _samplingTypes.clear()
 
+                sampleTypesVisibility.set(false)
+
                 when(study.samplingMethod)
                 {
                     SamplingMethod.SimpleRandom -> {
+                        strataVisibility.set(false)
                         sampleTypesVisibility.set(true)
                     }
                     SamplingMethod.Cluster -> {
+                        strataVisibility.set(false)
                         sampleTypesVisibility.set(true)
                     }
-                    else -> {sampleTypesVisibility.set(false)}
+                    SamplingMethod.Strata -> {
+                        strataVisibility.set( true )
+                    }
+                    else -> {}
                 }
             }
         }

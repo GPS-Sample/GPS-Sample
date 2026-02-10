@@ -27,6 +27,7 @@ data class EnumArea (
     var uuid : String,
     var creationDate: Long,
     var configUuid: String,
+    var strataUuid: String,
     var name: String,
     var mbTilesPath: String,
     var mbTilesSize: Long,
@@ -39,11 +40,11 @@ data class EnumArea (
     var mapTileRegion: MapTileRegion?,
     var breadcrumbs: ArrayList<Breadcrumb>)
 {
-    constructor( uuid: String, creationDate: Long, configUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String )
-            : this(uuid, creationDate, configUuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid,null, ArrayList<Breadcrumb>())
+    constructor( uuid: String, creationDate: Long, configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, selectedEnumerationTeamUuid: String, selectedCollectionTeamUuid: String )
+            : this(uuid, creationDate, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, ArrayList<LatLon>(), ArrayList<Location>(), ArrayList<EnumerationTeam>(), selectedEnumerationTeamUuid, ArrayList<CollectionTeam>(), selectedCollectionTeamUuid,null, ArrayList<Breadcrumb>())
 
-    constructor( configUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
-            : this(UUID.randomUUID().toString(), Date().time, configUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>())
+    constructor( configUuid: String, strataUuid: String, name: String, mbTilesPath: String, mbTilesSize: Long, vertices: ArrayList<LatLon>, mapTileRegion: MapTileRegion?)
+            : this(UUID.randomUUID().toString(), Date().time, configUuid, strataUuid, name, mbTilesPath, mbTilesSize, vertices, ArrayList<Location>(), ArrayList<EnumerationTeam>(), "", ArrayList<CollectionTeam>(), "", mapTileRegion, ArrayList<Breadcrumb>())
 
     fun equals( other: EnumArea ): Boolean
     {

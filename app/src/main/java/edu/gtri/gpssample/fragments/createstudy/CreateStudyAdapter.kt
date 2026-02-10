@@ -8,6 +8,7 @@
 package edu.gtri.gpssample.fragments.createstudy
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,8 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
     lateinit var didSelectField: ((field: Field) -> Unit)
     lateinit var didSelectRule: ((rule: Rule) -> Unit)
     lateinit var didSelectFilter: ((filter: Filter) -> Unit)
+
+    lateinit var setExpandableListViewHeight: (() -> Unit)
 
     lateinit var shouldAddField: (() -> Unit)
     lateinit var shouldAddRule: (() -> Unit)
@@ -199,6 +202,10 @@ class CreateStudyAdapter(var context: Context) : BaseExpandableListAdapter()
         {
             upImageView.visibility = View.GONE
             downImageView.visibility = View.VISIBLE
+        }
+
+        view.post {
+            setExpandableListViewHeight()
         }
 
         val addButton = view.findViewById<ImageView>(R.id.add_button)

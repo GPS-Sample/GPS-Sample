@@ -61,6 +61,12 @@ class StudyDAO(private var dao: DAO)
             DAO.filterDAO.createOrUpdateFilter(filter, study);
         }
 
+        // add stratas
+        for (strata in study.stratas)
+        {
+            DAO.strataDAO.createOrUpdateStrata( strata )
+        }
+
         return study
     }
 
@@ -118,6 +124,7 @@ class StudyDAO(private var dao: DAO)
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
+            study.stratas = DAO.strataDAO.getStratasWithStudyUuid(uuid )
         }
 
         cursor.close()
@@ -141,6 +148,7 @@ class StudyDAO(private var dao: DAO)
             study.fields = DAO.fieldDAO.getFields(study)
             // study.rules is loaded by getFields()
             study.filters.addAll(DAO.filterDAO.getFilters(study))
+            study.stratas = DAO.strataDAO.getStratasWithStudyUuid(study.uuid )
         }
 
         cursor.close()

@@ -427,6 +427,11 @@
     <string name="open_settings">"Open Settings"</string>
 
     <string name="note">"Note"</string>
+    <string name="edit_location">"Edit Location"</string>
+    <string name="add_strata">"Add Strata"</string>
+    <string name="select_strata">"Select Strata"</string>
+    <string name="strata_name">"Strata Name"</string>
+    <string name="delete_strata_message">"Are you sure you want to permanently delete this strata?"</string>
 
     <string-array name="forgot_pin_questions">
         <item>"Father's middle name"</item>
