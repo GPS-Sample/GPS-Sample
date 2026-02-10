@@ -105,7 +105,7 @@ class StrataDAO(private var dao: DAO)
     fun getStratasWithStudyUuid( studyUuid: String ): ArrayList<Strata>
     {
         val stratas = ArrayList<Strata>()
-        val query = "SELECT * FROM ${DAO.TABLE_STRATA} WHERE ${DAO.COLUMN_STUDY_UUID} = '$studyUuid'"
+        val query = "SELECT * FROM ${DAO.TABLE_STRATA} WHERE ${DAO.COLUMN_STUDY_UUID} = '$studyUuid' ORDER BY ${DAO.COLUMN_CREATION_DATE}"
         val cursor = dao.writableDatabase.rawQuery(query, null)
 
         while (cursor.moveToNext())
