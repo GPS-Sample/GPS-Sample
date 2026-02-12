@@ -18,168 +18,116 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:id="@+id/fragment_root_layout"
-            android:orientation="vertical"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <FrameLayout
-                android:background="@color/primary"
-                android:layout_width="match_parent"
-                android:layout_height="50dp">
-
-                <ImageView
-                    android:id="@+id/delete_image_view"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    app:srcCompat="@drawable/delete_white"/>
-            </FrameLayout>
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
             <LinearLayout
+                android:id="@+id/fragment_root_layout"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-                <TextView
+                <FrameLayout
+                    android:background="@color/primary"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/filter_name"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
+                    android:layout_height="50dp">
 
-                <EditText
-                    android:id="@+id/name_edit_text"
-                    android:inputType="textCapWords"
-                    android:imeOptions="actionDone"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:text="@={viewModel.createFilterModel.currentFilter.name}"
-                    android:hint="@string/enter_filter_name" />
+                    <ImageView
+                        android:id="@+id/delete_image_view"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="end"
+                        app:srcCompat="@drawable/delete_white"/>
+                </FrameLayout>
 
-                <TextView
-                    android:layout_marginTop="20dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="20dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/filters"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_margin="20dp"
-                    android:layout_weight="1"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:adapter="@{viewModel.createFilterModel.createFilterAdapter}"
-                    />
-
-                <Button
-                    android:id="@+id/add_rule_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/add_condition" />
-
-
-
-                <TextView
-                    android:id="@+id/sample_size_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/sample_size"
-                    android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.GONE : View.VISIBLE}"
-                    android:textSize="17sp"
-                    android:textColor="@color/primary_textcolor" />
                 <LinearLayout
-                    android:id="@+id/sample_size_layout"
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:visibility="@{viewModel.createStudyModel.sampleTypesVisibility ? View.GONE : View.VISIBLE}"
-                    >
-                    <EditText
-                        android:id="@+id/sample_size_edit_text"
-                        android:gravity="center"
-                        android:inputType="number"
-                        android:imeOptions="actionDone"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_marginLeft="20dp"
-                        android:text="@={viewModel.createFilterModel.currentSampleSize}"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                        />
-                    <FrameLayout
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/filter_name"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <EditText
+                        android:id="@+id/name_edit_text"
+                        android:inputType="textCapWords"
+                        android:imeOptions="actionDone"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="10dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
-                        android:background="@drawable/spinner_frame"
-                        >
-                        <Spinner
-                            android:id="@+id/sampling_type_spinner"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:entries="@{viewModel.createStudyModel.SampleTypes}"
-                            android:selectedItemPosition="@={viewModel.createFilterModel.samplingTypePosition}"
-                            android:onItemSelected="@{viewModel.createFilterModel::onSampleTypeSelected}"
-                            android:contentDescription="@string/sampling_type"/>
-                    </FrameLayout>
+                        android:text="@={viewModel.createFilterModel.currentFilter.name}"
+                        android:hint="@string/enter_filter_name" />
 
+                    <TextView
+                        android:layout_marginTop="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="20dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/filters"
+                        android:textSize="17sp"
+                        android:textColor="@color/primary_textcolor" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_view"
+                        android:layout_margin="20dp"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:adapter="@{viewModel.createFilterModel.createFilterAdapter}"
+                        />
+
+                    <Button
+                        android:id="@+id/add_rule_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/add_condition" />
                 </LinearLayout>
-
             </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/save" />
         </LinearLayout>
-    </ScrollView>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/cancel" />
-
-        <Button
-            android:id="@+id/save_button"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/save" />
-    </LinearLayout>
     </LinearLayout>
 </layout>

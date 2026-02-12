@@ -70,21 +70,6 @@ class CreateFilterFragment : Fragment()
             this.executePendingBindings()
         }
 
-//
-//            if (sampleSizeIsVisible)
-//            {
-//                if (filter.sampleSize > 0)
-//                {
-//                    when(filter.sampleSizeIndex)
-//                    {
-//                        0 -> binding.sampleSize1EditText.setText(filter.sampleSize.toString())
-//                        1 -> binding.sampleSize2EditText.setText(filter.sampleSize.toString())
-//                        2 -> binding.sampleSize3EditText.setText(filter.sampleSize.toString())
-//                    }
-//                }
-//            }
-
-
         createFilterAdapter = sharedViewModel.createFilterModel.createFilterAdapter
         createFilterAdapter.shouldEditFilterRule = this::shouldEditFilterRule
         createFilterAdapter.shouldDeleteFilterRule = this::shouldDeleteFilterRule
@@ -100,27 +85,7 @@ class CreateFilterFragment : Fragment()
             sharedViewModel.createNewFilterRule()
 
             findNavController().navigate(R.id.action_navigate_to_SelectRuleDialogFragment, bundle)
-
-//            SelectRuleDialogFragment().show(
-//                childFragmentManager, SelectRuleDialogFragment.TAG)
-
-            //SelectedRuleDialog( activity!!, sharedViewModel, null, null, this )
         }
-
-//        binding.sampleSize1EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-//            binding.sampleSize2EditText.setText("")
-//            binding.sampleSize3EditText.setText("")
-//        }
-//
-//        binding.sampleSize2EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-//            binding.sampleSize1EditText.setText("")
-//            binding.sampleSize3EditText.setText("")
-//        }
-//
-//        binding.sampleSize3EditText.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-//            binding.sampleSize1EditText.setText("")
-//            binding.sampleSize2EditText.setText("")
-//        }
 
         binding.deleteImageView.setOnClickListener {
             sharedViewModel.createStudyModel.currentStudy?.value?.let { study ->
