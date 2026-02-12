@@ -11,18 +11,15 @@ enum class SampleType(val format : String) {
     None("None"),
     NumberHouseholds("# of Households"),
     PercentHouseholds("% of all Households"),
-    PercentTotal("% of total population"),
-
 }
 
 object SampleTypeConverter
 {
-    val array : Array<String> = Array(4){ i ->
+    val array : Array<String> = Array(2){ i ->
             when(i)
             {
                 0 -> SampleType.NumberHouseholds.format
                 1 -> SampleType.PercentHouseholds.format
-                2 -> SampleType.PercentTotal.format
                 else -> String()
             }
     }
@@ -33,7 +30,6 @@ object SampleTypeConverter
         {
             SampleType.NumberHouseholds -> 1
             SampleType.PercentHouseholds -> 2
-            SampleType.PercentTotal -> 3
             else -> 0
         }
     }
@@ -44,7 +40,6 @@ object SampleTypeConverter
         {
             1 -> SampleType.NumberHouseholds
             2 -> SampleType.PercentHouseholds
-            3 -> SampleType.PercentTotal
             else -> SampleType.None
         }
     }
@@ -55,7 +50,6 @@ object SampleTypeConverter
         {
             1 -> SampleType.NumberHouseholds
             2 -> SampleType.PercentHouseholds
-            3 -> SampleType.PercentTotal
             else -> SampleType.None
         }
     }
@@ -66,7 +60,6 @@ object SampleTypeConverter
         {
             SampleType.NumberHouseholds -> 0
             SampleType.PercentHouseholds -> 1
-            SampleType.PercentTotal -> 2
             else -> 0
         }
     }
@@ -76,7 +69,6 @@ object SampleTypeConverter
         {
             SampleType.NumberHouseholds.format -> SampleType.NumberHouseholds
             SampleType.PercentHouseholds.format -> SampleType.PercentHouseholds
-            SampleType.PercentTotal.format -> SampleType.PercentTotal
             else -> SampleType.None
         }
     }

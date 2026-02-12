@@ -439,10 +439,6 @@ class SamplingViewModel : ViewModel()
                 {
                     sampleSize = (studySampleSize.toDouble() / 100.0 * validSamples.size.toDouble()).roundToInt()
                 }
-                SampleType.PercentTotal ->
-                {
-                    sampleSize = (studySampleSize.toDouble() / 100.0 * totalPopulation().toDouble()).roundToInt()
-                }
                 else -> {}
             }
 
@@ -525,39 +521,5 @@ class SamplingViewModel : ViewModel()
                 performSimpleRandomSampling(strata.sampleSize, strata.sampleType )
             }
         }
-    }
-
-    fun totalPopulation() : Int
-    {
-        var total = 0
-
-        currentConfig?.value?.let { config ->
-            for (enumArea in config.enumAreas)
-            {
-                for (location in enumArea.locations)
-                {
-                    if (!location.isLandmark && location.enumerationItems.isNotEmpty())
-                    {
-                        for (enumerationItem in location.enumerationItems)
-                        {
-                            if (enumerationItem.enumerationState == EnumerationState.Enumerated)
-                            {
-                                for (fieldData in enumerationItem.fieldDataList)
-                                {
-                                    DAO.fieldDAO.getField( fieldData.fieldUuid )?.let { field ->
-                                        if (field.type == FieldType.Number && field.numberOfResidents)
-                                        {
-                                            total += 1
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return total
     }
 }

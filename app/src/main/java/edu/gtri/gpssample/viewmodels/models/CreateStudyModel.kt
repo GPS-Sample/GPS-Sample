@@ -78,7 +78,6 @@ class CreateStudyModel {
 
                         0 -> fragment.getString(R.string.numberhouseholds)
                         1 -> fragment.getString(R.string.percenthouseholds)
-                        2 -> fragment.getString(R.string.percenttotal)
                         else -> String()
                     }
                 }
