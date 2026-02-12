@@ -116,7 +116,7 @@ data class Config(
         set(value){
             value.toIntOrNull()?.let {
                 proximityWarningValue = it
-            } ?: {proximityWarningValue = 10}
+            } ?: {proximityWarningValue = 5}
         }
 
     fun pack() : String

@@ -228,7 +228,7 @@ class ConfigurationViewModel : ViewModel()
     fun createNewConfiguration()
     {
         val timeZone = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60 / 60
-        val newConfig = Config(timeZone,"", DAO.DATABASE_VERSION, 0, DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 10 )
+        val newConfig = Config(timeZone,"", DAO.DATABASE_VERSION, 0, DateFormat.None, TimeFormat.None, DistanceFormat.None, 20, "", false, false, false, true, 5 )
         _currentConfiguration = MutableLiveData(newConfig)
         //saveNewConfiguration()
     }
