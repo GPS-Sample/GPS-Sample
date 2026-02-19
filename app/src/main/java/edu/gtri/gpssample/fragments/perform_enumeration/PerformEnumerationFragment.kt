@@ -1172,7 +1172,8 @@ class PerformEnumerationFragment : Fragment(),
             val dateTime = LocalDateTime.now().format(formatter)
 
             val versionName = BuildConfig.VERSION_NAME
-            val clusterName = enumArea.name.replace(" ", "" ).uppercase()
+            var clusterName = enumArea.name.replace(" ", "" ).uppercase()
+            clusterName = clusterName.replace(Regex("-\\[.*?]"), "")
 
             when(user.role)
             {
