@@ -47,6 +47,7 @@ import com.mapbox.maps.TilesetDescriptorOptions
 import com.mapbox.maps.extension.style.expressions.dsl.generated.interpolate
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.LocationPuck2D
+import com.mapbox.maps.plugin.annotation.AnnotationConfig
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
@@ -117,6 +118,7 @@ class MapManager
     private val MIN_ZOOM = 8
     private val MAX_ZOOM = 18
 
+    var mapboxBreadcrumbAnnotationManager: PointAnnotationManager? = null
     var mapboxPointAnnotationManager: PointAnnotationManager? = null
     var mapboxPolygonAnnotationManager: PolygonAnnotationManager? = null
     var mapboxPolylineAnnotationManager: PolylineAnnotationManager?= null
@@ -252,10 +254,6 @@ class MapManager
 
     private fun initializeMapboxMap( mapView: com.mapbox.maps.MapView, style: String, enumArea: EnumArea?, zoom: Double, completion: (()->Unit))
     {
-        createMapboxPointAnnotationManager( mapView )
-        createMapboxPolygonAnnotationManager( mapView )
-        createMapboxPolylineAnnotationManager( mapView )
-
         mapView.compass.marginTop = 50.0f
 
         if (enumArea == null)
@@ -278,6 +276,11 @@ class MapManager
             },
             object : Style.OnStyleLoaded {
                 override fun onStyleLoaded(style: Style) {
+                    createMapboxPolygonAnnotationManager( mapView )
+                    createMapboxPolylineAnnotationManager( mapView )
+                    createMapboxBreadcrumbAnnotationManager( mapView )
+                    createMapboxPointAnnotationManager( mapView )
+
                     mapView.location.updateSettings {
                         this.enabled = true
                         this.locationPuck = LocationPuck2D(
@@ -445,7 +448,9 @@ class MapManager
 
     fun createMapboxPointAnnotationManager( mapView: MapView )
     {
-        mapboxPointAnnotationManager = mapView.annotations.createPointAnnotationManager()
+        mapboxPointAnnotationManager = mapView.annotations.createPointAnnotationManager(
+            AnnotationConfig(layerId = "markers")
+        )
 
         mapboxPointAnnotationManager!!.apply {
             addClickListener(
@@ -461,14 +466,21 @@ class MapManager
         }
     }
 
+    fun createMapboxBreadcrumbAnnotationManager( mapView: MapView )
+    {
+        mapboxBreadcrumbAnnotationManager = mapView.annotations.createPointAnnotationManager(
+            AnnotationConfig(layerId = "breadcrumbs")
+        )
+    }
+
     fun createMapboxPolylineAnnotationManager( mapView: MapView )
     {
-        mapboxPolylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager()
+        mapboxPolylineAnnotationManager = mapView.annotations.createPolylineAnnotationManager(AnnotationConfig(layerId = "polylines"))
     }
 
     fun createMapboxPolygonAnnotationManager( mapView: MapView )
     {
-        mapboxPolygonAnnotationManager = mapView.annotations.createPolygonAnnotationManager()
+        mapboxPolygonAnnotationManager = mapView.annotations.createPolygonAnnotationManager(AnnotationConfig(layerId = "polygons"))
     }
 
     fun clearMap( mapView: View )
@@ -509,6 +521,7 @@ class MapManager
             mapboxPolygonAnnotationManager?.deleteAll()
             mapboxPolylineAnnotationManager?.deleteAll()
             mapboxPointAnnotationManager?.deleteAll()
+            mapboxBreadcrumbAnnotationManager?.deleteAll()
         }
     }
 
@@ -547,7 +560,7 @@ class MapManager
                 fillPaint.color = fillColor
                 fillPaint.alpha = fillOpacity
                 outlinePaint.color = borderColor
-                outlinePaint.strokeWidth = 8f
+                outlinePaint.strokeWidth = 4f
             }
 
             mapView.overlays.add(polygon)
@@ -642,7 +655,7 @@ class MapManager
         createPolyline( mapView, points, Color.BLUE, 2f )
     }
 
-    fun createPolyline( mapView: View, points: List<Point>, color: Int, lineWidth: Float = 10.0f ) : Any?
+    fun createPolyline( mapView: View, points: List<Point>, color: Int, lineWidth: Float = 4.0f ) : Any?
     {
         if (mapView is org.osmdroid.views.MapView)
         {
@@ -799,6 +812,82 @@ class MapManager
                         .withTextField( title )
 
                     pointAnnotationManager.create(pointAnnotationOptions)
+                }
+            }
+        }
+    }
+
+    fun createBreadcrumb( context: Context, mapView: View, point: Point, @DrawableRes resourceId: Int, title: String = "" )
+    {
+        if (mapView is org.osmdroid.views.MapView)
+        {
+            val marker = org.osmdroid.views.overlay.Marker(mapView)
+            marker.position = GeoPoint( point.latitude(), point.longitude())
+            marker.setAnchor( org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_CENTER)
+
+            val icon: Drawable? = ContextCompat.getDrawable(context, resourceId)
+            val paddedIcon = InsetDrawable(icon, 36, 36, 36, 36)
+
+            marker.title = title
+            marker.icon = paddedIcon
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            mapView.overlays.add(marker)
+
+            if (title.isNotEmpty())
+            {
+                val textOverlay = object : TextOverlay()
+                {
+                    override fun draw( canvas: Canvas, mapView: org.osmdroid.views.MapView, shadow: Boolean)
+                    {
+                        if (!shadow)
+                        {
+                            val point = GeoPoint(point.latitude(), point.longitude())
+                            val screenPoint = android.graphics.Point()
+                            mapView.projection.toPixels(point, screenPoint)
+
+                            val paint = Paint().apply {
+                                color = android.graphics.Color.BLACK
+                                textSize = 30f
+                                isAntiAlias = true
+                                textAlign = Paint.Align.LEFT
+                            }
+
+                            val textBounds = Rect()
+                            paint.getTextBounds(title, 0, title.length, textBounds)
+                            val textWidth = textBounds.width()
+                            val textHeight = textBounds.height()
+
+                            val x = screenPoint.x.toFloat() - textWidth / 2
+                            val y = screenPoint.y.toFloat() + textHeight / 2
+
+                            canvas.drawText(title, x, y, paint)
+                        }
+                    }
+                }
+
+                mapView.overlays.add(textOverlay)
+            }
+
+            mapView.invalidate()
+        }
+        else if (mapView is com.mapbox.maps.MapView)
+        {
+            mapView.getMapboxMap().getStyle { style ->
+                val iconId = "custom-marker-${resourceId}"
+
+                if (style.getStyleImage(iconId) == null)
+                {
+                    val bitmap = convertDrawableToBitmap(AppCompatResources.getDrawable(context,resourceId))!!
+                    style.addImage(iconId, bitmap)
+                }
+
+                mapboxBreadcrumbAnnotationManager?.let { pointAnnotationManager ->
+                    val pointAnnotationOptions = PointAnnotationOptions()
+                        .withPoint( point )
+                        .withIconImage( iconId )
+                        .withTextField( title )
+
+                    pointAnnotationManager.create( pointAnnotationOptions )
                 }
             }
         }

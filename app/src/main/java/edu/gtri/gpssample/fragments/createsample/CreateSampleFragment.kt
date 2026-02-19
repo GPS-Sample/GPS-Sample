@@ -168,7 +168,7 @@ class CreateSampleFragment : Fragment(), MapManager.MapManagerDelegate
                     }
                 }
             }
-            else if (study.samplingMethod == SamplingMethod.Cluster)
+            else if (study.samplingMethod == SamplingMethod.Cluster || study.samplingMethod == SamplingMethod.Strata)
             {
                 sharedViewModel.enumAreaViewModel.currentEnumArea?.value?.let { enumArea ->
                     for (location in DAO.locationDAO.getLocations( enumArea ))

@@ -760,21 +760,21 @@ class PerformCollectionFragment : Fragment(),
                 {
                     if (path.size == 1)
                     {
-                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
+                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
+                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
                     }
                     else if (path.size > 1)
                     {
-                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
-                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
-                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
-                        MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
+                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.start_breadcrumb, "")
+                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.first().longitude, path.first().latitude), R.drawable.breadcrumb, "")
+                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.end_breadcrumb, "")
+                        MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(path.last().longitude, path.last().latitude), R.drawable.breadcrumb, "")
                     }
                     for (breadcrumb in path)
                     {
                         if (breadcrumb != path.first() && breadcrumb != path.last())
                         {
-                            MapManager.instance().createMarker( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
+                            MapManager.instance().createBreadcrumb( activity!!, mapView, Point.fromLngLat(breadcrumb.longitude, breadcrumb.latitude), R.drawable.breadcrumb, "")
                         }
                     }
                 }
